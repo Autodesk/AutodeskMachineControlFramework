@@ -1,0 +1,45 @@
+Output/logs/*.db
+Output/data/*.db
+Output/*.db
+Output/*.dll
+Output/*.ilk
+Output/*.db-journal
+Output/*.exe
+Output/*.pdb
+Output/*.dist
+Output/dist.xml
+build
+ACT/LibMC_component
+ACT/LibMCDriverEnv_component
+ACT/LibMCDriver_component
+ACT/LibMCPlugin_component
+ACT/LibMCEnv_component
+ACT/LibMCData_component
+
+Client/.DS_Store
+Client/node_modules
+Client/dist
+Client/dist.xml
+
+# local env files
+Client/.env.local
+Client/.env.*.local
+
+# Log files
+Client/npm-debug.log*
+Client/yarn-debug.log*
+Client/yarn-error.log*
+
+# Editor directories and files
+Client/.idea
+Client/.vscode
+Client/*.suo
+Client/*.ntvs*
+Client/*.njsproj
+Client/*.sln
+Client/*.sw?
+
+Framework/HeadersCore/Go
+Drivers/ScanLab/Dependencies
+Drivers/ScanLab/BinaryData
+Drivers/Marlin/BinaryData

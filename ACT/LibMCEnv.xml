@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="MC Environment Interface" namespace="LibMCEnv" copyright="Autodesk Inc." year="2020" basename="libmcenv"
+	version="1.0.0">
+
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+		
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />				
+		<error name="PARAMETERGROUPNOTFOUND" code="9" description="Parameter group not found" />
+		<error name="PARAMETERNOTFOUND" code="10" description="Parameter not found" />
+		<error name="COULDNOTFINDSIGNALDEFINITON" code="11" description="Could not find signal definition" />
+		<error name="COULDNOTTRIGGERSIGNAL" code="12" description="Could not trigger signal" />
+		<error name="SIGNALNOTFOUND" code="13" description="Signal not found" />
+		<error name="TERMINATED" code="14" description="operation has been terminated." />
+		<error name="SIGNALHASTRIGGEREDTWICE" code="15" description="signal has been triggered twice." />
+		<error name="SIGNALHASNOTBEENTRIGGERED" code="16" description="signal has not been triggered." />
+	
+		
+	</errors>
+	
+	<enum name="ToolpathSegmentType">
+		<option name="Unknown" value="0" />
+		<option name="Hatch" value="1" />
+		<option name="Loop" value="2" />
+		<option name="Polyline" value="3" />
+	</enum>
+	
+	<struct name="Position2D">
+		<member name="Coordinates" type="single" rows="2"/>
+	</struct>
+	
+	<class name="Base">
+	</class>
+
+	<class name="ToolpathLayer" parent="Base">
+	  
+		<method name="GetLayerDataUUID" description="Retrieves the layerdata's uuid">
+			<param name="UUID" type="string" pass="return" description="Returns the uuid value." />
+		</method>
+		
+		<method name="GetSegmentCount" description="Retrieves the count of segments.">
+			<param name="Count" type="uint32" pass="return" description="Count" />
+		</method>
+		
+		<method name="GetSegmentInfo" description="Retrieves the segment type information .">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Type" type="enum" class="ToolpathSegmentType" pass="out" description="Segment Type" />
+			<param name="PointCount" type="uint32" pass="out" description="Point count of segment." />
+		</method>
+				
+		<method name="GetSegmentProfileUUID" description="Retrieves the assigned segment profile uuid.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="ProfileUUID" type="string" pass="return" description="Segment Profile UUID" />
+		</method>
+		
+		<method name="GetSegmentPartUUID" description="Retrieves the assigned segment part uuid.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />
+		</method>
+		
+		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array" />
+		</method>
+		
+	</class>
+
+
+	<class name="ToolpathAccessor" parent="Base">
+	
+		<method name="GetUUID" description="Returns Toolpath data UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns toolpath data uuid." />
+		</method>
+	
+		<method name="GetLayerCount" description="Returns layer count.">
+			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
+		</method>
+
+		<method name="LoadLayer" description="Reads and returns a layer object.">
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index." />
+			<param name="LayerData" type="class" class="ToolpathLayer" pass="return" description="Toolpath layer object." />
+		</method>
+	
+	</class>
+
+
+	<class name="SignalTrigger" parent="Base" description="Class for signal triggering">
+
+		<method name="CanTrigger" description="Returns, if signal channel is available.">
+			<param name="ChannelIsAvailable" type="bool" pass="return" description="Returns true, if signal channel is available." />
+		</method>
+
+		<method name="Trigger" description="Triggers a signal, if signal channel is available.">
+		</method>
+
+		<method name="WaitForHandling" description="Waits until the signal is reset.">
+			<param name="TimeOut" type="uint32" pass="in" description="Timeout in Milliseconds. 0 for Immediate return." />			
+			<param name="Success" type="bool" pass="return" description="Flag if signal handling has been handled." />
+		</method>
+		
+		<method name="GetName" description="Returns the signal name.">
+			<param name="SignalName" type="string" pass="return" description="Name Of Signal" />
+		</method>
+		
+		<method name="GetStateMachine" description="Returns the signal state machine instance.">
+			<param name="StateMachineName" type="string" pass="return" description="Name Of State Machine" />
+		</method>
+
+		<method name="SetString" description="sets a string value">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
+		<method name="SetDouble" description="sets a double">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="double" pass="in" description="Value" />
+		</method>
+
+		<method name="SetInteger" description="sets an int.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="int64" pass="in" description="Value" />
+		</method>
+
+		<method name="SetBool" description="sets a bool">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="bool" pass="in" description="Value" />
+		</method>
+
+		<method name="GetStringResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+		<method name="GetDoubleResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="double" pass="return" description="Value" />
+		</method>
+
+		<method name="GetIntegerResult" description="returns an int value of the result.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="int64" pass="return" description="Value" />
+		</method>
+
+		<method name="GetBoolResult" description="returns a bool value of the result.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="bool" pass="return" description="Value" />
+		</method>
+
+	</class>
+
+
+
+	<class name="SignalHandler" parent="Base" description="Class for signal handling">
+
+		<method name="SignalHandled" description="Marks signal as handled and resets signal channel.">
+		</method>
+		
+		<method name="GetName" description="Returns the signal name.">
+			<param name="SignalName" type="string" pass="return" description="Name Of Signal" />
+		</method>
+
+		<method name="GetSignalID" description="Returns the signal id.">
+			<param name="SignalID" type="string" pass="return" description="Signal Identifier" />
+		</method>
+		
+		<method name="GetStateMachine" description="Returns the signal state machine instance.">
+			<param name="StateMachineName" type="string" pass="return" description="Name Of State Machine" />
+		</method>
+
+		<method name="GetString" description="gets a string value">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+		<method name="GetDouble" description="gets a double">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="double" pass="return" description="Value" />
+		</method>
+
+		<method name="GetInteger" description="gets an int.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="int64" pass="return" description="Value" />
+		</method>
+
+		<method name="GetBool" description="gets a bool">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="bool" pass="return" description="Value" />
+		</method>
+
+		<method name="SetStringResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
+		<method name="SetDoubleResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="double" pass="in" description="Value" />
+		</method>
+
+		<method name="SetIntegerResult" description="sets an int.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="int64" pass="in" description="Value" />
+		</method>
+
+		<method name="SetBoolResult" description="sets a bool">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="bool" pass="in" description="Value" />
+		</method>
+
+	</class>
+
+
+	<class name="StateEnvironment" parent="Base" description="Environment of the state">
+	  
+		<method name="CreateSignal" description="creates a signal object to trigger.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="SignalName" type="string" pass="in" description="Name Of signal channel." />
+			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />
+		</method>
+	  
+		<method name="WaitForSignal" description="waits for a signal.">
+			<param name="SignalName" type="string" pass="in" description="Name Of Signal" />
+			<param name="TimeOut" type="uint32" pass="in" description="Timeout in Milliseconds. 0 for Immediate return." />			
+			<param name="HandlerInstance" type="optionalclass" class="SignalHandler" pass="out" description="Signal object. If Success is false, the Signal Handler Object will be null." />
+			<param name="Success" type="bool" pass="return" description="Signal has been triggered" />
+		</method>		
+
+		<method name="GetDriverLibrary" description="Returns the driver type and library lookup for a specific registered driver.">
+			<param name="DriverName" type="string" pass="in" description="Name identifier of the driver." />
+			<param name="DriverType" type="string" pass="out" description="returns type identifier of the driver." />
+			<param name="DriverLookup" type="pointer" pass="out" description="GetProcAddress Handle of the driver." />
+		</method>
+
+		<method name="CreateDriverAccess" description="Accesses and locks a driver for the execution of the current state.">
+			<param name="DriverName" type="string" pass="in" description="Name identifier of the driver." />
+			<param name="DriverHandle" type="pointer" pass="out" description="Handle of the driver." />
+		</method>
+
+		<method name="LoadToolpath" description="Loads a toolpath from disk into memory.">
+			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
+		</method>
+
+		<method name="UnloadToolpath" description="unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.">
+			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
+		</method>
+
+		<method name="UnloadAllToolpathes" description="unloads all toolpath in memory to clean up">
+		</method>
+
+		<method name="CreateToolpathAccessor" description="creates an accessor object for a toolpath, if loaded to memory before.">
+			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
+			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="UUID of the toolpath entity." />
+		</method>
+
+		<method name="ToolpathIsLoaded" description="checks, if a toolpath object is loaded to memory.">
+			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
+			<param name="IsLoaded" type="bool" pass="return" description="returns if toolpath is loaded." />
+		</method>
+
+
+		<method name="SetNextState" description="sets the next state">
+			<param name="StateName" type="string" pass="in" description="Name of next state" />
+		</method>
+
+		<method name="LogMessage" description="logs a string as message">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogWarning" description="logs a string as warning">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogInfo" description="logs a string as info">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+		<method name="CheckForTermination" description="checks environment for termination signal. MUST be called frequently in longer-running operations.">
+			<param name="ShallTerminate" type="bool" pass="return" description="Returns if termination shall appear" />
+		</method>
+
+
+
+		<method name="StoreString" description="stores a string in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
+		<method name="StoreInteger" description="stores a string in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="int64" pass="in" description="Value" />
+		</method>
+
+		<method name="StoreDouble" description="stores a string in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="double" pass="in" description="Value" />
+		</method>
+
+		<method name="StoreBool" description="stores a string in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="bool" pass="in" description="Value" />
+		</method>
+
+		<method name="StoreSignal" description="stores a signal handler in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Handler" type="class" class="SignalHandler" pass="in" description="Signal handler to store." />
+		</method>
+
+		<method name="RetrieveString" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+		<method name="RetrieveInteger" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="int64" pass="return" description="Value" />
+		</method>
+
+		<method name="RetrieveDouble" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="double" pass="return" description="Value" />
+		</method>
+
+		<method name="RetrieveBool" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="bool" pass="return" description="Value" />
+		</method>
+
+		<method name="RetrieveSignal" description="retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Handler" type="class" class="SignalHandler" pass="return" description="Signal handler instance." />
+		</method>
+
+		<method name="ClearStoredValue" description="deletes a value from the data store.">
+			<param name="Name" type="string" pass="in" description="Name" />
+		</method>
+		
+		
+		<method name="SetStringParameter" description="sets a string parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetDoubleParameter" description="sets a double parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetIntegerParameter" description="sets an int parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetBoolParameter" description="sets a bool parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="in" description="Value to set" />
+		</method>
+
+		<method name="GetStringParameter" description="returns a string parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetDoubleParameter" description="returns a double parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetIntegerParameter" description="returns an int parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetBoolParameter" description="returns a bool parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="return" description="Value to set" />
+		</method>
+		
+
+
+	</class>
+
+
+		
+	<global baseclassname="Base" 
+		stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>		
+		
+	</global>
+	
+	
+</component>
+

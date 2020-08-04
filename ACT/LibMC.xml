@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="Machine Control library" namespace="LibMC" copyright="Autodesk Inc." year="2020" basename="libmc"
+	version="1.0.0">
+		
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	 
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="Go" indentation="tabs" />
+
+<!--		<binding language="Cpp" indentation="tabs" />
+		<binding language="CDynamic" indentation="tabs" />
+		<binding language="Node" indentation="tabs" />
+		<binding language="Pascal" indentation="2spaces" />
+		<binding language="Python" indentation="tabs" />
+		<binding language="CSharp" indentation="tabs" /> -->
+		
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="LibMCData.xml" namespace="LibMCData"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		
+		<error name="COULDNOTPARSECONFIGURATION" code="9" description="could not parse configuration" />
+		<error name="DUPLICATESTATENAME" code="10" description="duplicate state name" />
+		<error name="STATENOTFOUND" code="11" description="state not found" />
+		<error name="DUPLICATEOUTSTATE" code="12" description="duplicate out state" />				
+		<error name="MISSINGMACHINEDEFINITION" code="13" description="missing machine definition" />
+		<error name="MISSINGINSTANCENAME" code="14" description="missing instance name" />				
+		<error name="DUPLICATEMACHINEINSTANCE" code="15" description="duplicate machine instance" />
+		<error name="MISSINGXMLSCHEMA" code="16" description="missing XML schema" />
+		<error name="INVALIDXMLSCHEMA" code="17" description="invalid XML schema" />
+		<error name="MISSINGSTATENAME" code="18" description="missing state name" />
+		<error name="MISSINGOUTSTATETARGET" code="19" description="missing outstate target" />
+		<error name="INVALIDOUTSTATETARGET" code="20" description="invalid outstate target" />
+		
+		<error name="NOINITSTATE" code="21" description="no init state" />
+		<error name="NOFAILEDSTATE" code="22" description="no failed state" />
+		<error name="INITSTATENOTFOUND" code="23" description="init state not found" />
+		<error name="FAILEDSTATENOTFOUND" code="24" description="failed state not found" />
+		<error name="MISSINGINITSTATE" code="25" description="missing init state" />
+		<error name="MISSINGFAILEDSTATE" code="26" description="missing failed state" />		
+		<error name="MISSINGPLUGINNAME" code="27" description="missing plugin name" />
+		<error name="EMPTYINITSTATE" code="28" description="empty init state" />
+		<error name="EMPTYFAILEDSTATE" code="29" description="empty failed state" />
+		<error name="EMPTYPLUGINNAME" code="30" description="empty plugin name" />		
+		<error name="COULDNOTCREATESTATEFACTORY" code="31" description="could not create state factory" />		
+		<error name="INVALIDSTATENAME" code="32" description="invalid state name" />
+		<error name="COULDNOTCREATESTATE" code="33" description="could not create state" />		
+		<error name="COULDNOTINITIALIZEFACTORY" code="34" description="could not initialize factory" />		
+		<error name="COULDNOTFINALIZEFACTORY" code="35" description="could not finalize factory" />		
+		<error name="COULDNOTLOADPLUGIN" code="36" description="could not load plugin" />		
+		<error name="NOCURRENTSTATE" code="37" description="no current state" />		
+		<error name="NOPLUGINSTATE" code="38" description="no plugin state" />						
+		<error name="COULDNOTEXECUTEPLUGIN" code="39" description="could not execute plugin" />
+		<error name="TOOMANYMACHINEINSTANCES" code="40" description="too many machine instances" />						
+		<error name="INVALIDINDEX" code="41" description="invalid index" />						
+
+		<error name="NOOUTSTATEGIVEN" code="42" description="no new outstate has been given" />
+		<error name="INVALIDOUTSTATEGIVEN" code="43" description="invalid outstate has been given" />
+		<error name="INVALIDREPEATDELAY" code="44" description="invalid repeat delay" />
+		<error name="INVALIDEXECUTIONDELAY" code="45" description="invalid execution delay" />
+		<error name="MISSINGREPEATDELAY" code="46" description="missing repeat delay" />
+		
+		<error name="THREADISRUNNING" code="47" description="thread is running" />
+		<error name="THREADISNOTRUNNING" code="48" description="thread is not running" />
+
+		<error name="DUPLICATESIGNAL" code="49" description="duplicate signal" />
+		<error name="INVALIDSIGNALNAME" code="50" description="invalid signal name" />
+		<error name="MISSINGSIGNALNAME" code="51" description="missing signal name" />
+		
+		<error name="MISSINGSERVERNODE" code="52" description="missing server node" />
+		<error name="MISSINGHOSTNAME" code="53" description="missing host name" />
+		<error name="MISSINGPORT" code="54" description="missing port" />
+		<error name="UUIDGENERATIONFAILED" code="55" description="uuid generation failed" />
+		<error name="INVALIDBUFFERSIZE" code="56" description="invalid buffer size" />
+		<error name="COULDNOTCONVERTTOUTF8" code="57" description="could not convert to utf8" />
+
+		<error name="NOCOLUMNAVAILABLE" code="58" description="no column available" />
+		<error name="INVALIDTEXTCOLUMN" code="59" description="invalid text column" />
+		<error name="INVALIDCOLUMNTYPE" code="60" description="invalid column type" />
+		
+		<error name="TOOMANYREQUESTEDLOGS" code="61" description="too many requested logs" />
+		<error name="MISSINGINSTANCEDESCRIPTION" code="62" description="missing instance description" />
+		
+		<error name="DUPLICATEPARAMETERGROUPNAME" code="63" description="duplicate parameter group name" />
+		<error name="MISSINGPARAMETERGROUPNAME" code="64" description="missing parameter group name" />
+		<error name="EMPTYPARAMETERGROUPNAME" code="65" description="empty parameter group name" />
+		<error name="MISSINGPARAMETERGROUPDESCRIPTION" code="66" description="missing parameter group description" />
+		<error name="EMPTYPARAMETERGROUPDESCRIPTION" code="67" description="empty parameter group description" />
+		<error name="TOOMANYPARAMETERS" code="68" description="too many parameters" />
+		<error name="TOOMANYPARAMETERGROUPS" code="69" description="too many parameter groups" />
+		<error name="DUPLICATEPARAMETERNAME" code="70" description="duplicate parameter name" />
+		<error name="MISSINGPARAMETERNAME" code="71" description="missing parameter name" />
+		<error name="EMPTYPARAMETERNAME" code="72" description="empty parameter name" />
+		<error name="MISSINGPARAMETERDESCRIPTION" code="73" description="missing parameter description" />
+		<error name="EMPTYPARAMETERDESCRIPTION" code="74" description="empty parameter description" />
+		<error name="PARAMETERNOTFOUND" code="75" description="parameter not found" />
+		<error name="MISSINGPARAMETERDEFAULTVALUE" code="76" description="missing parameter default value" />
+		
+		<error name="MISSINGDATACONFIGNODE" code="77" description="missing data config node" />
+		<error name="MISSINGDIRECTORY" code="78" description="missing directory" />
+		<error name="MISSINGDATABASETYPE" code="79" description="missing database type" />
+		<error name="MISSINGSQLITEINFO" code="80" description="missing sqlite info" />
+		<error name="UNKNOWNDATABASETYPE" code="81" description="unknown database type" />		
+		<error name="STORAGENOTINITIALISED" code="82" description="storage not initialised" />
+		<error name="COULDNOTCONVERTTOUTF16" code="83" description="could not convert to utf 16" />
+		
+		<error name="COULDNOTCREATEFILE" code="84" description="could not create file" />
+		<error name="COULDNOTSEEKSTREAM" code="85" description="could not seek stream" />
+		<error name="COULDNOTGETSTREAMPOSITION" code="86" description="could not get stream position" />
+		<error name="COULDNOTWRITESTREAM" code="87" description="could not write stream" />		
+		<error name="INVALIDDATABASEMIGRATION" code="88" description="invalid database migration" />
+		<error name="INTERNALERROR" code="89" description="internal error" />		
+		<error name="COULDNOTSTORECONTENTSTREAM" code="90" description="could not store content stream" />
+		<error name="DATABASENOTINITIALISED" code="91" description="database not initialised" />		
+		<error name="PARAMETERGROUPNOTFOUND" code="92" description="parameter group not found" />		
+		
+		<error name="SIGNALNOTFOUND" code="93" description="signal not found" />		
+		<error name="STATEMACHINENOTFOUND" code="94" description="state machine not found." />
+		<error name="MISSINGPARAMETERTYPE" code="95" description="missing parameter type." />
+		<error name="INVALIDPARAMETERTYPE" code="96" description="invalid parameter type." />
+		<error name="COULDNOTPARSEJSON" code="97" description="could not parse json." />
+		<error name="INVALIDJSONFORMAT" code="98" description="invalid json format." />
+		
+		<error name="URLNOTFOUND" code="99" description="url not found." />
+		<error name="GENERICBADREQUEST" code="100" description="generic bad request." />
+		
+		
+		
+		<error name="SQLITE_ERROR" code="101" description="SQLite: Generic Error" />
+		<error name="SQLITE_INTERNAL" code="102" description="SQLite: Internal logic error in SQLite" />
+		<error name="SQLITE_PERM" code="103" description="SQLite: Access permission denied" />
+		<error name="SQLITE_ABORT" code="104" description="SQLite: Callback routine requested an abort" />
+		<error name="SQLITE_BUSY" code="105" description="SQLite: The database file is locked" />
+		<error name="SQLITE_LOCKED" code="106" description="SQLite: A table in the database is locked" />
+		<error name="SQLITE_NOMEM" code="107" description="SQLite: A malloc failed" />
+		<error name="SQLITE_READONLY" code="108" description="SQLite: Attempt to write a readonly database" />
+		<error name="SQLITE_INTERRUPT" code="109" description="SQLite: Operation terminated by sqlite3_interrupt" />
+		<error name="SQLITE_IOERR" code="110" description="SQLite: Some kind of disk I/O error occurred" />
+		<error name="SQLITE_CORRUPT" code="111" description="SQLite: The database disk image is malformed" />
+		<error name="SQLITE_NOTFOUND" code="112" description="SQLite: Unknown opcode in sqlite3_file_control" />
+		<error name="SQLITE_FULL" code="113" description="SQLite: Insertion failed because database is full" />
+		<error name="SQLITE_CANTOPEN" code="114" description="SQLite: Unable to open the database file" />
+		<error name="SQLITE_PROTOCOL" code="115" description="SQLite: Database lock protocol error" />
+		<error name="SQLITE_SCHEMA" code="117" description="SQLite: The database schema changed" />
+		<error name="SQLITE_TOOBIG" code="118" description="SQLite: String or BLOB exceeds size limit" />
+		<error name="SQLITE_CONSTRAINT" code="119" description="SQLite: Abort due to constraint violation" />
+		<error name="SQLITE_MISMATCH" code="120" description="SQLite: Data type mismatch" />
+		<error name="SQLITE_MISUSE" code="121" description="SQLite: Library used incorrectly" />
+		<error name="SQLITE_NOLFS" code="122" description="SQLite: Uses OS features not supported on host" />
+		<error name="SQLITE_AUTH" code="123" description="SQLite: Authorization denied" />
+		<error name="SQLITE_RANGE" code="125" description="SQLite: 2nd parameter to sqlite3_bind out of range" />
+		<error name="SQLITE_NOTADB" code="126" description="SQLite: File opened that is not a database file" />
+		<error name="SQLITE_NOTICE" code="127" description="SQLite: Notifications from sqlite3_log" />
+		<error name="SQLITE_WARNING" code="128" description="SQLite: Warnings from sqlite3_log" />
+		<error name="SQLITE_OTHER" code="130" description="SQLite: Other Error" />		
+		<error name="SQLITE_TOOMANYRESULTROWS" code="131" description="too many result rows" />
+		
+		<error name="COULDNOTREADZIPFILE" code="200" description="Could not read ZIP file" />		
+		<error name="COULDNOTOPENZIPFILE" code="201" description="Could not open ZIP file" />		
+		<error name="COULDNOTGETZIPENTRIES" code="202" description="Could not get ZIP file entries" />		
+		<error name="ZIPENTRYNOTFOUND" code="203" description="ZIP Entry not found" />		
+		<error name="COULDNOTSTATZIPENTRY" code="204" description="Could not stat ZIP entry" />		
+		<error name="COULDNOTOPENZIPENTRY" code="205" description="Could not open ZIP entry" />		
+		<error name="COULDNOTREADZIPSTREAM" code="206" description="Could not read ZIP stream" />		
+		<error name="COULDNOTREADFULLZIPDATA" code="207" description="Could not read full zip data" />		
+		
+		<error name="COULDNOTFINDDISTRIBUTIONINDEX" code="208" description="Could not find distribution index." />		
+		<error name="COULDNOTPARSEDISTRIBUTIONINDEX" code="209" description="Could not parse distribution index." />
+		<error name="EMPTYDISTRIBUTIONINDEX" code="210" description="Empty distribution index." />
+		<error name="MISSINGDISTRIBUTIONINDEX" code="211" description="Missing distribution index." />
+		
+		<error name="MISSINGDISTRIBUTIONURL" code="212" description="Missing distribution url." />
+		<error name="MISSINGDISTRIBUTIONFILENAME" code="213" description="Missing distribution filename." />
+		<error name="MISSINGDISTRIBUTIONSIZE" code="214" description="Missing distribution size." />
+		<error name="MISSINGDISTRIBUTIONCONTENTTYPE" code="215" description="Missing distribution content type." />
+		
+		<error name="DRIVERALREADYREGISTERED" code="216" description="Driver already registered." />
+		<error name="DRIVERNOTFOUND" code="217" description="Driver not found." />
+		<error name="MISSINGDRIVERNAME" code="218" description="Missing driver name." />
+		<error name="MISSINGDRIVERTYPE" code="219" description="Missing driver type." />
+		<error name="MISSINGDRIVERLIBRARY" code="220" description="Missing driver library." />		
+		
+		<error name="DRIVERALREADYRESERVED" code="221" description="Driver has already been reserved by an instance." />		
+		<error name="LIBRARYPATHNOTFOUND" code="222" description="Library path not found." />
+		
+		<error name="TOOLPATHENTITYNOTLOADED" code="223" description="Toolpath entity not loaded" />
+		<error name="TOOLPATHENTITYREFERENCEERROR" code="224" description="Toolpath entity reference error" />
+		<error name="TOOLPATHENTITYINVALIDFILE" code="225" description="Toolpath entity is invalid" />
+		<error name="NO3MFLIBRARY" code="226" description="No 3MF Library specified" />
+		
+		<error name="INVALIDPOINTCOUNT" code="227" description="Invalid point count" />
+		<error name="DUPLICATEJOBUUID" code="228" description="Duplicate job uuid" />
+		<error name="INVALIDJOBSTATUS" code="229" description="Invalid Job status" />
+		<error name="INVALIDSTREAMCONTEXT" code="230" description="Invalid stream context" />		
+		<error name="JOBUUIDNOTFOUND" code="231" description="Job uuid not found" />
+		<error name="INVALIDJOBNAME" code="232" description="Invalid job name" />
+		<error name="INVALIDJOBTIMESTAMP" code="233" description="Invalid job timestamp" />
+		<error name="INVALIDUSERID" code="234" description="Invalid job name" />
+		<error name="INVALIDSTORAGECALLBACKSIGNATURE" code="235" description="Invalid storage callback signature" />
+		<error name="INVALIDSTORAGECALLBACKSTREAM" code="236" description="Invalid storage callback stream" />
+		<error name="INVALIDSTORAGEPATH" code="237" description="Invalid storage path" />
+
+		<error name="STORAGESTREAMNOTFOUND" code="238" description="Storage Stream not found" />
+		<error name="DUPLICATESTORAGESTREAM" code="239" description="Duplicate Storage Stream" />
+		<error name="INVALIDPARTIALUPLOAD" code="240" description="Invalid Partial Upload" />
+		<error name="PARTIALUPLOADNOTFINISHED" code="241" description="Partial Upload not finished" />
+
+	</errors>
+	
+	
+	<enum name="LogLevel">
+		<option name="UserAcknowledge" value="1"/>
+		<option name="FatalError" value="2"/>
+		<option name="CriticalError" value="3"/>
+		<option name="Warning" value="4"/>
+		<option name="Message" value="5"/>
+		<option name="Info" value="6"/>
+		<option name="Debug" value="7"/>
+		<option name="Unknown" value="8"/>
+	</enum>	
+
+	<enum name="LogSubSystem">
+		<option name="System" value="1"/>
+		<option name="Network" value="2"/>
+	</enum>	
+
+
+		
+		
+	<class name="Base">
+	</class>
+
+
+	<class name="APIResponse" parent="Base" description="Response class for an API Call">
+
+		<method name="GetHTTPCode" description="returns the HTTP Errorcode to set (200 for success).">
+			<param name="HTTPCode" type="uint32" pass="return" description="HTTP Code" />	
+		</method>
+
+		<method name="GetContentType" description="returns the content type string of the data.">
+			<param name="ContentType" type="string" pass="return" description="Content Type." />	
+		</method>
+
+		<method name="GetData" description="returns the stream content of the data.">
+			<param name="Data" type="basicarray" class="uint8" pass="out" description="Binary stream data" />	
+		</method>
+
+	</class>
+
+
+	<class name="MCContext" parent="Base" description="MC Context">
+
+		<method name="RegisterLibraryPath" description="registers a library for a given name.">
+			<param name="LibraryName" type="string" pass="in" description="Library Name." />
+			<param name="LibraryPath" type="string" pass="in" description="Path to the shared library." />
+		</method>
+
+
+		<method name="ParseConfiguration" description="parses and initialises the state machines from a configuration XML.">
+			<param name="XMLString" type="string" pass="in" description="XML Configuration String." />
+		</method>
+		
+		<method name="StartAllThreads" description="starts the threads for all the state machines.">
+		</method>
+
+		<method name="TerminateAllThreads" description="terminates the threads for all the state machines.">
+		</method>
+		
+		<method name="LoadClientPackage" description="load a client package to serve the client website.">
+			<param name="ZIPStream" type="basicarray" class="uint8" pass="in" description="client package ZIP stream." />
+		</method>
+		
+
+		<method name="Log" description="log message with a certain log level.">
+			<param name="Message" type="string" pass="in" description="log message" />
+			<param name="Subsystem" type="enum" class="LogSubSystem" pass="in" description="log subsystem" />
+			<param name="LogLevel" type="enum" class="LogLevel" pass="in" description="log level" />
+		</method>
+		
+		
+		<method name="HandleAPIGetRequest" description="handle an API GET request.">
+			<param name="URI" type="string" pass="in" description="URI to serve" />
+			<param name="Response" type="class" class="APIResponse" pass="return" description="Response instance." />
+		</method>
+		
+		<method name="HandleAPIPostRequest" description="handle an API POST request.">
+			<param name="URI" type="string" pass="in" description="URI to serve" />
+			<param name="Body" type="basicarray" class="uint8" pass="in" description="Body that was sent." />
+			<param name="Response" type="class" class="APIResponse" pass="return" description="Response instance." />
+		</method>
+		
+	</class>
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>
+		
+		<method name="CreateMCContext" description="Creates and initializes new MC Context.">		
+			<param name="DataModel" type="class" class="LibMCData:DataModel" pass="in" description="DataModel Object" />
+			<param name="Instance" type="class" class="MCContext" pass="return" description="New Context instance" />
+		</method>
+	</global>
+	
+	
+</component>
+

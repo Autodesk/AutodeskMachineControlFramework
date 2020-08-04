@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<driverpackage xmlns="http://schemas.autodesk.com/amc/driverpackage/2020/07">
+	<binarydata name="correction_file" source="BinaryData/Cor_1to1.ct5" />
+	<binarydata name="rtc_data" source="BinaryData/RTC6DAT.dat" />
+	<binarydata name="eth_data" source="BinaryData/RTC6ETH.out" />
+	<binarydata name="rbf_data" source="BinaryData/RTC6RBF.rbf" />
+	
+	<dependency name="rtc_dll" suffix="rtc" source="Dependencies/RTC6DLLx64.dll" />
+</driverpackage>
