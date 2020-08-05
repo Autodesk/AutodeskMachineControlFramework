@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 CDriverHandler::CDriverHandler(LibMCDriverEnv::PWrapper pEnvironmentWrapper)
+	: m_pEnvironmentWrapper (pEnvironmentWrapper)
 {
 	if (pEnvironmentWrapper.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -59,6 +60,9 @@ CDriverHandler::~CDriverHandler()
 
 template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCDriverEnv::Impl::IBase> pImplInstance, LibMCDriverEnv::PWrapper pWrapper)
 {
+	if (pWrapper.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
 	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCDriverEnv::Impl::IBase*) (pImplInstance.get()));
 	pImplInstance->IncRefCount();
 	return pExternalInstance;

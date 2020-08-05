@@ -98,6 +98,33 @@ typedef PDriver_ScanLab_RTC5 PLibMCDriver_ScanLabDriver_ScanLab_RTC5;
 
 
 /*************************************************************************************************************************
+ classParam Definition
+**************************************************************************************************************************/
+
+template<class T> class classParam {
+private:
+	const T* m_ptr;
+
+public:
+	classParam(const T* ptr)
+		: m_ptr (ptr)
+	{
+	}
+
+	classParam(std::shared_ptr <T> sharedPtr)
+		: m_ptr (sharedPtr.get())
+	{
+	}
+
+	LibMCDriver_ScanLabHandle GetHandle()
+	{
+		if (m_ptr != nullptr)
+			return m_ptr->handle();
+		return nullptr;
+	}
+};
+
+/*************************************************************************************************************************
  Class ELibMCDriver_ScanLabException 
 **************************************************************************************************************************/
 class ELibMCDriver_ScanLabException : public std::exception {
@@ -217,12 +244,12 @@ public:
 	inline void CheckError(CBase * pBaseClass, LibMCDriver_ScanLabResult nResult);
 
 	inline void GetVersion(LibMCDriver_ScanLab_uint32 & nMajor, LibMCDriver_ScanLab_uint32 & nMinor, LibMCDriver_ScanLab_uint32 & nMicro);
-	inline bool GetLastError(CBase * pInstance, std::string & sErrorMessage);
-	inline void ReleaseInstance(CBase * pInstance);
-	inline void AcquireInstance(CBase * pInstance);
+	inline bool GetLastError(classParam<CBase> pInstance, std::string & sErrorMessage);
+	inline void ReleaseInstance(classParam<CBase> pInstance);
+	inline void AcquireInstance(classParam<CBase> pInstance);
 	inline void InjectComponent(const std::string & sNameSpace, const LibMCDriver_ScanLab_pvoid pSymbolAddressMethod);
 	inline LibMCDriver_ScanLab_pvoid GetSymbolLookupMethod();
-	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::CDriverEnvironment * pDriverEnvironment);
+	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment);
 
 private:
 	sLibMCDriver_ScanLabDynamicWrapperTable m_WrapperTable;
@@ -291,11 +318,19 @@ public:
 	}
 
 	/**
-	* CBase::GetHandle - Returns handle to instance.
+	* CBase::handle - Returns handle to instance.
 	*/
-	LibMCDriver_ScanLabHandle GetHandle()
+	LibMCDriver_ScanLabHandle handle() const
 	{
 		return m_pHandle;
+	}
+
+	/**
+	* CBase::wrapper - Returns wrapper instance.
+	*/
+	CWrapper * wrapper() const
+	{
+		return m_pWrapper;
 	}
 	
 	friend class CWrapper;
@@ -419,12 +454,9 @@ public:
 	* @param[out] sErrorMessage - Message of the last error
 	* @return Is there a last error to query
 	*/
-	inline bool CWrapper::GetLastError(CBase * pInstance, std::string & sErrorMessage)
+	inline bool CWrapper::GetLastError(classParam<CBase> pInstance, std::string & sErrorMessage)
 	{
-		LibMCDriver_ScanLabHandle hInstance = nullptr;
-		if (pInstance != nullptr) {
-			hInstance = pInstance->GetHandle();
-		};
+		LibMCDriver_ScanLabHandle hInstance = pInstance.GetHandle();
 		LibMCDriver_ScanLab_uint32 bytesNeededErrorMessage = 0;
 		LibMCDriver_ScanLab_uint32 bytesWrittenErrorMessage = 0;
 		bool resultHasError = 0;
@@ -440,12 +472,9 @@ public:
 	* CWrapper::ReleaseInstance - Releases shared ownership of an Instance
 	* @param[in] pInstance - Instance Handle
 	*/
-	inline void CWrapper::ReleaseInstance(CBase * pInstance)
+	inline void CWrapper::ReleaseInstance(classParam<CBase> pInstance)
 	{
-		LibMCDriver_ScanLabHandle hInstance = nullptr;
-		if (pInstance != nullptr) {
-			hInstance = pInstance->GetHandle();
-		};
+		LibMCDriver_ScanLabHandle hInstance = pInstance.GetHandle();
 		CheckError(nullptr,m_WrapperTable.m_ReleaseInstance(hInstance));
 	}
 	
@@ -453,12 +482,9 @@ public:
 	* CWrapper::AcquireInstance - Acquires shared ownership of an Instance
 	* @param[in] pInstance - Instance Handle
 	*/
-	inline void CWrapper::AcquireInstance(CBase * pInstance)
+	inline void CWrapper::AcquireInstance(classParam<CBase> pInstance)
 	{
-		LibMCDriver_ScanLabHandle hInstance = nullptr;
-		if (pInstance != nullptr) {
-			hInstance = pInstance->GetHandle();
-		};
+		LibMCDriver_ScanLabHandle hInstance = pInstance.GetHandle();
 		CheckError(nullptr,m_WrapperTable.m_AcquireInstance(hInstance));
 	}
 	
@@ -502,12 +528,9 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::CDriverEnvironment * pDriverEnvironment)
+	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment)
 	{
-		LibMCDriverEnvHandle hDriverEnvironment = nullptr;
-		if (pDriverEnvironment != nullptr) {
-			hDriverEnvironment = pDriverEnvironment->GetHandle();
-		};
+		LibMCDriverEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
 		LibMCDriver_ScanLabHandle hInstance = nullptr;
 		CheckError(nullptr,m_WrapperTable.m_CreateDriver(sName.c_str(), sType.c_str(), hDriverEnvironment, &hInstance));
 		

@@ -41,6 +41,7 @@ CDriver::CDriver(const std::string& sName, const std::string& sType, const std::
 {
 
 	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibrary);
+	m_pDriverWrapper->InjectComponent("LibMCDriverEnv", pDriverEnvironment->wrapper()->GetSymbolLookupMethod());
 	m_pDriverInstance = m_pDriverWrapper->CreateDriver (sName, sType, pDriverEnvironment.get());
 }
 
@@ -58,7 +59,7 @@ HDriverHandle CDriver::acquireDriverHandle(const std::string& sInstanceName)
 
 	m_sReservationInstance = sInstanceName;
 	m_pDriverWrapper->AcquireInstance(m_pDriverInstance.get());
-	return  m_pDriverInstance->GetHandle();	
+	return  m_pDriverInstance->handle();	
 }
 
 void CDriver::releaseDriverHandle(const std::string& sInstanceName)
