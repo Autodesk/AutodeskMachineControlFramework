@@ -107,7 +107,7 @@ public:
 	LibMCDriverHandle GetHandle()
 	{
 		if (m_ptr != nullptr)
-			return m_ptr->GetHandle();
+			return m_ptr->handle();
 		return nullptr;
 	}
 };
@@ -303,11 +303,19 @@ public:
 	}
 
 	/**
-	* CBase::GetHandle - Returns handle to instance.
+	* CBase::handle - Returns handle to instance.
 	*/
-	LibMCDriverHandle GetHandle() const
+	LibMCDriverHandle handle() const
 	{
 		return m_pHandle;
+	}
+
+	/**
+	* CBase::wrapper - Returns wrapper instance.
+	*/
+	CWrapper * wrapper() const
+	{
+		return m_pWrapper;
 	}
 	
 	friend class CWrapper;
