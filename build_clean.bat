@@ -7,7 +7,7 @@ set outputdir=%builddir%\Output
 
 if not exist "%builddir%" (mkdir "%builddir%")
 if not exist "%outputdir%" (mkdir "%outputdir%")
-if not exist "%builddir%\DevPackage (mkdir "%builddir%\DevPackage")
+if not exist "%builddir%\DevPackage" (mkdir "%builddir%\DevPackage")
 if not exist "%builddir%\DevPackage\Plugins" (mkdir "%builddir%\DevPackage\Plugins")
 if not exist "%builddir%\DevPackage\Framework" (mkdir "%builddir%\DevPackage\Framework")
 if not exist "%builddir%\DevPackage\Framework\HeadersDev" (mkdir "%builddir%\DevPackage\Framework\HeadersDev")
