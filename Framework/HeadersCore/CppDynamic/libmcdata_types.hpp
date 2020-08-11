@@ -266,6 +266,9 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM 239
 #define LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD 240
 #define LIBMCDATA_ERROR_PARTIALUPLOADNOTFINISHED 241
+#define LIBMCDATA_ERROR_APIREQUESTNOTHANDLED 242
+#define LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED 243
+#define LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE 244
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -444,6 +447,9 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM: return "Duplicate Storage Stream";
     case LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD: return "Invalid Partial Upload";
     case LIBMCDATA_ERROR_PARTIALUPLOADNOTFINISHED: return "Partial Upload not finished";
+    case LIBMCDATA_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
+    case LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
+    case LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
     default: return "unknown error";
   }
 }

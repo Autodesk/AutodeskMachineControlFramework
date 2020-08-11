@@ -1,6 +1,7 @@
 @echo off
 
 set basepath=%~dp0
+echo %basepath%
 set builddir=%basepath%\build
 set outputdir=%builddir%\Output
 

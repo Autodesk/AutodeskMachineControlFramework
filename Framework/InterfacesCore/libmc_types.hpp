@@ -266,6 +266,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DUPLICATESTORAGESTREAM 239
 #define LIBMC_ERROR_INVALIDPARTIALUPLOAD 240
 #define LIBMC_ERROR_PARTIALUPLOADNOTFINISHED 241
+#define LIBMC_ERROR_APIREQUESTNOTHANDLED 242
+#define LIBMC_ERROR_APIREQUESTALREADYHANDLED 243
+#define LIBMC_ERROR_INVALIDAPIREQUESTTYPE 244
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -444,6 +447,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DUPLICATESTORAGESTREAM: return "Duplicate Storage Stream";
     case LIBMC_ERROR_INVALIDPARTIALUPLOAD: return "Invalid Partial Upload";
     case LIBMC_ERROR_PARTIALUPLOADNOTFINISHED: return "Partial Upload not finished";
+    case LIBMC_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
+    case LIBMC_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
+    case LIBMC_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
     default: return "unknown error";
   }
 }
@@ -453,7 +459,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCHandle LibMC_Base;
-typedef LibMCHandle LibMC_APIResponse;
+typedef LibMCHandle LibMC_APIRequestHandler;
 typedef LibMCHandle LibMC_MCContext;
 
 namespace LibMC {

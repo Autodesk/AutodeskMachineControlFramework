@@ -52,82 +52,83 @@ std::string CAPIHandler_Setup::getBaseURI ()
 	return "api/setup";
 }
 		
-PAPIResponse CAPIHandler_Setup::handleGetRequest(const std::string& sURI)
+PAPIResponse CAPIHandler_Setup::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize)
 {
-	CJSONWriter writer;	
-	writeJSONHeader(writer, AMC_API_PROTOCOL_SETUP);
 
-	if (!m_Instances.empty()) {
-		CJSONWriterArray instanceJSONArray(writer);
+	if (requestType == eAPIRequestType::rtGet) {
+		CJSONWriter writer;
+		writeJSONHeader(writer, AMC_API_PROTOCOL_SETUP);
 
-		for (auto pInstance : m_Instances) {
+		if (!m_Instances.empty()) {
+			CJSONWriterArray instanceJSONArray(writer);
 
-			CJSONWriterObject instanceJSONObject (writer);
-			instanceJSONObject.addString (AMC_API_KEY_SETUPINSTANCE_NAME, pInstance->getName());
-			instanceJSONObject.addString (AMC_API_KEY_SETUPINSTANCE_DESCRIPTION, pInstance->getDescription());
-			
-			CJSONWriterArray statesJSONArray(writer);
-			uint32_t nStateCount = pInstance->getStateCount();
-			for (uint32_t nStateIndex = 0; nStateIndex < nStateCount; nStateIndex++) {
-				CJSONWriterObject stateJSONObject(writer);
-				stateJSONObject.addString(AMC_API_KEY_SETUPSTATE_NAME, pInstance->getNameOfState(nStateIndex));
+			for (auto pInstance : m_Instances) {
 
-				CJSONWriterArray outstateJSONArray(writer);
-				uint32_t nOutStateCount = pInstance->getOutstateCountOfState(nStateIndex);
-				for (uint32_t nOutStateIndex = 0; nOutStateIndex < nOutStateCount; nOutStateIndex++) {
-					outstateJSONArray.addString(pInstance->getOutstateNameOfState(nStateIndex, nOutStateIndex));
-				}
+				CJSONWriterObject instanceJSONObject(writer);
+				instanceJSONObject.addString(AMC_API_KEY_SETUPINSTANCE_NAME, pInstance->getName());
+				instanceJSONObject.addString(AMC_API_KEY_SETUPINSTANCE_DESCRIPTION, pInstance->getDescription());
 
-				stateJSONObject.addArray(AMC_API_KEY_SETUPSTATE_OUTSTATES, outstateJSONArray);
+				CJSONWriterArray statesJSONArray(writer);
+				uint32_t nStateCount = pInstance->getStateCount();
+				for (uint32_t nStateIndex = 0; nStateIndex < nStateCount; nStateIndex++) {
+					CJSONWriterObject stateJSONObject(writer);
+					stateJSONObject.addString(AMC_API_KEY_SETUPSTATE_NAME, pInstance->getNameOfState(nStateIndex));
 
-				statesJSONArray.addObject(stateJSONObject);
+					CJSONWriterArray outstateJSONArray(writer);
+					uint32_t nOutStateCount = pInstance->getOutstateCountOfState(nStateIndex);
+					for (uint32_t nOutStateIndex = 0; nOutStateIndex < nOutStateCount; nOutStateIndex++) {
+						outstateJSONArray.addString(pInstance->getOutstateNameOfState(nStateIndex, nOutStateIndex));
+					}
 
-			}
-			instanceJSONObject.addArray(AMC_API_KEY_SETUPSTATES, statesJSONArray);
+					stateJSONObject.addArray(AMC_API_KEY_SETUPSTATE_OUTSTATES, outstateJSONArray);
 
-			CJSONWriterArray parameterGroupsJSONArray(writer);
-			auto pParameterHandler = pInstance->getParameterHandler();
-			uint32_t nParameterGroupCount = pParameterHandler->getGroupCount();
-
-			for (uint32_t nGroupIndex = 0; nGroupIndex < nParameterGroupCount; nGroupIndex++) {
-				auto pGroup = pParameterHandler->getGroup(nGroupIndex);
-
-				CJSONWriterObject groupJSONObject(writer);
-				groupJSONObject.addString(AMC_API_KEY_SETUPPARAMETERGROUP_NAME, pGroup->getName ());
-				groupJSONObject.addString(AMC_API_KEY_SETUPPARAMETERGROUP_DESCRIPTION, pGroup->getDescription());
-
-				CJSONWriterArray parametersJSONArray(writer);
-				uint32_t nParameterCount = pGroup->getParameterCount();
-				for (uint32_t nParamIndex = 0; nParamIndex < nParameterCount; nParamIndex++) {
-					CJSONWriterObject parameterJSONObject(writer);
-					std::string sParamName, sParamDescription, sParamDefaultValue;
-					pGroup->getParameterInfo(nParamIndex, sParamName, sParamDescription, sParamDefaultValue);
-					parameterJSONObject.addString(AMC_API_KEY_SETUPPARAMETER_NAME, sParamName);
-					parameterJSONObject.addString(AMC_API_KEY_SETUPPARAMETER_DESCRIPTION, sParamDescription);
-					parametersJSONArray.addObject(parameterJSONObject);
+					statesJSONArray.addObject(stateJSONObject);
 
 				}
-				groupJSONObject.addArray(AMC_API_KEY_SETUPPARAMETERGROUP_PARAMETERS, parametersJSONArray);
+				instanceJSONObject.addArray(AMC_API_KEY_SETUPSTATES, statesJSONArray);
 
-				parameterGroupsJSONArray.addObject(groupJSONObject);
+				CJSONWriterArray parameterGroupsJSONArray(writer);
+				auto pParameterHandler = pInstance->getParameterHandler();
+				uint32_t nParameterGroupCount = pParameterHandler->getGroupCount();
+
+				for (uint32_t nGroupIndex = 0; nGroupIndex < nParameterGroupCount; nGroupIndex++) {
+					auto pGroup = pParameterHandler->getGroup(nGroupIndex);
+
+					CJSONWriterObject groupJSONObject(writer);
+					groupJSONObject.addString(AMC_API_KEY_SETUPPARAMETERGROUP_NAME, pGroup->getName());
+					groupJSONObject.addString(AMC_API_KEY_SETUPPARAMETERGROUP_DESCRIPTION, pGroup->getDescription());
+
+					CJSONWriterArray parametersJSONArray(writer);
+					uint32_t nParameterCount = pGroup->getParameterCount();
+					for (uint32_t nParamIndex = 0; nParamIndex < nParameterCount; nParamIndex++) {
+						CJSONWriterObject parameterJSONObject(writer);
+						std::string sParamName, sParamDescription, sParamDefaultValue;
+						pGroup->getParameterInfo(nParamIndex, sParamName, sParamDescription, sParamDefaultValue);
+						parameterJSONObject.addString(AMC_API_KEY_SETUPPARAMETER_NAME, sParamName);
+						parameterJSONObject.addString(AMC_API_KEY_SETUPPARAMETER_DESCRIPTION, sParamDescription);
+						parametersJSONArray.addObject(parameterJSONObject);
+
+					}
+					groupJSONObject.addArray(AMC_API_KEY_SETUPPARAMETERGROUP_PARAMETERS, parametersJSONArray);
+
+					parameterGroupsJSONArray.addObject(groupJSONObject);
+				}
+
+				instanceJSONObject.addArray(AMC_API_KEY_SETUPPARAMETERGROUPS, parameterGroupsJSONArray);
+
+				instanceJSONArray.addObject(instanceJSONObject);
 			}
 
-			instanceJSONObject.addArray(AMC_API_KEY_SETUPPARAMETERGROUPS, parameterGroupsJSONArray);
-
-			instanceJSONArray.addObject(instanceJSONObject);
+			writer.addArray(AMC_API_KEY_SETUPINSTANCES, instanceJSONArray);
 		}
 
-		writer.addArray(AMC_API_KEY_SETUPINSTANCES, instanceJSONArray);
+		return std::make_shared<CAPIStringResponse>(AMC_API_HTTP_SUCCESS, AMC_API_CONTENTTYPE, writer.saveToString());
 	}
 
-	return std::make_shared<CAPIStringResponse> (AMC_API_CONTENTTYPE, writer.saveToString());
-}
-
-
-PAPIResponse CAPIHandler_Setup::handlePostRequest(const std::string& sURI, const uint8_t* pBodyData, const size_t nBodyDataSize)
-{
 	return nullptr;
 }
+
+
 
 	
 

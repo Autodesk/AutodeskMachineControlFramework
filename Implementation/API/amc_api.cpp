@@ -49,62 +49,14 @@ CAPI::~CAPI()
 {
 }
 
-PAPIResponse CAPI::handleGetRequest(const std::string& sURI, uint32_t& nHTTPCode)
+
+PAPIHandler CAPI::getURIMatch(const std::string& sURI)
 {
+	for (auto pHandler : m_ApiHandlers) {
+		std::string sBaseURI = pHandler->getBaseURI();
+		bool bIsMatch;
 
-	try {
-
-		for (auto pHandler : m_ApiHandlers) {
-			std::string sBaseURI = pHandler->getBaseURI();
-			bool bIsMatch;
-
-			if (sBaseURI.length() > 0) {
-				if (sBaseURI.length() < sURI.length()) {
-					std::string sSlashURI = sBaseURI + "/";
-
-					bIsMatch = (sSlashURI == sURI.substr(0, sSlashURI.length()));
-				}
-				else {
-					bIsMatch = (sBaseURI == sURI);
-				}
-			}
-			else {
-				bIsMatch = true;
-			}
-
-			if (bIsMatch) {
-				auto pResponse = pHandler->handleGetRequest(sURI);
-				if (pResponse.get() != nullptr) {
-					nHTTPCode = AMC_API_HTTP_SUCCESS;
-					return pResponse;
-				}
-
-				break;
-			}
-		}
-
-		nHTTPCode = AMC_API_HTTP_NOTFOUND;
-		return makeError (LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
-	}
-	catch (ELibMCInterfaceException & IntfException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(IntfException.getErrorCode(), IntfException.what ());
-	}
-	catch (std::exception& StdException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(LIBMC_ERROR_GENERICBADREQUEST, StdException.what());
-	}
-}
-
-PAPIResponse CAPI::handlePostRequest(const std::string& sURI, const uint8_t* pBody, const size_t nStreamSize, uint32_t& nHTTPCode)
-{
-
-	try {
-
-		for (auto pHandler : m_ApiHandlers) {
-			std::string sBaseURI = pHandler->getBaseURI();
-			bool bIsMatch;
-
+		if (sBaseURI.length() > 0) {
 			if (sBaseURI.length() < sURI.length()) {
 				std::string sSlashURI = sBaseURI + "/";
 
@@ -113,30 +65,75 @@ PAPIResponse CAPI::handlePostRequest(const std::string& sURI, const uint8_t* pBo
 			else {
 				bIsMatch = (sBaseURI == sURI);
 			}
-
-			if (bIsMatch) {
-				PAPIResponse pResponse = pHandler->handlePostRequest(sURI, pBody, nStreamSize);
-				if (pResponse.get() != nullptr) {
-					nHTTPCode = AMC_API_HTTP_SUCCESS;
-					return pResponse;
-				}
-
-				break;
-			}
+		}
+		else {
+			bIsMatch = true;
 		}
 
-		nHTTPCode = AMC_API_HTTP_NOTFOUND;
-		return makeError(LIBMC_ERROR_URLNOTFOUND, "url not found" + sURI);
+		if (bIsMatch) {
+			return pHandler;
+		}
+	}
+
+	return nullptr;
+}
+
+
+bool CAPI::expectsRawBody(const std::string& sURI, const eAPIRequestType requestType)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr)
+		return false;
+
+	return pHandler->expectsRawBody(requestType);
+}
+
+PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, PAPIFormFields pFormFields)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr)
+		return makeError(AMC_API_HTTP_NOTFOUND, LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
+
+	try {
+		
+		auto pResponse = pHandler->handleRequest (sURI, requestType, pData, nCount);	
+
+		if (pResponse.get() == nullptr)
+			return makeError(AMC_API_HTTP_NOTFOUND, LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
+		
+		return pResponse;		
 	}
 	catch (ELibMCInterfaceException& IntfException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(IntfException.getErrorCode(), IntfException.what());
+		return makeError(AMC_API_HTTP_BADREQUEST, IntfException.getErrorCode(), IntfException.what());
 	}
 	catch (std::exception& StdException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(LIBMC_ERROR_GENERICBADREQUEST, StdException.what());
+		return makeError(AMC_API_HTTP_BADREQUEST, LIBMC_ERROR_GENERICBADREQUEST, StdException.what());
 	}
 }
+
+uint32_t CAPI::getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr)
+		return false;
+
+	return pHandler->getFormDataFieldCount(requestType);
+
+}
+
+void CAPI::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex, std::string& sName, bool& bMandatory)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr) {
+		sName = "";
+		bMandatory = false;
+		return;
+	}
+
+	pHandler->getFormDataFieldDetails(requestType, nFieldIndex, sName, bMandatory);
+
+}
+
 
 void CAPI::registerHandler(PAPIHandler pAPIHandler)
 {
@@ -147,12 +144,12 @@ void CAPI::registerHandler(PAPIHandler pAPIHandler)
 }
 
 
-PAPIResponse CAPI::makeError(LibMCResult errorCode, const std::string& sErrorString)
+PAPIResponse CAPI::makeError(uint32_t nHTTPError, LibMCResult errorCode, const std::string& sErrorString)
 {
 	CJSONWriter writer;
 	writer.addString(AMC_API_KEY_PROTOCOL, AMC_API_PROTOCOL_ERROR);
 	writer.addString(AMC_API_KEY_VERSION, AMC_API_PROTOCOL_VERSION);
 	writer.addInteger(AMC_API_KEY_ERRORCODE, errorCode);
 	writer.addString(AMC_API_KEY_MESSAGE, sErrorString);
-	return std::make_shared<CAPIStringResponse> (AMC_API_CONTENTTYPE, writer.saveToString () );
+	return std::make_shared<CAPIStringResponse> (nHTTPError, AMC_API_CONTENTTYPE, writer.saveToString () );
 }

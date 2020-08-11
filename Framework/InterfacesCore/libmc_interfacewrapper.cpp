@@ -81,20 +81,20 @@ LibMCResult handleUnhandledException(IBase * pIBaseClass)
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
- Class implementation for APIResponse
+ Class implementation for APIRequestHandler
 **************************************************************************************************************************/
-LibMCResult libmc_apiresponse_gethttpcode(LibMC_APIResponse pAPIResponse, LibMC_uint32 * pHTTPCode)
+LibMCResult libmc_apirequesthandler_expectsrawbody(LibMC_APIRequestHandler pAPIRequestHandler, bool * pValue)
 {
-	IBase* pIBaseClass = (IBase *)pAPIResponse;
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
 
 	try {
-		if (pHTTPCode == nullptr)
+		if (pValue == nullptr)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		IAPIResponse* pIAPIResponse = dynamic_cast<IAPIResponse*>(pIBaseClass);
-		if (!pIAPIResponse)
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
-		*pHTTPCode = pIAPIResponse->GetHTTPCode();
+		*pValue = pIAPIRequestHandler->ExpectsRawBody();
 
 		return LIBMC_SUCCESS;
 	}
@@ -109,30 +109,141 @@ LibMCResult libmc_apiresponse_gethttpcode(LibMC_APIResponse pAPIResponse, LibMC_
 	}
 }
 
-LibMCResult libmc_apiresponse_getcontenttype(LibMC_APIResponse pAPIResponse, const LibMC_uint32 nContentTypeBufferSize, LibMC_uint32* pContentTypeNeededChars, char * pContentTypeBuffer)
+LibMCResult libmc_apirequesthandler_expectsformdata(LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 * pFieldCount, bool * pValue)
 {
-	IBase* pIBaseClass = (IBase *)pAPIResponse;
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
 
 	try {
+		if (!pFieldCount)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		*pValue = pIAPIRequestHandler->ExpectsFormData(*pFieldCount);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_apirequesthandler_getformdatadetails(LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 nFieldIndex, const LibMC_uint32 nNameBufferSize, LibMC_uint32* pNameNeededChars, char * pNameBuffer, bool * pMandatory)
+{
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (!pMandatory)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			pIAPIRequestHandler->GetFormDataDetails(nFieldIndex, sName, *pMandatory);
+
+			pIAPIRequestHandler->_setCache (new ParameterCache_2<std::string, bool> (sName, *pMandatory));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_2<std::string, bool>*> (pIAPIRequestHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+			cache->retrieveData (sName, *pMandatory);
+			pIAPIRequestHandler->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMC_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCInterfaceException (LIBMC_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_apirequesthandler_setformdatafield(LibMC_APIRequestHandler pAPIRequestHandler, const char * pName, LibMC_uint64 nDataFieldBufferSize, const LibMC_uint8 * pDataFieldBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if ( (!pDataFieldBuffer) && (nDataFieldBufferSize>0))
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIAPIRequestHandler->SetFormDataField(sName, nDataFieldBufferSize, pDataFieldBuffer);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_apirequesthandler_handle(LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8 * pRawBodyBuffer, const LibMC_uint32 nContentTypeBufferSize, LibMC_uint32* pContentTypeNeededChars, char * pContentTypeBuffer, LibMC_uint32 * pHTTPCode)
+{
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
+
+	try {
+		if ( (!pRawBodyBuffer) && (nRawBodyBufferSize>0))
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		if ( (!pContentTypeBuffer) && !(pContentTypeNeededChars) )
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (!pHTTPCode)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		std::string sContentType("");
-		IAPIResponse* pIAPIResponse = dynamic_cast<IAPIResponse*>(pIBaseClass);
-		if (!pIAPIResponse)
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
 		bool isCacheCall = (pContentTypeBuffer == nullptr);
 		if (isCacheCall) {
-			sContentType = pIAPIResponse->GetContentType();
+			pIAPIRequestHandler->Handle(nRawBodyBufferSize, pRawBodyBuffer, sContentType, *pHTTPCode);
 
-			pIAPIResponse->_setCache (new ParameterCache_1<std::string> (sContentType));
+			pIAPIRequestHandler->_setCache (new ParameterCache_2<std::string, LibMC_uint32> (sContentType, *pHTTPCode));
 		}
 		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIAPIResponse->_getCache ());
+			auto cache = dynamic_cast<ParameterCache_2<std::string, LibMC_uint32>*> (pIAPIRequestHandler->_getCache ());
 			if (cache == nullptr)
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
-			cache->retrieveData (sContentType);
-			pIAPIResponse->_setCache (nullptr);
+			cache->retrieveData (sContentType, *pHTTPCode);
+			pIAPIRequestHandler->_setCache (nullptr);
 		}
 		
 		if (pContentTypeNeededChars)
@@ -157,18 +268,18 @@ LibMCResult libmc_apiresponse_getcontenttype(LibMC_APIResponse pAPIResponse, con
 	}
 }
 
-LibMCResult libmc_apiresponse_getdata(LibMC_APIResponse pAPIResponse, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)
+LibMCResult libmc_apirequesthandler_getresultdata(LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)
 {
-	IBase* pIBaseClass = (IBase *)pAPIResponse;
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
 
 	try {
 		if ((!pDataBuffer) && !(pDataNeededCount))
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		IAPIResponse* pIAPIResponse = dynamic_cast<IAPIResponse*>(pIBaseClass);
-		if (!pIAPIResponse)
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
-		pIAPIResponse->GetData(nDataBufferSize, pDataNeededCount, pDataBuffer);
+		pIAPIRequestHandler->GetResultData(nDataBufferSize, pDataNeededCount, pDataBuffer);
 
 		return LIBMC_SUCCESS;
 	}
@@ -345,57 +456,27 @@ LibMCResult libmc_mccontext_log(LibMC_MCContext pMCContext, const char * pMessag
 	}
 }
 
-LibMCResult libmc_mccontext_handleapigetrequest(LibMC_MCContext pMCContext, const char * pURI, LibMC_APIResponse * pResponse)
+LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
 
 	try {
 		if (pURI == nullptr)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		if (pResponse == nullptr)
+		if (pRequestMethod == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pHandlerInstance == nullptr)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		std::string sURI(pURI);
-		IBase* pBaseResponse(nullptr);
+		std::string sRequestMethod(pRequestMethod);
+		IBase* pBaseHandlerInstance(nullptr);
 		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
 		if (!pIMCContext)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
-		pBaseResponse = pIMCContext->HandleAPIGetRequest(sURI);
+		pBaseHandlerInstance = pIMCContext->CreateAPIRequestHandler(sURI, sRequestMethod);
 
-		*pResponse = (IBase*)(pBaseResponse);
-		return LIBMC_SUCCESS;
-	}
-	catch (ELibMCInterfaceException & Exception) {
-		return handleLibMCException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCResult libmc_mccontext_handleapipostrequest(LibMC_MCContext pMCContext, const char * pURI, LibMC_uint64 nBodyBufferSize, const LibMC_uint8 * pBodyBuffer, LibMC_APIResponse * pResponse)
-{
-	IBase* pIBaseClass = (IBase *)pMCContext;
-
-	try {
-		if (pURI == nullptr)
-			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		if ( (!pBodyBuffer) && (nBodyBufferSize>0))
-			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		if (pResponse == nullptr)
-			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
-		std::string sURI(pURI);
-		IBase* pBaseResponse(nullptr);
-		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
-		if (!pIMCContext)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
-		
-		pBaseResponse = pIMCContext->HandleAPIPostRequest(sURI, nBodyBufferSize, pBodyBuffer);
-
-		*pResponse = (IBase*)(pBaseResponse);
+		*pHandlerInstance = (IBase*)(pBaseHandlerInstance);
 		return LIBMC_SUCCESS;
 	}
 	catch (ELibMCInterfaceException & Exception) {
@@ -424,12 +505,18 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
-	if (sProcName == "libmc_apiresponse_gethttpcode") 
-		*ppProcAddress = (void*) &libmc_apiresponse_gethttpcode;
-	if (sProcName == "libmc_apiresponse_getcontenttype") 
-		*ppProcAddress = (void*) &libmc_apiresponse_getcontenttype;
-	if (sProcName == "libmc_apiresponse_getdata") 
-		*ppProcAddress = (void*) &libmc_apiresponse_getdata;
+	if (sProcName == "libmc_apirequesthandler_expectsrawbody") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_expectsrawbody;
+	if (sProcName == "libmc_apirequesthandler_expectsformdata") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_expectsformdata;
+	if (sProcName == "libmc_apirequesthandler_getformdatadetails") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_getformdatadetails;
+	if (sProcName == "libmc_apirequesthandler_setformdatafield") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_setformdatafield;
+	if (sProcName == "libmc_apirequesthandler_handle") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_handle;
+	if (sProcName == "libmc_apirequesthandler_getresultdata") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_getresultdata;
 	if (sProcName == "libmc_mccontext_registerlibrarypath") 
 		*ppProcAddress = (void*) &libmc_mccontext_registerlibrarypath;
 	if (sProcName == "libmc_mccontext_parseconfiguration") 
@@ -442,10 +529,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_mccontext_loadclientpackage;
 	if (sProcName == "libmc_mccontext_log") 
 		*ppProcAddress = (void*) &libmc_mccontext_log;
-	if (sProcName == "libmc_mccontext_handleapigetrequest") 
-		*ppProcAddress = (void*) &libmc_mccontext_handleapigetrequest;
-	if (sProcName == "libmc_mccontext_handleapipostrequest") 
-		*ppProcAddress = (void*) &libmc_mccontext_handleapipostrequest;
+	if (sProcName == "libmc_mccontext_createapirequesthandler") 
+		*ppProcAddress = (void*) &libmc_mccontext_createapirequesthandler;
 	if (sProcName == "libmc_getversion") 
 		*ppProcAddress = (void*) &libmc_getversion;
 	if (sProcName == "libmc_getlasterror") 

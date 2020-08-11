@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriverEnvironment
+Abstract: This is the class declaration of CWorkingFile
 
 */
 
 
-#ifndef __LIBMCDRIVERENV_DRIVERENVIRONMENT
-#define __LIBMCDRIVERENV_DRIVERENVIRONMENT
+#ifndef __LIBMCDRIVERENV_WORKINGFILE
+#define __LIBMCDRIVERENV_WORKINGFILE
 
 #include "libmcdriverenv_interfaces.hpp"
 
@@ -52,10 +52,10 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriverEnvironment 
+ Class declaration of CWorkingFile 
 **************************************************************************************************************************/
 
-class CDriverEnvironment : public virtual IDriverEnvironment, public virtual CBase {
+class CWorkingFile : public virtual IWorkingFile, public virtual CBase {
 private:
 
 	/**
@@ -79,9 +79,15 @@ public:
 	* Public member functions to implement.
 	*/
 
-	IWorkingDirectory * CreateWorkingDirectory() override;
+	std::string GetAbsoluteFileName() override;
 
-	void RetrieveDriverData(const std::string & sIdentifier, LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer) override;
+	LibMCDriverEnv_uint64 GetSize() override;
+
+	std::string CalculateSHA2() override;
+
+	void DeleteFile() override;
+
+	IWorkingFileExecution * ExecuteFile() override;
 
 };
 
@@ -91,4 +97,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVERENV_DRIVERENVIRONMENT
+#endif // __LIBMCDRIVERENV_WORKINGFILE

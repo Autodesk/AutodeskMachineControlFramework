@@ -56,7 +56,7 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
-class IAPIResponse;
+class IAPIRequestHandler;
 class IMCContext;
 
 
@@ -239,34 +239,60 @@ typedef IBaseSharedPtr<IBase> PIBase;
 
 
 /*************************************************************************************************************************
- Class interface for APIResponse 
+ Class interface for APIRequestHandler 
 **************************************************************************************************************************/
 
-class IAPIResponse : public virtual IBase {
+class IAPIRequestHandler : public virtual IBase {
 public:
 	/**
-	* IAPIResponse::GetHTTPCode - returns the HTTP Errorcode to set (200 for success).
-	* @return HTTP Code
+	* IAPIRequestHandler::ExpectsRawBody - checks if the raw body is needed to handle the request.
+	* @return Flag, if the raw body is needed in the request.
 	*/
-	virtual LibMC_uint32 GetHTTPCode() = 0;
+	virtual bool ExpectsRawBody() = 0;
 
 	/**
-	* IAPIResponse::GetContentType - returns the content type string of the data.
-	* @return Content Type.
+	* IAPIRequestHandler::ExpectsFormData - checks if the parsed form data is needed to handle the request.
+	* @param[out] nFieldCount - Number of Form Data entries that are expected.
+	* @return Flag, if the parsed form data is needed in the request.
 	*/
-	virtual std::string GetContentType() = 0;
+	virtual bool ExpectsFormData(LibMC_uint32 & nFieldCount) = 0;
 
 	/**
-	* IAPIResponse::GetData - returns the stream content of the data.
+	* IAPIRequestHandler::GetFormDataDetails - returns details of expected form data.
+	* @param[in] nFieldIndex - Index of Form Data Field (0..FieldCount - 1)
+	* @param[out] sName - Name of the expected form data field.
+	* @param[out] bMandatory - Flag, if the field MUST be present.
+	*/
+	virtual void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bMandatory) = 0;
+
+	/**
+	* IAPIRequestHandler::SetFormDataField - passes the a form data field to the request handler. Call only, if ExpectsFormData returns true.
+	* @param[in] sName - Name of the form data field.
+	* @param[in] nDataFieldBufferSize - Number of elements in buffer
+	* @param[in] pDataFieldBuffer - DataField that was sent.
+	*/
+	virtual void SetFormDataField(const std::string & sName, const LibMC_uint64 nDataFieldBufferSize, const LibMC_uint8 * pDataFieldBuffer) = 0;
+
+	/**
+	* IAPIRequestHandler::Handle - handles the request.
+	* @param[in] nRawBodyBufferSize - Number of elements in buffer
+	* @param[in] pRawBodyBuffer - Raw Body that was sent. Only necessary, if ExpectsRawBody returns true.
+	* @param[out] sContentType - the resulting Content Type String of the data.
+	* @param[out] nHTTPCode - the resulting HTTP Errorcode (200 for success).
+	*/
+	virtual void Handle(const LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8 * pRawBodyBuffer, std::string & sContentType, LibMC_uint32 & nHTTPCode) = 0;
+
+	/**
+	* IAPIRequestHandler::GetResultData - returns the cached stream content of the resulting data. Call only after Handle().
 	* @param[in] nDataBufferSize - Number of elements in buffer
 	* @param[out] pDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pDataBuffer - uint8 buffer of Binary stream data
 	*/
-	virtual void GetData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer) = 0;
+	virtual void GetResultData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer) = 0;
 
 };
 
-typedef IBaseSharedPtr<IAPIResponse> PIAPIResponse;
+typedef IBaseSharedPtr<IAPIRequestHandler> PIAPIRequestHandler;
 
 
 /*************************************************************************************************************************
@@ -314,20 +340,12 @@ public:
 	virtual void Log(const std::string & sMessage, const LibMC::eLogSubSystem eSubsystem, const LibMC::eLogLevel eLogLevel) = 0;
 
 	/**
-	* IMCContext::HandleAPIGetRequest - handle an API GET request.
+	* IMCContext::CreateAPIRequestHandler - creates an API request handler.
 	* @param[in] sURI - URI to serve
-	* @return Response instance.
+	* @param[in] sRequestMethod - Request Method
+	* @return Request Handler instance.
 	*/
-	virtual IAPIResponse * HandleAPIGetRequest(const std::string & sURI) = 0;
-
-	/**
-	* IMCContext::HandleAPIPostRequest - handle an API POST request.
-	* @param[in] sURI - URI to serve
-	* @param[in] nBodyBufferSize - Number of elements in buffer
-	* @param[in] pBodyBuffer - Body that was sent.
-	* @return Response instance.
-	*/
-	virtual IAPIResponse * HandleAPIPostRequest(const std::string & sURI, const LibMC_uint64 nBodyBufferSize, const LibMC_uint8 * pBodyBuffer) = 0;
+	virtual IAPIRequestHandler * CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod) = 0;
 
 };
 

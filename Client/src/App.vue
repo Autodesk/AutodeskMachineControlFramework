@@ -102,7 +102,7 @@
 		
 		
 		
-		<v-content>
+		<v-main>
 		
 		
 			<v-container class="fill-height" fluid v-if="!UI.isLoggedIn">
@@ -155,7 +155,7 @@
 
 								 <form enctype="multipart/form-data" novalidate v-if="uploadIsInitial || uploadIsSaving">							
 									<div class="dropbox">
-									  <input type="file" multiple :name="uploadFieldName" :disabled="uploadIsSaving" @change="uploadFilesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
+									  <input type="file" multiple :name="Upload.uploadFieldName" :disabled="uploadIsSaving" @change="uploadFilesChange($event.target.name, $event.target.files); fileCount = $event.target.files.length"
 										accept="" class="input-file">
 										<p v-if="uploadIsInitial">
 										  Drag your build file here to begin or click to browse
@@ -351,7 +351,7 @@
 				</v-row>
 
 			</v-container>
-		</v-content>
+		</v-main>
 
 		<v-footer
 				color="primary"
@@ -369,7 +369,7 @@
 
 <script>
 
-  import axios from "axios";
+  import * as Axios from 'axios';
   import Dracula from 'graphdracula'
   
   export default {
@@ -506,17 +506,22 @@
 		uploadSave (formData) {
         
 			this.Upload.currentStatus = 'saving';
-			formData.teset = 4;
+			alert ("Saving: " + formData);
+			
+			//const url = `http://localhost:8869/api/logs`;
+		
 
-			//upload(formData)
-//				.then(x => {
-					//this.uploadedFiles = [].concat(x);
-					//this.currentStatus = STATUS_SUCCESS;
-//				})
-				//.catch(err => {
-//					this.uploadError = err.response;
-					//this.currentStatus = STATUS_FAILED;
-				//});
+			Axios({ method: "POST", "url": 'http://localhost:8869/api/logs', data: formData})
+				.then(x => {
+					this.Upload.uploadedFiles = [].concat(x);
+					this.Upload.currentStatus = "success";
+					alert ("SavingOK");
+				})
+				.catch(err => {
+					this.Upload.uploadError = err.response;
+					this.Upload.currentStatus = "failed";
+					alert ("SavingFailed: " + err.response);
+				});
 				
 		},
 		
@@ -541,7 +546,7 @@
 		
 		dataRetrieveSetup () {
 			var url = this.API.baseURL + "/setup/";	
-			axios({ method: "GET", "url": url }).then(result => {
+			Axios({ method: "GET", "url": url }).then(result => {
 			
 				var instances = result.data.instances;
 				if (instances) {
@@ -615,7 +620,7 @@
 		
 		dataRetrieveStatus () {
 			var url = this.API.baseURL + "/status/";	
-			axios({ method: "GET", "url": url }).then(result => {
+			Axios({ method: "GET", "url": url }).then(result => {
 			
 				var instances = result.data.instances;
 				if (instances) {
@@ -745,7 +750,7 @@
 			
 				var url = this.API.baseURL + "/logs/" + (this.Logs.LastID + 1);	
 				console.log (url);
-				axios({ method: "GET", "url": url }).then(result => {
+				Axios({ method: "GET", "url": url }).then(result => {
 												
 				var logs=result.data.logs;
 				

@@ -112,14 +112,14 @@ public:
 
 	void LoadClientPackage(const LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8* pZIPStreamBuffer) override;
 
+	IAPIRequestHandler* CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod) override;
+
 	AMC::PStateMachineInstance addMachineInstance (const pugi::xml_node & xmlNode);
 	AMC::PStateMachineInstance findMachineInstance (std::string sName, bool bFailIfNotExisting);	
 
 	void addDriver(const pugi::xml_node& xmlNode);
 
-	IAPIResponse* HandleAPIGetRequest(const std::string& sURI) override;
-
-	IAPIResponse* HandleAPIPostRequest(const std::string& sURI, const LibMC_uint64 nBodyBufferSize, const LibMC_uint8* pBodyBuffer) override;
+	
 
 
 };

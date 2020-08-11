@@ -253,6 +253,23 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE 225
 #define LIBMC_ERROR_NO3MFLIBRARY 226
 #define LIBMC_ERROR_INVALIDPOINTCOUNT 227
+#define LIBMC_ERROR_DUPLICATEJOBUUID 228
+#define LIBMC_ERROR_INVALIDJOBSTATUS 229
+#define LIBMC_ERROR_INVALIDSTREAMCONTEXT 230
+#define LIBMC_ERROR_JOBUUIDNOTFOUND 231
+#define LIBMC_ERROR_INVALIDJOBNAME 232
+#define LIBMC_ERROR_INVALIDJOBTIMESTAMP 233
+#define LIBMC_ERROR_INVALIDUSERID 234
+#define LIBMC_ERROR_INVALIDSTORAGECALLBACKSIGNATURE 235
+#define LIBMC_ERROR_INVALIDSTORAGECALLBACKSTREAM 236
+#define LIBMC_ERROR_INVALIDSTORAGEPATH 237
+#define LIBMC_ERROR_STORAGESTREAMNOTFOUND 238
+#define LIBMC_ERROR_DUPLICATESTORAGESTREAM 239
+#define LIBMC_ERROR_INVALIDPARTIALUPLOAD 240
+#define LIBMC_ERROR_PARTIALUPLOADNOTFINISHED 241
+#define LIBMC_ERROR_APIREQUESTNOTHANDLED 242
+#define LIBMC_ERROR_APIREQUESTALREADYHANDLED 243
+#define LIBMC_ERROR_INVALIDAPIREQUESTTYPE 244
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -417,6 +434,23 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE: return "Toolpath entity is invalid";
     case LIBMC_ERROR_NO3MFLIBRARY: return "No 3MF Library specified";
     case LIBMC_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
+    case LIBMC_ERROR_DUPLICATEJOBUUID: return "Duplicate job uuid";
+    case LIBMC_ERROR_INVALIDJOBSTATUS: return "Invalid Job status";
+    case LIBMC_ERROR_INVALIDSTREAMCONTEXT: return "Invalid stream context";
+    case LIBMC_ERROR_JOBUUIDNOTFOUND: return "Job uuid not found";
+    case LIBMC_ERROR_INVALIDJOBNAME: return "Invalid job name";
+    case LIBMC_ERROR_INVALIDJOBTIMESTAMP: return "Invalid job timestamp";
+    case LIBMC_ERROR_INVALIDUSERID: return "Invalid job name";
+    case LIBMC_ERROR_INVALIDSTORAGECALLBACKSIGNATURE: return "Invalid storage callback signature";
+    case LIBMC_ERROR_INVALIDSTORAGECALLBACKSTREAM: return "Invalid storage callback stream";
+    case LIBMC_ERROR_INVALIDSTORAGEPATH: return "Invalid storage path";
+    case LIBMC_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found";
+    case LIBMC_ERROR_DUPLICATESTORAGESTREAM: return "Duplicate Storage Stream";
+    case LIBMC_ERROR_INVALIDPARTIALUPLOAD: return "Invalid Partial Upload";
+    case LIBMC_ERROR_PARTIALUPLOADNOTFINISHED: return "Partial Upload not finished";
+    case LIBMC_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
+    case LIBMC_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
+    case LIBMC_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
     default: return "unknown error";
   }
 }
@@ -426,17 +460,42 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCHandle LibMC_Base;
-typedef LibMCHandle LibMC_APIResponse;
+typedef LibMCHandle LibMC_APIRequestHandler;
 typedef LibMCHandle LibMC_MCContext;
 
 /*************************************************************************************************************************
  Declaration of enums
 **************************************************************************************************************************/
 
+typedef enum eLibMCLogLevel {
+  eLogLevelUserAcknowledge = 1,
+  eLogLevelFatalError = 2,
+  eLogLevelCriticalError = 3,
+  eLogLevelWarning = 4,
+  eLogLevelMessage = 5,
+  eLogLevelInfo = 6,
+  eLogLevelDebug = 7,
+  eLogLevelUnknown = 8
+} eLibMCLogLevel;
+
 typedef enum eLibMCLogSubSystem {
   eLogSubSystemSystem = 1,
   eLogSubSystemNetwork = 2
 } eLibMCLogSubSystem;
+
+/*************************************************************************************************************************
+ Declaration of enum members for 4 byte struct alignment
+**************************************************************************************************************************/
+
+typedef union {
+  eLibMCLogLevel m_enum;
+  int m_code;
+} structEnumLibMCLogLevel;
+
+typedef union {
+  eLibMCLogSubSystem m_enum;
+  int m_code;
+} structEnumLibMCLogSubSystem;
 
 
 #endif // __LIBMC_TYPES_HEADER

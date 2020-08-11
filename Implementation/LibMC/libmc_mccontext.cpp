@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmc_mccontext.hpp"
 #include "libmc_interfaceexception.hpp"
-#include "libmc_apiresponse.hpp"
+#include "libmc_apirequesthandler.hpp"
 #include "pugixml.hpp"
 
 #include "libmcdriverenv_interfaces.hpp"
@@ -462,44 +462,8 @@ void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSu
     m_pSystemState->logger()->logMessage (sMessage, sSubSystem, (AMC::eLogLevel) eLogLevel);
 }
 
-
-IAPIResponse* CMCContext::HandleAPIGetRequest(const std::string& sURI)
+IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod)
 {
+    return new CAPIRequestHandler(m_pAPI, sURI, sRequestMethod);
 
-    std::string sURIWithoutLeadingSlash;
-    if (sURI.length() > 0) {
-        if (sURI.substr(0, 1) == "/")
-            sURIWithoutLeadingSlash = sURI.substr(1);
-        else
-            sURIWithoutLeadingSlash = sURI;
-    }
-
-    uint32_t nHTTPCode = AMC_API_HTTP_NOTFOUND;
-    auto pResponseObject = m_pAPI->handleGetRequest(sURIWithoutLeadingSlash, nHTTPCode);
-
-    if (pResponseObject.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
-    
-    return new CAPIResponse(pResponseObject, nHTTPCode);    
 }
-
-IAPIResponse* CMCContext::HandleAPIPostRequest(const std::string& sURI, const LibMC_uint64 nBodyBufferSize, const LibMC_uint8* pBodyBuffer)
-{
-    std::string sURIWithoutLeadingSlash;
-    if (sURI.length() > 0) {
-        if (sURI.substr(0, 1) == "/")
-            sURIWithoutLeadingSlash = sURI.substr(1);
-        else
-            sURIWithoutLeadingSlash = sURI;
-    }
-
-    uint32_t nHTTPCode = AMC_API_HTTP_NOTFOUND;
-    auto pResponseObject = m_pAPI->handlePostRequest(sURIWithoutLeadingSlash, pBodyBuffer, nBodyBufferSize, nHTTPCode);
-
-    if (pResponseObject.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
-
-    return new CAPIResponse(pResponseObject, nHTTPCode);
-}
-
-

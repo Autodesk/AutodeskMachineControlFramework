@@ -27,68 +27,29 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriverEnvironment
+Abstract: This is a stub class definition of CWorkingFileExecution
 
 */
 
-
-#ifndef __LIBMCDRIVERENV_DRIVERENVIRONMENT
-#define __LIBMCDRIVERENV_DRIVERENVIRONMENT
-
-#include "libmcdriverenv_interfaces.hpp"
-
-// Parent classes
-#include "libmcdriverenv_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcdriverenv_workingfileexecution.hpp"
+#include "libmcdriverenv_interfaceexception.hpp"
 
 // Include custom headers here.
 
 
-namespace LibMCDriverEnv {
-namespace Impl {
-
+using namespace LibMCDriverEnv::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CDriverEnvironment 
+ Class definition of CWorkingFileExecution 
 **************************************************************************************************************************/
 
-class CDriverEnvironment : public virtual IDriverEnvironment, public virtual CBase {
-private:
+void CWorkingFileExecution::GetStatus()
+{
+	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
+}
 
-	/**
-	* Put private members here.
-	*/
+std::string CWorkingFileExecution::ReturnStdOut()
+{
+	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
+}
 
-protected:
-
-	/**
-	* Put protected members here.
-	*/
-
-public:
-
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
-
-	IWorkingDirectory * CreateWorkingDirectory() override;
-
-	void RetrieveDriverData(const std::string & sIdentifier, LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCDriverEnv
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVERENV_DRIVERENVIRONMENT

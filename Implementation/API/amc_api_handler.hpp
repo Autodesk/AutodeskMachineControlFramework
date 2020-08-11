@@ -58,10 +58,23 @@ namespace AMC {
 				
 		virtual std::string getBaseURI () = 0;
 
-		virtual PAPIResponse handleGetRequest(const std::string& sURI) = 0;
+		virtual bool expectsRawBody(const eAPIRequestType requestType)
+		{
+			return false;
+		}
 
-		virtual PAPIResponse handlePostRequest(const std::string& sURI, const uint8_t* pBodyData, const size_t nBodyDataSize) = 0;
+		virtual uint32_t getFormDataFieldCount(const eAPIRequestType requestType)
+		{
+			return 0;
+		}
 
+		virtual void getFormDataFieldDetails(const eAPIRequestType requestType, const uint32_t nFieldIndex, std::string & sFieldName, bool & bIsMandatory) 
+		{
+			sFieldName = "";
+			bIsMandatory = false;			
+		}
+
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize)  = 0;
 
 		virtual void writeJSONHeader(CJSONWriter & writer, const std::string & sProtocol)
 		{

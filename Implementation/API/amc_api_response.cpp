@@ -30,13 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_api_response.hpp"
+#include "amc_api_constants.hpp"
 #include "libmc_interfaceexception.hpp"
 
 using namespace AMC;
 
 
-CAPIResponse::CAPIResponse(const std::string& sContentType)
-	: m_sContentType (sContentType)
+CAPIResponse::CAPIResponse(uint32_t nHTTPCode, const std::string& sContentType)
+	: m_sContentType (sContentType), m_nHTTPCode (nHTTPCode)
 {
 
 }
@@ -59,10 +60,16 @@ std::string CAPIResponse::getContentType() const
 	return m_sContentType;
 }
 
+uint32_t CAPIResponse::getHTTPCode() const
+{
+	return m_nHTTPCode;
+}
 
 
-CAPIStringResponse::CAPIStringResponse(const std::string& sContentType, const std::string& sStringValue)
-	: CAPIResponse (sContentType)
+
+
+CAPIStringResponse::CAPIStringResponse(uint32_t nHTTPCode, const std::string& sContentType, const std::string& sStringValue)
+	: CAPIResponse (nHTTPCode, sContentType)
 {
 	size_t len = sStringValue.length();
 	if (len > 0) {
@@ -82,7 +89,7 @@ CAPIStringResponse::CAPIStringResponse(const std::string& sContentType, const st
 
 
 CAPIFixedBufferResponse::CAPIFixedBufferResponse(const std::string& sContentType)
-	: CAPIResponse (sContentType)
+	: CAPIResponse (AMC_API_HTTP_SUCCESS, sContentType)
 {
 }
 

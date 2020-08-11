@@ -49,39 +49,76 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
- Class definition for APIResponse
+ Class definition for APIRequestHandler
 **************************************************************************************************************************/
 
 /**
-* returns the HTTP Errorcode to set (200 for success).
+* checks if the raw body is needed to handle the request.
 *
-* @param[in] pAPIResponse - APIResponse instance.
-* @param[out] pHTTPCode - HTTP Code
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[out] pValue - Flag, if the raw body is needed in the request.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCAPIResponse_GetHTTPCodePtr) (LibMC_APIResponse pAPIResponse, LibMC_uint32 * pHTTPCode);
+typedef LibMCResult (*PLibMCAPIRequestHandler_ExpectsRawBodyPtr) (LibMC_APIRequestHandler pAPIRequestHandler, bool * pValue);
 
 /**
-* returns the content type string of the data.
+* checks if the parsed form data is needed to handle the request.
 *
-* @param[in] pAPIResponse - APIResponse instance.
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[out] pFieldCount - Number of Form Data entries that are expected.
+* @param[out] pValue - Flag, if the parsed form data is needed in the request.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCAPIRequestHandler_ExpectsFormDataPtr) (LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 * pFieldCount, bool * pValue);
+
+/**
+* returns details of expected form data.
+*
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[in] nFieldIndex - Index of Form Data Field (0..FieldCount - 1)
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the expected form data field., may be NULL
+* @param[out] pMandatory - Flag, if the field MUST be present.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCAPIRequestHandler_GetFormDataDetailsPtr) (LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 nFieldIndex, const LibMC_uint32 nNameBufferSize, LibMC_uint32* pNameNeededChars, char * pNameBuffer, bool * pMandatory);
+
+/**
+* passes the a form data field to the request handler. Call only, if ExpectsFormData returns true.
+*
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[in] pName - Name of the form data field.
+* @param[in] nDataFieldBufferSize - Number of elements in buffer
+* @param[in] pDataFieldBuffer - uint8 buffer of DataField that was sent.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCAPIRequestHandler_SetFormDataFieldPtr) (LibMC_APIRequestHandler pAPIRequestHandler, const char * pName, LibMC_uint64 nDataFieldBufferSize, const LibMC_uint8 * pDataFieldBuffer);
+
+/**
+* handles the request.
+*
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[in] nRawBodyBufferSize - Number of elements in buffer
+* @param[in] pRawBodyBuffer - uint8 buffer of Raw Body that was sent. Only necessary, if ExpectsRawBody returns true.
 * @param[in] nContentTypeBufferSize - size of the buffer (including trailing 0)
 * @param[out] pContentTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pContentTypeBuffer -  buffer of Content Type., may be NULL
+* @param[out] pContentTypeBuffer -  buffer of the resulting Content Type String of the data., may be NULL
+* @param[out] pHTTPCode - the resulting HTTP Errorcode (200 for success).
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCAPIResponse_GetContentTypePtr) (LibMC_APIResponse pAPIResponse, const LibMC_uint32 nContentTypeBufferSize, LibMC_uint32* pContentTypeNeededChars, char * pContentTypeBuffer);
+typedef LibMCResult (*PLibMCAPIRequestHandler_HandlePtr) (LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8 * pRawBodyBuffer, const LibMC_uint32 nContentTypeBufferSize, LibMC_uint32* pContentTypeNeededChars, char * pContentTypeBuffer, LibMC_uint32 * pHTTPCode);
 
 /**
-* returns the stream content of the data.
+* returns the cached stream content of the resulting data. Call only after Handle().
 *
-* @param[in] pAPIResponse - APIResponse instance.
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
 * @param[in] nDataBufferSize - Number of elements in buffer
 * @param[out] pDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
 * @param[out] pDataBuffer - uint8 buffer of Binary stream data
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCAPIResponse_GetDataPtr) (LibMC_APIResponse pAPIResponse, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer);
+typedef LibMCResult (*PLibMCAPIRequestHandler_GetResultDataPtr) (LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer);
 
 /*************************************************************************************************************************
  Class definition for MCContext
@@ -144,26 +181,15 @@ typedef LibMCResult (*PLibMCMCContext_LoadClientPackagePtr) (LibMC_MCContext pMC
 typedef LibMCResult (*PLibMCMCContext_LogPtr) (LibMC_MCContext pMCContext, const char * pMessage, LibMC::eLogSubSystem eSubsystem, LibMC::eLogLevel eLogLevel);
 
 /**
-* handle an API GET request.
+* creates an API request handler.
 *
 * @param[in] pMCContext - MCContext instance.
 * @param[in] pURI - URI to serve
-* @param[out] pResponse - Response instance.
+* @param[in] pRequestMethod - Request Method
+* @param[out] pHandlerInstance - Request Handler instance.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_HandleAPIGetRequestPtr) (LibMC_MCContext pMCContext, const char * pURI, LibMC_APIResponse * pResponse);
-
-/**
-* handle an API POST request.
-*
-* @param[in] pMCContext - MCContext instance.
-* @param[in] pURI - URI to serve
-* @param[in] nBodyBufferSize - Number of elements in buffer
-* @param[in] pBodyBuffer - uint8 buffer of Body that was sent.
-* @param[out] pResponse - Response instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCResult (*PLibMCMCContext_HandleAPIPostRequestPtr) (LibMC_MCContext pMCContext, const char * pURI, LibMC_uint64 nBodyBufferSize, const LibMC_uint8 * pBodyBuffer, LibMC_APIResponse * pResponse);
+typedef LibMCResult (*PLibMCMCContext_CreateAPIRequestHandlerPtr) (LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance);
 
 /*************************************************************************************************************************
  Global functions
@@ -231,17 +257,19 @@ typedef LibMCResult (*PLibMCCreateMCContextPtr) (LibMCData_DataModel pDataModel,
 
 typedef struct {
 	void * m_LibraryHandle;
-	PLibMCAPIResponse_GetHTTPCodePtr m_APIResponse_GetHTTPCode;
-	PLibMCAPIResponse_GetContentTypePtr m_APIResponse_GetContentType;
-	PLibMCAPIResponse_GetDataPtr m_APIResponse_GetData;
+	PLibMCAPIRequestHandler_ExpectsRawBodyPtr m_APIRequestHandler_ExpectsRawBody;
+	PLibMCAPIRequestHandler_ExpectsFormDataPtr m_APIRequestHandler_ExpectsFormData;
+	PLibMCAPIRequestHandler_GetFormDataDetailsPtr m_APIRequestHandler_GetFormDataDetails;
+	PLibMCAPIRequestHandler_SetFormDataFieldPtr m_APIRequestHandler_SetFormDataField;
+	PLibMCAPIRequestHandler_HandlePtr m_APIRequestHandler_Handle;
+	PLibMCAPIRequestHandler_GetResultDataPtr m_APIRequestHandler_GetResultData;
 	PLibMCMCContext_RegisterLibraryPathPtr m_MCContext_RegisterLibraryPath;
 	PLibMCMCContext_ParseConfigurationPtr m_MCContext_ParseConfiguration;
 	PLibMCMCContext_StartAllThreadsPtr m_MCContext_StartAllThreads;
 	PLibMCMCContext_TerminateAllThreadsPtr m_MCContext_TerminateAllThreads;
 	PLibMCMCContext_LoadClientPackagePtr m_MCContext_LoadClientPackage;
 	PLibMCMCContext_LogPtr m_MCContext_Log;
-	PLibMCMCContext_HandleAPIGetRequestPtr m_MCContext_HandleAPIGetRequest;
-	PLibMCMCContext_HandleAPIPostRequestPtr m_MCContext_HandleAPIPostRequest;
+	PLibMCMCContext_CreateAPIRequestHandlerPtr m_MCContext_CreateAPIRequestHandler;
 	PLibMCGetVersionPtr m_GetVersion;
 	PLibMCGetLastErrorPtr m_GetLastError;
 	PLibMCReleaseInstancePtr m_ReleaseInstance;

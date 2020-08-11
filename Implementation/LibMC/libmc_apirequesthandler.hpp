@@ -27,68 +27,72 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriverEnvironment
+Abstract: This is the class declaration of CAPIRequestHandler
 
 */
 
 
-#ifndef __LIBMCDRIVERENV_DRIVERENVIRONMENT
-#define __LIBMCDRIVERENV_DRIVERENVIRONMENT
+#ifndef __LIBMC_APIREQUESTHANDLER
+#define __LIBMC_APIREQUESTHANDLER
 
-#include "libmcdriverenv_interfaces.hpp"
+#include "libmc_interfaces.hpp"
+#include "API/amc_api_response.hpp"
+#include "API/amc_api.hpp"
 
 // Parent classes
-#include "libmcdriverenv_base.hpp"
+#include "libmc_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
+#include <map>
 
-
-namespace LibMCDriverEnv {
+namespace LibMC {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriverEnvironment 
+ Class declaration of CAPIRequestHandler 
 **************************************************************************************************************************/
 
-class CDriverEnvironment : public virtual IDriverEnvironment, public virtual CBase {
+class CAPIRequestHandler : public virtual IAPIRequestHandler, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+	AMC::PAPI m_pAPI;
+	AMC::PAPIResponse m_pResponse;
+
+	std::string m_sURIWithoutLeadingSlash;
+	AMC::eAPIRequestType m_RequestType;
+
+	AMC::PAPIFormFields m_FormFields;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const std::string& sRequestMethod);
 
+	bool ExpectsRawBody() override;
 
-	/**
-	* Public member functions to implement.
-	*/
+	bool ExpectsFormData(LibMC_uint32 & nFieldCount) override;
 
-	IWorkingDirectory * CreateWorkingDirectory() override;
+	void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bMandatory) override;
 
-	void RetrieveDriverData(const std::string & sIdentifier, LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer) override;
+	void SetFormDataField(const std::string & sName, const LibMC_uint64 nBodyBufferSize, const LibMC_uint8 * pBodyBuffer) override;
 
+	void Handle(const LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8* pRawBodyBuffer, std::string& sContentType, LibMC_uint32& nHTTPCode) override;
+
+	void GetResultData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer) override;
+	
 };
 
 } // namespace Impl
-} // namespace LibMCDriverEnv
+} // namespace LibMC
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVERENV_DRIVERENVIRONMENT
+#endif // __LIBMC_APIREQUESTHANDLER

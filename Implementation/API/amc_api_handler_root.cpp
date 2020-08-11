@@ -214,20 +214,17 @@ std::string CAPIHandler_Root::getBaseURI ()
 	return "";
 }
 		
-PAPIResponse CAPIHandler_Root::handleGetRequest(const std::string& sURI)
+PAPIResponse CAPIHandler_Root::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize)
 {
-	auto iIterator = m_FilesToServe.find(sURI);
-	if (iIterator != m_FilesToServe.end())
-		return iIterator->second;
+
+	if (requestType == eAPIRequestType::rtGet) {
+		auto iIterator = m_FilesToServe.find(sURI);
+		if (iIterator != m_FilesToServe.end())
+			return iIterator->second;
+	}
 
 	return nullptr;
 }
-
-PAPIResponse CAPIHandler_Root::handlePostRequest(const std::string& sURI, const uint8_t* pBodyData, const size_t nBodyDataSize)
-{
-	return nullptr;
-}
-
 
 void CAPIHandler_Root::LoadClientPackage(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer)
 {

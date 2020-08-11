@@ -57,25 +57,22 @@ std::string CAPIHandler_Logs::getBaseURI ()
 	return "api/logs";
 }
 		
-PAPIResponse CAPIHandler_Logs::handleGetRequest(const std::string& sURI)
+PAPIResponse CAPIHandler_Logs::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize)
 {
 	std::cout << sURI << std::endl;
-	std::string sURIParam = sURI.substr(9); // remove "api/logs/" from the URI...
 
-	uint32_t maxLogEntries = 32;
-	uint32_t nStartID = 0;	
-	if (sURIParam.length() > 0) {
-		nStartID = std::stoul(sURIParam);
+	if (requestType == eAPIRequestType::rtGet) {
+		std::string sURIParam = sURI.substr(9); // remove "api/logs/" from the URI...
+
+		uint32_t maxLogEntries = 32;
+		uint32_t nStartID = 0;
+		if (sURIParam.length() > 0) {
+			nStartID = std::stoul(sURIParam);
+		}
+
 	}
 
 
-
-
-	return nullptr;
-}
-
-PAPIResponse CAPIHandler_Logs::handlePostRequest(const std::string& sURI, const uint8_t* pBodyData, const size_t nBodyDataSize)
-{
 	return nullptr;
 }
 

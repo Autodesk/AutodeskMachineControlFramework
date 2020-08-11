@@ -40,6 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+	enum class eAPIRequestType : uint32_t {
+		rtUnknown = 0,
+		rtGet = 1,
+		rtPost = 2
+	};
+
 
 	class CAPIResponse {
 	protected:
@@ -47,16 +53,20 @@ namespace AMC {
 		std::vector<uint8_t> m_StreamData;
 
 		std::string m_sContentType;
+
+		uint32_t m_nHTTPCode;
 			
 	public:
 
-		CAPIResponse (const std::string & sContentType);
+		CAPIResponse (uint32_t nHTTPCode, const std::string & sContentType);
 		
 		size_t getStreamSize () const;
 		
 		const uint8_t * getStreamData () const;
 		
 		std::string getContentType () const;
+
+		uint32_t getHTTPCode() const;
 
 	};
 
@@ -66,7 +76,7 @@ namespace AMC {
 			
 	public:
 
-		CAPIStringResponse(const std::string & sContentType, const std::string & sStringValue);
+		CAPIStringResponse(uint32_t nHTTPCode, const std::string & sContentType, const std::string & sStringValue);
 
 	};
 

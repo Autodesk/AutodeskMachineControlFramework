@@ -42,6 +42,7 @@ Interface version: 1.0.0
 #include <windows.h>
 #else // _WIN32
 #include <dlfcn.h>
+#include <stdlib.h>
 #endif // _WIN32
 
 LibMCResult InitLibMCWrapperTable(sLibMCDynamicWrapperTable * pWrapperTable)
@@ -50,17 +51,19 @@ LibMCResult InitLibMCWrapperTable(sLibMCDynamicWrapperTable * pWrapperTable)
 		return LIBMC_ERROR_INVALIDPARAM;
 	
 	pWrapperTable->m_LibraryHandle = NULL;
-	pWrapperTable->m_APIResponse_GetHTTPCode = NULL;
-	pWrapperTable->m_APIResponse_GetContentType = NULL;
-	pWrapperTable->m_APIResponse_GetData = NULL;
+	pWrapperTable->m_APIRequestHandler_ExpectsRawBody = NULL;
+	pWrapperTable->m_APIRequestHandler_ExpectsFormData = NULL;
+	pWrapperTable->m_APIRequestHandler_GetFormDataDetails = NULL;
+	pWrapperTable->m_APIRequestHandler_SetFormDataField = NULL;
+	pWrapperTable->m_APIRequestHandler_Handle = NULL;
+	pWrapperTable->m_APIRequestHandler_GetResultData = NULL;
 	pWrapperTable->m_MCContext_RegisterLibraryPath = NULL;
 	pWrapperTable->m_MCContext_ParseConfiguration = NULL;
 	pWrapperTable->m_MCContext_StartAllThreads = NULL;
 	pWrapperTable->m_MCContext_TerminateAllThreads = NULL;
 	pWrapperTable->m_MCContext_LoadClientPackage = NULL;
 	pWrapperTable->m_MCContext_Log = NULL;
-	pWrapperTable->m_MCContext_HandleAPIGetRequest = NULL;
-	pWrapperTable->m_MCContext_HandleAPIPostRequest = NULL;
+	pWrapperTable->m_MCContext_CreateAPIRequestHandler = NULL;
 	pWrapperTable->m_GetVersion = NULL;
 	pWrapperTable->m_GetLastError = NULL;
 	pWrapperTable->m_ReleaseInstance = NULL;
@@ -120,30 +123,57 @@ LibMCResult LoadLibMCWrapperTable(sLibMCDynamicWrapperTable * pWrapperTable, con
 	#endif // _WIN32
 	
 	#ifdef _WIN32
-	pWrapperTable->m_APIResponse_GetHTTPCode = (PLibMCAPIResponse_GetHTTPCodePtr) GetProcAddress(hLibrary, "libmc_apiresponse_gethttpcode");
+	pWrapperTable->m_APIRequestHandler_ExpectsRawBody = (PLibMCAPIRequestHandler_ExpectsRawBodyPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_expectsrawbody");
 	#else // _WIN32
-	pWrapperTable->m_APIResponse_GetHTTPCode = (PLibMCAPIResponse_GetHTTPCodePtr) dlsym(hLibrary, "libmc_apiresponse_gethttpcode");
+	pWrapperTable->m_APIRequestHandler_ExpectsRawBody = (PLibMCAPIRequestHandler_ExpectsRawBodyPtr) dlsym(hLibrary, "libmc_apirequesthandler_expectsrawbody");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_APIResponse_GetHTTPCode == NULL)
+	if (pWrapperTable->m_APIRequestHandler_ExpectsRawBody == NULL)
 		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_APIResponse_GetContentType = (PLibMCAPIResponse_GetContentTypePtr) GetProcAddress(hLibrary, "libmc_apiresponse_getcontenttype");
+	pWrapperTable->m_APIRequestHandler_ExpectsFormData = (PLibMCAPIRequestHandler_ExpectsFormDataPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_expectsformdata");
 	#else // _WIN32
-	pWrapperTable->m_APIResponse_GetContentType = (PLibMCAPIResponse_GetContentTypePtr) dlsym(hLibrary, "libmc_apiresponse_getcontenttype");
+	pWrapperTable->m_APIRequestHandler_ExpectsFormData = (PLibMCAPIRequestHandler_ExpectsFormDataPtr) dlsym(hLibrary, "libmc_apirequesthandler_expectsformdata");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_APIResponse_GetContentType == NULL)
+	if (pWrapperTable->m_APIRequestHandler_ExpectsFormData == NULL)
 		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_APIResponse_GetData = (PLibMCAPIResponse_GetDataPtr) GetProcAddress(hLibrary, "libmc_apiresponse_getdata");
+	pWrapperTable->m_APIRequestHandler_GetFormDataDetails = (PLibMCAPIRequestHandler_GetFormDataDetailsPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_getformdatadetails");
 	#else // _WIN32
-	pWrapperTable->m_APIResponse_GetData = (PLibMCAPIResponse_GetDataPtr) dlsym(hLibrary, "libmc_apiresponse_getdata");
+	pWrapperTable->m_APIRequestHandler_GetFormDataDetails = (PLibMCAPIRequestHandler_GetFormDataDetailsPtr) dlsym(hLibrary, "libmc_apirequesthandler_getformdatadetails");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_APIResponse_GetData == NULL)
+	if (pWrapperTable->m_APIRequestHandler_GetFormDataDetails == NULL)
+		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_APIRequestHandler_SetFormDataField = (PLibMCAPIRequestHandler_SetFormDataFieldPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_setformdatafield");
+	#else // _WIN32
+	pWrapperTable->m_APIRequestHandler_SetFormDataField = (PLibMCAPIRequestHandler_SetFormDataFieldPtr) dlsym(hLibrary, "libmc_apirequesthandler_setformdatafield");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_APIRequestHandler_SetFormDataField == NULL)
+		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_APIRequestHandler_Handle = (PLibMCAPIRequestHandler_HandlePtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_handle");
+	#else // _WIN32
+	pWrapperTable->m_APIRequestHandler_Handle = (PLibMCAPIRequestHandler_HandlePtr) dlsym(hLibrary, "libmc_apirequesthandler_handle");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_APIRequestHandler_Handle == NULL)
+		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_APIRequestHandler_GetResultData = (PLibMCAPIRequestHandler_GetResultDataPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_getresultdata");
+	#else // _WIN32
+	pWrapperTable->m_APIRequestHandler_GetResultData = (PLibMCAPIRequestHandler_GetResultDataPtr) dlsym(hLibrary, "libmc_apirequesthandler_getresultdata");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_APIRequestHandler_GetResultData == NULL)
 		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -201,21 +231,12 @@ LibMCResult LoadLibMCWrapperTable(sLibMCDynamicWrapperTable * pWrapperTable, con
 		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_MCContext_HandleAPIGetRequest = (PLibMCMCContext_HandleAPIGetRequestPtr) GetProcAddress(hLibrary, "libmc_mccontext_handleapigetrequest");
+	pWrapperTable->m_MCContext_CreateAPIRequestHandler = (PLibMCMCContext_CreateAPIRequestHandlerPtr) GetProcAddress(hLibrary, "libmc_mccontext_createapirequesthandler");
 	#else // _WIN32
-	pWrapperTable->m_MCContext_HandleAPIGetRequest = (PLibMCMCContext_HandleAPIGetRequestPtr) dlsym(hLibrary, "libmc_mccontext_handleapigetrequest");
+	pWrapperTable->m_MCContext_CreateAPIRequestHandler = (PLibMCMCContext_CreateAPIRequestHandlerPtr) dlsym(hLibrary, "libmc_mccontext_createapirequesthandler");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_MCContext_HandleAPIGetRequest == NULL)
-		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-	
-	#ifdef _WIN32
-	pWrapperTable->m_MCContext_HandleAPIPostRequest = (PLibMCMCContext_HandleAPIPostRequestPtr) GetProcAddress(hLibrary, "libmc_mccontext_handleapipostrequest");
-	#else // _WIN32
-	pWrapperTable->m_MCContext_HandleAPIPostRequest = (PLibMCMCContext_HandleAPIPostRequestPtr) dlsym(hLibrary, "libmc_mccontext_handleapipostrequest");
-	dlerror();
-	#endif // _WIN32
-	if (pWrapperTable->m_MCContext_HandleAPIPostRequest == NULL)
+	if (pWrapperTable->m_MCContext_CreateAPIRequestHandler == NULL)
 		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32

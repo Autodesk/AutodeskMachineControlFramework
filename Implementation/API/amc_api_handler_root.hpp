@@ -51,9 +51,7 @@ namespace AMC {
 				
 		virtual std::string getBaseURI () override;
 		
-		virtual PAPIResponse handleGetRequest(const std::string& sURI) override;
-
-		virtual PAPIResponse handlePostRequest(const std::string& sURI, const uint8_t* pBodyData, const size_t nBodyDataSize) override;
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize) override;
 
 		void LoadClientPackage(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer);
 

@@ -231,9 +231,10 @@
 		<error name="DUPLICATESTORAGESTREAM" code="239" description="Duplicate Storage Stream" />
 		<error name="INVALIDPARTIALUPLOAD" code="240" description="Invalid Partial Upload" />
 		<error name="PARTIALUPLOADNOTFINISHED" code="241" description="Partial Upload not finished" />
-		
-		
-		
+		<error name="APIREQUESTNOTHANDLED" code="242" description="API Request not handled" />
+		<error name="APIREQUESTALREADYHANDLED" code="243" description="API Request already handled" />
+		<error name="INVALIDAPIREQUESTTYPE" code="244" description="Invalid API Request type" />
+
 		
 	</errors>
 	

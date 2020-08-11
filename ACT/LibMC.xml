@@ -244,6 +244,12 @@
 		<error name="DUPLICATESTORAGESTREAM" code="239" description="Duplicate Storage Stream" />
 		<error name="INVALIDPARTIALUPLOAD" code="240" description="Invalid Partial Upload" />
 		<error name="PARTIALUPLOADNOTFINISHED" code="241" description="Partial Upload not finished" />
+		
+		<error name="APIREQUESTNOTHANDLED" code="242" description="API Request not handled" />
+		<error name="APIREQUESTALREADYHANDLED" code="243" description="API Request already handled" />
+		<error name="INVALIDAPIREQUESTTYPE" code="244" description="Invalid API Request type" />
+		
+		
 
 	</errors>
 	
@@ -271,19 +277,41 @@
 	</class>
 
 
-	<class name="APIResponse" parent="Base" description="Response class for an API Call">
+	<class name="APIRequestHandler" parent="Base" description="API Request Handler">
 
-		<method name="GetHTTPCode" description="returns the HTTP Errorcode to set (200 for success).">
-			<param name="HTTPCode" type="uint32" pass="return" description="HTTP Code" />	
+		<method name="ExpectsRawBody" description="checks if the raw body is needed to handle the request.">
+			<param name="Value" type="bool" pass="return" description="Flag, if the raw body is needed in the request." />	
 		</method>
 
-		<method name="GetContentType" description="returns the content type string of the data.">
-			<param name="ContentType" type="string" pass="return" description="Content Type." />	
+		<method name="ExpectsFormData" description="checks if the parsed form data is needed to handle the request.">
+			<param name="FieldCount" type="uint32" pass="out" description="Number of Form Data entries that are expected." />
+			<param name="Value" type="bool" pass="return" description="Flag, if the parsed form data is needed in the request." />	
 		</method>
 
-		<method name="GetData" description="returns the stream content of the data.">
+		<method name="GetFormDataDetails" description="returns details of expected form data.">
+			<param name="FieldIndex" type="uint32" pass="in" description="Index of Form Data Field (0..FieldCount - 1)" />
+			<param name="Name" type="string" pass="out" description="Name of the expected form data field." />	
+			<param name="Mandatory" type="bool" pass="out" description="Flag, if the field MUST be present." />	
+		</method>
+
+
+		<method name="SetFormDataField" description="passes the a form data field to the request handler. Call only, if ExpectsFormData returns true.">
+			<param name="Name" type="string" pass="in" description="Name of the form data field." />	
+			<param name="DataField" type="basicarray" class="uint8" pass="in" description="DataField that was sent." />
+		</method>
+
+
+		<method name="Handle" description="handles the request.">
+			<param name="RawBody" type="basicarray" class="uint8" pass="in" description="Raw Body that was sent. Only necessary, if ExpectsRawBody returns true." />
+			<param name="ContentType" type="string" pass="out" description="the resulting Content Type String of the data." />	
+			<param name="HTTPCode" type="uint32" pass="out" description="the resulting HTTP Errorcode (200 for success)." />	
+		</method>
+		
+		
+		<method name="GetResultData" description="returns the cached stream content of the resulting data. Call only after Handle().">
 			<param name="Data" type="basicarray" class="uint8" pass="out" description="Binary stream data" />	
 		</method>
+		
 
 	</class>
 
@@ -318,17 +346,12 @@
 		</method>
 		
 		
-		<method name="HandleAPIGetRequest" description="handle an API GET request.">
+		<method name="CreateAPIRequestHandler" description="creates an API request handler.">
 			<param name="URI" type="string" pass="in" description="URI to serve" />
-			<param name="Response" type="class" class="APIResponse" pass="return" description="Response instance." />
+			<param name="RequestMethod" type="string" pass="in" description="Request Method" />
+			<param name="HandlerInstance" type="class" class="APIRequestHandler" pass="return" description="Request Handler instance." />
 		</method>
-		
-		<method name="HandleAPIPostRequest" description="handle an API POST request.">
-			<param name="URI" type="string" pass="in" description="URI to serve" />
-			<param name="Body" type="basicarray" class="uint8" pass="in" description="Body that was sent." />
-			<param name="Response" type="class" class="APIResponse" pass="return" description="Response instance." />
-		</method>
-		
+						
 	</class>
 
 		
