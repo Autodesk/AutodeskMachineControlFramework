@@ -44,10 +44,12 @@ using namespace LibMC::Impl;
  Class definition of CAPIRequestHandler 
 **************************************************************************************************************************/
 
-CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const std::string& sRequestMethod)
-    : m_RequestType(AMC::eAPIRequestType::rtUnknown), m_pAPI (pAPI)
+CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const std::string& sRequestMethod, AMC::PAPIAuth pAuth)
+    : m_RequestType(AMC::eAPIRequestType::rtUnknown), m_pAPI (pAPI), m_pAuth (pAuth)
 {
     if (pAPI.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pAuth.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
     if (sURI.length() > 0) {
@@ -81,16 +83,18 @@ bool CAPIRequestHandler::ExpectsFormData(LibMC_uint32 & nFieldCount)
     return (nFieldCount > 0);
 }
 
-void CAPIRequestHandler::GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bMandatory)
+void CAPIRequestHandler::GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool& bIsFile, bool & bMandatory)
 {
-    m_pAPI->getFormDataFieldDetails(m_sURIWithoutLeadingSlash, m_RequestType, nFieldIndex, sName, bMandatory);
+    auto fieldDetails = m_pAPI->getFormDataFieldDetails(m_sURIWithoutLeadingSlash, m_RequestType, nFieldIndex);
+    sName = fieldDetails.m_sFieldName;
+    bIsFile = fieldDetails.m_bIsFileData;
+    bMandatory = fieldDetails.m_bIsMandatory;
 }
 
 
 void CAPIRequestHandler::SetFormDataField(const std::string & sName, const LibMC_uint64 nBodyBufferSize, const LibMC_uint8 * pBodyBuffer)
 {
     auto pData = std::make_shared<std::vector<uint8_t>> ();
-    m_FormFields.insert(std::make_pair (sName, pData));
 
     if (pBodyBuffer != nullptr) {
         pData->resize(nBodyBufferSize);
@@ -108,7 +112,15 @@ void CAPIRequestHandler::SetFormDataField(const std::string & sName, const LibMC
         if (nBodyBufferSize > 0)
             throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     }
+
+    m_FormFields.addDataField (sName, pData);
 }
+
+void CAPIRequestHandler::SetFormStringField(const std::string& sName, const std::string& sString)
+{
+    m_FormFields.addStringField(sName, sString);
+}
+
 
 void CAPIRequestHandler::Handle(const LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8* pRawBodyBuffer, std::string& sContentType, LibMC_uint32& nHTTPCode)
 {
@@ -116,7 +128,7 @@ void CAPIRequestHandler::Handle(const LibMC_uint64 nRawBodyBufferSize, const Lib
     if (m_pResponse.get() != nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_APIREQUESTALREADYHANDLED);
 
-    m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields);
+    m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields, m_pAuth);
 
     if (m_pResponse.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);

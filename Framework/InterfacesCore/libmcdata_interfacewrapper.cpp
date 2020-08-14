@@ -831,6 +831,61 @@ LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage
 	}
 }
 
+LibMCDataResult libmcdata_storage_getmaxstreamsize(LibMCData_Storage pStorage, LibMCData_uint64 * pMaxStreamSize)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pMaxStreamSize == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pMaxStreamSize = pIStorage->GetMaxStreamSize();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_storage_contenttypeisaccepted(LibMCData_Storage pStorage, const char * pContentType, bool * pAccepted)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pContentType == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pAccepted == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sContentType(pContentType);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pAccepted = pIStorage->ContentTypeIsAccepted(sContentType);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for BuildJob
@@ -1476,6 +1531,10 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storage_storepartialstream;
 	if (sProcName == "libmcdata_storage_finishpartialstream") 
 		*ppProcAddress = (void*) &libmcdata_storage_finishpartialstream;
+	if (sProcName == "libmcdata_storage_getmaxstreamsize") 
+		*ppProcAddress = (void*) &libmcdata_storage_getmaxstreamsize;
+	if (sProcName == "libmcdata_storage_contenttypeisaccepted") 
+		*ppProcAddress = (void*) &libmcdata_storage_contenttypeisaccepted;
 	if (sProcName == "libmcdata_buildjob_getuuid") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_getuuid;
 	if (sProcName == "libmcdata_buildjob_getname") 

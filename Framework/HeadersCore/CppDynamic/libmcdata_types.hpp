@@ -269,6 +269,17 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_APIREQUESTNOTHANDLED 242
 #define LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED 243
 #define LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE 244
+#define LIBMCDATA_ERROR_INVALIDUPLOADSTREAM 245
+#define LIBMCDATA_ERROR_COULDNOTPARSEJSONREQUEST 246
+#define LIBMCDATA_ERROR_INVALIDCONTEXTUUID 247
+#define LIBMCDATA_ERROR_INVALIDUPLOADNAME 248
+#define LIBMCDATA_ERROR_INVALIDMIMETYPE 249
+#define LIBMCDATA_ERROR_INVALIDSTREAMSIZE 250
+#define LIBMCDATA_ERROR_INVALIDSHA256SUM 251
+#define LIBMCDATA_ERROR_INVALIDSTREAMUUID 252
+#define LIBMCDATA_ERROR_INVALIDFIELDNAME 253
+#define LIBMCDATA_ERROR_UPLOADSIZEMISMATCH 254
+#define LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED 255
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -450,6 +461,17 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
     case LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
     case LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
+    case LIBMCDATA_ERROR_INVALIDUPLOADSTREAM: return "Invalid Upload Stream";
+    case LIBMCDATA_ERROR_COULDNOTPARSEJSONREQUEST: return "Could not parse JSON request";
+    case LIBMCDATA_ERROR_INVALIDCONTEXTUUID: return "Invalid Context UUID";
+    case LIBMCDATA_ERROR_INVALIDUPLOADNAME: return "Invalid Upload Name";
+    case LIBMCDATA_ERROR_INVALIDMIMETYPE: return "Invalid Mime Type";
+    case LIBMCDATA_ERROR_INVALIDSTREAMSIZE: return "Invalid Stream Size";
+    case LIBMCDATA_ERROR_INVALIDSHA256SUM: return "Invalid SHA256 Sum";
+    case LIBMCDATA_ERROR_INVALIDSTREAMUUID: return "Invalid Stream UUID";
+    case LIBMCDATA_ERROR_INVALIDFIELDNAME: return "Invalid field name";
+    case LIBMCDATA_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
+    case LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED: return "Content type not accepted";
     default: return "unknown error";
   }
 }

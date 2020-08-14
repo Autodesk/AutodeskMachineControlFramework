@@ -35,52 +35,73 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_jsonwriter.hpp"
 #include "amc_api_constants.hpp"
 #include "amc_api_response.hpp"
+#include "amc_api_auth.hpp"
 
 #include <memory>
+#include <map>
 #include <vector>
 #include <string>
 
 namespace AMC {
 
+
+
 	class CAPIHandler;
 	typedef std::shared_ptr<CAPIHandler> PAPIHandler;
 
+	class APIFieldDetails {
+	public:
+		std::string m_sFieldName;
+		bool m_bIsFileData;
+		bool m_bIsMandatory;
+
+		APIFieldDetails();
+		APIFieldDetails(const std::string & sFieldName, const bool bIsFileData, const bool bIsMandatory);
+	};
+
+	class APIFormFields {
+	private:
+
+		std::map<std::string, std::shared_ptr <std::vector<uint8_t>>> m_FileData;
+		std::map<std::string, std::string> m_StringData;
+
+	public:
+		APIFormFields();
+
+		void addDataField(const std::string& sName, std::shared_ptr<std::vector<uint8_t>> pData);
+		bool hasDataField(const std::string& sName);
+		std::shared_ptr<std::vector<uint8_t>> getDataField(const std::string& sName);
+
+		void addStringField(const std::string& sName, const std::string& sValue);
+		bool hasStringField(const std::string& sName);
+		std::string getStringField(const std::string& sName);
+		uint64_t getUint64Field(const std::string& sName);
+
+
+	};
+
 	class CAPIHandler {
 	private:
+
+	protected:
 			
 	public:
 
-		CAPIHandler()
-		{}
+		CAPIHandler();
 
-		virtual ~CAPIHandler()
-		{}
+		virtual ~CAPIHandler();
 				
 		virtual std::string getBaseURI () = 0;
 
-		virtual bool expectsRawBody(const eAPIRequestType requestType)
-		{
-			return false;
-		}
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) = 0;
 
-		virtual uint32_t getFormDataFieldCount(const eAPIRequestType requestType)
-		{
-			return 0;
-		}
+		virtual bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType);
 
-		virtual void getFormDataFieldDetails(const eAPIRequestType requestType, const uint32_t nFieldIndex, std::string & sFieldName, bool & bIsMandatory) 
-		{
-			sFieldName = "";
-			bIsMandatory = false;			
-		}
+		virtual uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType);
 
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize)  = 0;
+		virtual APIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex);
 
-		virtual void writeJSONHeader(CJSONWriter & writer, const std::string & sProtocol)
-		{
-			writer.addString(AMC_API_KEY_PROTOCOL, sProtocol);
-			writer.addString(AMC_API_KEY_VERSION, AMC_API_PROTOCOL_VERSION);
-		}
+		virtual void writeJSONHeader(CJSONWriter& writer, const std::string& sProtocol);
 
 	};
 

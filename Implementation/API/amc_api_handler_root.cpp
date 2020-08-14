@@ -214,7 +214,7 @@ std::string CAPIHandler_Root::getBaseURI ()
 	return "";
 }
 		
-PAPIResponse CAPIHandler_Root::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize)
+PAPIResponse CAPIHandler_Root::handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 
 	if (requestType == eAPIRequestType::rtGet) {

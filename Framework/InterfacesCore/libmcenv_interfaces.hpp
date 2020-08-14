@@ -285,9 +285,21 @@ public:
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[out] pPointDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPointDataBuffer - Position2D buffer of The point data array
+	* @param[out] pPointDataBuffer - Position2D buffer of The point data array. Positions are absolute in units.
 	*/
 	virtual void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetZValue - Retrieves the layers Z Value in units.
+	* @return Z Value of the layer in units.
+	*/
+	virtual LibMCEnv_int32 GetZValue() = 0;
+
+	/**
+	* IToolpathLayer::GetUnits - Retrieves the toolpath units in mm.
+	* @return Toolpath units.
+	*/
+	virtual LibMCEnv_double GetUnits() = 0;
 
 };
 
@@ -318,6 +330,12 @@ public:
 	* @return Toolpath layer object.
 	*/
 	virtual IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) = 0;
+
+	/**
+	* IToolpathAccessor::GetUnits - Retrieves the toolpath units in mm.
+	* @return Toolpath units.
+	*/
+	virtual LibMCEnv_double GetUnits() = 0;
 
 };
 
@@ -368,6 +386,13 @@ public:
 	virtual void SetString(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
+	* ISignalTrigger::SetUUID - sets a uuid value
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void SetUUID(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
 	* ISignalTrigger::SetDouble - sets a double
 	* @param[in] sName - Name
 	* @param[in] dValue - Value
@@ -394,6 +419,13 @@ public:
 	* @return Value
 	*/
 	virtual std::string GetStringResult(const std::string & sName) = 0;
+
+	/**
+	* ISignalTrigger::GetUUIDResult - returns a uuid value of the result
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string GetUUIDResult(const std::string & sName) = 0;
 
 	/**
 	* ISignalTrigger::GetDoubleResult - returns a string value of the result
@@ -458,6 +490,13 @@ public:
 	virtual std::string GetString(const std::string & sName) = 0;
 
 	/**
+	* ISignalHandler::GetUUID - gets a uuid value
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string GetUUID(const std::string & sName) = 0;
+
+	/**
 	* ISignalHandler::GetDouble - gets a double
 	* @param[in] sName - Name
 	* @return Value
@@ -484,6 +523,13 @@ public:
 	* @param[in] sValue - Value
 	*/
 	virtual void SetStringResult(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* ISignalHandler::SetUUIDResult - returns a uuid value of the result
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void SetUUIDResult(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
 	* ISignalHandler::SetDoubleResult - returns a string value of the result
@@ -624,6 +670,13 @@ public:
 	virtual void StoreString(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
+	* IStateEnvironment::StoreUUID - stores a uuid in the current state machine
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void StoreUUID(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
 	* IStateEnvironment::StoreInteger - stores a string in the current state machine
 	* @param[in] sName - Name
 	* @param[in] nValue - Value
@@ -657,6 +710,13 @@ public:
 	* @return Value
 	*/
 	virtual std::string RetrieveString(const std::string & sName) = 0;
+
+	/**
+	* IStateEnvironment::RetrieveUUID - retrieves a uuid from the current state machine. Fails if value has not been stored before.
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string RetrieveUUID(const std::string & sName) = 0;
 
 	/**
 	* IStateEnvironment::RetrieveInteger - retrieves a string from the current state machine. Fails if value has not been stored before.
@@ -701,6 +761,14 @@ public:
 	virtual void SetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
 
 	/**
+	* IStateEnvironment::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetUUIDParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
 	* IStateEnvironment::SetDoubleParameter - sets a double parameter
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
@@ -731,6 +799,14 @@ public:
 	* @return Value to set
 	*/
 	virtual std::string GetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IStateEnvironment::GetUUIDParameter - returns a uuid parameter
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual std::string GetUUIDParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
 	* IStateEnvironment::GetDoubleParameter - returns a double parameter

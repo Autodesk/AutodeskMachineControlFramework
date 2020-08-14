@@ -69,19 +69,22 @@ protected:
 	std::string m_sURIWithoutLeadingSlash;
 	AMC::eAPIRequestType m_RequestType;
 
-	AMC::PAPIFormFields m_FormFields;
+	AMC::APIFormFields m_FormFields;
+	AMC::PAPIAuth m_pAuth;
 
 public:
 
-	CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const std::string& sRequestMethod);
+	CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const std::string& sRequestMethod, AMC::PAPIAuth pAuth);
 
 	bool ExpectsRawBody() override;
 
 	bool ExpectsFormData(LibMC_uint32 & nFieldCount) override;
 
-	void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bMandatory) override;
+	void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool& bIsFile, bool & bMandatory) override;
 
 	void SetFormDataField(const std::string & sName, const LibMC_uint64 nBodyBufferSize, const LibMC_uint8 * pBodyBuffer) override;
+
+	void SetFormStringField(const std::string& sName, const std::string& sString) override;
 
 	void Handle(const LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8* pRawBodyBuffer, std::string& sContentType, LibMC_uint32& nHTTPCode) override;
 

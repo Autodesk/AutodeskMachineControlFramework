@@ -434,6 +434,8 @@ public:
 	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sSHA2, const std::string & sUserID);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID);
+	inline LibMCData_uint64 GetMaxStreamSize();
+	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 };
 	
 /*************************************************************************************************************************
@@ -634,6 +636,8 @@ public:
 		pWrapperTable->m_Storage_BeginPartialStream = nullptr;
 		pWrapperTable->m_Storage_StorePartialStream = nullptr;
 		pWrapperTable->m_Storage_FinishPartialStream = nullptr;
+		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
+		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
 		pWrapperTable->m_BuildJob_GetUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetName = nullptr;
 		pWrapperTable->m_BuildJob_GetStatus = nullptr;
@@ -892,6 +896,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Storage_FinishPartialStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_GetMaxStreamSize = (PLibMCDataStorage_GetMaxStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_storage_getmaxstreamsize");
+		#else // _WIN32
+		pWrapperTable->m_Storage_GetMaxStreamSize = (PLibMCDataStorage_GetMaxStreamSizePtr) dlsym(hLibrary, "libmcdata_storage_getmaxstreamsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_GetMaxStreamSize == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_ContentTypeIsAccepted = (PLibMCDataStorage_ContentTypeIsAcceptedPtr) GetProcAddress(hLibrary, "libmcdata_storage_contenttypeisaccepted");
+		#else // _WIN32
+		pWrapperTable->m_Storage_ContentTypeIsAccepted = (PLibMCDataStorage_ContentTypeIsAcceptedPtr) dlsym(hLibrary, "libmcdata_storage_contenttypeisaccepted");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_ContentTypeIsAccepted == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1199,6 +1221,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_storage_finishpartialstream", (void**)&(pWrapperTable->m_Storage_FinishPartialStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishPartialStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_getmaxstreamsize", (void**)&(pWrapperTable->m_Storage_GetMaxStreamSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_GetMaxStreamSize == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_storage_contenttypeisaccepted", (void**)&(pWrapperTable->m_Storage_ContentTypeIsAccepted));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_ContentTypeIsAccepted == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getuuid", (void**)&(pWrapperTable->m_BuildJob_GetUUID));
@@ -1598,6 +1628,31 @@ public:
 	void CStorage::FinishPartialStream(const std::string & sUUID)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStream(m_pHandle, sUUID.c_str()));
+	}
+	
+	/**
+	* CStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
+	* @return Maximum Stream Size in Bytes.
+	*/
+	LibMCData_uint64 CStorage::GetMaxStreamSize()
+	{
+		LibMCData_uint64 resultMaxStreamSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_GetMaxStreamSize(m_pHandle, &resultMaxStreamSize));
+		
+		return resultMaxStreamSize;
+	}
+	
+	/**
+	* CStorage::ContentTypeIsAccepted - Returns if the given content type is an acceptable value.
+	* @param[in] sContentType - Content type string (is taken case-insensitive)
+	* @return Content type is accepted.
+	*/
+	bool CStorage::ContentTypeIsAccepted(const std::string & sContentType)
+	{
+		bool resultAccepted = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_ContentTypeIsAccepted(m_pHandle, sContentType.c_str(), &resultAccepted));
+		
+		return resultAccepted;
 	}
 	
 	/**

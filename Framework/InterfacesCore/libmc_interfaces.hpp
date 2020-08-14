@@ -261,9 +261,10 @@ public:
 	* IAPIRequestHandler::GetFormDataDetails - returns details of expected form data.
 	* @param[in] nFieldIndex - Index of Form Data Field (0..FieldCount - 1)
 	* @param[out] sName - Name of the expected form data field.
+	* @param[out] bIsFile - Flag, if the field Is a file field.
 	* @param[out] bMandatory - Flag, if the field MUST be present.
 	*/
-	virtual void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bMandatory) = 0;
+	virtual void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bIsFile, bool & bMandatory) = 0;
 
 	/**
 	* IAPIRequestHandler::SetFormDataField - passes the a form data field to the request handler. Call only, if ExpectsFormData returns true.
@@ -272,6 +273,13 @@ public:
 	* @param[in] pDataFieldBuffer - DataField that was sent.
 	*/
 	virtual void SetFormDataField(const std::string & sName, const LibMC_uint64 nDataFieldBufferSize, const LibMC_uint8 * pDataFieldBuffer) = 0;
+
+	/**
+	* IAPIRequestHandler::SetFormStringField - passes the a form string field to the request handler. Call only, if ExpectsFormData returns true.
+	* @param[in] sName - Name of the form data field.
+	* @param[in] sString - DataString that was sent.
+	*/
+	virtual void SetFormStringField(const std::string & sName, const std::string & sString) = 0;
 
 	/**
 	* IAPIRequestHandler::Handle - handles the request.

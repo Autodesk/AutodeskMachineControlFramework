@@ -288,6 +288,25 @@ typedef LibMCDataResult (*PLibMCDataStorage_StorePartialStreamPtr) (LibMCData_St
 */
 typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID);
 
+/**
+* Returns the maximum stream size that the data model allows.
+*
+* @param[in] pStorage - Storage instance.
+* @param[out] pMaxStreamSize - Maximum Stream Size in Bytes.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorage_GetMaxStreamSizePtr) (LibMCData_Storage pStorage, LibMCData_uint64 * pMaxStreamSize);
+
+/**
+* Returns if the given content type is an acceptable value.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pContentType - Content type string (is taken case-insensitive)
+* @param[out] pAccepted - Content type is accepted.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorage_ContentTypeIsAcceptedPtr) (LibMCData_Storage pStorage, const char * pContentType, bool * pAccepted);
+
 /*************************************************************************************************************************
  Class definition for BuildJob
 **************************************************************************************************************************/
@@ -560,6 +579,8 @@ typedef struct {
 	PLibMCDataStorage_BeginPartialStreamPtr m_Storage_BeginPartialStream;
 	PLibMCDataStorage_StorePartialStreamPtr m_Storage_StorePartialStream;
 	PLibMCDataStorage_FinishPartialStreamPtr m_Storage_FinishPartialStream;
+	PLibMCDataStorage_GetMaxStreamSizePtr m_Storage_GetMaxStreamSize;
+	PLibMCDataStorage_ContentTypeIsAcceptedPtr m_Storage_ContentTypeIsAccepted;
 	PLibMCDataBuildJob_GetUUIDPtr m_BuildJob_GetUUID;
 	PLibMCDataBuildJob_GetNamePtr m_BuildJob_GetName;
 	PLibMCDataBuildJob_GetStatusPtr m_BuildJob_GetStatus;

@@ -100,6 +100,10 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
+	LibMCData::PStorage CSystemState::storage()
+	{
+		return m_pStorage;
+	}
 
 	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath)
 	{

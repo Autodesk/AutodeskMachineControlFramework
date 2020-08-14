@@ -85,10 +85,10 @@ bool CAPI::expectsRawBody(const std::string& sURI, const eAPIRequestType request
 	if (pHandler.get() == nullptr)
 		return false;
 
-	return pHandler->expectsRawBody(requestType);
+	return pHandler->expectsRawBody(sURI, requestType);
 }
 
-PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, PAPIFormFields pFormFields)
+PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, APIFormFields pFormFields, PAPIAuth pAuth)
 {
 	auto pHandler = getURIMatch(sURI);
 	if (pHandler.get() == nullptr)
@@ -96,7 +96,7 @@ PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType 
 
 	try {
 		
-		auto pResponse = pHandler->handleRequest (sURI, requestType, pData, nCount);	
+		auto pResponse = pHandler->handleRequest (sURI, requestType, pFormFields, pData, nCount, pAuth);
 
 		if (pResponse.get() == nullptr)
 			return makeError(AMC_API_HTTP_NOTFOUND, LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
@@ -117,20 +117,17 @@ uint32_t CAPI::getFormDataFieldCount(const std::string& sURI, const eAPIRequestT
 	if (pHandler.get() == nullptr)
 		return false;
 
-	return pHandler->getFormDataFieldCount(requestType);
+	return pHandler->getFormDataFieldCount(sURI, requestType);
 
 }
 
-void CAPI::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex, std::string& sName, bool& bMandatory)
+APIFieldDetails CAPI::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
 {
 	auto pHandler = getURIMatch(sURI);
-	if (pHandler.get() == nullptr) {
-		sName = "";
-		bMandatory = false;
-		return;
-	}
+	if (pHandler.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_URLNOTFOUND);
 
-	pHandler->getFormDataFieldDetails(requestType, nFieldIndex, sName, bMandatory);
+	return pHandler->getFormDataFieldDetails(sURI, requestType, nFieldIndex);
 
 }
 

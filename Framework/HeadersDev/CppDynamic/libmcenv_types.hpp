@@ -171,7 +171,7 @@ namespace LibMCEnv {
   #pragma pack (1)
   
   typedef struct {
-      LibMCEnv_single m_Coordinates[2];
+      LibMCEnv_int32 m_Coordinates[2];
   } sPosition2D;
   
   #pragma pack ()

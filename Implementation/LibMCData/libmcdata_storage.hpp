@@ -52,6 +52,7 @@ Abstract: This is the class declaration of CStorage
 #include <thread>
 #include <mutex>
 #include <map>
+#include <set>
 
 namespace LibMCData {
 namespace Impl {
@@ -68,6 +69,8 @@ private:
 
     std::mutex m_StorageWriteMutex;
     std::map<std::string, AMCData::PStorageWriter> m_PartialWriters;
+
+    std::set<std::string> m_AcceptedContentTypes;
 
     void insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID);
 
@@ -88,6 +91,11 @@ public:
 	void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) override;
 
 	void FinishPartialStream(const std::string & sUUID) override;
+
+    LibMCData_uint64 GetMaxStreamSize() override;
+
+    bool ContentTypeIsAccepted(const std::string& sContentType) override;
+
 
 };
 

@@ -188,6 +188,20 @@ void CStateEnvironment::StoreString(const std::string& sName, const std::string&
 
 }
 
+void CStateEnvironment::StoreUUID(const std::string& sName, const std::string& sValue)
+{
+	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+
+	if (!pGroup->hasParameter(sName)) {
+		pGroup->addNewStringParameter(sName, "", AMCCommon::CUtils::normalizeUUIDString (sValue));
+	}
+	else {
+		pGroup->setParameterValueByName(sName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+	}
+
+}
+
+
 void CStateEnvironment::StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue)
 {
 	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
@@ -249,6 +263,15 @@ std::string CStateEnvironment::RetrieveString(const std::string& sName)
 	return pGroup->getParameterValueByName(sName);
 }
 
+
+std::string CStateEnvironment::RetrieveUUID(const std::string& sName)
+{
+	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+
+	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sName));
+}
+
+
 LibMCEnv_int64 CStateEnvironment::RetrieveInteger(const std::string& sName)
 {
 	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
@@ -298,6 +321,20 @@ void CStateEnvironment::SetStringParameter(const std::string& sParameterGroup, c
 	pGroup->setParameterValueByName(sParameterName, sValue);
 }
 
+
+void CStateEnvironment::SetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (!pGroup->hasParameter(sParameterName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+
+	pGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+
+
 void CStateEnvironment::SetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue)
 {
 	if (!m_pParameterHandler->hasGroup(sParameterGroup))
@@ -344,6 +381,19 @@ std::string CStateEnvironment::GetStringParameter(const std::string& sParameterG
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
 
 	return pGroup->getParameterValueByName(sParameterName);
+}
+
+
+std::string CStateEnvironment::GetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (!pGroup->hasParameter(sParameterName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+
+	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sParameterName));
 }
 
 LibMCEnv_double CStateEnvironment::GetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName)

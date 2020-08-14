@@ -55,6 +55,7 @@ namespace AMC {
 	class CToolpathLayerData {
 	private:
 		double m_dUnits;
+		int32_t m_nZValue;
 		std::string m_sUUID;
 		
 		std::vector<sToolpathLayerSegment> m_Segments;
@@ -69,7 +70,7 @@ namespace AMC {
 
 	public:
 
-		CToolpathLayerData(Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits);
+		CToolpathLayerData(Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue);
 		virtual ~CToolpathLayerData();		
 
 		std::string getUUID ();
@@ -82,6 +83,10 @@ namespace AMC {
 
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
+
+		double getUnits();
+
+		int32_t getZValue ();
 
 	};
 

@@ -89,3 +89,12 @@ void CToolpathLayer::GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_
 	}
 }
 
+LibMCEnv_double CToolpathLayer::GetUnits()
+{
+	return m_pToolpathLayerData->getUnits();
+}
+
+LibMCEnv_int32 CToolpathLayer::GetZValue()
+{
+	return m_pToolpathLayerData->getZValue();
+}

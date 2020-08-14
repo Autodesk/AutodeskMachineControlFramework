@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_PROTOCOL_LOGS "com.autodesk.machinecontrol.logs"
 #define AMC_API_PROTOCOL_STATUS "com.autodesk.machinecontrol.status"
 #define AMC_API_PROTOCOL_SETUP "com.autodesk.machinecontrol.setup"
+#define AMC_API_PROTOCOL_UPLOAD "com.autodesk.machinecontrol.upload"
 
 #define AMC_API_CONTENTTYPE "application/json"
 
@@ -60,6 +61,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_SETUPPARAMETERGROUP_PARAMETERS "parameters"
 #define AMC_API_KEY_SETUPPARAMETER_NAME "name"
 #define AMC_API_KEY_SETUPPARAMETER_DESCRIPTION "description"
+#define AMC_API_KEY_UPLOAD_STREAMUUID "streamuuid"
+#define AMC_API_KEY_UPLOAD_CONTEXTUUID "contextuuid"
+#define AMC_API_KEY_UPLOAD_NAME "name"
+#define AMC_API_KEY_UPLOAD_MIMETYPE "mimetype"
+#define AMC_API_KEY_UPLOAD_SIZE "size"
+#define AMC_API_KEY_UPLOAD_SHA256 "sha256"
+#define AMC_API_KEY_UPLOAD_DATA "data"
+#define AMC_API_KEY_UPLOAD_DATASIZE "size"
+#define AMC_API_KEY_UPLOAD_DATAOFFSET "offset"
+
 
 #define AMC_API_KEY_STATUSINSTANCE_NAME "name"
 #define AMC_API_KEY_STATUSINSTANCE_STATE "state"

@@ -432,6 +432,19 @@ public:
 	*/
 	virtual void FinishPartialStream(const std::string & sUUID) = 0;
 
+	/**
+	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
+	* @return Maximum Stream Size in Bytes.
+	*/
+	virtual LibMCData_uint64 GetMaxStreamSize() = 0;
+
+	/**
+	* IStorage::ContentTypeIsAccepted - Returns if the given content type is an acceptable value.
+	* @param[in] sContentType - Content type string (is taken case-insensitive)
+	* @return Content type is accepted.
+	*/
+	virtual bool ContentTypeIsAccepted(const std::string & sContentType) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStorage> PIStorage;

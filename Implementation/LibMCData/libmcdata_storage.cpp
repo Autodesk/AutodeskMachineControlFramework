@@ -54,6 +54,10 @@ CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStor
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
     if (pSQLHandler.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    m_AcceptedContentTypes.insert("application/3mf");
+    m_AcceptedContentTypes.insert("text/csv");
+
 }
 
 
@@ -169,7 +173,7 @@ void CStorage::StorePartialStream(const std::string & sUUID, const LibMCData_uin
 
     if (nContentBufferSize == 0)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDBUFFERSIZE);
-    if (pContentBuffer == 0)
+    if (pContentBuffer == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
@@ -193,6 +197,21 @@ void CStorage::FinishPartialStream(const std::string & sUUID)
 
     iIterator->second->finalize ();
 }
+
+
+LibMCData_uint64 CStorage::GetMaxStreamSize()
+{
+    return 1024ULL * 1024ULL * 1024ULL * 32ULL; // 32GB Maximum stream data size
+}
+
+bool CStorage::ContentTypeIsAccepted(const std::string& sContentType)
+{
+    auto sLowerContentType = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(sContentType));
+
+    auto iIter = m_AcceptedContentTypes.find(sLowerContentType);
+    return (iIter != m_AcceptedContentTypes.end());
+}
+
 
 
 

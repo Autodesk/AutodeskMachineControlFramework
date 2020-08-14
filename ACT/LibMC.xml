@@ -247,10 +247,20 @@
 		
 		<error name="APIREQUESTNOTHANDLED" code="242" description="API Request not handled" />
 		<error name="APIREQUESTALREADYHANDLED" code="243" description="API Request already handled" />
-		<error name="INVALIDAPIREQUESTTYPE" code="244" description="Invalid API Request type" />
+		<error name="INVALIDAPIREQUESTTYPE" code="244" description="Invalid API Request type" />		
+		<error name="INVALIDUPLOADSTREAM" code="245" description="Invalid Upload Stream" />
+		<error name="COULDNOTPARSEJSONREQUEST" code="246" description="Could not parse JSON request" />
 		
-		
-
+		<error name="INVALIDCONTEXTUUID" code="247" description="Invalid Context UUID" />
+		<error name="INVALIDUPLOADNAME" code="248" description="Invalid Upload Name" />
+		<error name="INVALIDMIMETYPE" code="249" description="Invalid Mime Type" />
+		<error name="INVALIDSTREAMSIZE" code="250" description="Invalid Stream Size" />
+		<error name="INVALIDSHA256SUM" code="251" description="Invalid SHA256 Sum" />
+		<error name="INVALIDSTREAMUUID" code="252" description="Invalid Stream UUID" />
+		<error name="INVALIDFIELDNAME" code="253" description="Invalid field name" />		
+		<error name="UPLOADSIZEMISMATCH" code="254" description="Upload size mismatch" />
+		<error name="CONTENTTYPENOTACCEPTED" code="255" description="Content type not accepted" />
+				
 	</errors>
 	
 	
@@ -291,6 +301,7 @@
 		<method name="GetFormDataDetails" description="returns details of expected form data.">
 			<param name="FieldIndex" type="uint32" pass="in" description="Index of Form Data Field (0..FieldCount - 1)" />
 			<param name="Name" type="string" pass="out" description="Name of the expected form data field." />	
+			<param name="IsFile" type="bool" pass="out" description="Flag, if the field Is a file field." />	
 			<param name="Mandatory" type="bool" pass="out" description="Flag, if the field MUST be present." />	
 		</method>
 
@@ -300,6 +311,10 @@
 			<param name="DataField" type="basicarray" class="uint8" pass="in" description="DataField that was sent." />
 		</method>
 
+		<method name="SetFormStringField" description="passes the a form string field to the request handler. Call only, if ExpectsFormData returns true.">
+			<param name="Name" type="string" pass="in" description="Name of the form data field." />	
+			<param name="String" type="string" pass="in" description="DataString that was sent." />
+		</method>
 
 		<method name="Handle" description="handles the request.">
 			<param name="RawBody" type="basicarray" class="uint8" pass="in" description="Raw Body that was sent. Only necessary, if ExpectsRawBody returns true." />

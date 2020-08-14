@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_database.hpp"
 
 #include "API/amc_api_handler_logs.hpp"
+#include "API/amc_api_handler_upload.hpp"
 #include "API/amc_api_handler_setup.hpp"
 #include "API/amc_api_handler_status.hpp"
 #include "API/amc_api_handler_root.hpp"
@@ -81,6 +82,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Logs> (m_pSystemState->getLoggerInstance ()));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(m_InstanceList));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(m_InstanceList));
+    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(m_pSystemState));
 
     // Create Client Dist Handler
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();
@@ -464,6 +466,8 @@ void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSu
 
 IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod)
 {
-    return new CAPIRequestHandler(m_pAPI, sURI, sRequestMethod);
+    auto pAuth = std::make_shared<CAPIAuth>();
+
+    return new CAPIRequestHandler(m_pAPI, sURI, sRequestMethod, pAuth);
 
 }

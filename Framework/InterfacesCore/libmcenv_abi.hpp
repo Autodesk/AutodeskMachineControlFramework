@@ -126,10 +126,28 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpartuuid(LibMC
 * @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] nPointDataBufferSize - Number of elements in buffer
 * @param[out] pPointDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pPointDataBuffer - Position2D buffer of The point data array
+* @param[out] pPointDataBuffer - Position2D buffer of The point data array. Positions are absolute in units.
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointdata(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer);
+
+/**
+* Retrieves the layers Z Value in units.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pZValue - Z Value of the layer in units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getzvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_int32 * pZValue);
+
+/**
+* Retrieves the toolpath units in mm.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pUnits - Toolpath units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getunits(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pUnits);
 
 /*************************************************************************************************************************
  Class definition for ToolpathAccessor
@@ -164,6 +182,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getlayercount(LibMCEn
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_loadlayer(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_ToolpathLayer * pLayerData);
+
+/**
+* Retrieves the toolpath units in mm.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pUnits - Toolpath units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pUnits);
 
 /*************************************************************************************************************************
  Class definition for SignalTrigger
@@ -229,6 +256,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signaltrigger_getstatemachine(LibMCEnv
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signaltrigger_setstring(LibMCEnv_SignalTrigger pSignalTrigger, const char * pName, const char * pValue);
 
 /**
+* sets a uuid value
+*
+* @param[in] pSignalTrigger - SignalTrigger instance.
+* @param[in] pName - Name
+* @param[in] pValue - Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signaltrigger_setuuid(LibMCEnv_SignalTrigger pSignalTrigger, const char * pName, const char * pValue);
+
+/**
 * sets a double
 *
 * @param[in] pSignalTrigger - SignalTrigger instance.
@@ -269,6 +306,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signaltrigger_setbool(LibMCEnv_SignalT
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signaltrigger_getstringresult(LibMCEnv_SignalTrigger pSignalTrigger, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a uuid value of the result
+*
+* @param[in] pSignalTrigger - SignalTrigger instance.
+* @param[in] pName - Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signaltrigger_getuuidresult(LibMCEnv_SignalTrigger pSignalTrigger, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * returns a string value of the result
@@ -358,6 +407,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getstatemachine(LibMCEnv
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getstring(LibMCEnv_SignalHandler pSignalHandler, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
+* gets a uuid value
+*
+* @param[in] pSignalHandler - SignalHandler instance.
+* @param[in] pName - Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getuuid(LibMCEnv_SignalHandler pSignalHandler, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
 * gets a double
 *
 * @param[in] pSignalHandler - SignalHandler instance.
@@ -396,6 +457,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_getbool(LibMCEnv_SignalH
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setstringresult(LibMCEnv_SignalHandler pSignalHandler, const char * pName, const char * pValue);
+
+/**
+* returns a uuid value of the result
+*
+* @param[in] pSignalHandler - SignalHandler instance.
+* @param[in] pName - Name
+* @param[in] pValue - Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setuuidresult(LibMCEnv_SignalHandler pSignalHandler, const char * pName, const char * pValue);
 
 /**
 * returns a string value of the result
@@ -588,6 +659,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkfortermination(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
 
 /**
+* stores a uuid in the current state machine
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name
+* @param[in] pValue - Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storeuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
+
+/**
 * stores a string in the current state machine
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -638,6 +719,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storesignal(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* retrieves a uuid from the current state machine. Fails if value has not been stored before.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pName - Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrieveuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * retrieves a string from the current state machine. Fails if value has not been stored before.
@@ -700,6 +793,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_clearstoredvalue(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setstringparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, const char * pValue);
 
 /**
+* sets a uuid parameter
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setuuidparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, const char * pValue);
+
+/**
 * sets a double parameter
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -744,6 +848,19 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_setboolparameter(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getstringparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a uuid parameter
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value to set, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getuuidparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * returns a double parameter

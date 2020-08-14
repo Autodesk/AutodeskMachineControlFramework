@@ -65,6 +65,7 @@ namespace AMC {
 		CStateSignalHandler* stateSignalHandler();
 		CDriverHandler* driverHandler();
 		CToolpathHandler* toolpathHandler();
+		LibMCData::PStorage storage();
 
 		PLogger getLoggerInstance();
 		PStateSignalHandler getStateSignalHandlerInstance();

@@ -72,3 +72,8 @@ IToolpathLayer * CToolpathAccessor::LoadLayer(const LibMCEnv_uint32 nLayerIndex)
 	return new CToolpathLayer(pToolpathEntity->readLayer (nLayerIndex));
 }
 
+LibMCEnv_double CToolpathAccessor::GetUnits()
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sUUID, true);
+	return pToolpathEntity->getUnits();
+}

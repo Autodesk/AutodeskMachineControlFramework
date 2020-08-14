@@ -102,29 +102,35 @@ public:
 
 	bool CheckForTermination() override;
 
-	void StoreString(const std::string& sName, const std::string& sValue);
+	void StoreString(const std::string& sName, const std::string& sValue) override;
 
-	void StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue);
+	void StoreUUID(const std::string& sName, const std::string& sValue) override;
 
-	void StoreDouble(const std::string& sName, const LibMCEnv_double dValue);
+	void StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue) override;
 
-	void StoreBool(const std::string& sName, const bool bValue);
+	void StoreDouble(const std::string& sName, const LibMCEnv_double dValue) override;
 
-	void StoreSignal(const std::string& sName, ISignalHandler* pHandler);
+	void StoreBool(const std::string& sName, const bool bValue) override;
 
-	std::string RetrieveString(const std::string& sName);
+	void StoreSignal(const std::string& sName, ISignalHandler* pHandler) override;
 
-	LibMCEnv_int64 RetrieveInteger(const std::string& sName);
+	std::string RetrieveString(const std::string& sName) override;
 
-	LibMCEnv_double RetrieveDouble(const std::string& sName);
+	std::string RetrieveUUID(const std::string& sName) override;
 
-	bool RetrieveBool(const std::string& sName);
+	LibMCEnv_int64 RetrieveInteger(const std::string& sName) override;
 
-	ISignalHandler* RetrieveSignal(const std::string& sName);
+	LibMCEnv_double RetrieveDouble(const std::string& sName) override;
 
-	void ClearStoredValue(const std::string& sName);
+	bool RetrieveBool(const std::string& sName) override;
+
+	ISignalHandler* RetrieveSignal(const std::string& sName) override;
+
+	void ClearStoredValue(const std::string& sName) override;
 
 	void SetStringParameter(const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
+
+	void SetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
 
 	void SetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue) override;
 
@@ -133,6 +139,8 @@ public:
 	void SetBoolParameter(const std::string& sParameterGroup, const std::string& sParameterName, const bool bValue) override;
 
 	std::string GetStringParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
+
+	std::string GetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
 	LibMCEnv_double GetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 

@@ -92,10 +92,11 @@ LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_expectsformdata(LibMC_APIRequ
 * @param[in] nNameBufferSize - size of the buffer (including trailing 0)
 * @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pNameBuffer -  buffer of Name of the expected form data field., may be NULL
+* @param[out] pIsFile - Flag, if the field Is a file field.
 * @param[out] pMandatory - Flag, if the field MUST be present.
 * @return error code or 0 (success)
 */
-LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_getformdatadetails(LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 nFieldIndex, const LibMC_uint32 nNameBufferSize, LibMC_uint32* pNameNeededChars, char * pNameBuffer, bool * pMandatory);
+LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_getformdatadetails(LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 nFieldIndex, const LibMC_uint32 nNameBufferSize, LibMC_uint32* pNameNeededChars, char * pNameBuffer, bool * pIsFile, bool * pMandatory);
 
 /**
 * passes the a form data field to the request handler. Call only, if ExpectsFormData returns true.
@@ -107,6 +108,16 @@ LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_getformdatadetails(LibMC_APIR
 * @return error code or 0 (success)
 */
 LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_setformdatafield(LibMC_APIRequestHandler pAPIRequestHandler, const char * pName, LibMC_uint64 nDataFieldBufferSize, const LibMC_uint8 * pDataFieldBuffer);
+
+/**
+* passes the a form string field to the request handler. Call only, if ExpectsFormData returns true.
+*
+* @param[in] pAPIRequestHandler - APIRequestHandler instance.
+* @param[in] pName - Name of the form data field.
+* @param[in] pString - DataString that was sent.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_setformstringfield(LibMC_APIRequestHandler pAPIRequestHandler, const char * pName, const char * pString);
 
 /**
 * handles the request.

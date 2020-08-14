@@ -55,6 +55,7 @@ LibMCResult InitLibMCWrapperTable(sLibMCDynamicWrapperTable * pWrapperTable)
 	pWrapperTable->m_APIRequestHandler_ExpectsFormData = NULL;
 	pWrapperTable->m_APIRequestHandler_GetFormDataDetails = NULL;
 	pWrapperTable->m_APIRequestHandler_SetFormDataField = NULL;
+	pWrapperTable->m_APIRequestHandler_SetFormStringField = NULL;
 	pWrapperTable->m_APIRequestHandler_Handle = NULL;
 	pWrapperTable->m_APIRequestHandler_GetResultData = NULL;
 	pWrapperTable->m_MCContext_RegisterLibraryPath = NULL;
@@ -156,6 +157,15 @@ LibMCResult LoadLibMCWrapperTable(sLibMCDynamicWrapperTable * pWrapperTable, con
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_APIRequestHandler_SetFormDataField == NULL)
+		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_APIRequestHandler_SetFormStringField = (PLibMCAPIRequestHandler_SetFormStringFieldPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_setformstringfield");
+	#else // _WIN32
+	pWrapperTable->m_APIRequestHandler_SetFormStringField = (PLibMCAPIRequestHandler_SetFormStringFieldPtr) dlsym(hLibrary, "libmc_apirequesthandler_setformstringfield");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_APIRequestHandler_SetFormStringField == NULL)
 		return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32

@@ -52,7 +52,7 @@ std::string CAPIHandler_Setup::getBaseURI ()
 	return "api/setup";
 }
 		
-PAPIResponse CAPIHandler_Setup::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pBodyData, const size_t nBodyDataSize)
+PAPIResponse CAPIHandler_Setup::handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 
 	if (requestType == eAPIRequestType::rtGet) {

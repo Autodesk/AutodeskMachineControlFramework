@@ -53,8 +53,21 @@ namespace AMCData {
 
 	void CStorageWriter::writeChunkAsync(const uint8_t* pChunkData, const uint64_t nChunkSize, const uint64_t nOffset)
 	{
-		// TODO: Create Threading
-		m_pExportStream->writeBuffer(pChunkData, nOffset);
+		if (nChunkSize > 0) {
+			m_pExportStream->seekFromEnd(0, true);
+			auto nSize = m_pExportStream->getPosition();
+
+			if (nOffset > nSize) {
+				m_pExportStream->writeZeros(nOffset - nSize);
+			}
+
+			if (nOffset < nSize) {
+				m_pExportStream->seekPosition(nOffset, true);
+			}
+
+
+			m_pExportStream->writeBuffer(pChunkData, nChunkSize);
+		}
 
 	}
 

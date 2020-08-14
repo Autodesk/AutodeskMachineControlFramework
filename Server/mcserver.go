@@ -355,16 +355,88 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 	var dataBytes []byte;
 	bodyBytes := make ([]byte, 1);
 	
-
 	w.Header().Set("Access-Control-Allow-Origin", "*");	
 	w.Header().Set("Cache-Control", "no-cache");
-		
+	
+	fmt.Println ("field name: ", r.URL.Path);
+				
 	requestHandler, err := GlobalContext.CreateAPIRequestHandler (r.URL.Path, r.Method);
 	if (err == nil) {
 	
-		expectsRawBody, err := requestHandler.ExpectsRawBody ();	
+		var expectsRawBody bool = false;
+		var expectsFormData bool = false;
+		var fieldCount uint32 = 0;
+	
+		expectsRawBody, err = requestHandler.ExpectsRawBody ();	
 		if ((expectsRawBody) && (err == nil)) {				
 			bodyBytes, err = ioutil.ReadAll (r.Body);		
+		}
+		
+		if (err == nil) {
+			fieldCount, expectsFormData, err = requestHandler.ExpectsFormData ();
+		}
+				
+		if (expectsFormData) {		
+			err = r.ParseMultipartForm (32 * 1024 * 1024);
+			
+			if (err == nil) {
+				var fieldIndex uint32;
+				for fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++ {
+				
+					fieldName, isFile, isMandatory, err := requestHandler.GetFormDataDetails (fieldIndex);
+					if (err == nil) {
+		
+						fmt.Println ("field name: ", fieldName);
+		
+		
+						if (isFile) {
+		
+							formFile, _, err := r.FormFile(fieldName);
+							fmt.Println ("err: ", err);
+							
+							if (err == nil) {
+
+							
+								defer formFile.Close ();
+					
+								byteArray, err := ioutil.ReadAll(formFile);
+								if (err == nil) {
+									fmt.Println ("bytearray len: ", len (byteArray));
+									
+									err = requestHandler.SetFormDataField (fieldName, byteArray);							
+								}													
+								
+							} else {
+							
+								if (!isMandatory) {
+									err = nil;
+								}
+							
+							}
+						
+						} else {
+						
+						
+								formValue := r.FormValue (fieldName);
+								if (formValue != "") {																
+									fmt.Println ("formvalue: " + formValue);														
+									err = requestHandler.SetFormStringField (fieldName, formValue);							
+								}
+								
+						
+						
+						}
+					
+					}
+										
+					if (err != nil) {
+						break;
+					}
+														
+				}
+				
+			}
+			
 		}
 		
 		if (err == nil) {

@@ -301,6 +301,25 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storepartialstream(LibMCDat
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage, const char * pUUID);
 
+/**
+* Returns the maximum stream size that the data model allows.
+*
+* @param[in] pStorage - Storage instance.
+* @param[out] pMaxStreamSize - Maximum Stream Size in Bytes.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_getmaxstreamsize(LibMCData_Storage pStorage, LibMCData_uint64 * pMaxStreamSize);
+
+/**
+* Returns if the given content type is an acceptable value.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pContentType - Content type string (is taken case-insensitive)
+* @param[out] pAccepted - Content type is accepted.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_contenttypeisaccepted(LibMCData_Storage pStorage, const char * pContentType, bool * pAccepted);
+
 /*************************************************************************************************************************
  Class definition for BuildJob
 **************************************************************************************************************************/

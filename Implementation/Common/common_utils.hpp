@@ -50,9 +50,13 @@ namespace AMCCommon {
 		static std::string getCurrentTimeFileName();
 		static std::string createUUID();
 		static std::string normalizeUUIDString(std::string sRawString);
+		static std::string normalizeSHA256String(std::string sRawString);		
 		
 		static std::string UTF16toUTF8(std::wstring sString);
 		static std::wstring UTF8toUTF16(std::string sString);
+		static bool UTF8StringIsValid (const std::string & sString);
+		static std::string trimString (const std::string& sString);
+		static std::string toLowerString(const std::string& sString);
 
 		static void sleepMilliseconds(const uint32_t milliSeconds);
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);

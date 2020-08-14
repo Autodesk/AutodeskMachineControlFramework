@@ -67,7 +67,7 @@
 	</enum>
 	
 	<struct name="Position2D">
-		<member name="Coordinates" type="single" rows="2"/>
+		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
 	
 	<class name="Base">
@@ -101,7 +101,15 @@
 		
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
-			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array" />
+			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array. Positions are absolute in units." />
+		</method>
+		
+		<method name="GetZValue" description="Retrieves the layers Z Value in units.">
+			<param name="ZValue" type="int32" pass="return" description="Z Value of the layer in units." />
+		</method>
+		
+		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
+			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
 		
 	</class>
@@ -121,7 +129,11 @@
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index." />
 			<param name="LayerData" type="class" class="ToolpathLayer" pass="return" description="Toolpath layer object." />
 		</method>
-	
+		
+		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
+			<param name="Units" type="double" pass="return" description="Toolpath units." />
+		</method>
+			
 	</class>
 
 
@@ -152,6 +164,11 @@
 			<param name="Value" type="string" pass="in" description="Value" />
 		</method>
 
+		<method name="SetUUID" description="sets a uuid value">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
 		<method name="SetDouble" description="sets a double">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="double" pass="in" description="Value" />
@@ -168,6 +185,11 @@
 		</method>
 
 		<method name="GetStringResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+		<method name="GetUUIDResult" description="returns a uuid value of the result">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="string" pass="return" description="Value" />
 		</method>
@@ -213,6 +235,12 @@
 			<param name="Value" type="string" pass="return" description="Value" />
 		</method>
 
+		<method name="GetUUID" description="gets a uuid value">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+
 		<method name="GetDouble" description="gets a double">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="double" pass="return" description="Value" />
@@ -229,6 +257,11 @@
 		</method>
 
 		<method name="SetStringResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
+		<method name="SetUUIDResult" description="returns a uuid value of the result">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="string" pass="in" description="Value" />
 		</method>
@@ -330,6 +363,11 @@
 			<param name="Value" type="string" pass="in" description="Value" />
 		</method>
 
+		<method name="StoreUUID" description="stores a uuid in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
 		<method name="StoreInteger" description="stores a string in the current state machine">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="int64" pass="in" description="Value" />
@@ -351,6 +389,11 @@
 		</method>
 
 		<method name="RetrieveString" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+		<method name="RetrieveUUID" description="retrieves a uuid from the current state machine. Fails if value has not been stored before.">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="string" pass="return" description="Value" />
 		</method>
@@ -386,6 +429,12 @@
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
+		<method name="SetUUIDParameter" description="sets a uuid parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
 		<method name="SetDoubleParameter" description="sets a double parameter">
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
@@ -405,6 +454,12 @@
 		</method>
 
 		<method name="GetStringParameter" description="returns a string parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetUUIDParameter" description="returns a uuid parameter">
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="return" description="Value to set" />

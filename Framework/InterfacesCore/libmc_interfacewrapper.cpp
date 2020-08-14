@@ -137,12 +137,14 @@ LibMCResult libmc_apirequesthandler_expectsformdata(LibMC_APIRequestHandler pAPI
 	}
 }
 
-LibMCResult libmc_apirequesthandler_getformdatadetails(LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 nFieldIndex, const LibMC_uint32 nNameBufferSize, LibMC_uint32* pNameNeededChars, char * pNameBuffer, bool * pMandatory)
+LibMCResult libmc_apirequesthandler_getformdatadetails(LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 nFieldIndex, const LibMC_uint32 nNameBufferSize, LibMC_uint32* pNameNeededChars, char * pNameBuffer, bool * pIsFile, bool * pMandatory)
 {
 	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
 
 	try {
 		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (!pIsFile)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		if (!pMandatory)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
@@ -153,15 +155,15 @@ LibMCResult libmc_apirequesthandler_getformdatadetails(LibMC_APIRequestHandler p
 		
 		bool isCacheCall = (pNameBuffer == nullptr);
 		if (isCacheCall) {
-			pIAPIRequestHandler->GetFormDataDetails(nFieldIndex, sName, *pMandatory);
+			pIAPIRequestHandler->GetFormDataDetails(nFieldIndex, sName, *pIsFile, *pMandatory);
 
-			pIAPIRequestHandler->_setCache (new ParameterCache_2<std::string, bool> (sName, *pMandatory));
+			pIAPIRequestHandler->_setCache (new ParameterCache_3<std::string, bool, bool> (sName, *pIsFile, *pMandatory));
 		}
 		else {
-			auto cache = dynamic_cast<ParameterCache_2<std::string, bool>*> (pIAPIRequestHandler->_getCache ());
+			auto cache = dynamic_cast<ParameterCache_3<std::string, bool, bool>*> (pIAPIRequestHandler->_getCache ());
 			if (cache == nullptr)
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
-			cache->retrieveData (sName, *pMandatory);
+			cache->retrieveData (sName, *pIsFile, *pMandatory);
 			pIAPIRequestHandler->_setCache (nullptr);
 		}
 		
@@ -202,6 +204,36 @@ LibMCResult libmc_apirequesthandler_setformdatafield(LibMC_APIRequestHandler pAP
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
 		pIAPIRequestHandler->SetFormDataField(sName, nDataFieldBufferSize, pDataFieldBuffer);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_apirequesthandler_setformstringfield(LibMC_APIRequestHandler pAPIRequestHandler, const char * pName, const char * pString)
+{
+	IBase* pIBaseClass = (IBase *)pAPIRequestHandler;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pString == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		std::string sString(pString);
+		IAPIRequestHandler* pIAPIRequestHandler = dynamic_cast<IAPIRequestHandler*>(pIBaseClass);
+		if (!pIAPIRequestHandler)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIAPIRequestHandler->SetFormStringField(sName, sString);
 
 		return LIBMC_SUCCESS;
 	}
@@ -513,6 +545,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_apirequesthandler_getformdatadetails;
 	if (sProcName == "libmc_apirequesthandler_setformdatafield") 
 		*ppProcAddress = (void*) &libmc_apirequesthandler_setformdatafield;
+	if (sProcName == "libmc_apirequesthandler_setformstringfield") 
+		*ppProcAddress = (void*) &libmc_apirequesthandler_setformstringfield;
 	if (sProcName == "libmc_apirequesthandler_handle") 
 		*ppProcAddress = (void*) &libmc_apirequesthandler_handle;
 	if (sProcName == "libmc_apirequesthandler_getresultdata") 

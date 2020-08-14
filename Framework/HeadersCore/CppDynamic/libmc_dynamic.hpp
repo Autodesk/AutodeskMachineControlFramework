@@ -341,8 +341,9 @@ public:
 	
 	inline bool ExpectsRawBody();
 	inline bool ExpectsFormData(LibMC_uint32 & nFieldCount);
-	inline void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bMandatory);
+	inline void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bIsFile, bool & bMandatory);
 	inline void SetFormDataField(const std::string & sName, const CInputVector<LibMC_uint8> & DataFieldBuffer);
+	inline void SetFormStringField(const std::string & sName, const std::string & sString);
 	inline void Handle(const CInputVector<LibMC_uint8> & RawBodyBuffer, std::string & sContentType, LibMC_uint32 & nHTTPCode);
 	inline void GetResultData(std::vector<LibMC_uint8> & DataBuffer);
 };
@@ -481,6 +482,7 @@ public:
 		pWrapperTable->m_APIRequestHandler_ExpectsFormData = nullptr;
 		pWrapperTable->m_APIRequestHandler_GetFormDataDetails = nullptr;
 		pWrapperTable->m_APIRequestHandler_SetFormDataField = nullptr;
+		pWrapperTable->m_APIRequestHandler_SetFormStringField = nullptr;
 		pWrapperTable->m_APIRequestHandler_Handle = nullptr;
 		pWrapperTable->m_APIRequestHandler_GetResultData = nullptr;
 		pWrapperTable->m_MCContext_RegisterLibraryPath = nullptr;
@@ -578,6 +580,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_APIRequestHandler_SetFormDataField == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_APIRequestHandler_SetFormStringField = (PLibMCAPIRequestHandler_SetFormStringFieldPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_setformstringfield");
+		#else // _WIN32
+		pWrapperTable->m_APIRequestHandler_SetFormStringField = (PLibMCAPIRequestHandler_SetFormStringFieldPtr) dlsym(hLibrary, "libmc_apirequesthandler_setformstringfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_APIRequestHandler_SetFormStringField == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -747,6 +758,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_SetFormDataField == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmc_apirequesthandler_setformstringfield", (void**)&(pWrapperTable->m_APIRequestHandler_SetFormStringField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_SetFormStringField == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmc_apirequesthandler_handle", (void**)&(pWrapperTable->m_APIRequestHandler_Handle));
 		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_Handle == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -849,15 +864,16 @@ public:
 	* CAPIRequestHandler::GetFormDataDetails - returns details of expected form data.
 	* @param[in] nFieldIndex - Index of Form Data Field (0..FieldCount - 1)
 	* @param[out] sName - Name of the expected form data field.
+	* @param[out] bIsFile - Flag, if the field Is a file field.
 	* @param[out] bMandatory - Flag, if the field MUST be present.
 	*/
-	void CAPIRequestHandler::GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bMandatory)
+	void CAPIRequestHandler::GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bIsFile, bool & bMandatory)
 	{
 		LibMC_uint32 bytesNeededName = 0;
 		LibMC_uint32 bytesWrittenName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetFormDataDetails(m_pHandle, nFieldIndex, 0, &bytesNeededName, nullptr, &bMandatory));
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetFormDataDetails(m_pHandle, nFieldIndex, 0, &bytesNeededName, nullptr, &bIsFile, &bMandatory));
 		std::vector<char> bufferName(bytesNeededName);
-		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetFormDataDetails(m_pHandle, nFieldIndex, bytesNeededName, &bytesWrittenName, &bufferName[0], &bMandatory));
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetFormDataDetails(m_pHandle, nFieldIndex, bytesNeededName, &bytesWrittenName, &bufferName[0], &bIsFile, &bMandatory));
 		sName = std::string(&bufferName[0]);
 	}
 	
@@ -869,6 +885,16 @@ public:
 	void CAPIRequestHandler::SetFormDataField(const std::string & sName, const CInputVector<LibMC_uint8> & DataFieldBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_SetFormDataField(m_pHandle, sName.c_str(), (LibMC_uint64)DataFieldBuffer.size(), DataFieldBuffer.data()));
+	}
+	
+	/**
+	* CAPIRequestHandler::SetFormStringField - passes the a form string field to the request handler. Call only, if ExpectsFormData returns true.
+	* @param[in] sName - Name of the form data field.
+	* @param[in] sString - DataString that was sent.
+	*/
+	void CAPIRequestHandler::SetFormStringField(const std::string & sName, const std::string & sString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_SetFormStringField(m_pHandle, sName.c_str(), sString.c_str()));
 	}
 	
 	/**

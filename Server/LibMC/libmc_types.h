@@ -270,6 +270,16 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_APIREQUESTNOTHANDLED 242
 #define LIBMC_ERROR_APIREQUESTALREADYHANDLED 243
 #define LIBMC_ERROR_INVALIDAPIREQUESTTYPE 244
+#define LIBMC_ERROR_INVALIDUPLOADSTREAM 245
+#define LIBMC_ERROR_COULDNOTPARSEJSONREQUEST 246
+#define LIBMC_ERROR_INVALIDCONTEXTUUID 247
+#define LIBMC_ERROR_INVALIDUPLOADNAME 248
+#define LIBMC_ERROR_INVALIDMIMETYPE 249
+#define LIBMC_ERROR_INVALIDSTREAMSIZE 250
+#define LIBMC_ERROR_INVALIDSHA256SUM 251
+#define LIBMC_ERROR_INVALIDSTREAMUUID 252
+#define LIBMC_ERROR_INVALIDFIELDNAME 253
+#define LIBMC_ERROR_UPLOADSIZEMISMATCH 254
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -451,6 +461,16 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
     case LIBMC_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
     case LIBMC_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
+    case LIBMC_ERROR_INVALIDUPLOADSTREAM: return "Invalid Upload Stream";
+    case LIBMC_ERROR_COULDNOTPARSEJSONREQUEST: return "Could not parse JSON request";
+    case LIBMC_ERROR_INVALIDCONTEXTUUID: return "Invalid Context UUID";
+    case LIBMC_ERROR_INVALIDUPLOADNAME: return "Invalid Upload Name";
+    case LIBMC_ERROR_INVALIDMIMETYPE: return "Invalid Mime Type";
+    case LIBMC_ERROR_INVALIDSTREAMSIZE: return "Invalid Stream Size";
+    case LIBMC_ERROR_INVALIDSHA256SUM: return "Invalid SHA256 Sum";
+    case LIBMC_ERROR_INVALIDSTREAMUUID: return "Invalid Stream UUID";
+    case LIBMC_ERROR_INVALIDFIELDNAME: return "Invalid field name";
+    case LIBMC_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
     default: return "unknown error";
   }
 }

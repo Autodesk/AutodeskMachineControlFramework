@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <string>
 #include "amc_api_response.hpp"
+#include "amc_api_handler.hpp"
 
 
 namespace AMC {
@@ -46,8 +47,6 @@ namespace AMC {
 
 	class CAPI;
 	typedef std::shared_ptr<CAPI> PAPI;
-
-	typedef std::map<std::string, std::shared_ptr <std::vector<uint8_t>>> PAPIFormFields;
 
 	class CAPI {
 	private:
@@ -66,11 +65,11 @@ namespace AMC {
 								
 		bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType);
 
-		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, PAPIFormFields pFormFields);
+		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, APIFormFields pFormFields, PAPIAuth pAuth);
 
 		uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType);
 
-		void getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex, std::string& sName, bool& bMandatory);
+		APIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex);
 
 		void registerHandler (PAPIHandler pAPIHandler);
 

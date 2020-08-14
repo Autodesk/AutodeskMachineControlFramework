@@ -72,6 +72,8 @@ public:
 
 	IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) override;
 
+	LibMCEnv_double GetUnits() override;
+
 };
 
 } // namespace Impl
