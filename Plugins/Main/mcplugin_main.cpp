@@ -159,6 +159,8 @@ public:
 		// Find out layer count
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
+		pBuildJob->LoadToolpath();
+
 		auto nLayerCount = pBuildJob->GetLayerCount();
 
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 1);

@@ -290,6 +290,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS 263
 #define LIBMC_ERROR_INVALIDITERATOR 264
 #define LIBMC_ERROR_INVALIDDATATYPE 265
+#define LIBMC_ERROR_COULDNOTSENDSIGNAL 266
+#define LIBMC_ERROR_MISSINGSIGNALPARAMETER 267
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -492,6 +494,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
     case LIBMC_ERROR_INVALIDITERATOR: return "Invalid iterator";
     case LIBMC_ERROR_INVALIDDATATYPE: return "Invalid data type";
+    case LIBMC_ERROR_COULDNOTSENDSIGNAL: return "Could not send signal";
+    case LIBMC_ERROR_MISSINGSIGNALPARAMETER: return "Missing signal parameter";
     default: return "unknown error";
   }
 }

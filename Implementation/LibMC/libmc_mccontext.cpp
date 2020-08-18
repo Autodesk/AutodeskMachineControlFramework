@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "API/amc_api_handler_status.hpp"
 #include "API/amc_api_handler_build.hpp"
 #include "API/amc_api_handler_root.hpp"
+#include "API/amc_api_handler_signal.hpp"
 
 
 // Include custom headers here.
@@ -86,6 +87,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(m_InstanceList));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(m_pSystemState));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(m_pSystemState));
+    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Signal>(m_pSystemState));
 
     // Create Client Dist Handler
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();

@@ -290,6 +290,8 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS 263
 #define LIBMCDATA_ERROR_INVALIDITERATOR 264
 #define LIBMCDATA_ERROR_INVALIDDATATYPE 265
+#define LIBMCDATA_ERROR_COULDNOTSENDSIGNAL 266
+#define LIBMCDATA_ERROR_MISSINGSIGNALPARAMETER 267
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -492,6 +494,8 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
     case LIBMCDATA_ERROR_INVALIDITERATOR: return "Invalid iterator";
     case LIBMCDATA_ERROR_INVALIDDATATYPE: return "Invalid data type";
+    case LIBMCDATA_ERROR_COULDNOTSENDSIGNAL: return "Could not send signal";
+    case LIBMCDATA_ERROR_MISSINGSIGNALPARAMETER: return "Missing signal parameter";
     default: return "unknown error";
   }
 }

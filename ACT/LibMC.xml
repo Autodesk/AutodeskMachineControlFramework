@@ -271,7 +271,9 @@
 		<error name="COULDNOTUPDATEBUILDSTATUS" code="263" description="Could not update build status" />							
 		<error name="INVALIDITERATOR" code="264" description="Invalid iterator" />
 		<error name="INVALIDDATATYPE" code="265" description="Invalid data type" />
-						
+		<error name="COULDNOTSENDSIGNAL" code="266" description="Could not send signal" />
+		<error name="MISSINGSIGNALPARAMETER" code="267" description="Missing signal parameter" />
+
 	</errors>
 	
 	

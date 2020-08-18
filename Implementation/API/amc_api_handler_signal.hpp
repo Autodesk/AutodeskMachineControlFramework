@@ -29,54 +29,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_TOOLPATHHANDLER
-#define __AMC_TOOLPATHHANDLER
+#ifndef __AMC_API_HANDLER_SIGNAL
+#define __AMC_API_HANDLER_SIGNAL
 
-#include <memory>
-#include <map>
-#include <string>
+#include "amc_api_handler.hpp"
+#include "amc_logger.hpp"
+#include "amc_api_response.hpp"
 
-#include "amc_toolpathentity.hpp"
-#include "libmcdata_dynamic.hpp"
+#include "amc_systemstate.hpp"
 
 namespace AMC {
 
-	
+	enum class APIHandler_SignalType {
+		stUnknown = 0,
+		stSendSignal = 1
+	};
 
-	class CToolpathHandler;
-	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
-
-	class CToolpathHandler {
+	class CAPIHandler_Signal : public CAPIHandler {
 	private:
 		
-		std::map<std::string, PToolpathEntity> m_Entities;
+		PSystemState m_pSystemState;
 
-		std::string m_sLib3MFPath;
-		Lib3MF::PWrapper m_pLib3MFWrapper;
+		APIHandler_SignalType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& jobUUID);
 
-		LibMCData::PStorage m_pStorage;
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		void handleSendSignalRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:
 
-		CToolpathHandler(LibMCData::PStorage pStorage, LibMCData::PBuildJobHandler pBuildJobHandler);
-		virtual ~CToolpathHandler();
+		CAPIHandler_Signal(PSystemState pSystemState);
 
-		CToolpathEntity * findToolpathEntity(const std::string & sStreamUUID, bool bFailIfNotExistent);
-		CToolpathEntity* loadToolpathEntity(const std::string& sStreamUUID);
-		
-		void unloadToolpathEntity (const std::string& sStreamUUID);
-		void unloadAllEntities();
+		virtual ~CAPIHandler_Signal();
+				
+		virtual std::string getBaseURI () override;
 
-		void setLibraryPath(const std::string& sLibraryName, const std::string sLibraryPath);
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
 
-		Lib3MF::PWrapper getLib3MFWrapper();
-		
+		virtual uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType) override;
+
+		virtual APIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex) override;
+
+		virtual bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType) override;
+
 	};
 
 	
 }
 
 
-#endif //__AMC_TOOLPATHHANDLER
+#endif //__AMC_API_HANDLER_SIGNAL
 

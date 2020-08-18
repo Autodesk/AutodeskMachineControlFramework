@@ -53,9 +53,9 @@ namespace AMC {
 
 	}
 
-	CToolpathEntity* CToolpathHandler::findToolpathEntity(const std::string& sUUID, bool bFailIfNotExistent)
+	CToolpathEntity* CToolpathHandler::findToolpathEntity(const std::string& sStreamUUID, bool bFailIfNotExistent)
 	{
-		auto iIter = m_Entities.find(sUUID);
+		auto iIter = m_Entities.find(sStreamUUID);
 		if (iIter != m_Entities.end()) {
 			return iIter->second.get();
 		}
@@ -66,20 +66,19 @@ namespace AMC {
 		return nullptr;
 	}
 	
-	CToolpathEntity* CToolpathHandler::loadToolpathEntity(const std::string& sJobUUID)
+	CToolpathEntity* CToolpathHandler::loadToolpathEntity(const std::string& sStreamUUID)
 	{
-		if (sJobUUID.empty())
+		if (sStreamUUID.empty())
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		auto pToolpathEntity = findToolpathEntity(sJobUUID, false);
+		auto pToolpathEntity = findToolpathEntity(sStreamUUID, false);
 		if (pToolpathEntity == nullptr) {
 
-			auto p3MFWrapper = getLib3MFWrapper();
+			auto pStorageStream = m_pStorage->RetrieveStream(sStreamUUID);
 
-			auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sJobUUID);			
-			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pBuildJob->GetStorageStream(), p3MFWrapper);
+			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pStorageStream, getLib3MFWrapper());
 			pNewToolpathEntity->IncRef();
-			m_Entities.insert(std::make_pair(sJobUUID, pNewToolpathEntity));
+			m_Entities.insert(std::make_pair(sStreamUUID, pNewToolpathEntity));
 			return pNewToolpathEntity.get();
 
 		}
@@ -89,11 +88,11 @@ namespace AMC {
 		}
 	}
 
-	void CToolpathHandler::unloadToolpathEntity(const std::string& sUUID)
+	void CToolpathHandler::unloadToolpathEntity(const std::string& sStreamUUID)
 	{
-		auto pToolpathEntity = findToolpathEntity(sUUID, true);
+		auto pToolpathEntity = findToolpathEntity(sStreamUUID, true);
 		if (pToolpathEntity->DecRef())
-			m_Entities.erase(sUUID);
+			m_Entities.erase(sStreamUUID);
 	}
 
 
@@ -104,8 +103,12 @@ namespace AMC {
 
 	void CToolpathHandler::setLibraryPath(const std::string& sLibraryName, const std::string sLibraryPath)
 	{
-		if (sLibraryName == LIBRARYNAME_LIB3MF)
+		if (sLibraryName == LIBRARYNAME_LIB3MF) {		
 			m_sLib3MFPath = sLibraryPath;
+			getLib3MFWrapper();
+		}
+
+
 	}
 
 	Lib3MF::PWrapper CToolpathHandler::getLib3MFWrapper()
