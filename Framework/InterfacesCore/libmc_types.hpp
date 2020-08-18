@@ -280,6 +280,16 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDFIELDNAME 253
 #define LIBMC_ERROR_UPLOADSIZEMISMATCH 254
 #define LIBMC_ERROR_CONTENTTYPENOTACCEPTED 255
+#define LIBMC_ERROR_NOCURRENTUPLOAD 256
+#define LIBMC_ERROR_UPLOADCHECKSUMMISMATCH 257
+#define LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS 258
+#define LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED 259
+#define LIBMC_ERROR_INVALIDBUILDUUID 260
+#define LIBMC_ERROR_MISSINGTHREADCOUNT 261
+#define LIBMC_ERROR_INVALIDTHREADCOUNT 262
+#define LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS 263
+#define LIBMC_ERROR_INVALIDITERATOR 264
+#define LIBMC_ERROR_INVALIDDATATYPE 265
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -472,6 +482,16 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDFIELDNAME: return "Invalid field name";
     case LIBMC_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
     case LIBMC_ERROR_CONTENTTYPENOTACCEPTED: return "Content type not accepted";
+    case LIBMC_ERROR_NOCURRENTUPLOAD: return "No current upload";
+    case LIBMC_ERROR_UPLOADCHECKSUMMISMATCH: return "Upload checksum mismatch";
+    case LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS: return "Invalid storage stream status";
+    case LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED: return "Context uuid not accepted";
+    case LIBMC_ERROR_INVALIDBUILDUUID: return "Invalid build uuid";
+    case LIBMC_ERROR_MISSINGTHREADCOUNT: return "Missing thread count";
+    case LIBMC_ERROR_INVALIDTHREADCOUNT: return "Invalid thread count";
+    case LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
+    case LIBMC_ERROR_INVALIDITERATOR: return "Invalid iterator";
+    case LIBMC_ERROR_INVALIDDATATYPE: return "Invalid data type";
     default: return "unknown error";
   }
 }

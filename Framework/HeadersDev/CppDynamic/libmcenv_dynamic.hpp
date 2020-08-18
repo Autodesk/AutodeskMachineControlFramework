@@ -62,6 +62,7 @@ class CWrapper;
 class CBase;
 class CToolpathLayer;
 class CToolpathAccessor;
+class CBuild;
 class CSignalTrigger;
 class CSignalHandler;
 class CStateEnvironment;
@@ -73,6 +74,7 @@ typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
+typedef CBuild CLibMCEnvBuild;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
@@ -84,6 +86,7 @@ typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
+typedef std::shared_ptr<CBuild> PBuild;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
@@ -95,6 +98,7 @@ typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
+typedef PBuild PLibMCEnvBuild;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
@@ -272,6 +276,7 @@ private:
 	friend class CBase;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
+	friend class CBuild;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
 	friend class CStateEnvironment;
@@ -373,10 +378,36 @@ public:
 	{
 	}
 	
-	inline std::string GetUUID();
+	inline std::string GetStorageUUID();
 	inline LibMCEnv_uint32 GetLayerCount();
 	inline PToolpathLayer LoadLayer(const LibMCEnv_uint32 nLayerIndex);
 	inline LibMCEnv_double GetUnits();
+};
+	
+/*************************************************************************************************************************
+ Class CBuild 
+**************************************************************************************************************************/
+class CBuild : public CBase {
+public:
+	
+	/**
+	* CBuild::CBuild - Constructor for Build class.
+	*/
+	CBuild(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetBuildUUID();
+	inline std::string GetStorageUUID();
+	inline std::string GetStorageSHA256();
+	inline LibMCEnv_uint32 GetLayerCount();
+	inline void LoadToolpath();
+	inline void UnloadToolpath();
+	inline bool ToolpathIsLoaded();
+	inline PToolpathAccessor CreateToolpathAccessor();
+	inline std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -458,11 +489,8 @@ public:
 	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
-	inline void LoadToolpath(const std::string & sToolpathUUID);
-	inline void UnloadToolpath(const std::string & sToolpathUUID);
+	inline PBuild GetBuildJob(const std::string & sBuildUUID);
 	inline void UnloadAllToolpathes();
-	inline PToolpathAccessor CreateToolpathAccessor(const std::string & sToolpathUUID);
-	inline bool ToolpathIsLoaded(const std::string & sToolpathUUID);
 	inline void SetNextState(const std::string & sStateName);
 	inline void LogMessage(const std::string & sLogString);
 	inline void LogWarning(const std::string & sLogString);
@@ -583,10 +611,20 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
-		pWrapperTable->m_ToolpathAccessor_GetUUID = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
 		pWrapperTable->m_ToolpathAccessor_LoadLayer = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetUnits = nullptr;
+		pWrapperTable->m_Build_GetName = nullptr;
+		pWrapperTable->m_Build_GetBuildUUID = nullptr;
+		pWrapperTable->m_Build_GetStorageUUID = nullptr;
+		pWrapperTable->m_Build_GetStorageSHA256 = nullptr;
+		pWrapperTable->m_Build_GetLayerCount = nullptr;
+		pWrapperTable->m_Build_LoadToolpath = nullptr;
+		pWrapperTable->m_Build_UnloadToolpath = nullptr;
+		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
+		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
+		pWrapperTable->m_Build_AddBinaryData = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -620,11 +658,8 @@ public:
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
-		pWrapperTable->m_StateEnvironment_LoadToolpath = nullptr;
-		pWrapperTable->m_StateEnvironment_UnloadToolpath = nullptr;
+		pWrapperTable->m_StateEnvironment_GetBuildJob = nullptr;
 		pWrapperTable->m_StateEnvironment_UnloadAllToolpathes = nullptr;
-		pWrapperTable->m_StateEnvironment_CreateToolpathAccessor = nullptr;
-		pWrapperTable->m_StateEnvironment_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_StateEnvironment_SetNextState = nullptr;
 		pWrapperTable->m_StateEnvironment_LogMessage = nullptr;
 		pWrapperTable->m_StateEnvironment_LogWarning = nullptr;
@@ -780,12 +815,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetUUID = (PLibMCEnvToolpathAccessor_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getuuid");
+		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = (PLibMCEnvToolpathAccessor_GetStorageUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getstorageuuid");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathAccessor_GetUUID = (PLibMCEnvToolpathAccessor_GetUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getuuid");
+		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = (PLibMCEnvToolpathAccessor_GetStorageUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getstorageuuid");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathAccessor_GetUUID == nullptr)
+		if (pWrapperTable->m_ToolpathAccessor_GetStorageUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -813,6 +848,96 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetUnits == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_build_getname");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) dlsym(hLibrary, "libmcenv_build_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetBuildUUID = (PLibMCEnvBuild_GetBuildUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_getbuilduuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetBuildUUID = (PLibMCEnvBuild_GetBuildUUIDPtr) dlsym(hLibrary, "libmcenv_build_getbuilduuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetBuildUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetStorageUUID = (PLibMCEnvBuild_GetStorageUUIDPtr) GetProcAddress(hLibrary, "libmcenv_build_getstorageuuid");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetStorageUUID = (PLibMCEnvBuild_GetStorageUUIDPtr) dlsym(hLibrary, "libmcenv_build_getstorageuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetStorageUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetStorageSHA256 = (PLibMCEnvBuild_GetStorageSHA256Ptr) GetProcAddress(hLibrary, "libmcenv_build_getstoragesha256");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetStorageSHA256 = (PLibMCEnvBuild_GetStorageSHA256Ptr) dlsym(hLibrary, "libmcenv_build_getstoragesha256");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetStorageSHA256 == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetLayerCount = (PLibMCEnvBuild_GetLayerCountPtr) GetProcAddress(hLibrary, "libmcenv_build_getlayercount");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetLayerCount = (PLibMCEnvBuild_GetLayerCountPtr) dlsym(hLibrary, "libmcenv_build_getlayercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetLayerCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_LoadToolpath = (PLibMCEnvBuild_LoadToolpathPtr) GetProcAddress(hLibrary, "libmcenv_build_loadtoolpath");
+		#else // _WIN32
+		pWrapperTable->m_Build_LoadToolpath = (PLibMCEnvBuild_LoadToolpathPtr) dlsym(hLibrary, "libmcenv_build_loadtoolpath");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_LoadToolpath == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_UnloadToolpath = (PLibMCEnvBuild_UnloadToolpathPtr) GetProcAddress(hLibrary, "libmcenv_build_unloadtoolpath");
+		#else // _WIN32
+		pWrapperTable->m_Build_UnloadToolpath = (PLibMCEnvBuild_UnloadToolpathPtr) dlsym(hLibrary, "libmcenv_build_unloadtoolpath");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_UnloadToolpath == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_ToolpathIsLoaded = (PLibMCEnvBuild_ToolpathIsLoadedPtr) GetProcAddress(hLibrary, "libmcenv_build_toolpathisloaded");
+		#else // _WIN32
+		pWrapperTable->m_Build_ToolpathIsLoaded = (PLibMCEnvBuild_ToolpathIsLoadedPtr) dlsym(hLibrary, "libmcenv_build_toolpathisloaded");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_ToolpathIsLoaded == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_CreateToolpathAccessor = (PLibMCEnvBuild_CreateToolpathAccessorPtr) GetProcAddress(hLibrary, "libmcenv_build_createtoolpathaccessor");
+		#else // _WIN32
+		pWrapperTable->m_Build_CreateToolpathAccessor = (PLibMCEnvBuild_CreateToolpathAccessorPtr) dlsym(hLibrary, "libmcenv_build_createtoolpathaccessor");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_CreateToolpathAccessor == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_AddBinaryData = (PLibMCEnvBuild_AddBinaryDataPtr) GetProcAddress(hLibrary, "libmcenv_build_addbinarydata");
+		#else // _WIN32
+		pWrapperTable->m_Build_AddBinaryData = (PLibMCEnvBuild_AddBinaryDataPtr) dlsym(hLibrary, "libmcenv_build_addbinarydata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_AddBinaryData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1113,21 +1238,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_LoadToolpath = (PLibMCEnvStateEnvironment_LoadToolpathPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadtoolpath");
+		pWrapperTable->m_StateEnvironment_GetBuildJob = (PLibMCEnvStateEnvironment_GetBuildJobPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getbuildjob");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_LoadToolpath = (PLibMCEnvStateEnvironment_LoadToolpathPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadtoolpath");
+		pWrapperTable->m_StateEnvironment_GetBuildJob = (PLibMCEnvStateEnvironment_GetBuildJobPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getbuildjob");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_LoadToolpath == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_UnloadToolpath = (PLibMCEnvStateEnvironment_UnloadToolpathPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_unloadtoolpath");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_UnloadToolpath = (PLibMCEnvStateEnvironment_UnloadToolpathPtr) dlsym(hLibrary, "libmcenv_stateenvironment_unloadtoolpath");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_UnloadToolpath == nullptr)
+		if (pWrapperTable->m_StateEnvironment_GetBuildJob == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1137,24 +1253,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_UnloadAllToolpathes == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_CreateToolpathAccessor = (PLibMCEnvStateEnvironment_CreateToolpathAccessorPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createtoolpathaccessor");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_CreateToolpathAccessor = (PLibMCEnvStateEnvironment_CreateToolpathAccessorPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createtoolpathaccessor");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_CreateToolpathAccessor == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_ToolpathIsLoaded = (PLibMCEnvStateEnvironment_ToolpathIsLoadedPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_toolpathisloaded");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_ToolpathIsLoaded = (PLibMCEnvStateEnvironment_ToolpathIsLoadedPtr) dlsym(hLibrary, "libmcenv_stateenvironment_toolpathisloaded");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_ToolpathIsLoaded == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1511,8 +1609,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetUnits == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetUUID == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getstorageuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_GetStorageUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetStorageUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getlayercount", (void**)&(pWrapperTable->m_ToolpathAccessor_GetLayerCount));
@@ -1525,6 +1623,46 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getunits", (void**)&(pWrapperTable->m_ToolpathAccessor_GetUnits));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetUnits == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getbuilduuid", (void**)&(pWrapperTable->m_Build_GetBuildUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetBuildUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getstorageuuid", (void**)&(pWrapperTable->m_Build_GetStorageUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetStorageUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getstoragesha256", (void**)&(pWrapperTable->m_Build_GetStorageSHA256));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetStorageSHA256 == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getlayercount", (void**)&(pWrapperTable->m_Build_GetLayerCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetLayerCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_loadtoolpath", (void**)&(pWrapperTable->m_Build_LoadToolpath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_LoadToolpath == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_unloadtoolpath", (void**)&(pWrapperTable->m_Build_UnloadToolpath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_UnloadToolpath == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_toolpathisloaded", (void**)&(pWrapperTable->m_Build_ToolpathIsLoaded));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_ToolpathIsLoaded == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_createtoolpathaccessor", (void**)&(pWrapperTable->m_Build_CreateToolpathAccessor));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_CreateToolpathAccessor == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_addbinarydata", (void**)&(pWrapperTable->m_Build_AddBinaryData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddBinaryData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
@@ -1659,24 +1797,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateDriverAccess == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadtoolpath", (void**)&(pWrapperTable->m_StateEnvironment_LoadToolpath));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadToolpath == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_unloadtoolpath", (void**)&(pWrapperTable->m_StateEnvironment_UnloadToolpath));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_UnloadToolpath == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getbuildjob", (void**)&(pWrapperTable->m_StateEnvironment_GetBuildJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBuildJob == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_unloadalltoolpathes", (void**)&(pWrapperTable->m_StateEnvironment_UnloadAllToolpathes));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_UnloadAllToolpathes == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_createtoolpathaccessor", (void**)&(pWrapperTable->m_StateEnvironment_CreateToolpathAccessor));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateToolpathAccessor == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_toolpathisloaded", (void**)&(pWrapperTable->m_StateEnvironment_ToolpathIsLoaded));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_ToolpathIsLoaded == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_setnextstate", (void**)&(pWrapperTable->m_StateEnvironment_SetNextState));
@@ -1941,18 +2067,18 @@ public:
 	 */
 	
 	/**
-	* CToolpathAccessor::GetUUID - Returns Toolpath data UUID.
-	* @return Returns toolpath data uuid.
+	* CToolpathAccessor::GetStorageUUID - Returns Toolpath storage UUID.
+	* @return Returns toolpath storage uuid.
 	*/
-	std::string CToolpathAccessor::GetUUID()
+	std::string CToolpathAccessor::GetStorageUUID()
 	{
-		LibMCEnv_uint32 bytesNeededUUID = 0;
-		LibMCEnv_uint32 bytesWrittenUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
-		std::vector<char> bufferUUID(bytesNeededUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		LibMCEnv_uint32 bytesNeededStorageUUID = 0;
+		LibMCEnv_uint32 bytesWrittenStorageUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetStorageUUID(m_pHandle, 0, &bytesNeededStorageUUID, nullptr));
+		std::vector<char> bufferStorageUUID(bytesNeededStorageUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetStorageUUID(m_pHandle, bytesNeededStorageUUID, &bytesWrittenStorageUUID, &bufferStorageUUID[0]));
 		
-		return std::string(&bufferUUID[0]);
+		return std::string(&bufferStorageUUID[0]);
 	}
 	
 	/**
@@ -1993,6 +2119,143 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetUnits(m_pHandle, &resultUnits));
 		
 		return resultUnits;
+	}
+	
+	/**
+	 * Method definitions for class CBuild
+	 */
+	
+	/**
+	* CBuild::GetName - Returns name of the build.
+	* @return Name of the build.
+	*/
+	std::string CBuild::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CBuild::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	std::string CBuild::GetBuildUUID()
+	{
+		LibMCEnv_uint32 bytesNeededBuildUUID = 0;
+		LibMCEnv_uint32 bytesWrittenBuildUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetBuildUUID(m_pHandle, 0, &bytesNeededBuildUUID, nullptr));
+		std::vector<char> bufferBuildUUID(bytesNeededBuildUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetBuildUUID(m_pHandle, bytesNeededBuildUUID, &bytesWrittenBuildUUID, &bufferBuildUUID[0]));
+		
+		return std::string(&bufferBuildUUID[0]);
+	}
+	
+	/**
+	* CBuild::GetStorageUUID - Returns storage uuid of the build.
+	* @return Storage UUID of the build.
+	*/
+	std::string CBuild::GetStorageUUID()
+	{
+		LibMCEnv_uint32 bytesNeededStorageUUID = 0;
+		LibMCEnv_uint32 bytesWrittenStorageUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetStorageUUID(m_pHandle, 0, &bytesNeededStorageUUID, nullptr));
+		std::vector<char> bufferStorageUUID(bytesNeededStorageUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetStorageUUID(m_pHandle, bytesNeededStorageUUID, &bytesWrittenStorageUUID, &bufferStorageUUID[0]));
+		
+		return std::string(&bufferStorageUUID[0]);
+	}
+	
+	/**
+	* CBuild::GetStorageSHA256 - Returns SHA256 of the build stream.
+	* @return SHA256 of the build stream.
+	*/
+	std::string CBuild::GetStorageSHA256()
+	{
+		LibMCEnv_uint32 bytesNeededSHA256 = 0;
+		LibMCEnv_uint32 bytesWrittenSHA256 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetStorageSHA256(m_pHandle, 0, &bytesNeededSHA256, nullptr));
+		std::vector<char> bufferSHA256(bytesNeededSHA256);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetStorageSHA256(m_pHandle, bytesNeededSHA256, &bytesWrittenSHA256, &bufferSHA256[0]));
+		
+		return std::string(&bufferSHA256[0]);
+	}
+	
+	/**
+	* CBuild::GetLayerCount - Returns cached layer count of the toolpath.
+	* @return Returns layer count.
+	*/
+	LibMCEnv_uint32 CBuild::GetLayerCount()
+	{
+		LibMCEnv_uint32 resultLayerCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetLayerCount(m_pHandle, &resultLayerCount));
+		
+		return resultLayerCount;
+	}
+	
+	/**
+	* CBuild::LoadToolpath - loads the a toolpath into memory
+	*/
+	void CBuild::LoadToolpath()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_LoadToolpath(m_pHandle));
+	}
+	
+	/**
+	* CBuild::UnloadToolpath - unloads the a toolpath from memory, if it has been loaded before.
+	*/
+	void CBuild::UnloadToolpath()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_UnloadToolpath(m_pHandle));
+	}
+	
+	/**
+	* CBuild::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
+	* @return returns if toolpath is loaded.
+	*/
+	bool CBuild::ToolpathIsLoaded()
+	{
+		bool resultIsLoaded = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_ToolpathIsLoaded(m_pHandle, &resultIsLoaded));
+		
+		return resultIsLoaded;
+	}
+	
+	/**
+	* CBuild::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded with LoadToolpath before.
+	* @return Toolpath instance.
+	*/
+	PToolpathAccessor CBuild::CreateToolpathAccessor()
+	{
+		LibMCEnvHandle hToolpathInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_CreateToolpathAccessor(m_pHandle, &hToolpathInstance));
+		
+		if (!hToolpathInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
+	}
+	
+	/**
+	* CBuild::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sName - Name of the attache data block.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] ContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	std::string CBuild::AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer)
+	{
+		LibMCEnv_uint32 bytesNeededDataUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
@@ -2430,21 +2693,19 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::LoadToolpath - Loads a toolpath from disk into memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
+	* CStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
 	*/
-	void CStateEnvironment::LoadToolpath(const std::string & sToolpathUUID)
+	PBuild CStateEnvironment::GetBuildJob(const std::string & sBuildUUID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadToolpath(m_pHandle, sToolpathUUID.c_str()));
-	}
-	
-	/**
-	* CStateEnvironment::UnloadToolpath - unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	*/
-	void CStateEnvironment::UnloadToolpath(const std::string & sToolpathUUID)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_UnloadToolpath(m_pHandle, sToolpathUUID.c_str()));
+		LibMCEnvHandle hBuildInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBuildJob(m_pHandle, sBuildUUID.c_str(), &hBuildInstance));
+		
+		if (!hBuildInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuild>(m_pWrapper, hBuildInstance);
 	}
 	
 	/**
@@ -2453,35 +2714,6 @@ public:
 	void CStateEnvironment::UnloadAllToolpathes()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_UnloadAllToolpathes(m_pHandle));
-	}
-	
-	/**
-	* CStateEnvironment::CreateToolpathAccessor - creates an accessor object for a toolpath, if loaded to memory before.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return UUID of the toolpath entity.
-	*/
-	PToolpathAccessor CStateEnvironment::CreateToolpathAccessor(const std::string & sToolpathUUID)
-	{
-		LibMCEnvHandle hToolpathInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateToolpathAccessor(m_pHandle, sToolpathUUID.c_str(), &hToolpathInstance));
-		
-		if (!hToolpathInstance) {
-			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
-	}
-	
-	/**
-	* CStateEnvironment::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return returns if toolpath is loaded.
-	*/
-	bool CStateEnvironment::ToolpathIsLoaded(const std::string & sToolpathUUID)
-	{
-		bool resultIsLoaded = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_ToolpathIsLoaded(m_pHandle, sToolpathUUID.c_str(), &resultIsLoaded));
-		
-		return resultIsLoaded;
 	}
 	
 	/**

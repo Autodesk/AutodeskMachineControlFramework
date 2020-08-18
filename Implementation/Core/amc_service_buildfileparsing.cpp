@@ -29,45 +29,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UTILS
-#define __AMC_UTILS
+#include "amc_service_buildfileparsing.hpp"
+#include "amc_servicehandler.hpp"
 
-#include <memory>
-#include <string>
+#include "common_utils.hpp"
+#include "libmc_interfaceexception.hpp"
+
+#include "amc_systemstate.hpp"
+#include "amc_toolpathentity.hpp"
 
 
-namespace AMCCommon {
+namespace AMC {
+	
+	
+	CService_BuildFileParsing::CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PBuildJob pBuildJob, Lib3MF::PWrapper p3MFWrapper, const std::string& sUserID)
+		: CService (pServiceHandler), m_pBuildJob (pBuildJob), m_p3MFWrapper (p3MFWrapper), m_sUserID (sUserID)
+	{
+		if (pBuildJob.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (p3MFWrapper.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-
-	class CUtils {
-	private:
-
-		static void characterIDToUTF16(uint32_t nCharacterID, uint16_t& nHighSurrogate, uint16_t& nLowSurrogate);
-
-	public:
-
-		static std::string getCurrentISO8601TimeUTC();
-		static std::string getCurrentTimeFileName();
-		static std::string createUUID();
-		static std::string normalizeUUIDString(std::string sRawString);
-		static std::string normalizeSHA256String(std::string sRawString);		
+	}
+	
+	
+	CService_BuildFileParsing::~CService_BuildFileParsing()
+	{
 		
-		static std::string UTF16toUTF8(std::wstring sString);
-		static std::wstring UTF8toUTF16(std::string sString);
-		static bool UTF8StringIsValid (const std::string & sString);
-		static std::string trimString (const std::string& sString);
-		static std::string toLowerString(const std::string& sString);
-
-		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
-		static std::string calculateSHA256FromString(const std::string& sString);
-
-		static void sleepMilliseconds(const uint32_t milliSeconds);
-		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
-	};
+	}
 
 	
+	void CService_BuildFileParsing::executeBlocking()
+	{
+		
+		auto pStorageStream = m_pBuildJob->GetStorageStream();
+		
+		// TODO: Check Toolpath Entity Integrity
+		CToolpathEntity toolpathEntity (pStorageStream, m_p3MFWrapper);		
+		m_pBuildJob->FinishValidating (toolpathEntity.getLayerCount ());
+		m_pBuildJob->AddJobData(pStorageStream->GetName(), pStorageStream, LibMCData::eBuildJobDataType::Toolpath, m_sUserID);
+		
+
+	}
+		
+
+	std::string CService_BuildFileParsing::getName()
+	{
+		return "build file parsing";
+	}
+	
+
 }
 
-
-#endif //__AMC_UTILS
 

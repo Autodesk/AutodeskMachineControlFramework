@@ -117,8 +117,8 @@
 
 	<class name="ToolpathAccessor" parent="Base">
 	
-		<method name="GetUUID" description="Returns Toolpath data UUID.">
-			<param name="UUID" type="string" pass="return" description="Returns toolpath data uuid." />
+		<method name="GetStorageUUID" description="Returns Toolpath storage UUID.">
+			<param name="StorageUUID" type="string" pass="return" description="Returns toolpath storage uuid." />
 		</method>
 	
 		<method name="GetLayerCount" description="Returns layer count.">
@@ -136,6 +136,53 @@
 			
 	</class>
 
+
+	<class name="Build" parent="Base" description="Build instance to access build files">
+
+		<method name="GetName" description="Returns name of the build.">
+			<param name="Name" type="string" pass="return" description="Name of the build." />
+		</method>
+
+		<method name="GetBuildUUID" description="Returns uuid of the build.">
+			<param name="BuildUUID" type="string" pass="return" description="UUID of the build." />
+		</method>
+
+		<method name="GetStorageUUID" description="Returns storage uuid of the build.">
+			<param name="StorageUUID" type="string" pass="return" description="Storage UUID of the build." />
+		</method>
+
+		<method name="GetStorageSHA256" description="Returns SHA256 of the build stream.">
+			<param name="SHA256" type="string" pass="return" description="SHA256 of the build stream." />
+		</method>
+
+		<method name="GetLayerCount" description="Returns cached layer count of the toolpath.">
+			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
+		</method>
+
+		<method name="LoadToolpath" description="loads the a toolpath into memory">
+		</method>
+
+		<method name="UnloadToolpath" description="unloads the a toolpath from memory, if it has been loaded before.">
+		</method>
+
+		<method name="ToolpathIsLoaded" description="checks, if a toolpath object is loaded to memory.">
+			<param name="IsLoaded" type="bool" pass="return" description="returns if toolpath is loaded." />
+		</method>
+
+		<method name="CreateToolpathAccessor" description="Creates an accessor object for a toolpath. Toolpath MUST have been loaded with LoadToolpath before.">
+			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
+		</method>
+
+		<method name="AddBinaryData" description="Adds binary data to store with the build.">
+			<param name="Name" type="string" pass="in" description="Name of the attache data block." />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>
+
+				
+	</class>
+	
 
 	<class name="SignalTrigger" parent="Base" description="Class for signal triggering">
 
@@ -310,25 +357,12 @@
 			<param name="DriverHandle" type="pointer" pass="out" description="Handle of the driver." />
 		</method>
 
-		<method name="LoadToolpath" description="Loads a toolpath from disk into memory.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
-		</method>
-
-		<method name="UnloadToolpath" description="unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
+		<method name="GetBuildJob" description="Returns a instance of a build object.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
 		<method name="UnloadAllToolpathes" description="unloads all toolpath in memory to clean up">
-		</method>
-
-		<method name="CreateToolpathAccessor" description="creates an accessor object for a toolpath, if loaded to memory before.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
-			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="UUID of the toolpath entity." />
-		</method>
-
-		<method name="ToolpathIsLoaded" description="checks, if a toolpath object is loaded to memory.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
-			<param name="IsLoaded" type="bool" pass="return" description="returns if toolpath is loaded." />
 		</method>
 
 

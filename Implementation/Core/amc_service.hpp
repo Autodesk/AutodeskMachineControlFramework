@@ -29,45 +29,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UTILS
-#define __AMC_UTILS
+#ifndef __AMC_SERVICE
+#define __AMC_SERVICE
 
 #include <memory>
 #include <string>
+#include <map>
+#include <list>
+#include <thread>
+#include <mutex>
+
+namespace AMC {
+
+	class CServiceHandler;
+	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
+
+	class CService;
+	typedef std::shared_ptr<CService> PService;
 
 
-namespace AMCCommon {
-
-
-	class CUtils {
+	class CService {
 	private:
+		bool m_bHasBeenExecuted;
+		bool m_bIsRunning;
+		std::mutex m_Mutex;
 
-		static void characterIDToUTF16(uint32_t nCharacterID, uint16_t& nHighSurrogate, uint16_t& nLowSurrogate);
+		void setHasBeenExecuted(bool bValue);
+		void setIsRunning(bool bValue);
+		
+	protected:
+		CServiceHandler * m_pServiceHandler;
 
 	public:
 
-		static std::string getCurrentISO8601TimeUTC();
-		static std::string getCurrentTimeFileName();
-		static std::string createUUID();
-		static std::string normalizeUUIDString(std::string sRawString);
-		static std::string normalizeSHA256String(std::string sRawString);		
-		
-		static std::string UTF16toUTF8(std::wstring sString);
-		static std::wstring UTF8toUTF16(std::string sString);
-		static bool UTF8StringIsValid (const std::string & sString);
-		static std::string trimString (const std::string& sString);
-		static std::string toLowerString(const std::string& sString);
+		CService (CServiceHandler* pServiceHandler);
+		virtual ~CService();
 
-		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
-		static std::string calculateSHA256FromString(const std::string& sString);
+		void executeThreaded();
 
-		static void sleepMilliseconds(const uint32_t milliSeconds);
-		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
+		bool getHasBeenExecuted();
+		bool getIsRunning();
+
+		CServiceHandler* getServiceHandler ();
+
+		void executeThreadedEx();
+
+		virtual void executeBlocking() = 0;
+
+		virtual std::string getName() = 0;
+
 	};
 
 	
 }
 
 
-#endif //__AMC_UTILS
+#endif //__AMC_SERVICE
 

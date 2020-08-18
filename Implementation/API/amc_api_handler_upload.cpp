@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_jsonrequest.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "libmcdata_dynamic.hpp"
 
 #include "common_utils.hpp"
 
@@ -152,18 +153,31 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 
 	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
 
-	auto sContextUUID = jsonRequest.getUUID(AMC_API_KEY_UPLOAD_CONTEXTUUID, LIBMC_ERROR_INVALIDCONTEXTUUID);
+	auto sContext = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_CONTEXT, LIBMC_ERROR_INVALIDCONTEXTUUID);
 	auto sName = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_NAME, LIBMC_ERROR_INVALIDUPLOADNAME);
 	auto sMimeType = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_MIMETYPE, LIBMC_ERROR_INVALIDMIMETYPE);
-	auto nSize = jsonRequest.getSize(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize (), LIBMC_ERROR_INVALIDSTREAMSIZE);
+	auto nSize = jsonRequest.getSize(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize(), LIBMC_ERROR_INVALIDSTREAMSIZE);
 	auto sSHA256 = jsonRequest.getSHA256(AMC_API_KEY_UPLOAD_SHA256, LIBMC_ERROR_INVALIDSHA256SUM);
 
+	std::string sContextUUID;
+
+	if (sContext == "build") {
+		sContextUUID = createNewBuild (sName, sUUID, pAuth);
+	}
+	else {
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCONTEXTUUID);
+	}
+		
 	if (!pStorage->ContentTypeIsAccepted(sMimeType))
 		throw ELibMCInterfaceException(LIBMC_ERROR_CONTENTTYPENOTACCEPTED);
+	
+	if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
+		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED);
 
 	pStorage->BeginPartialStream (sUUID, sContextUUID, sName, sMimeType, nSize, sSHA256, pAuth->getUserName ());
 
 	writer.addString(AMC_API_KEY_UPLOAD_STREAMUUID, sUUID);
+	writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);
 
 }
 
@@ -240,6 +254,19 @@ PAPIResponse CAPIHandler_Upload::handleRequest(const std::string& sURI, const eA
 
 
 	return nullptr;
+}
+
+
+std::string CAPIHandler_Upload::createNewBuild(const std::string& sName, const std::string& sStorageStreamUUID, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	std::string sBuildUUID = AMCCommon::CUtils::createUUID();
+
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	pBuildJobHandler->CreateJob(sBuildUUID, sName, pAuth->getUserName(), sStorageStreamUUID);
+
+	return sBuildUUID;
 }
 
 		

@@ -27,73 +27,72 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildJobHandler
+Abstract: This is the class declaration of CBuild
 
 */
 
 
-#ifndef __LIBMCDATA_BUILDJOBHANDLER
-#define __LIBMCDATA_BUILDJOBHANDLER
+#ifndef __LIBMCENV_BUILD
+#define __LIBMCENV_BUILD
 
-#include "libmcdata_interfaces.hpp"
-#include <vector>
+#include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcdata_base.hpp"
-
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagepath.hpp"
+#include "libmcdata_dynamic.hpp"
+#include "amc_systemstate.hpp"
 
-#include <mutex>
-#include <thread>
-
-
-namespace LibMCData {
+namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildJobHandler 
+ Class declaration of CBuild 
 **************************************************************************************************************************/
 
-class CBuildJobHandler : public virtual IBuildJobHandler, public virtual CBase {
+class CBuild : public virtual IBuild, public virtual CBase {
 private:
 
-	AMCData::PSQLHandler m_pSQLHandler;
-    AMCData::PStoragePath m_pStoragePath;
-
-protected:
-
-
+	AMC::PSystemState m_pSystemState;
+	LibMCData::PBuildJob m_pBuildJob;
 
 
 public:
 
+	CBuild(LibMCData::PBuildJob pBuildJob, AMC::PSystemState pSystemState);
 
-    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+	std::string GetName() override;
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID) override;
+	std::string GetBuildUUID() override;
 
-	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
+	std::string GetStorageUUID() override;
 
-	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
+	std::string GetStorageSHA256() override;
 
-    std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
+	LibMCEnv_uint32 GetLayerCount() override;
 
-    LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
+	void LoadToolpath() override;
+
+	void UnloadToolpath() override;
+
+	bool ToolpathIsLoaded() override;
+
+	IToolpathAccessor* CreateToolpathAccessor() override;
+
+	std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCData
+} // namespace LibMCEnv
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_BUILDJOBHANDLER
+#endif // __LIBMCENV_BUILD

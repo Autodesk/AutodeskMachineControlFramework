@@ -42,8 +42,8 @@ using namespace LibMCEnv::Impl;
  Class definition of CToolpathAccessor 
 **************************************************************************************************************************/
 
-CToolpathAccessor::CToolpathAccessor(const std::string& sUUID, AMC::PToolpathHandler pToolpathHandler)
-	: m_sUUID(sUUID), m_pToolpathHandler(pToolpathHandler)
+CToolpathAccessor::CToolpathAccessor(const std::string& sStorageUUID, AMC::PToolpathHandler pToolpathHandler)
+	: m_sStorageUUID(sStorageUUID), m_pToolpathHandler(pToolpathHandler)
 {
 	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -53,27 +53,27 @@ CToolpathAccessor::~CToolpathAccessor()
 {
 }
 
-std::string CToolpathAccessor::GetUUID()
+std::string CToolpathAccessor::GetStorageUUID()
 {
-	return m_sUUID;
+	return m_sStorageUUID;
 }
 
 LibMCEnv_uint32 CToolpathAccessor::GetLayerCount()
 {
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sUUID, true);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 	return pToolpathEntity->getLayerCount();
 
 }
 
 IToolpathLayer * CToolpathAccessor::LoadLayer(const LibMCEnv_uint32 nLayerIndex)
 {
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sUUID, true);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 
 	return new CToolpathLayer(pToolpathEntity->readLayer (nLayerIndex));
 }
 
 LibMCEnv_double CToolpathAccessor::GetUnits()
 {
-	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sUUID, true);
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 	return pToolpathEntity->getUnits();
 }

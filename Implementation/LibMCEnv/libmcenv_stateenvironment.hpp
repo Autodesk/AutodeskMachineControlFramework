@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_systemstate.hpp"
+#include "amc_parameterhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -74,15 +75,9 @@ public:
 
 	bool WaitForSignal(const std::string& sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) override;
 
-	void LoadToolpath(const std::string& sToolpathUUID) override;
-
-	void UnloadToolpath(const std::string& sToolpathUUID) override;
+	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
 	void UnloadAllToolpathes() override;
-
-	bool ToolpathIsLoaded(const std::string& sToolpathUUID) override;
-
-	IToolpathAccessor* CreateToolpathAccessor(const std::string& sToolpathUUID) override;
 
 	void GetDriverLibrary(const std::string& sDriverName, std::string& sDriverType, LibMCEnv_pvoid& pDriverLookup) override;
 

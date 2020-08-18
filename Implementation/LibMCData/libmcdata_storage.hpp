@@ -62,6 +62,7 @@ namespace Impl {
  Class declaration of CStorage 
 **************************************************************************************************************************/
 
+
 class CStorage : public virtual IStorage, public virtual CBase {
 private:
     AMCData::PStoragePath m_pStoragePath;
@@ -95,7 +96,6 @@ public:
     LibMCData_uint64 GetMaxStreamSize() override;
 
     bool ContentTypeIsAccepted(const std::string& sContentType) override;
-
 
 };
 

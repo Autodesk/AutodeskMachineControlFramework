@@ -32,6 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_systemstate.hpp"
 #include "libmc_interfaceexception.hpp"
 
+#include "amc_logger.hpp"
+#include "amc_parameterhandler.hpp"
+#include "amc_statesignalhandler.hpp"
+#include "amc_driverhandler.hpp"
+#include "amc_toolpathhandler.hpp"
+#include "amc_servicehandler.hpp"
+
+#include "libmcdata_dynamic.hpp"
+
 namespace AMC {
 
 	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper)
@@ -53,6 +62,7 @@ namespace AMC {
 		m_pDriverHandler = std::make_shared<CDriverHandler>(pDriverEnvWrapper);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
+		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 	}
 
 	CSystemState::~CSystemState()
@@ -80,6 +90,11 @@ namespace AMC {
 		return m_pToolpathHandler.get();
 	}
 
+	CServiceHandler* CSystemState::serviceHandler()
+	{
+		return m_pServiceHandler.get();
+	}
+
 	PLogger CSystemState::getLoggerInstance()
 	{
 		return m_pLogger;
@@ -100,10 +115,16 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
-	LibMCData::PStorage CSystemState::storage()
+	LibMCData::CStorage * CSystemState::storage()
 	{
-		return m_pStorage;
+		return m_pStorage.get();
 	}
+
+	LibMCData::CBuildJobHandler* CSystemState::buildJobHandler()
+	{
+		return m_pBuildJobHandler.get();
+	}
+
 
 	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath)
 	{
@@ -120,5 +141,10 @@ namespace AMC {
 		return iIter->second;
 	}
 
+	std::string CSystemState::getSystemUserID()
+	{
+		// TODO: Retrieve a unique User ID for the current running session
+		return "amc";
+	}
 
 }

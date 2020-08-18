@@ -29,45 +29,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UTILS
-#define __AMC_UTILS
+#ifndef __AMC_SERVICEHANDLER
+#define __AMC_SERVICEHANDLER
+
+#include "amc_service.hpp"
+#include "amc_logger.hpp"
 
 #include <memory>
 #include <string>
+#include <set>
+#include <queue>
 
+#define SERVICETHREADCOUNT_MIN 2
+#define SERVICETHREADCOUNT_MAX 128
+#define SERVICETHREADCOUNT_DEFAULT 8
 
-namespace AMCCommon {
+namespace AMC {
 
+	class CServiceHandler;
+	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 
-	class CUtils {
+	class CService;
+	typedef std::shared_ptr<CService> PService;
+
+	class CServiceHandler {
 	private:
 
-		static void characterIDToUTF16(uint32_t nCharacterID, uint16_t& nHighSurrogate, uint16_t& nLowSurrogate);
+		uint32_t m_nMaxThreadCount;
+		std::mutex m_Mutex;
+		std::queue<PService> m_QueuedServices;
+		std::set<PService> m_RunningServices;
+		std::set<PService> m_FinishedServices;
+
+		PLogger m_pLogger;
+
 
 	public:
 
-		static std::string getCurrentISO8601TimeUTC();
-		static std::string getCurrentTimeFileName();
-		static std::string createUUID();
-		static std::string normalizeUUIDString(std::string sRawString);
-		static std::string normalizeSHA256String(std::string sRawString);		
-		
-		static std::string UTF16toUTF8(std::wstring sString);
-		static std::wstring UTF8toUTF16(std::string sString);
-		static bool UTF8StringIsValid (const std::string & sString);
-		static std::string trimString (const std::string& sString);
-		static std::string toLowerString(const std::string& sString);
+		CServiceHandler(PLogger pLogger);
+		virtual ~CServiceHandler();
 
-		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
-		static std::string calculateSHA256FromString(const std::string& sString);
+		void addServiceToQueue (PService pService);
 
-		static void sleepMilliseconds(const uint32_t milliSeconds);
-		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
+		void handleQueue();
+
+		void clearGarbage();
+
+		void logMessage(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel);
+
+		void setMaxThreadCount(uint32_t nMaxThreadCount);
+
 	};
 
-	
 }
 
 
-#endif //__AMC_UTILS
+#endif //__AMC_SERVICEHANDLER
 

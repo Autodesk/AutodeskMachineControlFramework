@@ -69,6 +69,8 @@ namespace AMC {
 		void unloadAllEntities();
 
 		void setLibraryPath(const std::string& sLibraryName, const std::string sLibraryPath);
+
+		Lib3MF::PWrapper getLib3MFWrapper();
 		
 	};
 

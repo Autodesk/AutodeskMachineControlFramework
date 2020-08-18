@@ -60,6 +60,8 @@ namespace AMC {
 		void handleFinishUploadRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 		void handleStreamUploadRequest(CJSONWriter& writer, APIFormFields pFormFields, const std::string & sStreamUUID, PAPIAuth pAuth);
 
+		std::string createNewBuild (const std::string & sName, const std::string & sStorageStreamUUID, PAPIAuth pAuth);
+
 	public:
 
 		CAPIHandler_Upload(PSystemState pSystemState);

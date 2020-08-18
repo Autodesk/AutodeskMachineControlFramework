@@ -57,6 +57,7 @@ namespace Impl {
 class IBase;
 class IToolpathLayer;
 class IToolpathAccessor;
+class IBuild;
 class ISignalTrigger;
 class ISignalHandler;
 class IStateEnvironment;
@@ -313,10 +314,10 @@ typedef IBaseSharedPtr<IToolpathLayer> PIToolpathLayer;
 class IToolpathAccessor : public virtual IBase {
 public:
 	/**
-	* IToolpathAccessor::GetUUID - Returns Toolpath data UUID.
-	* @return Returns toolpath data uuid.
+	* IToolpathAccessor::GetStorageUUID - Returns Toolpath storage UUID.
+	* @return Returns toolpath storage uuid.
 	*/
-	virtual std::string GetUUID() = 0;
+	virtual std::string GetStorageUUID() = 0;
 
 	/**
 	* IToolpathAccessor::GetLayerCount - Returns layer count.
@@ -340,6 +341,79 @@ public:
 };
 
 typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
+
+
+/*************************************************************************************************************************
+ Class interface for Build 
+**************************************************************************************************************************/
+
+class IBuild : public virtual IBase {
+public:
+	/**
+	* IBuild::GetName - Returns name of the build.
+	* @return Name of the build.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IBuild::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	virtual std::string GetBuildUUID() = 0;
+
+	/**
+	* IBuild::GetStorageUUID - Returns storage uuid of the build.
+	* @return Storage UUID of the build.
+	*/
+	virtual std::string GetStorageUUID() = 0;
+
+	/**
+	* IBuild::GetStorageSHA256 - Returns SHA256 of the build stream.
+	* @return SHA256 of the build stream.
+	*/
+	virtual std::string GetStorageSHA256() = 0;
+
+	/**
+	* IBuild::GetLayerCount - Returns cached layer count of the toolpath.
+	* @return Returns layer count.
+	*/
+	virtual LibMCEnv_uint32 GetLayerCount() = 0;
+
+	/**
+	* IBuild::LoadToolpath - loads the a toolpath into memory
+	*/
+	virtual void LoadToolpath() = 0;
+
+	/**
+	* IBuild::UnloadToolpath - unloads the a toolpath from memory, if it has been loaded before.
+	*/
+	virtual void UnloadToolpath() = 0;
+
+	/**
+	* IBuild::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
+	* @return returns if toolpath is loaded.
+	*/
+	virtual bool ToolpathIsLoaded() = 0;
+
+	/**
+	* IBuild::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded with LoadToolpath before.
+	* @return Toolpath instance.
+	*/
+	virtual IToolpathAccessor * CreateToolpathAccessor() = 0;
+
+	/**
+	* IBuild::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sName - Name of the attache data block.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] nContentBufferSize - Number of elements in buffer
+	* @param[in] pContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuild> PIBuild;
 
 
 /*************************************************************************************************************************
@@ -596,35 +670,16 @@ public:
 	virtual void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle) = 0;
 
 	/**
-	* IStateEnvironment::LoadToolpath - Loads a toolpath from disk into memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
+	* IStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
 	*/
-	virtual void LoadToolpath(const std::string & sToolpathUUID) = 0;
-
-	/**
-	* IStateEnvironment::UnloadToolpath - unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	*/
-	virtual void UnloadToolpath(const std::string & sToolpathUUID) = 0;
+	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
 	* IStateEnvironment::UnloadAllToolpathes - unloads all toolpath in memory to clean up
 	*/
 	virtual void UnloadAllToolpathes() = 0;
-
-	/**
-	* IStateEnvironment::CreateToolpathAccessor - creates an accessor object for a toolpath, if loaded to memory before.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return UUID of the toolpath entity.
-	*/
-	virtual IToolpathAccessor * CreateToolpathAccessor(const std::string & sToolpathUUID) = 0;
-
-	/**
-	* IStateEnvironment::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return returns if toolpath is loaded.
-	*/
-	virtual bool ToolpathIsLoaded(const std::string & sToolpathUUID) = 0;
 
 	/**
 	* IStateEnvironment::SetNextState - sets the next state

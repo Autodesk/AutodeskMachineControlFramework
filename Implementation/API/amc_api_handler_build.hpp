@@ -29,45 +29,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UTILS
-#define __AMC_UTILS
+#ifndef __AMC_API_HANDLER_BUILD
+#define __AMC_API_HANDLER_BUILD
 
-#include <memory>
-#include <string>
+#include "amc_api_handler.hpp"
+#include "amc_logger.hpp"
+#include "amc_api_response.hpp"
 
+#include "amc_systemstate.hpp"
 
-namespace AMCCommon {
+namespace AMC {
 
+	enum APIHandler_BuildType {
+		btUnknown = 0,
+		btStartPrepareJob = 1,
+		btListJobs = 2
+	};
 
-	class CUtils {
+	class CAPIHandler_Build : public CAPIHandler {
 	private:
+		
+		PSystemState m_pSystemState;
 
-		static void characterIDToUTF16(uint32_t nCharacterID, uint16_t& nHighSurrogate, uint16_t& nLowSurrogate);
+		APIHandler_BuildType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& jobUUID);
+
+		void handlePrepareJobRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+		void handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth);
 
 	public:
 
-		static std::string getCurrentISO8601TimeUTC();
-		static std::string getCurrentTimeFileName();
-		static std::string createUUID();
-		static std::string normalizeUUIDString(std::string sRawString);
-		static std::string normalizeSHA256String(std::string sRawString);		
-		
-		static std::string UTF16toUTF8(std::wstring sString);
-		static std::wstring UTF8toUTF16(std::string sString);
-		static bool UTF8StringIsValid (const std::string & sString);
-		static std::string trimString (const std::string& sString);
-		static std::string toLowerString(const std::string& sString);
+		CAPIHandler_Build(PSystemState pSystemState);
 
-		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
-		static std::string calculateSHA256FromString(const std::string& sString);
+		virtual ~CAPIHandler_Build();
+				
+		virtual std::string getBaseURI () override;
 
-		static void sleepMilliseconds(const uint32_t milliSeconds);
-		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
+
+		virtual uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType) override;
+
+		virtual APIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex) override;
+
+		virtual bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType) override;
+
 	};
 
 	
 }
 
 
-#endif //__AMC_UTILS
+#endif //__AMC_API_HANDLER_BUILD
 

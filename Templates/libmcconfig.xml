@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02">
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02"  threadcount="32">
 
 
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
@@ -7,12 +7,18 @@
   
   <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 	 	  		  
+	  <signaldefinition name="signal_startjob" external="1">
+		<parameter name="jobname" type="string" />
+		<parameter name="jobuuid" type="string" />
+		<result name="success" type="bool" />		
+	  </signaldefinition>				  
+				  
 	  <parametergroup name="jobinfo" description="Job Information">
 		<parameter name="jobname" description="Job Name" default="TestJob" type="string" />
 		<parameter name="jobuuid" description="Job UUID" default="12345" type="string" />
 		<parameter name="layercount" description="Layer Count" default="0" type="int" />
 		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
-		<parameter name="autostart" description="Automatically start job after init" default="1" type="bool" />
+		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
 		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
 	  </parametergroup>
 	     	  

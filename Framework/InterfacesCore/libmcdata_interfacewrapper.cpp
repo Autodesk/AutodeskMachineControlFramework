@@ -306,54 +306,6 @@ LibMCDataResult libmcdata_storagestream_getuuid(LibMCData_StorageStream pStorage
 	}
 }
 
-LibMCDataResult libmcdata_storagestream_getcontextuuid(LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nContextUUIDBufferSize, LibMCData_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pStorageStream;
-
-	try {
-		if ( (!pContextUUIDBuffer) && !(pContextUUIDNeededChars) )
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		std::string sContextUUID("");
-		IStorageStream* pIStorageStream = dynamic_cast<IStorageStream*>(pIBaseClass);
-		if (!pIStorageStream)
-			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pContextUUIDBuffer == nullptr);
-		if (isCacheCall) {
-			sContextUUID = pIStorageStream->GetContextUUID();
-
-			pIStorageStream->_setCache (new ParameterCache_1<std::string> (sContextUUID));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStorageStream->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-			cache->retrieveData (sContextUUID);
-			pIStorageStream->_setCache (nullptr);
-		}
-		
-		if (pContextUUIDNeededChars)
-			*pContextUUIDNeededChars = (LibMCData_uint32) (sContextUUID.size()+1);
-		if (pContextUUIDBuffer) {
-			if (sContextUUID.size() >= nContextUUIDBufferSize)
-				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
-			for (size_t iContextUUID = 0; iContextUUID < sContextUUID.size(); iContextUUID++)
-				pContextUUIDBuffer[iContextUUID] = sContextUUID[iContextUUID];
-			pContextUUIDBuffer[sContextUUID.size()] = 0;
-		}
-		return LIBMCDATA_SUCCESS;
-	}
-	catch (ELibMCDataInterfaceException & Exception) {
-		return handleLibMCDataException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCDataResult libmcdata_storagestream_gettimestamp(LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pStorageStream;
@@ -888,6 +840,240 @@ LibMCDataResult libmcdata_storage_contenttypeisaccepted(LibMCData_Storage pStora
 
 
 /*************************************************************************************************************************
+ Class implementation for BuildJobData
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_buildjobdata_getname(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobData;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IBuildJobData* pIBuildJobData = dynamic_cast<IBuildJobData*>(pIBaseClass);
+		if (!pIBuildJobData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			sName = pIBuildJobData->GetName();
+
+			pIBuildJobData->_setCache (new ParameterCache_1<std::string> (sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuildJobData->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sName);
+			pIBuildJobData->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCData_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobdata_gettimestamp(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobData;
+
+	try {
+		if ( (!pTimestampBuffer) && !(pTimestampNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTimestamp("");
+		IBuildJobData* pIBuildJobData = dynamic_cast<IBuildJobData*>(pIBaseClass);
+		if (!pIBuildJobData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTimestampBuffer == nullptr);
+		if (isCacheCall) {
+			sTimestamp = pIBuildJobData->GetTimeStamp();
+
+			pIBuildJobData->_setCache (new ParameterCache_1<std::string> (sTimestamp));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuildJobData->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sTimestamp);
+			pIBuildJobData->_setCache (nullptr);
+		}
+		
+		if (pTimestampNeededChars)
+			*pTimestampNeededChars = (LibMCData_uint32) (sTimestamp.size()+1);
+		if (pTimestampBuffer) {
+			if (sTimestamp.size() >= nTimestampBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestamp = 0; iTimestamp < sTimestamp.size(); iTimestamp++)
+				pTimestampBuffer[iTimestamp] = sTimestamp[iTimestamp];
+			pTimestampBuffer[sTimestamp.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobdata_getstoragestream(LibMCData_BuildJobData pBuildJobData, LibMCData_StorageStream * pStreamInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobData;
+
+	try {
+		if (pStreamInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseStreamInstance(nullptr);
+		IBuildJobData* pIBuildJobData = dynamic_cast<IBuildJobData*>(pIBaseClass);
+		if (!pIBuildJobData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseStreamInstance = pIBuildJobData->GetStorageStream();
+
+		*pStreamInstance = (IBase*)(pBaseStreamInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobdata_getdatatype(LibMCData_BuildJobData pBuildJobData, eLibMCDataBuildJobDataType * pDataType)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobData;
+
+	try {
+		if (pDataType == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBuildJobData* pIBuildJobData = dynamic_cast<IBuildJobData*>(pIBaseClass);
+		if (!pIBuildJobData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pDataType = pIBuildJobData->GetDataType();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjobdata_getmimetype(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nMimeTypeBufferSize, LibMCData_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobData;
+
+	try {
+		if ( (!pMimeTypeBuffer) && !(pMimeTypeNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sMimeType("");
+		IBuildJobData* pIBuildJobData = dynamic_cast<IBuildJobData*>(pIBaseClass);
+		if (!pIBuildJobData)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pMimeTypeBuffer == nullptr);
+		if (isCacheCall) {
+			sMimeType = pIBuildJobData->GetMIMEType();
+
+			pIBuildJobData->_setCache (new ParameterCache_1<std::string> (sMimeType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuildJobData->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sMimeType);
+			pIBuildJobData->_setCache (nullptr);
+		}
+		
+		if (pMimeTypeNeededChars)
+			*pMimeTypeNeededChars = (LibMCData_uint32) (sMimeType.size()+1);
+		if (pMimeTypeBuffer) {
+			if (sMimeType.size() >= nMimeTypeBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iMimeType = 0; iMimeType < sMimeType.size(); iMimeType++)
+				pMimeTypeBuffer[iMimeType] = sMimeType[iMimeType];
+			pMimeTypeBuffer[sMimeType.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for BuildJobDataIterator
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_buildjobdataiterator_getcurrentjobdata(LibMCData_BuildJobDataIterator pBuildJobDataIterator, LibMCData_BuildJobData * pCurrentInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJobDataIterator;
+
+	try {
+		if (pCurrentInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseCurrentInstance(nullptr);
+		IBuildJobDataIterator* pIBuildJobDataIterator = dynamic_cast<IBuildJobDataIterator*>(pIBaseClass);
+		if (!pIBuildJobDataIterator)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseCurrentInstance = pIBuildJobDataIterator->GetCurrentJobData();
+
+		*pCurrentInstance = (IBase*)(pBaseCurrentInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for BuildJob
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_buildjob_getuuid(LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer)
@@ -1012,6 +1198,32 @@ LibMCDataResult libmcdata_buildjob_getstatus(LibMCData_BuildJob pBuildJob, eLibM
 	}
 }
 
+LibMCDataResult libmcdata_buildjob_getlayercount(LibMCData_BuildJob pBuildJob, LibMCData_uint32 * pLayerCount)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		if (pLayerCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pLayerCount = pIBuildJob->GetLayerCount();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_buildjob_gettimestamp(LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJob;
@@ -1088,6 +1300,54 @@ LibMCDataResult libmcdata_buildjob_getstoragestream(LibMCData_BuildJob pBuildJob
 	}
 }
 
+LibMCDataResult libmcdata_buildjob_getstoragestreamuuid(LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		if ( (!pStreamUUIDBuffer) && !(pStreamUUIDNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sStreamUUID("");
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pStreamUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sStreamUUID = pIBuildJob->GetStorageStreamUUID();
+
+			pIBuildJob->_setCache (new ParameterCache_1<std::string> (sStreamUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIBuildJob->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sStreamUUID);
+			pIBuildJob->_setCache (nullptr);
+		}
+		
+		if (pStreamUUIDNeededChars)
+			*pStreamUUIDNeededChars = (LibMCData_uint32) (sStreamUUID.size()+1);
+		if (pStreamUUIDBuffer) {
+			if (sStreamUUID.size() >= nStreamUUIDBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iStreamUUID = 0; iStreamUUID < sStreamUUID.size(); iStreamUUID++)
+				pStreamUUIDBuffer[iStreamUUID] = sStreamUUID[iStreamUUID];
+			pStreamUUIDBuffer[sStreamUUID.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_buildjob_getbuildjoblogger(LibMCData_BuildJob pBuildJob, LibMCData_LogSession * pLogSession)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJob;
@@ -1103,6 +1363,243 @@ LibMCDataResult libmcdata_buildjob_getbuildjoblogger(LibMCData_BuildJob pBuildJo
 		pBaseLogSession = pIBuildJob->GetBuildJobLogger();
 
 		*pLogSession = (IBase*)(pBaseLogSession);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_startvalidating(LibMCData_BuildJob pBuildJob)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIBuildJob->StartValidating();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_finishvalidating(LibMCData_BuildJob pBuildJob, LibMCData_uint32 nLayerCount)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIBuildJob->FinishValidating(nLayerCount);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_archivejob(LibMCData_BuildJob pBuildJob)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIBuildJob->ArchiveJob();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_unarchivejob(LibMCData_BuildJob pBuildJob)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIBuildJob->UnArchiveJob();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_deletejob(LibMCData_BuildJob pBuildJob)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIBuildJob->DeleteJob();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_jobcanbearchived(LibMCData_BuildJob pBuildJob, bool * pCanBeArchived)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		if (pCanBeArchived == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCanBeArchived = pIBuildJob->JobCanBeArchived();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pName, LibMCData_StorageStream pStream, eLibMCDataBuildJobDataType eDataType, const char * pUserID)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pUserID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IBase* pIBaseClassStream = (IBase *)pStream;
+		IStorageStream* pIStream = dynamic_cast<IStorageStream*>(pIBaseClassStream);
+		if (!pIStream)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDCAST);
+		
+		std::string sUserID(pUserID);
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIBuildJob->AddJobData(sName, pIStream, eDataType, sUserID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_listjobdatabytype(LibMCData_BuildJob pBuildJob, eLibMCDataBuildJobDataType eDataType, LibMCData_BuildJobDataIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIBuildJob->ListJobDataByType(eDataType);
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_buildjob_listjobdata(LibMCData_BuildJob pBuildJob, LibMCData_BuildJobDataIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pBuildJob;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IBuildJob* pIBuildJob = dynamic_cast<IBuildJob*>(pIBaseClass);
+		if (!pIBuildJob)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIBuildJob->ListJobData();
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -1152,7 +1649,7 @@ LibMCDataResult libmcdata_buildjobiterator_getcurrentjob(LibMCData_BuildJobItera
 /*************************************************************************************************************************
  Class implementation for BuildJobHandler
 **************************************************************************************************************************/
-LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, LibMCData_StorageStream pStreamInstance, LibMCData_BuildJob * pJobInstance)
+LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, const char * pStorageStreamUUID, LibMCData_BuildJob * pJobInstance)
 {
 	IBase* pIBaseClass = (IBase *)pBuildJobHandler;
 
@@ -1163,22 +1660,20 @@ LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pB
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pStorageStreamUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pJobInstance == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sJobUUID(pJobUUID);
 		std::string sName(pName);
 		std::string sUserID(pUserID);
-		IBase* pIBaseClassStreamInstance = (IBase *)pStreamInstance;
-		IStorageStream* pIStreamInstance = dynamic_cast<IStorageStream*>(pIBaseClassStreamInstance);
-		if (!pIStreamInstance)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDCAST);
-		
+		std::string sStorageStreamUUID(pStorageStreamUUID);
 		IBase* pBaseJobInstance(nullptr);
 		IBuildJobHandler* pIBuildJobHandler = dynamic_cast<IBuildJobHandler*>(pIBaseClass);
 		if (!pIBuildJobHandler)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pBaseJobInstance = pIBuildJobHandler->CreateJob(sJobUUID, sName, sUserID, pIStreamInstance);
+		pBaseJobInstance = pIBuildJobHandler->CreateJob(sJobUUID, sName, sUserID, sStorageStreamUUID);
 
 		*pJobInstance = (IBase*)(pBaseJobInstance);
 		return LIBMCDATA_SUCCESS;
@@ -1503,8 +1998,6 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_logsession_addentry;
 	if (sProcName == "libmcdata_storagestream_getuuid") 
 		*ppProcAddress = (void*) &libmcdata_storagestream_getuuid;
-	if (sProcName == "libmcdata_storagestream_getcontextuuid") 
-		*ppProcAddress = (void*) &libmcdata_storagestream_getcontextuuid;
 	if (sProcName == "libmcdata_storagestream_gettimestamp") 
 		*ppProcAddress = (void*) &libmcdata_storagestream_gettimestamp;
 	if (sProcName == "libmcdata_storagestream_getname") 
@@ -1535,18 +2028,52 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storage_getmaxstreamsize;
 	if (sProcName == "libmcdata_storage_contenttypeisaccepted") 
 		*ppProcAddress = (void*) &libmcdata_storage_contenttypeisaccepted;
+	if (sProcName == "libmcdata_buildjobdata_getname") 
+		*ppProcAddress = (void*) &libmcdata_buildjobdata_getname;
+	if (sProcName == "libmcdata_buildjobdata_gettimestamp") 
+		*ppProcAddress = (void*) &libmcdata_buildjobdata_gettimestamp;
+	if (sProcName == "libmcdata_buildjobdata_getstoragestream") 
+		*ppProcAddress = (void*) &libmcdata_buildjobdata_getstoragestream;
+	if (sProcName == "libmcdata_buildjobdata_getdatatype") 
+		*ppProcAddress = (void*) &libmcdata_buildjobdata_getdatatype;
+	if (sProcName == "libmcdata_buildjobdata_getmimetype") 
+		*ppProcAddress = (void*) &libmcdata_buildjobdata_getmimetype;
+	if (sProcName == "libmcdata_buildjobdataiterator_getcurrentjobdata") 
+		*ppProcAddress = (void*) &libmcdata_buildjobdataiterator_getcurrentjobdata;
 	if (sProcName == "libmcdata_buildjob_getuuid") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_getuuid;
 	if (sProcName == "libmcdata_buildjob_getname") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_getname;
 	if (sProcName == "libmcdata_buildjob_getstatus") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_getstatus;
+	if (sProcName == "libmcdata_buildjob_getlayercount") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_getlayercount;
 	if (sProcName == "libmcdata_buildjob_gettimestamp") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_gettimestamp;
 	if (sProcName == "libmcdata_buildjob_getstoragestream") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_getstoragestream;
+	if (sProcName == "libmcdata_buildjob_getstoragestreamuuid") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_getstoragestreamuuid;
 	if (sProcName == "libmcdata_buildjob_getbuildjoblogger") 
 		*ppProcAddress = (void*) &libmcdata_buildjob_getbuildjoblogger;
+	if (sProcName == "libmcdata_buildjob_startvalidating") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_startvalidating;
+	if (sProcName == "libmcdata_buildjob_finishvalidating") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_finishvalidating;
+	if (sProcName == "libmcdata_buildjob_archivejob") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_archivejob;
+	if (sProcName == "libmcdata_buildjob_unarchivejob") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_unarchivejob;
+	if (sProcName == "libmcdata_buildjob_deletejob") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_deletejob;
+	if (sProcName == "libmcdata_buildjob_jobcanbearchived") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_jobcanbearchived;
+	if (sProcName == "libmcdata_buildjob_addjobdata") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_addjobdata;
+	if (sProcName == "libmcdata_buildjob_listjobdatabytype") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_listjobdatabytype;
+	if (sProcName == "libmcdata_buildjob_listjobdata") 
+		*ppProcAddress = (void*) &libmcdata_buildjob_listjobdata;
 	if (sProcName == "libmcdata_buildjobiterator_getcurrentjob") 
 		*ppProcAddress = (void*) &libmcdata_buildjobiterator_getcurrentjob;
 	if (sProcName == "libmcdata_buildjobhandler_createjob") 

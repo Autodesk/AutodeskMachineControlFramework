@@ -58,7 +58,6 @@ LibMCDataResult InitLibMCDataWrapperTable(sLibMCDataDynamicWrapperTable * pWrapp
 	pWrapperTable->m_Iterator_Count = NULL;
 	pWrapperTable->m_LogSession_AddEntry = NULL;
 	pWrapperTable->m_StorageStream_GetUUID = NULL;
-	pWrapperTable->m_StorageStream_GetContextUUID = NULL;
 	pWrapperTable->m_StorageStream_GetTimeStamp = NULL;
 	pWrapperTable->m_StorageStream_GetName = NULL;
 	pWrapperTable->m_StorageStream_GetMIMEType = NULL;
@@ -66,16 +65,37 @@ LibMCDataResult InitLibMCDataWrapperTable(sLibMCDataDynamicWrapperTable * pWrapp
 	pWrapperTable->m_StorageStream_GetSize = NULL;
 	pWrapperTable->m_StorageStream_GetContent = NULL;
 	pWrapperTable->m_StorageStream_GetCallbacks = NULL;
+	pWrapperTable->m_Storage_StreamIsReady = NULL;
+	pWrapperTable->m_Storage_RetrieveStream = NULL;
 	pWrapperTable->m_Storage_StoreNewStream = NULL;
 	pWrapperTable->m_Storage_BeginPartialStream = NULL;
 	pWrapperTable->m_Storage_StorePartialStream = NULL;
 	pWrapperTable->m_Storage_FinishPartialStream = NULL;
+	pWrapperTable->m_Storage_GetMaxStreamSize = NULL;
+	pWrapperTable->m_Storage_ContentTypeIsAccepted = NULL;
+	pWrapperTable->m_BuildJobData_GetName = NULL;
+	pWrapperTable->m_BuildJobData_GetTimeStamp = NULL;
+	pWrapperTable->m_BuildJobData_GetStorageStream = NULL;
+	pWrapperTable->m_BuildJobData_GetDataType = NULL;
+	pWrapperTable->m_BuildJobData_GetMIMEType = NULL;
+	pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = NULL;
 	pWrapperTable->m_BuildJob_GetUUID = NULL;
 	pWrapperTable->m_BuildJob_GetName = NULL;
 	pWrapperTable->m_BuildJob_GetStatus = NULL;
+	pWrapperTable->m_BuildJob_GetLayerCount = NULL;
 	pWrapperTable->m_BuildJob_GetTimeStamp = NULL;
 	pWrapperTable->m_BuildJob_GetStorageStream = NULL;
+	pWrapperTable->m_BuildJob_GetStorageStreamUUID = NULL;
 	pWrapperTable->m_BuildJob_GetBuildJobLogger = NULL;
+	pWrapperTable->m_BuildJob_StartValidating = NULL;
+	pWrapperTable->m_BuildJob_FinishValidating = NULL;
+	pWrapperTable->m_BuildJob_ArchiveJob = NULL;
+	pWrapperTable->m_BuildJob_UnArchiveJob = NULL;
+	pWrapperTable->m_BuildJob_DeleteJob = NULL;
+	pWrapperTable->m_BuildJob_JobCanBeArchived = NULL;
+	pWrapperTable->m_BuildJob_AddJobData = NULL;
+	pWrapperTable->m_BuildJob_ListJobDataByType = NULL;
+	pWrapperTable->m_BuildJob_ListJobData = NULL;
 	pWrapperTable->m_BuildJobIterator_GetCurrentJob = NULL;
 	pWrapperTable->m_BuildJobHandler_CreateJob = NULL;
 	pWrapperTable->m_BuildJobHandler_RetrieveJob = NULL;
@@ -209,15 +229,6 @@ LibMCDataResult LoadLibMCDataWrapperTable(sLibMCDataDynamicWrapperTable * pWrapp
 		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_StorageStream_GetContextUUID = (PLibMCDataStorageStream_GetContextUUIDPtr) GetProcAddress(hLibrary, "libmcdata_storagestream_getcontextuuid");
-	#else // _WIN32
-	pWrapperTable->m_StorageStream_GetContextUUID = (PLibMCDataStorageStream_GetContextUUIDPtr) dlsym(hLibrary, "libmcdata_storagestream_getcontextuuid");
-	dlerror();
-	#endif // _WIN32
-	if (pWrapperTable->m_StorageStream_GetContextUUID == NULL)
-		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-	
-	#ifdef _WIN32
 	pWrapperTable->m_StorageStream_GetTimeStamp = (PLibMCDataStorageStream_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_storagestream_gettimestamp");
 	#else // _WIN32
 	pWrapperTable->m_StorageStream_GetTimeStamp = (PLibMCDataStorageStream_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_storagestream_gettimestamp");
@@ -281,6 +292,24 @@ LibMCDataResult LoadLibMCDataWrapperTable(sLibMCDataDynamicWrapperTable * pWrapp
 		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_Storage_StreamIsReady = (PLibMCDataStorage_StreamIsReadyPtr) GetProcAddress(hLibrary, "libmcdata_storage_streamisready");
+	#else // _WIN32
+	pWrapperTable->m_Storage_StreamIsReady = (PLibMCDataStorage_StreamIsReadyPtr) dlsym(hLibrary, "libmcdata_storage_streamisready");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Storage_StreamIsReady == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_Storage_RetrieveStream = (PLibMCDataStorage_RetrieveStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_retrievestream");
+	#else // _WIN32
+	pWrapperTable->m_Storage_RetrieveStream = (PLibMCDataStorage_RetrieveStreamPtr) dlsym(hLibrary, "libmcdata_storage_retrievestream");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Storage_RetrieveStream == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_Storage_StoreNewStream = (PLibMCDataStorage_StoreNewStreamPtr) GetProcAddress(hLibrary, "libmcdata_storage_storenewstream");
 	#else // _WIN32
 	pWrapperTable->m_Storage_StoreNewStream = (PLibMCDataStorage_StoreNewStreamPtr) dlsym(hLibrary, "libmcdata_storage_storenewstream");
@@ -317,6 +346,78 @@ LibMCDataResult LoadLibMCDataWrapperTable(sLibMCDataDynamicWrapperTable * pWrapp
 		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_Storage_GetMaxStreamSize = (PLibMCDataStorage_GetMaxStreamSizePtr) GetProcAddress(hLibrary, "libmcdata_storage_getmaxstreamsize");
+	#else // _WIN32
+	pWrapperTable->m_Storage_GetMaxStreamSize = (PLibMCDataStorage_GetMaxStreamSizePtr) dlsym(hLibrary, "libmcdata_storage_getmaxstreamsize");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Storage_GetMaxStreamSize == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_Storage_ContentTypeIsAccepted = (PLibMCDataStorage_ContentTypeIsAcceptedPtr) GetProcAddress(hLibrary, "libmcdata_storage_contenttypeisaccepted");
+	#else // _WIN32
+	pWrapperTable->m_Storage_ContentTypeIsAccepted = (PLibMCDataStorage_ContentTypeIsAcceptedPtr) dlsym(hLibrary, "libmcdata_storage_contenttypeisaccepted");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Storage_ContentTypeIsAccepted == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJobData_GetName = (PLibMCDataBuildJobData_GetNamePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getname");
+	#else // _WIN32
+	pWrapperTable->m_BuildJobData_GetName = (PLibMCDataBuildJobData_GetNamePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getname");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJobData_GetName == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_gettimestamp");
+	#else // _WIN32
+	pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_buildjobdata_gettimestamp");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJobData_GetTimeStamp == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJobData_GetStorageStream = (PLibMCDataBuildJobData_GetStorageStreamPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getstoragestream");
+	#else // _WIN32
+	pWrapperTable->m_BuildJobData_GetStorageStream = (PLibMCDataBuildJobData_GetStorageStreamPtr) dlsym(hLibrary, "libmcdata_buildjobdata_getstoragestream");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJobData_GetStorageStream == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJobData_GetDataType = (PLibMCDataBuildJobData_GetDataTypePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getdatatype");
+	#else // _WIN32
+	pWrapperTable->m_BuildJobData_GetDataType = (PLibMCDataBuildJobData_GetDataTypePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getdatatype");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJobData_GetDataType == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJobData_GetMIMEType = (PLibMCDataBuildJobData_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getmimetype");
+	#else // _WIN32
+	pWrapperTable->m_BuildJobData_GetMIMEType = (PLibMCDataBuildJobData_GetMIMETypePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getmimetype");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJobData_GetMIMEType == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = (PLibMCDataBuildJobDataIterator_GetCurrentJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdataiterator_getcurrentjobdata");
+	#else // _WIN32
+	pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = (PLibMCDataBuildJobDataIterator_GetCurrentJobDataPtr) dlsym(hLibrary, "libmcdata_buildjobdataiterator_getcurrentjobdata");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_BuildJob_GetUUID = (PLibMCDataBuildJob_GetUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getuuid");
 	#else // _WIN32
 	pWrapperTable->m_BuildJob_GetUUID = (PLibMCDataBuildJob_GetUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_getuuid");
@@ -344,6 +445,15 @@ LibMCDataResult LoadLibMCDataWrapperTable(sLibMCDataDynamicWrapperTable * pWrapp
 		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_GetLayerCount = (PLibMCDataBuildJob_GetLayerCountPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getlayercount");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_GetLayerCount = (PLibMCDataBuildJob_GetLayerCountPtr) dlsym(hLibrary, "libmcdata_buildjob_getlayercount");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_GetLayerCount == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_BuildJob_GetTimeStamp = (PLibMCDataBuildJob_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_gettimestamp");
 	#else // _WIN32
 	pWrapperTable->m_BuildJob_GetTimeStamp = (PLibMCDataBuildJob_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_buildjob_gettimestamp");
@@ -362,12 +472,102 @@ LibMCDataResult LoadLibMCDataWrapperTable(sLibMCDataDynamicWrapperTable * pWrapp
 		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_GetStorageStreamUUID = (PLibMCDataBuildJob_GetStorageStreamUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getstoragestreamuuid");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_GetStorageStreamUUID = (PLibMCDataBuildJob_GetStorageStreamUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_getstoragestreamuuid");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_GetStorageStreamUUID == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
 	#else // _WIN32
 	pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) dlsym(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_BuildJob_GetBuildJobLogger == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_StartValidating = (PLibMCDataBuildJob_StartValidatingPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_startvalidating");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_StartValidating = (PLibMCDataBuildJob_StartValidatingPtr) dlsym(hLibrary, "libmcdata_buildjob_startvalidating");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_StartValidating == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_FinishValidating = (PLibMCDataBuildJob_FinishValidatingPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_finishvalidating");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_FinishValidating = (PLibMCDataBuildJob_FinishValidatingPtr) dlsym(hLibrary, "libmcdata_buildjob_finishvalidating");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_FinishValidating == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_ArchiveJob = (PLibMCDataBuildJob_ArchiveJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_archivejob");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_ArchiveJob = (PLibMCDataBuildJob_ArchiveJobPtr) dlsym(hLibrary, "libmcdata_buildjob_archivejob");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_ArchiveJob == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_UnArchiveJob = (PLibMCDataBuildJob_UnArchiveJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_unarchivejob");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_UnArchiveJob = (PLibMCDataBuildJob_UnArchiveJobPtr) dlsym(hLibrary, "libmcdata_buildjob_unarchivejob");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_UnArchiveJob == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_DeleteJob = (PLibMCDataBuildJob_DeleteJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_deletejob");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_DeleteJob = (PLibMCDataBuildJob_DeleteJobPtr) dlsym(hLibrary, "libmcdata_buildjob_deletejob");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_DeleteJob == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_JobCanBeArchived = (PLibMCDataBuildJob_JobCanBeArchivedPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_jobcanbearchived");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_JobCanBeArchived = (PLibMCDataBuildJob_JobCanBeArchivedPtr) dlsym(hLibrary, "libmcdata_buildjob_jobcanbearchived");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_JobCanBeArchived == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_AddJobData = (PLibMCDataBuildJob_AddJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_addjobdata");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_AddJobData = (PLibMCDataBuildJob_AddJobDataPtr) dlsym(hLibrary, "libmcdata_buildjob_addjobdata");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_AddJobData == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_ListJobDataByType = (PLibMCDataBuildJob_ListJobDataByTypePtr) GetProcAddress(hLibrary, "libmcdata_buildjob_listjobdatabytype");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_ListJobDataByType = (PLibMCDataBuildJob_ListJobDataByTypePtr) dlsym(hLibrary, "libmcdata_buildjob_listjobdatabytype");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_ListJobDataByType == NULL)
+		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_BuildJob_ListJobData = (PLibMCDataBuildJob_ListJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_listjobdata");
+	#else // _WIN32
+	pWrapperTable->m_BuildJob_ListJobData = (PLibMCDataBuildJob_ListJobDataPtr) dlsym(hLibrary, "libmcdata_buildjob_listjobdata");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_BuildJob_ListJobData == NULL)
 		return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32

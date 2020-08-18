@@ -141,17 +141,6 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_addentry(LibMCData_LogSe
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagestream_getuuid(LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
-* returns the context uuid of a storage stream. Context might be for example a project uuid that this stream is part of.
-*
-* @param[in] pStorageStream - StorageStream instance.
-* @param[in] nContextUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pContextUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pContextUUIDBuffer -  buffer of UUID String, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storagestream_getcontextuuid(LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nContextUUIDBufferSize, LibMCData_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer);
-
-/**
 * returns the timestamp of a storage stream.
 *
 * @param[in] pStorageStream - StorageStream instance.
@@ -321,6 +310,74 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_getmaxstreamsize(LibMCData_
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_contenttypeisaccepted(LibMCData_Storage pStorage, const char * pContentType, bool * pAccepted);
 
 /*************************************************************************************************************************
+ Class definition for BuildJobData
+**************************************************************************************************************************/
+
+/**
+* returns the name of a build job.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getname(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the timestamp when the job was created.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_gettimestamp(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* returns the storage stream of the build.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[out] pStreamInstance - Stream Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestream(LibMCData_BuildJobData pBuildJobData, LibMCData_StorageStream * pStreamInstance);
+
+/**
+* returns the data type of the job data.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[out] pDataType - Data type of the job data
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatatype(LibMCData_BuildJobData pBuildJobData, LibMCData::eBuildJobDataType * pDataType);
+
+/**
+* returns the mime type of a storage stream.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nMimeTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMimeTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMimeTypeBuffer -  buffer of Mime Type String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getmimetype(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nMimeTypeBufferSize, LibMCData_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer);
+
+/*************************************************************************************************************************
+ Class definition for BuildJobDataIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the build job data the iterator points at.
+*
+* @param[in] pBuildJobDataIterator - BuildJobDataIterator instance.
+* @param[out] pCurrentInstance - returns the build job instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdataiterator_getcurrentjobdata(LibMCData_BuildJobDataIterator pBuildJobDataIterator, LibMCData_BuildJobData * pCurrentInstance);
+
+/*************************************************************************************************************************
  Class definition for BuildJob
 **************************************************************************************************************************/
 
@@ -356,6 +413,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getname(LibMCData_BuildJob
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getstatus(LibMCData_BuildJob pBuildJob, LibMCData::eBuildJobStatus * pStatus);
 
 /**
+* returns the layer count of a build job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pLayerCount - Layer Count of build job
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getlayercount(LibMCData_BuildJob pBuildJob, LibMCData_uint32 * pLayerCount);
+
+/**
 * returns the timestamp when the job was created.
 *
 * @param[in] pBuildJob - BuildJob instance.
@@ -376,6 +442,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_gettimestamp(LibMCData_Bui
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getstoragestream(LibMCData_BuildJob pBuildJob, LibMCData_StorageStream * pStreamInstance);
 
 /**
+* returns the storage stream uuid of the build.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] nStreamUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStreamUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStreamUUIDBuffer -  buffer of Stream UUID., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getstoragestreamuuid(LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nStreamUUIDBufferSize, LibMCData_uint32* pStreamUUIDNeededChars, char * pStreamUUIDBuffer);
+
+/**
 * creates a build job log session access class.
 *
 * @param[in] pBuildJob - BuildJob instance.
@@ -383,6 +460,87 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getstoragestream(LibMCData
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_getbuildjoblogger(LibMCData_BuildJob pBuildJob, LibMCData_LogSession * pLogSession);
+
+/**
+* Starts validation of a build job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_startvalidating(LibMCData_BuildJob pBuildJob);
+
+/**
+* Finishes validation of a build job.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] nLayerCount - Layer count
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_finishvalidating(LibMCData_BuildJob pBuildJob, LibMCData_uint32 nLayerCount);
+
+/**
+* Archives a Job. Job MUST not be opened in the system. Job MUST be of state validated.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_archivejob(LibMCData_BuildJob pBuildJob);
+
+/**
+* Unarchives a Job. Job MUST be of state archived.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_unarchivejob(LibMCData_BuildJob pBuildJob);
+
+/**
+* Deletes a Job permanently including all referencing data objects. Job MUST be of state archived to succeed.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_deletejob(LibMCData_BuildJob pBuildJob);
+
+/**
+* Returns if a job is opened.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pCanBeArchived - returns if the job can be archived.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_jobcanbearchived(LibMCData_BuildJob pBuildJob, bool * pCanBeArchived);
+
+/**
+* Adds additional data to the Job. Job MUST be of state validated in order to add job data.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pName - Name of the job
+* @param[in] pStream - Storage Stream Instance
+* @param[in] eDataType - Datatype of Job data
+* @param[in] pUserID - Currently authenticated user
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_addjobdata(LibMCData_BuildJob pBuildJob, const char * pName, LibMCData_StorageStream pStream, LibMCData::eBuildJobDataType eDataType, const char * pUserID);
+
+/**
+* Retrieves a list of build job data objects, filtered by type.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] eDataType - Datatype of Job data.
+* @param[out] pIteratorInstance - Build Job Data Iterator Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdatabytype(LibMCData_BuildJob pBuildJob, LibMCData::eBuildJobDataType eDataType, LibMCData_BuildJobDataIterator * pIteratorInstance);
+
+/**
+* Retrieves a list of build job data objects.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[out] pIteratorInstance - Build Job Data Iterator Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdata(LibMCData_BuildJob pBuildJob, LibMCData_BuildJobDataIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for BuildJobIterator
@@ -408,11 +566,11 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobiterator_getcurrentjob(LibM
 * @param[in] pJobUUID - UUID String for the build job. Must be unique and newly generated.
 * @param[in] pName - Name String
 * @param[in] pUserID - Currently authenticated user
-* @param[in] pStreamInstance - Storage stream to create the job from. ContextUUID of Stream MUST be the Job UUID.
+* @param[in] pStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
 * @param[out] pJobInstance - Build Job Instance.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, LibMCData_StorageStream pStreamInstance, LibMCData_BuildJob * pJobInstance);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, const char * pName, const char * pUserID, const char * pStorageStreamUUID, LibMCData_BuildJob * pJobInstance);
 
 /**
 * Retrieves a job with a specific UUID.

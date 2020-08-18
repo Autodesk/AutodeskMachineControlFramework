@@ -64,6 +64,8 @@ class CIterator;
 class CLogSession;
 class CStorageStream;
 class CStorage;
+class CBuildJobData;
+class CBuildJobDataIterator;
 class CBuildJob;
 class CBuildJobIterator;
 class CBuildJobHandler;
@@ -78,6 +80,8 @@ typedef CIterator CLibMCDataIterator;
 typedef CLogSession CLibMCDataLogSession;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorage CLibMCDataStorage;
+typedef CBuildJobData CLibMCDataBuildJobData;
+typedef CBuildJobDataIterator CLibMCDataBuildJobDataIterator;
 typedef CBuildJob CLibMCDataBuildJob;
 typedef CBuildJobIterator CLibMCDataBuildJobIterator;
 typedef CBuildJobHandler CLibMCDataBuildJobHandler;
@@ -92,6 +96,8 @@ typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CLogSession> PLogSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorage> PStorage;
+typedef std::shared_ptr<CBuildJobData> PBuildJobData;
+typedef std::shared_ptr<CBuildJobDataIterator> PBuildJobDataIterator;
 typedef std::shared_ptr<CBuildJob> PBuildJob;
 typedef std::shared_ptr<CBuildJobIterator> PBuildJobIterator;
 typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
@@ -106,6 +112,8 @@ typedef PIterator PLibMCDataIterator;
 typedef PLogSession PLibMCDataLogSession;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorage PLibMCDataStorage;
+typedef PBuildJobData PLibMCDataBuildJobData;
+typedef PBuildJobDataIterator PLibMCDataBuildJobDataIterator;
 typedef PBuildJob PLibMCDataBuildJob;
 typedef PBuildJobIterator PLibMCDataBuildJobIterator;
 typedef PBuildJobHandler PLibMCDataBuildJobHandler;
@@ -287,6 +295,8 @@ private:
 	friend class CLogSession;
 	friend class CStorageStream;
 	friend class CStorage;
+	friend class CBuildJobData;
+	friend class CBuildJobDataIterator;
 	friend class CBuildJob;
 	friend class CBuildJobIterator;
 	friend class CBuildJobHandler;
@@ -404,7 +414,6 @@ public:
 	}
 	
 	inline std::string GetUUID();
-	inline std::string GetContextUUID();
 	inline std::string GetTimeStamp();
 	inline std::string GetName();
 	inline std::string GetMIMEType();
@@ -439,6 +448,44 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CBuildJobData 
+**************************************************************************************************************************/
+class CBuildJobData : public CBase {
+public:
+	
+	/**
+	* CBuildJobData::CBuildJobData - Constructor for BuildJobData class.
+	*/
+	CBuildJobData(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetTimeStamp();
+	inline PStorageStream GetStorageStream();
+	inline eBuildJobDataType GetDataType();
+	inline std::string GetMIMEType();
+};
+	
+/*************************************************************************************************************************
+ Class CBuildJobDataIterator 
+**************************************************************************************************************************/
+class CBuildJobDataIterator : public CIterator {
+public:
+	
+	/**
+	* CBuildJobDataIterator::CBuildJobDataIterator - Constructor for BuildJobDataIterator class.
+	*/
+	CBuildJobDataIterator(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PBuildJobData GetCurrentJobData();
+};
+	
+/*************************************************************************************************************************
  Class CBuildJob 
 **************************************************************************************************************************/
 class CBuildJob : public CBase {
@@ -455,9 +502,20 @@ public:
 	inline std::string GetUUID();
 	inline std::string GetName();
 	inline eBuildJobStatus GetStatus();
+	inline LibMCData_uint32 GetLayerCount();
 	inline std::string GetTimeStamp();
 	inline PStorageStream GetStorageStream();
+	inline std::string GetStorageStreamUUID();
 	inline PLogSession GetBuildJobLogger();
+	inline void StartValidating();
+	inline void FinishValidating(const LibMCData_uint32 nLayerCount);
+	inline void ArchiveJob();
+	inline void UnArchiveJob();
+	inline void DeleteJob();
+	inline bool JobCanBeArchived();
+	inline void AddJobData(const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID);
+	inline PBuildJobDataIterator ListJobDataByType(const eBuildJobDataType eDataType);
+	inline PBuildJobDataIterator ListJobData();
 };
 	
 /*************************************************************************************************************************
@@ -491,7 +549,7 @@ public:
 	{
 	}
 	
-	inline PBuildJob CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, classParam<CStorageStream> pStreamInstance);
+	inline PBuildJob CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID);
 	inline PBuildJob RetrieveJob(const std::string & sJobUUID);
 	inline PBuildJobIterator ListJobsByStatus(const eBuildJobStatus eStatus);
 	inline std::string ConvertBuildStatusToString(const eBuildJobStatus eStatus);
@@ -622,7 +680,6 @@ public:
 		pWrapperTable->m_Iterator_Count = nullptr;
 		pWrapperTable->m_LogSession_AddEntry = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
-		pWrapperTable->m_StorageStream_GetContextUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
 		pWrapperTable->m_StorageStream_GetName = nullptr;
 		pWrapperTable->m_StorageStream_GetMIMEType = nullptr;
@@ -638,12 +695,29 @@ public:
 		pWrapperTable->m_Storage_FinishPartialStream = nullptr;
 		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
 		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
+		pWrapperTable->m_BuildJobData_GetName = nullptr;
+		pWrapperTable->m_BuildJobData_GetTimeStamp = nullptr;
+		pWrapperTable->m_BuildJobData_GetStorageStream = nullptr;
+		pWrapperTable->m_BuildJobData_GetDataType = nullptr;
+		pWrapperTable->m_BuildJobData_GetMIMEType = nullptr;
+		pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = nullptr;
 		pWrapperTable->m_BuildJob_GetUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetName = nullptr;
 		pWrapperTable->m_BuildJob_GetStatus = nullptr;
+		pWrapperTable->m_BuildJob_GetLayerCount = nullptr;
 		pWrapperTable->m_BuildJob_GetTimeStamp = nullptr;
 		pWrapperTable->m_BuildJob_GetStorageStream = nullptr;
+		pWrapperTable->m_BuildJob_GetStorageStreamUUID = nullptr;
 		pWrapperTable->m_BuildJob_GetBuildJobLogger = nullptr;
+		pWrapperTable->m_BuildJob_StartValidating = nullptr;
+		pWrapperTable->m_BuildJob_FinishValidating = nullptr;
+		pWrapperTable->m_BuildJob_ArchiveJob = nullptr;
+		pWrapperTable->m_BuildJob_UnArchiveJob = nullptr;
+		pWrapperTable->m_BuildJob_DeleteJob = nullptr;
+		pWrapperTable->m_BuildJob_JobCanBeArchived = nullptr;
+		pWrapperTable->m_BuildJob_AddJobData = nullptr;
+		pWrapperTable->m_BuildJob_ListJobDataByType = nullptr;
+		pWrapperTable->m_BuildJob_ListJobData = nullptr;
 		pWrapperTable->m_BuildJobIterator_GetCurrentJob = nullptr;
 		pWrapperTable->m_BuildJobHandler_CreateJob = nullptr;
 		pWrapperTable->m_BuildJobHandler_RetrieveJob = nullptr;
@@ -770,15 +844,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StorageStream_GetUUID == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StorageStream_GetContextUUID = (PLibMCDataStorageStream_GetContextUUIDPtr) GetProcAddress(hLibrary, "libmcdata_storagestream_getcontextuuid");
-		#else // _WIN32
-		pWrapperTable->m_StorageStream_GetContextUUID = (PLibMCDataStorageStream_GetContextUUIDPtr) dlsym(hLibrary, "libmcdata_storagestream_getcontextuuid");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StorageStream_GetContextUUID == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -917,6 +982,60 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJobData_GetName = (PLibMCDataBuildJobData_GetNamePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getname");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobData_GetName = (PLibMCDataBuildJobData_GetNamePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobData_GetName == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_gettimestamp");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobData_GetTimeStamp = (PLibMCDataBuildJobData_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_buildjobdata_gettimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobData_GetTimeStamp == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobData_GetStorageStream = (PLibMCDataBuildJobData_GetStorageStreamPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getstoragestream");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobData_GetStorageStream = (PLibMCDataBuildJobData_GetStorageStreamPtr) dlsym(hLibrary, "libmcdata_buildjobdata_getstoragestream");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobData_GetStorageStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobData_GetDataType = (PLibMCDataBuildJobData_GetDataTypePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getdatatype");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobData_GetDataType = (PLibMCDataBuildJobData_GetDataTypePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getdatatype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobData_GetDataType == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobData_GetMIMEType = (PLibMCDataBuildJobData_GetMIMETypePtr) GetProcAddress(hLibrary, "libmcdata_buildjobdata_getmimetype");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobData_GetMIMEType = (PLibMCDataBuildJobData_GetMIMETypePtr) dlsym(hLibrary, "libmcdata_buildjobdata_getmimetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobData_GetMIMEType == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = (PLibMCDataBuildJobDataIterator_GetCurrentJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjobdataiterator_getcurrentjobdata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData = (PLibMCDataBuildJobDataIterator_GetCurrentJobDataPtr) dlsym(hLibrary, "libmcdata_buildjobdataiterator_getcurrentjobdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJob_GetUUID = (PLibMCDataBuildJob_GetUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getuuid");
 		#else // _WIN32
 		pWrapperTable->m_BuildJob_GetUUID = (PLibMCDataBuildJob_GetUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_getuuid");
@@ -944,6 +1063,15 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_GetLayerCount = (PLibMCDataBuildJob_GetLayerCountPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getlayercount");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_GetLayerCount = (PLibMCDataBuildJob_GetLayerCountPtr) dlsym(hLibrary, "libmcdata_buildjob_getlayercount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_GetLayerCount == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJob_GetTimeStamp = (PLibMCDataBuildJob_GetTimeStampPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_gettimestamp");
 		#else // _WIN32
 		pWrapperTable->m_BuildJob_GetTimeStamp = (PLibMCDataBuildJob_GetTimeStampPtr) dlsym(hLibrary, "libmcdata_buildjob_gettimestamp");
@@ -962,12 +1090,102 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_GetStorageStreamUUID = (PLibMCDataBuildJob_GetStorageStreamUUIDPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getstoragestreamuuid");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_GetStorageStreamUUID = (PLibMCDataBuildJob_GetStorageStreamUUIDPtr) dlsym(hLibrary, "libmcdata_buildjob_getstoragestreamuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_GetStorageStreamUUID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
 		#else // _WIN32
 		pWrapperTable->m_BuildJob_GetBuildJobLogger = (PLibMCDataBuildJob_GetBuildJobLoggerPtr) dlsym(hLibrary, "libmcdata_buildjob_getbuildjoblogger");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_BuildJob_GetBuildJobLogger == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_StartValidating = (PLibMCDataBuildJob_StartValidatingPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_startvalidating");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_StartValidating = (PLibMCDataBuildJob_StartValidatingPtr) dlsym(hLibrary, "libmcdata_buildjob_startvalidating");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_StartValidating == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_FinishValidating = (PLibMCDataBuildJob_FinishValidatingPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_finishvalidating");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_FinishValidating = (PLibMCDataBuildJob_FinishValidatingPtr) dlsym(hLibrary, "libmcdata_buildjob_finishvalidating");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_FinishValidating == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_ArchiveJob = (PLibMCDataBuildJob_ArchiveJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_archivejob");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_ArchiveJob = (PLibMCDataBuildJob_ArchiveJobPtr) dlsym(hLibrary, "libmcdata_buildjob_archivejob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_ArchiveJob == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_UnArchiveJob = (PLibMCDataBuildJob_UnArchiveJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_unarchivejob");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_UnArchiveJob = (PLibMCDataBuildJob_UnArchiveJobPtr) dlsym(hLibrary, "libmcdata_buildjob_unarchivejob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_UnArchiveJob == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_DeleteJob = (PLibMCDataBuildJob_DeleteJobPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_deletejob");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_DeleteJob = (PLibMCDataBuildJob_DeleteJobPtr) dlsym(hLibrary, "libmcdata_buildjob_deletejob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_DeleteJob == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_JobCanBeArchived = (PLibMCDataBuildJob_JobCanBeArchivedPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_jobcanbearchived");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_JobCanBeArchived = (PLibMCDataBuildJob_JobCanBeArchivedPtr) dlsym(hLibrary, "libmcdata_buildjob_jobcanbearchived");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_JobCanBeArchived == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_AddJobData = (PLibMCDataBuildJob_AddJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_addjobdata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_AddJobData = (PLibMCDataBuildJob_AddJobDataPtr) dlsym(hLibrary, "libmcdata_buildjob_addjobdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_AddJobData == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_ListJobDataByType = (PLibMCDataBuildJob_ListJobDataByTypePtr) GetProcAddress(hLibrary, "libmcdata_buildjob_listjobdatabytype");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_ListJobDataByType = (PLibMCDataBuildJob_ListJobDataByTypePtr) dlsym(hLibrary, "libmcdata_buildjob_listjobdatabytype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_ListJobDataByType == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_BuildJob_ListJobData = (PLibMCDataBuildJob_ListJobDataPtr) GetProcAddress(hLibrary, "libmcdata_buildjob_listjobdata");
+		#else // _WIN32
+		pWrapperTable->m_BuildJob_ListJobData = (PLibMCDataBuildJob_ListJobDataPtr) dlsym(hLibrary, "libmcdata_buildjob_listjobdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_BuildJob_ListJobData == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1167,10 +1385,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_storagestream_getcontextuuid", (void**)&(pWrapperTable->m_StorageStream_GetContextUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetContextUUID == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdata_storagestream_gettimestamp", (void**)&(pWrapperTable->m_StorageStream_GetTimeStamp));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StorageStream_GetTimeStamp == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1231,6 +1445,30 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_ContentTypeIsAccepted == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjobdata_getname", (void**)&(pWrapperTable->m_BuildJobData_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetName == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobdata_gettimestamp", (void**)&(pWrapperTable->m_BuildJobData_GetTimeStamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetTimeStamp == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobdata_getstoragestream", (void**)&(pWrapperTable->m_BuildJobData_GetStorageStream));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetStorageStream == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobdata_getdatatype", (void**)&(pWrapperTable->m_BuildJobData_GetDataType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetDataType == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobdata_getmimetype", (void**)&(pWrapperTable->m_BuildJobData_GetMIMEType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobData_GetMIMEType == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjobdataiterator_getcurrentjobdata", (void**)&(pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJobDataIterator_GetCurrentJobData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getuuid", (void**)&(pWrapperTable->m_BuildJob_GetUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetUUID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1243,6 +1481,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetStatus == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjob_getlayercount", (void**)&(pWrapperTable->m_BuildJob_GetLayerCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetLayerCount == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjob_gettimestamp", (void**)&(pWrapperTable->m_BuildJob_GetTimeStamp));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetTimeStamp == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1251,8 +1493,48 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetStorageStream == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_buildjob_getstoragestreamuuid", (void**)&(pWrapperTable->m_BuildJob_GetStorageStreamUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetStorageStreamUUID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_buildjob_getbuildjoblogger", (void**)&(pWrapperTable->m_BuildJob_GetBuildJobLogger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_GetBuildJobLogger == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_startvalidating", (void**)&(pWrapperTable->m_BuildJob_StartValidating));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_StartValidating == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_finishvalidating", (void**)&(pWrapperTable->m_BuildJob_FinishValidating));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_FinishValidating == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_archivejob", (void**)&(pWrapperTable->m_BuildJob_ArchiveJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_ArchiveJob == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_unarchivejob", (void**)&(pWrapperTable->m_BuildJob_UnArchiveJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_UnArchiveJob == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_deletejob", (void**)&(pWrapperTable->m_BuildJob_DeleteJob));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_DeleteJob == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_jobcanbearchived", (void**)&(pWrapperTable->m_BuildJob_JobCanBeArchived));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_JobCanBeArchived == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_addjobdata", (void**)&(pWrapperTable->m_BuildJob_AddJobData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_AddJobData == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_listjobdatabytype", (void**)&(pWrapperTable->m_BuildJob_ListJobDataByType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_ListJobDataByType == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_buildjob_listjobdata", (void**)&(pWrapperTable->m_BuildJob_ListJobData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_BuildJob_ListJobData == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_buildjobiterator_getcurrentjob", (void**)&(pWrapperTable->m_BuildJobIterator_GetCurrentJob));
@@ -1435,21 +1717,6 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StorageStream_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
 		
 		return std::string(&bufferUUID[0]);
-	}
-	
-	/**
-	* CStorageStream::GetContextUUID - returns the context uuid of a storage stream. Context might be for example a project uuid that this stream is part of.
-	* @return UUID String
-	*/
-	std::string CStorageStream::GetContextUUID()
-	{
-		LibMCData_uint32 bytesNeededContextUUID = 0;
-		LibMCData_uint32 bytesWrittenContextUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StorageStream_GetContextUUID(m_pHandle, 0, &bytesNeededContextUUID, nullptr));
-		std::vector<char> bufferContextUUID(bytesNeededContextUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_StorageStream_GetContextUUID(m_pHandle, bytesNeededContextUUID, &bytesWrittenContextUUID, &bufferContextUUID[0]));
-		
-		return std::string(&bufferContextUUID[0]);
 	}
 	
 	/**
@@ -1656,6 +1923,101 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CBuildJobData
+	 */
+	
+	/**
+	* CBuildJobData::GetName - returns the name of a build job.
+	* @return Name String
+	*/
+	std::string CBuildJobData::GetName()
+	{
+		LibMCData_uint32 bytesNeededName = 0;
+		LibMCData_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CBuildJobData::GetTimeStamp - returns the timestamp when the job was created.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	std::string CBuildJobData::GetTimeStamp()
+	{
+		LibMCData_uint32 bytesNeededTimestamp = 0;
+		LibMCData_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetTimeStamp(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetTimeStamp(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CBuildJobData::GetStorageStream - returns the storage stream of the build.
+	* @return Stream Instance.
+	*/
+	PStorageStream CBuildJobData::GetStorageStream()
+	{
+		LibMCDataHandle hStreamInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetStorageStream(m_pHandle, &hStreamInstance));
+		
+		if (!hStreamInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CStorageStream>(m_pWrapper, hStreamInstance);
+	}
+	
+	/**
+	* CBuildJobData::GetDataType - returns the data type of the job data.
+	* @return Data type of the job data
+	*/
+	eBuildJobDataType CBuildJobData::GetDataType()
+	{
+		eBuildJobDataType resultDataType = (eBuildJobDataType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetDataType(m_pHandle, &resultDataType));
+		
+		return resultDataType;
+	}
+	
+	/**
+	* CBuildJobData::GetMIMEType - returns the mime type of a storage stream.
+	* @return Mime Type String
+	*/
+	std::string CBuildJobData::GetMIMEType()
+	{
+		LibMCData_uint32 bytesNeededMimeType = 0;
+		LibMCData_uint32 bytesWrittenMimeType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetMIMEType(m_pHandle, 0, &bytesNeededMimeType, nullptr));
+		std::vector<char> bufferMimeType(bytesNeededMimeType);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobData_GetMIMEType(m_pHandle, bytesNeededMimeType, &bytesWrittenMimeType, &bufferMimeType[0]));
+		
+		return std::string(&bufferMimeType[0]);
+	}
+	
+	/**
+	 * Method definitions for class CBuildJobDataIterator
+	 */
+	
+	/**
+	* CBuildJobDataIterator::GetCurrentJobData - Returns the build job data the iterator points at.
+	* @return returns the build job instance.
+	*/
+	PBuildJobData CBuildJobDataIterator::GetCurrentJobData()
+	{
+		LibMCDataHandle hCurrentInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobDataIterator_GetCurrentJobData(m_pHandle, &hCurrentInstance));
+		
+		if (!hCurrentInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobData>(m_pWrapper, hCurrentInstance);
+	}
+	
+	/**
 	 * Method definitions for class CBuildJob
 	 */
 	
@@ -1702,6 +2064,18 @@ public:
 	}
 	
 	/**
+	* CBuildJob::GetLayerCount - returns the layer count of a build job.
+	* @return Layer Count of build job
+	*/
+	LibMCData_uint32 CBuildJob::GetLayerCount()
+	{
+		LibMCData_uint32 resultLayerCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetLayerCount(m_pHandle, &resultLayerCount));
+		
+		return resultLayerCount;
+	}
+	
+	/**
 	* CBuildJob::GetTimeStamp - returns the timestamp when the job was created.
 	* @return Timestamp in ISO8601 UTC format
 	*/
@@ -1732,6 +2106,21 @@ public:
 	}
 	
 	/**
+	* CBuildJob::GetStorageStreamUUID - returns the storage stream uuid of the build.
+	* @return Stream UUID.
+	*/
+	std::string CBuildJob::GetStorageStreamUUID()
+	{
+		LibMCData_uint32 bytesNeededStreamUUID = 0;
+		LibMCData_uint32 bytesWrittenStreamUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetStorageStreamUUID(m_pHandle, 0, &bytesNeededStreamUUID, nullptr));
+		std::vector<char> bufferStreamUUID(bytesNeededStreamUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_GetStorageStreamUUID(m_pHandle, bytesNeededStreamUUID, &bytesWrittenStreamUUID, &bufferStreamUUID[0]));
+		
+		return std::string(&bufferStreamUUID[0]);
+	}
+	
+	/**
 	* CBuildJob::GetBuildJobLogger - creates a build job log session access class.
 	* @return LogSession class instance.
 	*/
@@ -1744,6 +2133,103 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CLogSession>(m_pWrapper, hLogSession);
+	}
+	
+	/**
+	* CBuildJob::StartValidating - Starts validation of a build job.
+	*/
+	void CBuildJob::StartValidating()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_StartValidating(m_pHandle));
+	}
+	
+	/**
+	* CBuildJob::FinishValidating - Finishes validation of a build job.
+	* @param[in] nLayerCount - Layer count
+	*/
+	void CBuildJob::FinishValidating(const LibMCData_uint32 nLayerCount)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_FinishValidating(m_pHandle, nLayerCount));
+	}
+	
+	/**
+	* CBuildJob::ArchiveJob - Archives a Job. Job MUST not be opened in the system. Job MUST be of state validated.
+	*/
+	void CBuildJob::ArchiveJob()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_ArchiveJob(m_pHandle));
+	}
+	
+	/**
+	* CBuildJob::UnArchiveJob - Unarchives a Job. Job MUST be of state archived.
+	*/
+	void CBuildJob::UnArchiveJob()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_UnArchiveJob(m_pHandle));
+	}
+	
+	/**
+	* CBuildJob::DeleteJob - Deletes a Job permanently including all referencing data objects. Job MUST be of state archived to succeed.
+	*/
+	void CBuildJob::DeleteJob()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_DeleteJob(m_pHandle));
+	}
+	
+	/**
+	* CBuildJob::JobCanBeArchived - Returns if a job is opened.
+	* @return returns if the job can be archived.
+	*/
+	bool CBuildJob::JobCanBeArchived()
+	{
+		bool resultCanBeArchived = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_JobCanBeArchived(m_pHandle, &resultCanBeArchived));
+		
+		return resultCanBeArchived;
+	}
+	
+	/**
+	* CBuildJob::AddJobData - Adds additional data to the Job. Job MUST be of state validated in order to add job data.
+	* @param[in] sName - Name of the job
+	* @param[in] pStream - Storage Stream Instance
+	* @param[in] eDataType - Datatype of Job data
+	* @param[in] sUserID - Currently authenticated user
+	*/
+	void CBuildJob::AddJobData(const std::string & sName, classParam<CStorageStream> pStream, const eBuildJobDataType eDataType, const std::string & sUserID)
+	{
+		LibMCDataHandle hStream = pStream.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_AddJobData(m_pHandle, sName.c_str(), hStream, eDataType, sUserID.c_str()));
+	}
+	
+	/**
+	* CBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
+	* @param[in] eDataType - Datatype of Job data.
+	* @return Build Job Data Iterator Instance.
+	*/
+	PBuildJobDataIterator CBuildJob::ListJobDataByType(const eBuildJobDataType eDataType)
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_ListJobDataByType(m_pHandle, eDataType, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobDataIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CBuildJob::ListJobData - Retrieves a list of build job data objects.
+	* @return Build Job Data Iterator Instance.
+	*/
+	PBuildJobDataIterator CBuildJob::ListJobData()
+	{
+		LibMCDataHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJob_ListJobData(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBuildJobDataIterator>(m_pWrapper, hIteratorInstance);
 	}
 	
 	/**
@@ -1774,14 +2260,13 @@ public:
 	* @param[in] sJobUUID - UUID String for the build job. Must be unique and newly generated.
 	* @param[in] sName - Name String
 	* @param[in] sUserID - Currently authenticated user
-	* @param[in] pStreamInstance - Storage stream to create the job from. ContextUUID of Stream MUST be the Job UUID.
+	* @param[in] sStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
 	* @return Build Job Instance.
 	*/
-	PBuildJob CBuildJobHandler::CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, classParam<CStorageStream> pStreamInstance)
+	PBuildJob CBuildJobHandler::CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID)
 	{
-		LibMCDataHandle hStreamInstance = pStreamInstance.GetHandle();
 		LibMCDataHandle hJobInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_CreateJob(m_pHandle, sJobUUID.c_str(), sName.c_str(), sUserID.c_str(), hStreamInstance, &hJobInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_BuildJobHandler_CreateJob(m_pHandle, sJobUUID.c_str(), sName.c_str(), sUserID.c_str(), sStorageStreamUUID.c_str(), &hJobInstance));
 		
 		if (!hJobInstance) {
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);

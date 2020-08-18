@@ -80,8 +80,8 @@ public:
 
 		pStateEnvironment->LogMessage("Initializing...");
 
-		pStateEnvironment->SetStringParameter("jobinfo", "jobname", "TestJob");
-		pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", "6b77d4ef-3a05-4b88-bb1f-3f1583e18c5c");
+		pStateEnvironment->SetStringParameter("jobinfo", "jobname", "");
+		pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", "00000000-0000-0000-0000-000000000000");
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
@@ -115,10 +115,13 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		if (pStateEnvironment->GetBoolParameter("jobinfo", "autostart")) {
+
+		LibMCEnv::PSignalHandler pHandlerInstance;
+		if (pStateEnvironment->WaitForSignal("signal_startjob", 0, pHandlerInstance)) {
+			pStateEnvironment->SetStringParameter("jobinfo", "jobname", pHandlerInstance->GetString ("jobname"));
+			pStateEnvironment->SetUUIDParameter("jobinfo", "jobuuid", pHandlerInstance->GetUUID ("jobuuid"));
 			pStateEnvironment->SetNextState("startprocess");
-		}
-		else {
+		} else {
 			pStateEnvironment->SetNextState("idle");
 		}
 
@@ -153,13 +156,10 @@ public:
 
 		pStateEnvironment->LogMessage("Starting process...");
 
-		// Load Toolpath into memory
-		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
-		pStateEnvironment->LoadToolpath(sJobUUID);
-
 		// Find out layer count
-		auto pToolpathAccessor = pStateEnvironment->CreateToolpathAccessor(sJobUUID);
-		auto nLayerCount = pToolpathAccessor->GetLayerCount();
+		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
+		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
+		auto nLayerCount = pBuildJob->GetLayerCount();
 
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 1);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
@@ -199,7 +199,7 @@ public:
 
 		// Unload Toolpath from memory
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
-		pStateEnvironment->UnloadToolpath(sJobUUID);
+		pStateEnvironment->GetBuildJob(sJobUUID)->UnloadToolpath();
 
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 		pStateEnvironment->SetNextState("idle");

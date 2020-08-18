@@ -52,6 +52,8 @@ namespace AMC {
 		virtual ~CAPIAuth();
 		
 		std::string getUserName ();
+
+		bool contextUUIDIsAuthorized(std::string & sContextUUID);
 								
 	};
 

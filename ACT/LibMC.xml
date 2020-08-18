@@ -260,7 +260,18 @@
 		<error name="INVALIDFIELDNAME" code="253" description="Invalid field name" />		
 		<error name="UPLOADSIZEMISMATCH" code="254" description="Upload size mismatch" />
 		<error name="CONTENTTYPENOTACCEPTED" code="255" description="Content type not accepted" />
-				
+		<error name="NOCURRENTUPLOAD" code="256" description="No current upload" />
+		<error name="UPLOADCHECKSUMMISMATCH" code="257" description="Upload checksum mismatch" />
+		<error name="INVALIDSTORAGESTREAMSTATUS" code="258" description="Invalid storage stream status" />
+		<error name="CONTEXTUUIDNOTACCEPTED" code="259" description="Context uuid not accepted" />
+		<error name="INVALIDBUILDUUID" code="260" description="Invalid build uuid" />
+		
+		<error name="MISSINGTHREADCOUNT" code="261" description="Missing thread count" />
+		<error name="INVALIDTHREADCOUNT" code="262" description="Invalid thread count" />
+		<error name="COULDNOTUPDATEBUILDSTATUS" code="263" description="Could not update build status" />							
+		<error name="INVALIDITERATOR" code="264" description="Invalid iterator" />
+		<error name="INVALIDDATATYPE" code="265" description="Invalid data type" />
+						
 	</errors>
 	
 	

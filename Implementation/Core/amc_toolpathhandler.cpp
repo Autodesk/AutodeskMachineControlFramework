@@ -74,14 +74,10 @@ namespace AMC {
 		auto pToolpathEntity = findToolpathEntity(sJobUUID, false);
 		if (pToolpathEntity == nullptr) {
 
-			if (m_pLib3MFWrapper.get() == nullptr) {
-				if (m_sLib3MFPath.empty ())
-					throw ELibMCInterfaceException(LIBMC_ERROR_NO3MFLIBRARY);
-				m_pLib3MFWrapper = Lib3MF::CWrapper::loadLibrary(m_sLib3MFPath);
-			}
+			auto p3MFWrapper = getLib3MFWrapper();
 
 			auto pBuildJob = m_pBuildJobHandler->RetrieveJob(sJobUUID);			
-			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pBuildJob->GetStorageStream(), m_pLib3MFWrapper);
+			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pBuildJob->GetStorageStream(), p3MFWrapper);
 			pNewToolpathEntity->IncRef();
 			m_Entities.insert(std::make_pair(sJobUUID, pNewToolpathEntity));
 			return pNewToolpathEntity.get();
@@ -110,6 +106,18 @@ namespace AMC {
 	{
 		if (sLibraryName == LIBRARYNAME_LIB3MF)
 			m_sLib3MFPath = sLibraryPath;
+	}
+
+	Lib3MF::PWrapper CToolpathHandler::getLib3MFWrapper()
+	{
+		if (m_pLib3MFWrapper.get() == nullptr) {
+			if (m_sLib3MFPath.empty())
+				throw ELibMCInterfaceException(LIBMC_ERROR_NO3MFLIBRARY);
+			m_pLib3MFWrapper = Lib3MF::CWrapper::loadLibrary(m_sLib3MFPath);
+		}
+
+		return m_pLib3MFWrapper;
+
 	}
 
 

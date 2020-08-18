@@ -41,11 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_multi.hpp"
 #include "amc_logger_stdout.hpp"
 #include "amc_logger_database.hpp"
+#include "amc_servicehandler.hpp"
 
 #include "API/amc_api_handler_logs.hpp"
 #include "API/amc_api_handler_upload.hpp"
 #include "API/amc_api_handler_setup.hpp"
 #include "API/amc_api_handler_status.hpp"
+#include "API/amc_api_handler_build.hpp"
 #include "API/amc_api_handler_root.hpp"
 
 
@@ -83,6 +85,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(m_InstanceList));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(m_InstanceList));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(m_pSystemState));
+    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(m_pSystemState));
 
     // Create Client Dist Handler
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();
@@ -111,6 +114,15 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     std::string xmlns(xmlnsAttrib.as_string ());
     if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLSCHEMA);
+
+    auto threadCountAttrib = machinedefinitionNode.attribute("threadcount");
+    if (threadCountAttrib.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTHREADCOUNT);
+    auto nMaxThreadCount = threadCountAttrib.as_uint();
+    if ((nMaxThreadCount < SERVICETHREADCOUNT_MIN) || (nMaxThreadCount > SERVICETHREADCOUNT_MAX))
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTHREADCOUNT);
+    m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t) nMaxThreadCount);
+
 
 
     m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);

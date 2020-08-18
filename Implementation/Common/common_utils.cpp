@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 
 #include "crossguid/guid.hpp"
+#include "PicoSHA2/picosha2.h"
 
 #ifdef _WIN32
 #include <objbase.h>
@@ -526,6 +527,28 @@ namespace AMCCommon {
 #endif
 	}
 
+
+	std::string CUtils::calculateSHA256FromFile(const std::string& sFileNameUTF8)
+	{
+		std::vector<unsigned char> hash(picosha2::k_digest_size);
+
+#ifdef _WIN32
+		auto sWidePath = AMCCommon::CUtils::UTF8toUTF16(sFileNameUTF8);
+		std::ifstream shaStream(sWidePath, std::ios::binary);
+#else
+		std::ifstream shaStream(sFileNameUTF8, std::ios::binary);
+#endif			
+
+		picosha2::hash256(shaStream, hash.begin(), hash.end());
+		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+	}
+
+	std::string CUtils::calculateSHA256FromString(const std::string& sString)
+	{
+		std::vector<unsigned char> hash(picosha2::k_digest_size);
+		picosha2::hash256(sString.begin(), sString.end(), hash.begin(), hash.end());
+		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+	}
 
 
 }

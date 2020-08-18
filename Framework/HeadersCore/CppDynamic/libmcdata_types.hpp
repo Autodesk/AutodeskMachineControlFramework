@@ -280,6 +280,16 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDFIELDNAME 253
 #define LIBMCDATA_ERROR_UPLOADSIZEMISMATCH 254
 #define LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED 255
+#define LIBMCDATA_ERROR_NOCURRENTUPLOAD 256
+#define LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH 257
+#define LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS 258
+#define LIBMCDATA_ERROR_CONTEXTUUIDNOTACCEPTED 259
+#define LIBMCDATA_ERROR_INVALIDBUILDUUID 260
+#define LIBMCDATA_ERROR_MISSINGTHREADCOUNT 261
+#define LIBMCDATA_ERROR_INVALIDTHREADCOUNT 262
+#define LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS 263
+#define LIBMCDATA_ERROR_INVALIDITERATOR 264
+#define LIBMCDATA_ERROR_INVALIDDATATYPE 265
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -472,6 +482,16 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDFIELDNAME: return "Invalid field name";
     case LIBMCDATA_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
     case LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED: return "Content type not accepted";
+    case LIBMCDATA_ERROR_NOCURRENTUPLOAD: return "No current upload";
+    case LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH: return "Upload checksum mismatch";
+    case LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS: return "Invalid storage stream status";
+    case LIBMCDATA_ERROR_CONTEXTUUIDNOTACCEPTED: return "Context uuid not accepted";
+    case LIBMCDATA_ERROR_INVALIDBUILDUUID: return "Invalid build uuid";
+    case LIBMCDATA_ERROR_MISSINGTHREADCOUNT: return "Missing thread count";
+    case LIBMCDATA_ERROR_INVALIDTHREADCOUNT: return "Invalid thread count";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
+    case LIBMCDATA_ERROR_INVALIDITERATOR: return "Invalid iterator";
+    case LIBMCDATA_ERROR_INVALIDDATATYPE: return "Invalid data type";
     default: return "unknown error";
   }
 }
@@ -485,6 +505,8 @@ typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
+typedef LibMCDataHandle LibMCData_BuildJobData;
+typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
@@ -515,7 +537,18 @@ namespace LibMCData {
     Created = 0,
     Validating = 100,
     Validated = 200,
-    Archived = 300
+    Archived = 300,
+    Deleted = 400
+  };
+  
+  enum class eBuildJobDataType : LibMCData_int32 {
+    Unknown = 0,
+    Toolpath = 1,
+    PNGImage = 2,
+    JPEGImage = 3,
+    Thumbnail = 4,
+    Timeline = 5,
+    CustomBinaryData = 100
   };
   
   /*************************************************************************************************************************
@@ -547,6 +580,7 @@ namespace LibMCData {
 typedef LibMCData::eLogLevel eLibMCDataLogLevel;
 typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
+typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;
 

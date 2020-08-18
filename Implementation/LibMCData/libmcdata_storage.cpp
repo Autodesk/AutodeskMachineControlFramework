@@ -37,6 +37,7 @@ Abstract: This is a stub class definition of CStorage
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "amcdata_storagepath.hpp"
 
 
 #include "PicoSHA2/picosha2.h"
@@ -64,28 +65,40 @@ CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStor
 void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID)
 {
 
+    auto pTransaction = m_pSQLHandler->beginTransaction();
+
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
     std::string sParsedContextUUID = AMCCommon::CUtils::normalizeUUIDString(sContextUUID);
     std::string sTimestamp = AMCCommon::CUtils::getCurrentISO8601TimeUTC();
 
     std::string sQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
-    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    auto pStatement = pTransaction->prepareStatement(sQuery);
     pStatement->setString(1, sParsedUUID);
     if (pStatement->nextRow())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM);
     pStatement = nullptr;
 
-    std::string sInsertQuery = "INSERT INTO storage_streams (uuid, contextuuid, name, mimetype, sha2, size, userid, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    auto pInsertStatement = m_pSQLHandler->prepareStatement(sInsertQuery);
+    std::string sInsertQuery = "INSERT INTO storage_streams (uuid, name, mimetype, sha2, size, userid, timestamp, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    auto pInsertStatement = pTransaction->prepareStatement(sInsertQuery);
     pInsertStatement->setString(1, sParsedUUID);
-    pInsertStatement->setString(2, sParsedContextUUID);
-    pInsertStatement->setString(3, sName);
-    pInsertStatement->setString(4, sMimeType);
-    pInsertStatement->setString(5, sSHA2);
-    pInsertStatement->setInt64(6, nSize);
-    pInsertStatement->setString(7, sUserID);
-    pInsertStatement->setString(8, sTimestamp);
+    pInsertStatement->setString(2, sName);
+    pInsertStatement->setString(3, sMimeType);
+    pInsertStatement->setString(4, sSHA2);
+    pInsertStatement->setInt64(5, nSize);
+    pInsertStatement->setString(6, sUserID);
+    pInsertStatement->setString(7, sTimestamp);
+    pInsertStatement->setString(8, AMCData::CStoragePath::storageStreamStatusToString (AMCData::sssNew));
     pInsertStatement->execute();
+    pInsertStatement = nullptr;
+
+    std::string sContextQuery = "INSERT INTO storage_context (streamuuid, contextuuid) VALUES (?, ?)";
+    auto pContextStatement = pTransaction->prepareStatement(sContextQuery);
+    pContextStatement->setString(1, sParsedUUID);
+    pContextStatement->setString(2, sParsedContextUUID);
+    pContextStatement->execute();
+    pContextStatement = nullptr;
+
+    pTransaction->commit();
 }
 
 
@@ -93,9 +106,10 @@ bool CStorage::StreamIsReady(const std::string& sUUID)
 {
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
 
-    std::string sQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
+    std::string sQuery = "SELECT uuid FROM storage_streams WHERE uuid=? AND status=?";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, sParsedUUID);
+    pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
     return (pStatement->nextRow());
 }
 
@@ -137,7 +151,7 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
     }
 
     // Store data asynchroniously on disk and finalize when writing has finished
-    auto pWriter = std::make_shared<AMCData::CStorageWriter>(sUUID, m_pStoragePath->getStreamPath (sUUID), nContentBufferSize);
+    auto pWriter = std::make_shared<AMCData::CStorageWriter>(sUUID, m_pStoragePath->getStreamPath (sUUID), nContentBufferSize, sSHA256);
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, 0);
     pWriter->finalize();
  
@@ -161,7 +175,7 @@ void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& s
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
         insertDBEntry(sParsedUUID, sContextUUID, sName, sMimeType, nSize, sSHA2, sUserID);
 
-        auto pWriter = std::make_shared<AMCData::CStorageWriter>(sParsedUUID, m_pStoragePath->getStreamPath(sUUID), nSize);
+        auto pWriter = std::make_shared<AMCData::CStorageWriter>(sParsedUUID, m_pStoragePath->getStreamPath(sUUID), nSize, sSHA2);
         m_PartialWriters.insert(std::make_pair(sParsedUUID, pWriter));
     }
     
@@ -195,7 +209,18 @@ void CStorage::FinishPartialStream(const std::string & sUUID)
     if (iIterator == m_PartialWriters.end())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD);
 
-    iIterator->second->finalize ();
+    auto pWriter = iIterator->second;
+    m_PartialWriters.erase(iIterator);
+
+    pWriter->finalize ();
+
+    std::string sUpdateQuery = "UPDATE storage_streams SET status=? WHERE uuid=? AND status=?";
+    auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
+    pUpdateStatement->setString(1, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
+    pUpdateStatement->setString(2, sUUID);
+    pUpdateStatement->setString(3, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssNew));
+    pUpdateStatement->execute();
+
 }
 
 

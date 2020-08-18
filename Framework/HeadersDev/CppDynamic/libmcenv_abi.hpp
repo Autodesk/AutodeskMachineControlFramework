@@ -154,15 +154,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getunits(LibMCEnv_Toolpa
 **************************************************************************************************************************/
 
 /**
-* Returns Toolpath data UUID.
+* Returns Toolpath storage UUID.
 *
 * @param[in] pToolpathAccessor - ToolpathAccessor instance.
-* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUUIDBuffer -  buffer of Returns toolpath data uuid., may be NULL
+* @param[in] nStorageUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStorageUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStorageUUIDBuffer -  buffer of Returns toolpath storage uuid., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getstorageuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const LibMCEnv_uint32 nStorageUUIDBufferSize, LibMCEnv_uint32* pStorageUUIDNeededChars, char * pStorageUUIDBuffer);
 
 /**
 * Returns layer count.
@@ -191,6 +191,112 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_loadlayer(LibMCEnv_To
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pUnits);
+
+/*************************************************************************************************************************
+ Class definition for Build
+**************************************************************************************************************************/
+
+/**
+* Returns name of the build.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of the build., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getname(LibMCEnv_Build pBuild, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns uuid of the build.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nBuildUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBuildUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBuildUUIDBuffer -  buffer of UUID of the build., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getbuilduuid(LibMCEnv_Build pBuild, const LibMCEnv_uint32 nBuildUUIDBufferSize, LibMCEnv_uint32* pBuildUUIDNeededChars, char * pBuildUUIDBuffer);
+
+/**
+* Returns storage uuid of the build.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nStorageUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStorageUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStorageUUIDBuffer -  buffer of Storage UUID of the build., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getstorageuuid(LibMCEnv_Build pBuild, const LibMCEnv_uint32 nStorageUUIDBufferSize, LibMCEnv_uint32* pStorageUUIDNeededChars, char * pStorageUUIDBuffer);
+
+/**
+* Returns SHA256 of the build stream.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nSHA256BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA256NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA256Buffer -  buffer of SHA256 of the build stream., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getstoragesha256(LibMCEnv_Build pBuild, const LibMCEnv_uint32 nSHA256BufferSize, LibMCEnv_uint32* pSHA256NeededChars, char * pSHA256Buffer);
+
+/**
+* Returns cached layer count of the toolpath.
+*
+* @param[in] pBuild - Build instance.
+* @param[out] pLayerCount - Returns layer count.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getlayercount(LibMCEnv_Build pBuild, LibMCEnv_uint32 * pLayerCount);
+
+/**
+* loads the a toolpath into memory
+*
+* @param[in] pBuild - Build instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_loadtoolpath(LibMCEnv_Build pBuild);
+
+/**
+* unloads the a toolpath from memory, if it has been loaded before.
+*
+* @param[in] pBuild - Build instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_unloadtoolpath(LibMCEnv_Build pBuild);
+
+/**
+* checks, if a toolpath object is loaded to memory.
+*
+* @param[in] pBuild - Build instance.
+* @param[out] pIsLoaded - returns if toolpath is loaded.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_toolpathisloaded(LibMCEnv_Build pBuild, bool * pIsLoaded);
+
+/**
+* Creates an accessor object for a toolpath. Toolpath MUST have been loaded with LoadToolpath before.
+*
+* @param[in] pBuild - Build instance.
+* @param[out] pToolpathInstance - Toolpath instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_Build pBuild, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
+* Adds binary data to store with the build.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] pName - Name of the attache data block.
+* @param[in] pMIMEType - Mime type of the data.
+* @param[in] nContentBufferSize - Number of elements in buffer
+* @param[in] pContentBuffer - uint8 buffer of Stream content to store
+* @param[in] nDataUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataUUIDBuffer -  buffer of Data UUID of the attachment., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /*************************************************************************************************************************
  Class definition for SignalTrigger
@@ -549,22 +655,14 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getdriverlibrary(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createdriveraccess(LibMCEnv_StateEnvironment pStateEnvironment, const char * pDriverName, LibMCEnv_pvoid * pDriverHandle);
 
 /**
-* Loads a toolpath from disk into memory.
+* Returns a instance of a build object.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pToolpathUUID - UUID of the toolpath entity.
+* @param[in] pBuildUUID - UUID of the build entity.
+* @param[out] pBuildInstance - Build instance
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadtoolpath(LibMCEnv_StateEnvironment pStateEnvironment, const char * pToolpathUUID);
-
-/**
-* unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pToolpathUUID - UUID of the toolpath entity.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_unloadtoolpath(LibMCEnv_StateEnvironment pStateEnvironment, const char * pToolpathUUID);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getbuildjob(LibMCEnv_StateEnvironment pStateEnvironment, const char * pBuildUUID, LibMCEnv_Build * pBuildInstance);
 
 /**
 * unloads all toolpath in memory to clean up
@@ -573,26 +671,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_unloadtoolpath(LibMCE
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_unloadalltoolpathes(LibMCEnv_StateEnvironment pStateEnvironment);
-
-/**
-* creates an accessor object for a toolpath, if loaded to memory before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pToolpathUUID - UUID of the toolpath entity.
-* @param[out] pToolpathInstance - UUID of the toolpath entity.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createtoolpathaccessor(LibMCEnv_StateEnvironment pStateEnvironment, const char * pToolpathUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance);
-
-/**
-* checks, if a toolpath object is loaded to memory.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pToolpathUUID - UUID of the toolpath entity.
-* @param[out] pIsLoaded - returns if toolpath is loaded.
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_toolpathisloaded(LibMCEnv_StateEnvironment pStateEnvironment, const char * pToolpathUUID, bool * pIsLoaded);
 
 /**
 * sets the next state

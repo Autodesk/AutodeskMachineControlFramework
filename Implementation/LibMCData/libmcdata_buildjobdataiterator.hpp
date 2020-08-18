@@ -27,19 +27,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildJobHandler
+Abstract: This is the class declaration of CBuildJobDataIterator
 
 */
 
 
-#ifndef __LIBMCDATA_BUILDJOBHANDLER
-#define __LIBMCDATA_BUILDJOBHANDLER
+#ifndef __LIBMCDATA_BUILDJOBDATAITERATOR
+#define __LIBMCDATA_BUILDJOBDATAITERATOR
 
 #include "libmcdata_interfaces.hpp"
-#include <vector>
 
 // Parent classes
-#include "libmcdata_base.hpp"
+#include "libmcdata_iterator.hpp"
+#include "libmcdata_buildjobdata.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -47,11 +47,6 @@ Abstract: This is the class declaration of CBuildJobHandler
 #endif
 
 // Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagepath.hpp"
-
-#include <mutex>
-#include <thread>
 
 
 namespace LibMCData {
@@ -59,34 +54,24 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildJobHandler 
+ Class declaration of CBuildJobDataIterator 
 **************************************************************************************************************************/
 
-class CBuildJobHandler : public virtual IBuildJobHandler, public virtual CBase {
+class CBuildJobDataIterator : public virtual IBuildJobDataIterator, public virtual CIterator {
 private:
-
-	AMCData::PSQLHandler m_pSQLHandler;
-    AMCData::PStoragePath m_pStoragePath;
 
 protected:
 
-
-
-
 public:
+    CBuildJobDataIterator();
 
+    IBase* GetCurrent() override;
 
-    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    IBuildJobData* GetCurrentJobData() override;
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID) override;
+    IIterator* Clone() override;
 
-	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
-
-	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
-
-    std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
-
-    LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
+    void AddJobData(std::shared_ptr<CBuildJobData> pBuildJobData);
 
 };
 
@@ -96,4 +81,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_BUILDJOBHANDLER
+#endif // __LIBMCDATA_BUILDJOBDATAITERATOR

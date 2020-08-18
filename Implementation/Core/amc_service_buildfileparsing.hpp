@@ -29,45 +29,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UTILS
-#define __AMC_UTILS
+#ifndef __AMC_SERVICE_BUILDFILEPARSING
+#define __AMC_SERVICE_BUILDFILEPARSING
+
+#include "amc_servicehandler.hpp"
+#include "amc_service.hpp"
+
+#include "libmcdata_dynamic.hpp"
+#include "lib3mf/lib3mf_dynamic.hpp"
 
 #include <memory>
-#include <string>
+
+namespace AMC {
 
 
-namespace AMCCommon {
-
-
-	class CUtils {
+	class CService_BuildFileParsing : public CService {
 	private:
+		LibMCData::PBuildJob m_pBuildJob;
+		Lib3MF::PWrapper m_p3MFWrapper;
+		Lib3MF::PModel m_p3MFModel;
+		std::string m_sUserID;
 
-		static void characterIDToUTF16(uint32_t nCharacterID, uint16_t& nHighSurrogate, uint16_t& nLowSurrogate);
-
+	protected:
 	public:
 
-		static std::string getCurrentISO8601TimeUTC();
-		static std::string getCurrentTimeFileName();
-		static std::string createUUID();
-		static std::string normalizeUUIDString(std::string sRawString);
-		static std::string normalizeSHA256String(std::string sRawString);		
-		
-		static std::string UTF16toUTF8(std::wstring sString);
-		static std::wstring UTF8toUTF16(std::string sString);
-		static bool UTF8StringIsValid (const std::string & sString);
-		static std::string trimString (const std::string& sString);
-		static std::string toLowerString(const std::string& sString);
+		CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PBuildJob pBuildJob, Lib3MF::PWrapper p3MFWrapper, const std::string & sUserID);
+		virtual ~CService_BuildFileParsing();
 
-		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
-		static std::string calculateSHA256FromString(const std::string& sString);
+		virtual void executeBlocking() override;
 
-		static void sleepMilliseconds(const uint32_t milliSeconds);
-		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
+		virtual std::string getName() override;
 	};
 
 	
 }
 
 
-#endif //__AMC_UTILS
+#endif //__AMC_SERVICE_BUILDFILEPARSING
 

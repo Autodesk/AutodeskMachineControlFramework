@@ -34,7 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_signalhandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
+#include "libmcenv_build.hpp"
 
+#include "amc_logger.hpp"
+#include "amc_driverhandler.hpp"
+#include "amc_parameterhandler.hpp"
 
 #include <thread> 
 
@@ -98,26 +102,19 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 }
 
 
-void CStateEnvironment::LoadToolpath(const std::string& sToolpathUUID)
+IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
-	m_pSystemState->toolpathHandler()->loadToolpathEntity(sToolpathUUID);
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+	return new CBuild(pBuildJob, m_pSystemState);
 }
 
-void CStateEnvironment::UnloadToolpath(const std::string& sToolpathUUID)
-{
-	m_pSystemState->toolpathHandler()->unloadToolpathEntity(sToolpathUUID);
-}
 
 void CStateEnvironment::UnloadAllToolpathes()
 {
 	m_pSystemState->toolpathHandler()->unloadAllEntities();
 }
 
-
-IToolpathAccessor* CStateEnvironment::CreateToolpathAccessor(const std::string& sToolpathUUID)
-{
-	return new CToolpathAccessor(sToolpathUUID, m_pSystemState->getToolpathHandlerInstance ());
-}
 
 
 void CStateEnvironment::GetDriverLibrary(const std::string& sDriverName, std::string& sDriverType, LibMCEnv_pvoid& pDriverLookup)
@@ -128,12 +125,6 @@ void CStateEnvironment::GetDriverLibrary(const std::string& sDriverName, std::st
 void CStateEnvironment::CreateDriverAccess(const std::string& sDriverName, LibMCEnv_pvoid& pDriverHandle) 
 {	
 	pDriverHandle = m_pSystemState->driverHandler()->acquireDriver(sDriverName, m_sInstanceName);
-}
-
-
-bool CStateEnvironment::ToolpathIsLoaded(const std::string& sToolpathUUID)
-{
-	return (m_pSystemState->toolpathHandler ()->findToolpathEntity(sToolpathUUID, false) != nullptr);
 }
 
 
