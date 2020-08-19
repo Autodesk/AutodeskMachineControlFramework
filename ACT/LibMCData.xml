@@ -260,6 +260,20 @@
 		
 		<error name="COULDNOTSENDSIGNAL" code="266" description="Could not send signal" />
 		<error name="MISSINGSIGNALPARAMETER" code="267" description="Missing signal parameter" />
+		<error name="NOUSERINTERFACEDEFINITION" code="268" description="No user interface definition" />
+		
+		<error name="MISSINGAPPNAME" code="269" description="Missing app name" />
+		<error name="MISSINGCOPYRIGHT" code="270" description="Missing copyright" />
+		<error name="MISSINGMAINPAGE" code="271" description="Missing main page" />
+		<error name="MISSINGMENUITEMID" code="272" description="Missing menu item id" />
+		<error name="MISSINGMENUITEMICON" code="273" description="Missing menu item icon" />
+		<error name="MISSINGMENUITEMCAPTION" code="274" description="Missing menu item caption" />
+		<error name="MISSINGTARGETPAGE" code="275" description="Missing menu item target page" />
+		<error name="MISSINGMENUNODE" code="276" description="Missing menu node" />
+		<error name="MISSINGTOOLBARNODE" code="277" description="Missing toolbar node" />
+		<error name="MISSINGTOOLBARITEMID" code="278" description="Missing toolbar item id" />
+		<error name="MISSINGTOOLBARITEMICON" code="279" description="Missing toolbar item icon" />
+		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />
 		
 		
 

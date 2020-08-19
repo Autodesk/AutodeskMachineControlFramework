@@ -28,41 +28,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amc_api_auth.hpp"
-#include "libmc_interfaceexception.hpp"
 
-#include "common_utils.hpp"
+#ifndef __AMC_UI_MENUITEM
+#define __AMC_UI_MENUITEM
 
-using namespace AMC;
+#include <memory>
+#include <vector>
+#include <string>
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID)
-	: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
-{
+namespace AMC {
 
+	class CUIMenuItem {
+	protected:
+		std::string m_sID;
+		std::string m_sIcon;
+		std::string m_sCaption;
+		
+	public:
+
+		CUIMenuItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption);		
+		
+		virtual ~CUIMenuItem();
+						
+		std::string getID ();
+		std::string getIcon ();
+		std::string getCaption ();
+				
+	};
+	
+	typedef std::shared_ptr<CUIMenuItem> PUIMenuItem;
+	
 }
 
-CAPIAuth::~CAPIAuth()
-{
 
-}
+#endif //__AMC_UI_MENUITEM
 
-
-bool CAPIAuth::contextUUIDIsAuthorized(std::string& sContextUUID)
-{
-	return true;
-}
-
-std::string CAPIAuth::getSessionUUID()
-{
-	return m_sSessionUUID;
-}
-
-bool CAPIAuth::userIsAuthorized()
-{
-	return true;
-}
-
-std::string CAPIAuth::getUserName()
-{
-	return "user";
-}

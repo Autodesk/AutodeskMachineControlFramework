@@ -81,6 +81,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_SIGNAL_SIGNALNAME "signalname"
 #define AMC_API_KEY_SIGNAL_SIGNALUUID "signaluuid"
 
+#define AMC_API_KEY_UI_APPNAME "appname"
+#define AMC_API_KEY_UI_COPYRIGHT "copyright"
+#define AMC_API_KEY_UI_MAINPAGE "mainpage"
+#define AMC_API_KEY_UI_SESSIONID "sessionid"
+#define AMC_API_KEY_UI_ICON "icon"
+#define AMC_API_KEY_UI_ID "id"
+#define AMC_API_KEY_UI_CAPTION "caption"
+#define AMC_API_KEY_UI_TARGETPAGE "targetpage"
+#define AMC_API_KEY_UI_MENUITEMS "menuitems"
+#define AMC_API_KEY_UI_TOOLBARITEMS "toolbaritems"
+
 #define AMC_API_KEY_BUILDUUID "builduuid"
 
 

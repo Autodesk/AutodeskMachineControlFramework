@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driverhandler.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "amc_servicehandler.hpp"
+#include "amc_ui_handler.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -63,6 +64,7 @@ namespace AMC {
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
+		m_pUIHandler = std::make_shared<CUIHandler>();
 	}
 
 	CSystemState::~CSystemState()
@@ -94,6 +96,12 @@ namespace AMC {
 	{
 		return m_pServiceHandler.get();
 	}
+
+	CUIHandler* CSystemState::uiHandler()
+	{
+		return m_pUIHandler.get();
+	}
+
 
 	PLogger CSystemState::getLoggerInstance()
 	{

@@ -28,41 +28,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amc_api_auth.hpp"
-#include "libmc_interfaceexception.hpp"
 
-#include "common_utils.hpp"
+#ifndef __AMC_API_HANDLER_UI
+#define __AMC_API_HANDLER_UI
 
-using namespace AMC;
+#include "amc_api_handler.hpp"
+#include "amc_logger.hpp"
+#include "amc_api_response.hpp"
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID)
-	: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
-{
+#include "amc_systemstate.hpp"
 
+namespace AMC {
+
+	enum class APIHandler_UIType {
+		utUnknown = 0,
+		utConfiguration = 1,
+	};
+
+	class CAPIHandler_UI : public CAPIHandler {
+	private:
+		
+		PSystemState m_pSystemState;
+
+		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType);
+
+		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
+
+	public:
+
+		CAPIHandler_UI(PSystemState pSystemState);
+
+		virtual ~CAPIHandler_UI();
+				
+		virtual std::string getBaseURI () override;
+
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
+
+	};
+
+	
 }
 
-CAPIAuth::~CAPIAuth()
-{
 
-}
+#endif //__AMC_API_HANDLER_UI
 
-
-bool CAPIAuth::contextUUIDIsAuthorized(std::string& sContextUUID)
-{
-	return true;
-}
-
-std::string CAPIAuth::getSessionUUID()
-{
-	return m_sSessionUUID;
-}
-
-bool CAPIAuth::userIsAuthorized()
-{
-	return true;
-}
-
-std::string CAPIAuth::getUserName()
-{
-	return "user";
-}

@@ -59,12 +59,14 @@ namespace AMC {
 	class CDriverHandler;
 	class CToolpathHandler;
 	class CServiceHandler;
+	class CUIHandler;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
 	typedef std::shared_ptr<CDriverHandler> PDriverHandler;
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
+	typedef std::shared_ptr<CUIHandler> PUIHandler;
 
 	class CSystemState {
 	private:
@@ -73,6 +75,7 @@ namespace AMC {
 		AMC::PDriverHandler m_pDriverHandler;
 		AMC::PToolpathHandler m_pToolpathHandler;
 		AMC::PServiceHandler m_pServiceHandler;
+		AMC::PUIHandler m_pUIHandler;
 		
 		LibMCData::PDataModel m_pDataModel;
 		LibMCData::PStorage m_pStorage;
@@ -90,6 +93,7 @@ namespace AMC {
 		CDriverHandler* driverHandler();
 		CToolpathHandler* toolpathHandler();
 		CServiceHandler* serviceHandler();
+		CUIHandler* uiHandler();
 
 		LibMCData::CStorage * storage();
 		LibMCData::CBuildJobHandler * buildJobHandler();

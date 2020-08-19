@@ -292,6 +292,19 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDDATATYPE 265
 #define LIBMC_ERROR_COULDNOTSENDSIGNAL 266
 #define LIBMC_ERROR_MISSINGSIGNALPARAMETER 267
+#define LIBMC_ERROR_NOUSERINTERFACEDEFINITION 268
+#define LIBMC_ERROR_MISSINGAPPNAME 269
+#define LIBMC_ERROR_MISSINGCOPYRIGHT 270
+#define LIBMC_ERROR_MISSINGMAINPAGE 271
+#define LIBMC_ERROR_MISSINGMENUITEMID 272
+#define LIBMC_ERROR_MISSINGMENUITEMICON 273
+#define LIBMC_ERROR_MISSINGMENUITEMCAPTION 274
+#define LIBMC_ERROR_MISSINGTARGETPAGE 275
+#define LIBMC_ERROR_MISSINGMENUNODE 276
+#define LIBMC_ERROR_MISSINGTOOLBARNODE 277
+#define LIBMC_ERROR_MISSINGTOOLBARITEMID 278
+#define LIBMC_ERROR_MISSINGTOOLBARITEMICON 279
+#define LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION 280
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -496,6 +509,19 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDDATATYPE: return "Invalid data type";
     case LIBMC_ERROR_COULDNOTSENDSIGNAL: return "Could not send signal";
     case LIBMC_ERROR_MISSINGSIGNALPARAMETER: return "Missing signal parameter";
+    case LIBMC_ERROR_NOUSERINTERFACEDEFINITION: return "No user interface definition";
+    case LIBMC_ERROR_MISSINGAPPNAME: return "Missing app name";
+    case LIBMC_ERROR_MISSINGCOPYRIGHT: return "Missing copyright";
+    case LIBMC_ERROR_MISSINGMAINPAGE: return "Missing main page";
+    case LIBMC_ERROR_MISSINGMENUITEMID: return "Missing menu item id";
+    case LIBMC_ERROR_MISSINGMENUITEMICON: return "Missing menu item icon";
+    case LIBMC_ERROR_MISSINGMENUITEMCAPTION: return "Missing menu item caption";
+    case LIBMC_ERROR_MISSINGTARGETPAGE: return "Missing menu item target page";
+    case LIBMC_ERROR_MISSINGMENUNODE: return "Missing menu node";
+    case LIBMC_ERROR_MISSINGTOOLBARNODE: return "Missing toolbar node";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMID: return "Missing toolbar item id";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
     default: return "unknown error";
   }
 }

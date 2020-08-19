@@ -91,7 +91,8 @@ private:
 
 	void loadParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
 	void readSignalParameters(const pugi::xml_node& xmlNode, std::list<AMC::CStateSignalParameter> & Parameters, std::list<AMC::CStateSignalParameter>& Results);
-	
+	void loadUserInterface(const pugi::xml_node& xmlNode);
+
 
 protected:
 

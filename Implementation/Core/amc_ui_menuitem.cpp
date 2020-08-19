@@ -28,41 +28,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amc_api_auth.hpp"
+
+#include "amc_ui_menuitem.hpp"
 #include "libmc_interfaceexception.hpp"
 
-#include "common_utils.hpp"
 
 using namespace AMC;
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID)
-	: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
+CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption)
+	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption)
 {
 
 }
 
-CAPIAuth::~CAPIAuth()
+CUIMenuItem::~CUIMenuItem()
 {
 
 }
 
-
-bool CAPIAuth::contextUUIDIsAuthorized(std::string& sContextUUID)
+std::string CUIMenuItem::getID()
 {
-	return true;
+	return m_sID;
 }
 
-std::string CAPIAuth::getSessionUUID()
+std::string CUIMenuItem::getIcon()
 {
-	return m_sSessionUUID;
+	return m_sIcon;
 }
 
-bool CAPIAuth::userIsAuthorized()
+std::string CUIMenuItem::getCaption()
 {
-	return true;
-}
-
-std::string CAPIAuth::getUserName()
-{
-	return "user";
+	return m_sCaption;
 }

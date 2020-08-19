@@ -28,41 +28,73 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amc_api_auth.hpp"
+
+#include "amc_ui_handler.hpp"
+#include "API/amc_api_constants.hpp"
+
 #include "libmc_interfaceexception.hpp"
 
-#include "common_utils.hpp"
 
 using namespace AMC;
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID)
-	: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
+CUIHandler::CUIHandler()
 {
 
 }
 
-CAPIAuth::~CAPIAuth()
+CUIHandler::~CUIHandler()
+{
+
+}
+
+void CUIHandler::Initialise(const std::string& sAppName, const std::string& sCopyRightString)
+{
+	m_sAppName = sAppName;
+	m_sCopyrightString = sCopyRightString;
+}
+
+std::string CUIHandler::getAppName()
+{
+	return m_sAppName;
+}
+
+std::string CUIHandler::getCopyrightString()
+{
+	return m_sCopyrightString;
+}
+
+void CUIHandler::addMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
+{
+	m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption));
+}
+
+void CUIHandler::addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
 {
 
 }
 
 
-bool CAPIAuth::contextUUIDIsAuthorized(std::string& sContextUUID)
+void CUIHandler::writeToJSON(CJSONWriter& writer)
 {
-	return true;
-}
+	writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
+	writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
+	//writer.addString(AMC_API_KEY_UI_MAINPAGE, m_);
 
-std::string CAPIAuth::getSessionUUID()
-{
-	return m_sSessionUUID;
-}
+	CJSONWriterArray menuItems(writer);
 
-bool CAPIAuth::userIsAuthorized()
-{
-	return true;
-}
+	for (auto iter : m_MenuItems) {
+		CJSONWriterObject menuItem(writer);
+		menuItem.addString(AMC_API_KEY_UI_ID, iter->getID ());
+		menuItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon ());
+		menuItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption ());
+		//menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, "main");
+		menuItems.addObject(menuItem);
+	}
 
-std::string CAPIAuth::getUserName()
-{
-	return "user";
+	writer.addArray(AMC_API_KEY_UI_MENUITEMS, menuItems);
+
+	CJSONWriterArray toolbarItems(writer);
+
+	writer.addArray(AMC_API_KEY_UI_TOOLBARITEMS, toolbarItems);
+
 }

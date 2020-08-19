@@ -28,41 +28,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amc_api_auth.hpp"
-#include "libmc_interfaceexception.hpp"
 
-#include "common_utils.hpp"
+#ifndef __AMC_UI_HANDLER
+#define __AMC_UI_HANDLER
 
-using namespace AMC;
+#include <memory>
+#include <vector>
+#include <string>
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID)
-	: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
-{
+#include "amc_ui_menuitem.hpp"
+#include "amc_jsonwriter.hpp"
 
+namespace AMC {
+
+	class CUIHandler {
+	protected:
+		std::string m_sAppName;
+		std::string m_sCopyrightString;
+
+		std::vector <PUIMenuItem> m_MenuItems;
+		
+	public:
+
+		CUIHandler();
+		
+		virtual ~CUIHandler();
+		
+		void Initialise (const std::string & sAppName, const std::string & sCopyRightString);
+
+		std::string getAppName();
+		std::string getCopyrightString();
+
+		void addMenuItem (const std::string & sID, const std::string & sIcon, const std::string & sCaption, const std::string & sTargetPage);
+		void addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+
+		void writeToJSON (CJSONWriter & writer);
+	};
+	
+	typedef std::shared_ptr<CUIHandler> PUIHandler;
+	
 }
 
-CAPIAuth::~CAPIAuth()
-{
 
-}
+#endif //__AMC_UI_HANDLER
 
-
-bool CAPIAuth::contextUUIDIsAuthorized(std::string& sContextUUID)
-{
-	return true;
-}
-
-std::string CAPIAuth::getSessionUUID()
-{
-	return m_sSessionUUID;
-}
-
-bool CAPIAuth::userIsAuthorized()
-{
-	return true;
-}
-
-std::string CAPIAuth::getUserName()
-{
-	return "user";
-}

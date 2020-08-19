@@ -292,6 +292,19 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDDATATYPE 265
 #define LIBMCDATA_ERROR_COULDNOTSENDSIGNAL 266
 #define LIBMCDATA_ERROR_MISSINGSIGNALPARAMETER 267
+#define LIBMCDATA_ERROR_NOUSERINTERFACEDEFINITION 268
+#define LIBMCDATA_ERROR_MISSINGAPPNAME 269
+#define LIBMCDATA_ERROR_MISSINGCOPYRIGHT 270
+#define LIBMCDATA_ERROR_MISSINGMAINPAGE 271
+#define LIBMCDATA_ERROR_MISSINGMENUITEMID 272
+#define LIBMCDATA_ERROR_MISSINGMENUITEMICON 273
+#define LIBMCDATA_ERROR_MISSINGMENUITEMCAPTION 274
+#define LIBMCDATA_ERROR_MISSINGTARGETPAGE 275
+#define LIBMCDATA_ERROR_MISSINGMENUNODE 276
+#define LIBMCDATA_ERROR_MISSINGTOOLBARNODE 277
+#define LIBMCDATA_ERROR_MISSINGTOOLBARITEMID 278
+#define LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON 279
+#define LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION 280
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -496,6 +509,19 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDDATATYPE: return "Invalid data type";
     case LIBMCDATA_ERROR_COULDNOTSENDSIGNAL: return "Could not send signal";
     case LIBMCDATA_ERROR_MISSINGSIGNALPARAMETER: return "Missing signal parameter";
+    case LIBMCDATA_ERROR_NOUSERINTERFACEDEFINITION: return "No user interface definition";
+    case LIBMCDATA_ERROR_MISSINGAPPNAME: return "Missing app name";
+    case LIBMCDATA_ERROR_MISSINGCOPYRIGHT: return "Missing copyright";
+    case LIBMCDATA_ERROR_MISSINGMAINPAGE: return "Missing main page";
+    case LIBMCDATA_ERROR_MISSINGMENUITEMID: return "Missing menu item id";
+    case LIBMCDATA_ERROR_MISSINGMENUITEMICON: return "Missing menu item icon";
+    case LIBMCDATA_ERROR_MISSINGMENUITEMCAPTION: return "Missing menu item caption";
+    case LIBMCDATA_ERROR_MISSINGTARGETPAGE: return "Missing menu item target page";
+    case LIBMCDATA_ERROR_MISSINGMENUNODE: return "Missing menu node";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARNODE: return "Missing toolbar node";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARITEMID: return "Missing toolbar item id";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
     default: return "unknown error";
   }
 }

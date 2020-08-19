@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_stdout.hpp"
 #include "amc_logger_database.hpp"
 #include "amc_servicehandler.hpp"
+#include "amc_ui_handler.hpp"
 
 #include "API/amc_api_handler_logs.hpp"
 #include "API/amc_api_handler_upload.hpp"
@@ -50,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "API/amc_api_handler_build.hpp"
 #include "API/amc_api_handler_root.hpp"
 #include "API/amc_api_handler_signal.hpp"
-
+#include "API/amc_api_handler_ui.hpp"
 
 // Include custom headers here.
 #include <iostream>
@@ -88,6 +89,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(m_pSystemState));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(m_pSystemState));
     m_pAPI->registerHandler(std::make_shared <CAPIHandler_Signal>(m_pSystemState));
+    m_pAPI->registerHandler(std::make_shared <CAPIHandler_UI>(m_pSystemState));
 
     // Create Client Dist Handler
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();
@@ -125,6 +127,12 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTHREADCOUNT);
     m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t) nMaxThreadCount);
 
+
+    // Load User Interface
+    auto userInterfaceNode = machinedefinitionNode.child("userinterface");
+    if (userInterfaceNode.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
+    loadUserInterface(userInterfaceNode);
 
 
     m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -299,6 +307,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
     pInstance->setInitState(sInitState);
     pInstance->setFailedState(sFailedState);
 
+    // load Plugin DLLs
     auto pPlugin = loadPlugin (m_pSystemState->getLibraryPath (slibraryName));
     LibMCPlugin::PStateFactory pStateFactory;
     try {
@@ -375,6 +384,82 @@ void CMCContext::readSignalParameters(const pugi::xml_node& xmlNode, std::list<A
     }
 
 }
+
+void CMCContext::loadUserInterface(const pugi::xml_node& xmlNode)
+{
+
+    auto uiHandler = m_pSystemState->uiHandler();
+
+    auto appnameAttrib = xmlNode.attribute("appname");
+    if (appnameAttrib.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGAPPNAME);
+    std::string sAppName(appnameAttrib.as_string());
+
+    auto copyrightAttrib = xmlNode.attribute("copyright");
+    if (copyrightAttrib.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOPYRIGHT);
+    std::string sCopyRight(copyrightAttrib.as_string());
+
+    auto mainpageAttrib = xmlNode.attribute("mainpage");
+    if (mainpageAttrib.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
+    std::string sMainPage(mainpageAttrib.as_string());
+
+    uiHandler->Initialise(sAppName, sCopyRight);
+
+    auto menuNode = xmlNode.child("menu");
+    if (menuNode.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUNODE);
+
+    auto menuItems = menuNode.children("item");
+    for (pugi::xml_node menuItem : menuItems) {
+        auto idAttrib = menuItem.attribute("id");
+        if (idAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMID);
+
+        auto iconAttrib = menuItem.attribute("icon");
+        if (iconAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMICON);
+
+        auto captionAttrib = menuItem.attribute("caption");
+        if (captionAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMCAPTION);
+
+        auto targetPageAttrib = menuItem.attribute("targetpage");
+        if (targetPageAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
+
+        uiHandler->addMenuItem (idAttrib.as_string (), iconAttrib.as_string (), captionAttrib.as_string (), targetPageAttrib.as_string ());
+    }
+
+    auto toolbarNode = xmlNode.child("toolbar");
+    if (toolbarNode.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARNODE);
+
+    auto toolbarItems = toolbarNode.children("item");
+    for (pugi::xml_node menuItem : menuItems) {
+        auto idAttrib = menuItem.attribute("id");
+        if (idAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMID);
+
+        auto iconAttrib = menuItem.attribute("icon");
+        if (iconAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMICON);
+
+        auto captionAttrib = menuItem.attribute("caption");
+        if (captionAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION);
+
+        auto targetPageAttrib = menuItem.attribute("targetpage");
+        if (targetPageAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
+
+        uiHandler->addToolbarItem(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
+    }
+
+
+}
+
 
 void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup)
 {
@@ -480,7 +565,9 @@ void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSu
 
 IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod)
 {
-    auto pAuth = std::make_shared<CAPIAuth>();
+    auto sNewSessionUUID = AMCCommon::CUtils::createUUID();
+
+    auto pAuth = std::make_shared<CAPIAuth>(sNewSessionUUID);
 
     return new CAPIRequestHandler(m_pAPI, sURI, sRequestMethod, pAuth);
 
