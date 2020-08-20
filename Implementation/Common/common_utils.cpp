@@ -415,7 +415,7 @@ namespace AMCCommon {
 				throw std::runtime_error("could not delete file: " + sFileName);		
 		}
 #else
-		if (std::remove(sFileName)) {
+		if (std::remove(sFileName.c_str())) {
 			throw std::runtime_error("could not delete file: " + sFileName);
 		}
 #endif
