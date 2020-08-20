@@ -28,59 +28,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmcdriver_marlin_abi.hpp"
-#include "libmcdriver_marlin_interfaces.hpp"
-#include "libmcdriver_marlin_interfaceexception.hpp"
+#include "amc_api_factory.hpp"
+#include "libmc_interfaceexception.hpp"
 
-#include "libmcdriver_marlin_driver_marlin.hpp"
+#include "API/amc_api.hpp"
+#include "API/amc_api_handler_logs.hpp"
+#include "API/amc_api_handler_upload.hpp"
+#include "API/amc_api_handler_setup.hpp"
+#include "API/amc_api_handler_status.hpp"
+#include "API/amc_api_handler_build.hpp"
+#include "API/amc_api_handler_root.hpp"
+#include "API/amc_api_handler_signal.hpp"
+#include "API/amc_api_handler_ui.hpp"
 
-using namespace LibMCDriver_Marlin;
-using namespace LibMCDriver_Marlin::Impl;
-
-// Injected Components
-LibMCDriverEnv::PWrapper CWrapper::sPLibMCDriverEnvWrapper;
-
-void CWrapper::GetVersion(LibMCDriver_Marlin_uint32 & nMajor, LibMCDriver_Marlin_uint32 & nMinor, LibMCDriver_Marlin_uint32 & nMicro)
+using namespace AMC;
+CAPIFactory::CAPIFactory(PAPI pAPI, PSystemState pSystemState, std::vector <AMC::PStateMachineInstance>& MachineInstanceList)
 {
-	nMajor = LIBMCDRIVER_MARLIN_VERSION_MAJOR;
-	nMinor = LIBMCDRIVER_MARLIN_VERSION_MINOR;
-	nMicro = LIBMCDRIVER_MARLIN_VERSION_MICRO;
+	if (pAPI.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pSystemState.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Logs>(pSystemState->getLoggerInstance()));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(MachineInstanceList));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(MachineInstanceList));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(pSystemState));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(pSystemState));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Signal>(pSystemState));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_UI>(pSystemState));
 }
-
-bool CWrapper::GetLastError(IBase* pInstance, std::string & sErrorMessage)
-{
-	if (pInstance) {
-		return pInstance->GetLastErrorMessage (sErrorMessage);
-	} else {
-		return false;
-	}
-}
-
-void CWrapper::ReleaseInstance(IBase* pInstance)
-{
-	IBase::ReleaseBaseClassInterface(pInstance);
-}
-
-void CWrapper::AcquireInstance(IBase* pInstance)
-{
-	IBase::AcquireBaseClassInterface(pInstance);
-}
-
-
-
-IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
-{
-
-	if (sType == "marlin-2.0") {
-		bool bDebug = false;
-		bool bDoFirmwareQuery = false;
-		bool bDisableHoming = true;
-
-		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug);
-	}
-
-	throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_DRIVERERROR);
-	
-}
-
 

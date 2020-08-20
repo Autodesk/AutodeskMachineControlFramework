@@ -80,14 +80,9 @@ public:
 
 		pStateEnvironment->LogMessage("Initializing...");
 
-		pStateEnvironment->SetStringParameter("jobinfo", "jobname", "");
-		pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", "00000000-0000-0000-0000-000000000000");
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
-		// TODO check if default value 1000 is ok for layer timeout grace time
-		pStateEnvironment->SetDoubleParameter("jobinfo", "layertimeoutgracetime", 1000);
-
 
 		pStateEnvironment->SetNextState("idle");
 	}
@@ -120,14 +115,44 @@ public:
 
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
-		if (pStateEnvironment->WaitForSignal("signal_startjob", 0, pHandlerInstance)) {
-			pStateEnvironment->SetStringParameter("jobinfo", "jobname", pHandlerInstance->GetString ("jobname"));
-			pStateEnvironment->SetUUIDParameter("jobinfo", "jobuuid", pHandlerInstance->GetUUID ("jobuuid"));
-			pHandlerInstance->SignalHandled();
-
+		if (pStateEnvironment->GetBoolParameter("jobinfo", "autostart")) {
 			pStateEnvironment->SetNextState("startprocess");
-		} else {
-			pStateEnvironment->SetNextState("idle");
+
+		}
+		else {
+			if (pStateEnvironment->WaitForSignal("signal_startjob", 0, pHandlerInstance)) {
+
+				pStateEnvironment->LogMessage("Starting job..");
+				try {
+					auto sJobName = pHandlerInstance->GetString("jobname");
+					auto sJobUUID = pHandlerInstance->GetString("jobuuid");
+
+					if (sJobName == "")
+						throw std::runtime_error ("empty job name!");
+					if (sJobName.length () > 64)
+						throw std::runtime_error("invalid job name: " + sJobName);
+
+					// Check if build job exists
+					pStateEnvironment->GetBuildJob(sJobUUID);
+
+					pStateEnvironment->SetStringParameter("jobinfo", "jobname", sJobName);
+					pStateEnvironment->SetUUIDParameter("jobinfo", "jobuuid", sJobUUID);
+					pHandlerInstance->SetBoolResult("success", true);
+
+					pStateEnvironment->SetNextState("startprocess");
+				}
+				catch (std::exception& E) {
+					pStateEnvironment->LogMessage (std::string ("Could not start job: ") + E.what ());
+					pHandlerInstance->SetBoolResult("success", false);
+					pStateEnvironment->SetNextState("idle");
+				}
+
+				pHandlerInstance->SignalHandled();
+
+			}
+			else {
+				pStateEnvironment->SetNextState("idle");
+			}
 		}
 
 	}
@@ -246,21 +271,24 @@ public:
 
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
-		auto dLayerTimeoutGraceTime= pStateEnvironment->GetDoubleParameter("jobinfo", "layertimeoutgracetime");
+		auto nLayerTimeoutGraceTime = pStateEnvironment->GetIntegerParameter("jobinfo", "layertimeoutgracetime");
+
+		if (nLayerTimeoutGraceTime < 0)
+			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
 		// TODO get/calc timeout (from layer length, given speed....)
-		double dLayerTimeout = 200000;
+		int64_t nLayerTimeout = 200000;
 
 		pStateEnvironment->LogMessage("Extrude layer #" + std::to_string(nCurrentLayer) + "...");
 
 		auto pSignal = pStateEnvironment->PrepareSignal("movement", "signal_doextrudelayer");
-		pSignal->SetInteger("layertimeout", dLayerTimeout);
+		pSignal->SetInteger("layertimeout", nLayerTimeout);
 		pSignal->SetInteger("layerindex", nCurrentLayer);
 		pSignal->SetString("jobuuid", sJobUUID);
 		pSignal->Trigger();
 
-		if (pSignal->WaitForHandling(dLayerTimeout + dLayerTimeoutGraceTime)) {
-			auto bSuccess = pSignal->GetBoolResult("successxx");
+		if (pSignal->WaitForHandling((uint32_t) (nLayerTimeout + nLayerTimeoutGraceTime))) {
+			auto bSuccess = pSignal->GetBoolResult("success");
 			std::string bSuccessMsg;
 			//auto bSuccess = pSignal->GetBoolResult("successextrude");
 			//auto bSuccessMsg = pSignal->GetStringResult("successextrudemessage");

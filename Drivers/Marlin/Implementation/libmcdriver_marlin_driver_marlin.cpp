@@ -40,10 +40,9 @@ using namespace LibMCDriver_Marlin::Impl;
  Class definition of CDriver_Marlin 
 **************************************************************************************************************************/
 
-CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType)
-	: CDriver (sName, sType)
+CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug)
+	: CDriver (sName, sType), m_doQueryFirmwareInfo (doQueryFirmwareInfo), m_bDisableHoming (bDisableHoming), m_bDebug (bDebug)
 {
-
 }
 
 
@@ -51,9 +50,7 @@ void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marl
 {
 	Disconnect ();
 
-	// TODO Debug wieder de/aktivieren
-	// auto pSerialController = std::make_shared<AMC::CSerialController_Marlin>(true);
-	auto pSerialController = std::make_shared<AMC::CSerialController_Marlin>(false);
+	auto pSerialController = std::make_shared<AMC::CSerialController_Marlin>(m_bDebug, m_doQueryFirmwareInfo, m_bDisableHoming);
 	pSerialController->setCOMPort(sCOMPort);
 	pSerialController->setBaudrate(nBaudrate);
 	pSerialController->setStatusUpdateTimerInterval(dStatusUpdateInterval);

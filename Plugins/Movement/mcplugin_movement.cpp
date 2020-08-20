@@ -274,9 +274,10 @@ public:
 **************************************************************************************************************************/
 class CMovementState_DoExtrudeLayer : public virtual CMovementState {
 private:
-	bool timeElapsed() {
-		auto tEnd = std::chrono::steady_clock::now();
-		if ((std::chrono::duration_cast<std::chrono::milliseconds> (tEnd - m_tStart).count() > m_dLayerTimeout)) {
+
+	bool timeElapsed(int64_t nLayerTimeout, std::chrono::high_resolution_clock::time_point tStart) {
+		auto tEnd = std::chrono::high_resolution_clock::now();
+		if ((std::chrono::duration_cast<std::chrono::milliseconds> (tEnd -tStart).count() > nLayerTimeout)) {
 			return true;
 		}
 		else {
@@ -284,13 +285,16 @@ private:
 		}
 	}
 
-	bool canExecuteMovement(LibMCEnv::PStateEnvironment pStateEnvironment, double dStatusUpdateInterval, PDriver_Marlin pDriver)
+	bool canExecuteMovement(LibMCEnv::PStateEnvironment pStateEnvironment, double dStatusUpdateInterval, PDriver_Marlin pDriver, int64_t nLayerTimeout, std::chrono::high_resolution_clock::time_point tStart)
 	{
 		bool bSucces = true;
 		while (!pDriver->CanExecuteMovement()) {
-			pStateEnvironment->Sleep(dStatusUpdateInterval);
+			if (dStatusUpdateInterval < 0.0)
+				dStatusUpdateInterval = 0.0;
+
+			pStateEnvironment->Sleep((uint32_t) dStatusUpdateInterval);
 			m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
-			if (timeElapsed()) {
+			if (timeElapsed(nLayerTimeout, tStart)) {
 				bSucces = false;
 				break;
 			}
@@ -299,8 +303,6 @@ private:
 	}
 
 public:
-	std::chrono::time_point<std::chrono::steady_clock> m_tStart;
-	double m_dLayerTimeout;
 	
 	CMovementState_DoExtrudeLayer(const std::string& sStateName, PPluginData pPluginData)
 		: CMovementState(getStateName(), sStateName, pPluginData)
@@ -326,15 +328,17 @@ public:
 		auto pSignal = pStateEnvironment->RetrieveSignal("globalsignal_doextrudelayer");
 		auto sJobUUID = pSignal->GetString("jobuuid");
 		auto nLayerIndex = pSignal->GetInteger("layerindex");
-		m_dLayerTimeout = pSignal->GetInteger("layertimeout");
+		auto nLayerTimeout = pSignal->GetInteger("layertimeout");
 
 		auto pToolpathAccessor = pStateEnvironment->GetBuildJob(sJobUUID)->CreateToolpathAccessor();
 		auto pLayer = pToolpathAccessor->LoadLayer((uint32_t)nLayerIndex);
 
+		double dLayerZ = pLayer->GetZValue();
+
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 		auto nSegmentCount = pLayer->GetSegmentCount();
 
-		m_tStart = std::chrono::steady_clock::now();
+		auto tStart = std::chrono::steady_clock::now();
 		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 			LibMCEnv::eToolpathSegmentType eSegmentType;
 			uint32_t nPointCount;
@@ -352,21 +356,21 @@ public:
 						// even number draw hatch lines
 						for (uint32_t i = 0; i < nPointCount; i+=2) {
 							// move fast to first hatch coord (first of a pair of coord)
-							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver);
+							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
 								// TODO check how to en/disable extrusion
 								// TODO check how to set Speed/Feedrate
 								// TODO remove div by 1000 (use Units...)
-								pDriver->MoveFastTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, nLayerIndex, 100.0);
+								pDriver->MoveFastTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
 								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
 
 								// move to second hatch coord with extrusion (second of a pair of coord)
-								bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver);
+								bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 								if (bSucces) {
 									// TODO check how to en/disable extrusion
 									// TODO check how to set Speed/Feedrate
 									// TODO remove div by 1000 (use Units...)
-									pDriver->MoveTo(PointData[i + 1].m_Coordinates[0] / 1000.0, PointData[i + 1].m_Coordinates[1] / 1000.0, nLayerIndex, 100.0);
+									pDriver->MoveTo(PointData[i + 1].m_Coordinates[0] / 1000.0, PointData[i + 1].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
 									m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
 								}
 								else {
@@ -390,23 +394,23 @@ public:
 
 				case LibMCEnv::eToolpathSegmentType::Loop:
 					// move fast to first point of loop
-					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver);
+					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 					if (bSucces) {
 						// TODO check how to en/disable extrusion
 						// TODO check how to set Speed/Feedrate
 						// TODO remove div by 1000 (use Units...)
-						pDriver->MoveFastTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, nLayerIndex, 100.0);
+						pDriver->MoveFastTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
 						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
 
 
 						for (uint32_t i = 1; i < nPointCount; i++) {
 							// move to rest of points of loop (with extrusion)
-							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver);
+							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
 								// TODO check how to en/disable extrusion
 								// TODO check how to set Speed/Feedrate
 								// TODO remove div by 1000 (use Units...)
-								pDriver->MoveTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, nLayerIndex, 100.0);
+								pDriver->MoveTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
 								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
 							}
 							else {
@@ -417,12 +421,12 @@ public:
 							}
 						}
 						// move from last point in list to first point to close the of loop (with extrusion)
-						bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver);
+						bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 						if (bSucces) {
 							// TODO check how to en/disable extrusion
 							// TODO check how to set Speed/Feedrate
 							// TODO remove div by 1000 (use Units...)
-							pDriver->MoveTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, nLayerIndex, 100.0);
+							pDriver->MoveTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
 							m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
 						}
 						else {
@@ -436,23 +440,23 @@ public:
 
 				case LibMCEnv::eToolpathSegmentType::Polyline:
 					// move fast to first point of Polyline
-					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver);
+					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 					if (bSucces) {
 						// TODO check how to en/disable extrusion
 						// TODO check how to set Speed/Feedrate
 						// TODO remove div by 1000 (use Units...)
-						pDriver->MoveFastTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, nLayerIndex, 100.0);
+						pDriver->MoveFastTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
 						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
 
 
 						for (uint32_t i = 1; i < nPointCount; i++) {
 							// move to rest of points of polyline (with extrusion)
-							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver);
+							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
 								// TODO check how to en/disable extrusion
 								// TODO check how to set Speed/Feedrate
 								// TODO remove div by 1000 (use Units...)
-								pDriver->MoveTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, nLayerIndex, 100.0);
+								pDriver->MoveTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
 								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
 
 							}
@@ -476,7 +480,7 @@ public:
 			}
 		}
 
-		pSignal->SetBoolResult("successxx", bSucces);
+		pSignal->SetBoolResult("success", bSucces);
 		//pSignal->SetStringResult("successextrudemessage", sNoSuccessMsg.str());
 		pSignal->SignalHandled();
 

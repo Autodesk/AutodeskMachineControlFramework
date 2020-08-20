@@ -23,6 +23,8 @@ namespace AMC {
 
 		bool m_bDebug;
 		bool m_bIsHomed;
+		bool m_bDoQueryFirmwareInfo;
+		bool m_bDisableHoming;
 
 		double m_dAxisStepsPerUnitX;
 		double m_dAxisStepsPerUnitY;
@@ -77,7 +79,7 @@ namespace AMC {
 		uint32_t m_nLayer;
 
 	public:
-		CSerialController_Marlin(bool bDebug);
+		CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming);
 		virtual ~CSerialController_Marlin();
 
 		void setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval);

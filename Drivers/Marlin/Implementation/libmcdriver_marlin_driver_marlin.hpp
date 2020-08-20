@@ -38,10 +38,13 @@ private:
 protected:
 
 	AMC::PSerialController m_pSerialController;
+	bool m_doQueryFirmwareInfo;
+	bool m_bDisableHoming;
+	bool m_bDebug;
 
 public:
 
-	CDriver_Marlin(const std::string& sName, const std::string& sType);
+	CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug);
 
 	void Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval) override;
 

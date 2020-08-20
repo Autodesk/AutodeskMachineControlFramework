@@ -44,14 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
 
-#include "API/amc_api_handler_logs.hpp"
-#include "API/amc_api_handler_upload.hpp"
-#include "API/amc_api_handler_setup.hpp"
-#include "API/amc_api_handler_status.hpp"
-#include "API/amc_api_handler_build.hpp"
-#include "API/amc_api_handler_root.hpp"
-#include "API/amc_api_handler_signal.hpp"
-#include "API/amc_api_handler_ui.hpp"
+#include "API/amc_api_factory.hpp"
 
 // Include custom headers here.
 #include <iostream>
@@ -83,13 +76,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 
     // Create API Handlers for data model requests
     m_pAPI = std::make_shared<AMC::CAPI>();
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Logs> (m_pSystemState->getLoggerInstance ()));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(m_InstanceList));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(m_InstanceList));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(m_pSystemState));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(m_pSystemState));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Signal>(m_pSystemState));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_UI>(m_pSystemState));
+    CAPIFactory factory (m_pAPI, m_pSystemState, m_InstanceList);
 
     // Create Client Dist Handler
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();

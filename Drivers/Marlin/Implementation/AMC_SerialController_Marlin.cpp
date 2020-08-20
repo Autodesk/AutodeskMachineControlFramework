@@ -35,17 +35,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSerialController_Marlin::CSerialController_Marlin(bool bDebug)
-		: m_sCOMPort ("COM1"), 
-		m_nBaudRate (115200),
+	CSerialController_Marlin::CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming)
+		: m_sCOMPort("COM1"),
+		m_nBaudRate(115200),
+		m_bDoQueryFirmwareInfo(bDoQueryFirmwareInfo),
+		m_bDisableHoming(bDisableHoming),
 		m_dStatusUpdateTimerInterval(100),
-		m_sAckSymbol ("ok"), 
-		m_nLineNumber (1), 
-		m_bDebug (bDebug),
-		m_sResendSymbol ("Resend:"), 
-		m_nMinBufferSpace (3),
-		m_nMaxBufferSpace (0),
-		m_nCurrentBufferSpace (0),
+		m_sAckSymbol("ok"),
+		m_nLineNumber(1),
+		m_bDebug(bDebug),
+		m_sResendSymbol("Resend:"),
+		m_nMinBufferSpace(3),
+		m_nMaxBufferSpace(0),
+		m_nCurrentBufferSpace(0),
 		m_bIsHomed(false),
 		m_iExtruderCount(0),
 		m_dCurrentBedTemp(0),
@@ -72,6 +74,10 @@ namespace AMC {
 		m_sPosTempLogStream.str("");
 		m_sPosTempLogStream << "Xc,Yc,Zc" << std::endl;
 		m_nLayer = 0;
+
+		// If we disabled homing, then we expect to be at the home position at creation
+		if (m_bDisableHoming)
+			m_bIsHomed = true;
 	}
 
 	// TODO nur temp => wieder raus
@@ -179,7 +185,12 @@ namespace AMC {
 		}
 
 		queryAxisStepsPerUnitStateAndPidValues();
-		queryFirmwareInfo();
+
+		m_iExtruderCount = 1;
+
+		if (m_bDoQueryFirmwareInfo)
+			queryFirmwareInfo();
+
 		// add an element to list of extruder for every detected extruder
 		for (uint32_t i = 0; i < m_iExtruderCount; ++i)
 		{
@@ -210,21 +221,26 @@ namespace AMC {
 		if (m_pConnection.get() == nullptr)
 			throw std::exception("Serial Port not initialized");
 
-		// get endstops states
-		auto sStream = sendCommand("M119");
-		auto sLine = sStream.str();
-		std::transform(sLine.begin(), sLine.end(), sLine.begin(), ::tolower);
+		if (!m_bDisableHoming) {
 
-		auto nPosition = sLine.find("_min: open\n");
+			// get endstops states
+			auto sStream = sendCommand("M119");
+			auto sLine = sStream.str();
+			std::transform(sLine.begin(), sLine.end(), sLine.begin(), ::tolower);
 
-		if (nPosition == std::string::npos) {
-			// no axis is open => all are TRIGGERED => homed
-			m_bIsHomed = true;
+			auto nPosition = sLine.find("_min: open\n");
+
+			if (nPosition == std::string::npos) {
+				// no axis is open => all are TRIGGERED => homed
+				m_bIsHomed = true;
+			}
+			else {
+				// at least on end stop of an axis is "open" => not homed
+				m_bIsHomed = false;
+			}
+
 		}
-		else {
-			// at least on end stop of an axis is "open" => not homed
-			m_bIsHomed = false;
-		}
+
 	}
 
 	uint32_t CSerialController_Marlin::calculateLineChecksum(const std::string& sCommand)
@@ -473,9 +489,7 @@ namespace AMC {
 		auto sLine = sStream.str();
 
 
-		m_iExtruderCount = 1;
-
-/*		const std::string sFirmwareName = "FIRMWARE_NAME:";
+		const std::string sFirmwareName = "FIRMWARE_NAME:";
 		const std::string sSourceCodeUrl = "SOURCE_CODE_URL:";
 		const std::string sProtocolVersion = "PROTOCOL_VERSION:";
 		const std::string sMachineType = "MACHINE_TYPE:";
@@ -515,7 +529,7 @@ namespace AMC {
 		m_sProtocolVersion = sLine.substr(nPosProtocolVersion + sProtocolVersion.length(), nPosMachineType - (nPosProtocolVersion + sProtocolVersion.length() + 1));
 		m_sMachineType = sLine.substr(nPosMachineType + sMachineType.length(), nPosExtruderCount - (nPosMachineType + sMachineType.length() + 1));
 		m_iExtruderCount = std::stoi(sLine.substr(nPosExtruderCount + sExtruderCount.length(), nPosUuid - (nPosExtruderCount + sExtruderCount.length() + 1)));
-		m_sUUID = sLine.substr(nPosUuid + sUuid.length(), nPosEol - (nPosUuid + sUuid.length())); */
+		m_sUUID = sLine.substr(nPosUuid + sUuid.length(), nPosEol - (nPosUuid + sUuid.length())); 
 
 	}
 
@@ -632,9 +646,11 @@ namespace AMC {
 
 	void CSerialController_Marlin::startHoming()
 	{
-		//sendCommand("G28");
+		if (!m_bDisableHoming) {
+			sendCommand("G28");
+		}
 		sendCommand("M400");
-		//checkIsHomed();
+		checkIsHomed();
 	}
 
 	void CSerialController_Marlin::setLcdMsg(const std::string& sLcdMsg)

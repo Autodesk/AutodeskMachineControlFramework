@@ -28,59 +28,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmcdriver_marlin_abi.hpp"
-#include "libmcdriver_marlin_interfaces.hpp"
-#include "libmcdriver_marlin_interfaceexception.hpp"
+#define __AMCIMPL_UI_MODULE
 
-#include "libmcdriver_marlin_driver_marlin.hpp"
-
-using namespace LibMCDriver_Marlin;
-using namespace LibMCDriver_Marlin::Impl;
-
-// Injected Components
-LibMCDriverEnv::PWrapper CWrapper::sPLibMCDriverEnvWrapper;
-
-void CWrapper::GetVersion(LibMCDriver_Marlin_uint32 & nMajor, LibMCDriver_Marlin_uint32 & nMinor, LibMCDriver_Marlin_uint32 & nMicro)
-{
-	nMajor = LIBMCDRIVER_MARLIN_VERSION_MAJOR;
-	nMinor = LIBMCDRIVER_MARLIN_VERSION_MINOR;
-	nMicro = LIBMCDRIVER_MARLIN_VERSION_MICRO;
-}
-
-bool CWrapper::GetLastError(IBase* pInstance, std::string & sErrorMessage)
-{
-	if (pInstance) {
-		return pInstance->GetLastErrorMessage (sErrorMessage);
-	} else {
-		return false;
-	}
-}
-
-void CWrapper::ReleaseInstance(IBase* pInstance)
-{
-	IBase::ReleaseBaseClassInterface(pInstance);
-}
-
-void CWrapper::AcquireInstance(IBase* pInstance)
-{
-	IBase::AcquireBaseClassInterface(pInstance);
-}
+#include "amc_ui_module.hpp"
+#include "libmc_interfaceexception.hpp"
 
 
+using namespace AMC;
 
-IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+CUIModule::CUIModule(const std::string& sName)
+	: m_sName (sName)
 {
 
-	if (sType == "marlin-2.0") {
-		bool bDebug = false;
-		bool bDoFirmwareQuery = false;
-		bool bDisableHoming = true;
-
-		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug);
-	}
-
-	throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_DRIVERERROR);
-	
 }
 
+CUIModule::~CUIModule()
+{
 
+}

@@ -9,15 +9,21 @@
     <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
   	 	  		  
   	  <parametergroup name="jobinfo" description="Job Information">
-  		<parameter name="jobname" description="Job Name" default="TestJob" type="string" />
-  		<parameter name="jobuuid" description="Job UUID" default="12345" type="string" />
+  		<parameter name="jobname" description="Job Name" default="Job Name" type="string" />
+  		<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string" />
   		<parameter name="layercount" description="Layer Count" default="0" type="int" />
   		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
-  		<parameter name="autostart" description="Automatically start job after init" default="1" type="bool" />
+  		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
   		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
-  		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="0" type="double" />
+  		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="0" type="int" />
   	  </parametergroup>
-  	     	  
+
+	  
+  	  <signaldefinition name="signal_startjob">
+  		<parameter name="jobuuid" type="string" />
+   		<parameter name="jobname" type="string" />
+  		<result name="success" type="bool" />		
+  	  </signaldefinition>	 	  	  	     
     
   	  <state name="init" repeatdelay="100">
   			<outstate target="idle" />

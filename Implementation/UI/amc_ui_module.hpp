@@ -28,59 +28,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmcdriver_marlin_abi.hpp"
-#include "libmcdriver_marlin_interfaces.hpp"
-#include "libmcdriver_marlin_interfaceexception.hpp"
 
-#include "libmcdriver_marlin_driver_marlin.hpp"
+#ifndef __AMC_UI_MODULE
+#define __AMC_UI_MODULE
 
-using namespace LibMCDriver_Marlin;
-using namespace LibMCDriver_Marlin::Impl;
+#include "header_protection.hpp"
 
-// Injected Components
-LibMCDriverEnv::PWrapper CWrapper::sPLibMCDriverEnvWrapper;
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
-void CWrapper::GetVersion(LibMCDriver_Marlin_uint32 & nMajor, LibMCDriver_Marlin_uint32 & nMinor, LibMCDriver_Marlin_uint32 & nMicro)
-{
-	nMajor = LIBMCDRIVER_MARLIN_VERSION_MAJOR;
-	nMinor = LIBMCDRIVER_MARLIN_VERSION_MINOR;
-	nMicro = LIBMCDRIVER_MARLIN_VERSION_MICRO;
-}
+namespace AMC {
 
-bool CWrapper::GetLastError(IBase* pInstance, std::string & sErrorMessage)
-{
-	if (pInstance) {
-		return pInstance->GetLastErrorMessage (sErrorMessage);
-	} else {
-		return false;
-	}
-}
+	class CUIModule {
+	protected:
+		std::string m_sName;
+		
+	public:
 
-void CWrapper::ReleaseInstance(IBase* pInstance)
-{
-	IBase::ReleaseBaseClassInterface(pInstance);
-}
-
-void CWrapper::AcquireInstance(IBase* pInstance)
-{
-	IBase::AcquireBaseClassInterface(pInstance);
-}
-
-
-
-IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
-{
-
-	if (sType == "marlin-2.0") {
-		bool bDebug = false;
-		bool bDoFirmwareQuery = false;
-		bool bDisableHoming = true;
-
-		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug);
-	}
-
-	throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_DRIVERERROR);
+		CUIModule(const std::string & sName);	
+		
+		virtual ~CUIModule();
+										
+	};
+	
+	typedef std::shared_ptr<CUIModule> PUIModule;
 	
 }
 
+
+#endif //__AMC_UI_MODULE
 
