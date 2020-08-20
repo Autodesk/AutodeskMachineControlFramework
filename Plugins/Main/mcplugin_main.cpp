@@ -41,7 +41,7 @@ using namespace LibMCPlugin::Impl;
 #endif
 
 /*************************************************************************************************************************
- Class definition of CLaserData
+ Class definition of CMainData
 **************************************************************************************************************************/
 class CMainData : public virtual CPluginData {
 public:
@@ -85,6 +85,9 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
+		// TODO check if default value 1000 is ok for layer timeout grace time
+		pStateEnvironment->SetDoubleParameter("jobinfo", "layertimeoutgracetime", 1000);
+
 
 		pStateEnvironment->SetNextState("idle");
 	}
@@ -120,6 +123,8 @@ public:
 		if (pStateEnvironment->WaitForSignal("signal_startjob", 0, pHandlerInstance)) {
 			pStateEnvironment->SetStringParameter("jobinfo", "jobname", pHandlerInstance->GetString ("jobname"));
 			pStateEnvironment->SetUUIDParameter("jobinfo", "jobuuid", pHandlerInstance->GetUUID ("jobuuid"));
+			pHandlerInstance->SignalHandled();
+
 			pStateEnvironment->SetNextState("startprocess");
 		} else {
 			pStateEnvironment->SetNextState("idle");
@@ -156,18 +161,23 @@ public:
 
 		pStateEnvironment->LogMessage("Starting process...");
 
-		// Find out layer count
+		// Load Toolpath into memory
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
 		pBuildJob->LoadToolpath();
 
+		// Find out layer count
 		auto nLayerCount = pBuildJob->GetLayerCount();
-
-		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 1);
+		
+		auto pSignal = pStateEnvironment->PrepareSignal("pidcontrol_extruder", "signal_startcontrolling");
+		pSignal->Trigger();
+		pSignal->WaitForHandling(10000);
+		
+		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
 		pStateEnvironment->SetBoolParameter("jobinfo", "autostart", false);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", true);
-		pStateEnvironment->SetNextState("coatlayer");
+		pStateEnvironment->SetNextState("extrudelayer");
 	}
 
 };
@@ -201,7 +211,7 @@ public:
 
 		// Unload Toolpath from memory
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
-		pStateEnvironment->GetBuildJob(sJobUUID)->UnloadToolpath();
+		pStateEnvironment->GetBuildJob(sJobUUID)->UnloadToolpath ();
 
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 		pStateEnvironment->SetNextState("idle");
@@ -211,22 +221,21 @@ public:
 };
 
 
-
 /*************************************************************************************************************************
- Class definition of CMainState_CoatLayer
+ Class definition of CMainState_ExtrudeLayer
 **************************************************************************************************************************/
 
-class CMainState_CoatLayer : public virtual CMainState {
+class CMainState_ExtrudeLayer : public virtual CMainState {
 public:
 
-	CMainState_CoatLayer(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_ExtrudeLayer(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "coatlayer";
+		return "extrudelayer";
 	}
 
 
@@ -235,90 +244,41 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
-
-		pStateEnvironment->LogMessage("Coating layer #" + std::to_string(nCurrentLayer) + "...");
-
-		auto pSignal = pStateEnvironment->PrepareSignal("movement", "signal_recoatlayer");
-		pSignal->SetInteger("layerindex", nCurrentLayer);
-		pSignal->Trigger();
-
-		if (pSignal->WaitForHandling (20000)) {
-			auto bSuccess = pSignal->GetBoolResult("success");
-
-			if (bSuccess) {
-				pStateEnvironment->LogMessage("Coating success. ");
-				pStateEnvironment->SetNextState("drawlayer");
-			}
-			else {
-				pStateEnvironment->LogMessage("Coating failure. ");
-				pStateEnvironment->SetNextState("fatalerror");
-			}
-		}
-		else {
-
-			pStateEnvironment->LogMessage("Coating timeout!");
-			pStateEnvironment->SetNextState("fatalerror");
-		}		
-
-	}
-
-};
-
-
-
-/*************************************************************************************************************************
- Class definition of CMainState_CoatLayer
-**************************************************************************************************************************/
-
-class CMainState_DrawLayer : public virtual CMainState {
-public:
-
-	CMainState_DrawLayer(const std::string& sStateName, PPluginData pPluginData)
-		: CMainState(getStateName(), sStateName, pPluginData)
-	{
-	}
-
-	static const std::string getStateName()
-	{
-		return "drawlayer";
-	}
-
-
-	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
-		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
+		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
+		auto dLayerTimeoutGraceTime= pStateEnvironment->GetDoubleParameter("jobinfo", "layertimeoutgracetime");
 
-		pStateEnvironment->LogMessage("Drawing layer #" + std::to_string(nCurrentLayer) + "...");
+		// TODO get/calc timeout (from layer length, given speed....)
+		double dLayerTimeout = 200000;
 
-		auto pSignal = pStateEnvironment->PrepareSignal ("laser", "signal_drawlayer");
+		pStateEnvironment->LogMessage("Extrude layer #" + std::to_string(nCurrentLayer) + "...");
+
+		auto pSignal = pStateEnvironment->PrepareSignal("movement", "signal_doextrudelayer");
+		pSignal->SetInteger("layertimeout", dLayerTimeout);
 		pSignal->SetInteger("layerindex", nCurrentLayer);
 		pSignal->SetString("jobuuid", sJobUUID);
 		pSignal->Trigger();
 
-		if (pSignal->WaitForHandling(20000)) {
-			auto bSuccess = pSignal->GetBoolResult("success");
+		if (pSignal->WaitForHandling(dLayerTimeout + dLayerTimeoutGraceTime)) {
+			auto bSuccess = pSignal->GetBoolResult("successxx");
+			std::string bSuccessMsg;
+			//auto bSuccess = pSignal->GetBoolResult("successextrude");
+			//auto bSuccessMsg = pSignal->GetStringResult("successextrudemessage");
 
 			if (bSuccess) {
-				pStateEnvironment->LogMessage("Drawing success. ");
+				pStateEnvironment->LogMessage("Extruding success. ");
 				pStateEnvironment->SetNextState("nextlayer");
 			}
 			else {
-				pStateEnvironment->LogMessage("Drawing failure. ");
+				pStateEnvironment->LogMessage("Extruding failure: " + bSuccessMsg);
 				pStateEnvironment->SetNextState("fatalerror");
 			}
 		}
 		else {
 
-			pStateEnvironment->LogMessage("Drawing timeout!");
+			pStateEnvironment->LogMessage("Extruding timeout!");
 			pStateEnvironment->SetNextState("fatalerror");
 		}
-
-		
 
 	}
 
@@ -352,10 +312,10 @@ public:
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
 
-		if (nCurrentLayer < nLayerCount) {
+		if (nCurrentLayer < (nLayerCount - 1)) {
 			pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");
 			pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nCurrentLayer + 1);
-			pStateEnvironment->SetNextState("coatlayer");
+			pStateEnvironment->SetNextState("extrudelayer");
 		}
 		else {
 			pStateEnvironment->LogMessage("Finishing process...");
@@ -431,10 +391,7 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 	if (createStateInstanceByName<CMainState_FinishProcess>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_CoatLayer>(sStateName, pStateInstance, m_pPluginData))
-		return pStateInstance;
-
-	if (createStateInstanceByName<CMainState_DrawLayer>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_ExtrudeLayer>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	if (createStateInstanceByName<CMainState_NextLayer>(sStateName, pStateInstance, m_pPluginData))

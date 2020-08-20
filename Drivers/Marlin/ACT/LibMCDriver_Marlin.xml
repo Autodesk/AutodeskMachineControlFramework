@@ -108,6 +108,7 @@ Custom implementation
 		<method name="Connect" description="Creates and initializes a new Marlin Connector.">
 			<param name="COMPort" type="string" pass="in" description="Device Port to connect to" />
 			<param name="Baudrate" type="uint32" pass="in" description="Baudrate to use" />
+			<param name="StatusUpdateInterval" type="double" pass="in" description="Timer interval [ms] for updating status" />
 		</method>
 
 		<method name="Disconnect" description="Disconnects from the Marlin board.">
@@ -117,6 +118,21 @@ Custom implementation
 			<param name="Absolute" type="bool" pass="in" description="If true, sets positioning to absolute, if false to relative" />
 		</method>
 		
+		<method name="SetHeatedBedTargetTemperature" description="Sets heated bed target temperature.">
+			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Bed target temperature." />
+		</method>
+
+		<method name="SetExtruderTargetTemperature" description="Sets target temperature of the given extruder.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of extruder." />
+			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Extruder target temperature." />
+		</method>
+
+		<method name="SetPidParameters" description="Sets PID parameters.">
+			<param name="P" type="double" pass="in" description="New value for P parameter." />
+			<param name="I" type="double" pass="in" description="New value for I parameter." />
+			<param name="D" type="double" pass="in" description="New value for D parameter." />
+		</method>
+
 		<method name="UpdateState" description="Polls a new state from the firmware.">
 		</method>
 
@@ -132,10 +148,25 @@ Custom implementation
 			<param name="Z" type="double" pass="out" description="Z Value in mm" />
 		</method>
 
-		<method name="GetExtruderTemperature" description="Returns the current temperature of an extruder.">
-			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
-			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
+		<method name="GetExtruderPosition" description="Returns the current extruder position.">
+			<param name="E" type="double" pass="out" description="E Value in mm" />
+		</method>
+
+		<method name="GetHeatedBedTemperature" description="Returns the current and the target bed temperature.">
 			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
+			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
+		</method>
+
+		<method name="GetExtruderTemperature" description="Returns the current and the target temperature of an extruder.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
+			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
+			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
+		</method>
+
+		<method name="GetPidParameters" description="Returns the current PID values.">
+			<param name="P" type="double" pass="out" description="Current P value." />
+			<param name="I" type="double" pass="out" description="Current I value." />
+			<param name="D" type="double" pass="out" description="Current D value." />
 		</method>
 
 
@@ -145,6 +176,10 @@ Custom implementation
 
 		<method name="IsMoving" description="Returns if the extruder is moving..">
 			<param name="Value" type="bool" pass="return" description="Extruder is moving" />
+		</method>
+
+		<method name="IsHomed" description="Returns if the printer is homed">
+			<param name="Value" type="bool" pass="return" description="True if printer is homed." />
 		</method>
 
 		<method name="MoveTo" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
@@ -162,6 +197,9 @@ Custom implementation
 		</method>
 		
 	
+		<method name="StartHoming" description="Start Homing of printer.">
+		</method>
+
 	</class>
 
 
