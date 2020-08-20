@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <thread>
+#include <math.h>
 
 namespace AMC {
 
@@ -145,7 +146,7 @@ namespace AMC {
 
 		if (!m_pConnection->isOpen()) {
 			m_pConnection.reset();
-			throw std::exception("Could not connect to serial port");
+			throw std::runtime_error("Could not connect to serial port");
 		}
 
 		// instead of waiting a fixed time wait until "start" or "" (after timeout) received from device??
@@ -208,7 +209,7 @@ namespace AMC {
 	void CSerialController_Marlin::checkIsHomed()
 	{
 		if (m_pConnection.get() == nullptr)
-			throw std::exception("Serial Port not initialized");
+			throw std::runtime_error("Serial Port not initialized");
 
 		// get endstops states
 		auto sStream = sendCommand("M119");
@@ -344,7 +345,7 @@ namespace AMC {
 			auto nPosition = sLine.find("T:");
 
 			if (nPosition == std::string::npos)
-				throw std::exception("could not query extruder temperature state.");
+				throw std::runtime_error("could not query extruder temperature state.");
 
 
 			// get extruder temperature
@@ -354,12 +355,12 @@ namespace AMC {
 			auto nTargetExtruderTempPosition = sExtruderTempPosString.find('B');
 
 			if (nCurrentExtruderTempPosition == std::string::npos)
-				throw std::exception("could not find extruder current temperature position.");
+				throw std::runtime_error("could not find extruder current temperature position.");
 			if (nTargetExtruderTempPosition == std::string::npos)
-				throw std::exception("could not find extruder target temperature position.");
+				throw std::runtime_error("could not find extruder target temperature position.");
 
 			if (!(nCurrentExtruderTempPosition < nTargetExtruderTempPosition))
-				throw std::exception("invalid extruder temperature position order.");
+				throw std::runtime_error("invalid extruder temperature position order.");
 
 			auto sCurrentExtTemp = sExtruderTempPosString.substr(0, nCurrentExtruderTempPosition);
 			auto sTargetExtTemp = sExtruderTempPosString.substr(nCurrentExtruderTempPosition + 1, nTargetExtruderTempPosition - (nCurrentExtruderTempPosition + 1));
@@ -375,12 +376,12 @@ namespace AMC {
 			auto nTargetBedTempPosition = sBedTempPosString.find('@');
 
 			if (nCurrentBedTempPosition == std::string::npos)
-				throw std::exception("could not find bed current temperature position.");
+				throw std::runtime_error("could not find bed current temperature position.");
 			if (nTargetBedTempPosition == std::string::npos)
-				throw std::exception("could not find bed target temperature position.");
+				throw std::runtime_error("could not find bed target temperature position.");
 
 			if (!(nCurrentBedTempPosition < nTargetBedTempPosition))
-				throw std::exception("invalid bed temperature position order.");
+				throw std::runtime_error("invalid bed temperature position order.");
 
 			auto sCurrentBedTemp = sBedTempPosString.substr(0, nCurrentBedTempPosition);
 			auto sTargetBedTemp = sBedTempPosString.substr(nCurrentBedTempPosition + 1, nTargetBedTempPosition - (nCurrentBedTempPosition + 1));
@@ -399,7 +400,7 @@ namespace AMC {
 		auto nPosition = sLine.find("M92");
 
 		if (nPosition == std::string::npos)
-			throw std::exception("could not query axis_steps_per_unit state.");
+			throw std::runtime_error("could not query axis_steps_per_unit state.");
 
 		auto sTempString = sLine.substr(nPosition + 4);
 		nPosition = sTempString.find("\n");
@@ -411,17 +412,17 @@ namespace AMC {
 		auto nAxisStepsPerUnitEPosition = sAxisStepsPerUnitString.find("E");
 
 		if (nAxisStepsPerUnitXPosition == std::string::npos)
-			throw std::exception("could not find axis_steps_per_unit X position.");
+			throw std::runtime_error("could not find axis_steps_per_unit X position.");
 		if (nAxisStepsPerUnitYPosition == std::string::npos)
-			throw std::exception("could not find axis_steps_per_unit Y position.");
+			throw std::runtime_error("could not find axis_steps_per_unit Y position.");
 		if (nAxisStepsPerUnitZPosition == std::string::npos)
-			throw std::exception("could not find axis_steps_per_unit Z position.");
+			throw std::runtime_error("could not find axis_steps_per_unit Z position.");
 		if (nAxisStepsPerUnitEPosition == std::string::npos)
-			throw std::exception("could not find axis_steps_per_unit E position.");
+			throw std::runtime_error("could not find axis_steps_per_unit E position.");
 
 		if (!((nAxisStepsPerUnitXPosition < nAxisStepsPerUnitYPosition) && (nAxisStepsPerUnitYPosition < nAxisStepsPerUnitZPosition) &&
 			(nAxisStepsPerUnitZPosition < nAxisStepsPerUnitEPosition)))
-			throw std::exception("invalid axis_steps_per_unit position order.");
+			throw std::runtime_error("invalid axis_steps_per_unit position order.");
 
 		auto sAxis_steps_per_unitXString = sAxisStepsPerUnitString.substr(nAxisStepsPerUnitXPosition + 1, nAxisStepsPerUnitYPosition - (nAxisStepsPerUnitXPosition + 1));
 		auto sAxis_steps_per_unitYString = sAxisStepsPerUnitString.substr(nAxisStepsPerUnitYPosition + 1, nAxisStepsPerUnitZPosition - (nAxisStepsPerUnitYPosition + 1));
@@ -437,7 +438,7 @@ namespace AMC {
 		nPosition = sLine.find("M301");
 
 		if (nPosition == std::string::npos)
-			throw std::exception("could not query PID values.");
+			throw std::runtime_error("could not query PID values.");
 
 		sTempString = sLine.substr(nPosition + 5);
 		nPosition = sTempString.find("\n");
@@ -448,14 +449,14 @@ namespace AMC {
 		auto nPidValueDPosition = sPidValuesString.find("D");
 
 		if (nPidValuePPosition == std::string::npos)
-			throw std::exception("could not find PID value P position.");
+			throw std::runtime_error("could not find PID value P position.");
 		if (nPidValueIPosition == std::string::npos)
-			throw std::exception("could not find PID value I position.");
+			throw std::runtime_error("could not find PID value I position.");
 		if (nPidValueDPosition == std::string::npos)
-			throw std::exception("could not find PID value D position.");
+			throw std::runtime_error("could not find PID value D position.");
 
 		if (!((nPidValuePPosition < nPidValueIPosition) && (nPidValueIPosition < nPidValueDPosition)))
-			throw std::exception("invalid PID values position order.");
+			throw std::runtime_error("invalid PID values position order.");
 
 		auto sPidValuePString = sPidValuesString.substr(nPidValuePPosition + 1, nPidValueIPosition - (nPidValuePPosition + 1));
 		auto sPidValueIString = sPidValuesString.substr(nPidValueIPosition + 1, nPidValueDPosition - (nPidValueIPosition + 1));
@@ -491,24 +492,24 @@ namespace AMC {
 		auto nPosEol = sLine.find("\n");
 
 		if (nPosFirmwareName == std::string::npos)
-			throw std::exception("could not query FIRMWARE_NAME in firmware info.");
+			throw std::runtime_error("could not query FIRMWARE_NAME in firmware info.");
 		if (nPosSourceCodeUrl == std::string::npos)
-			throw std::exception("could not query SOURCE_CODE_URL in firmware info.");
+			throw std::runtime_error("could not query SOURCE_CODE_URL in firmware info.");
 		if (nPosProtocolVersion == std::string::npos)
-			throw std::exception("could not query PROTOCOL_VERSION in firmware info.");
+			throw std::runtime_error("could not query PROTOCOL_VERSION in firmware info.");
 		if (nPosMachineType == std::string::npos)
-			throw std::exception("could not query MACHINE_TYPE in firmware info.");
+			throw std::runtime_error("could not query MACHINE_TYPE in firmware info.");
 		if (nPosExtruderCount == std::string::npos)
-			throw std::exception("could not query EXTRUDER_COUNT in firmware info.");
+			throw std::runtime_error("could not query EXTRUDER_COUNT in firmware info.");
 		if (nPosUuid == std::string::npos)
-			throw std::exception("could not query UUID in firmware info.");
+			throw std::runtime_error("could not query UUID in firmware info.");
 		if (nPosEol == std::string::npos)
-			throw std::exception("could not query EOL in firmware info.");
+			throw std::runtime_error("could not query EOL in firmware info.");
 
 		if (!((nPosFirmwareName < nPosSourceCodeUrl) && (nPosSourceCodeUrl < nPosProtocolVersion) &&
 			(nPosProtocolVersion < nPosMachineType) && (nPosMachineType < nPosExtruderCount) &&
 			(nPosExtruderCount < nPosUuid) && (nPosUuid < nPosEol)))
-			throw std::exception("invalid order of firmware info.");
+			throw std::runtime_error("invalid order of firmware info.");
 
 		m_sFirmwareName = sLine.substr(sFirmwareName.length(), nPosSourceCodeUrl - sFirmwareName.length() - 1);
 		m_sSourceCodeUrl = sLine.substr(nPosSourceCodeUrl + sSourceCodeUrl.length(), nPosProtocolVersion - (nPosSourceCodeUrl + sSourceCodeUrl.length() + 1));
