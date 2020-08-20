@@ -221,9 +221,9 @@ void CStorageStream::GetContent(LibMCData_uint64 nContentBufferSize, LibMCData_u
 
 void CStorageStream::GetCallbacks(LibMCData_pvoid & pTheReadCallback, LibMCData_pvoid & pTheSeekCallback, LibMCData_pvoid & pStreamHandle)
 {
-	pTheReadCallback = &storageStream_ReadCallback;
-	pTheSeekCallback = &storageStream_SeekCallback;
-	pStreamHandle = &m_sStreamCallbackData;
+	pTheReadCallback = (void*)&storageStream_ReadCallback;
+	pTheSeekCallback = (void*)&storageStream_SeekCallback;
+	pStreamHandle = (void*)&m_sStreamCallbackData;
 }
 
 AMCCommon::CImportStream* CStorageStream::getImportStream()
