@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02">
 
+  <services threadcount="32" />
+
 
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
   
@@ -175,6 +177,37 @@
 	  
   </statemachine>
 
+
+<userinterface appname="Autodesk Machine Control" copyright="2020 Autodesk Inc." mainpage="workflow.main" >
+
+	<page id="main" module="dialog">
+
+
+	</page>
+
+	<page id="buildlist" module="buildselector">
+
+	</page>
+
+	<page id="parameters" module="datatable">
+
+	</page>
+
+
+	<menu>
+		<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
+		<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
+
+	</menu>
+
+	<toolbar>
+		<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
+		<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
+
+	</toolbar>
+
+
+  </userinterface>
 
 </machinedefinition>
 

@@ -305,6 +305,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_MISSINGTOOLBARITEMID 278
 #define LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON 279
 #define LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION 280
+#define LIBMCDATA_ERROR_MISSINGSERVICESNODE 281
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -522,6 +523,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_MISSINGTOOLBARITEMID: return "Missing toolbar item id";
     case LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
     case LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
+    case LIBMCDATA_ERROR_MISSINGSERVICESNODE: return "Missing services node";
     default: return "unknown error";
   }
 }

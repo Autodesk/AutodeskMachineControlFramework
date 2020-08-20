@@ -53,7 +53,7 @@ copy ..\Output\%GITHASH%_core_client.zip Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\Output\lib3mf.dll Framework\Dist\%GITHASH%_core_lib3mf.dll
 copy ..\..\Templates\CMakeLists_DeveloperPackage.txt CMakeLists.txt
-copy ..\..\Templates\libmcconfig.xml .\template_config.xml
+copy ..\..\Templates\libmcconfig.xml .\configuration.xml
 copy ..\..\Templates\build_devpackage_clean.bat .\build_devpackage_clean.bat
 copy ..\..\Framework\HeadersDev\CppDynamic\*.* Framework\HeadersDev\CppDynamic
 copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev

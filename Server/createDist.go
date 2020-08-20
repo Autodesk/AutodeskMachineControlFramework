@@ -51,7 +51,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_movement\" import=\"%s_plugin_movement.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.dll\" />\n", gitHash);

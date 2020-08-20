@@ -305,6 +305,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGTOOLBARITEMID 278
 #define LIBMC_ERROR_MISSINGTOOLBARITEMICON 279
 #define LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION 280
+#define LIBMC_ERROR_MISSINGSERVICESNODE 281
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -522,6 +523,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGTOOLBARITEMID: return "Missing toolbar item id";
     case LIBMC_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
     case LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
+    case LIBMC_ERROR_MISSINGSERVICESNODE: return "Missing services node";
     default: return "unknown error";
   }
 }

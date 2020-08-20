@@ -274,8 +274,7 @@
 		<error name="MISSINGTOOLBARITEMID" code="278" description="Missing toolbar item id" />
 		<error name="MISSINGTOOLBARITEMICON" code="279" description="Missing toolbar item icon" />
 		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />
-		
-		
+		<error name="MISSINGSERVICESNODE" code="281" description="Missing services node" />		
 
 	</errors>
 	

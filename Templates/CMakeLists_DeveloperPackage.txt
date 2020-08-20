@@ -30,7 +30,32 @@ cmake_minimum_required(VERSION 3.5)
 
 project("MyMachineController")
 
+file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/githash.txt GLOBALGITHASH)
+message(STATUS "Global git hash: \"${GLOBALGITHASH}\"")
+
 add_subdirectory(Plugins)
+
+add_custom_target(configuration_xml ALL)
+
+add_custom_command(
+	TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "creating output directory")
+
+add_custom_command(
+	TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory			
+			${CMAKE_CURRENT_BINARY_DIR}/Output)
+
+add_custom_command(
+	TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "copying configuration.xml...")
+
+add_custom_command(
+    TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/configuration.xml
+			${CMAKE_CURRENT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
+
 
 add_custom_target(copy_distribution ALL)
 

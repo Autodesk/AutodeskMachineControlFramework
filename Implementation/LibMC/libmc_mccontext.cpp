@@ -119,7 +119,11 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLSCHEMA);
 
-    auto threadCountAttrib = machinedefinitionNode.attribute("threadcount");
+    auto servicesNode = machinedefinitionNode.child("services");
+    if (servicesNode.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGSERVICESNODE);
+
+    auto threadCountAttrib = servicesNode.attribute("threadcount");
     if (threadCountAttrib.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTHREADCOUNT);
     auto nMaxThreadCount = threadCountAttrib.as_uint();
