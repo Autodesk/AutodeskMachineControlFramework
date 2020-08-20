@@ -29,38 +29,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_HANDLER_ROOT
-#define __AMC_API_HANDLER_ROOT
+#ifndef __AMC_UI_MENUITEM
+#define __AMC_UI_MENUITEM
 
-#include "amc_api_handler.hpp"
-#include <string>
-#include <map>
+#include "header_protection.hpp"
+
+#ifndef __AMCIMPL_UI_MENUITEM
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
 namespace AMC {
 
-	class CAPIHandler_Root : public CAPIHandler {
-	private:
-
-		std::map<std::string, PAPIResponse> m_FilesToServe;
-			
+	class CUIMenuItem {
+	protected:
+		std::string m_sID;
+		std::string m_sIcon;
+		std::string m_sCaption;
+		
 	public:
 
-		CAPIHandler_Root();
-
-		virtual ~CAPIHandler_Root();
-				
-		virtual std::string getBaseURI () override;
+		CUIMenuItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption);		
 		
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
-
-		void LoadClientPackage(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer);
-
+		virtual ~CUIMenuItem();
+						
+		std::string getID ();
+		std::string getIcon ();
+		std::string getCaption ();
+				
 	};
-
-	typedef std::shared_ptr<CAPIHandler_Root> PAPIHandler_Root;
-
+	
+	typedef std::shared_ptr<CUIMenuItem> PUIMenuItem;
+	
 }
 
 
-#endif //__AMC_API_HANDLER_STATUS
+#endif //__AMC_UI_MENUITEM
 

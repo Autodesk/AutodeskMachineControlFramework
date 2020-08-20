@@ -239,7 +239,7 @@ public:
 
 		pStateEnvironment->LogMessage("Coating layer #" + std::to_string(nCurrentLayer) + "...");
 
-		auto pSignal = pStateEnvironment->CreateSignal("movement", "signal_recoatlayer");
+		auto pSignal = pStateEnvironment->PrepareSignal("movement", "signal_recoatlayer");
 		pSignal->SetInteger("layerindex", nCurrentLayer);
 		pSignal->Trigger();
 
@@ -295,7 +295,7 @@ public:
 
 		pStateEnvironment->LogMessage("Drawing layer #" + std::to_string(nCurrentLayer) + "...");
 
-		auto pSignal = pStateEnvironment->CreateSignal ("laser", "signal_drawlayer");
+		auto pSignal = pStateEnvironment->PrepareSignal ("laser", "signal_drawlayer");
 		pSignal->SetInteger("layerindex", nCurrentLayer);
 		pSignal->SetString("jobuuid", sJobUUID);
 		pSignal->Trigger();

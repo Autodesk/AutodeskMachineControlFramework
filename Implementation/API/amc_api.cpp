@@ -28,7 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_API_RESPONSE
+
 #include "amc_api.hpp"
+#include "amc_api_auth.hpp"
 #include "amc_api_handler.hpp"
 #include "amc_api_response.hpp"
 #include "libmc_interfaceexception.hpp"
@@ -88,7 +91,7 @@ bool CAPI::expectsRawBody(const std::string& sURI, const eAPIRequestType request
 	return pHandler->expectsRawBody(sURI, requestType);
 }
 
-PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, APIFormFields pFormFields, PAPIAuth pAuth)
+PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth)
 {
 	auto pHandler = getURIMatch(sURI);
 	if (pHandler.get() == nullptr)
@@ -121,7 +124,7 @@ uint32_t CAPI::getFormDataFieldCount(const std::string& sURI, const eAPIRequestT
 
 }
 
-APIFieldDetails CAPI::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
+CAPIFieldDetails CAPI::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
 {
 	auto pHandler = getURIMatch(sURI);
 	if (pHandler.get() == nullptr)

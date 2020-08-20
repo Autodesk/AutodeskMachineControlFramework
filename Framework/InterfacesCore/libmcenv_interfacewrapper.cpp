@@ -1883,7 +1883,7 @@ LibMCEnvResult libmcenv_signalhandler_setboolresult(LibMCEnv_SignalHandler pSign
 /*************************************************************************************************************************
  Class implementation for StateEnvironment
 **************************************************************************************************************************/
-LibMCEnvResult libmcenv_stateenvironment_createsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance)
+LibMCEnvResult libmcenv_stateenvironment_preparesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
 
@@ -1901,7 +1901,7 @@ LibMCEnvResult libmcenv_stateenvironment_createsignal(LibMCEnv_StateEnvironment 
 		if (!pIStateEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pBaseSignalInstance = pIStateEnvironment->CreateSignal(sMachineInstance, sSignalName);
+		pBaseSignalInstance = pIStateEnvironment->PrepareSignal(sMachineInstance, sSignalName);
 
 		*pSignalInstance = (IBase*)(pBaseSignalInstance);
 		return LIBMCENV_SUCCESS;
@@ -3142,8 +3142,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_signalhandler_setintegerresult;
 	if (sProcName == "libmcenv_signalhandler_setboolresult") 
 		*ppProcAddress = (void*) &libmcenv_signalhandler_setboolresult;
-	if (sProcName == "libmcenv_stateenvironment_createsignal") 
-		*ppProcAddress = (void*) &libmcenv_stateenvironment_createsignal;
+	if (sProcName == "libmcenv_stateenvironment_preparesignal") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_preparesignal;
 	if (sProcName == "libmcenv_stateenvironment_waitforsignal") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_waitforsignal;
 	if (sProcName == "libmcenv_stateenvironment_getdriverlibrary") 

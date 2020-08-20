@@ -596,7 +596,7 @@ typedef LibMCEnvResult (*PLibMCEnvSignalHandler_SetBoolResultPtr) (LibMCEnv_Sign
 **************************************************************************************************************************/
 
 /**
-* creates a signal object to trigger.
+* prepares a signal object to trigger later.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pMachineInstance - State machine instance name
@@ -604,7 +604,7 @@ typedef LibMCEnvResult (*PLibMCEnvSignalHandler_SetBoolResultPtr) (LibMCEnv_Sign
 * @param[out] pSignalInstance - Signal trigger object.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateSignalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance);
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_PrepareSignalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance);
 
 /**
 * waits for a signal.
@@ -1067,7 +1067,7 @@ typedef struct {
 	PLibMCEnvSignalHandler_SetDoubleResultPtr m_SignalHandler_SetDoubleResult;
 	PLibMCEnvSignalHandler_SetIntegerResultPtr m_SignalHandler_SetIntegerResult;
 	PLibMCEnvSignalHandler_SetBoolResultPtr m_SignalHandler_SetBoolResult;
-	PLibMCEnvStateEnvironment_CreateSignalPtr m_StateEnvironment_CreateSignal;
+	PLibMCEnvStateEnvironment_PrepareSignalPtr m_StateEnvironment_PrepareSignal;
 	PLibMCEnvStateEnvironment_WaitForSignalPtr m_StateEnvironment_WaitForSignal;
 	PLibMCEnvStateEnvironment_GetDriverLibraryPtr m_StateEnvironment_GetDriverLibrary;
 	PLibMCEnvStateEnvironment_CreateDriverAccessPtr m_StateEnvironment_CreateDriverAccess;

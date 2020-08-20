@@ -50,9 +50,9 @@ CAPIHandler_Upload::CAPIHandler_Upload(PSystemState pSystemState)
 	if (pSystemState.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	m_StreamUploadFields.push_back(APIFieldDetails(AMC_API_KEY_UPLOAD_DATASIZE, false, true));
-	m_StreamUploadFields.push_back(APIFieldDetails(AMC_API_KEY_UPLOAD_DATAOFFSET, false, false));
-	m_StreamUploadFields.push_back(APIFieldDetails(AMC_API_KEY_UPLOAD_DATA, true, true));
+	m_StreamUploadFields.push_back(CAPIFieldDetails(AMC_API_KEY_UPLOAD_DATASIZE, false, true));
+	m_StreamUploadFields.push_back(CAPIFieldDetails(AMC_API_KEY_UPLOAD_DATAOFFSET, false, false));
+	m_StreamUploadFields.push_back(CAPIFieldDetails(AMC_API_KEY_UPLOAD_DATA, true, true));
 }
 
 CAPIHandler_Upload::~CAPIHandler_Upload()
@@ -120,7 +120,7 @@ uint32_t CAPIHandler_Upload::getFormDataFieldCount(const std::string& sURI, cons
 	
 }
 
-APIFieldDetails CAPIHandler_Upload::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
+CAPIFieldDetails CAPIHandler_Upload::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
 {
 	std::string uploadUUID;
 	auto uploadType = parseRequest(sURI, requestType, uploadUUID);
@@ -198,7 +198,7 @@ void CAPIHandler_Upload::handleFinishUploadRequest(CJSONWriter& writer, const ui
 
 }
 
-void CAPIHandler_Upload::handleStreamUploadRequest(CJSONWriter& writer, APIFormFields pFormFields, const std::string& sStreamUUID, PAPIAuth pAuth)
+void CAPIHandler_Upload::handleStreamUploadRequest(CJSONWriter& writer, CAPIFormFields & pFormFields, const std::string& sStreamUUID, PAPIAuth pAuth)
 {
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -219,7 +219,7 @@ void CAPIHandler_Upload::handleStreamUploadRequest(CJSONWriter& writer, APIFormF
 
 
 		
-PAPIResponse CAPIHandler_Upload::handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+PAPIResponse CAPIHandler_Upload::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 
 

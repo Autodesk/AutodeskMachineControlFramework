@@ -132,7 +132,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     auto userInterfaceNode = machinedefinitionNode.child("userinterface");
     if (userInterfaceNode.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
-    loadUserInterface(userInterfaceNode);
+    m_pSystemState->uiHandler ()->loadFromXML (userInterfaceNode);
 
 
     m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -385,80 +385,6 @@ void CMCContext::readSignalParameters(const pugi::xml_node& xmlNode, std::list<A
 
 }
 
-void CMCContext::loadUserInterface(const pugi::xml_node& xmlNode)
-{
-
-    auto uiHandler = m_pSystemState->uiHandler();
-
-    auto appnameAttrib = xmlNode.attribute("appname");
-    if (appnameAttrib.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGAPPNAME);
-    std::string sAppName(appnameAttrib.as_string());
-
-    auto copyrightAttrib = xmlNode.attribute("copyright");
-    if (copyrightAttrib.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOPYRIGHT);
-    std::string sCopyRight(copyrightAttrib.as_string());
-
-    auto mainpageAttrib = xmlNode.attribute("mainpage");
-    if (mainpageAttrib.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
-    std::string sMainPage(mainpageAttrib.as_string());
-
-    uiHandler->Initialise(sAppName, sCopyRight);
-
-    auto menuNode = xmlNode.child("menu");
-    if (menuNode.empty ())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUNODE);
-
-    auto menuItems = menuNode.children("item");
-    for (pugi::xml_node menuItem : menuItems) {
-        auto idAttrib = menuItem.attribute("id");
-        if (idAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMID);
-
-        auto iconAttrib = menuItem.attribute("icon");
-        if (iconAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMICON);
-
-        auto captionAttrib = menuItem.attribute("caption");
-        if (captionAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMCAPTION);
-
-        auto targetPageAttrib = menuItem.attribute("targetpage");
-        if (targetPageAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
-
-        uiHandler->addMenuItem (idAttrib.as_string (), iconAttrib.as_string (), captionAttrib.as_string (), targetPageAttrib.as_string ());
-    }
-
-    auto toolbarNode = xmlNode.child("toolbar");
-    if (toolbarNode.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARNODE);
-
-    auto toolbarItems = toolbarNode.children("item");
-    for (pugi::xml_node menuItem : menuItems) {
-        auto idAttrib = menuItem.attribute("id");
-        if (idAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMID);
-
-        auto iconAttrib = menuItem.attribute("icon");
-        if (iconAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMICON);
-
-        auto captionAttrib = menuItem.attribute("caption");
-        if (captionAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION);
-
-        auto targetPageAttrib = menuItem.attribute("targetpage");
-        if (targetPageAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
-
-        uiHandler->addToolbarItem(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
-    }
-
-
-}
 
 
 void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup)

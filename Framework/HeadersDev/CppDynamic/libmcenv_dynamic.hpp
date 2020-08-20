@@ -485,7 +485,7 @@ public:
 	{
 	}
 	
-	inline PSignalTrigger CreateSignal(const std::string & sMachineInstance, const std::string & sSignalName);
+	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
 	inline void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle);
@@ -654,7 +654,7 @@ public:
 		pWrapperTable->m_SignalHandler_SetDoubleResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetIntegerResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetBoolResult = nullptr;
-		pWrapperTable->m_StateEnvironment_CreateSignal = nullptr;
+		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateDriverAccess = nullptr;
@@ -1202,12 +1202,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_CreateSignal = (PLibMCEnvStateEnvironment_CreateSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createsignal");
+		pWrapperTable->m_StateEnvironment_PrepareSignal = (PLibMCEnvStateEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_preparesignal");
 		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_CreateSignal = (PLibMCEnvStateEnvironment_CreateSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_createsignal");
+		pWrapperTable->m_StateEnvironment_PrepareSignal = (PLibMCEnvStateEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_preparesignal");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_CreateSignal == nullptr)
+		if (pWrapperTable->m_StateEnvironment_PrepareSignal == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1781,8 +1781,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_SetBoolResult == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_createsignal", (void**)&(pWrapperTable->m_StateEnvironment_CreateSignal));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateSignal == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_preparesignal", (void**)&(pWrapperTable->m_StateEnvironment_PrepareSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_PrepareSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_waitforsignal", (void**)&(pWrapperTable->m_StateEnvironment_WaitForSignal));
@@ -2629,15 +2629,15 @@ public:
 	 */
 	
 	/**
-	* CStateEnvironment::CreateSignal - creates a signal object to trigger.
+	* CStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
 	* @return Signal trigger object.
 	*/
-	PSignalTrigger CStateEnvironment::CreateSignal(const std::string & sMachineInstance, const std::string & sSignalName)
+	PSignalTrigger CStateEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
 	{
 		LibMCEnvHandle hSignalInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateSignal(m_pHandle, sMachineInstance.c_str(), sSignalName.c_str(), &hSignalInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_PrepareSignal(m_pHandle, sMachineInstance.c_str(), sSignalName.c_str(), &hSignalInstance));
 		
 		if (!hSignalInstance) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

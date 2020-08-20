@@ -28,39 +28,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_UI_TOOLBARITEM
 
-#ifndef __AMC_API_HANDLER_ROOT
-#define __AMC_API_HANDLER_ROOT
+#include "amc_ui_toolbaritem.hpp"
+#include "libmc_interfaceexception.hpp"
 
-#include "amc_api_handler.hpp"
-#include <string>
-#include <map>
 
-namespace AMC {
+using namespace AMC;
 
-	class CAPIHandler_Root : public CAPIHandler {
-	private:
-
-		std::map<std::string, PAPIResponse> m_FilesToServe;
-			
-	public:
-
-		CAPIHandler_Root();
-
-		virtual ~CAPIHandler_Root();
-				
-		virtual std::string getBaseURI () override;
-		
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
-
-		void LoadClientPackage(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer);
-
-	};
-
-	typedef std::shared_ptr<CAPIHandler_Root> PAPIHandler_Root;
+CUIToolbarItem::CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption)
+	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption)
+{
 
 }
 
+CUIToolbarItem::~CUIToolbarItem()
+{
 
-#endif //__AMC_API_HANDLER_STATUS
+}
 
+std::string CUIToolbarItem::getID()
+{
+	return m_sID;
+}
+
+std::string CUIToolbarItem::getIcon()
+{
+	return m_sIcon;
+}
+
+std::string CUIToolbarItem::getCaption()
+{
+	return m_sCaption;
+}

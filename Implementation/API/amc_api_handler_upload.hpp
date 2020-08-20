@@ -52,13 +52,13 @@ namespace AMC {
 		
 		PSystemState m_pSystemState;
 
-		std::vector <APIFieldDetails> m_StreamUploadFields;
+		std::vector <CAPIFieldDetails> m_StreamUploadFields;
 
 		APIHandler_UploadType parseRequest (const std::string& sURI, const eAPIRequestType requestType, std::string & uploadUUID);
 
 		void handleInitUploadRequest(CJSONWriter & writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 		void handleFinishUploadRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
-		void handleStreamUploadRequest(CJSONWriter& writer, APIFormFields pFormFields, const std::string & sStreamUUID, PAPIAuth pAuth);
+		void handleStreamUploadRequest(CJSONWriter& writer, CAPIFormFields & pFormFields, const std::string & sStreamUUID, PAPIAuth pAuth);
 
 		std::string createNewBuild (const std::string & sName, const std::string & sStorageStreamUUID, PAPIAuth pAuth);
 
@@ -70,11 +70,11 @@ namespace AMC {
 				
 		virtual std::string getBaseURI () override;
 
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
 
 		virtual uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType) override;
 
-		virtual APIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex) override;
+		virtual CAPIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex) override;
 
 		virtual bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType) override;
 

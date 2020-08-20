@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CAPIRequestHandler
 #define __LIBMC_APIREQUESTHANDLER
 
 #include "libmc_interfaces.hpp"
+#include "API/amc_api_handler.hpp"
 #include "API/amc_api_response.hpp"
 #include "API/amc_api.hpp"
 
@@ -69,7 +70,7 @@ protected:
 	std::string m_sURIWithoutLeadingSlash;
 	AMC::eAPIRequestType m_RequestType;
 
-	AMC::APIFormFields m_FormFields;
+	AMC::CAPIFormFields m_FormFields;
 	AMC::PAPIAuth m_pAuth;
 
 public:

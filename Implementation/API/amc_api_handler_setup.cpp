@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_API_CONSTANTS
 
 #include "amc_api_handler_setup.hpp"
 #include "amc_api_constants.hpp"
@@ -52,7 +53,7 @@ std::string CAPIHandler_Setup::getBaseURI ()
 	return "api/setup";
 }
 		
-PAPIResponse CAPIHandler_Setup::handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+PAPIResponse CAPIHandler_Setup::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 
 	if (requestType == eAPIRequestType::rtGet) {

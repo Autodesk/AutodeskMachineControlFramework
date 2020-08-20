@@ -57,7 +57,7 @@ std::string CAPIHandler_Logs::getBaseURI ()
 	return "api/logs";
 }
 		
-PAPIResponse CAPIHandler_Logs::handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+PAPIResponse CAPIHandler_Logs::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::cout << sURI << std::endl;
 

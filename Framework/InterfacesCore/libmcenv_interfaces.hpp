@@ -638,12 +638,12 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 class IStateEnvironment : public virtual IBase {
 public:
 	/**
-	* IStateEnvironment::CreateSignal - creates a signal object to trigger.
+	* IStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
 	* @return Signal trigger object.
 	*/
-	virtual ISignalTrigger * CreateSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
+	virtual ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
 
 	/**
 	* IStateEnvironment::WaitForSignal - waits for a signal.

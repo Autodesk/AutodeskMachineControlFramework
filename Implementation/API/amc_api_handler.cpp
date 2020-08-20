@@ -35,36 +35,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 
-	APIFieldDetails::APIFieldDetails()
+	CAPIFieldDetails::CAPIFieldDetails()
 		: m_sFieldName (), m_bIsFileData (false), m_bIsMandatory (false)
 	{
 
 	}
 
-	APIFieldDetails::APIFieldDetails(const std::string& sFieldName, const bool bIsFileData, const bool bIsMandatory)
+	CAPIFieldDetails::CAPIFieldDetails(const std::string& sFieldName, const bool bIsFileData, const bool bIsMandatory)
 		: m_sFieldName (sFieldName), m_bIsFileData (bIsFileData), m_bIsMandatory (bIsMandatory)
 	{
 
 	}
 
 
-	APIFormFields::APIFormFields ()		
+	CAPIFormFields::CAPIFormFields()
 	{
 
 	}
 
-	void APIFormFields::addDataField (const std::string& sName, std::shared_ptr<std::vector<uint8_t>> pData)
+	void CAPIFormFields::addDataField (const std::string& sName, std::shared_ptr<std::vector<uint8_t>> pData)
 	{
 		m_FileData.insert(std::make_pair (sName, pData));
 	}
 
-	bool APIFormFields::hasDataField(const std::string& sName)
+	bool CAPIFormFields::hasDataField(const std::string& sName)
 	{
 		auto iIter = m_FileData.find(sName);
 		return (iIter != m_FileData.end());
 	}
 
-	std::shared_ptr<std::vector<uint8_t>> APIFormFields::getDataField(const std::string& sName)
+	std::shared_ptr<std::vector<uint8_t>> CAPIFormFields::getDataField(const std::string& sName)
 	{
 		auto iIter = m_FileData.find(sName);
 		if (iIter == m_FileData.end())
@@ -74,18 +74,18 @@ namespace AMC {
 	}
 
 
-	void APIFormFields::addStringField(const std::string& sName, const std::string& sValue)
+	void CAPIFormFields::addStringField(const std::string& sName, const std::string& sValue)
 	{
 		m_StringData.insert(std::make_pair (sName, sValue));
 	}
 
-	bool APIFormFields::hasStringField(const std::string& sName)
+	bool CAPIFormFields::hasStringField(const std::string& sName)
 	{
 		auto iIter = m_StringData.find (sName);
 		return (iIter != m_StringData.end());
 	}
 
-	std::string APIFormFields::getStringField(const std::string& sName)
+	std::string CAPIFormFields::getStringField(const std::string& sName)
 	{
 		auto iIter = m_StringData.find(sName);
 		if (iIter == m_StringData.end())
@@ -94,7 +94,7 @@ namespace AMC {
 		return iIter->second;
 	}
 
-	uint64_t APIFormFields::getUint64Field(const std::string& sName)
+	uint64_t CAPIFormFields::getUint64Field(const std::string& sName)
 	{
 		auto sString = getStringField(sName);
 		return std::stoull(sString);
@@ -122,7 +122,7 @@ namespace AMC {
 		return 0;
 	}
 
-	APIFieldDetails CAPIHandler::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
+	CAPIFieldDetails CAPIHandler::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
 	{
 		throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDINDEX);
 	}

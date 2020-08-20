@@ -333,7 +333,7 @@
 
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
 	  
-		<method name="CreateSignal" description="creates a signal object to trigger.">
+		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="SignalName" type="string" pass="in" description="Name Of signal channel." />
 			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />

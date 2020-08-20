@@ -609,7 +609,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setboolresult(LibMCEnv_S
 **************************************************************************************************************************/
 
 /**
-* creates a signal object to trigger.
+* prepares a signal object to trigger later.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
 * @param[in] pMachineInstance - State machine instance name
@@ -617,7 +617,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setboolresult(LibMCEnv_S
 * @param[out] pSignalInstance - Signal trigger object.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_createsignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_preparesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance);
 
 /**
 * waits for a signal.

@@ -29,46 +29,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_HANDLER
-#define __AMC_UI_HANDLER
+#ifndef __AMC_HEADER_PUGIXML
+#define __AMC_HEADER_PUGIXML
 
-#include <memory>
-#include <vector>
-#include <string>
+// Forward declarations of external headers
 
-#include "amc_ui_menuitem.hpp"
-#include "amc_jsonwriter.hpp"
+namespace pugi {
 
-namespace AMC {
+	class xml_node;
 
-	class CUIHandler {
-	protected:
-		std::string m_sAppName;
-		std::string m_sCopyrightString;
-
-		std::vector <PUIMenuItem> m_MenuItems;
-		
-	public:
-
-		CUIHandler();
-		
-		virtual ~CUIHandler();
-		
-		void Initialise (const std::string & sAppName, const std::string & sCopyRightString);
-
-		std::string getAppName();
-		std::string getCopyrightString();
-
-		void addMenuItem (const std::string & sID, const std::string & sIcon, const std::string & sCaption, const std::string & sTargetPage);
-		void addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
-
-		void writeToJSON (CJSONWriter & writer);
-	};
-	
-	typedef std::shared_ptr<CUIHandler> PUIHandler;
-	
 }
 
-
-#endif //__AMC_UI_HANDLER
+#endif //__AMC_HEADER_PUGIXML
 

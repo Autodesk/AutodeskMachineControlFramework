@@ -32,20 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_API_RESPONSE
 #define __AMC_API_RESPONSE
 
+#include "header_protection.hpp"
+
+#include "amc_api_types.hpp"
+
 #include <vector>
-#include <memory>
-#include <string>
-
-
 
 namespace AMC {
-
-	enum class eAPIRequestType : uint32_t {
-		rtUnknown = 0,
-		rtGet = 1,
-		rtPost = 2
-	};
-
 
 	class CAPIResponse {
 	protected:

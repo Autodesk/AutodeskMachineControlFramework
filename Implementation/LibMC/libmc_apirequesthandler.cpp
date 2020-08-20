@@ -31,9 +31,11 @@ Abstract: This is a stub class definition of CAPIRequestHandler
 
 */
 
+#define __AMCIMPL_API_CONSTANTS
+
 #include "libmc_apirequesthandler.hpp"
 #include "libmc_interfaceexception.hpp"
-#include "API/amc_api_constants.hpp"
+#include "amc_api_constants.hpp"
 
 // Include custom headers here.
 

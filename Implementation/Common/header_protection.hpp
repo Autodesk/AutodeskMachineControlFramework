@@ -29,37 +29,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MENUITEM
-#define __AMC_UI_MENUITEM
+#ifndef __AMC_HEADER_PROTECTION
+#define __AMC_HEADER_PROTECTION
 
 #include <memory>
-#include <vector>
 #include <string>
+#include <list>
+#include <map>
 
-namespace AMC {
+// Macros for forward declaration of classes
+#define amcDeclareDependingClass(CLASSNAME, SHAREDPTRNAME) class CLASSNAME; typedef std::shared_ptr<CLASSNAME> SHAREDPTRNAME;
 
-	class CUIMenuItem {
-	protected:
-		std::string m_sID;
-		std::string m_sIcon;
-		std::string m_sCaption;
-		
-	public:
-
-		CUIMenuItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption);		
-		
-		virtual ~CUIMenuItem();
-						
-		std::string getID ();
-		std::string getIcon ();
-		std::string getCaption ();
-				
-	};
-	
-	typedef std::shared_ptr<CUIMenuItem> PUIMenuItem;
-	
-}
-
-
-#endif //__AMC_UI_MENUITEM
+#endif //__AMC_HEADER_PROTECTION
 

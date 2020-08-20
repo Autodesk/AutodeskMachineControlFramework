@@ -28,73 +28,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_UI_MENUITEM
 
-#include "amc_ui_handler.hpp"
-#include "API/amc_api_constants.hpp"
-
+#include "amc_ui_menuitem.hpp"
 #include "libmc_interfaceexception.hpp"
 
 
 using namespace AMC;
 
-CUIHandler::CUIHandler()
+CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption)
+	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption)
 {
 
 }
 
-CUIHandler::~CUIHandler()
+CUIMenuItem::~CUIMenuItem()
 {
 
 }
 
-void CUIHandler::Initialise(const std::string& sAppName, const std::string& sCopyRightString)
+std::string CUIMenuItem::getID()
 {
-	m_sAppName = sAppName;
-	m_sCopyrightString = sCopyRightString;
+	return m_sID;
 }
 
-std::string CUIHandler::getAppName()
+std::string CUIMenuItem::getIcon()
 {
-	return m_sAppName;
+	return m_sIcon;
 }
 
-std::string CUIHandler::getCopyrightString()
+std::string CUIMenuItem::getCaption()
 {
-	return m_sCopyrightString;
-}
-
-void CUIHandler::addMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
-{
-	m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption));
-}
-
-void CUIHandler::addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
-{
-
-}
-
-
-void CUIHandler::writeToJSON(CJSONWriter& writer)
-{
-	writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
-	writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
-	//writer.addString(AMC_API_KEY_UI_MAINPAGE, m_);
-
-	CJSONWriterArray menuItems(writer);
-
-	for (auto iter : m_MenuItems) {
-		CJSONWriterObject menuItem(writer);
-		menuItem.addString(AMC_API_KEY_UI_ID, iter->getID ());
-		menuItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon ());
-		menuItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption ());
-		//menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, "main");
-		menuItems.addObject(menuItem);
-	}
-
-	writer.addArray(AMC_API_KEY_UI_MENUITEMS, menuItems);
-
-	CJSONWriterArray toolbarItems(writer);
-
-	writer.addArray(AMC_API_KEY_UI_TOOLBARITEMS, toolbarItems);
-
+	return m_sCaption;
 }

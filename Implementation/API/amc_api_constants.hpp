@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_API_CONSTANTS
 #define __AMC_API_CONSTANTS
 
+#ifndef __AMCIMPL_API_CONSTANTS
+#error this header should only be included in the implementation CPP files.
+#endif
+
 #define AMC_API_HTTP_SUCCESS 200
 #define AMC_API_HTTP_BADREQUEST 400
 #define AMC_API_HTTP_NOTFOUND 404

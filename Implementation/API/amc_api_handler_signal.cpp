@@ -102,7 +102,7 @@ uint32_t CAPIHandler_Signal::getFormDataFieldCount(const std::string& sURI, cons
 	return 0;	
 }
 
-APIFieldDetails CAPIHandler_Signal::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
+CAPIFieldDetails CAPIHandler_Signal::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
 {
 	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
 }
@@ -147,7 +147,7 @@ void CAPIHandler_Signal::handleSendSignalRequest(CJSONWriter& writer, const uint
 
 
 
-PAPIResponse CAPIHandler_Signal::handleRequest(const std::string& sURI, const eAPIRequestType requestType, APIFormFields pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+PAPIResponse CAPIHandler_Signal::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::string jobUUID;
 

@@ -63,7 +63,7 @@ CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParam
 }
 
 
-ISignalTrigger* CStateEnvironment::CreateSignal(const std::string& sMachineInstance, const std::string& sSignalName)
+ISignalTrigger* CStateEnvironment::PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName)
 {
 	if (!m_pSystemState->stateSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);

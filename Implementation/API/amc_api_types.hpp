@@ -29,34 +29,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "amc_ui_menuitem.hpp"
-#include "libmc_interfaceexception.hpp"
+#ifndef __AMC_API_TYPES
+#define __AMC_API_TYPES
 
 
-using namespace AMC;
+namespace AMC {
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption)
-{
+	enum class eAPIRequestType : uint32_t {
+		rtUnknown = 0,
+		rtGet = 1,
+		rtPost = 2
+	};
 
+
+	
 }
 
-CUIMenuItem::~CUIMenuItem()
-{
 
-}
+#endif //__AMC_API_TYPES
 
-std::string CUIMenuItem::getID()
-{
-	return m_sID;
-}
-
-std::string CUIMenuItem::getIcon()
-{
-	return m_sIcon;
-}
-
-std::string CUIMenuItem::getCaption()
-{
-	return m_sCaption;
-}

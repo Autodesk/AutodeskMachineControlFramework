@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_API_CONSTANTS
 
 #include "amc_api_response.hpp"
 #include "amc_api_constants.hpp"

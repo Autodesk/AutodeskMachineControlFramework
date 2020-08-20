@@ -29,38 +29,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_HANDLER_ROOT
-#define __AMC_API_HANDLER_ROOT
+#ifndef __AMC_UI_HANDLER
+#define __AMC_UI_HANDLER
 
-#include "amc_api_handler.hpp"
+#include "header_protection.hpp"
+#include "header_pugixml.hpp"
+
+#include <memory>
+#include <vector>
 #include <string>
-#include <map>
 
 namespace AMC {
 
-	class CAPIHandler_Root : public CAPIHandler {
-	private:
+	amcDeclareDependingClass(CUIMenuItem, PUIMenuItem);
+	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
+	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
+	
+	class CUIHandler {
+	protected:
+		std::string m_sAppName;
+		std::string m_sCopyrightString;
 
-		std::map<std::string, PAPIResponse> m_FilesToServe;
-			
+		std::vector <PUIMenuItem> m_MenuItems;
+		std::vector <PUIToolbarItem> m_ToolbarItems;
+
 	public:
 
-		CAPIHandler_Root();
-
-		virtual ~CAPIHandler_Root();
-				
-		virtual std::string getBaseURI () override;
+		CUIHandler();
 		
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
+		virtual ~CUIHandler();
+		
+		std::string getAppName();
+		std::string getCopyrightString();
 
-		void LoadClientPackage(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer);
+		void addMenuItem (const std::string & sID, const std::string & sIcon, const std::string & sCaption, const std::string & sTargetPage);
+		void addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
 
+		void writeToJSON (CJSONWriter & writer);
+
+		void loadFromXML (pugi::xml_node & xmlNode);
 	};
-
-	typedef std::shared_ptr<CAPIHandler_Root> PAPIHandler_Root;
-
+	
+	typedef std::shared_ptr<CUIHandler> PUIHandler;
+	
 }
 
 
-#endif //__AMC_API_HANDLER_STATUS
+#endif //__AMC_UI_HANDLER
 
