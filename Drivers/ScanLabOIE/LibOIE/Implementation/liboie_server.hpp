@@ -45,6 +45,23 @@ Abstract: This is the class declaration of CServer
 #endif
 
 // Include custom headers here.
+namespace brynet {
+    namespace net {
+        class TcpService;
+
+        namespace wrapper {
+            class ListenerBuilder;
+        }
+
+    }
+}
+#define LIBOIE_THREADCOUNT_MIN 4
+#define LIBOIE_THREADCOUNT_MAX 1024
+#define LIBOIE_THREADCOUNT_DEFAULT 32
+
+#define LIBOIE_RECEIVEBUFFERSIZE_MIN 4096
+#define LIBOIE_RECEIVEBUFFERSIZE_MAX (1024 * 1024 * 1024)
+#define LIBOIE_RECEIVEBUFFERSIZE_DEFAULT (1024 * 1024)
 
 
 namespace LibOIE {
@@ -57,27 +74,18 @@ namespace Impl {
 
 class CServer : public virtual IServer, public virtual CBase {
 private:
+    uint32_t m_nThreadCount;
+    uint32_t m_nReceiveBufferSize;
 
-	/**
-	* Put private members here.
-	*/
+    std::shared_ptr<brynet::net::TcpService> m_pService;
+    std::shared_ptr<brynet::net::wrapper::ListenerBuilder> m_pListener;
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+    CServer();
 
 	void Start(const std::string & sIPAddress, const LibOIE_uint32 nPort, const bool bIPv6) override;
 

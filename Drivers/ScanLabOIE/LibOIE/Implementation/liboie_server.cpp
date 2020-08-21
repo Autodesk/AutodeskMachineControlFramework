@@ -35,7 +35,10 @@ Abstract: This is a stub class definition of CServer
 #include "liboie_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include <brynet/net/EventLoop.hpp>
+#include <brynet/net/TcpService.hpp>
+#include <brynet/net/wrapper/ServiceBuilder.hpp>
+#include <brynet/base/AppStatus.hpp>
 
 using namespace LibOIE::Impl;
 
@@ -43,14 +46,81 @@ using namespace LibOIE::Impl;
  Class definition of CServer 
 **************************************************************************************************************************/
 
-void CServer::Start(const std::string & sIPAddress, const LibOIE_uint32 nPort, const bool bIPv6)
+CServer::CServer()
+    : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+
 }
+
+
+void CServer::Start(const std::string& sIPAddress, const LibOIE_uint32 nPort, const bool bIPv6) 
+{
+
+
+    m_pService = brynet::net::TcpService::Create();
+
+    m_pService->startWorkerThread(m_nThreadCount, nullptr);
+
+    auto enterCallback = [](const  brynet::net::TcpConnection::Ptr& session) {
+        //total_client_num++;
+
+        session->setDataCallback([session](const char* buffer, size_t len) {
+            session->send(buffer, len);
+            //TotalRecvSize += len;
+            //total_packet_num++;
+            return len;
+        });
+
+        session->setDisConnectCallback([](const  brynet::net::TcpConnection::Ptr& session) {
+            (void)session;
+            //total_client_num--;
+        });
+
+    };
+
+
+    m_pListener = std::make_shared<brynet::net::wrapper::ListenerBuilder>();
+    m_pListener->configureService(m_pService)
+        .configureSocketOptions({
+            [](brynet::net::TcpSocket& socket) {
+                socket.setNodelay();
+            }
+            })
+        .configureConnectionOptions({
+            brynet::net::AddSocketOption::WithMaxRecvBufferSize(m_nReceiveBufferSize),
+            brynet::net::AddSocketOption::AddEnterCallback(enterCallback)
+            })
+                .configureListen([=](brynet::net::wrapper::BuildListenConfig config) {
+                config.setAddr (bIPv6, sIPAddress, nPort);
+            })
+                .asyncRun();
+
+}
+
+
 
 void CServer::Stop()
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+
+}
+
+void CServer::SetThreadCount(const LibOIE_uint32 nThreadCount)
+{
+    if (nThreadCount < LIBOIE_THREADCOUNT_MIN)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_INVALIDPARAM);
+    if (nThreadCount > LIBOIE_THREADCOUNT_MAX)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_INVALIDPARAM);
+    m_nThreadCount = nThreadCount;
+}
+
+void CServer::SetBufferSize(const LibOIE_uint32 nRCVBufferSize)
+{
+    if (nRCVBufferSize < LIBOIE_RECEIVEBUFFERSIZE_MIN)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_INVALIDPARAM);
+    if (nRCVBufferSize > LIBOIE_RECEIVEBUFFERSIZE_MAX)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_INVALIDPARAM);
+
+    m_nReceiveBufferSize = nRCVBufferSize;
 }
 
 void CServer::CloseAllConnections()
@@ -58,15 +128,6 @@ void CServer::CloseAllConnections()
 	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
 }
 
-void CServer::SetThreadCount(const LibOIE_uint32 nThreadCount)
-{
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
-}
-
-void CServer::SetBufferSize(const LibOIE_uint32 nRCVBufferSize)
-{
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
-}
 
 LibOIE_uint32 CServer::AcceptDevice(const std::string & sDeviceName, const std::string & sApplicationName, const std::string & sVersionName)
 {
