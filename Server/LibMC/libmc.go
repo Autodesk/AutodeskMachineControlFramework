@@ -41,6 +41,8 @@ Interface version: 1.0.0
 package libmc
 
 /*
+#cgo linux LDFLAGS: -ldl
+#include <stdlib.h>
 #include "libmc_dynamic.cc"
 
 	// Injected Components

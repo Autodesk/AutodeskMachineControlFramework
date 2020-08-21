@@ -44,6 +44,9 @@ Interface version: 1.0.0
 #include <dlfcn.h>
 #include <stdlib.h>
 #endif // _WIN32
+#ifdef __linux__
+#include <stddef.h>
+#endif
 
 LibMCResult InitLibMCWrapperTable(sLibMCDynamicWrapperTable * pWrapperTable)
 {
