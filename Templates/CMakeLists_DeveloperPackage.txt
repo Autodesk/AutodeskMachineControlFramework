@@ -87,27 +87,7 @@ foreach(distfile ${distfiles})
 				
 endforeach()				
 
-		
-
-add_custom_command(
-	TARGET copy_distribution PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E echo "copying config.xml...")
-
-add_custom_command(
-	TARGET copy_distribution PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_SOURCE_DIR}/template_config.xml
-			${CMAKE_CURRENT_BINARY_DIR}/Output/template_config.xml)
-
-add_custom_command(
-	TARGET copy_distribution PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E echo "creating logs directory")
-
-add_custom_command(
-	TARGET copy_distribution PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E make_directory			
-			${CMAKE_CURRENT_BINARY_DIR}/Output/logs)
-
+	
 add_custom_command(
 	TARGET copy_distribution PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E echo "creating data directory")
