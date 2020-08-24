@@ -198,7 +198,8 @@ set_target_properties(libmcdata PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
 if(WIN32)
 target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
 elseif(UNIX AND NOT APPLE)
-target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/libsqlite3.a)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
+target_link_libraries(libmcdata SQLite3)
 endif()
 
 # This makes sure symbols are exported
