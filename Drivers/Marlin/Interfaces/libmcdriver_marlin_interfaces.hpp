@@ -413,22 +413,34 @@ public:
 	virtual bool IsHomed() = 0;
 
 	/**
-	* IDriver_Marlin::MoveTo - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* IDriver_Marlin::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
-	* @param[in] dZ - Z Value in mm
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	virtual void MoveTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed) = 0;
+	virtual void MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed) = 0;
 
 	/**
-	* IDriver_Marlin::MoveFastTo - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* IDriver_Marlin::MoveFastToXY - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	virtual void MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::MoveToZ - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dZ - Z Value in mm
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	virtual void MoveFastTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed) = 0;
+	virtual void MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::MoveFastToZ - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dZ - Z Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	virtual void MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed) = 0;
 
 	/**
 	* IDriver_Marlin::StartHoming - Start Homing of printer.

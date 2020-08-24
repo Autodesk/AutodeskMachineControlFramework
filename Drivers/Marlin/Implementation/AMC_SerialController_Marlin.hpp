@@ -12,9 +12,6 @@ namespace AMC {
 	class CSerialController_Marlin : public CSerialController {
 
 	private:
-		// TODO log ccord to file just for testing => remove later		
-		std::stringstream m_sPosTempLogStream;
-
 		std::unique_ptr<serial::Serial> m_pConnection;
 		std::string m_sCOMPort;
 		uint32_t m_nBaudRate;
@@ -72,11 +69,9 @@ namespace AMC {
 		uint32_t calculateLineChecksum (const std::string& sCommand);
 		void checkIsHomed();
 		bool parseAckSymbol(const std::string& sLine, const uint32_t nLineNumber);
-		void queryAxisStepsPerUnitStateAndPidValues() override;
-		void queryFirmwareInfo() override;
-		// TODO nur temp => wieder raus
-		void savePosTempLog() override;
-		uint32_t m_nLayer;
+		void queryAxisStepsPerUnitStateAndPidValues();
+		void queryFirmwareInfo();
+		void moveToEx (bool bFastMove, bool bInX, const double dX, bool bInY, const double dY, bool bInZ, const double dZ, const double dSpeedInMMperSecond);
 
 	public:
 		CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming);
@@ -115,8 +110,10 @@ namespace AMC {
 		void startHoming() override;
 		void setLcdMsg(const std::string& sLcdMsg) override;
 
-		void move(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond) override;
-		void moveFast(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond) override;
+		void moveXY(const double dX, const double dY, const double dSpeedInMMperSecond) override;
+		void moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond) override;
+		void moveZ(const double dZ, const double dSpeedInMMperSecond) override;
+		void moveFastZ(const double dZ, const double dSpeedInMMperSecond) override;
 
 		bool isHomed() override;
 		bool isMoving() override;

@@ -376,8 +376,10 @@ public:
 	inline bool CanExecuteMovement();
 	inline bool IsMoving();
 	inline bool IsHomed();
-	inline void MoveTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed);
-	inline void MoveFastTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed);
+	inline void MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed);
+	inline void MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed);
+	inline void MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed);
+	inline void MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed);
 	inline void StartHoming();
 };
 	
@@ -522,8 +524,10 @@ public:
 		pWrapperTable->m_Driver_Marlin_CanExecuteMovement = nullptr;
 		pWrapperTable->m_Driver_Marlin_IsMoving = nullptr;
 		pWrapperTable->m_Driver_Marlin_IsHomed = nullptr;
-		pWrapperTable->m_Driver_Marlin_MoveTo = nullptr;
-		pWrapperTable->m_Driver_Marlin_MoveFastTo = nullptr;
+		pWrapperTable->m_Driver_Marlin_MoveToXY = nullptr;
+		pWrapperTable->m_Driver_Marlin_MoveFastToXY = nullptr;
+		pWrapperTable->m_Driver_Marlin_MoveToZ = nullptr;
+		pWrapperTable->m_Driver_Marlin_MoveFastToZ = nullptr;
 		pWrapperTable->m_Driver_Marlin_StartHoming = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -761,21 +765,39 @@ public:
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Marlin_MoveTo = (PLibMCDriver_MarlinDriver_Marlin_MoveToPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_moveto");
+		pWrapperTable->m_Driver_Marlin_MoveToXY = (PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_movetoxy");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Marlin_MoveTo = (PLibMCDriver_MarlinDriver_Marlin_MoveToPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_moveto");
+		pWrapperTable->m_Driver_Marlin_MoveToXY = (PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_movetoxy");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Marlin_MoveTo == nullptr)
+		if (pWrapperTable->m_Driver_Marlin_MoveToXY == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Marlin_MoveFastTo = (PLibMCDriver_MarlinDriver_Marlin_MoveFastToPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_movefastto");
+		pWrapperTable->m_Driver_Marlin_MoveFastToXY = (PLibMCDriver_MarlinDriver_Marlin_MoveFastToXYPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_movefasttoxy");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Marlin_MoveFastTo = (PLibMCDriver_MarlinDriver_Marlin_MoveFastToPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_movefastto");
+		pWrapperTable->m_Driver_Marlin_MoveFastToXY = (PLibMCDriver_MarlinDriver_Marlin_MoveFastToXYPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_movefasttoxy");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Marlin_MoveFastTo == nullptr)
+		if (pWrapperTable->m_Driver_Marlin_MoveFastToXY == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_MoveToZ = (PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_movetoz");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_MoveToZ = (PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_movetoz");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_MoveToZ == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_MoveFastToZ = (PLibMCDriver_MarlinDriver_Marlin_MoveFastToZPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_movefasttoz");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_MoveFastToZ = (PLibMCDriver_MarlinDriver_Marlin_MoveFastToZPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_movefasttoz");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_MoveFastToZ == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -946,12 +968,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_IsHomed == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_moveto", (void**)&(pWrapperTable->m_Driver_Marlin_MoveTo));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_MoveTo == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_movetoxy", (void**)&(pWrapperTable->m_Driver_Marlin_MoveToXY));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_MoveToXY == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_movefastto", (void**)&(pWrapperTable->m_Driver_Marlin_MoveFastTo));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_MoveFastTo == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_movefasttoxy", (void**)&(pWrapperTable->m_Driver_Marlin_MoveFastToXY));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_MoveFastToXY == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_movetoz", (void**)&(pWrapperTable->m_Driver_Marlin_MoveToZ));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_MoveToZ == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_movefasttoz", (void**)&(pWrapperTable->m_Driver_Marlin_MoveFastToZ));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_MoveFastToZ == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_starthoming", (void**)&(pWrapperTable->m_Driver_Marlin_StartHoming));
@@ -1235,27 +1265,45 @@ public:
 	}
 	
 	/**
-	* CDriver_Marlin::MoveTo - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* CDriver_Marlin::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
-	* @param[in] dZ - Z Value in mm
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	void CDriver_Marlin::MoveTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+	void CDriver_Marlin::MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_MoveTo(m_pHandle, dX, dY, dZ, dSpeed));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_MoveToXY(m_pHandle, dX, dY, dSpeed));
 	}
 	
 	/**
-	* CDriver_Marlin::MoveFastTo - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* CDriver_Marlin::MoveFastToXY - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	void CDriver_Marlin::MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_MoveFastToXY(m_pHandle, dX, dY, dSpeed));
+	}
+	
+	/**
+	* CDriver_Marlin::MoveToZ - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dZ - Z Value in mm
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	void CDriver_Marlin::MoveFastTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+	void CDriver_Marlin::MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_MoveFastTo(m_pHandle, dX, dY, dZ, dSpeed));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_MoveToZ(m_pHandle, dZ, dSpeed));
+	}
+	
+	/**
+	* CDriver_Marlin::MoveFastToZ - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dZ - Z Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	void CDriver_Marlin::MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_MoveFastToZ(m_pHandle, dZ, dSpeed));
 	}
 	
 	/**

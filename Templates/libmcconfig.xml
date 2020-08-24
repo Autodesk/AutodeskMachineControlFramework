@@ -15,7 +15,7 @@
   		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
   		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
   		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
-  		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="0" type="int" />
+  		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
   	  </parametergroup>
 
 	  
@@ -72,7 +72,7 @@
   		<parameter name="jobuuid" type="string" />
    		<parameter name="layerindex" type="int" />
    		<parameter name="layertimeout" type="double" />
-  		<result name="successxx" type="bool" />		
+  		<result name="success" type="bool" />
   	  </signaldefinition>	 
 
 	  <signaldefinition name="signal_setpidvalues">

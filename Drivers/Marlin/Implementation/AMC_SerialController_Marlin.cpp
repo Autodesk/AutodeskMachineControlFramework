@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <thread>
-#include <math.h>
+
+#define MARLINDRIVER_MINSPEED 0.0001
 
 namespace AMC {
 
@@ -71,29 +72,9 @@ namespace AMC {
 		m_dPidValueD(0)
 
 	{
-		// TODO nur temp => wieder raus
-		m_sPosTempLogStream.str("");
-		m_sPosTempLogStream << "Xc,Yc,Zc" << std::endl;
-		m_nLayer = 0;
-
 		// If we disabled homing, then we expect to be at the home position at creation
 		if (m_bDisableHoming)
 			m_bIsHomed = true;
-	}
-
-	// TODO nur temp => wieder raus
-	void CSerialController_Marlin::savePosTempLog()
-	{
-		//auto sLayer = std::to_string(m_nLayer);
-		//const std::string filename = "d:\\$aaaa\\coord" + sLayer + ".csv";
-		//std::ofstream myfile;
-		//myfile.open(filename);
-		//myfile << m_sPosTempLogStream.str();
-		//myfile.close();
-		//m_sPosTempLogStream.str("");
-		//m_sPosTempLogStream << "Xc,Yc,Zc" << std::endl;
-		//m_nLayer++;
-
 	}
 
 	void CSerialController_Marlin::setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval)
@@ -640,9 +621,6 @@ namespace AMC {
 	void CSerialController_Marlin::getExtruderPosition(double& dE)
 	{
 		dE = m_dCurrentPosE;
-
-		// TODO nur temp => wieder raus
-		savePosTempLog();
 	}
 
 	void CSerialController_Marlin::startHoming()
@@ -670,42 +648,67 @@ namespace AMC {
 		sendCommand("G91");
 	}
 
-	void CSerialController_Marlin::move(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond = -1)
+	void CSerialController_Marlin::moveToEx(bool bFastMove, bool bInX, const double dX, bool bInY, const double dY, bool bInZ, const double dZ, const double dSpeedInMMperSecond)
 	{
 		std::stringstream sCommand;
-		sCommand << "G1 X" << dX << " Y" << dY << " Z" << dZ;
+
+		if (bFastMove) {
+			sCommand << "G0";
+		}
+		else {
+			sCommand << "G1";
+		}
+
+		if (bInX) {
+			// X given => add X+value to command str
+			sCommand << " X" << dX;
+		}
+		if (bInY) {
+			// Y given => add Y+value to command str
+			sCommand << " Y" << dY;
+		}
+		if (bInZ) {
+			// Z given => add Z+value to command str
+			sCommand << " Z" << dZ;
+		}
 		if (dSpeedInMMperSecond > 0) {
-			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > 0.0001) {
+			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
 				m_dCurrentSpeedInMMperSecond = dSpeedInMMperSecond;
 				sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
 			}
 		}
 		sendCommand(sCommand.str());
 
-		m_dTargetPosX = dX;
-		m_dTargetPosY = dY;
-		m_dTargetPosZ = dZ;
-		// TODO nur temp => wieder raus
-		m_sPosTempLogStream << dX << "," << dY << "," << dZ << std::endl;
+		if (bInX) {
+			m_dTargetPosX = dX;
+		}
+		if (bInY) {
+			m_dTargetPosY = dY;
+		}
+		if (bInZ) {
+			m_dTargetPosZ = dZ;
+		}
 	}
 
-	void CSerialController_Marlin::moveFast(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond = -1)
-	{
-		std::stringstream sCommand;
-		sCommand << "G0 X" << dX << " Y" << dY << " Z" << dZ ;
-			if (dSpeedInMMperSecond > 0) {
-				if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > 0.0001) {
-					m_dCurrentSpeedInMMperSecond = dSpeedInMMperSecond;
-					sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
-				}
-			}
-		sendCommand(sCommand.str());
 
-		m_dTargetPosX = dX;
-		m_dTargetPosY = dY;
-		m_dTargetPosZ = dZ;
-		// TODO nur temp => wieder raus
-		m_sPosTempLogStream << dX << "," << dY << "," << dZ << std::endl;
+	void CSerialController_Marlin::moveXY(const double dX, const double dY, const double dSpeedInMMperSecond)
+	{
+		moveToEx(false, true, dX, true, dY, false, 0.0, dSpeedInMMperSecond);
+	}
+
+	void CSerialController_Marlin::moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond)
+	{
+		moveToEx(true, true, dX, true, dY, false, 0.0, dSpeedInMMperSecond);
+	}
+
+	void CSerialController_Marlin::moveZ(const double dZ, const double dSpeedInMMperSecond)
+	{
+		moveToEx(false, false, 0.0, false, 0.0, true, dZ, dSpeedInMMperSecond);
+	}
+
+	void CSerialController_Marlin::moveFastZ(const double dZ, const double dSpeedInMMperSecond)
+	{
+		moveToEx(true, false, 0.0, false, 0.0, true, dZ, dSpeedInMMperSecond);
 	}
 
 	void CSerialController_Marlin::waitForMovement()

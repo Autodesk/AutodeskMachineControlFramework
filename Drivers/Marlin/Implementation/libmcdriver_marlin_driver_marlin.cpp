@@ -149,15 +149,27 @@ bool CDriver_Marlin::IsHomed()
 	return m_pSerialController->isHomed();
 }
 
-void CDriver_Marlin::MoveTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+void CDriver_Marlin::MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed)
 {
-	m_pSerialController->move(dX, dY, dZ, dSpeed);
+	m_pSerialController->moveXY(dX, dY, dSpeed);
 }
 
-void CDriver_Marlin::MoveFastTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+void CDriver_Marlin::MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed)
 {
-	m_pSerialController->moveFast(dX, dY, dZ, dSpeed);
+	m_pSerialController->moveFastXY(dX, dY, dSpeed);
 }
+
+void CDriver_Marlin::MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+{
+	m_pSerialController->moveZ(dZ, dSpeed);
+}
+
+void CDriver_Marlin::MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+{
+	m_pSerialController->moveFastZ(dZ, dSpeed);
+}
+
+
 
 void CDriver_Marlin::StartHoming()
 {

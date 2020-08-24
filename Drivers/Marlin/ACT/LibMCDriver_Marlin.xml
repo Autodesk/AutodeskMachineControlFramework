@@ -182,20 +182,27 @@ Custom implementation
 			<param name="Value" type="bool" pass="return" description="True if printer is homed." />
 		</method>
 
-		<method name="MoveTo" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+		<method name="MoveToXY" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="X" type="double" pass="in" description="X Value in mm" />
 			<param name="Y" type="double" pass="in" description="Y Value in mm" />
+			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
+		</method>
+
+		<method name="MoveFastToXY" description="Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+			<param name="X" type="double" pass="in" description="X Value in mm" />
+			<param name="Y" type="double" pass="in" description="Y Value in mm" />
+			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
+		</method>
+		
+		<method name="MoveToZ" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="Z" type="double" pass="in" description="Z Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 
-		<method name="MoveFastTo" description="Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
-			<param name="X" type="double" pass="in" description="X Value in mm" />
-			<param name="Y" type="double" pass="in" description="Y Value in mm" />
+		<method name="MoveFastToZ" description="Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="Z" type="double" pass="in" description="Z Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
-		
 	
 		<method name="StartHoming" description="Start Homing of printer.">
 		</method>

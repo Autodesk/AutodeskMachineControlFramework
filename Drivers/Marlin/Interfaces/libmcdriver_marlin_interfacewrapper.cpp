@@ -718,7 +718,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_ishomed(LibMCDriver_Ma
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_moveto(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoxy(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -727,7 +727,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_moveto(LibMCDriver_Mar
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->MoveTo(dX, dY, dZ, dSpeed);
+		pIDriver_Marlin->MoveToXY(dX, dY, dSpeed);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -742,7 +742,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_moveto(LibMCDriver_Mar
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movefastto(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movefasttoxy(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -751,7 +751,55 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movefastto(LibMCDriver
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->MoveFastTo(dX, dY, dZ, dSpeed);
+		pIDriver_Marlin->MoveFastToXY(dX, dY, dSpeed);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoz(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->MoveToZ(dZ, dSpeed);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movefasttoz(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->MoveFastToZ(dZ, dSpeed);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -845,10 +893,14 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_ismoving;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_ishomed") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_ishomed;
-	if (sProcName == "libmcdriver_marlin_driver_marlin_moveto") 
-		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_moveto;
-	if (sProcName == "libmcdriver_marlin_driver_marlin_movefastto") 
-		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movefastto;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_movetoxy") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movetoxy;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_movefasttoxy") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movefasttoxy;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_movetoz") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movetoz;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_movefasttoz") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movefasttoz;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_starthoming") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_starthoming;
 	if (sProcName == "libmcdriver_marlin_getversion") 

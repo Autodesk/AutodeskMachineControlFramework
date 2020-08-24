@@ -27,8 +27,6 @@ namespace AMC {
 		{
 
 		}
-		// TODO nur temp => wieder raus
-		virtual void savePosTempLog() = 0;
 
 		virtual void initializeController () = 0;
 		virtual void disconnectController() = 0;
@@ -43,8 +41,6 @@ namespace AMC {
 
 		virtual void queryTemperatureState (uint32_t nExtruderIndex) = 0;
 		virtual void queryPositionState () = 0;
-		virtual void queryAxisStepsPerUnitStateAndPidValues() = 0;
-		virtual void queryFirmwareInfo() = 0;
 
 		virtual void getHeatedBedTemperature(double & dTargetTemperature, double & dCurrentTemperature) = 0;
 		virtual void getExtruderTemperature(uint32_t nExtruderIndex, double& dTargetTemperature, double& dCurrentTemperature) = 0;
@@ -57,8 +53,11 @@ namespace AMC {
 		virtual void startHoming() = 0;
 		virtual void setLcdMsg(const std::string& sLcdMsg) = 0;
 
-		virtual void move(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond) = 0;
-		virtual void moveFast(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond) = 0;
+		virtual void moveXY(const double dX, const double dY, const double dSpeedInMMperSecond) = 0;
+		virtual void moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond) = 0;
+
+		virtual void moveZ(const double dZ, const double dSpeedInMMperSecond) = 0;
+		virtual void moveFastZ(const double dZ, const double dSpeedInMMperSecond) = 0;
 
 		virtual bool isHomed() = 0;
 		virtual bool isMoving() = 0;

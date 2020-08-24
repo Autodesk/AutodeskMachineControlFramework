@@ -125,7 +125,7 @@ public:
 				pStateEnvironment->LogMessage("Starting job..");
 				try {
 					auto sJobName = pHandlerInstance->GetString("jobname");
-					auto sJobUUID = pHandlerInstance->GetString("jobuuid");
+					auto	 sJobUUID = pHandlerInstance->GetString("jobuuid");
 
 					if (sJobName == "")
 						throw std::runtime_error ("empty job name!");
@@ -289,16 +289,13 @@ public:
 
 		if (pSignal->WaitForHandling((uint32_t) (nLayerTimeout + nLayerTimeoutGraceTime))) {
 			auto bSuccess = pSignal->GetBoolResult("success");
-			std::string bSuccessMsg;
-			//auto bSuccess = pSignal->GetBoolResult("successextrude");
-			//auto bSuccessMsg = pSignal->GetStringResult("successextrudemessage");
 
 			if (bSuccess) {
 				pStateEnvironment->LogMessage("Extruding success. ");
 				pStateEnvironment->SetNextState("nextlayer");
 			}
 			else {
-				pStateEnvironment->LogMessage("Extruding failure: " + bSuccessMsg);
+				pStateEnvironment->LogMessage("Extruding failure. ");
 				pStateEnvironment->SetNextState("fatalerror");
 			}
 		}

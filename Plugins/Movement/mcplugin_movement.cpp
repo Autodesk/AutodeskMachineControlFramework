@@ -75,21 +75,20 @@ public:
 	{
 		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_setpidvalues", 0, pSignalHandler)) {
-			//double dP = pSignalHandler->GetDouble("dp");
-			//double dI = pSignalHandler->GetDouble("di");
-			//double dD = pSignalHandler->GetDouble("dd");
+			double dP = pSignalHandler->GetDouble("dp");
+			double dI = pSignalHandler->GetDouble("di");
+			double dD = pSignalHandler->GetDouble("dd");
 
-			//pStateEnvironment->LogMessage("Setting PID Value to P: " + std::to_string (dP) + " I: " + std::to_string(dI) + "D: " + std::to_string(dD));
-			//pDriver->SetPidParameters (dP, dI, dD);
+			pStateEnvironment->LogMessage("Setting PID Value to P: " + std::to_string (dP) + " I: " + std::to_string(dI) + "D: " + std::to_string(dD));
+			pDriver->SetPidParameters (dP, dI, dD);
 
-			// TODO modify!!!!!!!!! => to be able to use two different signals in one statemachine
 			pSignalHandler->SetBoolResult("success", true);
 			pSignalHandler->SignalHandled();
 		} 
 
 	}
 
-	void updateStateFromDriver(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	void updateStateFromDriver(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment, bool bDoUpdatePIDValues)
 	{
 
 		if (pDriver.get() == nullptr)
@@ -111,7 +110,9 @@ public:
 		double dI;
 		double dD;
 
-		updatePIDValues(pDriver, pStateEnvironment);
+		if (bDoUpdatePIDValues) {
+			updatePIDValues(pDriver, pStateEnvironment);
+		}
 		pDriver->UpdateState();
 		pDriver->GetCurrentPosition(dCurrentX, dCurrentY, dCurrentZ);
 		pDriver->GetTargetPosition(dTargetX, dTargetY, dTargetZ);
@@ -176,7 +177,7 @@ public:
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 		pDriver->Connect(sCOMPort, (uint32_t) nBaudRate, dTimerInterval);
-		m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+		m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, false);
 
 		if (!pDriver->IsHomed()) {
 			pStateEnvironment->SetNextState("homing");
@@ -215,7 +216,7 @@ public:
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 		
-		m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+		m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, false);
 		if (pDriver->CanExecuteMovement()) {
 
 			std::string sParameterData;
@@ -293,7 +294,7 @@ private:
 				dStatusUpdateInterval = 0.0;
 
 			pStateEnvironment->Sleep((uint32_t) dStatusUpdateInterval);
-			m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+			m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 			if (timeElapsed(nLayerTimeout, tStart)) {
 				bSucces = false;
 				break;
@@ -332,13 +333,30 @@ public:
 
 		auto pToolpathAccessor = pStateEnvironment->GetBuildJob(sJobUUID)->CreateToolpathAccessor();
 		auto pLayer = pToolpathAccessor->LoadLayer((uint32_t)nLayerIndex);
-
-		double dLayerZ = pLayer->GetZValue();
+		auto dUnit = pLayer->GetUnits();
+		auto dLayerZ = pLayer->GetZValue();
+		double dZ = dLayerZ * dUnit;
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 		auto nSegmentCount = pLayer->GetSegmentCount();
 
 		auto tStart = std::chrono::steady_clock::now();
+
+		// do initial move to read z value/layer height
+		if ((nSegmentCount > 0) && (dZ > 0)) {
+			bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
+			if (bSucces) {
+				// TODO check how to en/disable extrusion
+				// TODO check how to set Speed/Feedrate
+				pDriver->MoveToZ(dZ, 100.0);
+				m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
+			}
+			else {
+				sNoSuccessMsg << "Timeout while moving to layer height Z=" << dZ << " of layer " << nLayerIndex;
+			}
+
+		}
+		
 		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 			LibMCEnv::eToolpathSegmentType eSegmentType;
 			uint32_t nPointCount;
@@ -347,7 +365,7 @@ public:
 			pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
 			pLayer->GetSegmentPointData(nSegmentIndex, PointData);
 			
-			if (eSegmentType != LibMCEnv::eToolpathSegmentType::Unknown && nPointCount > 0 && nPointCount == PointData.size()) {
+			if (eSegmentType != LibMCEnv::eToolpathSegmentType::Unknown && nPointCount > 0 && nPointCount == PointData.size() && dZ > 0.0) {
 				// handle x/y coordinates, dependent on SegmentType, no z value provided
 				// => printer head remains on z level of given layer, no retract movement handled
 				switch (eSegmentType) {
@@ -360,18 +378,16 @@ public:
 							if (bSucces) {
 								// TODO check how to en/disable extrusion
 								// TODO check how to set Speed/Feedrate
-								// TODO remove div by 1000 (use Units...)
-								pDriver->MoveFastTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
-								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+								pDriver->MoveFastToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, 100.0);
+								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 								// move to second hatch coord with extrusion (second of a pair of coord)
 								bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 								if (bSucces) {
 									// TODO check how to en/disable extrusion
 									// TODO check how to set Speed/Feedrate
-									// TODO remove div by 1000 (use Units...)
-									pDriver->MoveTo(PointData[i + 1].m_Coordinates[0] / 1000.0, PointData[i + 1].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
-									m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+									pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + 1].m_Coordinates[1] * dUnit, 100.0);
+									m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 								}
 								else {
 									sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Hatch of layer " << nLayerIndex;
@@ -398,9 +414,8 @@ public:
 					if (bSucces) {
 						// TODO check how to en/disable extrusion
 						// TODO check how to set Speed/Feedrate
-						// TODO remove div by 1000 (use Units...)
-						pDriver->MoveFastTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
-						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, 100.0);
+						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 
 						for (uint32_t i = 1; i < nPointCount; i++) {
@@ -409,9 +424,8 @@ public:
 							if (bSucces) {
 								// TODO check how to en/disable extrusion
 								// TODO check how to set Speed/Feedrate
-								// TODO remove div by 1000 (use Units...)
-								pDriver->MoveTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
-								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, 100.0);
+								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 							}
 							else {
 								sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop of layer " << nLayerIndex;
@@ -425,9 +439,8 @@ public:
 						if (bSucces) {
 							// TODO check how to en/disable extrusion
 							// TODO check how to set Speed/Feedrate
-							// TODO remove div by 1000 (use Units...)
-							pDriver->MoveTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
-							m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+							pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, 100.0);
+							m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 						}
 						else {
 							sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop to close loop of layer " << nLayerIndex;
@@ -444,9 +457,8 @@ public:
 					if (bSucces) {
 						// TODO check how to en/disable extrusion
 						// TODO check how to set Speed/Feedrate
-						// TODO remove div by 1000 (use Units...)
-						pDriver->MoveFastTo(PointData[0].m_Coordinates[0] / 1000.0, PointData[0].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
-						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, 100.0);
+						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 
 						for (uint32_t i = 1; i < nPointCount; i++) {
@@ -455,9 +467,8 @@ public:
 							if (bSucces) {
 								// TODO check how to en/disable extrusion
 								// TODO check how to set Speed/Feedrate
-								// TODO remove div by 1000 (use Units...)
-								pDriver->MoveTo(PointData[i].m_Coordinates[0] / 1000.0, PointData[i].m_Coordinates[1] / 1000.0, dLayerZ, 100.0);
-								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment);
+								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, 100.0);
+								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 							}
 							else {
@@ -480,8 +491,10 @@ public:
 			}
 		}
 
+		if (!bSucces) {
+			pStateEnvironment->LogMessage("Extrude error: " + sNoSuccessMsg.str());
+		}
 		pSignal->SetBoolResult("success", bSucces);
-		//pSignal->SetStringResult("successextrudemessage", sNoSuccessMsg.str());
 		pSignal->SignalHandled();
 
 		pStateEnvironment->SetNextState("idle");

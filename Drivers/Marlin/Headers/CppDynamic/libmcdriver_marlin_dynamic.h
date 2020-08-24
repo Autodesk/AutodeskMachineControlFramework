@@ -268,11 +268,10 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_IsHomedPtr) 
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dX - X Value in mm
 * @param[in] dY - Y Value in mm
-* @param[in] dZ - Z Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dSpeed);
 
 /**
 * Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -280,11 +279,30 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToPtr) (
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dX - X Value in mm
 * @param[in] dY - Y Value in mm
+* @param[in] dSpeed - Movement speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveFastToXYPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dSpeed);
+
+/**
+* Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dZ - Z Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveFastToPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed);
+
+/**
+* Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] dZ - Z Value in mm
+* @param[in] dSpeed - Movement speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveFastToZPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed);
 
 /**
 * Start Homing of printer.
@@ -390,8 +408,10 @@ typedef struct {
 	PLibMCDriver_MarlinDriver_Marlin_CanExecuteMovementPtr m_Driver_Marlin_CanExecuteMovement;
 	PLibMCDriver_MarlinDriver_Marlin_IsMovingPtr m_Driver_Marlin_IsMoving;
 	PLibMCDriver_MarlinDriver_Marlin_IsHomedPtr m_Driver_Marlin_IsHomed;
-	PLibMCDriver_MarlinDriver_Marlin_MoveToPtr m_Driver_Marlin_MoveTo;
-	PLibMCDriver_MarlinDriver_Marlin_MoveFastToPtr m_Driver_Marlin_MoveFastTo;
+	PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr m_Driver_Marlin_MoveToXY;
+	PLibMCDriver_MarlinDriver_Marlin_MoveFastToXYPtr m_Driver_Marlin_MoveFastToXY;
+	PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr m_Driver_Marlin_MoveToZ;
+	PLibMCDriver_MarlinDriver_Marlin_MoveFastToZPtr m_Driver_Marlin_MoveFastToZ;
 	PLibMCDriver_MarlinDriver_Marlin_StartHomingPtr m_Driver_Marlin_StartHoming;
 	PLibMCDriver_MarlinGetVersionPtr m_GetVersion;
 	PLibMCDriver_MarlinGetLastErrorPtr m_GetLastError;

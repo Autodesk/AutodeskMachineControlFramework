@@ -52,7 +52,6 @@ public:
 
 	bool setPIDValues (LibMCEnv::PStateEnvironment pStateEnvironment, double dP, double dI, double dD)
 	{
-		// TODO implement handling
 		auto pSignal = pStateEnvironment->PrepareSignal("movement", "signal_setpidvalues");
 		pSignal->SetDouble("dp", dP);
 		pSignal->SetDouble("di", dI);
@@ -60,7 +59,7 @@ public:
 		pSignal->Trigger();
 
 		pStateEnvironment->LogMessage("PID-Control: setting P-Values");
-		if (pSignal->WaitForHandling(10000)) {
+		if (pSignal->WaitForHandling(20000)) {
 			// Store the p-Values in the state
 			pStateEnvironment->SetDoubleParameter("status", "dp", dP);
 			pStateEnvironment->SetDoubleParameter("status", "di", dI);
@@ -111,17 +110,6 @@ public:
 		pStateEnvironment->LogMessage("PIDControl Initialisation...");
 
 		pStateEnvironment->SetNextState("idle");
-
-
-
-		//if (m_pPluginData->setPIDValues(pStateEnvironment, 10.0, 20.0, 30.0)) {
-		//	pStateEnvironment->SetNextState("idle");
-
-		//} else {
-		//	// Could not change signal...
-		//	pStateEnvironment->LogMessage("Could not set P-Values!");
-		//	pStateEnvironment->SetNextState("fatalerror");
-		//} 
 
 
 	}
