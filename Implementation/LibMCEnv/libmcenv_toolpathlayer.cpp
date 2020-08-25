@@ -74,6 +74,18 @@ std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nIndex)
 	return m_pToolpathLayerData->getSegmentPartUUID(nIndex);
 }
 
+std::string CToolpathLayer::GetSegmentProfileValue(const std::string& sValueName)
+{
+	return "";
+}
+
+LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv::eToolpathProfileValueType eValueType)
+{
+	return 0.0;
+}
+
+
+
 void CToolpathLayer::GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer)
 {
 

@@ -65,6 +65,17 @@
 		<option name="Loop" value="2" />
 		<option name="Polyline" value="3" />
 	</enum>
+
+	<enum name="ToolpathProfileValueType">
+		<option name="Custom" value="0" />
+		<option name="Speed" value="1" />
+		<option name="JumpSpeed" value="2" />
+		<option name="ExtrusionFactor" value="3" />
+		<option name="LaserPower" value="4" />
+		<option name="StartDelay" value="5" />
+		<option name="EndDelay" value="6" />
+		<option name="PolyDelay" value="7" />
+	</enum>
 	
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
@@ -72,6 +83,7 @@
 	
 	<class name="Base">
 	</class>
+
 
 	<class name="ToolpathLayer" parent="Base">
 	  
@@ -93,6 +105,17 @@
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ProfileUUID" type="string" pass="return" description="Segment Profile UUID" />
 		</method>
+
+		<method name="GetSegmentProfileValue" description="Retrieves an assigned profile custom value.">
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="Value" type="string" pass="return" description="String Value." />
+		</method>
+
+		<method name="GetSegmentProfileTypedValue" description="Retrieves an assigned profile value of a standard type.">
+			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
+			<param name="Value" type="double" pass="return" description="Double Value" />
+		</method>
+
 		
 		<method name="GetSegmentPartUUID" description="Retrieves the assigned segment part uuid.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
