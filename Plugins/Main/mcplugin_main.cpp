@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCPlugin::Impl;
 
+#include "libmcdriver_camera_dynamic.hpp"
+#include "libmcenv_drivercast.hpp"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -41,10 +43,26 @@ using namespace LibMCPlugin::Impl;
 #endif
 
 /*************************************************************************************************************************
+ Import functionality for Driver into current plugin
+**************************************************************************************************************************/
+typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
+typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
+
+/*************************************************************************************************************************
  Class definition of CMainData
 **************************************************************************************************************************/
 class CMainData : public virtual CPluginData {
+protected:
+	// We need to globally store driver wrappers in the plugin
+	PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
+
 public:
+
+	PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
+	}
+
 };
 
 /*************************************************************************************************************************
@@ -333,9 +351,19 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-
+		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
+
+		pStateEnvironment->LogMessage("Getting Camera Image");
+		auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
+		auto pPNGImage = pCameraDriver->CapturePNGImage();
+		
+		std::vector<uint8_t> Buffer;
+		pPNGImage->GetRawData(Buffer);
+
+		auto pBuild = pStateEnvironment->GetBuildJob(sJobUUID);
+		pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
 
 		if (nCurrentLayer < (nLayerCount - 1)) {
 			pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");

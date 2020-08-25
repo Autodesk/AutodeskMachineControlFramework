@@ -132,10 +132,10 @@ CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID,
 
 	auto sParsedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
 
-	std::string sQuery = "SELECT uuid, name, mimetype, sha2, size, userid, timestamp FROM storage_streams WHERE uuid=? AND status=?";
+	std::string sQuery = "SELECT uuid, name, mimetype, sha2, size, userid, timestamp FROM storage_streams WHERE uuid=?";
 	auto pStatement = pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, sParsedStreamUUID);
-	pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
+	//pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
 	if (!pStatement->nextRow())
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND);
 
