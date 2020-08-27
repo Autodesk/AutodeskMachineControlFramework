@@ -44,6 +44,7 @@ namespace AMC {
 	CSerialController_Marlin::CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming)
 		: m_sCOMPort("COM1"),
 		m_nBaudRate(115200),
+		m_nConnectTimeout(2000),
 		m_bDoQueryFirmwareInfo(bDoQueryFirmwareInfo),
 		m_bDisableHoming(bDisableHoming),
 		m_dStatusUpdateTimerInterval(100),
@@ -65,7 +66,6 @@ namespace AMC {
 		m_dCurrentPosX(0),
 		m_dCurrentPosY(0),
 		m_dCurrentPosZ(0),
-		m_dCurrentPosE(0),
 		m_dAxisStepsPerUnitX(0),
 		m_dAxisStepsPerUnitY(0),
 		m_dAxisStepsPerUnitZ(0),
@@ -99,7 +99,7 @@ namespace AMC {
 
 		return m_sCOMPort;
 	}
-
+	
 	void CSerialController_Marlin::setBaudrate(const uint32_t nBaudrate)
 	{
 		if (m_pConnection.get() != nullptr)
@@ -113,6 +113,19 @@ namespace AMC {
 		return m_nBaudRate;
 	}
 
+	void CSerialController_Marlin::setConnectTimeout(const uint32_t nConnectTimeout)
+	{
+		if (m_pConnection.get() != nullptr)
+			throw std::runtime_error("Serial Port already initialized");
+
+		m_nConnectTimeout = nConnectTimeout;
+	}
+
+	uint32_t CSerialController_Marlin::getConnectTimeout()
+	{
+		return m_nConnectTimeout;
+	}
+
 	CSerialController_Marlin::~CSerialController_Marlin()
 	{
 	}
@@ -122,7 +135,7 @@ namespace AMC {
 		if (m_pConnection.get() != nullptr)
 			throw std::runtime_error("Serial Port already initialized");
 
-		// set timeout >1000 => 3000
+		// set timeout >1000 => 2000 (default of m_nConnectTimeout)
 		// 
 		// if printer is booting (echoing start+ Date+Memory... after switch on printer or plug in cable) and
 		// timeout would be 1000 the while loop below we be leaved "to early" (after timeout of 1sec) and
@@ -131,9 +144,9 @@ namespace AMC {
 		//
 		// if printer is not booting (no echoing text... after software" reconnect)
 		// "start" will no be received,
-		// but timeout after 3000 will respond with an empty string and
+		// but timeout after 2000 will respond with an empty string and
 		// printer is ready to receive commands
-		m_pConnection.reset(new serial::Serial(m_sCOMPort, m_nBaudRate, serial::Timeout::simpleTimeout(2000)));
+		m_pConnection.reset(new serial::Serial(m_sCOMPort, m_nBaudRate, serial::Timeout::simpleTimeout(m_nConnectTimeout)));
 
 		if (!m_pConnection->isOpen()) {
 			m_pConnection.reset();
@@ -314,16 +327,30 @@ namespace AMC {
 
 
 
-	void CSerialController_Marlin::setHeatedBedTargetTemperature(double nTemperatureInDegreeCelcius)
+	void CSerialController_Marlin::setHeatedBedTargetTemperature(double nTemperatureInDegreeCelcius, bool bWait)
 	{
-		sendCommand("M140 S" + std::to_string(nTemperatureInDegreeCelcius));
+		if (bWait) {
+			// wait for the target bed temperature to be reached before proceeding
+			sendCommand("M190 S" + std::to_string(nTemperatureInDegreeCelcius));
+		}
+		else {
+			// don't wait
+			sendCommand("M140 S" + std::to_string(nTemperatureInDegreeCelcius));
+		}
 	}
 
-	void CSerialController_Marlin::setExtruderTargetTemperature(uint32_t nExtruderIndex, double nTemperatureInDegreeCelcius)
+	void CSerialController_Marlin::setExtruderTargetTemperature(uint32_t nExtruderIndex, double nTemperatureInDegreeCelcius, bool bWait)
 	{
-		if (nExtruderIndex < m_iExtruderCount)
+		if ((nExtruderIndex >= 0) && (nExtruderIndex < m_iExtruderCount))
 		{
-			sendCommand("M104 T" + std::to_string(nExtruderIndex) + " S" + std::to_string(nTemperatureInDegreeCelcius));
+			if (bWait) {
+				// wait for the target extruder temperature to be reached before proceeding
+				sendCommand("M109 T" + std::to_string(nExtruderIndex) + " S" + std::to_string(nTemperatureInDegreeCelcius));
+			}
+			else {
+				// don't wait
+				sendCommand("M104 T" + std::to_string(nExtruderIndex) + " S" + std::to_string(nTemperatureInDegreeCelcius));
+			}
 		}
 	}
 
@@ -337,6 +364,21 @@ namespace AMC {
 
 	}
 
+	void CSerialController_Marlin::setFanSpeed(uint32_t nFanIndex, uint32_t nSpeed)
+	{
+		if ((nFanIndex >= 0))
+		{
+			if ((nSpeed > 0) && (nSpeed < 256))	 {
+				// turn fan on
+				sendCommand("M106 P" + std::to_string(nFanIndex) + " S" + std::to_string(nSpeed));
+			}
+			else {
+				// turn fan off
+				sendCommand("M107 P" + std::to_string(nFanIndex));
+			}
+		}
+	}
+	
 	void CSerialController_Marlin::queryTemperatureState(uint32_t nExtruderIndex)
 	{
 		if (nExtruderIndex < m_iExtruderCount)
@@ -622,9 +664,9 @@ namespace AMC {
 		dZ = m_dCurrentPosZ;
 	}
 
-	void CSerialController_Marlin::getExtruderPosition(double& dE)
+	void CSerialController_Marlin::getExtruderTargetPosition(double& dE)
 	{
-		dE = m_dCurrentPosE;
+		dE = m_dTargetPosE;
 	}
 
 	void CSerialController_Marlin::startHoming()
@@ -652,7 +694,12 @@ namespace AMC {
 		sendCommand("G91");
 	}
 
-	void CSerialController_Marlin::moveToEx(bool bFastMove, bool bInX, const double dX, bool bInY, const double dY, bool bInZ, const double dZ, const double dSpeedInMMperSecond)
+	void CSerialController_Marlin::moveToEx(bool bFastMove, 
+		bool bInX, const double dX, 
+		bool bInY, const double dY, 
+		bool bInZ, const double dZ,
+		bool bInE, const double dE,
+		const double dSpeedInMMperSecond)
 	{
 		std::stringstream sCommand;
 
@@ -675,6 +722,11 @@ namespace AMC {
 			// Z given => add Z+value to command str
 			sCommand << " Z" << dZ;
 		}
+		if (bInE && !bFastMove) {
+			// E given => add E+value to command str
+			// TODO remove to activate Extrusion
+			//sCommand << " E" << dE;
+		}
 		if (dSpeedInMMperSecond > 0) {
 			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
 				m_dCurrentSpeedInMMperSecond = dSpeedInMMperSecond;
@@ -692,27 +744,38 @@ namespace AMC {
 		if (bInZ) {
 			m_dTargetPosZ = dZ;
 		}
+		if (bInE) {
+			m_dTargetPosE = dE;
+		}
 	}
 
 
-	void CSerialController_Marlin::moveXY(const double dX, const double dY, const double dSpeedInMMperSecond)
+	void CSerialController_Marlin::moveXY(const double dX, const double dY, const double dE, const double dSpeedInMMperSecond)
 	{
-		moveToEx(false, true, dX, true, dY, false, 0.0, dSpeedInMMperSecond);
+		bool dInE = false;
+		if (fabs(dE) > MARLINDRIVER_MINSPEED) {
+			dInE = true;
+		}
+		moveToEx(false, true, dX, true, dY, false, 0.0, dInE, dE, dSpeedInMMperSecond);
 	}
 
 	void CSerialController_Marlin::moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond)
 	{
-		moveToEx(true, true, dX, true, dY, false, 0.0, dSpeedInMMperSecond);
+		moveToEx(true, true, dX, true, dY, false, 0.0, false, 0.0, dSpeedInMMperSecond);
 	}
 
-	void CSerialController_Marlin::moveZ(const double dZ, const double dSpeedInMMperSecond)
+	void CSerialController_Marlin::moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond)
 	{
-		moveToEx(false, false, 0.0, false, 0.0, true, dZ, dSpeedInMMperSecond);
+		bool dInE = false;
+		if (fabs(dE) > MARLINDRIVER_MINSPEED) {
+			dInE = true;
+		}
+		moveToEx(false, false, 0.0, false, 0.0, true, dZ, dInE, dE, dSpeedInMMperSecond);
 	}
 
 	void CSerialController_Marlin::moveFastZ(const double dZ, const double dSpeedInMMperSecond)
 	{
-		moveToEx(true, false, 0.0, false, 0.0, true, dZ, dSpeedInMMperSecond);
+		moveToEx(true, false, 0.0, false, 0.0, true, dZ, false, 0.0, dSpeedInMMperSecond);
 	}
 
 	void CSerialController_Marlin::waitForMovement()

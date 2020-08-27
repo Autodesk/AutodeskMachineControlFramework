@@ -126,9 +126,10 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_g
 * @param[in] pCOMPort - Device Port to connect to
 * @param[in] nBaudrate - Baudrate to use
 * @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+* @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
 
 /**
 * Disconnects from the Marlin board.
@@ -152,9 +153,10 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_m
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dTemperatureInDegreeCelcius - Bed target temperature.
+* @param[in] bWaitForTemp - If true, waits for the target bed temperature to be reached before proceeding
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setheatedbedtargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setheatedbedtargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, bool bWaitForTemp);
 
 /**
 * Sets target temperature of the given extruder.
@@ -162,9 +164,20 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_m
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] nExtruderID - ID of extruder.
 * @param[in] dTemperatureInDegreeCelcius - Extruder target temperature.
+* @param[in] bWaitForTemp - If true, waits for the target extruder temperature to be reached before proceeding
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setextrudertargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setextrudertargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, bool bWaitForTemp);
+
+/**
+* Turns on one of the fans and set its speed.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] nFanID - ID of fan.
+* @param[in] nSpeed - Fan speed [0..255]. 0=0%!.(MISSING).255=100%!
+(MISSING)* @return error code or 0 (success)
+*/
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setfanspeed(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nFanID, LibMCDriver_Marlin_uint32 nSpeed);
 
 /**
 * Sets PID parameters.
@@ -208,13 +221,13 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_m
 LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_gettargetposition(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pX, LibMCDriver_Marlin_double * pY, LibMCDriver_Marlin_double * pZ);
 
 /**
-* Returns the current extruder position.
+* Returns the target extruder position.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[out] pE - E Value in mm
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextruderposition(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pE);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextrudertargetposition(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pE);
 
 /**
 * Returns the current and the target bed temperature.
@@ -281,10 +294,11 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_m
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dX - X Value in mm
 * @param[in] dY - Y Value in mm
+* @param[in] dE - E Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoxy(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dSpeed);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoxy(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed);
 
 /**
 * Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -302,10 +316,11 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_m
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dZ - Z Value in mm
+* @param[in] dE - E Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoz(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoz(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed);
 
 /**
 * Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.

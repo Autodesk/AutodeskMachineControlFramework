@@ -149,7 +149,9 @@ public:
 			//pSignalHandler->SignalHandled();
 
 			pStateEnvironment->LogMessage("PIDControl Active...");
-			pStateEnvironment->SetNextState("controlling");
+			// TODO blocked while testing extrusion => do uncomment later pStateEnvironment->SetNextState("controlling");
+			pStateEnvironment->Sleep(2000);
+			pStateEnvironment->SetNextState("idle");
 
 		}
 		else {

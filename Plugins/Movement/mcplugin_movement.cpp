@@ -173,16 +173,31 @@ public:
 
 		auto sCOMPort = pStateEnvironment->GetStringParameter ("comdata", "port");
 		auto nBaudRate = pStateEnvironment->GetIntegerParameter("comdata", "baudrate");
+		auto nConnectTimeout = pStateEnvironment->GetIntegerParameter("comdata", "connecttimeout");
 		auto dTimerInterval = pStateEnvironment->GetDoubleParameter("movementstate", "statusupdateinterval");
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
-		pDriver->Connect(sCOMPort, (uint32_t) nBaudRate, dTimerInterval);
+		pDriver->Connect(sCOMPort, (uint32_t) nBaudRate, dTimerInterval, nConnectTimeout);
 		m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, false);
 
 		if (!pDriver->IsHomed()) {
 			pStateEnvironment->SetNextState("homing");
 		}
 		else {
+			// TODO set temp, fan speed etc parameters??
+			//pDriver->SetFanSpeed(0, 126);
+			//pDriver->SetExtruderTargetTemperature(0, 190, false);
+			//pDriver->SetHeatedBedTargetTemperature(45, false);
+			// TODO lower temp for testing without extrusion
+			//pDriver->SetExtruderTargetTemperature(0, 25, false);
+			//pDriver->SetHeatedBedTargetTemperature(25, false);
+
+			//pDriver->SetExtruderTargetTemperature(0, 190, true);
+			//pDriver->SetHeatedBedTargetTemperature(45, true);
+			// TODO lower temp for testing without extrusion
+			//pDriver->SetExtruderTargetTemperature(0, 30, true);
+			//pDriver->SetHeatedBedTargetTemperature(30, true);
+
 			pStateEnvironment->SetNextState("idle");
 		}
 
@@ -323,7 +338,7 @@ public:
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 		bool bSucces = true;
 		std::stringstream sNoSuccessMsg;
-		
+
 		double dStatusUpdateInterval = pStateEnvironment->GetDoubleParameter("movementstate", "statusupdateinterval");
 
 		auto pSignal = pStateEnvironment->RetrieveSignal("globalsignal_doextrudelayer");
@@ -337,24 +352,29 @@ public:
 		auto dLayerZ = pLayer->GetZValue();
 		double dZ = dLayerZ * dUnit;
 
-		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
-		auto nSegmentCount = pLayer->GetSegmentCount();
+		// TODO set speed values by reading data from toolptah... uncomment if data is available
+		//const double dSpeedMmPerSecond = pLayer->GetSegmentProfileTypedValue(LibMCEnv::eToolpathProfileValueType::Speed);
+		//const double dSpeedFastMmPerSecond = pLayer->GetSegmentProfileTypedValue(LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+		//const double dExtrusionFactor = pLayer->GetSegmentProfileTypedValue(LibMCEnv::eToolpathProfileValueType::ExtrusionFactor);
+		const double dSpeedMmPerSecond = 20;
+		const double dSpeedFastMmPerSecond = 50;
+		const double dExtrusionFactor = 5.0;
+		double dE = 0.0;
 
-		auto tStart = std::chrono::high_resolution_clock::now();
+		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 
 		// do initial move to read z value/layer height
+		auto nSegmentCount = pLayer->GetSegmentCount();
+		auto tStart = std::chrono::high_resolution_clock::now();
 		if ((nSegmentCount > 0) && (dZ > 0)) {
 			bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 			if (bSucces) {
-				// TODO check how to en/disable extrusion
-				// TODO check how to set Speed/Feedrate
-				pDriver->MoveToZ(dZ, 100.0);
+				pDriver->MoveFastToZ(dZ, dSpeedFastMmPerSecond);
 				m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 			}
 			else {
 				sNoSuccessMsg << "Timeout while moving to layer height Z=" << dZ << " of layer " << nLayerIndex;
 			}
-
 		}
 		
 		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -376,17 +396,17 @@ public:
 							// move fast to first hatch coord (first of a pair of coord)
 							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
-								// TODO check how to en/disable extrusion
-								// TODO check how to set Speed/Feedrate
-								pDriver->MoveFastToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, 100.0);
+								pDriver->MoveFastToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
 								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 								// move to second hatch coord with extrusion (second of a pair of coord)
 								bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 								if (bSucces) {
-									// TODO check how to en/disable extrusion
-									// TODO check how to set Speed/Feedrate
-									pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + 1].m_Coordinates[1] * dUnit, 100.0);
+									auto dDistance = sqrt(
+										pow(PointData[i + 1].m_Coordinates[0] - PointData[i].m_Coordinates[0], 2) +
+										pow(PointData[i + 1].m_Coordinates[1] - PointData[i].m_Coordinates[1], 2)) * dUnit;
+									dE = dDistance * dExtrusionFactor;
+									pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + (int)1].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 									m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 								}
 								else {
@@ -412,9 +432,7 @@ public:
 					// move fast to first point of loop
 					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 					if (bSucces) {
-						// TODO check how to en/disable extrusion
-						// TODO check how to set Speed/Feedrate
-						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, 100.0);
+						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
 						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 
@@ -422,9 +440,11 @@ public:
 							// move to rest of points of loop (with extrusion)
 							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
-								// TODO check how to en/disable extrusion
-								// TODO check how to set Speed/Feedrate
-								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, 100.0);
+								auto dDistance = sqrt(
+									pow(PointData[i].m_Coordinates[0] - PointData[i - 1].m_Coordinates[0], 2) +
+									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
+								dE = dDistance * dExtrusionFactor;
+								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 							}
 							else {
@@ -437,9 +457,11 @@ public:
 						// move from last point in list to first point to close the of loop (with extrusion)
 						bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 						if (bSucces) {
-							// TODO check how to en/disable extrusion
-							// TODO check how to set Speed/Feedrate
-							pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, 100.0);
+							auto dDistance = sqrt(
+								pow(PointData[0].m_Coordinates[0] - PointData[nPointCount - 1].m_Coordinates[0], 2) +
+								pow(PointData[0].m_Coordinates[1] - PointData[nPointCount - 1].m_Coordinates[1], 2)) * dUnit;
+							dE = dDistance * dExtrusionFactor;
+							pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 							m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 						}
 						else {
@@ -455,9 +477,7 @@ public:
 					// move fast to first point of Polyline
 					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 					if (bSucces) {
-						// TODO check how to en/disable extrusion
-						// TODO check how to set Speed/Feedrate
-						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, 100.0);
+						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
 						m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 
@@ -465,9 +485,11 @@ public:
 							// move to rest of points of polyline (with extrusion)
 							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
-								// TODO check how to en/disable extrusion
-								// TODO check how to set Speed/Feedrate
-								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, 100.0);
+								auto dDistance = sqrt(
+									pow(PointData[i].m_Coordinates[0] - PointData[i -1].m_Coordinates[0], 2) +
+									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
+								dE = dDistance * dExtrusionFactor;
+								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 								m_pPluginData->updateStateFromDriver(pDriver, pStateEnvironment, true);
 
 							}
@@ -530,6 +552,20 @@ public:
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 		pDriver->StartHoming();
+
+		// TODO set temp, fan speed etc parameters??
+		//pDriver->SetFanSpeed(0, 126);
+		//pDriver->SetExtruderTargetTemperature(0, 190, false);
+		//pDriver->SetHeatedBedTargetTemperature(45, false);
+		// TODO lower temp for testing without extrusion
+		//pDriver->SetExtruderTargetTemperature(0, 25, false);
+		//pDriver->SetHeatedBedTargetTemperature(25, false);
+
+		//pDriver->SetExtruderTargetTemperature(0, 190, true);
+		//pDriver->SetHeatedBedTargetTemperature(45, true);
+		// TODO lower temp for testing without extrusion
+		//pDriver->SetExtruderTargetTemperature(0, 30, true);
+		//pDriver->SetHeatedBedTargetTemperature(30, true);
 
 		pStateEnvironment->SetNextState("idle");
 

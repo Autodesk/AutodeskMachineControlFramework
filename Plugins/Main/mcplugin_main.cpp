@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCPlugin::Impl;
 
-#include "libmcdriver_camera_dynamic.hpp"
+//#include "libmcdriver_camera_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
 #ifdef _MSC_VER
@@ -45,8 +45,8 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
-typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
+//typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
+//typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
 
 /*************************************************************************************************************************
  Class definition of CMainData
@@ -54,14 +54,14 @@ typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDri
 class CMainData : public virtual CPluginData {
 protected:
 	// We need to globally store driver wrappers in the plugin
-	PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
+	//PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
 
 public:
 
-	PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
-	}
+	//PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	//{
+	//	return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
+	//}
 
 };
 
@@ -220,6 +220,39 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
 		pStateEnvironment->SetBoolParameter("jobinfo", "autostart", false);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", true);
+		pStateEnvironment->SetNextState("waitfortemperature");
+	}
+
+};
+
+
+/*************************************************************************************************************************
+ Class definition of CMainState_WaitForTemperature
+**************************************************************************************************************************/
+
+class CMainState_WaitForTemperature : public virtual CMainState {
+public:
+
+	CMainState_WaitForTemperature(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "waitfortemperature";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		if (pStateEnvironment.get() == nullptr)
+			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+
+		pStateEnvironment->LogMessage("Wait for temperature...");
+
+		// TODO do something...
+
 		pStateEnvironment->SetNextState("extrudelayer");
 	}
 
@@ -355,20 +388,20 @@ public:
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
 
-		pStateEnvironment->LogMessage("Getting Camera Image");
-		auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
-		auto pPNGImage = pCameraDriver->CapturePNGImage();
-		
-		std::vector<uint8_t> Buffer;
-		pPNGImage->GetRawData(Buffer);
+		//pStateEnvironment->LogMessage("Getting Camera Image");
+		//auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
+		//auto pPNGImage = pCameraDriver->CapturePNGImage();
+		//
+		//std::vector<uint8_t> Buffer;
+		//pPNGImage->GetRawData(Buffer);
 
 		auto pBuild = pStateEnvironment->GetBuildJob(sJobUUID);
-		pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
+		//pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
 
 		if (nCurrentLayer < (nLayerCount - 1)) {
 			pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");
 			pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nCurrentLayer + 1);
-			pStateEnvironment->SetNextState("extrudelayer");
+			pStateEnvironment->SetNextState("waitfortemperature");
 		}
 		else {
 			pStateEnvironment->LogMessage("Finishing process...");
@@ -448,6 +481,9 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 		return pStateInstance;
 
 	if (createStateInstanceByName<CMainState_NextLayer>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_WaitForTemperature>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDSTATENAME);

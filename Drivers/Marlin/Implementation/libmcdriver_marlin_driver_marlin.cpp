@@ -46,13 +46,14 @@ CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sTyp
 }
 
 
-void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval)
+void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	Disconnect ();
 
 	auto pSerialController = std::make_shared<AMC::CSerialController_Marlin>(m_bDebug, m_doQueryFirmwareInfo, m_bDisableHoming);
 	pSerialController->setCOMPort(sCOMPort);
 	pSerialController->setBaudrate(nBaudrate);
+	pSerialController->setConnectTimeout(nConnectTimeout);
 	pSerialController->setStatusUpdateTimerInterval(dStatusUpdateInterval);
 	pSerialController->initializeController();
 	m_pSerialController = pSerialController;
@@ -80,14 +81,19 @@ void CDriver_Marlin::SetAbsolutePositioning(const bool bAbsolute)
 	}
 }
 
-void CDriver_Marlin::SetHeatedBedTargetTemperature(const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius)
+void CDriver_Marlin::SetHeatedBedTargetTemperature(const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp)
 {
-	m_pSerialController->setHeatedBedTargetTemperature(dTemperatureInDegreeCelcius);
+	m_pSerialController->setHeatedBedTargetTemperature(dTemperatureInDegreeCelcius, bWaitForTemp);
 }
 
-void CDriver_Marlin::SetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius)
+void CDriver_Marlin::SetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp)
 {
-	m_pSerialController->setExtruderTargetTemperature(nExtruderID, dTemperatureInDegreeCelcius);
+	m_pSerialController->setExtruderTargetTemperature(nExtruderID, dTemperatureInDegreeCelcius, bWaitForTemp);
+}
+
+void CDriver_Marlin::SetFanSpeed(const LibMCDriver_Marlin_uint32 nFanID, const LibMCDriver_Marlin_uint32 nSpeed)
+{
+	m_pSerialController->setFanSpeed(nFanID, nSpeed);
 }
 
 void CDriver_Marlin::SetPidParameters(const LibMCDriver_Marlin_double dP, const LibMCDriver_Marlin_double dI, const LibMCDriver_Marlin_double dD)
@@ -114,9 +120,9 @@ void CDriver_Marlin::GetTargetPosition(LibMCDriver_Marlin_double& dX, LibMCDrive
 	m_pSerialController->getTargetPosition(dX, dY, dZ);
 }
 
-void CDriver_Marlin::GetExtruderPosition(LibMCDriver_Marlin_double& dE)
+void CDriver_Marlin::GetExtruderTargetPosition(LibMCDriver_Marlin_double& dE)
 {
-	m_pSerialController->getExtruderPosition(dE);
+	m_pSerialController->getExtruderTargetPosition(dE);
 }
 
 void CDriver_Marlin::GetHeatedBedTemperature(LibMCDriver_Marlin_double& dTargetTemperature, LibMCDriver_Marlin_double& dCurrentTemperature)
@@ -149,9 +155,9 @@ bool CDriver_Marlin::IsHomed()
 	return m_pSerialController->isHomed();
 }
 
-void CDriver_Marlin::MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed)
+void CDriver_Marlin::MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed)
 {
-	m_pSerialController->moveXY(dX, dY, dSpeed);
+	m_pSerialController->moveXY(dX, dY, dE, dSpeed);
 }
 
 void CDriver_Marlin::MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed)
@@ -159,9 +165,9 @@ void CDriver_Marlin::MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibM
 	m_pSerialController->moveFastXY(dX, dY, dSpeed);
 }
 
-void CDriver_Marlin::MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+void CDriver_Marlin::MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed)
 {
-	m_pSerialController->moveZ(dZ, dSpeed);
+	m_pSerialController->moveZ(dZ, dE, dSpeed);
 }
 
 void CDriver_Marlin::MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
