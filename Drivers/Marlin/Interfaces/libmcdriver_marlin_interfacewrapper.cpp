@@ -297,7 +297,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_getheaderinformation(LibMCDri
 /*************************************************************************************************************************
  Class implementation for Driver_Marlin
 **************************************************************************************************************************/
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -309,7 +309,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Ma
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, dStatusUpdateInterval);
+		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, dStatusUpdateInterval, nConnectTimeout);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -372,7 +372,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setabsolutepositioning
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setheatedbedtargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setheatedbedtargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, bool bWaitForTemp)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -381,7 +381,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setheatedbedtargettemp
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->SetHeatedBedTargetTemperature(dTemperatureInDegreeCelcius);
+		pIDriver_Marlin->SetHeatedBedTargetTemperature(dTemperatureInDegreeCelcius, bWaitForTemp);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -396,7 +396,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setheatedbedtargettemp
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setextrudertargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setextrudertargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, bool bWaitForTemp)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -405,7 +405,31 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setextrudertargettempe
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->SetExtruderTargetTemperature(nExtruderID, dTemperatureInDegreeCelcius);
+		pIDriver_Marlin->SetExtruderTargetTemperature(nExtruderID, dTemperatureInDegreeCelcius, bWaitForTemp);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setfanspeed(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nFanID, LibMCDriver_Marlin_uint32 nSpeed)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->SetFanSpeed(nFanID, nSpeed);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -528,7 +552,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_gettargetposition(LibM
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextruderposition(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pE)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextrudertargetposition(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pE)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -539,7 +563,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextruderposition(Li
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->GetExtruderPosition(*pE);
+		pIDriver_Marlin->GetExtruderTargetPosition(*pE);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -718,7 +742,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_ishomed(LibMCDriver_Ma
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoxy(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dSpeed)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoxy(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -727,7 +751,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoxy(LibMCDriver_M
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->MoveToXY(dX, dY, dSpeed);
+		pIDriver_Marlin->MoveToXY(dX, dY, dE, dSpeed);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -766,7 +790,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movefasttoxy(LibMCDriv
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoz(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoz(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -775,7 +799,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoz(LibMCDriver_Ma
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->MoveToZ(dZ, dSpeed);
+		pIDriver_Marlin->MoveToZ(dZ, dE, dSpeed);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -871,6 +895,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setheatedbedtargettemperature;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_setextrudertargettemperature") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setextrudertargettemperature;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_setfanspeed") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setfanspeed;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_setpidparameters") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setpidparameters;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_updatestate") 
@@ -879,8 +905,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getcurrentposition;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_gettargetposition") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_gettargetposition;
-	if (sProcName == "libmcdriver_marlin_driver_marlin_getextruderposition") 
-		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getextruderposition;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_getextrudertargetposition") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getextrudertargetposition;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_getheatedbedtemperature") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getheatedbedtemperature;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_getextrudertemperature") 

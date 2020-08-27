@@ -18,6 +18,13 @@
   		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
   	  </parametergroup>
 
+  	  <parametergroup name="temperaturecontrol" description="Temperature Control">
+  		<parameter name="currentextrudertemperature" description="Current Extruder Temperature" default="0.0" type="double" />
+  		<parameter name="targetextrudertemperature" description="Target Extruder Temperature" default="0.0" type="double" />
+  		<parameter name="currentbedtemperature" description="Current Extruder Temperature" default="0.0" type="double" />
+  		<parameter name="targetbedtemperature" description="Target Extruder Temperature" default="0.0" type="double" />
+  	  </parametergroup>
+
 	  
   	  <signaldefinition name="signal_startjob">
   		<parameter name="jobuuid" type="string" />
@@ -37,17 +44,21 @@
   	  </state>
   
   	  <state name="startprocess" repeatdelay="100">	  
-  			<outstate target="extrudelayer" />
+  			<outstate target="waitfortemperature" />
   	  </state>
   	  
   
+  	  <state name="waitfortemperature" repeatdelay="100">
+  			<outstate target="extrudelayer" />
+  	  </state>
+  	  
   	  <state name="extrudelayer" repeatdelay="100">
   			<outstate target="nextlayer" />
   	  </state>
   	  
   
   	  <state name="nextlayer" repeatdelay="100">
-  			<outstate target="extrudelayer" />
+  			<outstate target="waitfortemperature" />
   			<outstate target="finishprocess" />
   	  </state>
   
@@ -82,9 +93,16 @@
 		<result name="success" type="bool" />	
 	  </signaldefinition>	  
 
+  	  <signaldefinition name="signal_settemperature">
+  		<parameter name="extrudertemperature" type="double" />
+  		<parameter name="bedtemperature" type="double" />
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
   	  <parametergroup name="comdata" description="COM Configuration">		
   		<parameter name="port" description="COM Port" default="COM4" type="string" />
   		<parameter name="baudrate" description="Baud rate" default="115200" type="int" />
+		<parameter name="connecttimeout" type="int" default="2000" description="Timeout [ms] for connecting printer" />
   	  </parametergroup>
   
   

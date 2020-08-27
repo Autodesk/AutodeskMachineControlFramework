@@ -109,6 +109,7 @@ Custom implementation
 			<param name="COMPort" type="string" pass="in" description="Device Port to connect to" />
 			<param name="Baudrate" type="uint32" pass="in" description="Baudrate to use" />
 			<param name="StatusUpdateInterval" type="double" pass="in" description="Timer interval [ms] for updating status" />
+			<param name="ConnectTimeout" type="uint32" pass="in" description="Timeout [ms] for connecting printer" />
 		</method>
 
 		<method name="Disconnect" description="Disconnects from the Marlin board.">
@@ -120,11 +121,18 @@ Custom implementation
 		
 		<method name="SetHeatedBedTargetTemperature" description="Sets heated bed target temperature.">
 			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Bed target temperature." />
+			<param name="WaitForTemp" type="bool" pass="in" description="If true, waits for the target bed temperature to be reached before proceeding" />
 		</method>
 
 		<method name="SetExtruderTargetTemperature" description="Sets target temperature of the given extruder.">
 			<param name="ExtruderID" type="uint32" pass="in" description="ID of extruder." />
 			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Extruder target temperature." />
+			<param name="WaitForTemp" type="bool" pass="in" description="If true, waits for the target extruder temperature to be reached before proceeding" />
+		</method>
+
+		<method name="SetFanSpeed" description="Turns on one of the fans and set its speed.">
+			<param name="FanID" type="uint32" pass="in" description="ID of fan." />
+			<param name="Speed" type="uint32" pass="in" description="Fan speed [0..255]. 0=0%...255=100%" />
 		</method>
 
 		<method name="SetPidParameters" description="Sets PID parameters.">
@@ -148,7 +156,7 @@ Custom implementation
 			<param name="Z" type="double" pass="out" description="Z Value in mm" />
 		</method>
 
-		<method name="GetExtruderPosition" description="Returns the current extruder position.">
+		<method name="GetExtruderTargetPosition" description="Returns the target extruder position.">
 			<param name="E" type="double" pass="out" description="E Value in mm" />
 		</method>
 
@@ -185,6 +193,7 @@ Custom implementation
 		<method name="MoveToXY" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="X" type="double" pass="in" description="X Value in mm" />
 			<param name="Y" type="double" pass="in" description="Y Value in mm" />
+			<param name="E" type="double" pass="in" description="E Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 
@@ -196,6 +205,7 @@ Custom implementation
 		
 		<method name="MoveToZ" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="Z" type="double" pass="in" description="Z Value in mm" />
+			<param name="E" type="double" pass="in" description="E Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 

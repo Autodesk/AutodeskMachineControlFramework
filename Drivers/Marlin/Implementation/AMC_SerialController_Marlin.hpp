@@ -15,6 +15,7 @@ namespace AMC {
 		std::unique_ptr<serial::Serial> m_pConnection;
 		std::string m_sCOMPort;
 		uint32_t m_nBaudRate;
+		uint32_t m_nConnectTimeout;
 		uint32_t m_nLineNumber;
 		double m_dStatusUpdateTimerInterval;
 
@@ -40,7 +41,6 @@ namespace AMC {
 		double m_dCurrentPosX;
 		double m_dCurrentPosY;
 		double m_dCurrentPosZ;
-		double m_dCurrentPosE;
 		double m_dCurrentSpeedInMMperSecond;
 
 		// firmware info
@@ -71,7 +71,7 @@ namespace AMC {
 		bool parseAckSymbol(const std::string& sLine, const uint32_t nLineNumber);
 		void queryAxisStepsPerUnitStateAndPidValues();
 		void queryFirmwareInfo();
-		void moveToEx (bool bFastMove, bool bInX, const double dX, bool bInY, const double dY, bool bInZ, const double dZ, const double dSpeedInMMperSecond);
+		void moveToEx (bool bFastMove, bool bInX, const double dX, bool bInY, const double dY, bool bInZ, const double dZ, bool bInE, const double dE, const double dSpeedInMMperSecond);
 
 	public:
 		CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming);
@@ -79,7 +79,10 @@ namespace AMC {
 
 		void setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval);
 
-		void setCOMPort(const std::string & sCOMPort);
+		void setConnectTimeout(const uint32_t nConnectTimeout);
+		uint32_t getConnectTimeout();
+
+		void setCOMPort(const std::string& sCOMPort);
 		std::string getCOMPort();
 
 		void setBaudrate(const uint32_t nBaudrate);
@@ -92,9 +95,10 @@ namespace AMC {
 		void setPositioningAbolute();
 		void setPositioningRelative();
 
-		void setHeatedBedTargetTemperature(double nTemperatureInDegreeCelcius) override;
-		void setExtruderTargetTemperature(uint32_t nExtruderIndex, double nTemperatureInDegreeCelcius) override;
+		void setHeatedBedTargetTemperature(double nTemperatureInDegreeCelcius, bool bWait) override;
+		void setExtruderTargetTemperature(uint32_t nExtruderIndex, double nTemperatureInDegreeCelcius, bool bWait) override;
 		void setPidParameters(double dP, double dI, double dD) override;
+		void setFanSpeed(uint32_t nFanIndex, uint32_t nSpeed) override;
 
 		void queryTemperatureState(uint32_t nExtruderIndex) override;
 		void queryPositionState() override;
@@ -104,15 +108,15 @@ namespace AMC {
 
 		void getTargetPosition(double& dX, double& dY, double& dZ) override;
 		void getCurrentPosition(double& dX, double& dY, double& dZ) override;
-		void getExtruderPosition(double& dE) override;
+		void getExtruderTargetPosition(double& dE) override;
 		void getPidParameters(double& dP, double& dI, double& dD) override;
 
 		void startHoming() override;
 		void setLcdMsg(const std::string& sLcdMsg) override;
 
-		void moveXY(const double dX, const double dY, const double dSpeedInMMperSecond) override;
+		void moveXY(const double dX, const double dY, const double dE, const double dSpeedInMMperSecond) override;
 		void moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond) override;
-		void moveZ(const double dZ, const double dSpeedInMMperSecond) override;
+		void moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond) override;
 		void moveFastZ(const double dZ, const double dSpeedInMMperSecond) override;
 
 		bool isHomed() override;
