@@ -340,7 +340,7 @@ public:
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 		auto nSegmentCount = pLayer->GetSegmentCount();
 
-		auto tStart = std::chrono::steady_clock::now();
+		auto tStart = std::chrono::high_resolution_clock::now();
 
 		// do initial move to read z value/layer height
 		if ((nSegmentCount > 0) && (dZ > 0)) {
