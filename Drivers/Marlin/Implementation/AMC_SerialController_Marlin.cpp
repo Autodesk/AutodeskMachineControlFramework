@@ -33,6 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <thread>
 
+#ifdef __linux__
+#include <math.h>
+#endif
+
 #define MARLINDRIVER_MINSPEED 0.0001
 
 namespace AMC {
