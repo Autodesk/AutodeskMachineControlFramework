@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmc_mccontext.hpp"
 #include "libmc_interfaceexception.hpp"
-#include "libmc_apiresponse.hpp"
+#include "libmc_apirequesthandler.hpp"
 #include "pugixml.hpp"
 
 #include "libmcdriverenv_interfaces.hpp"
@@ -41,12 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_multi.hpp"
 #include "amc_logger_stdout.hpp"
 #include "amc_logger_database.hpp"
+#include "amc_servicehandler.hpp"
+#include "amc_ui_handler.hpp"
 
-#include "API/amc_api_handler_logs.hpp"
-#include "API/amc_api_handler_setup.hpp"
-#include "API/amc_api_handler_status.hpp"
-#include "API/amc_api_handler_root.hpp"
-
+#include "API/amc_api_factory.hpp"
 
 // Include custom headers here.
 #include <iostream>
@@ -78,9 +76,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 
     // Create API Handlers for data model requests
     m_pAPI = std::make_shared<AMC::CAPI>();
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Logs> (m_pSystemState->getLoggerInstance ()));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(m_InstanceList));
-    m_pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(m_InstanceList));
+    CAPIFactory factory (m_pAPI, m_pSystemState, m_InstanceList);
 
     // Create Client Dist Handler
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();
@@ -109,6 +105,25 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     std::string xmlns(xmlnsAttrib.as_string ());
     if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLSCHEMA);
+
+    auto servicesNode = machinedefinitionNode.child("services");
+    if (servicesNode.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGSERVICESNODE);
+
+    auto threadCountAttrib = servicesNode.attribute("threadcount");
+    if (threadCountAttrib.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTHREADCOUNT);
+    auto nMaxThreadCount = threadCountAttrib.as_uint();
+    if ((nMaxThreadCount < SERVICETHREADCOUNT_MIN) || (nMaxThreadCount > SERVICETHREADCOUNT_MAX))
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTHREADCOUNT);
+    m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t) nMaxThreadCount);
+
+
+    // Load User Interface
+    auto userInterfaceNode = machinedefinitionNode.child("userinterface");
+    if (userInterfaceNode.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
+    m_pSystemState->uiHandler ()->loadFromXML (userInterfaceNode);
 
 
     m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -283,6 +298,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
     pInstance->setInitState(sInitState);
     pInstance->setFailedState(sFailedState);
 
+    // load Plugin DLLs
     auto pPlugin = loadPlugin (m_pSystemState->getLibraryPath (slibraryName));
     LibMCPlugin::PStateFactory pStateFactory;
     try {
@@ -359,6 +375,8 @@ void CMCContext::readSignalParameters(const pugi::xml_node& xmlNode, std::list<A
     }
 
 }
+
+
 
 void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup)
 {
@@ -462,44 +480,12 @@ void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSu
     m_pSystemState->logger()->logMessage (sMessage, sSubSystem, (AMC::eLogLevel) eLogLevel);
 }
 
-
-IAPIResponse* CMCContext::HandleAPIGetRequest(const std::string& sURI)
+IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod)
 {
+    auto sNewSessionUUID = AMCCommon::CUtils::createUUID();
 
-    std::string sURIWithoutLeadingSlash;
-    if (sURI.length() > 0) {
-        if (sURI.substr(0, 1) == "/")
-            sURIWithoutLeadingSlash = sURI.substr(1);
-        else
-            sURIWithoutLeadingSlash = sURI;
-    }
+    auto pAuth = std::make_shared<CAPIAuth>(sNewSessionUUID);
 
-    uint32_t nHTTPCode = AMC_API_HTTP_NOTFOUND;
-    auto pResponseObject = m_pAPI->handleGetRequest(sURIWithoutLeadingSlash, nHTTPCode);
+    return new CAPIRequestHandler(m_pAPI, sURI, sRequestMethod, pAuth);
 
-    if (pResponseObject.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
-    
-    return new CAPIResponse(pResponseObject, nHTTPCode);    
 }
-
-IAPIResponse* CMCContext::HandleAPIPostRequest(const std::string& sURI, const LibMC_uint64 nBodyBufferSize, const LibMC_uint8* pBodyBuffer)
-{
-    std::string sURIWithoutLeadingSlash;
-    if (sURI.length() > 0) {
-        if (sURI.substr(0, 1) == "/")
-            sURIWithoutLeadingSlash = sURI.substr(1);
-        else
-            sURIWithoutLeadingSlash = sURI;
-    }
-
-    uint32_t nHTTPCode = AMC_API_HTTP_NOTFOUND;
-    auto pResponseObject = m_pAPI->handlePostRequest(sURIWithoutLeadingSlash, pBodyBuffer, nBodyBufferSize, nHTTPCode);
-
-    if (pResponseObject.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
-
-    return new CAPIResponse(pResponseObject, nHTTPCode);
-}
-
-

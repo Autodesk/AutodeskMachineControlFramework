@@ -28,62 +28,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmc_apiresponse.hpp"
+#include "amc_api_auth.hpp"
 #include "libmc_interfaceexception.hpp"
 
-// Include custom headers here.
+#include "common_utils.hpp"
 
+using namespace AMC;
 
-using namespace LibMC::Impl;
-
-/*************************************************************************************************************************
- Class definition of CAPIResponse 
-**************************************************************************************************************************/
-
-CAPIResponse::CAPIResponse(AMC::PAPIResponse pResponse, uint32_t nErrorCode)
-	: m_pResponse (pResponse), m_nErrorCode (nErrorCode)
+CAPIAuth::CAPIAuth(const std::string& sSessionUUID)
+	: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
 {
-	if (pResponse.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+}
+
+CAPIAuth::~CAPIAuth()
+{
+
 }
 
 
-LibMC_uint32 CAPIResponse::GetHTTPCode()
+bool CAPIAuth::contextUUIDIsAuthorized(std::string& sContextUUID)
 {
-	return m_nErrorCode;
+	return true;
 }
 
-std::string CAPIResponse::GetContentType()
+std::string CAPIAuth::getSessionUUID()
 {
-	if (m_pResponse.get() != nullptr)
-		return m_pResponse->getContentType();
-
-	return "";
+	return m_sSessionUUID;
 }
 
-void CAPIResponse::GetData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)
+bool CAPIAuth::userIsAuthorized()
 {
-	uint64_t nStreamSize = 0;
-	if (m_pResponse.get() != nullptr)
-		nStreamSize = (uint64_t)m_pResponse->getStreamSize();
-
-	if (pDataNeededCount != nullptr) {
-		*pDataNeededCount = nStreamSize;
-	}
-
-	if (pDataBuffer != nullptr) {
-
-		if (nDataBufferSize < nStreamSize)
-			throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
-
-		if (m_pResponse.get() != nullptr) {
-			const uint8_t * pSrc = m_pResponse->getStreamData();
-			uint8_t * pDst = pDataBuffer;
-
-			for (uint64_t nIndex = 0; nIndex < nStreamSize; nIndex++) {
-				*pDst = *pSrc; pDst++; pSrc++;
-			}
-		}
-	}
+	return true;
 }
 
+std::string CAPIAuth::getUserName()
+{
+	return "user";
+}

@@ -29,56 +29,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __LIBMC_APIRESPONSE
-#define __LIBMC_APIRESPONSE
+#ifndef __AMC_HEADER_PROTECTION
+#define __AMC_HEADER_PROTECTION
 
-#include "libmc_interfaces.hpp"
+#include <memory>
+#include <string>
+#include <list>
+#include <map>
 
-#include "API/amc_api_response.hpp"
+// Macros for forward declaration of classes
+#define amcDeclareDependingClass(CLASSNAME, SHAREDPTRNAME) class CLASSNAME; typedef std::shared_ptr<CLASSNAME> SHAREDPTRNAME;
 
-// Parent classes
-#include "libmc_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#endif //__AMC_HEADER_PROTECTION
 
-// Include custom headers here.
-
-
-namespace LibMC {
-namespace Impl {
-
-
-/*************************************************************************************************************************
- Class declaration of CAPIResponse 
-**************************************************************************************************************************/
-
-class CAPIResponse : public virtual IAPIResponse, public virtual CBase {
-private:
-
-	AMC::PAPIResponse m_pResponse;
-
-	uint32_t m_nErrorCode;
-
-protected:
-
-public:
-
-	CAPIResponse (AMC::PAPIResponse pResponse, uint32_t nErrorCode);
-
-	LibMC_uint32 GetHTTPCode() override;
-
-	std::string GetContentType() override;
-
-	void GetData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMC
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMC_APIRESPONSE

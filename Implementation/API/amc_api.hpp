@@ -32,38 +32,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_API
 #define __AMC_API
 
-#include <list>
-#include <memory>
-#include <string>
-#include "amc_api_response.hpp"
-
+#include "header_protection.hpp"
+#include "amc_api_types.hpp"
 
 
 namespace AMC {
 
-	class CAPIHandler;
-	typedef std::shared_ptr<CAPIHandler> PAPIHandler;
-
-	class CAPI;
-	typedef std::shared_ptr<CAPI> PAPI;
+	amcDeclareDependingClass(CAPI, PAPI);
+	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
+	amcDeclareDependingClass(CAPIHandler, PAPIHandler);
+	amcDeclareDependingClass(CAPIResponse, PAPIResponse);
+	amcDeclareDependingClass(CAPIFormFields, PAPIFormFields);	
+	amcDeclareDependingClass(CAPIFieldDetails, PAPIFieldDetails);
+	
 
 	class CAPI {
 	private:
 
 		std::list<PAPIHandler> m_ApiHandlers;
 
-		PAPIResponse makeError (int32_t errorCode, const std::string & sErrorString);
+		PAPIResponse makeError (uint32_t nHTTPError, int32_t errorCode, const std::string & sErrorString);
+
+		PAPIHandler getURIMatch (const std::string& sURI);
 			
 	public:
 
 		CAPI();
 
 		virtual ~CAPI();
-						
-		PAPIResponse handleGetRequest(const std::string& sURI, uint32_t & nHTTPCode);
+								
+		bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType);
 
-		PAPIResponse handlePostRequest(const std::string& sURI, const uint8_t * pBody, const size_t nStreamSize, uint32_t & nHTTPCode);
-		
+		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth);
+
+		uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType);
+
+		CAPIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex);
+
 		void registerHandler (PAPIHandler pAPIHandler);
 
 	};

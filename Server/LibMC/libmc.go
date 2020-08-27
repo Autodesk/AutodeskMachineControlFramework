@@ -41,12 +41,16 @@ Interface version: 1.0.0
 package libmc
 
 /*
+#cgo linux LDFLAGS: -ldl
+#include <stdlib.h>
 #include "libmc_dynamic.cc"
 
+	// Injected Components
 LibMCDataHandle injectLibMCDataHandle (void * pLibMCDataHandle)
 {
 	return (LibMCDataHandle) pLibMCDataHandle;
 }
+
 
 LibMCHandle loadLibMCLibrary (const char * pFileName)
 {
@@ -79,30 +83,66 @@ void unloadLibMCLibrary (LibMCHandle nLibraryHandle)
 }
 
 
-LibMCResult CCall_libmc_apiresponse_gethttpcode(LibMCHandle libraryHandle, LibMC_APIResponse pAPIResponse, LibMC_uint32 * pHTTPCode)
+LibMCResult CCall_libmc_apirequesthandler_expectsrawbody(LibMCHandle libraryHandle, LibMC_APIRequestHandler pAPIRequestHandler, bool * pValue)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_APIResponse_GetHTTPCode (pAPIResponse, pHTTPCode);	
+	return wrapperTable->m_APIRequestHandler_ExpectsRawBody (pAPIRequestHandler, pValue);
 }
 
 
-LibMCResult CCall_libmc_apiresponse_getcontenttype(LibMCHandle libraryHandle, LibMC_APIResponse pAPIResponse, const LibMC_uint32 nContentTypeBufferSize, LibMC_uint32* pContentTypeNeededChars, char * pContentTypeBuffer)
+LibMCResult CCall_libmc_apirequesthandler_expectsformdata(LibMCHandle libraryHandle, LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 * pFieldCount, bool * pValue)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_APIResponse_GetContentType (pAPIResponse, nContentTypeBufferSize, pContentTypeNeededChars, pContentTypeBuffer);	
+	return wrapperTable->m_APIRequestHandler_ExpectsFormData (pAPIRequestHandler, pFieldCount, pValue);
 }
 
 
-LibMCResult CCall_libmc_apiresponse_getdata(LibMCHandle libraryHandle, LibMC_APIResponse pAPIResponse, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)
+LibMCResult CCall_libmc_apirequesthandler_getformdatadetails(LibMCHandle libraryHandle, LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint32 nFieldIndex, const LibMC_uint32 nNameBufferSize, LibMC_uint32* pNameNeededChars, char * pNameBuffer, bool * pIsFile, bool * pMandatory)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_APIResponse_GetData (pAPIResponse, nDataBufferSize, pDataNeededCount, pDataBuffer);	
+	return wrapperTable->m_APIRequestHandler_GetFormDataDetails (pAPIRequestHandler, nFieldIndex, nNameBufferSize, pNameNeededChars, pNameBuffer, pIsFile, pMandatory);
+}
+
+
+LibMCResult CCall_libmc_apirequesthandler_setformdatafield(LibMCHandle libraryHandle, LibMC_APIRequestHandler pAPIRequestHandler, const char * pName, LibMC_uint64 nDataFieldBufferSize, const LibMC_uint8 * pDataFieldBuffer)
+{
+	if (libraryHandle == 0) 
+		return LIBMC_ERROR_INVALIDCAST;
+	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_APIRequestHandler_SetFormDataField (pAPIRequestHandler, pName, nDataFieldBufferSize, pDataFieldBuffer);
+}
+
+
+LibMCResult CCall_libmc_apirequesthandler_setformstringfield(LibMCHandle libraryHandle, LibMC_APIRequestHandler pAPIRequestHandler, const char * pName, const char * pString)
+{
+	if (libraryHandle == 0) 
+		return LIBMC_ERROR_INVALIDCAST;
+	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_APIRequestHandler_SetFormStringField (pAPIRequestHandler, pName, pString);
+}
+
+
+LibMCResult CCall_libmc_apirequesthandler_handle(LibMCHandle libraryHandle, LibMC_APIRequestHandler pAPIRequestHandler, LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8 * pRawBodyBuffer, const LibMC_uint32 nContentTypeBufferSize, LibMC_uint32* pContentTypeNeededChars, char * pContentTypeBuffer, LibMC_uint32 * pHTTPCode)
+{
+	if (libraryHandle == 0) 
+		return LIBMC_ERROR_INVALIDCAST;
+	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_APIRequestHandler_Handle (pAPIRequestHandler, nRawBodyBufferSize, pRawBodyBuffer, nContentTypeBufferSize, pContentTypeNeededChars, pContentTypeBuffer, pHTTPCode);
+}
+
+
+LibMCResult CCall_libmc_apirequesthandler_getresultdata(LibMCHandle libraryHandle, LibMC_APIRequestHandler pAPIRequestHandler, const LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)
+{
+	if (libraryHandle == 0) 
+		return LIBMC_ERROR_INVALIDCAST;
+	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_APIRequestHandler_GetResultData (pAPIRequestHandler, nDataBufferSize, pDataNeededCount, pDataBuffer);
 }
 
 
@@ -111,7 +151,7 @@ LibMCResult CCall_libmc_mccontext_registerlibrarypath(LibMCHandle libraryHandle,
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_RegisterLibraryPath (pMCContext, pLibraryName, pLibraryPath);	
+	return wrapperTable->m_MCContext_RegisterLibraryPath (pMCContext, pLibraryName, pLibraryPath);
 }
 
 
@@ -120,7 +160,7 @@ LibMCResult CCall_libmc_mccontext_parseconfiguration(LibMCHandle libraryHandle, 
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_ParseConfiguration (pMCContext, pXMLString);	
+	return wrapperTable->m_MCContext_ParseConfiguration (pMCContext, pXMLString);
 }
 
 
@@ -129,7 +169,7 @@ LibMCResult CCall_libmc_mccontext_startallthreads(LibMCHandle libraryHandle, Lib
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_StartAllThreads (pMCContext);	
+	return wrapperTable->m_MCContext_StartAllThreads (pMCContext);
 }
 
 
@@ -138,7 +178,7 @@ LibMCResult CCall_libmc_mccontext_terminateallthreads(LibMCHandle libraryHandle,
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_TerminateAllThreads (pMCContext);	
+	return wrapperTable->m_MCContext_TerminateAllThreads (pMCContext);
 }
 
 
@@ -147,34 +187,25 @@ LibMCResult CCall_libmc_mccontext_loadclientpackage(LibMCHandle libraryHandle, L
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_LoadClientPackage (pMCContext, nZIPStreamBufferSize, pZIPStreamBuffer);	
+	return wrapperTable->m_MCContext_LoadClientPackage (pMCContext, nZIPStreamBufferSize, pZIPStreamBuffer);
 }
 
 
-LibMCResult CCall_libmc_mccontext_log(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pMessage, eLibMCLogSubSystem eSubsystem, eLibMCDataLogLevel eLogLevel)
+LibMCResult CCall_libmc_mccontext_log(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pMessage, eLibMCLogSubSystem eSubsystem, eLibMCLogLevel eLogLevel)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_Log (pMCContext, pMessage, eSubsystem, eLogLevel);	
+	return wrapperTable->m_MCContext_Log (pMCContext, pMessage, eSubsystem, eLogLevel);
 }
 
 
-LibMCResult CCall_libmc_mccontext_handleapigetrequest(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pURI, LibMC_APIResponse * pResponse)
+LibMCResult CCall_libmc_mccontext_createapirequesthandler(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_HandleAPIGetRequest (pMCContext, pURI, pResponse);	
-}
-
-
-LibMCResult CCall_libmc_mccontext_handleapipostrequest(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pURI, LibMC_uint64 nBodyBufferSize, const LibMC_uint8 * pBodyBuffer, LibMC_APIResponse * pResponse)
-{
-	if (libraryHandle == 0) 
-		return LIBMC_ERROR_INVALIDCAST;
-	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_HandleAPIPostRequest (pMCContext, pURI, nBodyBufferSize, pBodyBuffer, pResponse);	
+	return wrapperTable->m_MCContext_CreateAPIRequestHandler (pMCContext, pURI, pRequestMethod, pHandlerInstance);
 }
 
 
@@ -183,7 +214,7 @@ LibMCResult CCall_libmc_getversion(LibMCHandle libraryHandle, LibMC_uint32 * pMa
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_GetVersion (pMajor, pMinor, pMicro);	
+	return wrapperTable->m_GetVersion (pMajor, pMinor, pMicro);
 }
 
 
@@ -192,7 +223,7 @@ LibMCResult CCall_libmc_getlasterror(LibMCHandle libraryHandle, LibMC_Base pInst
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_GetLastError (pInstance, nErrorMessageBufferSize, pErrorMessageNeededChars, pErrorMessageBuffer, pHasError);	
+	return wrapperTable->m_GetLastError (pInstance, nErrorMessageBufferSize, pErrorMessageNeededChars, pErrorMessageBuffer, pHasError);
 }
 
 
@@ -201,7 +232,7 @@ LibMCResult CCall_libmc_releaseinstance(LibMCHandle libraryHandle, LibMC_Base pI
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_ReleaseInstance (pInstance);	
+	return wrapperTable->m_ReleaseInstance (pInstance);
 }
 
 
@@ -210,7 +241,7 @@ LibMCResult CCall_libmc_acquireinstance(LibMCHandle libraryHandle, LibMC_Base pI
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_AcquireInstance (pInstance);	
+	return wrapperTable->m_AcquireInstance (pInstance);
 }
 
 
@@ -219,7 +250,7 @@ LibMCResult CCall_libmc_injectcomponent(LibMCHandle libraryHandle, const char * 
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_InjectComponent (pNameSpace, (LibMC_pvoid) pSymbolAddressMethod);	
+	return wrapperTable->m_InjectComponent (pNameSpace, (LibMC_pvoid) pSymbolAddressMethod);
 }
 
 
@@ -228,7 +259,7 @@ LibMCResult CCall_libmc_createmccontext(LibMCHandle libraryHandle, LibMCData_Dat
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_CreateMCContext (pDataModel, pInstance);	
+	return wrapperTable->m_CreateMCContext (pDataModel, pInstance);
 }
 
 */
@@ -238,6 +269,7 @@ import (
 	"fmt"
 	"unsafe"
 	"runtime"
+	// Injected Components
 	"../LibMCData"
 )
 
@@ -423,6 +455,34 @@ const LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR = 224;
 const LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE = 225;
 const LIBMC_ERROR_NO3MFLIBRARY = 226;
 const LIBMC_ERROR_INVALIDPOINTCOUNT = 227;
+const LIBMC_ERROR_DUPLICATEJOBUUID = 228;
+const LIBMC_ERROR_INVALIDJOBSTATUS = 229;
+const LIBMC_ERROR_INVALIDSTREAMCONTEXT = 230;
+const LIBMC_ERROR_JOBUUIDNOTFOUND = 231;
+const LIBMC_ERROR_INVALIDJOBNAME = 232;
+const LIBMC_ERROR_INVALIDJOBTIMESTAMP = 233;
+const LIBMC_ERROR_INVALIDUSERID = 234;
+const LIBMC_ERROR_INVALIDSTORAGECALLBACKSIGNATURE = 235;
+const LIBMC_ERROR_INVALIDSTORAGECALLBACKSTREAM = 236;
+const LIBMC_ERROR_INVALIDSTORAGEPATH = 237;
+const LIBMC_ERROR_STORAGESTREAMNOTFOUND = 238;
+const LIBMC_ERROR_DUPLICATESTORAGESTREAM = 239;
+const LIBMC_ERROR_INVALIDPARTIALUPLOAD = 240;
+const LIBMC_ERROR_PARTIALUPLOADNOTFINISHED = 241;
+const LIBMC_ERROR_APIREQUESTNOTHANDLED = 242;
+const LIBMC_ERROR_APIREQUESTALREADYHANDLED = 243;
+const LIBMC_ERROR_INVALIDAPIREQUESTTYPE = 244;
+const LIBMC_ERROR_INVALIDUPLOADSTREAM = 245;
+const LIBMC_ERROR_COULDNOTPARSEJSONREQUEST = 246;
+const LIBMC_ERROR_INVALIDCONTEXTUUID = 247;
+const LIBMC_ERROR_INVALIDUPLOADNAME = 248;
+const LIBMC_ERROR_INVALIDMIMETYPE = 249;
+const LIBMC_ERROR_INVALIDSTREAMSIZE = 250;
+const LIBMC_ERROR_INVALIDSHA256SUM = 251;
+const LIBMC_ERROR_INVALIDSTREAMUUID = 252;
+const LIBMC_ERROR_INVALIDFIELDNAME = 253;
+const LIBMC_ERROR_UPLOADSIZEMISMATCH = 254;
+const LIBMC_ERROR_CONTENTTYPENOTACCEPTED = 255;
 
 // WrappedError is an error that wraps a LibMC error.
 type WrappedError struct {
@@ -748,6 +808,62 @@ func errorMessage(errorcode uint32) string {
 		return "No 3MF Library specified";
 	case LIBMC_ERROR_INVALIDPOINTCOUNT:
 		return "Invalid point count";
+	case LIBMC_ERROR_DUPLICATEJOBUUID:
+		return "Duplicate job uuid";
+	case LIBMC_ERROR_INVALIDJOBSTATUS:
+		return "Invalid Job status";
+	case LIBMC_ERROR_INVALIDSTREAMCONTEXT:
+		return "Invalid stream context";
+	case LIBMC_ERROR_JOBUUIDNOTFOUND:
+		return "Job uuid not found";
+	case LIBMC_ERROR_INVALIDJOBNAME:
+		return "Invalid job name";
+	case LIBMC_ERROR_INVALIDJOBTIMESTAMP:
+		return "Invalid job timestamp";
+	case LIBMC_ERROR_INVALIDUSERID:
+		return "Invalid job name";
+	case LIBMC_ERROR_INVALIDSTORAGECALLBACKSIGNATURE:
+		return "Invalid storage callback signature";
+	case LIBMC_ERROR_INVALIDSTORAGECALLBACKSTREAM:
+		return "Invalid storage callback stream";
+	case LIBMC_ERROR_INVALIDSTORAGEPATH:
+		return "Invalid storage path";
+	case LIBMC_ERROR_STORAGESTREAMNOTFOUND:
+		return "Storage Stream not found";
+	case LIBMC_ERROR_DUPLICATESTORAGESTREAM:
+		return "Duplicate Storage Stream";
+	case LIBMC_ERROR_INVALIDPARTIALUPLOAD:
+		return "Invalid Partial Upload";
+	case LIBMC_ERROR_PARTIALUPLOADNOTFINISHED:
+		return "Partial Upload not finished";
+	case LIBMC_ERROR_APIREQUESTNOTHANDLED:
+		return "API Request not handled";
+	case LIBMC_ERROR_APIREQUESTALREADYHANDLED:
+		return "API Request already handled";
+	case LIBMC_ERROR_INVALIDAPIREQUESTTYPE:
+		return "Invalid API Request type";
+	case LIBMC_ERROR_INVALIDUPLOADSTREAM:
+		return "Invalid Upload Stream";
+	case LIBMC_ERROR_COULDNOTPARSEJSONREQUEST:
+		return "Could not parse JSON request";
+	case LIBMC_ERROR_INVALIDCONTEXTUUID:
+		return "Invalid Context UUID";
+	case LIBMC_ERROR_INVALIDUPLOADNAME:
+		return "Invalid Upload Name";
+	case LIBMC_ERROR_INVALIDMIMETYPE:
+		return "Invalid Mime Type";
+	case LIBMC_ERROR_INVALIDSTREAMSIZE:
+		return "Invalid Stream Size";
+	case LIBMC_ERROR_INVALIDSHA256SUM:
+		return "Invalid SHA256 Sum";
+	case LIBMC_ERROR_INVALIDSTREAMUUID:
+		return "Invalid Stream UUID";
+	case LIBMC_ERROR_INVALIDFIELDNAME:
+		return "Invalid field name";
+	case LIBMC_ERROR_UPLOADSIZEMISMATCH:
+		return "Upload size mismatch";
+	case LIBMC_ERROR_CONTENTTYPENOTACCEPTED:
+		return "Content type not accepted";
 	default:
 		return "unknown";
 	}
@@ -756,98 +872,141 @@ func errorMessage(errorcode uint32) string {
 func makeError(errorcode uint32) error {
 	return &WrappedError{errorcode, errorMessage(uint32(errorcode))}
 }
+
 // Wrapper represents the number wrapper
 type Wrapper struct {
 	_ [0]func() // uncomparable; to make == not compile
 	LibraryHandle C.LibMCHandle
 }
 
-
 // Base represents a LibMC class.
 type Base struct {
-	_     [0]func() // uncomparable; to make == not compile
-	ref   ref       // identifies a C value, see ref type
-	wrapperRef *Wrapper
-	gcPtr *ref      // used to trigger the finalizer when the Value is not referenced any more
+	_     		[0]func() // uncomparable; to make == not compile
+	Ref   		ref       // identifies a C value, see ref type
+	wrapperRef Wrapper
+	gcPtr 		*ref      // used to trigger the finalizer when the Value is not referenced any more
 }
 
 // NewBase creates a new Base.
 // The wrapped C pointer will be freed when the Go pointer is finalized,
 // but one can release it manually calling Release.
-func (wrapper * Wrapper) NewBase(r ref) Base {
+func (wrapper Wrapper) NewBase(r ref) Base {
 	gcPtr := new(ref)
 	*gcPtr = r
 	runtime.SetFinalizer(gcPtr, wrapper.releaseC)
-	return Base{ref: r, gcPtr: gcPtr, wrapperRef: wrapper}
+	return Base{Ref: r, gcPtr: gcPtr, wrapperRef: wrapper}
 }
 
 // Release releases the C pointer.
 func (inst Base) Release() error {
-	if (inst.wrapperRef != nil) {
-		err := inst.wrapperRef.ReleaseInstance(inst)
-		*inst.gcPtr = nil
-		return err
-	} else {
-		*inst.gcPtr = nil
-		return nil;
-	}
+	err := inst.wrapperRef.ReleaseInstance(inst)
+	*inst.gcPtr = nil
+	return err
 }
 
 // Equal reports whether inst and w refer to the same C pointer.
 func (inst Base) Equal(w Base) bool {
-	return inst.ref == w.ref
+	return inst.Ref == w.Ref
 }
 
-// APIResponse represents a LibMC class.
-type APIResponse struct {
+// APIRequestHandler represents a LibMC class.
+type APIRequestHandler struct {
 	Base
 }
 
-func (wrapper * Wrapper) newAPIResponse(r ref) APIResponse {
-	return APIResponse{wrapper.NewBase(r)}
-}
-// GetHTTPCode returns the HTTP Errorcode to set (200 for success).
-func (inst APIResponse) GetHTTPCode() (uint32, error) {
-	var hTTPCode C.uint32_t
-	ret := C.CCall_libmc_apiresponse_gethttpcode(inst.wrapperRef.LibraryHandle, inst.ref, &hTTPCode)
-	if ret != 0 {
-		return 0, makeError(uint32(ret))
-	}
-	return uint32(hTTPCode), nil
+func (wrapper Wrapper) NewAPIRequestHandler(r ref) APIRequestHandler {
+	return APIRequestHandler{wrapper.NewBase(r)}
 }
 
-// GetContentType returns the content type string of the data.
-func (inst APIResponse) GetContentType() (string, error) {
+// ExpectsRawBody checks if the raw body is needed to handle the request.
+func (inst APIRequestHandler) ExpectsRawBody() (bool, error) {
+	var value C.bool
+	returnValue := C.CCall_libmc_apirequesthandler_expectsrawbody(inst.wrapperRef.LibraryHandle, inst.Ref, &value)
+	if returnValue != 0 {
+		return false, makeError(uint32(returnValue))
+	}
+	return bool(value), nil
+}
+
+// ExpectsFormData checks if the parsed form data is needed to handle the request.
+func (inst APIRequestHandler) ExpectsFormData() (uint32, bool, error) {
+	var fieldCount C.uint32_t
+	var value C.bool
+	returnValue := C.CCall_libmc_apirequesthandler_expectsformdata(inst.wrapperRef.LibraryHandle, inst.Ref, &fieldCount, &value)
+	if returnValue != 0 {
+		return 0, false, makeError(uint32(returnValue))
+	}
+	return uint32(fieldCount), bool(value), nil
+}
+
+// GetFormDataDetails returns details of expected form data.
+func (inst APIRequestHandler) GetFormDataDetails(fieldIndex uint32) (string, bool, bool, error) {
+	var neededforname C.uint32_t
+	var filledinname C.uint32_t
+	var isFile C.bool
+	var mandatory C.bool
+	returnValue := C.CCall_libmc_apirequesthandler_getformdatadetails(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(fieldIndex), 0, &neededforname, nil, &isFile, &mandatory)
+	if returnValue != 0 {
+		return "", false, false, makeError(uint32(returnValue))
+	}
+	bufferSizename := neededforname
+	buffername := make([]byte, bufferSizename)
+	returnValue = C.CCall_libmc_apirequesthandler_getformdatadetails(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint32_t(fieldIndex), bufferSizename, &filledinname, (*C.char)(unsafe.Pointer(&buffername[0])), &isFile, &mandatory)
+	if returnValue != 0 {
+		return "", false, false, makeError(uint32(returnValue))
+	}
+	return string(buffername[:(filledinname-1)]), bool(isFile), bool(mandatory), nil
+}
+
+// SetFormDataField passes the a form data field to the request handler. Call only, if ExpectsFormData returns true.
+func (inst APIRequestHandler) SetFormDataField(name string, dataField []uint8) error {
+	returnValue := C.CCall_libmc_apirequesthandler_setformdatafield(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(name), C.uint64_t(len(dataField)), (*C.uint8_t)(unsafe.Pointer(&dataField[0])))
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
+	}
+	return nil
+}
+
+// SetFormStringField passes the a form string field to the request handler. Call only, if ExpectsFormData returns true.
+func (inst APIRequestHandler) SetFormStringField(name string, string string) error {
+	returnValue := C.CCall_libmc_apirequesthandler_setformstringfield(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(name), C.CString(string))
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
+	}
+	return nil
+}
+
+// Handle handles the request.
+func (inst APIRequestHandler) Handle(rawBody []uint8) (string, uint32, error) {
 	var neededforcontentType C.uint32_t
 	var filledincontentType C.uint32_t
-	ret := C.CCall_libmc_apiresponse_getcontenttype(inst.wrapperRef.LibraryHandle, inst.ref, 0, &neededforcontentType, nil)
-	if ret != 0 {
-		return "", makeError(uint32(ret))
+	var hTTPCode C.uint32_t
+	returnValue := C.CCall_libmc_apirequesthandler_handle(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(len(rawBody)), (*C.uint8_t)(unsafe.Pointer(&rawBody[0])), 0, &neededforcontentType, nil, &hTTPCode)
+	if returnValue != 0 {
+		return "", 0, makeError(uint32(returnValue))
 	}
 	bufferSizecontentType := neededforcontentType
 	buffercontentType := make([]byte, bufferSizecontentType)
-	ret = C.CCall_libmc_apiresponse_getcontenttype(inst.wrapperRef.LibraryHandle, inst.ref, bufferSizecontentType, &filledincontentType, (*C.char)(unsafe.Pointer(&buffercontentType[0])))
-	if ret != 0 {
-		return "", makeError(uint32(ret))
+	returnValue = C.CCall_libmc_apirequesthandler_handle(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(len(rawBody)), (*C.uint8_t)(unsafe.Pointer(&rawBody[0])), bufferSizecontentType, &filledincontentType, (*C.char)(unsafe.Pointer(&buffercontentType[0])), &hTTPCode)
+	if returnValue != 0 {
+		return "", 0, makeError(uint32(returnValue))
 	}
-	return string(buffercontentType[:(filledincontentType-1)]), nil
+	return string(buffercontentType[:(filledincontentType-1)]), uint32(hTTPCode), nil
 }
 
-// GetData returns the stream content of the data.
-func (inst APIResponse) GetData() ([]uint8, error) {
-
-	var data []uint8;
+// GetResultData returns the cached stream content of the resulting data. Call only after Handle().
+func (inst APIRequestHandler) GetResultData(data []uint8) ([]uint8, error) {
 	var neededfordata C.uint64_t
-	ret := C.CCall_libmc_apiresponse_getdata(inst.wrapperRef.LibraryHandle, inst.ref, 0, &neededfordata, nil)
-	if ret != 0 {
-		return nil, makeError(uint32(ret))
+	returnValue := C.CCall_libmc_apirequesthandler_getresultdata(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededfordata, nil)
+	if returnValue != 0 {
+		return nil, makeError(uint32(returnValue))
 	}
 	if len(data) < int(neededfordata) {
 	 data = append(data, make([]uint8, int(neededfordata)-len(data))...)
 	}
-	ret = C.CCall_libmc_apiresponse_getdata(inst.wrapperRef.LibraryHandle, inst.ref, neededfordata, nil, (*C.uint8_t)(unsafe.Pointer(&data[0])))
-	if ret != 0 {
-		return nil, makeError(uint32(ret))
+	returnValue = C.CCall_libmc_apirequesthandler_getresultdata(inst.wrapperRef.LibraryHandle, inst.Ref, neededfordata, nil, (*C.uint8_t)(unsafe.Pointer(&data[0])))
+	if returnValue != 0 {
+		return nil, makeError(uint32(returnValue))
 	}
 	return data[:int(neededfordata)], nil
 }
@@ -858,81 +1017,72 @@ type MCContext struct {
 	Base
 }
 
-func (wrapper * Wrapper) newMCContext(r ref) MCContext {
+func (wrapper Wrapper) NewMCContext(r ref) MCContext {
 	return MCContext{wrapper.NewBase(r)}
 }
+
 // RegisterLibraryPath registers a library for a given name.
 func (inst MCContext) RegisterLibraryPath(libraryName string, libraryPath string) error {
-	ret := C.CCall_libmc_mccontext_registerlibrarypath(inst.wrapperRef.LibraryHandle, inst.ref, (*C.char)(unsafe.Pointer(&[]byte(libraryName)[0])), (*C.char)(unsafe.Pointer(&[]byte(libraryPath)[0])))
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_mccontext_registerlibrarypath(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(libraryName), C.CString(libraryPath))
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
 // ParseConfiguration parses and initialises the state machines from a configuration XML.
 func (inst MCContext) ParseConfiguration(xMLString string) error {
-	ret := C.CCall_libmc_mccontext_parseconfiguration(inst.wrapperRef.LibraryHandle, inst.ref, (*C.char)(unsafe.Pointer(&[]byte(xMLString)[0])))
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_mccontext_parseconfiguration(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(xMLString))
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
 // StartAllThreads starts the threads for all the state machines.
 func (inst MCContext) StartAllThreads() error {
-	ret := C.CCall_libmc_mccontext_startallthreads(inst.wrapperRef.LibraryHandle, inst.ref)
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_mccontext_startallthreads(inst.wrapperRef.LibraryHandle, inst.Ref)
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
 // TerminateAllThreads terminates the threads for all the state machines.
 func (inst MCContext) TerminateAllThreads() error {
-	ret := C.CCall_libmc_mccontext_terminateallthreads(inst.wrapperRef.LibraryHandle, inst.ref)
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_mccontext_terminateallthreads(inst.wrapperRef.LibraryHandle, inst.Ref)
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
 // LoadClientPackage load a client package to serve the client website.
 func (inst MCContext) LoadClientPackage(zIPStream []uint8) error {
-	ret := C.CCall_libmc_mccontext_loadclientpackage(inst.wrapperRef.LibraryHandle, inst.ref, C.uint64_t(len(zIPStream)), (*C.uint8_t)(unsafe.Pointer(&zIPStream[0])))
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_mccontext_loadclientpackage(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(len(zIPStream)), (*C.uint8_t)(unsafe.Pointer(&zIPStream[0])))
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
 // Log log message with a certain log level.
 func (inst MCContext) Log(message string, subsystem LogSubSystem, logLevel LogLevel) error {
-	ret := C.CCall_libmc_mccontext_log(inst.wrapperRef.LibraryHandle, inst.ref, (*C.char)(unsafe.Pointer(&[]byte(message)[0])), C.eLibMCLogSubSystem(subsystem), C.eLibMCDataLogLevel(logLevel))
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_mccontext_log(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(message), C.eLibMCLogSubSystem(subsystem), C.eLibMCLogLevel(logLevel))
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
-// HandleAPIGetRequest handle an API GET request.
-func (inst MCContext) HandleAPIGetRequest(uRI string) (APIResponse, error) {
-	var response ref
-	ret := C.CCall_libmc_mccontext_handleapigetrequest(inst.wrapperRef.LibraryHandle, inst.ref, (*C.char)(unsafe.Pointer(&[]byte(uRI)[0])), &response)
-	if ret != 0 {
-		return APIResponse{}, makeError(uint32(ret))
+// CreateAPIRequestHandler creates an API request handler.
+func (inst MCContext) CreateAPIRequestHandler(uRI string, requestMethod string) (APIRequestHandler, error) {
+	var handlerInstance ref
+	returnValue := C.CCall_libmc_mccontext_createapirequesthandler(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(uRI), C.CString(requestMethod), &handlerInstance)
+	if returnValue != 0 {
+		return APIRequestHandler{}, makeError(uint32(returnValue))
 	}
-	return inst.wrapperRef.newAPIResponse(response), nil
-}
-
-// HandleAPIPostRequest handle an API POST request.
-func (inst MCContext) HandleAPIPostRequest(uRI string, body []uint8) (APIResponse, error) {
-	var response ref
-	ret := C.CCall_libmc_mccontext_handleapipostrequest(inst.wrapperRef.LibraryHandle, inst.ref, (*C.char)(unsafe.Pointer(&[]byte(uRI)[0])), C.uint64_t(len(body)), (*C.uint8_t)(unsafe.Pointer(&body[0])), &response)
-	if ret != 0 {
-		return APIResponse{}, makeError(uint32(ret))
-	}
-	return inst.wrapperRef.newAPIResponse(response), nil
+	return inst.wrapperRef.NewAPIRequestHandler(handlerInstance), nil
 }
 
 
@@ -941,9 +1091,9 @@ func (wrapper Wrapper) GetVersion() (uint32, uint32, uint32, error) {
 	var major C.uint32_t
 	var minor C.uint32_t
 	var micro C.uint32_t
-	ret := C.CCall_libmc_getversion(wrapper.LibraryHandle, &major, &minor, &micro)
-	if ret != 0 {
-		return 0, 0, 0, makeError(uint32(ret))
+	returnValue := C.CCall_libmc_getversion(wrapper.LibraryHandle, &major, &minor, &micro)
+	if returnValue != 0 {
+		return 0, 0, 0, makeError(uint32(returnValue))
 	}
 	return uint32(major), uint32(minor), uint32(micro), nil
 }
@@ -953,42 +1103,42 @@ func (wrapper Wrapper) GetLastError(instance Base) (string, bool, error) {
 	var neededforerrorMessage C.uint32_t
 	var filledinerrorMessage C.uint32_t
 	var hasError C.bool
-	ret := C.CCall_libmc_getlasterror(wrapper.LibraryHandle, instance.ref, 0, &neededforerrorMessage, nil, &hasError)
-	if ret != 0 {
-		return "", false, makeError(uint32(ret))
+	returnValue := C.CCall_libmc_getlasterror(wrapper.LibraryHandle, instance.Ref, 0, &neededforerrorMessage, nil, &hasError)
+	if returnValue != 0 {
+		return "", false, makeError(uint32(returnValue))
 	}
 	bufferSizeerrorMessage := neededforerrorMessage
 	buffererrorMessage := make([]byte, bufferSizeerrorMessage)
-	ret = C.CCall_libmc_getlasterror(wrapper.LibraryHandle, instance.ref, bufferSizeerrorMessage, &filledinerrorMessage, (*C.char)(unsafe.Pointer(&buffererrorMessage[0])), &hasError)
-	if ret != 0 {
-		return "", false, makeError(uint32(ret))
+	returnValue = C.CCall_libmc_getlasterror(wrapper.LibraryHandle, instance.Ref, bufferSizeerrorMessage, &filledinerrorMessage, (*C.char)(unsafe.Pointer(&buffererrorMessage[0])), &hasError)
+	if returnValue != 0 {
+		return "", false, makeError(uint32(returnValue))
 	}
 	return string(buffererrorMessage[:(filledinerrorMessage-1)]), bool(hasError), nil
 }
 
 // ReleaseInstance releases shared ownership of an Instance.
 func (wrapper Wrapper) ReleaseInstance(instance Base) error {
-	ret := C.CCall_libmc_releaseinstance(wrapper.LibraryHandle, instance.ref)
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_releaseinstance(wrapper.LibraryHandle, instance.Ref)
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
 // AcquireInstance acquires shared ownership of an Instance.
 func (wrapper Wrapper) AcquireInstance(instance Base) error {
-	ret := C.CCall_libmc_acquireinstance(wrapper.LibraryHandle, instance.ref)
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_acquireinstance(wrapper.LibraryHandle, instance.Ref)
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
 
 // InjectComponent injects an imported component for usage within this component.
 func (wrapper Wrapper) InjectComponent(nameSpace string, symbolAddressMethod uint64) error {
-	ret := C.CCall_libmc_injectcomponent(wrapper.LibraryHandle, (*C.char)(unsafe.Pointer(&[]byte(nameSpace)[0])), C.uint64_t(symbolAddressMethod))
-	if ret != 0 {
-		return makeError(uint32(ret))
+	returnValue := C.CCall_libmc_injectcomponent(wrapper.LibraryHandle, C.CString(nameSpace), (C.uint64_t)(symbolAddressMethod))
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
 	}
 	return nil
 }
@@ -996,21 +1146,21 @@ func (wrapper Wrapper) InjectComponent(nameSpace string, symbolAddressMethod uin
 // CreateMCContext creates and initializes new MC Context.
 func (wrapper Wrapper) CreateMCContext(dataModel libmcdata.DataModel) (MCContext, error) {
 	var instance ref
-	ret := C.CCall_libmc_createmccontext(wrapper.LibraryHandle, C.injectLibMCDataHandle (unsafe.Pointer(dataModel.Ref)), &instance)
-	if ret != 0 {
-		return MCContext{}, makeError(uint32(ret))
+	returnValue := C.CCall_libmc_createmccontext(wrapper.LibraryHandle, C.injectLibMCDataHandle (unsafe.Pointer (dataModel.Ref)), &instance)
+	if returnValue != 0 {
+		return MCContext{}, makeError(uint32(returnValue))
 	}
-	return wrapper.newMCContext(instance), nil
+	return wrapper.NewMCContext(instance), nil
 }
 
-func (wrapper * Wrapper) releaseC(r *ref) error {
+func (wrapper Wrapper) releaseC(r *ref) error {
 	if r == nil || *r == nil {
 		return nil
 	}
-	return wrapper.ReleaseInstance(Base{ref: *r})
+	return wrapper.ReleaseInstance(Base{Ref: *r})
 }
 
-func (wrapper * Wrapper) CheckBinaryVersion() error {
+func (wrapper Wrapper) CheckBinaryVersion() error {
 	var nBindingMajor uint32 = 1;
 	var nBindingMinor uint32 = 0;
 	nMajor, nMinor, _, err := wrapper.GetVersion()

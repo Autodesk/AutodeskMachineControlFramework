@@ -70,8 +70,22 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (sType == "marlin-2.0") 
-		return new CDriver_Marlin(sName, sType);
+
+	if (sType == "marlin-2.0") {
+		bool bDebug = false;
+		bool bDoFirmwareQuery = false;
+		bool bDisableHoming = true;
+
+		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug);
+	}
+
+	if (sType == "marlin-ender-2.0") {
+		bool bDebug = false;
+		bool bDoFirmwareQuery = true;
+		bool bDisableHoming = false;
+
+		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug);
+	}
 
 	throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_DRIVERERROR);
 	

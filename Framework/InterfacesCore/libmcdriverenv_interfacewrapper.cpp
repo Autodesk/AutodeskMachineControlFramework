@@ -81,8 +81,438 @@ LibMCDriverEnvResult handleUnhandledException(IBase * pIBaseClass)
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class implementation for WorkingFileExecution
+**************************************************************************************************************************/
+LibMCDriverEnvResult libmcdriverenv_workingfileexecution_getstatus(LibMCDriverEnv_WorkingFileExecution pWorkingFileExecution)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFileExecution;
+
+	try {
+		IWorkingFileExecution* pIWorkingFileExecution = dynamic_cast<IWorkingFileExecution*>(pIBaseClass);
+		if (!pIWorkingFileExecution)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIWorkingFileExecution->GetStatus();
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_workingfileexecution_returnstdout(LibMCDriverEnv_WorkingFileExecution pWorkingFileExecution, const LibMCDriverEnv_uint32 nStringBufferBufferSize, LibMCDriverEnv_uint32* pStringBufferNeededChars, char * pStringBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFileExecution;
+
+	try {
+		if ( (!pStringBufferBuffer) && !(pStringBufferNeededChars) )
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sStringBuffer("");
+		IWorkingFileExecution* pIWorkingFileExecution = dynamic_cast<IWorkingFileExecution*>(pIBaseClass);
+		if (!pIWorkingFileExecution)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pStringBufferBuffer == nullptr);
+		if (isCacheCall) {
+			sStringBuffer = pIWorkingFileExecution->ReturnStdOut();
+
+			pIWorkingFileExecution->_setCache (new ParameterCache_1<std::string> (sStringBuffer));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIWorkingFileExecution->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sStringBuffer);
+			pIWorkingFileExecution->_setCache (nullptr);
+		}
+		
+		if (pStringBufferNeededChars)
+			*pStringBufferNeededChars = (LibMCDriverEnv_uint32) (sStringBuffer.size()+1);
+		if (pStringBufferBuffer) {
+			if (sStringBuffer.size() >= nStringBufferBufferSize)
+				throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iStringBuffer = 0; iStringBuffer < sStringBuffer.size(); iStringBuffer++)
+				pStringBufferBuffer[iStringBuffer] = sStringBuffer[iStringBuffer];
+			pStringBufferBuffer[sStringBuffer.size()] = 0;
+		}
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for WorkingFile
+**************************************************************************************************************************/
+LibMCDriverEnvResult libmcdriverenv_workingfile_getabsolutefilename(LibMCDriverEnv_WorkingFile pWorkingFile, const LibMCDriverEnv_uint32 nFileNameBufferSize, LibMCDriverEnv_uint32* pFileNameNeededChars, char * pFileNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		if ( (!pFileNameBuffer) && !(pFileNameNeededChars) )
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sFileName("");
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pFileNameBuffer == nullptr);
+		if (isCacheCall) {
+			sFileName = pIWorkingFile->GetAbsoluteFileName();
+
+			pIWorkingFile->_setCache (new ParameterCache_1<std::string> (sFileName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIWorkingFile->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sFileName);
+			pIWorkingFile->_setCache (nullptr);
+		}
+		
+		if (pFileNameNeededChars)
+			*pFileNameNeededChars = (LibMCDriverEnv_uint32) (sFileName.size()+1);
+		if (pFileNameBuffer) {
+			if (sFileName.size() >= nFileNameBufferSize)
+				throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iFileName = 0; iFileName < sFileName.size(); iFileName++)
+				pFileNameBuffer[iFileName] = sFileName[iFileName];
+			pFileNameBuffer[sFileName.size()] = 0;
+		}
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_workingfile_getsize(LibMCDriverEnv_WorkingFile pWorkingFile, LibMCDriverEnv_uint64 * pFileSize)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		if (pFileSize == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		*pFileSize = pIWorkingFile->GetSize();
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_workingfile_calculatesha2(LibMCDriverEnv_WorkingFile pWorkingFile, const LibMCDriverEnv_uint32 nSHA2BufferSize, LibMCDriverEnv_uint32* pSHA2NeededChars, char * pSHA2Buffer)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		if ( (!pSHA2Buffer) && !(pSHA2NeededChars) )
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sSHA2("");
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSHA2Buffer == nullptr);
+		if (isCacheCall) {
+			sSHA2 = pIWorkingFile->CalculateSHA2();
+
+			pIWorkingFile->_setCache (new ParameterCache_1<std::string> (sSHA2));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIWorkingFile->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSHA2);
+			pIWorkingFile->_setCache (nullptr);
+		}
+		
+		if (pSHA2NeededChars)
+			*pSHA2NeededChars = (LibMCDriverEnv_uint32) (sSHA2.size()+1);
+		if (pSHA2Buffer) {
+			if (sSHA2.size() >= nSHA2BufferSize)
+				throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSHA2 = 0; iSHA2 < sSHA2.size(); iSHA2++)
+				pSHA2Buffer[iSHA2] = sSHA2[iSHA2];
+			pSHA2Buffer[sSHA2.size()] = 0;
+		}
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_workingfile_deletefile(LibMCDriverEnv_WorkingFile pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIWorkingFile->DeleteFile();
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_workingfile_executefile(LibMCDriverEnv_WorkingFile pWorkingFile, LibMCDriverEnv_WorkingFileExecution * pExecution)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		if (pExecution == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		IBase* pBaseExecution(nullptr);
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pBaseExecution = pIWorkingFile->ExecuteFile();
+
+		*pExecution = (IBase*)(pBaseExecution);
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for WorkingDirectory
+**************************************************************************************************************************/
+LibMCDriverEnvResult libmcdriverenv_workingdirectory_getabsolutefilepath(LibMCDriverEnv_WorkingDirectory pWorkingDirectory, const LibMCDriverEnv_uint32 nFilePathBufferSize, LibMCDriverEnv_uint32* pFilePathNeededChars, char * pFilePathBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if ( (!pFilePathBuffer) && !(pFilePathNeededChars) )
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sFilePath("");
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pFilePathBuffer == nullptr);
+		if (isCacheCall) {
+			sFilePath = pIWorkingDirectory->GetAbsoluteFilePath();
+
+			pIWorkingDirectory->_setCache (new ParameterCache_1<std::string> (sFilePath));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIWorkingDirectory->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sFilePath);
+			pIWorkingDirectory->_setCache (nullptr);
+		}
+		
+		if (pFilePathNeededChars)
+			*pFilePathNeededChars = (LibMCDriverEnv_uint32) (sFilePath.size()+1);
+		if (pFilePathBuffer) {
+			if (sFilePath.size() >= nFilePathBufferSize)
+				throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iFilePath = 0; iFilePath < sFilePath.size(); iFilePath++)
+				pFilePathBuffer[iFilePath] = sFilePath[iFilePath];
+			pFilePathBuffer[sFilePath.size()] = 0;
+		}
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_workingdirectory_storecustomdata(LibMCDriverEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCDriverEnv_uint64 nDataBufferBufferSize, const LibMCDriverEnv_uint8 * pDataBufferBuffer, LibMCDriverEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pFileName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if ( (!pDataBufferBuffer) && (nDataBufferBufferSize>0))
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sFileName(pFileName);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->StoreCustomData(sFileName, nDataBufferBufferSize, pDataBufferBuffer);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_workingdirectory_storedriverdata(LibMCDriverEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCDriverEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pFileName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pIdentifier == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sFileName(pFileName);
+		std::string sIdentifier(pIdentifier);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->StoreDriverData(sFileName, sIdentifier);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DriverEnvironment
 **************************************************************************************************************************/
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_createworkingdirectory(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriverEnv_WorkingDirectory * pWorkingDirectory)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pWorkingDirectory == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		IBase* pBaseWorkingDirectory(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingDirectory = pIDriverEnvironment->CreateWorkingDirectory();
+
+		*pWorkingDirectory = (IBase*)(pBaseWorkingDirectory);
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_retrievedriverdata(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if ((!pDataBufferBuffer) && !(pDataBufferNeededCount))
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RetrieveDriverData(sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -98,6 +528,30 @@ LibMCDriverEnvResult LibMCDriverEnv::Impl::LibMCDriverEnv_GetProcAddress (const 
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriverenv_workingfileexecution_getstatus") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingfileexecution_getstatus;
+	if (sProcName == "libmcdriverenv_workingfileexecution_returnstdout") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingfileexecution_returnstdout;
+	if (sProcName == "libmcdriverenv_workingfile_getabsolutefilename") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingfile_getabsolutefilename;
+	if (sProcName == "libmcdriverenv_workingfile_getsize") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingfile_getsize;
+	if (sProcName == "libmcdriverenv_workingfile_calculatesha2") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingfile_calculatesha2;
+	if (sProcName == "libmcdriverenv_workingfile_deletefile") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingfile_deletefile;
+	if (sProcName == "libmcdriverenv_workingfile_executefile") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingfile_executefile;
+	if (sProcName == "libmcdriverenv_workingdirectory_getabsolutefilepath") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingdirectory_getabsolutefilepath;
+	if (sProcName == "libmcdriverenv_workingdirectory_storecustomdata") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingdirectory_storecustomdata;
+	if (sProcName == "libmcdriverenv_workingdirectory_storedriverdata") 
+		*ppProcAddress = (void*) &libmcdriverenv_workingdirectory_storedriverdata;
+	if (sProcName == "libmcdriverenv_driverenvironment_createworkingdirectory") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_createworkingdirectory;
+	if (sProcName == "libmcdriverenv_driverenvironment_retrievedriverdata") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_retrievedriverdata;
 	if (sProcName == "libmcdriverenv_getversion") 
 		*ppProcAddress = (void*) &libmcdriverenv_getversion;
 	if (sProcName == "libmcdriverenv_getlasterror") 

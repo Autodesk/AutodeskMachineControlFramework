@@ -52,6 +52,31 @@ import (
 var GlobalContext libmc.MCContext;
 
 const XMLNS_SERVERCONFIG = "http://schemas.autodesk.com/amc/2020/06"
+const XMLNS_PACKAGECONFIG = "http://schemas.autodesk.com/amcpackage/2020/06"
+
+type ServerPackageXMLLibrary struct {
+	XMLName xml.Name `xml:"library"`	
+	Name string `xml:"name,attr"`
+	Import string `xml:"import,attr"`
+}
+
+
+type ServerPackageXMLBuild struct {
+	XMLName xml.Name `xml:"build"`	
+	Configuration string `xml:"configuration,attr"`
+	Name string `xml:"name,attr"`
+	CoreClient string `xml:"coreclient,attr"`
+	Libraries []ServerPackageXMLLibrary `xml:"library"`
+}
+
+
+type ServerPackageXMLRoot struct {
+	XMLName xml.Name `xml:"amcpackage"`	
+	NameSpace string `xml:"xmlns,attr"`
+	Build ServerPackageXMLBuild `xml:"build"`
+}
+
+
 
 type ServerConfigXMLServer struct {
 	XMLName xml.Name `xml:"server"`	
@@ -67,27 +92,20 @@ type ServerConfigXMLData struct {
 	SqLiteDB string `xml:"sqlitedb,attr"`
 }
 
-type ServerConfigXMLLibrary struct {
-	XMLName xml.Name `xml:"library"`	
+type ServerConfigXMLDefaultPackage struct {
+	XMLName xml.Name `xml:"defaultpackage"`	
 	Name string `xml:"name,attr"`
-	Import string `xml:"import,attr"`
+	GitHash string `xml:"githash,attr"`
+	XMLSHA2 string `xml:"xmlsha2,attr"`
 }
 
-
-type ServerConfigXMLPackage struct {
-	XMLName xml.Name `xml:"package"`	
-	Config string `xml:"config,attr"`
-	Name string `xml:"name,attr"`
-	CoreClient string `xml:"coreclient,attr"`
-	Libraries []ServerConfigXMLLibrary `xml:"library"`
-}
 
 type ServerConfigXMLRoot struct {
 	XMLName xml.Name `xml:"amc"`	
 	NameSpace string `xml:"xmlns,attr"`
 	Server ServerConfigXMLServer `xml:"server"`
 	Data ServerConfigXMLData `xml:"data"`
-	Packages []ServerConfigXMLPackage `xml:"package"`
+	DefaultPackage ServerConfigXMLDefaultPackage `xml:"defaultpackage"`
 }
 
 
@@ -114,6 +132,45 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 		fn(w, r);
 	}
 }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// Server package configuration
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+func loadServerPackageXML (FileName string, SHA2 string) (ServerPackageXMLBuild, error) {
+
+	var root ServerPackageXMLRoot;
+	var build ServerPackageXMLBuild;
+	
+	file, err := os.Open(FileName);
+	if (err != nil) {
+		return build, err
+	}
+	
+	defer file.Close();
+
+	bytes, err := ioutil.ReadAll (file);
+	if (err != nil) {
+		return build, err
+	}
+	
+	err = xml.Unmarshal(bytes, &root)
+	if (err != nil) {
+		return build, err
+	}	
+	
+	if (root.NameSpace != XMLNS_PACKAGECONFIG) {
+		err = errors.New ("Invalid server package xml!");
+		return build, err;
+	}
+	
+	build = root.Build;
+	
+	return build, nil;
+
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Server configuration
@@ -190,19 +247,22 @@ func LoadServerConfigXML (FileName string) (ServerConfig, error) {
 	}
 
 
-	if (len (root.Packages) == 0) {
-		err = errors.New ("Invalid package information");
+	if (len (root.DefaultPackage.Name) == 0) {
+		err = errors.New ("Invalid default package information");
 		return config, err;
 	}
 	
-	packageToUse := root.Packages[0];
+	packageToUse, err := loadServerPackageXML (root.DefaultPackage.Name, root.DefaultPackage.XMLSHA2);
+	if (err != nil) {
+		return config, err
+	}	
 
 	if (packageToUse.Name == "") {
 		err = errors.New ("Invalid package name");
 		return config, err;
 	}
 
-	if (packageToUse.Config == "") {
+	if (packageToUse.Configuration == "") {
 		err = errors.New ("Invalid package config");
 		return config, err;
 	}
@@ -217,7 +277,7 @@ func LoadServerConfigXML (FileName string) (ServerConfig, error) {
 		return config, err
 	}
 
-	config.PackageConfig, err = filepath.Abs (packageToUse.Config);
+	config.PackageConfig, err = filepath.Abs (packageToUse.Configuration);
 	if (err != nil) {
 		return config, err
 	}
@@ -292,55 +352,119 @@ func LoadServerConfigXML (FileName string) (ServerConfig, error) {
 func RESTHandler (w http.ResponseWriter, r *http.Request) {
 
 	var err error = nil;
-	var response libmc.APIResponse;
-	var httpcode uint32
-	var contenttype string
-	var data []byte
-
-
+	var dataBytes []byte;
+	bodyBytes := make ([]byte, 1);
+	
 	w.Header().Set("Access-Control-Allow-Origin", "*");	
-	w.Header().Set("Cache-Control", "no-cache");	
-
-	if (r.Method == "GET") {	
-		response, err = GlobalContext.HandleAPIGetRequest (r.URL.Path);
-	}
+	w.Header().Set("Cache-Control", "no-cache");
 	
-	if (r.Method == "POST") {
-	
-		bytes, err := ioutil.ReadAll (r.Body);
-		if (err == nil) {
-			response, err = GlobalContext.HandleAPIPostRequest (r.URL.Path, bytes);
-		}			
-	}
-
-
+	fmt.Println ("field name: ", r.URL.Path);
+				
+	requestHandler, err := GlobalContext.CreateAPIRequestHandler (r.URL.Path, r.Method);
 	if (err == nil) {
-		
-		if (err == nil) {
-			httpcode, err = response.GetHTTPCode ();
+	
+		var expectsRawBody bool = false;
+		var expectsFormData bool = false;
+		var fieldCount uint32 = 0;
+	
+		expectsRawBody, err = requestHandler.ExpectsRawBody ();	
+		if ((expectsRawBody) && (err == nil)) {				
+			bodyBytes, err = ioutil.ReadAll (r.Body);		
 		}
 		
 		if (err == nil) {
-			contenttype, err = response.GetContentType ();
+			fieldCount, expectsFormData, err = requestHandler.ExpectsFormData ();
 		}
+				
+		if (expectsFormData) {		
+			err = r.ParseMultipartForm (32 * 1024 * 1024);
+			
+			if (err == nil) {
+				var fieldIndex uint32;
+				for fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++ {
+				
+					fieldName, isFile, isMandatory, err := requestHandler.GetFormDataDetails (fieldIndex);
+					if (err == nil) {
+		
+						fmt.Println ("field name: ", fieldName);
+		
+		
+						if (isFile) {
+		
+							formFile, _, err := r.FormFile(fieldName);
+							fmt.Println ("err: ", err);
+							
+							if (err == nil) {
 
-		if (err == nil) {
-			data, err = response.GetData ();
-		}
-
-
-		if (err == nil) {
-
-			if (httpcode == 200) {		
-				w.Header().Set("Content-Type", contenttype);	
-				w.Write (data);
-			} else {		
-				http.Error (w, string (data), int (httpcode));
+							
+								defer formFile.Close ();
+					
+								byteArray, err := ioutil.ReadAll(formFile);
+								if (err == nil) {
+									fmt.Println ("bytearray len: ", len (byteArray));
+									
+									err = requestHandler.SetFormDataField (fieldName, byteArray);							
+								}													
+								
+							} else {
+							
+								if (!isMandatory) {
+									err = nil;
+								}
+							
+							}
+						
+						} else {
+						
+						
+								formValue := r.FormValue (fieldName);
+								if (formValue != "") {																
+									fmt.Println ("formvalue: " + formValue);														
+									err = requestHandler.SetFormStringField (fieldName, formValue);							
+								}
+								
+						
+						
+						}
+					
+					}
+										
+					if (err != nil) {
+						break;
+					}
+														
+				}
+				
 			}
 			
 		}
-	}
+		
+		if (err == nil) {
+		
+			contentType, httpCode, err := requestHandler.Handle (bodyBytes);
+				
+			if (err == nil) {
+				dataBytes, err = requestHandler.GetResultData (dataBytes);
+			} else {
+				dataBytes = make ([]byte, 1);
+			}
+
+
+			if (err == nil) {
+
+				if (httpCode == 200) {		
+					w.Header().Set("Content-Type", contentType);	
+					w.Write (dataBytes);
+				} else {		
+					http.Error (w, string (dataBytes), int (httpCode));
+				}
+				
+			}
+		}
 	
+	}
+
+
 	
 	if (err != nil) {
 		GlobalContext.Log (fmt.Sprintf ("Fatal error on %s: %s", r.URL.Path, err.Error()), libmc.LogSubSystem_Network, libmc.LogLevel_Message);

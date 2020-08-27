@@ -40,8 +40,4 @@ Interface version: 1.0.0
 
 package libmcdata
 
-/*
-#include "libmcdata_types.h"
-*/
-import "C"
 

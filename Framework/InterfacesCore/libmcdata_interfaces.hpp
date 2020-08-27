@@ -59,6 +59,8 @@ class IIterator;
 class ILogSession;
 class IStorageStream;
 class IStorage;
+class IBuildJobData;
+class IBuildJobDataIterator;
 class IBuildJob;
 class IBuildJobIterator;
 class IBuildJobHandler;
@@ -317,12 +319,6 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IStorageStream::GetContextUUID - returns the context uuid of a storage stream. Context might be for example a project uuid that this stream is part of.
-	* @return UUID String
-	*/
-	virtual std::string GetContextUUID() = 0;
-
-	/**
 	* IStorageStream::GetTimeStamp - returns the timestamp of a storage stream.
 	* @return Timestamp in ISO8601 UTC format
 	*/
@@ -432,9 +428,80 @@ public:
 	*/
 	virtual void FinishPartialStream(const std::string & sUUID) = 0;
 
+	/**
+	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
+	* @return Maximum Stream Size in Bytes.
+	*/
+	virtual LibMCData_uint64 GetMaxStreamSize() = 0;
+
+	/**
+	* IStorage::ContentTypeIsAccepted - Returns if the given content type is an acceptable value.
+	* @param[in] sContentType - Content type string (is taken case-insensitive)
+	* @return Content type is accepted.
+	*/
+	virtual bool ContentTypeIsAccepted(const std::string & sContentType) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStorage> PIStorage;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobData 
+**************************************************************************************************************************/
+
+class IBuildJobData : public virtual IBase {
+public:
+	/**
+	* IBuildJobData::GetName - returns the name of a build job.
+	* @return Name String
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IBuildJobData::GetTimeStamp - returns the timestamp when the job was created.
+	* @return Timestamp in ISO8601 UTC format
+	*/
+	virtual std::string GetTimeStamp() = 0;
+
+	/**
+	* IBuildJobData::GetStorageStream - returns the storage stream of the build.
+	* @return Stream Instance.
+	*/
+	virtual IStorageStream * GetStorageStream() = 0;
+
+	/**
+	* IBuildJobData::GetDataType - returns the data type of the job data.
+	* @return Data type of the job data
+	*/
+	virtual LibMCData::eBuildJobDataType GetDataType() = 0;
+
+	/**
+	* IBuildJobData::GetMIMEType - returns the mime type of a storage stream.
+	* @return Mime Type String
+	*/
+	virtual std::string GetMIMEType() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobData> PIBuildJobData;
+
+
+/*************************************************************************************************************************
+ Class interface for BuildJobDataIterator 
+**************************************************************************************************************************/
+
+class IBuildJobDataIterator : public virtual IIterator {
+public:
+	/**
+	* IBuildJobDataIterator::GetCurrentJobData - Returns the build job data the iterator points at.
+	* @return returns the build job instance.
+	*/
+	virtual IBuildJobData * GetCurrentJobData() = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuildJobDataIterator> PIBuildJobDataIterator;
 
 
 /*************************************************************************************************************************
@@ -462,6 +529,12 @@ public:
 	virtual LibMCData::eBuildJobStatus GetStatus() = 0;
 
 	/**
+	* IBuildJob::GetLayerCount - returns the layer count of a build job.
+	* @return Layer Count of build job
+	*/
+	virtual LibMCData_uint32 GetLayerCount() = 0;
+
+	/**
 	* IBuildJob::GetTimeStamp - returns the timestamp when the job was created.
 	* @return Timestamp in ISO8601 UTC format
 	*/
@@ -474,10 +547,70 @@ public:
 	virtual IStorageStream * GetStorageStream() = 0;
 
 	/**
+	* IBuildJob::GetStorageStreamUUID - returns the storage stream uuid of the build.
+	* @return Stream UUID.
+	*/
+	virtual std::string GetStorageStreamUUID() = 0;
+
+	/**
 	* IBuildJob::GetBuildJobLogger - creates a build job log session access class.
 	* @return LogSession class instance.
 	*/
 	virtual ILogSession * GetBuildJobLogger() = 0;
+
+	/**
+	* IBuildJob::StartValidating - Starts validation of a build job.
+	*/
+	virtual void StartValidating() = 0;
+
+	/**
+	* IBuildJob::FinishValidating - Finishes validation of a build job.
+	* @param[in] nLayerCount - Layer count
+	*/
+	virtual void FinishValidating(const LibMCData_uint32 nLayerCount) = 0;
+
+	/**
+	* IBuildJob::ArchiveJob - Archives a Job. Job MUST not be opened in the system. Job MUST be of state validated.
+	*/
+	virtual void ArchiveJob() = 0;
+
+	/**
+	* IBuildJob::UnArchiveJob - Unarchives a Job. Job MUST be of state archived.
+	*/
+	virtual void UnArchiveJob() = 0;
+
+	/**
+	* IBuildJob::DeleteJob - Deletes a Job permanently including all referencing data objects. Job MUST be of state archived to succeed.
+	*/
+	virtual void DeleteJob() = 0;
+
+	/**
+	* IBuildJob::JobCanBeArchived - Returns if a job is opened.
+	* @return returns if the job can be archived.
+	*/
+	virtual bool JobCanBeArchived() = 0;
+
+	/**
+	* IBuildJob::AddJobData - Adds additional data to the Job. Job MUST be of state validated in order to add job data.
+	* @param[in] sName - Name of the job
+	* @param[in] pStream - Storage Stream Instance
+	* @param[in] eDataType - Datatype of Job data
+	* @param[in] sUserID - Currently authenticated user
+	*/
+	virtual void AddJobData(const std::string & sName, IStorageStream* pStream, const LibMCData::eBuildJobDataType eDataType, const std::string & sUserID) = 0;
+
+	/**
+	* IBuildJob::ListJobDataByType - Retrieves a list of build job data objects, filtered by type.
+	* @param[in] eDataType - Datatype of Job data.
+	* @return Build Job Data Iterator Instance.
+	*/
+	virtual IBuildJobDataIterator * ListJobDataByType(const LibMCData::eBuildJobDataType eDataType) = 0;
+
+	/**
+	* IBuildJob::ListJobData - Retrieves a list of build job data objects.
+	* @return Build Job Data Iterator Instance.
+	*/
+	virtual IBuildJobDataIterator * ListJobData() = 0;
 
 };
 
@@ -512,10 +645,10 @@ public:
 	* @param[in] sJobUUID - UUID String for the build job. Must be unique and newly generated.
 	* @param[in] sName - Name String
 	* @param[in] sUserID - Currently authenticated user
-	* @param[in] pStreamInstance - Storage stream to create the job from. ContextUUID of Stream MUST be the Job UUID.
+	* @param[in] sStorageStreamUUID - Storage stream uuid for the job. Needs not exist yet.
 	* @return Build Job Instance.
 	*/
-	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, IStorageStream* pStreamInstance) = 0;
+	virtual IBuildJob * CreateJob(const std::string & sJobUUID, const std::string & sName, const std::string & sUserID, const std::string & sStorageStreamUUID) = 0;
 
 	/**
 	* IBuildJobHandler::RetrieveJob - Retrieves a job with a specific UUID.

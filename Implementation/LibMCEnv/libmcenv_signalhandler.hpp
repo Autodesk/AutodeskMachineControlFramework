@@ -82,6 +82,8 @@ public:
 
 	std::string GetString(const std::string & sName) override;
 
+	std::string GetUUID(const std::string& sName) override;
+
 	LibMCEnv_double GetDouble(const std::string & sName) override;
 
 	LibMCEnv_int64 GetInteger(const std::string & sName) override;
@@ -89,6 +91,8 @@ public:
 	bool GetBool(const std::string & sName) override;
 
 	void SetStringResult(const std::string & sName, const std::string & sValue) override;
+
+	void SetUUIDResult(const std::string& sName, const std::string& sValue) override;
 
 	void SetDoubleResult(const std::string & sName, const LibMCEnv_double dValue) override;
 

@@ -48,8 +48,142 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for WorkingFileExecution
+**************************************************************************************************************************/
+
+/**
+* Returns the execution status
+*
+* @param[in] pWorkingFileExecution - WorkingFileExecution instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingFileExecution_GetStatusPtr) (LibMCDriverEnv_WorkingFileExecution pWorkingFileExecution);
+
+/**
+* Returns the output of the executable as string buffer
+*
+* @param[in] pWorkingFileExecution - WorkingFileExecution instance.
+* @param[in] nStringBufferBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStringBufferNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStringBufferBuffer -  buffer of stdout buffer, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingFileExecution_ReturnStdOutPtr) (LibMCDriverEnv_WorkingFileExecution pWorkingFileExecution, const LibMCDriverEnv_uint32 nStringBufferBufferSize, LibMCDriverEnv_uint32* pStringBufferNeededChars, char * pStringBufferBuffer);
+
+/*************************************************************************************************************************
+ Class definition for WorkingFile
+**************************************************************************************************************************/
+
+/**
+* Retrieves absolute file name of the working file
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[in] nFileNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pFileNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pFileNameBuffer -  buffer of global path of the file, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingFile_GetAbsoluteFileNamePtr) (LibMCDriverEnv_WorkingFile pWorkingFile, const LibMCDriverEnv_uint32 nFileNameBufferSize, LibMCDriverEnv_uint32* pFileNameNeededChars, char * pFileNameBuffer);
+
+/**
+* Returns the size of temporary file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pFileSize - file size
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingFile_GetSizePtr) (LibMCDriverEnv_WorkingFile pWorkingFile, LibMCDriverEnv_uint64 * pFileSize);
+
+/**
+* Calculates the SHA256 checksum of the file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of sha256 checksum, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingFile_CalculateSHA2Ptr) (LibMCDriverEnv_WorkingFile pWorkingFile, const LibMCDriverEnv_uint32 nSHA2BufferSize, LibMCDriverEnv_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* Deletes the temporary file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingFile_DeleteFilePtr) (LibMCDriverEnv_WorkingFile pWorkingFile);
+
+/**
+* Executes the temporary file, if it is an executable.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pExecution - execution object
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingFile_ExecuteFilePtr) (LibMCDriverEnv_WorkingFile pWorkingFile, LibMCDriverEnv_WorkingFileExecution * pExecution);
+
+/*************************************************************************************************************************
+ Class definition for WorkingDirectory
+**************************************************************************************************************************/
+
+/**
+* Retrieves absolute file path.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] nFilePathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pFilePathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pFilePathBuffer -  buffer of global path of the directory, including path delimiter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingDirectory_GetAbsoluteFilePathPtr) (LibMCDriverEnv_WorkingDirectory pWorkingDirectory, const LibMCDriverEnv_uint32 nFilePathBufferSize, LibMCDriverEnv_uint32* pFilePathNeededChars, char * pFilePathBuffer);
+
+/**
+* Stores a data buffer in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[in] pDataBufferBuffer - uint8 buffer of file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingDirectory_StoreCustomDataPtr) (LibMCDriverEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCDriverEnv_uint64 nDataBufferBufferSize, const LibMCDriverEnv_uint8 * pDataBufferBuffer, LibMCDriverEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores attached driver data in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvWorkingDirectory_StoreDriverDataPtr) (LibMCDriverEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCDriverEnv_WorkingFile * pWorkingFile);
+
+/*************************************************************************************************************************
  Class definition for DriverEnvironment
 **************************************************************************************************************************/
+
+/**
+* creates a temporary working directory.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pWorkingDirectory - creates a working directory
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_CreateWorkingDirectoryPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriverEnv_WorkingDirectory * pWorkingDirectory);
+
+/**
+* retrieves attached driver data into a memory buffer.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[out] pDataBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_RetrieveDriverDataPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer);
 
 /*************************************************************************************************************************
  Global functions
@@ -107,6 +241,18 @@ typedef LibMCDriverEnvResult (*PLibMCDriverEnvGetSymbolLookupMethodPtr) (LibMCDr
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriverEnvWorkingFileExecution_GetStatusPtr m_WorkingFileExecution_GetStatus;
+	PLibMCDriverEnvWorkingFileExecution_ReturnStdOutPtr m_WorkingFileExecution_ReturnStdOut;
+	PLibMCDriverEnvWorkingFile_GetAbsoluteFileNamePtr m_WorkingFile_GetAbsoluteFileName;
+	PLibMCDriverEnvWorkingFile_GetSizePtr m_WorkingFile_GetSize;
+	PLibMCDriverEnvWorkingFile_CalculateSHA2Ptr m_WorkingFile_CalculateSHA2;
+	PLibMCDriverEnvWorkingFile_DeleteFilePtr m_WorkingFile_DeleteFile;
+	PLibMCDriverEnvWorkingFile_ExecuteFilePtr m_WorkingFile_ExecuteFile;
+	PLibMCDriverEnvWorkingDirectory_GetAbsoluteFilePathPtr m_WorkingDirectory_GetAbsoluteFilePath;
+	PLibMCDriverEnvWorkingDirectory_StoreCustomDataPtr m_WorkingDirectory_StoreCustomData;
+	PLibMCDriverEnvWorkingDirectory_StoreDriverDataPtr m_WorkingDirectory_StoreDriverData;
+	PLibMCDriverEnvDriverEnvironment_CreateWorkingDirectoryPtr m_DriverEnvironment_CreateWorkingDirectory;
+	PLibMCDriverEnvDriverEnvironment_RetrieveDriverDataPtr m_DriverEnvironment_RetrieveDriverData;
 	PLibMCDriverEnvGetVersionPtr m_GetVersion;
 	PLibMCDriverEnvGetLastErrorPtr m_GetLastError;
 	PLibMCDriverEnvReleaseInstancePtr m_ReleaseInstance;

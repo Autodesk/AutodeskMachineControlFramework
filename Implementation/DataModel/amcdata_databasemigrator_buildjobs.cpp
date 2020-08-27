@@ -46,9 +46,24 @@ namespace AMCData {
 			sBuildJobsQuery += "`name`  varchar ( 256 ) NOT NULL,";
 			sBuildJobsQuery += "`status`  varchar ( 64 ) NOT NULL,";
 			sBuildJobsQuery += "`storagestreamuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobsQuery += "`layercount` integer DEFAULT 0,";
 			sBuildJobsQuery += "`userid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobsQuery += "`updateuuid`  varchar ( 64 ),";
 			sBuildJobsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 			pTransaction->executeStatement(sBuildJobsQuery);
+
+			std::string sBuildJobDataQuery = "CREATE TABLE `buildjobdata` (";
+			sBuildJobDataQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+			sBuildJobDataQuery += "`jobuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobDataQuery += "`storagestreamuuid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobDataQuery += "`name`  varchar ( 256 ) NOT NULL,";
+			sBuildJobDataQuery += "`datatype`  varchar ( 64 ) NOT NULL,";
+			sBuildJobDataQuery += "`userid`  varchar ( 64 ) NOT NULL,";
+			sBuildJobDataQuery += "`updateuuid`  varchar ( 64 ),";
+			sBuildJobDataQuery += "`active`  integer DEFAULT 0,";
+			sBuildJobDataQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
+			pTransaction->executeStatement(sBuildJobDataQuery);
+
 
 			break;
 		}

@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits)
-		: m_dUnits (dUnits)
+	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue)
+		: m_dUnits (dUnits), m_nZValue (nZValue)
 	{
 		if (p3MFLayer.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -84,8 +84,8 @@ namespace AMC {
 
 				for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_PointCount; nPointIndex++) {
 					
-					pDstPoint->m_Coordinates[0] = pSrcPoint->m_Coordinates[0];
-					pDstPoint->m_Coordinates[1] = pSrcPoint->m_Coordinates[1];
+					pDstPoint->m_Coordinates[0] = (int) pSrcPoint->m_Coordinates[0];
+					pDstPoint->m_Coordinates[1] = (int) pSrcPoint->m_Coordinates[1];
 					pSrcPoint++;
 					pDstPoint++;
 					
@@ -192,6 +192,16 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
 
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartID);
+	}
+
+	double CToolpathLayerData::getUnits()
+	{
+		return m_dUnits;
+	}
+
+	int32_t CToolpathLayerData::getZValue()
+	{
+		return m_nZValue;
 	}
 
 

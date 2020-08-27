@@ -147,6 +147,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
+typedef LibMCEnvHandle LibMCEnv_Build;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
@@ -164,6 +165,17 @@ namespace LibMCEnv {
     Polyline = 3
   };
   
+  enum class eToolpathProfileValueType : LibMCEnv_int32 {
+    Custom = 0,
+    Speed = 1,
+    JumpSpeed = 2,
+    ExtrusionFactor = 3,
+    LaserPower = 4,
+    StartDelay = 5,
+    EndDelay = 6,
+    PolyDelay = 7
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -171,7 +183,7 @@ namespace LibMCEnv {
   #pragma pack (1)
   
   typedef struct {
-      LibMCEnv_single m_Coordinates[2];
+      LibMCEnv_int32 m_Coordinates[2];
   } sPosition2D;
   
   #pragma pack ()
@@ -180,6 +192,7 @@ namespace LibMCEnv {
 
 // define legacy C-names for enums, structs and function types
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
+typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP

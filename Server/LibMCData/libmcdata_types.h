@@ -264,6 +264,33 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDSTORAGECALLBACKSTREAM 236
 #define LIBMCDATA_ERROR_INVALIDSTORAGEPATH 237
 #define LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND 238
+#define LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM 239
+#define LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD 240
+#define LIBMCDATA_ERROR_PARTIALUPLOADNOTFINISHED 241
+#define LIBMCDATA_ERROR_APIREQUESTNOTHANDLED 242
+#define LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED 243
+#define LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE 244
+#define LIBMCDATA_ERROR_INVALIDUPLOADSTREAM 245
+#define LIBMCDATA_ERROR_COULDNOTPARSEJSONREQUEST 246
+#define LIBMCDATA_ERROR_INVALIDCONTEXTUUID 247
+#define LIBMCDATA_ERROR_INVALIDUPLOADNAME 248
+#define LIBMCDATA_ERROR_INVALIDMIMETYPE 249
+#define LIBMCDATA_ERROR_INVALIDSTREAMSIZE 250
+#define LIBMCDATA_ERROR_INVALIDSHA256SUM 251
+#define LIBMCDATA_ERROR_INVALIDSTREAMUUID 252
+#define LIBMCDATA_ERROR_INVALIDFIELDNAME 253
+#define LIBMCDATA_ERROR_UPLOADSIZEMISMATCH 254
+#define LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED 255
+#define LIBMCDATA_ERROR_NOCURRENTUPLOAD 256
+#define LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH 257
+#define LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS 258
+#define LIBMCDATA_ERROR_CONTEXTUUIDNOTACCEPTED 259
+#define LIBMCDATA_ERROR_INVALIDBUILDUUID 260
+#define LIBMCDATA_ERROR_MISSINGTHREADCOUNT 261
+#define LIBMCDATA_ERROR_INVALIDTHREADCOUNT 262
+#define LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS 263
+#define LIBMCDATA_ERROR_INVALIDITERATOR 264
+#define LIBMCDATA_ERROR_INVALIDDATATYPE 265
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -439,6 +466,33 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDSTORAGECALLBACKSTREAM: return "Invalid storage callback stream";
     case LIBMCDATA_ERROR_INVALIDSTORAGEPATH: return "Invalid storage path";
     case LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found";
+    case LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM: return "Duplicate Storage Stream";
+    case LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD: return "Invalid Partial Upload";
+    case LIBMCDATA_ERROR_PARTIALUPLOADNOTFINISHED: return "Partial Upload not finished";
+    case LIBMCDATA_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
+    case LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
+    case LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
+    case LIBMCDATA_ERROR_INVALIDUPLOADSTREAM: return "Invalid Upload Stream";
+    case LIBMCDATA_ERROR_COULDNOTPARSEJSONREQUEST: return "Could not parse JSON request";
+    case LIBMCDATA_ERROR_INVALIDCONTEXTUUID: return "Invalid Context UUID";
+    case LIBMCDATA_ERROR_INVALIDUPLOADNAME: return "Invalid Upload Name";
+    case LIBMCDATA_ERROR_INVALIDMIMETYPE: return "Invalid Mime Type";
+    case LIBMCDATA_ERROR_INVALIDSTREAMSIZE: return "Invalid Stream Size";
+    case LIBMCDATA_ERROR_INVALIDSHA256SUM: return "Invalid SHA256 Sum";
+    case LIBMCDATA_ERROR_INVALIDSTREAMUUID: return "Invalid Stream UUID";
+    case LIBMCDATA_ERROR_INVALIDFIELDNAME: return "Invalid field name";
+    case LIBMCDATA_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
+    case LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED: return "Content type not accepted";
+    case LIBMCDATA_ERROR_NOCURRENTUPLOAD: return "No current upload";
+    case LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH: return "Upload checksum mismatch";
+    case LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS: return "Invalid storage stream status";
+    case LIBMCDATA_ERROR_CONTEXTUUIDNOTACCEPTED: return "Context uuid not accepted";
+    case LIBMCDATA_ERROR_INVALIDBUILDUUID: return "Invalid build uuid";
+    case LIBMCDATA_ERROR_MISSINGTHREADCOUNT: return "Missing thread count";
+    case LIBMCDATA_ERROR_INVALIDTHREADCOUNT: return "Invalid thread count";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
+    case LIBMCDATA_ERROR_INVALIDITERATOR: return "Invalid iterator";
+    case LIBMCDATA_ERROR_INVALIDDATATYPE: return "Invalid data type";
     default: return "unknown error";
   }
 }
@@ -452,6 +506,8 @@ typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
+typedef LibMCDataHandle LibMCData_BuildJobData;
+typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
@@ -480,8 +536,19 @@ typedef enum eLibMCDataBuildJobStatus {
   eBuildJobStatusCreated = 0,
   eBuildJobStatusValidating = 100,
   eBuildJobStatusValidated = 200,
-  eBuildJobStatusArchived = 300
+  eBuildJobStatusArchived = 300,
+  eBuildJobStatusDeleted = 400
 } eLibMCDataBuildJobStatus;
+
+typedef enum eLibMCDataBuildJobDataType {
+  eBuildJobDataTypeUnknown = 0,
+  eBuildJobDataTypeToolpath = 1,
+  eBuildJobDataTypePNGImage = 2,
+  eBuildJobDataTypeJPEGImage = 3,
+  eBuildJobDataTypeThumbnail = 4,
+  eBuildJobDataTypeTimeline = 5,
+  eBuildJobDataTypeCustomBinaryData = 100
+} eLibMCDataBuildJobDataType;
 
 /*************************************************************************************************************************
  Declaration of enum members for 4 byte struct alignment
@@ -501,6 +568,11 @@ typedef union {
   eLibMCDataBuildJobStatus m_enum;
   int m_code;
 } structEnumLibMCDataBuildJobStatus;
+
+typedef union {
+  eLibMCDataBuildJobDataType m_enum;
+  int m_code;
+} structEnumLibMCDataBuildJobDataType;
 
 /*************************************************************************************************************************
  Declaration of function pointers 

@@ -34,9 +34,34 @@ type DistXMLRoot struct {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-func createMCServerTemplate (outputName string, packageName string, clientName string, libraryName string, configName string, gitHash string) (error) {
+func createMCServerTemplate (outputDir string, packageName string, clientName string, libraryName string, configName string, gitHash string) (error) {
 
-	file, err := os.Create(outputName);
+	pkgfile, err := os.Create(outputDir + gitHash + "_package.xml");
+	if (err != nil) {
+		return err
+	}
+
+	defer pkgfile.Close()	
+
+	fmt.Fprintf(pkgfile, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+	fmt.Fprintf(pkgfile, "<amcpackage xmlns=\"http://schemas.autodesk.com/amcpackage/2020/06\">\n");
+	fmt.Fprintf(pkgfile, "  <build name=\"%s\" configuration=\"%s\" coreclient=\"%s\">\n", packageName, configName, clientName);
+
+	fmt.Fprintf(pkgfile, "    <library name=\"core\" import=\"%s\" />\n", libraryName);
+	fmt.Fprintf(pkgfile, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_movement\" import=\"%s_plugin_movement.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "  </build>\n");
+	fmt.Fprintf(pkgfile, "</amcpackage>\n");
+	
+	pkgfile.Close()	
+	
+
+	file, err := os.Create(outputDir + "amc_server.xml");
 	if (err != nil) {
 		return err
 	}
@@ -47,19 +72,10 @@ func createMCServerTemplate (outputName string, packageName string, clientName s
 	fmt.Fprintf(file, "<amc xmlns=\"http://schemas.autodesk.com/amc/2020/06\">\n");
 	fmt.Fprintf(file, "  <server hostname=\"127.0.0.1\" port=\"8869\" />\n");
 	fmt.Fprintf(file, "  <data directory=\"data/\" database=\"sqlite\" sqlitedb=\"storage.db\" />\n");
-	fmt.Fprintf(file, "  <package name=\"%s\" coreclient=\"%s\" config=\"%s\">\n", packageName, clientName, configName);
-	
-	fmt.Fprintf(file, "    <library name=\"core\" import=\"%s\" />\n", libraryName);
-	fmt.Fprintf(file, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"plugin_main\" import=\"%s_plugin_main.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"plugin_movement\" import=\"%s_plugin_movement.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "  </package>\n");
+	fmt.Fprintf(file, "  <defaultpackage name=\"%s_package.xml\" githash=\"%s\" sha256=\"%s\" />\n", gitHash, gitHash, "");	
 	fmt.Fprintf(file, "</amc>\n");
-	
+
+
 	return nil;
 
 }
@@ -84,7 +100,6 @@ func main() {
 	ConfigName := hexSum + "_config.xml";
 	
 	DistXMLName := "dist.xml";
-	MCServerXMLPath := OutputDir + "amc_server.xml";
 	
 	packageName := "Build " + hexSum;
 	
@@ -201,9 +216,9 @@ func main() {
 		}
 	}
 	
-	fmt.Printf("creating %s\n", MCServerXMLPath);
+	fmt.Printf("creating server config in %s\n", OutputDir);
 	
-	err = createMCServerTemplate (MCServerXMLPath, packageName, ClientZIPName, LibraryName, ConfigName, hexSum);
+	err = createMCServerTemplate (OutputDir, packageName, ClientZIPName, LibraryName, ConfigName, hexSum);
 	if err != nil {
 		log.Fatal(err)
 	}

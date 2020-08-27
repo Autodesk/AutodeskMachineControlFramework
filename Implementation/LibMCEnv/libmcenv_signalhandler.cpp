@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include "Common/common_utils.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -85,6 +85,11 @@ std::string CSignalHandler::GetString(const std::string & sName)
 	return m_pParameterGroup->getParameterValueByName(sName);
 }
 
+std::string CSignalHandler::GetUUID(const std::string& sName)
+{
+	return AMCCommon::CUtils::normalizeUUIDString (m_pParameterGroup->getParameterValueByName(sName));
+}
+
 LibMCEnv_double CSignalHandler::GetDouble(const std::string & sName)
 {
 	return m_pParameterGroup->getDoubleParameterValueByName(sName);
@@ -104,6 +109,12 @@ void CSignalHandler::SetStringResult(const std::string & sName, const std::strin
 {
 	m_pResultGroup->setParameterValueByName(sName, sValue);
 }
+
+void CSignalHandler::SetUUIDResult(const std::string& sName, const std::string& sValue)
+{
+	m_pResultGroup->setParameterValueByName(sName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+
 
 void CSignalHandler::SetDoubleResult(const std::string & sName, const LibMCEnv_double dValue)
 {

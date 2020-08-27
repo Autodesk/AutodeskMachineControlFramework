@@ -75,7 +75,6 @@ class CStorageStream : public virtual IStorageStream, public virtual CBase {
 private:
 
 	std::string m_sUUID;
-	std::string m_sContextUUID;
 	std::string m_sName;
 	uint64_t m_nSize;
 	std::string m_sMIMEType;
@@ -88,20 +87,18 @@ private:
 
 protected:
 
-	CStorageStream(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
+	CStorageStream(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
 
 public:
 
-	static CStorageStream* make (AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
+	static CStorageStream* make (AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
 	static CStorageStream* makeFromDatabase (const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
-	static PStorageStream makeShared(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
+	static PStorageStream makeShared(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID);
 	static PStorageStream makeSharedFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
 
 	~CStorageStream();
 
 	std::string GetUUID() override;
-
-	std::string GetContextUUID() override;
 
 	std::string GetTimeStamp() override;
 

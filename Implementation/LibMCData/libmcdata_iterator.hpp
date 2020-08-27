@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CIterator
 #endif
 
 // Include custom headers here.
-
+#include <vector>
 
 namespace LibMCData {
 namespace Impl {
@@ -58,34 +58,20 @@ namespace Impl {
 class CIterator : public virtual IIterator, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+    std::vector<std::shared_ptr<CBase>> m_List;
+
+    int32_t m_nCurrentIndex;
+
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+    CIterator();
 
 	bool MoveNext() override;
 
 	bool MovePrevious() override;
-
-	IBase * GetCurrent() override;
-
-	IIterator * Clone() override;
 
 	LibMCData_uint64 Count() override;
 

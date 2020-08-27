@@ -78,7 +78,7 @@ public:
 
     CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, IStorageStream* pStreamInstance) override;
+    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID) override;
 
 	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
 
