@@ -42,11 +42,12 @@ namespace AMC {
 
 	class CUIPage {
 	protected:
+		std::string m_sInstanceName;
 		std::string m_sName;
-		
+
 	public:
 
-		CUIPage(const std::string & sName);	
+		CUIPage(const std::string& sInstanceName, const std::string & sName);
 		
 		virtual ~CUIPage();
 										
