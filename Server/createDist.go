@@ -52,9 +52,12 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"plugin_movement\" import=\"%s_plugin_movement.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_printerconnection\" import=\"%s_plugin_printerconnection.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_camera\" import=\"%s_driver_camera.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.dll\" />\n", gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.dll\" />\n", gitHash);
 	fmt.Fprintf(pkgfile, "  </build>\n");
 	fmt.Fprintf(pkgfile, "</amcpackage>\n");
 	
