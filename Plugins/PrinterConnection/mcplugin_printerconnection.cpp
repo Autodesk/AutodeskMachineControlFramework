@@ -58,7 +58,7 @@ typedef LibMCEnv::CDriverCast <LibMCDriver_Marlin::CDriver_Marlin, LibMCDriver_M
 /*************************************************************************************************************************
  Class definition of CMovementData
 **************************************************************************************************************************/
-class CMovementData : public virtual CPluginData {	
+class CPrinterConnectionData : public virtual CPluginData {	
 private:
 	// We need to globally store driver wrappers in the plugin
 	PDriverCast_Marlin m_DriverCast_Marlin;
@@ -143,18 +143,18 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMovementState
+ Class definition of CPrinterConnectionState
 **************************************************************************************************************************/
-typedef CState<CMovementData> CMovementState;
+typedef CState<CPrinterConnectionData> CPrinterConnectionState;
 
 /*************************************************************************************************************************
- Class definition of CMovementState_Init
+ Class definition of CPrinterConnectionState_Init
 **************************************************************************************************************************/
-class CMovementState_Init : public virtual CMovementState {
+class CPrinterConnectionState_Init : public virtual CPrinterConnectionState {
 public:
 
-	CMovementState_Init(const std::string& sStateName, PPluginData pPluginData)
-		: CMovementState(getStateName(), sStateName, pPluginData)
+	CPrinterConnectionState_Init(const std::string& sStateName, PPluginData pPluginData)
+		: CPrinterConnectionState(getStateName(), sStateName, pPluginData)
 	{
 
 	}
@@ -207,13 +207,13 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMovementState_Idle
+ Class definition of CPrinterConnectionState_Idle
 **************************************************************************************************************************/
-class CMovementState_Idle : public virtual CMovementState {
+class CPrinterConnectionState_Idle : public virtual CPrinterConnectionState {
 public:
 
-	CMovementState_Idle(const std::string& sStateName, PPluginData pPluginData)
-		: CMovementState(getStateName(), sStateName, pPluginData)
+	CPrinterConnectionState_Idle(const std::string& sStateName, PPluginData pPluginData)
+		: CPrinterConnectionState(getStateName(), sStateName, pPluginData)
 	{
 
 	}
@@ -257,13 +257,13 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMovementState_FatalError
+ Class definition of CPrinterConnectionState_FatalError
 **************************************************************************************************************************/
-class CMovementState_FatalError : public virtual CMovementState {
+class CPrinterConnectionState_FatalError : public virtual CPrinterConnectionState {
 public:
 
-	CMovementState_FatalError(const std::string& sStateName, PPluginData pPluginData)
-		: CMovementState(getStateName(), sStateName, pPluginData)
+	CPrinterConnectionState_FatalError(const std::string& sStateName, PPluginData pPluginData)
+		: CPrinterConnectionState(getStateName(), sStateName, pPluginData)
 	{
 
 	}
@@ -286,9 +286,9 @@ public:
 };
 
 /*************************************************************************************************************************
- Class definition of CMovementState_DoExtrudeLayer
+ Class definition of CPrinterConnectionState_DoExtrudeLayer
 **************************************************************************************************************************/
-class CMovementState_DoExtrudeLayer : public virtual CMovementState {
+class CPrinterConnectionState_DoExtrudeLayer : public virtual CPrinterConnectionState {
 private:
 
 	bool timeElapsed(int64_t nLayerTimeout, std::chrono::high_resolution_clock::time_point tStart) {
@@ -320,8 +320,8 @@ private:
 
 public:
 	
-	CMovementState_DoExtrudeLayer(const std::string& sStateName, PPluginData pPluginData)
-		: CMovementState(getStateName(), sStateName, pPluginData)
+	CPrinterConnectionState_DoExtrudeLayer(const std::string& sStateName, PPluginData pPluginData)
+		: CPrinterConnectionState(getStateName(), sStateName, pPluginData)
 	{
 
 	}
@@ -527,13 +527,13 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMovementState_Homing
+ Class definition of CPrinterConnectionState_Homing
 **************************************************************************************************************************/
-class CMovementState_Homing : public virtual CMovementState {
+class CPrinterConnectionState_Homing : public virtual CPrinterConnectionState {
 public:
 
-	CMovementState_Homing(const std::string& sStateName, PPluginData pPluginData)
-		: CMovementState(getStateName(), sStateName, pPluginData)
+	CPrinterConnectionState_Homing(const std::string& sStateName, PPluginData pPluginData)
+		: CPrinterConnectionState(getStateName(), sStateName, pPluginData)
 	{
 
 	}
@@ -581,7 +581,7 @@ public:
 
 CStateFactory::CStateFactory(const std::string& sInstanceName)
 {
-	m_pPluginData = std::make_shared<CMovementData>();
+	m_pPluginData = std::make_shared<CPrinterConnectionData>();
 }
 
 
@@ -590,19 +590,19 @@ IState* CStateFactory::CreateState(const std::string& sStateName)
 
 	IState* pStateInstance = nullptr;
 
-	if (createStateInstanceByName<CMovementState_Init>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPrinterConnectionState_Init>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMovementState_Idle>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPrinterConnectionState_Idle>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMovementState_FatalError>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPrinterConnectionState_FatalError>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMovementState_DoExtrudeLayer>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPrinterConnectionState_DoExtrudeLayer>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMovementState_Homing>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPrinterConnectionState_Homing>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDSTATENAME);

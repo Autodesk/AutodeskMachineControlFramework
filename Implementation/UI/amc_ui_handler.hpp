@@ -44,7 +44,8 @@ namespace AMC {
 	amcDeclareDependingClass(CUIMenuItem, PUIMenuItem);
 	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
-	
+	amcDeclareDependingClass(CUIPage, PUIPage);
+
 	class CUIHandler {
 	protected:
 		std::string m_sAppName;
@@ -52,6 +53,8 @@ namespace AMC {
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
+
+		std::map <std::pair<std::string, std::string>, PUIPage> m_Pages;
 
 	public:
 
@@ -64,6 +67,8 @@ namespace AMC {
 
 		void addMenuItem (const std::string & sID, const std::string & sIcon, const std::string & sCaption, const std::string & sTargetPage);
 		void addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+
+		PUIPage addPage(const std::string& sInstanceName, const std::string& sName);
 
 		void writeToJSON (CJSONWriter & writer);
 

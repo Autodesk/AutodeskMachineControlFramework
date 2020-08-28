@@ -109,6 +109,13 @@ void CUIHandler::writeToJSON(CJSONWriter& writer)
 
 }
 
+PUIPage CUIHandler::addPage(const std::string& sInstanceName, const std::string& sName)    
+{
+    //auto pPage = std::make_shared<CUIPage> ();
+
+    return nullptr;
+}
+
 
 void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
 {

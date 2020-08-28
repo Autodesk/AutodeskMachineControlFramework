@@ -37,9 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIPage::CUIPage(const std::string& sName)
-	: m_sName(sName)
+CUIPage::CUIPage(const std::string& sInstanceName, const std::string& sName)
+	: m_sInstanceName (sInstanceName), m_sName(sName)
 {
+	if (sInstanceName.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (sName.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
 
 }
 

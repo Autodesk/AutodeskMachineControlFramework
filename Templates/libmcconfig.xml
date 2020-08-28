@@ -77,7 +77,7 @@
   
   
   
-    <statemachine name="movement" description="Movement System" initstate="init" failedstate="fatalerror" library="plugin_movement">
+    <statemachine name="printerconnection" description="Printer Connection System" initstate="init" failedstate="fatalerror" library="plugin_printerconnection">
   	  
   	  <signaldefinition name="signal_doextrudelayer">
   		<parameter name="jobuuid" type="string" />
@@ -106,7 +106,7 @@
   	  </parametergroup>
   
   
-  	  <parametergroup name="movementstate" description="Movement data">
+  	  <parametergroup name="printerstate" description="Printer State Data">
   		<parameter name="targetx" description="Target X Position" default="0" type="double" />
   		<parameter name="targety" description="Target Y Position" default="0" type="double" />
   		<parameter name="targetz" description="Target Z Position" default="0" type="double" />

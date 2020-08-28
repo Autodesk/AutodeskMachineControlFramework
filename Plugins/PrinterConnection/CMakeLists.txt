@@ -34,7 +34,7 @@ cmake_minimum_required(VERSION 3.5)
 ### Change the next line for making new plugins
 ##########################################################################################
 
-set (PLUGINPROJECT Movement)
+set (PLUGINPROJECT PrinterConnection)
 
 ##########################################################################################
 ### generic CMake code

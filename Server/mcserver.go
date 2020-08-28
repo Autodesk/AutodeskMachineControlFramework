@@ -317,11 +317,13 @@ func LoadServerConfigXML (FileName string) (ServerConfig, error) {
 			return config, err
 		}	
 		
+		/* for development, we are in lazy mode and do not care if the dlls exist.
+				
 		_, err = os.Stat (importPath);
 		if (err != nil) {
 			err = errors.New ("library \"" + library.Name + "\" does not exist: " + importPath);
 			return config, err
-		}		
+		}		 */
 		
 		config.PackageLibraries [library.Name] = importPath;
 		
