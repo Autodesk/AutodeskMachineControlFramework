@@ -266,6 +266,46 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DUPLICATESTORAGESTREAM 239
 #define LIBMC_ERROR_INVALIDPARTIALUPLOAD 240
 #define LIBMC_ERROR_PARTIALUPLOADNOTFINISHED 241
+#define LIBMC_ERROR_APIREQUESTNOTHANDLED 242
+#define LIBMC_ERROR_APIREQUESTALREADYHANDLED 243
+#define LIBMC_ERROR_INVALIDAPIREQUESTTYPE 244
+#define LIBMC_ERROR_INVALIDUPLOADSTREAM 245
+#define LIBMC_ERROR_COULDNOTPARSEJSONREQUEST 246
+#define LIBMC_ERROR_INVALIDCONTEXTUUID 247
+#define LIBMC_ERROR_INVALIDUPLOADNAME 248
+#define LIBMC_ERROR_INVALIDMIMETYPE 249
+#define LIBMC_ERROR_INVALIDSTREAMSIZE 250
+#define LIBMC_ERROR_INVALIDSHA256SUM 251
+#define LIBMC_ERROR_INVALIDSTREAMUUID 252
+#define LIBMC_ERROR_INVALIDFIELDNAME 253
+#define LIBMC_ERROR_UPLOADSIZEMISMATCH 254
+#define LIBMC_ERROR_CONTENTTYPENOTACCEPTED 255
+#define LIBMC_ERROR_NOCURRENTUPLOAD 256
+#define LIBMC_ERROR_UPLOADCHECKSUMMISMATCH 257
+#define LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS 258
+#define LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED 259
+#define LIBMC_ERROR_INVALIDBUILDUUID 260
+#define LIBMC_ERROR_MISSINGTHREADCOUNT 261
+#define LIBMC_ERROR_INVALIDTHREADCOUNT 262
+#define LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS 263
+#define LIBMC_ERROR_INVALIDITERATOR 264
+#define LIBMC_ERROR_INVALIDDATATYPE 265
+#define LIBMC_ERROR_COULDNOTSENDSIGNAL 266
+#define LIBMC_ERROR_MISSINGSIGNALPARAMETER 267
+#define LIBMC_ERROR_NOUSERINTERFACEDEFINITION 268
+#define LIBMC_ERROR_MISSINGAPPNAME 269
+#define LIBMC_ERROR_MISSINGCOPYRIGHT 270
+#define LIBMC_ERROR_MISSINGMAINPAGE 271
+#define LIBMC_ERROR_MISSINGMENUITEMID 272
+#define LIBMC_ERROR_MISSINGMENUITEMICON 273
+#define LIBMC_ERROR_MISSINGMENUITEMCAPTION 274
+#define LIBMC_ERROR_MISSINGTARGETPAGE 275
+#define LIBMC_ERROR_MISSINGMENUNODE 276
+#define LIBMC_ERROR_MISSINGTOOLBARNODE 277
+#define LIBMC_ERROR_MISSINGTOOLBARITEMID 278
+#define LIBMC_ERROR_MISSINGTOOLBARITEMICON 279
+#define LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION 280
+#define LIBMC_ERROR_MISSINGSERVICESNODE 281
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -444,6 +484,46 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DUPLICATESTORAGESTREAM: return "Duplicate Storage Stream";
     case LIBMC_ERROR_INVALIDPARTIALUPLOAD: return "Invalid Partial Upload";
     case LIBMC_ERROR_PARTIALUPLOADNOTFINISHED: return "Partial Upload not finished";
+    case LIBMC_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
+    case LIBMC_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
+    case LIBMC_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
+    case LIBMC_ERROR_INVALIDUPLOADSTREAM: return "Invalid Upload Stream";
+    case LIBMC_ERROR_COULDNOTPARSEJSONREQUEST: return "Could not parse JSON request";
+    case LIBMC_ERROR_INVALIDCONTEXTUUID: return "Invalid Context UUID";
+    case LIBMC_ERROR_INVALIDUPLOADNAME: return "Invalid Upload Name";
+    case LIBMC_ERROR_INVALIDMIMETYPE: return "Invalid Mime Type";
+    case LIBMC_ERROR_INVALIDSTREAMSIZE: return "Invalid Stream Size";
+    case LIBMC_ERROR_INVALIDSHA256SUM: return "Invalid SHA256 Sum";
+    case LIBMC_ERROR_INVALIDSTREAMUUID: return "Invalid Stream UUID";
+    case LIBMC_ERROR_INVALIDFIELDNAME: return "Invalid field name";
+    case LIBMC_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
+    case LIBMC_ERROR_CONTENTTYPENOTACCEPTED: return "Content type not accepted";
+    case LIBMC_ERROR_NOCURRENTUPLOAD: return "No current upload";
+    case LIBMC_ERROR_UPLOADCHECKSUMMISMATCH: return "Upload checksum mismatch";
+    case LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS: return "Invalid storage stream status";
+    case LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED: return "Context uuid not accepted";
+    case LIBMC_ERROR_INVALIDBUILDUUID: return "Invalid build uuid";
+    case LIBMC_ERROR_MISSINGTHREADCOUNT: return "Missing thread count";
+    case LIBMC_ERROR_INVALIDTHREADCOUNT: return "Invalid thread count";
+    case LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
+    case LIBMC_ERROR_INVALIDITERATOR: return "Invalid iterator";
+    case LIBMC_ERROR_INVALIDDATATYPE: return "Invalid data type";
+    case LIBMC_ERROR_COULDNOTSENDSIGNAL: return "Could not send signal";
+    case LIBMC_ERROR_MISSINGSIGNALPARAMETER: return "Missing signal parameter";
+    case LIBMC_ERROR_NOUSERINTERFACEDEFINITION: return "No user interface definition";
+    case LIBMC_ERROR_MISSINGAPPNAME: return "Missing app name";
+    case LIBMC_ERROR_MISSINGCOPYRIGHT: return "Missing copyright";
+    case LIBMC_ERROR_MISSINGMAINPAGE: return "Missing main page";
+    case LIBMC_ERROR_MISSINGMENUITEMID: return "Missing menu item id";
+    case LIBMC_ERROR_MISSINGMENUITEMICON: return "Missing menu item icon";
+    case LIBMC_ERROR_MISSINGMENUITEMCAPTION: return "Missing menu item caption";
+    case LIBMC_ERROR_MISSINGTARGETPAGE: return "Missing menu item target page";
+    case LIBMC_ERROR_MISSINGMENUNODE: return "Missing menu node";
+    case LIBMC_ERROR_MISSINGTOOLBARNODE: return "Missing toolbar node";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMID: return "Missing toolbar item id";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
+    case LIBMC_ERROR_MISSINGSERVICESNODE: return "Missing services node";
     default: return "unknown error";
   }
 }
@@ -453,7 +533,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCHandle LibMC_Base;
-typedef LibMCHandle LibMC_APIResponse;
+typedef LibMCHandle LibMC_APIRequestHandler;
 typedef LibMCHandle LibMC_MCContext;
 
 namespace LibMC {

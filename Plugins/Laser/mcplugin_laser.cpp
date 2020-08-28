@@ -176,7 +176,8 @@ public:
 		auto sJobUUID = pSignal->GetString("jobuuid");
 		auto nLayerIndex = pSignal->GetInteger("layerindex");
 
-		auto pToolpathAccessor = pStateEnvironment->CreateToolpathAccessor(sJobUUID);
+		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
+		auto pToolpathAccessor = pBuildJob->CreateToolpathAccessor();
 		auto pLayer = pToolpathAccessor->LoadLayer((uint32_t) nLayerIndex);
 
 		auto nSegmentCount = pLayer->GetSegmentCount();

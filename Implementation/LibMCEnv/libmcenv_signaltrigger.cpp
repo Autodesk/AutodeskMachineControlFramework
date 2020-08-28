@@ -118,6 +118,12 @@ void CSignalTrigger::SetString(const std::string & sName, const std::string & sV
 	m_pParameterGroup->setParameterValueByName(sName, sValue);
 }
 
+void CSignalTrigger::SetUUID(const std::string& sName, const std::string& sValue)
+{
+	m_pParameterGroup->setParameterValueByName(sName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+
+
 void CSignalTrigger::SetDouble(const std::string & sName, const LibMCEnv_double dValue)
 {
 	m_pParameterGroup->setDoubleParameterValueByName(sName, dValue);
@@ -137,6 +143,13 @@ std::string CSignalTrigger::GetStringResult(const std::string & sName)
 {
 	return m_pResultGroup->getParameterValueByName(sName);
 }
+
+
+std::string CSignalTrigger::GetUUIDResult(const std::string& sName)
+{
+	return AMCCommon::CUtils::normalizeUUIDString (m_pResultGroup->getParameterValueByName(sName));
+}
+
 
 LibMCEnv_double CSignalTrigger::GetDoubleResult(const std::string & sName)
 {

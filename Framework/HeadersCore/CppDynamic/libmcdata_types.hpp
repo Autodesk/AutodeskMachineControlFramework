@@ -266,6 +266,46 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM 239
 #define LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD 240
 #define LIBMCDATA_ERROR_PARTIALUPLOADNOTFINISHED 241
+#define LIBMCDATA_ERROR_APIREQUESTNOTHANDLED 242
+#define LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED 243
+#define LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE 244
+#define LIBMCDATA_ERROR_INVALIDUPLOADSTREAM 245
+#define LIBMCDATA_ERROR_COULDNOTPARSEJSONREQUEST 246
+#define LIBMCDATA_ERROR_INVALIDCONTEXTUUID 247
+#define LIBMCDATA_ERROR_INVALIDUPLOADNAME 248
+#define LIBMCDATA_ERROR_INVALIDMIMETYPE 249
+#define LIBMCDATA_ERROR_INVALIDSTREAMSIZE 250
+#define LIBMCDATA_ERROR_INVALIDSHA256SUM 251
+#define LIBMCDATA_ERROR_INVALIDSTREAMUUID 252
+#define LIBMCDATA_ERROR_INVALIDFIELDNAME 253
+#define LIBMCDATA_ERROR_UPLOADSIZEMISMATCH 254
+#define LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED 255
+#define LIBMCDATA_ERROR_NOCURRENTUPLOAD 256
+#define LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH 257
+#define LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS 258
+#define LIBMCDATA_ERROR_CONTEXTUUIDNOTACCEPTED 259
+#define LIBMCDATA_ERROR_INVALIDBUILDUUID 260
+#define LIBMCDATA_ERROR_MISSINGTHREADCOUNT 261
+#define LIBMCDATA_ERROR_INVALIDTHREADCOUNT 262
+#define LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS 263
+#define LIBMCDATA_ERROR_INVALIDITERATOR 264
+#define LIBMCDATA_ERROR_INVALIDDATATYPE 265
+#define LIBMCDATA_ERROR_COULDNOTSENDSIGNAL 266
+#define LIBMCDATA_ERROR_MISSINGSIGNALPARAMETER 267
+#define LIBMCDATA_ERROR_NOUSERINTERFACEDEFINITION 268
+#define LIBMCDATA_ERROR_MISSINGAPPNAME 269
+#define LIBMCDATA_ERROR_MISSINGCOPYRIGHT 270
+#define LIBMCDATA_ERROR_MISSINGMAINPAGE 271
+#define LIBMCDATA_ERROR_MISSINGMENUITEMID 272
+#define LIBMCDATA_ERROR_MISSINGMENUITEMICON 273
+#define LIBMCDATA_ERROR_MISSINGMENUITEMCAPTION 274
+#define LIBMCDATA_ERROR_MISSINGTARGETPAGE 275
+#define LIBMCDATA_ERROR_MISSINGMENUNODE 276
+#define LIBMCDATA_ERROR_MISSINGTOOLBARNODE 277
+#define LIBMCDATA_ERROR_MISSINGTOOLBARITEMID 278
+#define LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON 279
+#define LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION 280
+#define LIBMCDATA_ERROR_MISSINGSERVICESNODE 281
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -444,6 +484,46 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DUPLICATESTORAGESTREAM: return "Duplicate Storage Stream";
     case LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD: return "Invalid Partial Upload";
     case LIBMCDATA_ERROR_PARTIALUPLOADNOTFINISHED: return "Partial Upload not finished";
+    case LIBMCDATA_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
+    case LIBMCDATA_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
+    case LIBMCDATA_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
+    case LIBMCDATA_ERROR_INVALIDUPLOADSTREAM: return "Invalid Upload Stream";
+    case LIBMCDATA_ERROR_COULDNOTPARSEJSONREQUEST: return "Could not parse JSON request";
+    case LIBMCDATA_ERROR_INVALIDCONTEXTUUID: return "Invalid Context UUID";
+    case LIBMCDATA_ERROR_INVALIDUPLOADNAME: return "Invalid Upload Name";
+    case LIBMCDATA_ERROR_INVALIDMIMETYPE: return "Invalid Mime Type";
+    case LIBMCDATA_ERROR_INVALIDSTREAMSIZE: return "Invalid Stream Size";
+    case LIBMCDATA_ERROR_INVALIDSHA256SUM: return "Invalid SHA256 Sum";
+    case LIBMCDATA_ERROR_INVALIDSTREAMUUID: return "Invalid Stream UUID";
+    case LIBMCDATA_ERROR_INVALIDFIELDNAME: return "Invalid field name";
+    case LIBMCDATA_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
+    case LIBMCDATA_ERROR_CONTENTTYPENOTACCEPTED: return "Content type not accepted";
+    case LIBMCDATA_ERROR_NOCURRENTUPLOAD: return "No current upload";
+    case LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH: return "Upload checksum mismatch";
+    case LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS: return "Invalid storage stream status";
+    case LIBMCDATA_ERROR_CONTEXTUUIDNOTACCEPTED: return "Context uuid not accepted";
+    case LIBMCDATA_ERROR_INVALIDBUILDUUID: return "Invalid build uuid";
+    case LIBMCDATA_ERROR_MISSINGTHREADCOUNT: return "Missing thread count";
+    case LIBMCDATA_ERROR_INVALIDTHREADCOUNT: return "Invalid thread count";
+    case LIBMCDATA_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
+    case LIBMCDATA_ERROR_INVALIDITERATOR: return "Invalid iterator";
+    case LIBMCDATA_ERROR_INVALIDDATATYPE: return "Invalid data type";
+    case LIBMCDATA_ERROR_COULDNOTSENDSIGNAL: return "Could not send signal";
+    case LIBMCDATA_ERROR_MISSINGSIGNALPARAMETER: return "Missing signal parameter";
+    case LIBMCDATA_ERROR_NOUSERINTERFACEDEFINITION: return "No user interface definition";
+    case LIBMCDATA_ERROR_MISSINGAPPNAME: return "Missing app name";
+    case LIBMCDATA_ERROR_MISSINGCOPYRIGHT: return "Missing copyright";
+    case LIBMCDATA_ERROR_MISSINGMAINPAGE: return "Missing main page";
+    case LIBMCDATA_ERROR_MISSINGMENUITEMID: return "Missing menu item id";
+    case LIBMCDATA_ERROR_MISSINGMENUITEMICON: return "Missing menu item icon";
+    case LIBMCDATA_ERROR_MISSINGMENUITEMCAPTION: return "Missing menu item caption";
+    case LIBMCDATA_ERROR_MISSINGTARGETPAGE: return "Missing menu item target page";
+    case LIBMCDATA_ERROR_MISSINGMENUNODE: return "Missing menu node";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARNODE: return "Missing toolbar node";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARITEMID: return "Missing toolbar item id";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
+    case LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
+    case LIBMCDATA_ERROR_MISSINGSERVICESNODE: return "Missing services node";
     default: return "unknown error";
   }
 }
@@ -457,6 +537,8 @@ typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
+typedef LibMCDataHandle LibMCData_BuildJobData;
+typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
@@ -487,7 +569,18 @@ namespace LibMCData {
     Created = 0,
     Validating = 100,
     Validated = 200,
-    Archived = 300
+    Archived = 300,
+    Deleted = 400
+  };
+  
+  enum class eBuildJobDataType : LibMCData_int32 {
+    Unknown = 0,
+    Toolpath = 1,
+    PNGImage = 2,
+    JPEGImage = 3,
+    Thumbnail = 4,
+    Timeline = 5,
+    CustomBinaryData = 100
   };
   
   /*************************************************************************************************************************
@@ -519,6 +612,7 @@ namespace LibMCData {
 typedef LibMCData::eLogLevel eLibMCDataLogLevel;
 typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
+typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;
 

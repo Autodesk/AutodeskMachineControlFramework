@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amcdata_sqlstatement_sqlite.hpp"
 #include "libmcdata_interfaceexception.hpp"
 #include "sqlite3.h"
+#include "common_utils.hpp"
 
 namespace AMCData {
 
@@ -144,6 +145,11 @@ namespace AMCData {
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDTEXTCOLUMN);
 		return std::string((const char*) pText);
 
+	}
+
+	std::string CSQLStatement_SQLite::getColumnUUID(uint32_t nIdx)
+	{
+		return AMCCommon::CUtils::normalizeUUIDString (getColumnString (nIdx));
 	}
 
 	double CSQLStatement_SQLite::getColumnDouble(uint32_t nIdx)

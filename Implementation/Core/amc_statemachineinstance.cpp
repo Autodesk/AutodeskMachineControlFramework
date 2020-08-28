@@ -204,7 +204,7 @@ namespace AMC {
 
 			if (sNextState.empty())
 				throw ELibMCInterfaceException(LIBMC_ERROR_NOOUTSTATEGIVEN);
-			if (!m_pCurrentState->hasOutState(sNextState))
+			if (!m_pCurrentState->hasOutState(sNextState) && (sNextState != m_pFailedState->getName()))
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDOUTSTATEGIVEN);
 
 			// Set new current state		

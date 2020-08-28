@@ -65,7 +65,11 @@ public:
 
     CBuildJobIterator();
 
-	IBuildJob * GetCurrentJob() override;
+    IBase* GetCurrent() override;
+
+    IBuildJob * GetCurrentJob() override;
+
+    IIterator* Clone() override;
 
     void AddJob(std::shared_ptr<CBuildJob> pBuildJob);
 

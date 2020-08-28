@@ -60,6 +60,9 @@ namespace LibMCDriverEnv {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
+class CWorkingFileExecution;
+class CWorkingFile;
+class CWorkingDirectory;
 class CDriverEnvironment;
 
 /*************************************************************************************************************************
@@ -67,6 +70,9 @@ class CDriverEnvironment;
 **************************************************************************************************************************/
 typedef CWrapper CLibMCDriverEnvWrapper;
 typedef CBase CLibMCDriverEnvBase;
+typedef CWorkingFileExecution CLibMCDriverEnvWorkingFileExecution;
+typedef CWorkingFile CLibMCDriverEnvWorkingFile;
+typedef CWorkingDirectory CLibMCDriverEnvWorkingDirectory;
 typedef CDriverEnvironment CLibMCDriverEnvDriverEnvironment;
 
 /*************************************************************************************************************************
@@ -74,6 +80,9 @@ typedef CDriverEnvironment CLibMCDriverEnvDriverEnvironment;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
+typedef std::shared_ptr<CWorkingFileExecution> PWorkingFileExecution;
+typedef std::shared_ptr<CWorkingFile> PWorkingFile;
+typedef std::shared_ptr<CWorkingDirectory> PWorkingDirectory;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 
 /*************************************************************************************************************************
@@ -81,6 +90,9 @@ typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 **************************************************************************************************************************/
 typedef PWrapper PLibMCDriverEnvWrapper;
 typedef PBase PLibMCDriverEnvBase;
+typedef PWorkingFileExecution PLibMCDriverEnvWorkingFileExecution;
+typedef PWorkingFile PLibMCDriverEnvWorkingFile;
+typedef PWorkingDirectory PLibMCDriverEnvWorkingDirectory;
 typedef PDriverEnvironment PLibMCDriverEnvDriverEnvironment;
 
 
@@ -254,6 +266,9 @@ private:
 	LibMCDriverEnvResult loadWrapperTableFromSymbolLookupMethod(sLibMCDriverEnvDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
+	friend class CWorkingFileExecution;
+	friend class CWorkingFile;
+	friend class CWorkingDirectory;
 	friend class CDriverEnvironment;
 
 };
@@ -316,6 +331,64 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CWorkingFileExecution 
+**************************************************************************************************************************/
+class CWorkingFileExecution : public CBase {
+public:
+	
+	/**
+	* CWorkingFileExecution::CWorkingFileExecution - Constructor for WorkingFileExecution class.
+	*/
+	CWorkingFileExecution(CWrapper* pWrapper, LibMCDriverEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetStatus();
+	inline std::string ReturnStdOut();
+};
+	
+/*************************************************************************************************************************
+ Class CWorkingFile 
+**************************************************************************************************************************/
+class CWorkingFile : public CBase {
+public:
+	
+	/**
+	* CWorkingFile::CWorkingFile - Constructor for WorkingFile class.
+	*/
+	CWorkingFile(CWrapper* pWrapper, LibMCDriverEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetAbsoluteFileName();
+	inline LibMCDriverEnv_uint64 GetSize();
+	inline std::string CalculateSHA2();
+	inline void DeleteFile();
+	inline PWorkingFileExecution ExecuteFile();
+};
+	
+/*************************************************************************************************************************
+ Class CWorkingDirectory 
+**************************************************************************************************************************/
+class CWorkingDirectory : public CBase {
+public:
+	
+	/**
+	* CWorkingDirectory::CWorkingDirectory - Constructor for WorkingDirectory class.
+	*/
+	CWorkingDirectory(CWrapper* pWrapper, LibMCDriverEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetAbsoluteFilePath();
+	inline PWorkingFile StoreCustomData(const std::string & sFileName, const CInputVector<LibMCDriverEnv_uint8> & DataBufferBuffer);
+	inline PWorkingFile StoreDriverData(const std::string & sFileName, const std::string & sIdentifier);
+};
+	
+/*************************************************************************************************************************
  Class CDriverEnvironment 
 **************************************************************************************************************************/
 class CDriverEnvironment : public CBase {
@@ -329,6 +402,8 @@ public:
 	{
 	}
 	
+	inline PWorkingDirectory CreateWorkingDirectory();
+	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCDriverEnv_uint8> & DataBufferBuffer);
 };
 	
 	/**
@@ -412,6 +487,18 @@ public:
 			return LIBMCDRIVERENV_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
+		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = nullptr;
+		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = nullptr;
+		pWrapperTable->m_WorkingFile_GetSize = nullptr;
+		pWrapperTable->m_WorkingFile_CalculateSHA2 = nullptr;
+		pWrapperTable->m_WorkingFile_DeleteFile = nullptr;
+		pWrapperTable->m_WorkingFile_ExecuteFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomData = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -464,6 +551,114 @@ public:
 			return LIBMCDRIVERENV_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFileExecution_GetStatus = (PLibMCDriverEnvWorkingFileExecution_GetStatusPtr) GetProcAddress(hLibrary, "libmcdriverenv_workingfileexecution_getstatus");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFileExecution_GetStatus = (PLibMCDriverEnvWorkingFileExecution_GetStatusPtr) dlsym(hLibrary, "libmcdriverenv_workingfileexecution_getstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFileExecution_GetStatus == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = (PLibMCDriverEnvWorkingFileExecution_ReturnStdOutPtr) GetProcAddress(hLibrary, "libmcdriverenv_workingfileexecution_returnstdout");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = (PLibMCDriverEnvWorkingFileExecution_ReturnStdOutPtr) dlsym(hLibrary, "libmcdriverenv_workingfileexecution_returnstdout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFileExecution_ReturnStdOut == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = (PLibMCDriverEnvWorkingFile_GetAbsoluteFileNamePtr) GetProcAddress(hLibrary, "libmcdriverenv_workingfile_getabsolutefilename");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = (PLibMCDriverEnvWorkingFile_GetAbsoluteFileNamePtr) dlsym(hLibrary, "libmcdriverenv_workingfile_getabsolutefilename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_GetAbsoluteFileName == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_GetSize = (PLibMCDriverEnvWorkingFile_GetSizePtr) GetProcAddress(hLibrary, "libmcdriverenv_workingfile_getsize");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_GetSize = (PLibMCDriverEnvWorkingFile_GetSizePtr) dlsym(hLibrary, "libmcdriverenv_workingfile_getsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_GetSize == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_CalculateSHA2 = (PLibMCDriverEnvWorkingFile_CalculateSHA2Ptr) GetProcAddress(hLibrary, "libmcdriverenv_workingfile_calculatesha2");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_CalculateSHA2 = (PLibMCDriverEnvWorkingFile_CalculateSHA2Ptr) dlsym(hLibrary, "libmcdriverenv_workingfile_calculatesha2");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_CalculateSHA2 == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCDriverEnvWorkingFile_DeleteFilePtr) GetProcAddress(hLibrary, "libmcdriverenv_workingfile_deletefile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCDriverEnvWorkingFile_DeleteFilePtr) dlsym(hLibrary, "libmcdriverenv_workingfile_deletefile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_DeleteFile == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCDriverEnvWorkingFile_ExecuteFilePtr) GetProcAddress(hLibrary, "libmcdriverenv_workingfile_executefile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCDriverEnvWorkingFile_ExecuteFilePtr) dlsym(hLibrary, "libmcdriverenv_workingfile_executefile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = (PLibMCDriverEnvWorkingDirectory_GetAbsoluteFilePathPtr) GetProcAddress(hLibrary, "libmcdriverenv_workingdirectory_getabsolutefilepath");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = (PLibMCDriverEnvWorkingDirectory_GetAbsoluteFilePathPtr) dlsym(hLibrary, "libmcdriverenv_workingdirectory_getabsolutefilepath");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomData = (PLibMCDriverEnvWorkingDirectory_StoreCustomDataPtr) GetProcAddress(hLibrary, "libmcdriverenv_workingdirectory_storecustomdata");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomData = (PLibMCDriverEnvWorkingDirectory_StoreCustomDataPtr) dlsym(hLibrary, "libmcdriverenv_workingdirectory_storecustomdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomData == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverData = (PLibMCDriverEnvWorkingDirectory_StoreDriverDataPtr) GetProcAddress(hLibrary, "libmcdriverenv_workingdirectory_storedriverdata");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverData = (PLibMCDriverEnvWorkingDirectory_StoreDriverDataPtr) dlsym(hLibrary, "libmcdriverenv_workingdirectory_storedriverdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCDriverEnvDriverEnvironment_CreateWorkingDirectoryPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_createworkingdirectory");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCDriverEnvDriverEnvironment_CreateWorkingDirectoryPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_createworkingdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCDriverEnvDriverEnvironment_RetrieveDriverDataPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_retrievedriverdata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCDriverEnvDriverEnvironment_RetrieveDriverDataPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_retrievedriverdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriverEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcdriverenv_getversion");
@@ -526,6 +721,54 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriverEnvResult eLookupError = LIBMCDRIVERENV_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriverenv_workingfileexecution_getstatus", (void**)&(pWrapperTable->m_WorkingFileExecution_GetStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFileExecution_GetStatus == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingfileexecution_returnstdout", (void**)&(pWrapperTable->m_WorkingFileExecution_ReturnStdOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFileExecution_ReturnStdOut == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingfile_getabsolutefilename", (void**)&(pWrapperTable->m_WorkingFile_GetAbsoluteFileName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_GetAbsoluteFileName == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingfile_getsize", (void**)&(pWrapperTable->m_WorkingFile_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_GetSize == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingfile_calculatesha2", (void**)&(pWrapperTable->m_WorkingFile_CalculateSHA2));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_CalculateSHA2 == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingfile_deletefile", (void**)&(pWrapperTable->m_WorkingFile_DeleteFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_DeleteFile == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingfile_executefile", (void**)&(pWrapperTable->m_WorkingFile_ExecuteFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingdirectory_getabsolutefilepath", (void**)&(pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingdirectory_storecustomdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomData == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_workingdirectory_storedriverdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_createworkingdirectory", (void**)&(pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_retrievedriverdata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriverenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GetVersion == nullptr) )
 			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -556,8 +799,186 @@ public:
 	 */
 	
 	/**
+	 * Method definitions for class CWorkingFileExecution
+	 */
+	
+	/**
+	* CWorkingFileExecution::GetStatus - Returns the execution status
+	*/
+	void CWorkingFileExecution::GetStatus()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileExecution_GetStatus(m_pHandle));
+	}
+	
+	/**
+	* CWorkingFileExecution::ReturnStdOut - Returns the output of the executable as string buffer
+	* @return stdout buffer
+	*/
+	std::string CWorkingFileExecution::ReturnStdOut()
+	{
+		LibMCDriverEnv_uint32 bytesNeededStringBuffer = 0;
+		LibMCDriverEnv_uint32 bytesWrittenStringBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileExecution_ReturnStdOut(m_pHandle, 0, &bytesNeededStringBuffer, nullptr));
+		std::vector<char> bufferStringBuffer(bytesNeededStringBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileExecution_ReturnStdOut(m_pHandle, bytesNeededStringBuffer, &bytesWrittenStringBuffer, &bufferStringBuffer[0]));
+		
+		return std::string(&bufferStringBuffer[0]);
+	}
+	
+	/**
+	 * Method definitions for class CWorkingFile
+	 */
+	
+	/**
+	* CWorkingFile::GetAbsoluteFileName - Retrieves absolute file name of the working file
+	* @return global path of the file
+	*/
+	std::string CWorkingFile::GetAbsoluteFileName()
+	{
+		LibMCDriverEnv_uint32 bytesNeededFileName = 0;
+		LibMCDriverEnv_uint32 bytesWrittenFileName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_GetAbsoluteFileName(m_pHandle, 0, &bytesNeededFileName, nullptr));
+		std::vector<char> bufferFileName(bytesNeededFileName);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_GetAbsoluteFileName(m_pHandle, bytesNeededFileName, &bytesWrittenFileName, &bufferFileName[0]));
+		
+		return std::string(&bufferFileName[0]);
+	}
+	
+	/**
+	* CWorkingFile::GetSize - Returns the size of temporary file.
+	* @return file size
+	*/
+	LibMCDriverEnv_uint64 CWorkingFile::GetSize()
+	{
+		LibMCDriverEnv_uint64 resultFileSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_GetSize(m_pHandle, &resultFileSize));
+		
+		return resultFileSize;
+	}
+	
+	/**
+	* CWorkingFile::CalculateSHA2 - Calculates the SHA256 checksum of the file.
+	* @return sha256 checksum
+	*/
+	std::string CWorkingFile::CalculateSHA2()
+	{
+		LibMCDriverEnv_uint32 bytesNeededSHA2 = 0;
+		LibMCDriverEnv_uint32 bytesWrittenSHA2 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_CalculateSHA2(m_pHandle, 0, &bytesNeededSHA2, nullptr));
+		std::vector<char> bufferSHA2(bytesNeededSHA2);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_CalculateSHA2(m_pHandle, bytesNeededSHA2, &bytesWrittenSHA2, &bufferSHA2[0]));
+		
+		return std::string(&bufferSHA2[0]);
+	}
+	
+	/**
+	* CWorkingFile::DeleteFile - Deletes the temporary file.
+	*/
+	void CWorkingFile::DeleteFile()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFile(m_pHandle));
+	}
+	
+	/**
+	* CWorkingFile::ExecuteFile - Executes the temporary file, if it is an executable.
+	* @return execution object
+	*/
+	PWorkingFileExecution CWorkingFile::ExecuteFile()
+	{
+		LibMCDriverEnvHandle hExecution = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_ExecuteFile(m_pHandle, &hExecution));
+		
+		if (!hExecution) {
+			CheckError(LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileExecution>(m_pWrapper, hExecution);
+	}
+	
+	/**
+	 * Method definitions for class CWorkingDirectory
+	 */
+	
+	/**
+	* CWorkingDirectory::GetAbsoluteFilePath - Retrieves absolute file path.
+	* @return global path of the directory, including path delimiter.
+	*/
+	std::string CWorkingDirectory::GetAbsoluteFilePath()
+	{
+		LibMCDriverEnv_uint32 bytesNeededFilePath = 0;
+		LibMCDriverEnv_uint32 bytesWrittenFilePath = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_GetAbsoluteFilePath(m_pHandle, 0, &bytesNeededFilePath, nullptr));
+		std::vector<char> bufferFilePath(bytesNeededFilePath);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_GetAbsoluteFilePath(m_pHandle, bytesNeededFilePath, &bytesWrittenFilePath, &bufferFilePath[0]));
+		
+		return std::string(&bufferFilePath[0]);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] DataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomData(const std::string & sFileName, const CInputVector<LibMCDriverEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCDriverEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomData(m_pHandle, sFileName.c_str(), (LibMCDriverEnv_uint64)DataBufferBuffer.size(), DataBufferBuffer.data(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreDriverData(const std::string & sFileName, const std::string & sIdentifier)
+	{
+		LibMCDriverEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreDriverData(m_pHandle, sFileName.c_str(), sIdentifier.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
 	 * Method definitions for class CDriverEnvironment
 	 */
+	
+	/**
+	* CDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
+	* @return creates a working directory
+	*/
+	PWorkingDirectory CDriverEnvironment::CreateWorkingDirectory()
+	{
+		LibMCDriverEnvHandle hWorkingDirectory = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateWorkingDirectory(m_pHandle, &hWorkingDirectory));
+		
+		if (!hWorkingDirectory) {
+			CheckError(LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingDirectory>(m_pWrapper, hWorkingDirectory);
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[out] DataBufferBuffer - buffer data.
+	*/
+	void CDriverEnvironment::RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCDriverEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCDriverEnv_uint64 elementsNeededDataBuffer = 0;
+		LibMCDriverEnv_uint64 elementsWrittenDataBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
+		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
 
 } // namespace LibMCDriverEnv
 

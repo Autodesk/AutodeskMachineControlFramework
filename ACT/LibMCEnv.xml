@@ -65,13 +65,25 @@
 		<option name="Loop" value="2" />
 		<option name="Polyline" value="3" />
 	</enum>
+
+	<enum name="ToolpathProfileValueType">
+		<option name="Custom" value="0" />
+		<option name="Speed" value="1" />
+		<option name="JumpSpeed" value="2" />
+		<option name="ExtrusionFactor" value="3" />
+		<option name="LaserPower" value="4" />
+		<option name="StartDelay" value="5" />
+		<option name="EndDelay" value="6" />
+		<option name="PolyDelay" value="7" />
+	</enum>
 	
 	<struct name="Position2D">
-		<member name="Coordinates" type="single" rows="2"/>
+		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
 	
 	<class name="Base">
 	</class>
+
 
 	<class name="ToolpathLayer" parent="Base">
 	  
@@ -93,6 +105,17 @@
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ProfileUUID" type="string" pass="return" description="Segment Profile UUID" />
 		</method>
+
+		<method name="GetSegmentProfileValue" description="Retrieves an assigned profile custom value.">
+			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
+			<param name="Value" type="string" pass="return" description="String Value." />
+		</method>
+
+		<method name="GetSegmentProfileTypedValue" description="Retrieves an assigned profile value of a standard type.">
+			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
+			<param name="Value" type="double" pass="return" description="Double Value" />
+		</method>
+
 		
 		<method name="GetSegmentPartUUID" description="Retrieves the assigned segment part uuid.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
@@ -101,7 +124,15 @@
 		
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
-			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array" />
+			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array. Positions are absolute in units." />
+		</method>
+		
+		<method name="GetZValue" description="Retrieves the layers Z Value in units.">
+			<param name="ZValue" type="int32" pass="return" description="Z Value of the layer in units." />
+		</method>
+		
+		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
+			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
 		
 	</class>
@@ -109,8 +140,8 @@
 
 	<class name="ToolpathAccessor" parent="Base">
 	
-		<method name="GetUUID" description="Returns Toolpath data UUID.">
-			<param name="UUID" type="string" pass="return" description="Returns toolpath data uuid." />
+		<method name="GetStorageUUID" description="Returns Toolpath storage UUID.">
+			<param name="StorageUUID" type="string" pass="return" description="Returns toolpath storage uuid." />
 		</method>
 	
 		<method name="GetLayerCount" description="Returns layer count.">
@@ -121,9 +152,60 @@
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index." />
 			<param name="LayerData" type="class" class="ToolpathLayer" pass="return" description="Toolpath layer object." />
 		</method>
-	
+		
+		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
+			<param name="Units" type="double" pass="return" description="Toolpath units." />
+		</method>
+			
 	</class>
 
+
+	<class name="Build" parent="Base" description="Build instance to access build files">
+
+		<method name="GetName" description="Returns name of the build.">
+			<param name="Name" type="string" pass="return" description="Name of the build." />
+		</method>
+
+		<method name="GetBuildUUID" description="Returns uuid of the build.">
+			<param name="BuildUUID" type="string" pass="return" description="UUID of the build." />
+		</method>
+
+		<method name="GetStorageUUID" description="Returns storage uuid of the build.">
+			<param name="StorageUUID" type="string" pass="return" description="Storage UUID of the build." />
+		</method>
+
+		<method name="GetStorageSHA256" description="Returns SHA256 of the build stream.">
+			<param name="SHA256" type="string" pass="return" description="SHA256 of the build stream." />
+		</method>
+
+		<method name="GetLayerCount" description="Returns cached layer count of the toolpath.">
+			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
+		</method>
+
+		<method name="LoadToolpath" description="loads the a toolpath into memory">
+		</method>
+
+		<method name="UnloadToolpath" description="unloads the a toolpath from memory, if it has been loaded before.">
+		</method>
+
+		<method name="ToolpathIsLoaded" description="checks, if a toolpath object is loaded to memory.">
+			<param name="IsLoaded" type="bool" pass="return" description="returns if toolpath is loaded." />
+		</method>
+
+		<method name="CreateToolpathAccessor" description="Creates an accessor object for a toolpath. Toolpath MUST have been loaded with LoadToolpath before.">
+			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
+		</method>
+
+		<method name="AddBinaryData" description="Adds binary data to store with the build.">
+			<param name="Name" type="string" pass="in" description="Name of the attache data block." />
+			<param name="MIMEType" type="string" pass="in" description="Mime type of the data." />
+			<param name="Content" type="basicarray" class="uint8" pass="in" description="Stream content to store" />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the attachment." />
+		</method>
+
+				
+	</class>
+	
 
 	<class name="SignalTrigger" parent="Base" description="Class for signal triggering">
 
@@ -152,6 +234,11 @@
 			<param name="Value" type="string" pass="in" description="Value" />
 		</method>
 
+		<method name="SetUUID" description="sets a uuid value">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
 		<method name="SetDouble" description="sets a double">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="double" pass="in" description="Value" />
@@ -168,6 +255,11 @@
 		</method>
 
 		<method name="GetStringResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+		<method name="GetUUIDResult" description="returns a uuid value of the result">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="string" pass="return" description="Value" />
 		</method>
@@ -213,6 +305,12 @@
 			<param name="Value" type="string" pass="return" description="Value" />
 		</method>
 
+		<method name="GetUUID" description="gets a uuid value">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+
 		<method name="GetDouble" description="gets a double">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="double" pass="return" description="Value" />
@@ -229,6 +327,11 @@
 		</method>
 
 		<method name="SetStringResult" description="returns a string value of the result">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
+		<method name="SetUUIDResult" description="returns a uuid value of the result">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="string" pass="in" description="Value" />
 		</method>
@@ -253,7 +356,7 @@
 
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
 	  
-		<method name="CreateSignal" description="creates a signal object to trigger.">
+		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="SignalName" type="string" pass="in" description="Name Of signal channel." />
 			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />
@@ -277,25 +380,12 @@
 			<param name="DriverHandle" type="pointer" pass="out" description="Handle of the driver." />
 		</method>
 
-		<method name="LoadToolpath" description="Loads a toolpath from disk into memory.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
-		</method>
-
-		<method name="UnloadToolpath" description="unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
+		<method name="GetBuildJob" description="Returns a instance of a build object.">
+			<param name="BuildUUID" type="string" pass="in" description="UUID of the build entity." />
+			<param name="BuildInstance" type="class" class="Build" pass="return" description="Build instance" />
 		</method>
 
 		<method name="UnloadAllToolpathes" description="unloads all toolpath in memory to clean up">
-		</method>
-
-		<method name="CreateToolpathAccessor" description="creates an accessor object for a toolpath, if loaded to memory before.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
-			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="UUID of the toolpath entity." />
-		</method>
-
-		<method name="ToolpathIsLoaded" description="checks, if a toolpath object is loaded to memory.">
-			<param name="ToolpathUUID" type="string" pass="in" description="UUID of the toolpath entity." />
-			<param name="IsLoaded" type="bool" pass="return" description="returns if toolpath is loaded." />
 		</method>
 
 
@@ -330,6 +420,11 @@
 			<param name="Value" type="string" pass="in" description="Value" />
 		</method>
 
+		<method name="StoreUUID" description="stores a uuid in the current state machine">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="in" description="Value" />
+		</method>
+
 		<method name="StoreInteger" description="stores a string in the current state machine">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="int64" pass="in" description="Value" />
@@ -351,6 +446,11 @@
 		</method>
 
 		<method name="RetrieveString" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
+			<param name="Name" type="string" pass="in" description="Name" />
+			<param name="Value" type="string" pass="return" description="Value" />
+		</method>
+
+		<method name="RetrieveUUID" description="retrieves a uuid from the current state machine. Fails if value has not been stored before.">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Value" type="string" pass="return" description="Value" />
 		</method>
@@ -386,6 +486,12 @@
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
+		<method name="SetUUIDParameter" description="sets a uuid parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
 		<method name="SetDoubleParameter" description="sets a double parameter">
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
@@ -405,6 +511,12 @@
 		</method>
 
 		<method name="GetStringParameter" description="returns a string parameter">
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetUUIDParameter" description="returns a uuid parameter">
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="return" description="Value to set" />

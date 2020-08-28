@@ -55,6 +55,9 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
+class IWorkingFileExecution;
+class IWorkingFile;
+class IWorkingDirectory;
 class IDriverEnvironment;
 
 
@@ -237,11 +240,122 @@ typedef IBaseSharedPtr<IBase> PIBase;
 
 
 /*************************************************************************************************************************
+ Class interface for WorkingFileExecution 
+**************************************************************************************************************************/
+
+class IWorkingFileExecution : public virtual IBase {
+public:
+	/**
+	* IWorkingFileExecution::GetStatus - Returns the execution status
+	*/
+	virtual void GetStatus() = 0;
+
+	/**
+	* IWorkingFileExecution::ReturnStdOut - Returns the output of the executable as string buffer
+	* @return stdout buffer
+	*/
+	virtual std::string ReturnStdOut() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFileExecution> PIWorkingFileExecution;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingFile 
+**************************************************************************************************************************/
+
+class IWorkingFile : public virtual IBase {
+public:
+	/**
+	* IWorkingFile::GetAbsoluteFileName - Retrieves absolute file name of the working file
+	* @return global path of the file
+	*/
+	virtual std::string GetAbsoluteFileName() = 0;
+
+	/**
+	* IWorkingFile::GetSize - Returns the size of temporary file.
+	* @return file size
+	*/
+	virtual LibMCDriverEnv_uint64 GetSize() = 0;
+
+	/**
+	* IWorkingFile::CalculateSHA2 - Calculates the SHA256 checksum of the file.
+	* @return sha256 checksum
+	*/
+	virtual std::string CalculateSHA2() = 0;
+
+	/**
+	* IWorkingFile::DeleteFile - Deletes the temporary file.
+	*/
+	virtual void DeleteFile() = 0;
+
+	/**
+	* IWorkingFile::ExecuteFile - Executes the temporary file, if it is an executable.
+	* @return execution object
+	*/
+	virtual IWorkingFileExecution * ExecuteFile() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFile> PIWorkingFile;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingDirectory 
+**************************************************************************************************************************/
+
+class IWorkingDirectory : public virtual IBase {
+public:
+	/**
+	* IWorkingDirectory::GetAbsoluteFilePath - Retrieves absolute file path.
+	* @return global path of the directory, including path delimiter.
+	*/
+	virtual std::string GetAbsoluteFilePath() = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[in] pDataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCDriverEnv_uint64 nDataBufferBufferSize, const LibMCDriverEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingDirectory> PIWorkingDirectory;
+
+
+/*************************************************************************************************************************
  Class interface for DriverEnvironment 
 **************************************************************************************************************************/
 
 class IDriverEnvironment : public virtual IBase {
 public:
+	/**
+	* IDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
+	* @return creates a working directory
+	*/
+	virtual IWorkingDirectory * CreateWorkingDirectory() = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+	*/
+	virtual void RetrieveDriverData(const std::string & sIdentifier, LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;

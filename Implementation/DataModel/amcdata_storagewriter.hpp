@@ -47,12 +47,13 @@ class CStorageWriter {
 private:
     std::string m_sUUID;
     std::string m_sPath;
+    std::string m_sNeededSHA256;
 	uint64_t m_nSize;
     AMCCommon::PExportStream m_pExportStream;
 
 public:
 
-    CStorageWriter(const std::string & sUUID, const std::string & sPath, uint64_t nSize);
+    CStorageWriter(const std::string & sUUID, const std::string & sPath, uint64_t nSize, const std::string & sNeededSHA256);
 
     ~CStorageWriter();
 	

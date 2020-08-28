@@ -139,13 +139,6 @@ LibMCDataResult CCall_libmcdata_storagestream_getuuid(LibMCDataHandle libraryHan
 }
 
 
-LibMCDataResult CCall_libmcdata_storagestream_getcontextuuid(LibMCDataHandle libraryHandle, LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nContextUUIDBufferSize, LibMCData_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer)
-{
-	if (libraryHandle == 0) 
-		return LIBMCDATA_ERROR_INVALIDCAST;
-	sLibMCDataDynamicWrapperTable * wrapperTable = (sLibMCDataDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_StorageStream_GetContextUUID (pStorageStream, nContextUUIDBufferSize, pContextUUIDNeededChars, pContextUUIDBuffer);	
-}
 
 
 LibMCDataResult CCall_libmcdata_storagestream_gettimestamp(LibMCDataHandle libraryHandle, LibMCData_StorageStream pStorageStream, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
@@ -210,41 +203,6 @@ LibMCDataResult CCall_libmcdata_storagestream_getcallbacks(LibMCDataHandle libra
 	return wrapperTable->m_StorageStream_GetCallbacks ((void **)pStorageStream, (void **)pTheReadCallback, (void **)pTheSeekCallback, (void**)pStreamHandle);	
 }
 
-
-LibMCDataResult CCall_libmcdata_storage_storenewstream(LibMCDataHandle libraryHandle, LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer, const char * pUserID, LibMCData_StorageStream * pStreamInstance)
-{
-	if (libraryHandle == 0) 
-		return LIBMCDATA_ERROR_INVALIDCAST;
-	sLibMCDataDynamicWrapperTable * wrapperTable = (sLibMCDataDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_Storage_StoreNewStream (pStorage, pUUID, pContextUUID, pName, pMimeType, nContentBufferSize, pContentBuffer, pUserID, pStreamInstance);	
-}
-
-
-LibMCDataResult CCall_libmcdata_storage_beginpartialstream(LibMCDataHandle libraryHandle, LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize)
-{
-	if (libraryHandle == 0) 
-		return LIBMCDATA_ERROR_INVALIDCAST;
-	sLibMCDataDynamicWrapperTable * wrapperTable = (sLibMCDataDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_Storage_BeginPartialStream (pStorage, pUUID, pContextUUID, pName, pMimeType, nSize);	
-}
-
-
-LibMCDataResult CCall_libmcdata_storage_storepartialstream(LibMCDataHandle libraryHandle, LibMCData_Storage pStorage, const char * pUUID, LibMCData_uint64 nOffset, LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer)
-{
-	if (libraryHandle == 0) 
-		return LIBMCDATA_ERROR_INVALIDCAST;
-	sLibMCDataDynamicWrapperTable * wrapperTable = (sLibMCDataDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_Storage_StorePartialStream (pStorage, pUUID, nOffset, nContentBufferSize, pContentBuffer);	
-}
-
-
-LibMCDataResult CCall_libmcdata_storage_finishpartialstream(LibMCDataHandle libraryHandle, LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2, LibMCData_StorageStream * pStreamInstance)
-{
-	if (libraryHandle == 0) 
-		return LIBMCDATA_ERROR_INVALIDCAST;
-	sLibMCDataDynamicWrapperTable * wrapperTable = (sLibMCDataDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_Storage_FinishPartialStream (pStorage, pUUID, pSHA2, pStreamInstance);	
-}
 
 
 LibMCDataResult CCall_libmcdata_buildjob_getuuid(LibMCDataHandle libraryHandle, LibMCData_BuildJob pBuildJob, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer)
@@ -1163,22 +1121,6 @@ func (inst StorageStream) GetUUID() (string, error) {
 	return string(bufferuUID[:(filledinuUID-1)]), nil
 }
 
-// GetContextUUID returns the context uuid of a storage stream. Context might be for example a project uuid that this stream is part of.
-func (inst StorageStream) GetContextUUID() (string, error) {
-	var neededforcontextUUID C.uint32_t
-	var filledincontextUUID C.uint32_t
-	ret := C.CCall_libmcdata_storagestream_getcontextuuid(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededforcontextUUID, nil)
-	if ret != 0 {
-		return "", makeError(uint32(ret))
-	}
-	bufferSizecontextUUID := neededforcontextUUID
-	buffercontextUUID := make([]byte, bufferSizecontextUUID)
-	ret = C.CCall_libmcdata_storagestream_getcontextuuid(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizecontextUUID, &filledincontextUUID, (*C.char)(unsafe.Pointer(&buffercontextUUID[0])))
-	if ret != 0 {
-		return "", makeError(uint32(ret))
-	}
-	return string(buffercontextUUID[:(filledincontextUUID-1)]), nil
-}
 
 // GetTimeStamp returns the timestamp of a storage stream.
 func (inst StorageStream) GetTimeStamp() (string, error) {
@@ -1296,44 +1238,6 @@ type Storage struct {
 func (wrapper * Wrapper) NewStorage(r ref) Storage {
 	return Storage{wrapper.NewBase(r)}
 }
-// StoreNewStream stores a new stream.
-func (inst Storage) StoreNewStream(uUID string, contextUUID string, name string, mimeType string, content []uint8, userID string) (StorageStream, error) {
-	var streamInstance ref
-	ret := C.CCall_libmcdata_storage_storenewstream(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(uUID)[0])), (*C.char)(unsafe.Pointer(&[]byte(contextUUID)[0])), (*C.char)(unsafe.Pointer(&[]byte(name)[0])), (*C.char)(unsafe.Pointer(&[]byte(mimeType)[0])), C.uint64_t(len(content)), (*C.uint8_t)(unsafe.Pointer(&content[0])), (*C.char)(unsafe.Pointer(&[]byte(userID)[0])), &streamInstance)
-	if ret != 0 {
-		return StorageStream{}, makeError(uint32(ret))
-	}
-	return inst.wrapperRef.NewStorageStream(streamInstance), nil
-}
-
-// BeginPartialStream starts storing a stream with partial uploads.
-func (inst Storage) BeginPartialStream(uUID string, contextUUID string, name string, mimeType string, size uint64) error {
-	ret := C.CCall_libmcdata_storage_beginpartialstream(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(uUID)[0])), (*C.char)(unsafe.Pointer(&[]byte(contextUUID)[0])), (*C.char)(unsafe.Pointer(&[]byte(name)[0])), (*C.char)(unsafe.Pointer(&[]byte(mimeType)[0])), C.uint64_t(size))
-	if ret != 0 {
-		return makeError(uint32(ret))
-	}
-	return nil
-}
-
-// StorePartialStream stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
-func (inst Storage) StorePartialStream(uUID string, offset uint64, content []uint8) error {
-	ret := C.CCall_libmcdata_storage_storepartialstream(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(uUID)[0])), C.uint64_t(offset), C.uint64_t(len(content)), (*C.uint8_t)(unsafe.Pointer(&content[0])))
-	if ret != 0 {
-		return makeError(uint32(ret))
-	}
-	return nil
-}
-
-// FinishPartialStream finishes storing a stream.
-func (inst Storage) FinishPartialStream(uUID string, sHA2 string) (StorageStream, error) {
-	var streamInstance ref
-	ret := C.CCall_libmcdata_storage_finishpartialstream(inst.wrapperRef.LibraryHandle, inst.Ref, (*C.char)(unsafe.Pointer(&[]byte(uUID)[0])), (*C.char)(unsafe.Pointer(&[]byte(sHA2)[0])), &streamInstance)
-	if ret != 0 {
-		return StorageStream{}, makeError(uint32(ret))
-	}
-	return inst.wrapperRef.NewStorageStream(streamInstance), nil
-}
-
 
 // BuildJob represents a LibMCData class.
 type BuildJob struct {

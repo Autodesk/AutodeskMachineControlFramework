@@ -43,14 +43,20 @@ namespace AMCData {
 		case 0: {
 				std::string sStreamsQuery = "CREATE TABLE `storage_streams` (";
 				sStreamsQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
-				sStreamsQuery += "`contextuuid`  varchar ( 64 ) NOT NULL,";
 				sStreamsQuery += "`name`  varchar ( 256 ) NOT NULL,";
 				sStreamsQuery += "`mimetype`  varchar ( 256 ) NOT NULL,";
 				sStreamsQuery += "`sha2`  varchar ( 64 ) NOT NULL,";
 				sStreamsQuery += "`size`  integer DEFAULT 0,";
+				sStreamsQuery += "`status`  varchar ( 256 ) NOT NULL,";
 				sStreamsQuery += "`userid`  varchar ( 64 ) NOT NULL,";
+				sStreamsQuery += "`updateuuid`  varchar ( 64 ),";
 				sStreamsQuery += "`timestamp`  varchar ( 64 ) NOT NULL)";
 				pTransaction->executeStatement(sStreamsQuery);
+
+				std::string sContextQuery = "CREATE TABLE `storage_context` (";
+				sContextQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";
+				sContextQuery += "`contextuuid`  varchar ( 64 ) NOT NULL)";
+				pTransaction->executeStatement(sContextQuery);
 
 				std::string sAccessQuery = "CREATE TABLE `storage_access` (";
 				sAccessQuery += "`streamuuid`  varchar ( 64 ) NOT NULL,";

@@ -231,10 +231,51 @@
 		<error name="DUPLICATESTORAGESTREAM" code="239" description="Duplicate Storage Stream" />
 		<error name="INVALIDPARTIALUPLOAD" code="240" description="Invalid Partial Upload" />
 		<error name="PARTIALUPLOADNOTFINISHED" code="241" description="Partial Upload not finished" />
+		<error name="APIREQUESTNOTHANDLED" code="242" description="API Request not handled" />
+		<error name="APIREQUESTALREADYHANDLED" code="243" description="API Request already handled" />
+		<error name="INVALIDAPIREQUESTTYPE" code="244" description="Invalid API Request type" />
+		<error name="INVALIDUPLOADSTREAM" code="245" description="Invalid Upload Stream" />
+		<error name="COULDNOTPARSEJSONREQUEST" code="246" description="Could not parse JSON request" />
 		
+		<error name="INVALIDCONTEXTUUID" code="247" description="Invalid Context UUID" />
+		<error name="INVALIDUPLOADNAME" code="248" description="Invalid Upload Name" />
+		<error name="INVALIDMIMETYPE" code="249" description="Invalid Mime Type" />
+		<error name="INVALIDSTREAMSIZE" code="250" description="Invalid Stream Size" />
+		<error name="INVALIDSHA256SUM" code="251" description="Invalid SHA256 Sum" />
+		<error name="INVALIDSTREAMUUID" code="252" description="Invalid Stream UUID" />
+		<error name="INVALIDFIELDNAME" code="253" description="Invalid field name" />		
+		<error name="UPLOADSIZEMISMATCH" code="254" description="Upload size mismatch" />
+		<error name="CONTENTTYPENOTACCEPTED" code="255" description="Content type not accepted" />
+		<error name="NOCURRENTUPLOAD" code="256" description="No current upload" />		
+		<error name="UPLOADCHECKSUMMISMATCH" code="257" description="Upload checksum mismatch" />
+		<error name="INVALIDSTORAGESTREAMSTATUS" code="258" description="Invalid storage stream status" />
+		<error name="CONTEXTUUIDNOTACCEPTED" code="259" description="Context uuid not accepted" />
+		<error name="INVALIDBUILDUUID" code="260" description="Invalid build uuid" />
 		
+		<error name="MISSINGTHREADCOUNT" code="261" description="Missing thread count" />
+		<error name="INVALIDTHREADCOUNT" code="262" description="Invalid thread count" />		
+		<error name="COULDNOTUPDATEBUILDSTATUS" code="263" description="Could not update build status" />							
+		<error name="INVALIDITERATOR" code="264" description="Invalid iterator" />
+		<error name="INVALIDDATATYPE" code="265" description="Invalid data type" />
 		
+		<error name="COULDNOTSENDSIGNAL" code="266" description="Could not send signal" />
+		<error name="MISSINGSIGNALPARAMETER" code="267" description="Missing signal parameter" />
+		<error name="NOUSERINTERFACEDEFINITION" code="268" description="No user interface definition" />
 		
+		<error name="MISSINGAPPNAME" code="269" description="Missing app name" />
+		<error name="MISSINGCOPYRIGHT" code="270" description="Missing copyright" />
+		<error name="MISSINGMAINPAGE" code="271" description="Missing main page" />
+		<error name="MISSINGMENUITEMID" code="272" description="Missing menu item id" />
+		<error name="MISSINGMENUITEMICON" code="273" description="Missing menu item icon" />
+		<error name="MISSINGMENUITEMCAPTION" code="274" description="Missing menu item caption" />
+		<error name="MISSINGTARGETPAGE" code="275" description="Missing menu item target page" />
+		<error name="MISSINGMENUNODE" code="276" description="Missing menu node" />
+		<error name="MISSINGTOOLBARNODE" code="277" description="Missing toolbar node" />
+		<error name="MISSINGTOOLBARITEMID" code="278" description="Missing toolbar item id" />
+		<error name="MISSINGTOOLBARITEMICON" code="279" description="Missing toolbar item icon" />
+		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />
+		<error name="MISSINGSERVICESNODE" code="281" description="Missing services node" />		
+
 	</errors>
 	
 
@@ -259,8 +300,18 @@
 		<option name="Validating" value="100"/>
 		<option name="Validated" value="200"/>
 		<option name="Archived" value="300"/>
+		<option name="Deleted" value="400"/>
 	</enum>	
-	
+
+	<enum name="BuildJobDataType">
+		<option name="Unknown" value="0"/>
+		<option name="Toolpath" value="1"/>
+		<option name="PNGImage" value="2"/>
+		<option name="JPEGImage" value="3"/>
+		<option name="Thumbnail" value="4"/>
+		<option name="Timeline" value="5"/>
+		<option name="CustomBinaryData" value="100"/>
+	</enum>		
 	
 	<functiontype name="StreamReadCallback" description="Callback to call for reading a data chunk">
 		<param name="ByteData" type="pointer" pass="in" description="Pointer to a buffer to read data into"/>
@@ -313,10 +364,6 @@
 
 		<method name="GetUUID" description="returns the uuid of a storage stream.">
 			<param name="UUID" type="string" pass="return" description="UUID String" />	
-		</method>
-
-		<method name="GetContextUUID" description="returns the context uuid of a storage stream. Context might be for example a project uuid that this stream is part of.">
-			<param name="ContextUUID" type="string" pass="return" description="UUID String" />	
 		</method>
 	
 		<method name="GetTimeStamp" description="returns the timestamp of a storage stream.">
@@ -394,7 +441,47 @@
 		<method name="FinishPartialStream" description="Finishes storing a stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
 		</method>	
+		
+		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
+			<param name="MaxStreamSize" type="uint64" pass="return" description="Maximum Stream Size in Bytes." />	
+		</method>	
+			
+		<method name="ContentTypeIsAccepted" description="Returns if the given content type is an acceptable value.">
+			<param name="ContentType" type="string" pass="in" description="Content type string (is taken case-insensitive)" />	
+			<param name="Accepted" type="bool" pass="return" description="Content type is accepted." />	
+		</method>	
 	
+	</class>
+
+
+	<class name="BuildJobData" parent="Base" description="Build Job Data instance">
+
+		<method name="GetName" description="returns the name of a build job.">
+			<param name="Name" type="string" pass="return" description="Name String" />	
+		</method>
+
+		<method name="GetTimeStamp" description="returns the timestamp when the job was created.">
+			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
+		</method>
+				
+		<method name="GetStorageStream" description="returns the storage stream of the build.">
+			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
+		</method>
+
+		<method name="GetDataType" description="returns the data type of the job data.">
+			<param name="DataType" type="enum" class="BuildJobDataType" pass="return" description="Data type of the job data" />	
+		</method>
+
+		<method name="GetMIMEType" description="returns the mime type of a storage stream.">
+			<param name="MimeType" type="string" pass="return" description="Mime Type String" />	
+		</method>
+
+	</class>
+
+	<class name="BuildJobDataIterator" parent="Iterator">
+		<method name="GetCurrentJobData" description="Returns the build job data the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="BuildJobData" pass="return" description="returns the build job instance."/>
+		</method>
 	</class>
 
 
@@ -412,6 +499,10 @@
 			<param name="Status" type="enum" class="BuildJobStatus" pass="return" description="Status of build job." />	
 		</method>
 
+		<method name="GetLayerCount" description="returns the layer count of a build job.">
+			<param name="LayerCount" type="uint32" pass="return" description="Layer Count of build job" />	
+		</method>
+
 		<method name="GetTimeStamp" description="returns the timestamp when the job was created.">
 			<param name="Timestamp" type="string" pass="return" description="Timestamp in ISO8601 UTC format" />	
 		</method>
@@ -419,12 +510,51 @@
 		<method name="GetStorageStream" description="returns the storage stream of the build.">
 			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
 		</method>
+
+		<method name="GetStorageStreamUUID" description="returns the storage stream uuid of the build.">
+			<param name="StreamUUID" type="string" pass="return" description="Stream UUID." />
+		</method>
 		
 		<method name="GetBuildJobLogger" description="creates a build job log session access class.">
 			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
 		</method>
 		
-										
+		<method name="StartValidating" description="Starts validation of a build job.">
+		</method>
+
+		<method name="FinishValidating" description="Finishes validation of a build job.">
+			<param name="LayerCount" type="uint32" pass="in" description="Layer count" />
+		</method>
+
+		<method name="ArchiveJob" description="Archives a Job. Job MUST not be opened in the system. Job MUST be of state validated.">
+		</method>
+
+		<method name="UnArchiveJob" description="Unarchives a Job. Job MUST be of state archived.">
+		</method>
+
+		<method name="DeleteJob" description="Deletes a Job permanently including all referencing data objects. Job MUST be of state archived to succeed.">
+		</method>
+
+		<method name="JobCanBeArchived" description="Returns if a job is opened.">
+			<param name="CanBeArchived" type="bool" pass="return" description="returns if the job can be archived." />
+		</method>
+
+		<method name="AddJobData" description="Adds additional data to the Job. Job MUST be of state validated in order to add job data.">
+			<param name="Name" type="string" pass="in" description="Name of the job" />
+			<param name="Stream" type="class" class="StorageStream" pass="in" description="Storage Stream Instance" />
+			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data" />
+			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
+		</method>
+
+		<method name="ListJobDataByType" description="Retrieves a list of build job data objects, filtered by type.">
+			<param name="DataType" type="enum" class="BuildJobDataType" pass="in" description="Datatype of Job data." />	
+			<param name="IteratorInstance" type="class" class="BuildJobDataIterator" pass="return" description="Build Job Data Iterator Instance." />
+		</method>
+
+		<method name="ListJobData" description="Retrieves a list of build job data objects.">
+			<param name="IteratorInstance" type="class" class="BuildJobDataIterator" pass="return" description="Build Job Data Iterator Instance." />
+		</method>
+									
 	</class>
 
 	<class name="BuildJobIterator" parent="Iterator">
@@ -440,7 +570,7 @@
 			<param name="JobUUID" type="string" pass="in" description="UUID String for the build job. Must be unique and newly generated." />	
 			<param name="Name" type="string" pass="in" description="Name String" />	
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
-			<param name="StreamInstance" type="class" class="StorageStream" pass="in" description="Storage stream to create the job from. ContextUUID of Stream MUST be the Job UUID." />
+			<param name="StorageStreamUUID" type="string" pass="in" description="Storage stream uuid for the job. Needs not exist yet." />
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
 		</method>
 

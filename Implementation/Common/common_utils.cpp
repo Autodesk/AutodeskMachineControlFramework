@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 
 #include "crossguid/guid.hpp"
+#include "PicoSHA2/picosha2.h"
 
 #ifdef _WIN32
 #include <objbase.h>
@@ -276,6 +277,97 @@ namespace AMCCommon {
 		nLowSurrogate = (nCharacterID & 0x3ff) | 0xdc00;
 	}
 
+	bool CUtils::UTF8StringIsValid(const std::string& sString)
+	{
+		const char* pChar = sString.c_str();
+
+		while (*pChar) {
+			unsigned char cChar = (unsigned char)*pChar;
+			uint32_t nLength = UTF8DecodeTable[(uint32_t)cChar];
+			pChar++;
+
+			if (nLength == 0)
+				return false;
+			if (nLength > 6)
+				return false;
+
+			// Check for BOM (0xEF,0xBB,0xBF), this also checks for #0 characters at the end,
+			// so it does not read over the string end!
+			bool bIsBOM = false;
+			if (cChar == 0xef) {
+				if (*((const unsigned char*)pChar) == 0xbb) {
+					if (*((const unsigned char*)(pChar + 1)) == 0xbf) {
+						bIsBOM = true;
+					}
+				}
+			};
+
+
+			if (!bIsBOM) {
+				uint32_t nCode = cChar & UTF8DecodeMask[nLength];
+
+				while (nLength > 1) {
+					cChar = *pChar;
+					if ((cChar & 0xc0) != 0x80)
+						return false;
+					pChar++;
+
+					// Map UTF8 sequence to code
+					nCode = (nCode << 6) | (cChar & 0x3f);
+					nLength--;
+				}
+
+				// Map Code to UTF16
+				if ((nCode < 0xd800) || ((nCode >= 0xe000) && (nCode <= 0xffff))) {
+					// everything is good in this case
+
+				}
+				else {
+					if ((nCode < 0x10000) || (nCode > 0x10FFFF))
+						return false;
+
+					// everything is good in this case
+				}
+			}
+			else {
+				// If we find a UTF8 bom, we just ignore it.
+				if (nLength != 3)
+					return false;
+				pChar += 2;
+			}
+		}
+
+
+		// success
+		return true;
+	}
+
+	
+	std::string CUtils::trimString(const std::string& sString)
+	{
+		std::string s = sString;
+		// left trim
+		s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+			return !std::isspace(ch);
+		}));
+
+		// right trim
+		s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+			return !std::isspace(ch);
+		}).base(), s.end());
+
+		return s;
+	}
+
+	std::string CUtils::toLowerString(const std::string& sString)
+	{
+		std::string s = sString;
+		std::transform(s.begin(), s.end(), s.begin(),
+			[](unsigned char c) { return std::tolower(c); } // correct
+		);
+		return s;
+	}
+
 
     std::wstring CUtils::UTF8toUTF16(const std::string sString)
 	{
@@ -382,10 +474,24 @@ namespace AMCCommon {
 	}
 
 
+	std::string CUtils::normalizeSHA256String(std::string sRawString)
+	{
+		// to lowercase, remove all non hex characters, insert dashes again
+		std::transform(sRawString.begin(), sRawString.end(), sRawString.begin(), ::tolower);
+		sRawString.erase(std::remove_if(sRawString.begin(), sRawString.end(), &UUIDInValid), sRawString.end());
+		if (sRawString.length() != 64) {
+			throw std::runtime_error("invalid sha256 string " + sRawString);
+		}
+
+		return sRawString;
+	}
+
+
+
 	std::string CUtils::createUUID()
 	{
-		xg::Guid guid;
-		return guid.str();
+		auto guid = xg::newGuid ();		
+		return normalizeUUIDString (guid.str());
 	}
 
 	void CUtils::sleepMilliseconds(const uint32_t milliSeconds)
@@ -421,6 +527,28 @@ namespace AMCCommon {
 #endif
 	}
 
+
+	std::string CUtils::calculateSHA256FromFile(const std::string& sFileNameUTF8)
+	{
+		std::vector<unsigned char> hash(picosha2::k_digest_size);
+
+#ifdef _WIN32
+		auto sWidePath = AMCCommon::CUtils::UTF8toUTF16(sFileNameUTF8);
+		std::ifstream shaStream(sWidePath, std::ios::binary);
+#else
+		std::ifstream shaStream(sFileNameUTF8, std::ios::binary);
+#endif			
+
+		picosha2::hash256(shaStream, hash.begin(), hash.end());
+		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+	}
+
+	std::string CUtils::calculateSHA256FromString(const std::string& sString)
+	{
+		std::vector<unsigned char> hash(picosha2::k_digest_size);
+		picosha2::hash256(sString.begin(), sString.end(), hash.begin(), hash.end());
+		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+	}
 
 
 }

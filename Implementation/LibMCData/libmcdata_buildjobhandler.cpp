@@ -57,22 +57,14 @@ CBuildJobHandler::CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PS
 
 }
 
-IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, IStorageStream* pStreamInstance) 
+IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID)
 {
     auto sParsedJobUUID = AMCCommon::CUtils::normalizeUUIDString(sJobUUID);
 
-    if (pStreamInstance == nullptr)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
     if ((sName.length() == 0) || (sName.length() >= 255))
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
     if ((sUserID.length() == 0) || (sUserID.length() >= 63))
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
-
-    std::string sStorageStreamUUID = AMCCommon::CUtils::normalizeUUIDString(pStreamInstance->GetUUID());
-    std::string sStorageStreamContextUUID = AMCCommon::CUtils::normalizeUUIDString(pStreamInstance->GetContextUUID());
-
-    if (sStorageStreamContextUUID != sParsedJobUUID)
-        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTREAMCONTEXT);
 
     std::string sQuery = "SELECT uuid FROM buildjobs WHERE uuid=?";    
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
@@ -94,7 +86,7 @@ IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::s
     pInsertStatement->setString(6, sUserID);
     pInsertStatement->execute();
 
-    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, m_pSQLHandler, m_pStoragePath);
+    return CBuildJob::make(sParsedJobUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, 0, m_pSQLHandler, m_pStoragePath);
     
 }
 
@@ -108,7 +100,7 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
 
     std::unique_ptr<CBuildJobIterator> pJobIterator(new CBuildJobIterator());
 
-    std::string sQuery = "SELECT uuid, name, status, timestamp, storagestreamuuid, userid FROM buildjobs WHERE status=? ORDER BY timestamp DESC";
+    std::string sQuery = "SELECT uuid, name, status, timestamp, storagestreamuuid, layercount, userid FROM buildjobs WHERE status=? ORDER BY timestamp DESC";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, CBuildJob::convertBuildJobStatusToString(eStatus));
     while (pStatement->nextRow()) {
@@ -118,9 +110,10 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
         auto eJobStatus = CBuildJob::convertStringToBuildJobStatus(pStatement->getColumnString(3));
         auto sTimeStamp = pStatement->getColumnString(4);
         auto sStorageStreamUUID = pStatement->getColumnString(5);
-        auto sUserID = pStatement->getColumnString(6);
+        auto nLayerCount = pStatement->getColumnInt(6);
+        auto sUserID = pStatement->getColumnString(7);
     
-        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, m_pSQLHandler, m_pStoragePath));
+        pJobIterator->AddJob (CBuildJob::makeShared (sUUID, sName, eJobStatus, sTimeStamp, sStorageStreamUUID, sUserID, nLayerCount, m_pSQLHandler, m_pStoragePath));
     }
 
     return pJobIterator.release();

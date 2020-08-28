@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of CBuildJobIterator
 */
 
 #include "libmcdata_buildjobiterator.hpp"
+#include "libmcdata_buildjob.hpp"
 #include "libmcdata_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -44,6 +45,7 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 CBuildJobIterator::CBuildJobIterator()
+    : CIterator()
 {
 }
 
@@ -52,11 +54,38 @@ void CBuildJobIterator::AddJob(std::shared_ptr<CBuildJob> pBuildJob)
 {
     if (pBuildJob.get() == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    m_List.push_back(pBuildJob);
 }
 
+IBase* CBuildJobIterator::GetCurrent()
+{
+    return GetCurrentJob();
+}
 
 IBuildJob * CBuildJobIterator::GetCurrentJob()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if ((m_nCurrentIndex < 0) || (m_nCurrentIndex >= m_List.size()))
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDITERATOR);
+
+    auto pBuildJob = std::dynamic_pointer_cast<CBuildJob> (m_List[m_nCurrentIndex]);
+    if (pBuildJob.get() == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+
+    return CBuildJob::makeFrom (pBuildJob.get());
 }
 
+IIterator* CBuildJobIterator::Clone()
+{
+    std::unique_ptr<CBuildJobIterator> pNewIterator (new CBuildJobIterator ());
+
+    for (auto pBase : m_List) {
+        auto pBuildJob = std::dynamic_pointer_cast<CBuildJob> (pBase);
+        if (pBuildJob.get() == nullptr)
+            throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+        pNewIterator->AddJob(pBuildJob);
+    }
+
+    return pNewIterator.release();
+
+}

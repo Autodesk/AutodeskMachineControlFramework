@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="ScanLab Open Interface Extension" namespace="LibOIE" copyright="Autodesk Inc." year="2020" basename="liboie"
+	version="1.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+	</errors>
+
+
+	<functiontype name="ConnectionAcceptedCallback" description="A callback that is triggered when a device or application has connected.">
+		<param name="ConnectionInstance" type="class" class="Connection" pass="in" description="Returns whether the calculation should be aborted"/>
+		<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+	</functiontype>
+
+	<functiontype name="ConnectionRejectedCallback" description="A callback that is triggered when a device or application has been denied connecting.">
+		<param name="DeviceName" type="string" pass="in" description="Device name that was sent." />
+		<param name="ApplicationName" type="string" pass="in" description="Application name that was sent." />
+		<param name="VersionName" type="string" pass="in" description="Version name that was sent." />
+		<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+	</functiontype>
+
+	<functiontype name="ConnectionErrorCallback" description="A callback that is triggered when a connection sends an error state.">
+		<param name="ErrorMessage" type="string" pass="in" description="Error string that was triggered." />
+	</functiontype>
+	
+	<class name="Base">
+	</class>
+
+	<class name="Iterator" parent="Base">
+		<method name="MoveNext" description="Iterates to the next resource in the list.">
+			<param name="HasNext" type="bool" pass="return" description="Iterates to the next resource in the list."/>
+		</method>
+		<method name="MovePrevious" description="Iterates to the previous resource in the list.">
+			<param name="HasPrevious" type="bool" pass="return" description="Iterates to the previous resource in the list."/>
+		</method>
+		<method name="GetCurrent" description="Returns the resource the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="Base" pass="return" description="returns the resource instance."/>
+		</method>
+		<method name="Clone" description="Creates a new resource iterator with the same resource list.">
+			<param name="OutIterator" type="handle" class="Iterator" pass="return" description="returns the cloned Iterator instance"/>
+		</method>
+		<method name="Count" description="Returns the number of resoucres the iterator captures.">
+			<param name="Count" type="uint64" pass="return" description="returns the number of resources the iterator captures."/>
+		</method>
+	</class>
+
+
+
+	<class name="DataPackage" parent="Base">
+
+		<method name="GetRawPayload" description="Returns the raw payload.">
+			<param name="Payload" type="basicarray" class="uint8" pass="out" description="Raw payload data." />
+		</method>
+
+		<method name="Release" description="Releases memory of the data package.">
+		</method>
+		
+	</class>
+
+
+	<class name="PyroDataPackage" parent="DataPackage">
+
+
+	</class>
+
+	<class name="PyroDataPackageIterator" parent="Iterator">
+		<method name="GetCurrentPyroDataPackage" description="Returns the data package the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="PyroDataPackage" pass="return" description="returns the data package instance."/>
+		</method>
+	</class>
+
+
+	<class name="OctDataPackage" parent="DataPackage">
+
+
+	</class>
+
+
+	<class name="OctDataPackageIterator" parent="Iterator">
+		<method name="GetCurrentOctDataPackage" description="Returns the data package the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="OctDataPackage" pass="return" description="returns the data package instance."/>
+		</method>
+	</class>
+
+	<class name="RemoteFunctionCall" parent="Base">
+
+		<method name="GetFunctionName" description = "Returns function name">
+			<param name="FunctionName" type="string" pass="return" description="Function Name." />
+		</method>
+	
+		<method name="AddParameter" description = "Adds a function call parameter">
+			<param name="Parameter" type="string" pass="in" description="Parameter of the call." />
+		</method>
+	
+		<method name="Send" description = "Sends a remote function call over its connection.">
+			<param name="ResultString" type="string" pass="return" description="Returns result if successful." />
+		</method>
+	
+	</class>
+
+
+	<class name="Connection" parent="Base">
+	
+		<method name="Disconnect" description = "Disconnects and closes the connection">
+		</method>
+
+		<method name="SetRequestTimeout" description="Sets timeout value for each poll request below.">
+			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds. Default is 1000ms. Minimum 10ms, maximum 1000000ms." />
+		</method>
+
+		<method name="SetMaxErrorCount" description="Sets the maximum error messages that can be received before the connection is terminated.">
+			<param name="ErrorCount" type="uint32" pass="in" description="Max Error count. Default is 1024. Minimum 16, maximum 65535." />
+		</method>
+
+		<method name="SetMaxMemoryCount" description="Sets the maximum memory buffer the data packets can use before the connection is terminated.">
+			<param name="MaxMemoryCount" type="uint32" pass="in" description="Max memory count in bytes. Default is 1MB. Minimum 1kB, maximum 1GB." />
+		</method>
+
+		<method name="SetBufferFile" description="Sets a temporary filename to which the packets are buffered.">
+			<param name="FileName" type="string" pass="in" description="Filename which should be used as buffer." />
+			<param name="MaxMemoryCount" type="uint64" pass="in" description="Max memory count in bytes. Default is 1MB. Minimum 1kB, maximum 1TB." />
+		</method>
+
+		<method name="UnsetBufferFile" description="Stops writing to disk.">
+		</method>
+
+		<method name="SetCheckAliveInterval" description="Sets check alive interval. 0ms means no check alive request is sent.">
+			<param name="CheckAliveInterval" type="uint32" pass="in" description="Timeout in milliseconds. Default is 1000ms. Max value is 1000000ms." />
+		</method>
+	
+		<method name="RetrieveFirmwareVersion" description = "Retrieves Firmware Version. Fails if firmware is not existing.">
+			<param name="FirmwareName" type="string" pass="in" description="Name of the firmware to retrieve." />
+			<param name="FirmwareVersion" type="string" pass="out" description="Version of the requested firmware." />
+			<param name="Filename" type="string" pass="out" description="Filename of the requested firmware." />
+			<param name="Filedate" type="string" pass="out" description="Timestamp of the requested firmware in ISO8601 Time." />
+			<param name="SHA256" type="string" pass="out" description="Checksum of the requested firmware." />
+		</method>
+
+		<method name="UpdateFirmware" description = "Retrieves Firmware Version. Fails if firmware is not existing.">
+			<param name="FirmwareName" type="string" pass="in" description="Name of the new firmware." />
+			<param name="FirmwareVersion" type="string" pass="in" description="Version of the new firmware." />
+			<param name="FileName" type="string" pass="in" description="Filename of the new firmware." />
+			<param name="FileDate" type="string" pass="in" description="Timestamp of the requested firmware in ISO8601 Time." />
+			<param name="SHA256" type="string" pass="in" description="Checksum of the new firmware." />
+			<param name="BinaryData" type="basicarray" class="uint8" pass="in" description="Blob of new firmware." />
+		</method>
+
+		<method name="StartFirmware" description = "Starts firmware on Open Interface Extension.">
+			<param name="FileName" type="string" pass="in" description="Filename of the firmware to start." />
+			<param name="Success" type="bool" pass="return" description="Firmware successfully started." />
+		</method>
+
+		<method name="StopFirmware" description = "Stops firmware on Open Interface Extension.">
+			<param name="FileName" type="string" pass="in" description="Filename of the firmware to stop." />
+			<param name="Success" type="bool" pass="return" description="Firmware successfully stopped." />
+		</method>
+		
+		<method name="SetConnectionErrorCallback" description = "sets a callback that triggers when a connection error occured.">			
+			<param name="Callback" type="functiontype" class="ConnectionErrorCallback" pass="in" description="callback pointer." />
+		</method>
+
+		<method name="ClearErrors" description = "clears the error log.">			
+		</method>
+
+		<method name="GetErrorCount" description = "Returns the list of errors in the error log.">			
+			<param name="ErrorCount" type="uint32" pass="return" description="Errors in the error log." />
+		</method>
+
+		<method name="GetError" description = "Returns an error message of the error log">			
+			<param name="ErrorIndex" type="uint32" pass="in" description="Index of the error." />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the error." />
+			<param name="Timestamp" type="string" pass="out" description="ISO8601 Time when the error was reported." />
+		</method>
+
+		<method name="CreateRemoteFunctionCall" description="Creates a new remote function call.">			
+			<param name="FunctionName" type="string" pass="in" description="Function name." />
+			<param name="Instance" type="class" class="RemoteFunctionCall" pass="return" description="Function call instance." />			
+		</method>
+		
+		<method name="GetBufferedPyroPackages" description="Retrieves currently buffered pyro packages.">			
+			<param name="Iterator" type="class" class="PyroDataPackageIterator" pass="return" description="Iterator of buffered packages." />			
+		</method>
+		
+		<method name="GetBufferedOctPackages" description="Retrieves currently buffered oct packages.">			
+			<param name="Iterator" type="class" class="OctDataPackageIterator" pass="return" description="Iterator of buffered packages." />			
+		</method>
+		
+
+
+	</class>
+
+	<class name="ConnectionIterator" parent="Iterator">
+		<method name="GetCurrentConnection" description="Returns the connection the iterator points at.">
+			<param name="CurrentInstance" type="handle" class="Connection" pass="return" description="returns the connection instance."/>
+		</method>
+	</class>
+
+	<class name="Server" parent="Base">
+
+		<method name="Start" description = "starts listening for connections.">
+			<param name="IPAddress" type="string" pass="in" description="IP Address to run on" />
+			<param name="Port" type="uint32" pass="in" description="Port to run on" />
+			<param name="IPv6" type="bool" pass="in" description="flag if IPv6 should be used" />
+		</method>
+
+		<method name="Stop" description = "stops listening for connections and disconnects existing ones.">
+		</method>
+
+		<method name="CloseAllConnections" description = "disconnects all connections but does not stop listening.">			
+		</method>
+	
+		<method name="SetThreadCount" description = "sets the maximum thread count to use. Must be called before Start">
+			<param name="ThreadCount" type="uint32" pass="in" description="Thread count to use (must be larger than 4, default is 32)" />
+		</method>
+	
+		<method name="SetBufferSize" description = "sets the receive buffer size">
+			<param name="RCVBufferSize" type="uint32" pass="in" description="Receive buffer size to use in bytes (must be between 4kB and 1GB, default is 1MB)" />
+		</method>
+
+		<method name="AcceptDevice" description = "adds an accepted device">
+			<param name="DeviceName" type="string" pass="in" description="Device name to be accepted. Empty string means all devices." />
+			<param name="ApplicationName" type="string" pass="in" description="Application name to be accepted. Empty string means all applications." />
+			<param name="VersionName" type="string" pass="in" description="Version name to be accepted. Empty string means all versions." />
+			<param name="RuleID" type="uint32" pass="return" description="Returns identifier of acceptance rule." />
+		</method>
+
+		<method name="UnAcceptDevice" description = "removes an accepted">			
+			<param name="RuleID" type="uint32" pass="in" description="identifier of acceptance rule." />
+		</method>
+		
+		<method name="ClearAcceptedDevices" description = "clears all accepted device rules">			
+		</method>
+
+		<method name="ListConnections" description = "lists all open connections">			
+			<param name="ConnectionIteratorInstance" type="class" class="ConnectionIterator" pass="return" description="list of all open connections." />
+		</method>
+
+		<method name="SetConnectionAcceptedCallback" description = "sets a callback that triggers when a new connection was established.">			
+			<param name="Callback" type="functiontype" class="ConnectionAcceptedCallback" pass="in" description="callback pointer." />
+		</method>
+
+		<method name="SetConnectionRejectedCallback" description = "sets a callback that triggers when a new connection was rejected.">			
+			<param name="Callback" type="functiontype" class="ConnectionRejectedCallback" pass="in" description="callback pointer." />
+		</method>
+
+	</class>
+
+	
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateServer" description="Creates a open interface extension server instance.">
+			<param name="Instance" type="class" class="Server" pass="return" description="New Server instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
