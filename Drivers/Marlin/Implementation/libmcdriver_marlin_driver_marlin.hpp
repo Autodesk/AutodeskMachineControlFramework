@@ -60,7 +60,7 @@ public:
 
 	void SetPidParameters(const LibMCDriver_Marlin_double dP, const LibMCDriver_Marlin_double dI, const LibMCDriver_Marlin_double dD) override;
 
-	void UpdateState() override;
+	void UpdateState(const LibMCDriver_Marlin_uint32 nExtruderID) override;
 
 	void GetCurrentPosition(LibMCDriver_Marlin_double& dX, LibMCDriver_Marlin_double& dY, LibMCDriver_Marlin_double& dZ) override;
 
@@ -80,6 +80,8 @@ public:
 
 	bool IsHomed() override;
 	
+	bool IsConnected() override;
+
 	void MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed) override;
 
 	void MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed) override;
@@ -90,7 +92,7 @@ public:
 
 	void StartHoming() override;
 
-
+	void EmergencyStop() override;
 
 };
 

@@ -45,6 +45,7 @@ namespace AMC {
 		: m_sCOMPort("COM1"),
 		m_nBaudRate(115200),
 		m_nConnectTimeout(2000),
+		m_bIsConnected(false),
 		m_bDoQueryFirmwareInfo(bDoQueryFirmwareInfo),
 		m_bDisableHoming(bDisableHoming),
 		m_dStatusUpdateTimerInterval(100),
@@ -113,6 +114,11 @@ namespace AMC {
 		return m_nBaudRate;
 	}
 
+	bool CSerialController_Marlin::isConnected()
+	{
+		return m_bIsConnected;
+	}
+
 	void CSerialController_Marlin::setConnectTimeout(const uint32_t nConnectTimeout)
 	{
 		if (m_pConnection.get() != nullptr)
@@ -132,6 +138,7 @@ namespace AMC {
 
 	void CSerialController_Marlin::initializeController()
 	{
+		m_bIsConnected = false;
 		if (m_pConnection.get() != nullptr)
 			throw std::runtime_error("Serial Port already initialized");
 
@@ -198,12 +205,12 @@ namespace AMC {
 		}
 
 		checkIsHomed();
-
-
+		m_bIsConnected = true;
 	}
 
 	void CSerialController_Marlin::disconnectController()
 	{
+		m_bIsConnected = false;
 		m_pConnection.reset();
 	}
 
@@ -788,17 +795,22 @@ namespace AMC {
 
 	bool CSerialController_Marlin::canReceiveMovement()
 	{
-		return (m_nCurrentBufferSpace > m_nMinBufferSpace);
+		return (m_bIsConnected && (m_nCurrentBufferSpace > m_nMinBufferSpace));
 	}
 
 	bool CSerialController_Marlin::isMoving()
 	{
-		return (m_nCurrentBufferSpace != m_nMaxBufferSpace);
+		return (m_bIsConnected && m_nCurrentBufferSpace != m_nMaxBufferSpace);
 	}
 
 	bool CSerialController_Marlin::isHomed()
 	{
-		return (m_bIsHomed);
+		return (m_bIsConnected && m_bIsHomed);
+	}
+
+	void CSerialController_Marlin::emergencyStop()
+	{
+		sendCommand("M112");
 	}
 
 

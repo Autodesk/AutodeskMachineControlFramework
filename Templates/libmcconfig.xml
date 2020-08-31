@@ -32,6 +32,16 @@
   		<result name="success" type="bool" />		
   	  </signaldefinition>	 	  	  	     
     
+  	  <signaldefinition name="signal_gettemperature">
+  		<parameter name="extrudergetvalue" type="bool" />
+  		<parameter name="extruderid" type="int" />
+  		<parameter name="extrudertemperature" type="double" />
+  		<parameter name="bedgetvalue" type="bool" />
+  		<parameter name="bedtemperature" type="double" />
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
+
   	  <state name="init" repeatdelay="100">
   			<outstate target="idle" />
   			<outstate target="startprocess" />
@@ -79,6 +89,10 @@
   
     <statemachine name="printerconnection" description="Printer Connection System" initstate="init" failedstate="fatalerror" library="plugin_printerconnection">
   	  
+  	  <signaldefinition name="signal_isconnected">
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
   	  <signaldefinition name="signal_doextrudelayer">
   		<parameter name="jobuuid" type="string" />
    		<parameter name="layerindex" type="int" />
@@ -93,9 +107,22 @@
 		<result name="success" type="bool" />	
 	  </signaldefinition>	  
 
+	  <signaldefinition name="signal_disconnect">
+		<result name="success" type="bool" />	
+	  </signaldefinition>	  
+
+	  <signaldefinition name="signal_emergencystop">
+		<result name="success" type="bool" />	
+	  </signaldefinition>	  
+
   	  <signaldefinition name="signal_settemperature">
+  		<parameter name="extrudersetvalue" type="bool" />
+  		<parameter name="extruderid" type="int" />
   		<parameter name="extrudertemperature" type="double" />
+  		<parameter name="extruderdowait" type="bool" />
+  		<parameter name="bedsetvalue" type="bool" />
   		<parameter name="bedtemperature" type="double" />
+  		<parameter name="beddowait" type="bool" />
   		<result name="success" type="bool" />
   	  </signaldefinition>	 
 
@@ -113,12 +140,16 @@
   		<parameter name="currentx" description="X Position" default="0" type="double" />
   		<parameter name="currenty" description="Y Position" default="0" type="double" />
   		<parameter name="currentz" description="Z Position" default="0" type="double" />
-  		<parameter name="targettemperatureextruder" description="Target Extruder Temperature" default="0" type="double" />
+  		<parameter name="defaultfanid" description="Fan ID to set target speed" default="0" type="int" />
+  		<parameter name="defaultfanspeed" description="Default Fan Speed" default="0" type="double" />
+  		<parameter name="defaulttargettemperatureextruderid" description="Default Extruder ID to set target temperature" default="0" type="int" />
+  		<parameter name="defaulttargettemperatureextruder" description="Default Target Extruder Temperature" default="0" type="double" />
   		<parameter name="currenttemperatureextruder" description="Current Extruder Temperature" default="0" type="double" />
-  		<parameter name="targettemperaturebed" description="Target Bed Temperature" default="0" type="double" />
+  		<parameter name="defaulttargettemperaturebed" description="Default Target Bed Temperature" default="0" type="double" />
   		<parameter name="currenttemperaturebed" description="Current Bed Temperature" default="0" type="double" />
   		<parameter name="ismoving" description="Moving" default="0" type="bool" />
       		<parameter name="ishomed" description="Homed" default="0" type="bool" />
+      		<parameter name="isconnected" description="Connected" default="0" type="bool" />
   		<parameter name="bufferavailable" description="Buffer is available" default="0" type="bool" />
   		<parameter name="statusupdateinterval" description="Timer interval [ms] for updating status" default="100" type="double" />
   		<parameter name="pidvaluep" description="Printers PID, value P" default="0" type="double" />

@@ -367,7 +367,7 @@ public:
 	inline void SetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp);
 	inline void SetFanSpeed(const LibMCDriver_Marlin_uint32 nFanID, const LibMCDriver_Marlin_uint32 nSpeed);
 	inline void SetPidParameters(const LibMCDriver_Marlin_double dP, const LibMCDriver_Marlin_double dI, const LibMCDriver_Marlin_double dD);
-	inline void UpdateState();
+	inline void UpdateState(const LibMCDriver_Marlin_uint32 nExtruderID);
 	inline void GetCurrentPosition(LibMCDriver_Marlin_double & dX, LibMCDriver_Marlin_double & dY, LibMCDriver_Marlin_double & dZ);
 	inline void GetTargetPosition(LibMCDriver_Marlin_double & dX, LibMCDriver_Marlin_double & dY, LibMCDriver_Marlin_double & dZ);
 	inline void GetExtruderTargetPosition(LibMCDriver_Marlin_double & dE);
@@ -377,11 +377,13 @@ public:
 	inline bool CanExecuteMovement();
 	inline bool IsMoving();
 	inline bool IsHomed();
+	inline bool IsConnected();
 	inline void MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed);
 	inline void MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed);
 	inline void MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed);
 	inline void MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed);
 	inline void StartHoming();
+	inline void EmergencyStop();
 };
 	
 	/**
@@ -526,11 +528,13 @@ public:
 		pWrapperTable->m_Driver_Marlin_CanExecuteMovement = nullptr;
 		pWrapperTable->m_Driver_Marlin_IsMoving = nullptr;
 		pWrapperTable->m_Driver_Marlin_IsHomed = nullptr;
+		pWrapperTable->m_Driver_Marlin_IsConnected = nullptr;
 		pWrapperTable->m_Driver_Marlin_MoveToXY = nullptr;
 		pWrapperTable->m_Driver_Marlin_MoveFastToXY = nullptr;
 		pWrapperTable->m_Driver_Marlin_MoveToZ = nullptr;
 		pWrapperTable->m_Driver_Marlin_MoveFastToZ = nullptr;
 		pWrapperTable->m_Driver_Marlin_StartHoming = nullptr;
+		pWrapperTable->m_Driver_Marlin_EmergencyStop = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -776,6 +780,15 @@ public:
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_IsConnected = (PLibMCDriver_MarlinDriver_Marlin_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_isconnected");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_IsConnected = (PLibMCDriver_MarlinDriver_Marlin_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_isconnected");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_IsConnected == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_Marlin_MoveToXY = (PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_movetoxy");
 		#else // _WIN32
 		pWrapperTable->m_Driver_Marlin_MoveToXY = (PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_movetoxy");
@@ -818,6 +831,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_Marlin_StartHoming == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_EmergencyStop = (PLibMCDriver_MarlinDriver_Marlin_EmergencyStopPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_emergencystop");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_EmergencyStop = (PLibMCDriver_MarlinDriver_Marlin_EmergencyStopPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_emergencystop");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_EmergencyStop == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -983,6 +1005,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_IsHomed == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_isconnected", (void**)&(pWrapperTable->m_Driver_Marlin_IsConnected));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_IsConnected == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_movetoxy", (void**)&(pWrapperTable->m_Driver_Marlin_MoveToXY));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_MoveToXY == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1001,6 +1027,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_starthoming", (void**)&(pWrapperTable->m_Driver_Marlin_StartHoming));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_StartHoming == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_emergencystop", (void**)&(pWrapperTable->m_Driver_Marlin_EmergencyStop));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_EmergencyStop == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1187,10 +1217,11 @@ public:
 	
 	/**
 	* CDriver_Marlin::UpdateState - Polls a new state from the firmware.
+	* @param[in] nExtruderID - ID of extruder.
 	*/
-	void CDriver_Marlin::UpdateState()
+	void CDriver_Marlin::UpdateState(const LibMCDriver_Marlin_uint32 nExtruderID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_UpdateState(m_pHandle));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_UpdateState(m_pHandle, nExtruderID));
 	}
 	
 	/**
@@ -1293,6 +1324,18 @@ public:
 	}
 	
 	/**
+	* CDriver_Marlin::IsConnected - Returns if the printer is coneccted
+	* @return True if printer is connected.
+	*/
+	bool CDriver_Marlin::IsConnected()
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_IsConnected(m_pHandle, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
 	* CDriver_Marlin::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
@@ -1342,6 +1385,14 @@ public:
 	void CDriver_Marlin::StartHoming()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_StartHoming(m_pHandle));
+	}
+	
+	/**
+	* CDriver_Marlin::EmergencyStop - Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.
+	*/
+	void CDriver_Marlin::EmergencyStop()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_EmergencyStop(m_pHandle));
 	}
 
 } // namespace LibMCDriver_Marlin

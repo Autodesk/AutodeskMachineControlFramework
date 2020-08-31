@@ -17,6 +17,7 @@ namespace AMC {
 		uint32_t m_nBaudRate;
 		uint32_t m_nConnectTimeout;
 		uint32_t m_nLineNumber;
+		bool m_bIsConnected;
 		double m_dStatusUpdateTimerInterval;
 
 		bool m_bDebug;
@@ -88,9 +89,12 @@ namespace AMC {
 		void setBaudrate(const uint32_t nBaudrate);
 		uint32_t getBaudrate();
 
+		bool isConnected();
+
 		void initializeController() override;
 		void resetController() override;
 		void disconnectController() override;
+		void emergencyStop() override;
 
 		void setPositioningAbolute();
 		void setPositioningRelative();

@@ -181,9 +181,10 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetPidParame
 * Polls a new state from the firmware.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] nExtruderID - ID of extruder.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_UpdateStatePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_UpdateStatePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID);
 
 /**
 * Returns the current axis position.
@@ -276,6 +277,15 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_IsMovingPtr)
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_IsHomedPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool * pValue);
 
 /**
+* Returns if the printer is coneccted
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[out] pValue - True if printer is connected.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_IsConnectedPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool * pValue);
+
+/**
 * Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
@@ -326,6 +336,14 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveFastToZP
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_StartHomingPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
+
+/**
+* Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_EmergencyStopPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
 
 /*************************************************************************************************************************
  Global functions
@@ -424,11 +442,13 @@ typedef struct {
 	PLibMCDriver_MarlinDriver_Marlin_CanExecuteMovementPtr m_Driver_Marlin_CanExecuteMovement;
 	PLibMCDriver_MarlinDriver_Marlin_IsMovingPtr m_Driver_Marlin_IsMoving;
 	PLibMCDriver_MarlinDriver_Marlin_IsHomedPtr m_Driver_Marlin_IsHomed;
+	PLibMCDriver_MarlinDriver_Marlin_IsConnectedPtr m_Driver_Marlin_IsConnected;
 	PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr m_Driver_Marlin_MoveToXY;
 	PLibMCDriver_MarlinDriver_Marlin_MoveFastToXYPtr m_Driver_Marlin_MoveFastToXY;
 	PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr m_Driver_Marlin_MoveToZ;
 	PLibMCDriver_MarlinDriver_Marlin_MoveFastToZPtr m_Driver_Marlin_MoveFastToZ;
 	PLibMCDriver_MarlinDriver_Marlin_StartHomingPtr m_Driver_Marlin_StartHoming;
+	PLibMCDriver_MarlinDriver_Marlin_EmergencyStopPtr m_Driver_Marlin_EmergencyStop;
 	PLibMCDriver_MarlinGetVersionPtr m_GetVersion;
 	PLibMCDriver_MarlinGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_MarlinReleaseInstancePtr m_ReleaseInstance;

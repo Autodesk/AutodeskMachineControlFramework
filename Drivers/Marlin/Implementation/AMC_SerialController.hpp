@@ -31,6 +31,7 @@ namespace AMC {
 		virtual void initializeController () = 0;
 		virtual void disconnectController() = 0;
 		virtual void resetController() = 0;
+		virtual void emergencyStop() = 0;
 
 		virtual void setPositioningAbolute() = 0;
 		virtual void setPositioningRelative() = 0;
@@ -62,6 +63,7 @@ namespace AMC {
 
 		virtual bool isHomed() = 0;
 		virtual bool isMoving() = 0;
+		virtual bool isConnected() = 0;
 		virtual bool canReceiveMovement () = 0;
 		virtual void waitForMovement() = 0;
 

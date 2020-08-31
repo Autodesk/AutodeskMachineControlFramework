@@ -468,7 +468,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setpidparameters(LibMC
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_updatestate(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_updatestate(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -477,7 +477,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_updatestate(LibMCDrive
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->UpdateState();
+		pIDriver_Marlin->UpdateState(nExtruderID);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -742,6 +742,32 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_ishomed(LibMCDriver_Ma
 	}
 }
 
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_isconnected(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		*pValue = pIDriver_Marlin->IsConnected();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_movetoxy(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
@@ -862,6 +888,30 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_starthoming(LibMCDrive
 	}
 }
 
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_emergencystop(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->EmergencyStop();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -919,6 +969,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_ismoving;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_ishomed") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_ishomed;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_isconnected") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_isconnected;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_movetoxy") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movetoxy;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_movefasttoxy") 
@@ -929,6 +981,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movefasttoz;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_starthoming") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_starthoming;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_emergencystop") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_emergencystop;
 	if (sProcName == "libmcdriver_marlin_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_getversion;
 	if (sProcName == "libmcdriver_marlin_getlasterror") 
