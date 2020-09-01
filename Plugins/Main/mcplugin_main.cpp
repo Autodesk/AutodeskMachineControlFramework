@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCPlugin::Impl;
 
-//#include "libmcdriver_camera_dynamic.hpp"
+#include "libmcdriver_camera_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
 #ifdef _MSC_VER
@@ -45,8 +45,8 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-//typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
-//typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
+typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
+typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
 
 /*************************************************************************************************************************
  Class definition of CMainData
@@ -54,14 +54,14 @@ using namespace LibMCPlugin::Impl;
 class CMainData : public virtual CPluginData {
 protected:
 	// We need to globally store driver wrappers in the plugin
-	//PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
+	PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
 
 public:
 
-	//PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
-	//{
-	//	return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
-	//}
+	PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
+	}
 
 };
 
@@ -214,13 +214,34 @@ public:
 		
 		auto pSignal = pStateEnvironment->PrepareSignal("pidcontrol_extruder", "signal_startcontrolling");
 		pSignal->Trigger();
-		pSignal->WaitForHandling(10000);
+		pSignal->WaitForHandling(1000);
 		
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
 		pStateEnvironment->SetBoolParameter("jobinfo", "autostart", false);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", true);
-		pStateEnvironment->SetNextState("waitfortemperature");
+		
+		auto pSignalIsConnected = pStateEnvironment->PrepareSignal("printerconnection", "signal_isconnected");
+		pSignalIsConnected->Trigger();
+
+		if (pSignalIsConnected->WaitForHandling((uint32_t)(5000))) {
+			auto bSuccess = pSignalIsConnected->GetBoolResult("success");
+
+			if (bSuccess) {
+				pStateEnvironment->LogMessage("Printer connected. ");
+				pStateEnvironment->SetNextState("waitfortemperature");
+			}
+			else {
+				pStateEnvironment->LogMessage("Printer not connected. ");
+				pStateEnvironment->SetNextState("fatalerror");
+			}
+		}
+		else {
+			pStateEnvironment->LogMessage("Signal 'Printer is connected' timeout. ");
+			pStateEnvironment->SetNextState("fatalerror");
+		}
+
+
 	}
 
 };
@@ -251,9 +272,73 @@ public:
 
 		pStateEnvironment->LogMessage("Wait for temperature...");
 
-		// TODO do something...
+		// TODO get bed/extruder temperature (from somewhere) to set ...
+		uint32_t nExtruderId = 0;
+		double dExtruderTargetTemperature = 25.0;
+		double dBedTargetTemperature = 25.0;
 
-		pStateEnvironment->SetNextState("extrudelayer");
+		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_settemperature");
+		pSignal->SetBool("bedsetvalue", true);
+		pSignal->SetDouble("bedtemperature", dBedTargetTemperature);
+		pSignal->SetBool("beddowait", false);
+		pSignal->SetBool("extrudersetvalue", true);
+		pSignal->SetInteger("extruderid", nExtruderId);
+		pSignal->SetDouble("extrudertemperature", dExtruderTargetTemperature);
+		pSignal->SetBool("extruderdowait", false);
+		pSignal->Trigger();
+
+		if (pSignal->WaitForHandling(10000)) {
+			auto bSuccess = pSignal->GetBoolResult("success");
+
+			// TODO get info if we want to wait until temperature is reached (from somewhere), maybe we just want to wait the first time (after connect/homing)
+			bool bBedDoWait = true;
+			bool bExtruderDoWait = true;
+
+			if (bBedDoWait || bExtruderDoWait) {
+				// wait for defined temperature 
+				LibMCEnv::PSignalHandler pSignalHandler;
+				double dBedTemperature = -1;
+				double dExtruderTemperature = -1;
+
+				while ((bExtruderDoWait && (dExtruderTemperature < dExtruderTargetTemperature)) ||
+					(bBedDoWait && (dBedTemperature < dBedTargetTemperature))) {
+					
+					if (pStateEnvironment->WaitForSignal("signal_gettemperature", 0, pSignalHandler)) {
+						bool bBedGetValue = pSignalHandler->GetDouble("bedgetvalue");
+						if (bBedGetValue) {
+							dBedTemperature = pSignalHandler->GetDouble("bedtemperature");
+						}
+
+						bool bExtruderGetValue = pSignalHandler->GetDouble("extrudergetvalue");
+						if (bExtruderGetValue) {
+							//uint32_t nExtruderId = pSignalHandler->GetDouble("extruderid");
+							dExtruderTemperature = pSignalHandler->GetDouble("extrudertemperature");
+						}
+						pSignalHandler->SetBoolResult("success", true);
+						pSignalHandler->SignalHandled();
+
+						pStateEnvironment->LogMessage("Wait for temperature: E=" + std::to_string(dExtruderTemperature) + " B=" + std::to_string(dBedTemperature));
+					}
+					pStateEnvironment->Sleep(100);
+
+					// TODO add timeout/cancellation of "Wait for temperature"
+				}
+			}
+
+			if (bSuccess) {
+				pStateEnvironment->LogMessage("Temperature set successful. ");
+				pStateEnvironment->SetNextState("extrudelayer");
+			}
+			else {
+				pStateEnvironment->LogMessage("Set Temperature failure. ");
+				pStateEnvironment->SetNextState("fatalerror");
+			}
+		}
+		else {
+
+			pStateEnvironment->LogMessage("Set Temperature timeout!");
+			pStateEnvironment->SetNextState("fatalerror");
+		}
 	}
 
 };
@@ -290,6 +375,11 @@ public:
 		pStateEnvironment->GetBuildJob(sJobUUID)->UnloadToolpath ();
 
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
+
+		// TODO following commands disconnect automatically. maybe this should be done on demand
+		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_disconnect");
+		pSignal->Trigger();
+		
 		pStateEnvironment->SetNextState("idle");
 
 	}
@@ -332,7 +422,7 @@ public:
 
 		pStateEnvironment->LogMessage("Extrude layer #" + std::to_string(nCurrentLayer) + "...");
 
-		auto pSignal = pStateEnvironment->PrepareSignal("movement", "signal_doextrudelayer");
+		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_doextrudelayer");
 		pSignal->SetInteger("layertimeout", nLayerTimeout);
 		pSignal->SetInteger("layerindex", nCurrentLayer);
 		pSignal->SetString("jobuuid", sJobUUID);
@@ -388,7 +478,16 @@ public:
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
 
-		//pStateEnvironment->LogMessage("Getting Camera Image");
+
+		// TODO activate/uncomment following lines to test emergency stop when proceeding to layer 3
+		//if (nCurrentLayer > 1) {
+		//	pStateEnvironment->LogMessage("Just for testing. call EMERGENCY STOP if layer #" + std::to_string(nCurrentLayer + 1) + " is next layer");
+		//	auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_emergencystop");
+		//	pSignal->Trigger();
+		//	pStateEnvironment->SetNextState("fatalerror");
+		//}
+
+		// TODO uncomment to activate camera driver pStateEnvironment->LogMessage("Getting Camera Image");
 		//auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
 		//auto pPNGImage = pCameraDriver->CapturePNGImage();
 		//
@@ -396,7 +495,7 @@ public:
 		//pPNGImage->GetRawData(Buffer);
 
 		auto pBuild = pStateEnvironment->GetBuildJob(sJobUUID);
-		//pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
+		//TODO uncomment to activate camera driver pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
 
 		if (nCurrentLayer < (nLayerCount - 1)) {
 			pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");

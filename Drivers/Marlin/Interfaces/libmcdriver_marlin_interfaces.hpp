@@ -356,8 +356,9 @@ public:
 
 	/**
 	* IDriver_Marlin::UpdateState - Polls a new state from the firmware.
+	* @param[in] nExtruderID - ID of extruder.
 	*/
-	virtual void UpdateState() = 0;
+	virtual void UpdateState(const LibMCDriver_Marlin_uint32 nExtruderID) = 0;
 
 	/**
 	* IDriver_Marlin::GetCurrentPosition - Returns the current axis position.
@@ -423,6 +424,12 @@ public:
 	virtual bool IsHomed() = 0;
 
 	/**
+	* IDriver_Marlin::IsConnected - Returns if the printer is coneccted
+	* @return True if printer is connected.
+	*/
+	virtual bool IsConnected() = 0;
+
+	/**
 	* IDriver_Marlin::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
@@ -458,6 +465,11 @@ public:
 	* IDriver_Marlin::StartHoming - Start Homing of printer.
 	*/
 	virtual void StartHoming() = 0;
+
+	/**
+	* IDriver_Marlin::EmergencyStop - Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.
+	*/
+	virtual void EmergencyStop() = 0;
 
 };
 
