@@ -41,6 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "crossguid/guid.hpp"
 #include "PicoSHA2/picosha2.h"
 
+#include "cppcodec/base64_rfc4648.hpp"
+#include "cppcodec/base64_url.hpp"
+
 #ifdef _WIN32
 #include <objbase.h>
 #include <iomanip>
@@ -55,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCCommon {
 
 #define LIBMC_MAXSTRINGBUFFERSIZE (1024 * 1024 * 1024)
+#define LIBMC_MAXRANDOMSTRINGITERATIONS 1024
 
 	// Lookup table to convert UTF8 bytes to sequence length
 	const unsigned char UTF8DecodeTable[256] = {
@@ -548,6 +552,64 @@ namespace AMCCommon {
 		std::vector<unsigned char> hash(picosha2::k_digest_size);
 		picosha2::hash256(sString.begin(), sString.end(), hash.begin(), hash.end());
 		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+	}
+
+
+	std::string CUtils::calculateRandomSHA256String(const uint32_t nIterations)
+	{
+		if ((nIterations == 0) || (nIterations > LIBMC_MAXRANDOMSTRINGITERATIONS))
+			throw std::runtime_error("invalid random string iterations");
+
+		std::string sRandomString;
+
+		uint32_t nCount = nIterations + (((uint32_t) rand()) % nIterations);
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++)
+			sRandomString += createUUID();
+
+		return calculateSHA256FromString(sRandomString);
+	}
+
+	std::string CUtils::encodeBase64(const std::string& sString, eBase64Type eType)
+	{		
+		switch (eType) {
+		case eBase64Type::RFC4648:
+			return cppcodec::base64_rfc4648::encode(sString);
+		case eBase64Type::URL:
+			return cppcodec::base64_url::encode(sString);
+		default:
+			throw std::runtime_error("invalid base64 type");
+		}
+
+	}
+
+	void CUtils::decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t>& byteBuffer)
+	{
+		switch (eType) {
+		case eBase64Type::RFC4648:
+			cppcodec::base64_rfc4648::decode(byteBuffer, sString);
+			break;
+		case eBase64Type::URL:
+			cppcodec::base64_url::decode(byteBuffer, sString);
+			break;
+		default:
+			throw std::runtime_error("invalid base64 type");
+		}
+
+	}
+
+	std::string CUtils::decodeBase64ToASCIIString(const std::string& sString, eBase64Type eType)
+	{
+		std::vector<uint8_t> byteBuffer;
+		byteBuffer.reserve (sString.length () + 1);
+		decodeBase64(sString, eType, byteBuffer);
+
+		for (auto b : byteBuffer) {
+			if ((b < 32) || (b >= 128))
+				throw std::runtime_error("invalid ASCII character in base64 decoding");
+		}
+
+		byteBuffer.push_back (0);
+		return std::string((char*)byteBuffer.data());
 	}
 
 

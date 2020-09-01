@@ -42,6 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdata_dynamic.hpp"
 
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
+
+
 namespace AMC {
 
 	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper)
@@ -153,6 +157,24 @@ namespace AMC {
 	{
 		// TODO: Retrieve a unique User ID for the current running session
 		return "amc";
+	}
+
+
+	std::string CSystemState::getInstallationID()
+	{
+		// TODO: Find out a way to define a system ID
+		return getGitHash();
+	}
+
+	std::string CSystemState::getInstallationSecret()
+	{
+		// TODO: Find out a way to define a system Secret
+		return getGitHash();
+	}
+
+	std::string CSystemState::getGitHash()
+	{
+		return __STRINGIZE_VALUE_OF(__GITHASH);
 	}
 
 }

@@ -210,10 +210,11 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_log(LibMC_MCContext pMCContext, const
 * @param[in] pMCContext - MCContext instance.
 * @param[in] pURI - URI to serve
 * @param[in] pRequestMethod - Request Method
+* @param[in] pAuthorization - Authorization Header String
 * @param[out] pHandlerInstance - Request Handler instance.
 * @return error code or 0 (success)
 */
-LIBMC_DECLSPEC LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance);
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorization, LibMC_APIRequestHandler * pHandlerInstance);
 
 /*************************************************************************************************************************
  Global functions

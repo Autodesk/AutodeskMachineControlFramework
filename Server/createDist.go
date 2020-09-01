@@ -146,40 +146,44 @@ func main() {
 				}
 				
 				
-				var entry DistXMLEntry;
-				entry.URL = url;
-				entry.FileName = file;
-				entry.Size = uint32 (info.Size());
-				entry.ContentType = contenttype;
+				if (fileext!=".map") {
 				
-				Root.Entries = append (Root.Entries, entry);
+					var entry DistXMLEntry;
+					entry.URL = url;
+					entry.FileName = file;
+					entry.Size = uint32 (info.Size());
+					entry.ContentType = contenttype;
+					
+					Root.Entries = append (Root.Entries, entry);
+					
+					fmt.Printf("Adding %s (%d bytes)\n", path, info.Size())
+					
+					input, err := ioutil.ReadFile(path)
+					if err != nil {
+						return err
+					}
+					
+					
+					var header zip.FileHeader;
+					header.Name = file;
+					header.Method = zip.Deflate;
+					
+					filewriter, err := zipWriter.CreateHeader(&header)
+					if err != nil {
+						return err
+					}
+					
+					_, err = filewriter.Write(input)
+					if err != nil {
+						return err
+					}
+					
+					/*err = ioutil.WriteFile(OutputDir + "/" + TargetDistDir + "/" + file, input, 0644)
+					if err != nil {				
+						return err;
+					} */
 				
-				fmt.Printf("Adding %s (%d bytes)\n", path, info.Size())
-				
-				input, err := ioutil.ReadFile(path)
-				if err != nil {
-					return err
 				}
-				
-				
-				var header zip.FileHeader;
-				header.Name = file;
-				header.Method = zip.Deflate;
-				
-				filewriter, err := zipWriter.CreateHeader(&header)
-				if err != nil {
-					return err
-				}
-				
-				_, err = filewriter.Write(input)
-    			if err != nil {
-					return err
-				}
-				
-				/*err = ioutil.WriteFile(OutputDir + "/" + TargetDistDir + "/" + file, input, 0644)
-				if err != nil {				
-					return err;
-				} */
 				
 			}
 			

@@ -488,7 +488,7 @@ LibMCResult libmc_mccontext_log(LibMC_MCContext pMCContext, const char * pMessag
 	}
 }
 
-LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance)
+LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorization, LibMC_APIRequestHandler * pHandlerInstance)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
 
@@ -497,16 +497,19 @@ LibMCResult libmc_mccontext_createapirequesthandler(LibMC_MCContext pMCContext, 
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		if (pRequestMethod == nullptr)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pAuthorization == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		if (pHandlerInstance == nullptr)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		std::string sURI(pURI);
 		std::string sRequestMethod(pRequestMethod);
+		std::string sAuthorization(pAuthorization);
 		IBase* pBaseHandlerInstance(nullptr);
 		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
 		if (!pIMCContext)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
-		pBaseHandlerInstance = pIMCContext->CreateAPIRequestHandler(sURI, sRequestMethod);
+		pBaseHandlerInstance = pIMCContext->CreateAPIRequestHandler(sURI, sRequestMethod, sAuthorization);
 
 		*pHandlerInstance = (IBase*)(pBaseHandlerInstance);
 		return LIBMC_SUCCESS;

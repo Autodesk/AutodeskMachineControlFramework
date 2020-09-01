@@ -351,9 +351,10 @@ public:
 	* IMCContext::CreateAPIRequestHandler - creates an API request handler.
 	* @param[in] sURI - URI to serve
 	* @param[in] sRequestMethod - Request Method
+	* @param[in] sAuthorization - Authorization Header String
 	* @return Request Handler instance.
 	*/
-	virtual IAPIRequestHandler * CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod) = 0;
+	virtual IAPIRequestHandler * CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization) = 0;
 
 };
 

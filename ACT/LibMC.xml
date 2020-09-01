@@ -288,6 +288,18 @@
 		<error name="MISSINGTOOLBARITEMICON" code="279" description="Missing toolbar item icon" />
 		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />		
 		<error name="MISSINGSERVICESNODE" code="281" description="Missing services node" />
+
+		<error name="INVALIDSESSIONUUID" code="282" description="Invalid session UUID" />
+		<error name="INVALIDSESSIONKEY" code="283" description="Invalid session Key" />
+		<error name="SESSIONNOTAUTHORIZED" code="284" description="Session not authorized" />
+		<error name="INVALIDUSERNAME" code="285" description="Invalid user name" />
+		<error name="INVALIDPASSWORD" code="286" description="Invalid password" />
+		<error name="INVALIDAUTHORIZATION" code="287" description="Invalid Authorization" />
+		<error name="USERALREADYAUTHORIZED" code="288" description="User already authorized" />
+		<error name="INVALIDSESSIONTOKEN" code="289" description="Invalid session token" />
+		<error name="INVALIDCLIENTKEY" code="290" description="Invalid client key" />
+		<error name="INVALIDLOGIN" code="291" description="Invalid login credentials" />
+
 		
 	</errors>
 	
@@ -392,6 +404,7 @@
 		<method name="CreateAPIRequestHandler" description="creates an API request handler.">
 			<param name="URI" type="string" pass="in" description="URI to serve" />
 			<param name="RequestMethod" type="string" pass="in" description="Request Method" />
+			<param name="Authorization" type="string" pass="in" description="Authorization Header String" />
 			<param name="HandlerInstance" type="class" class="APIRequestHandler" pass="return" description="Request Handler instance." />
 		</method>
 						

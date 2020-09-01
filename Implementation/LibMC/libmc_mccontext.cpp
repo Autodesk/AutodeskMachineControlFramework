@@ -44,7 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
 
-#include "API/amc_api_factory.hpp"
+#include "amc_api_factory.hpp"
+#include "amc_api_sessionhandler.hpp"
 
 // Include custom headers here.
 #include <iostream>
@@ -480,12 +481,44 @@ void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSu
     m_pSystemState->logger()->logMessage (sMessage, sSubSystem, (AMC::eLogLevel) eLogLevel);
 }
 
-IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod)
+IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod, const std::string& sAuthorization)
 {
-    auto sNewSessionUUID = AMCCommon::CUtils::createUUID();
 
-    auto pAuth = std::make_shared<CAPIAuth>(sNewSessionUUID);
+    auto pSessionHandler = m_pAPI->getSessionHandler();
+    auto requestType = m_pAPI->getRequestTypeFromString(sRequestMethod);
+  
+    PAPIAuth pAuth;
+    if (sAuthorization.empty()) {
 
-    return new CAPIRequestHandler(m_pAPI, sURI, sRequestMethod, pAuth);
+        bool bNeedsToBeAuthorized = true;
+        bool bCreateNewSession = false;
+        m_pAPI->checkAuthorizationMode(sURI, requestType, bNeedsToBeAuthorized, bCreateNewSession);
+
+        if (bNeedsToBeAuthorized)
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAUTHORIZATION);
+
+        if (bCreateNewSession)
+            pAuth = pSessionHandler->createNewAuthenticationSession ();
+        else
+            pAuth = pSessionHandler->createEmptyAuthenticationSession();
+
+    }
+    else {
+
+        if (sAuthorization.length () < 7)
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAUTHORIZATION);
+        if (sAuthorization.substr (0, 7) != "Bearer ")
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAUTHORIZATION);
+
+        auto sAuthJSONString = AMCCommon::CUtils::decodeBase64ToASCIIString(sAuthorization.substr (7), AMCCommon::eBase64Type::URL);
+
+
+        pAuth = pSessionHandler->createAuthentication(sAuthJSONString);
+    }
+
+     
+
+    return new CAPIRequestHandler(m_pAPI, sURI, requestType, pAuth);
 
 }
+
