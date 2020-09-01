@@ -56,7 +56,7 @@
     <v-main>
         <v-container class="fill-height" fluid v-if="appIsLoading">
             <v-row align="center" justify="center">
-                <v-progress-circular :value="20" indeterminate="true"></v-progress-circular>
+                <v-progress-circular :value="20" indeterminate></v-progress-circular>
             </v-row>
         </v-container>
 
@@ -93,6 +93,8 @@
                         </v-toolbar>
                         <v-card-text>
                             Could not connect to server. Please try again later!
+							
+							{{ AppState.currentError }}
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer />
@@ -117,6 +119,7 @@
 
 <script>
 import * as Axios from "axios";
+var SHAJS = require('sha.js')
 
 export default {
     props: {
@@ -178,13 +181,59 @@ export default {
                 })
                 .catch(err => {
                     this.AppState.currentStatus = "error";
-                    this.AppState.currentError = err.response;
+                    this.AppState.currentError = err.response.data.message;
                 });
         },
 
         uiLogInClick() {
-            this.AppState.uiLoginPassword = "";
-            this.AppState.currentStatus = "ready";
+		
+			var url = this.API.baseURL + "/auth/";
+			
+            Axios({			
+                    method: "POST",
+                    url: url,
+					data: {
+						username: this.AppState.uiLoginUser
+					}
+                })
+                .then(resultCreateSession => {
+																
+					var sessionuuid = resultCreateSession.data.sessionuuid;
+					var sessionkey = resultCreateSession.data.sessionkey;
+					var loginsalt = resultCreateSession.data.loginsalt;
+					var clientkey = sessionkey;
+					
+					var saltedpassword = SHAJS("sha256").update(loginsalt + this.AppState.uiLoginPassword).digest("hex");
+					var clientkeyhash = SHAJS("sha256").update(clientkey + saltedpassword).digest("hex");
+					var sessionkeyhash = SHAJS("sha256").update(sessionkey + clientkeyhash).digest("hex");
+														
+					Axios({
+						method: "POST",
+						url: url + sessionuuid,
+						data: {
+							"clientkey": clientkey,
+							"password": sessionkeyhash
+						}
+					})
+					.then(resultAuthenticate => {
+					
+						this.AppState.uiLoginPassword = "";
+						this.AppState.currentStatus = "ready";
+						this.AppState.authToken = resultAuthenticate.data.token;
+						
+					})
+					.catch(err => {
+						this.AppState.currentStatus = "error";
+						this.AppState.currentError = err.response.data.message;
+					}); 
+									  
+					
+                })
+                .catch(err => {
+                    this.AppState.currentStatus = "error";
+                    this.AppState.currentError = err.response.data.message;
+                });
+		
         },
 
         uiReloadPageClick() {
@@ -237,7 +286,8 @@ export default {
             showDrawer: true,
             activePage: "",
             globalTimer: "",
-
+			authToken: "0000000000000000000000000000000000000000000000000000000000000000",
+			
             uiLoginUser: "",
             uiLoginPassword: ""
         }

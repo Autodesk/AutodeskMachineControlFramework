@@ -92,6 +92,8 @@ namespace AMC {
 		CAPIHandler();
 
 		virtual ~CAPIHandler();
+
+		virtual void checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession);
 				
 		virtual std::string getBaseURI () = 0;
 

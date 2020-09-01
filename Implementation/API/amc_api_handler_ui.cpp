@@ -80,6 +80,23 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 }
 
 
+void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) 
+{
+	auto uiType = parseRequest(sURI, requestType);
+
+	if (uiType == APIHandler_UIType::utConfiguration) {		
+
+		bNeedsToBeAuthorized = false;
+		bCreateNewSession = false;
+
+	}
+	else {
+		bNeedsToBeAuthorized = true;
+		bCreateNewSession = false;
+
+	}
+	
+}
 
 
 void CAPIHandler_UI::handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth)
@@ -88,6 +105,7 @@ void CAPIHandler_UI::handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pA
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	writer.addString(AMC_API_KEY_UI_SESSIONID, pAuth->getSessionUUID());
+	writer.addString(AMC_API_KEY_UI_SESSIONKEY, pAuth->getSessionKey());
 	m_pSystemState->uiHandler()->writeToJSON(writer);
 
 }
@@ -100,7 +118,7 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 	auto uiType = parseRequest(sURI, requestType);
 
 	CJSONWriter writer;
-	writeJSONHeader(writer, AMC_API_PROTOCOL_BUILD);
+	writeJSONHeader(writer, AMC_API_PROTOCOL_UI);
 
 	switch (uiType) {
 	case APIHandler_UIType::utConfiguration:

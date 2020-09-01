@@ -107,6 +107,9 @@ namespace AMC {
 		std::string getLibraryPath(const std::string& sLibraryName);
 
 		std::string getSystemUserID();
+		std::string getInstallationID(); // Returns a unique Hex ID of the installation
+		std::string getInstallationSecret(); // Returns a unique Secret String of the installation
+		std::string getGitHash();
 
 
 	};

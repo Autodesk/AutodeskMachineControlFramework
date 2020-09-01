@@ -306,6 +306,16 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGTOOLBARITEMICON 279
 #define LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION 280
 #define LIBMC_ERROR_MISSINGSERVICESNODE 281
+#define LIBMC_ERROR_INVALIDSESSIONUUID 282
+#define LIBMC_ERROR_INVALIDSESSIONKEY 283
+#define LIBMC_ERROR_SESSIONNOTAUTHORIZED 284
+#define LIBMC_ERROR_INVALIDUSERNAME 285
+#define LIBMC_ERROR_INVALIDPASSWORD 286
+#define LIBMC_ERROR_INVALIDAUTHORIZATION 287
+#define LIBMC_ERROR_USERALREADYAUTHORIZED 288
+#define LIBMC_ERROR_INVALIDSESSIONTOKEN 289
+#define LIBMC_ERROR_INVALIDCLIENTKEY 290
+#define LIBMC_ERROR_INVALIDLOGIN 291
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -524,6 +534,16 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
     case LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
     case LIBMC_ERROR_MISSINGSERVICESNODE: return "Missing services node";
+    case LIBMC_ERROR_INVALIDSESSIONUUID: return "Invalid session UUID";
+    case LIBMC_ERROR_INVALIDSESSIONKEY: return "Invalid session Key";
+    case LIBMC_ERROR_SESSIONNOTAUTHORIZED: return "Session not authorized";
+    case LIBMC_ERROR_INVALIDUSERNAME: return "Invalid user name";
+    case LIBMC_ERROR_INVALIDPASSWORD: return "Invalid password";
+    case LIBMC_ERROR_INVALIDAUTHORIZATION: return "Invalid Authorization";
+    case LIBMC_ERROR_USERALREADYAUTHORIZED: return "User already authorized";
+    case LIBMC_ERROR_INVALIDSESSIONTOKEN: return "Invalid session token";
+    case LIBMC_ERROR_INVALIDCLIENTKEY: return "Invalid client key";
+    case LIBMC_ERROR_INVALIDLOGIN: return "Invalid login credentials";
     default: return "unknown error";
   }
 }

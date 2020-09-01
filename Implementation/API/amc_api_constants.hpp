@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define AMC_API_HTTP_SUCCESS 200
 #define AMC_API_HTTP_BADREQUEST 400
+#define AMC_API_HTTP_FORBIDDEN 403
 #define AMC_API_HTTP_NOTFOUND 404
 
 #define AMC_API_PROTOCOL_VERSION "2.0.0"
@@ -48,6 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_PROTOCOL_UPLOAD "com.autodesk.machinecontrol.upload"
 #define AMC_API_PROTOCOL_BUILD "com.autodesk.machinecontrol.build"
 #define AMC_API_PROTOCOL_SIGNAL "com.autodesk.machinecontrol.signal"
+#define AMC_API_PROTOCOL_AUTH "com.autodesk.machinecontrol.auth"
+#define AMC_API_PROTOCOL_UI "com.autodesk.machinecontrol.ui"
+#define AMC_API_PROTOCOL_TOKEN "com.autodesk.machinecontrol.token"
 
 #define AMC_API_CONTENTTYPE "application/json"
 
@@ -89,6 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_COPYRIGHT "copyright"
 #define AMC_API_KEY_UI_MAINPAGE "mainpage"
 #define AMC_API_KEY_UI_SESSIONID "sessionid"
+#define AMC_API_KEY_UI_SESSIONKEY "sessionkey"
 #define AMC_API_KEY_UI_ICON "icon"
 #define AMC_API_KEY_UI_ID "id"
 #define AMC_API_KEY_UI_CAPTION "caption"
@@ -108,6 +113,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_STATUSPARAMETERGROUPS "parametergroups"
 #define AMC_API_KEY_STATUSINSTANCES "instances"
 
+#define AMC_API_KEY_SESSIONUUID "sessionuuid"
+#define AMC_API_KEY_SESSIONKEY "sessionkey"
+
+#define AMC_API_KEY_AUTH_SESSIONUUID "sessionuuid"
+#define AMC_API_KEY_AUTH_SESSIONKEY "sessionkey"
+#define AMC_API_KEY_AUTH_USERNAME "username"
+#define AMC_API_KEY_AUTH_SALTEDPASSWORD "password"
+#define AMC_API_KEY_AUTH_CLIENTKEY "clientkey"
+#define AMC_API_KEY_AUTH_LOGINSALT "loginsalt"
+#define AMC_API_KEY_AUTH_TOKEN "token"
+
+#define AMC_API_KEY_TOKEN_SESSION "session"
+#define AMC_API_KEY_TOKEN_TOKEN "token"
 
 #endif //__AMC_API_CONSTANTS
 

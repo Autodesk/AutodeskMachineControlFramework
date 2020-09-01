@@ -232,13 +232,10 @@
 	  
   </statemachine>
 
-
+  
+  
 <userinterface appname="Autodesk Machine Control" copyright="2020 Autodesk Inc." mainpage="workflow.main" >
 
-	<page id="main" module="dialog">
-
-
-	</page>
 
 	<page id="buildlist" module="buildselector">
 

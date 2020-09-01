@@ -112,7 +112,7 @@ public:
 
 	void LoadClientPackage(const LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8* pZIPStreamBuffer) override;
 
-	IAPIRequestHandler* CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod) override;
+	IAPIRequestHandler* CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod, const std::string& sAuthorization) override;
 
 	AMC::PStateMachineInstance addMachineInstance (const pugi::xml_node & xmlNode);
 	AMC::PStateMachineInstance findMachineInstance (std::string sName, bool bFailIfNotExisting);	

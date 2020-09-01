@@ -306,6 +306,16 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON 279
 #define LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION 280
 #define LIBMCDATA_ERROR_MISSINGSERVICESNODE 281
+#define LIBMCDATA_ERROR_INVALIDSESSIONUUID 282
+#define LIBMCDATA_ERROR_INVALIDSESSIONKEY 283
+#define LIBMCDATA_ERROR_SESSIONNOTAUTHORIZED 284
+#define LIBMCDATA_ERROR_INVALIDUSERNAME 285
+#define LIBMCDATA_ERROR_INVALIDPASSWORD 286
+#define LIBMCDATA_ERROR_INVALIDAUTHORIZATION 287
+#define LIBMCDATA_ERROR_USERALREADYAUTHORIZED 288
+#define LIBMCDATA_ERROR_INVALIDSESSIONTOKEN 289
+#define LIBMCDATA_ERROR_INVALIDCLIENTKEY 290
+#define LIBMCDATA_ERROR_INVALIDLOGIN 291
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -524,6 +534,16 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
     case LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
     case LIBMCDATA_ERROR_MISSINGSERVICESNODE: return "Missing services node";
+    case LIBMCDATA_ERROR_INVALIDSESSIONUUID: return "Invalid session UUID";
+    case LIBMCDATA_ERROR_INVALIDSESSIONKEY: return "Invalid session Key";
+    case LIBMCDATA_ERROR_SESSIONNOTAUTHORIZED: return "Session not authorized";
+    case LIBMCDATA_ERROR_INVALIDUSERNAME: return "Invalid user name";
+    case LIBMCDATA_ERROR_INVALIDPASSWORD: return "Invalid password";
+    case LIBMCDATA_ERROR_INVALIDAUTHORIZATION: return "Invalid Authorization";
+    case LIBMCDATA_ERROR_USERALREADYAUTHORIZED: return "User already authorized";
+    case LIBMCDATA_ERROR_INVALIDSESSIONTOKEN: return "Invalid session token";
+    case LIBMCDATA_ERROR_INVALIDCLIENTKEY: return "Invalid client key";
+    case LIBMCDATA_ERROR_INVALIDLOGIN: return "Invalid login credentials";
     default: return "unknown error";
   }
 }
