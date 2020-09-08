@@ -113,13 +113,20 @@ void CDriver_Marlin::SetPidParameters(const LibMCDriver_Marlin_double dP, const 
 	m_pSerialController->setPidParameters(dP, dI, dD);
 }
 
-void CDriver_Marlin::UpdateState(const LibMCDriver_Marlin_uint32 nExtruderID)
+void CDriver_Marlin::UpdateTemperatureState(const LibMCDriver_Marlin_uint32 nExtruderID)
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->queryTemperatureState(nExtruderID);
+}
+
+void CDriver_Marlin::UpdatePositionState()
 {
 	if (m_pSerialController.get() == nullptr)
 		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
 
 	m_pSerialController->queryPositionState();
-	m_pSerialController->queryTemperatureState(nExtruderID);
 }
 
 void CDriver_Marlin::GetCurrentPosition(LibMCDriver_Marlin_double& dX, LibMCDriver_Marlin_double& dY, LibMCDriver_Marlin_double& dZ)
@@ -146,20 +153,36 @@ void CDriver_Marlin::GetExtruderTargetPosition(LibMCDriver_Marlin_double& dE)
 	m_pSerialController->getExtruderTargetPosition(dE);
 }
 
-void CDriver_Marlin::GetHeatedBedTemperature(LibMCDriver_Marlin_double& dTargetTemperature, LibMCDriver_Marlin_double& dCurrentTemperature)
+void CDriver_Marlin::GetHeatedBedTargetTemperature(LibMCDriver_Marlin_double& dTargetTemperature)
 {
 	if (m_pSerialController.get() == nullptr)
 		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
 
-	m_pSerialController->getHeatedBedTemperature(dTargetTemperature, dCurrentTemperature);
+	m_pSerialController->getHeatedBedTargetTemperature(dTargetTemperature);
 }
 
-void CDriver_Marlin::GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double& dTargetTemperature, LibMCDriver_Marlin_double& dCurrentTemperature)
+void CDriver_Marlin::GetHeatedBedCurrentTemperature( LibMCDriver_Marlin_double& dCurrentTemperature)
 {
 	if (m_pSerialController.get() == nullptr)
 		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
 
-	m_pSerialController->getExtruderTemperature(nExtruderID, dTargetTemperature, dCurrentTemperature);
+	m_pSerialController->getHeatedBedCurrentTemperature(dCurrentTemperature);
+}
+
+void CDriver_Marlin::GetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double& dTargetTemperature)
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->getExtruderTargetTemperature(nExtruderID, dTargetTemperature);
+}
+
+void CDriver_Marlin::GetExtruderCurrentTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double& dCurrentTemperature)
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->getExtruderCurrentTemperature(nExtruderID, dCurrentTemperature);
 }
 
 void CDriver_Marlin::GetPidParameters(LibMCDriver_Marlin_double& dP, LibMCDriver_Marlin_double& dI, LibMCDriver_Marlin_double& dD)
@@ -250,3 +273,44 @@ void CDriver_Marlin::EmergencyStop()
 
 	m_pSerialController->emergencyStop();
 }
+
+void CDriver_Marlin::SetAxisPosition(const std::string& sAxis, const LibMCDriver_Marlin_double dValue)
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->setAxisPosition(sAxis, dValue);
+}
+
+void CDriver_Marlin::ExtruderDoExtrude(const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed)
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->extruderDoExtrude(dE, dSpeed);
+}
+
+void CDriver_Marlin::SetAbsoluteExtrusion(const bool bAbsolute)
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->setAbsoluteExtrusion(bAbsolute);
+}
+
+void CDriver_Marlin::StopIdleHold()
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->stopIdleHold();
+}
+
+void CDriver_Marlin::PowerOff()
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
+
+	m_pSerialController->powerOff();
+}
+

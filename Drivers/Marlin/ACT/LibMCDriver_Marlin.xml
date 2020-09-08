@@ -141,7 +141,10 @@ Custom implementation
 			<param name="D" type="double" pass="in" description="New value for D parameter." />
 		</method>
 
-		<method name="UpdateState" description="Polls a new state from the firmware.">
+		<method name="UpdatePositionState" description="Polls a new state from the printer.">
+		</method>
+
+		<method name="UpdateTemperatureState" description="Polls a new temperature state from the printer.">
 			<param name="ExtruderID" type="uint32" pass="in" description="ID of extruder." />
 		</method>
 
@@ -161,15 +164,22 @@ Custom implementation
 			<param name="E" type="double" pass="out" description="E Value in mm" />
 		</method>
 
-		<method name="GetHeatedBedTemperature" description="Returns the current and the target bed temperature.">
+		<method name="GetHeatedBedTargetTemperature" description="Returns the the target bed temperature.">
 			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
+		</method>
+
+		<method name="GetHeatedBedCurrentTemperature" description="Returns the current bed temperature.">
 			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
 		</method>
 
-		<method name="GetExtruderTemperature" description="Returns the current and the target temperature of an extruder.">
+		<method name="GetExtruderCurrentTemperature" description="Returns the current temperature of an extruder.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
+			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
+		</method>
+
+		<method name="GetExtruderTargetTemperature" description="Returns the target temperature of an extruder.">
 			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
 			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
-			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
 		</method>
 
 		<method name="GetPidParameters" description="Returns the current PID values.">
@@ -223,6 +233,26 @@ Custom implementation
 		</method>
 
 		<method name="EmergencyStop" description="Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.">
+		</method>
+
+		<method name="SetAxisPosition" description="Set the current position of given axis to the specified value.">
+			<param name="Axis" type="string" pass="in" description="Axis whose value is to be set." />
+			<param name="Value" type="double" pass="in" description="New value for given Axis." />
+		</method>
+
+		<method name="ExtruderDoExtrude" description="Extrudes the specified value with given Feedrate.">
+			<param name="E" type="double" pass="in" description="E value in mm" />
+			<param name="Speed" type="double" pass="in" description="Extrusion speed in mm/s" />
+		</method>
+
+		<method name="SetAbsoluteExtrusion" description="Sets the extrusion (E axis) to absolute mode.">
+			<param name="Absolute" type="bool" pass="in" description="If true, sets mode to absolute, if false to relative" />
+		</method>
+		
+		<method name="StopIdleHold" description="Stop the idle hold on all axis and extruder.">
+		</method>
+
+		<method name="PowerOff" description="Turn off the high-voltage power supply.">
 		</method>
 
 	</class>

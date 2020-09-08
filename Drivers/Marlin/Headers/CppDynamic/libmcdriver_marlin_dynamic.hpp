@@ -367,12 +367,15 @@ public:
 	inline void SetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp);
 	inline void SetFanSpeed(const LibMCDriver_Marlin_uint32 nFanID, const LibMCDriver_Marlin_uint32 nSpeed);
 	inline void SetPidParameters(const LibMCDriver_Marlin_double dP, const LibMCDriver_Marlin_double dI, const LibMCDriver_Marlin_double dD);
-	inline void UpdateState(const LibMCDriver_Marlin_uint32 nExtruderID);
+	inline void UpdatePositionState();
+	inline void UpdateTemperatureState(const LibMCDriver_Marlin_uint32 nExtruderID);
 	inline void GetCurrentPosition(LibMCDriver_Marlin_double & dX, LibMCDriver_Marlin_double & dY, LibMCDriver_Marlin_double & dZ);
 	inline void GetTargetPosition(LibMCDriver_Marlin_double & dX, LibMCDriver_Marlin_double & dY, LibMCDriver_Marlin_double & dZ);
 	inline void GetExtruderTargetPosition(LibMCDriver_Marlin_double & dE);
-	inline void GetHeatedBedTemperature(LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature);
-	inline void GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature);
+	inline void GetHeatedBedTargetTemperature(LibMCDriver_Marlin_double & dTargetTemperature);
+	inline void GetHeatedBedCurrentTemperature(LibMCDriver_Marlin_double & dCurrentTemperature);
+	inline void GetExtruderCurrentTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dCurrentTemperature);
+	inline void GetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dTargetTemperature);
 	inline void GetPidParameters(LibMCDriver_Marlin_double & dP, LibMCDriver_Marlin_double & dI, LibMCDriver_Marlin_double & dD);
 	inline bool CanExecuteMovement();
 	inline bool IsMoving();
@@ -384,6 +387,11 @@ public:
 	inline void MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed);
 	inline void StartHoming();
 	inline void EmergencyStop();
+	inline void SetAxisPosition(const std::string & sAxis, const LibMCDriver_Marlin_double dValue);
+	inline void ExtruderDoExtrude(const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed);
+	inline void SetAbsoluteExtrusion(const bool bAbsolute);
+	inline void StopIdleHold();
+	inline void PowerOff();
 };
 	
 	/**
@@ -518,12 +526,15 @@ public:
 		pWrapperTable->m_Driver_Marlin_SetExtruderTargetTemperature = nullptr;
 		pWrapperTable->m_Driver_Marlin_SetFanSpeed = nullptr;
 		pWrapperTable->m_Driver_Marlin_SetPidParameters = nullptr;
-		pWrapperTable->m_Driver_Marlin_UpdateState = nullptr;
+		pWrapperTable->m_Driver_Marlin_UpdatePositionState = nullptr;
+		pWrapperTable->m_Driver_Marlin_UpdateTemperatureState = nullptr;
 		pWrapperTable->m_Driver_Marlin_GetCurrentPosition = nullptr;
 		pWrapperTable->m_Driver_Marlin_GetTargetPosition = nullptr;
 		pWrapperTable->m_Driver_Marlin_GetExtruderTargetPosition = nullptr;
-		pWrapperTable->m_Driver_Marlin_GetHeatedBedTemperature = nullptr;
-		pWrapperTable->m_Driver_Marlin_GetExtruderTemperature = nullptr;
+		pWrapperTable->m_Driver_Marlin_GetHeatedBedTargetTemperature = nullptr;
+		pWrapperTable->m_Driver_Marlin_GetHeatedBedCurrentTemperature = nullptr;
+		pWrapperTable->m_Driver_Marlin_GetExtruderCurrentTemperature = nullptr;
+		pWrapperTable->m_Driver_Marlin_GetExtruderTargetTemperature = nullptr;
 		pWrapperTable->m_Driver_Marlin_GetPidParameters = nullptr;
 		pWrapperTable->m_Driver_Marlin_CanExecuteMovement = nullptr;
 		pWrapperTable->m_Driver_Marlin_IsMoving = nullptr;
@@ -535,6 +546,11 @@ public:
 		pWrapperTable->m_Driver_Marlin_MoveFastToZ = nullptr;
 		pWrapperTable->m_Driver_Marlin_StartHoming = nullptr;
 		pWrapperTable->m_Driver_Marlin_EmergencyStop = nullptr;
+		pWrapperTable->m_Driver_Marlin_SetAxisPosition = nullptr;
+		pWrapperTable->m_Driver_Marlin_ExtruderDoExtrude = nullptr;
+		pWrapperTable->m_Driver_Marlin_SetAbsoluteExtrusion = nullptr;
+		pWrapperTable->m_Driver_Marlin_StopIdleHold = nullptr;
+		pWrapperTable->m_Driver_Marlin_PowerOff = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -690,12 +706,21 @@ public:
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Marlin_UpdateState = (PLibMCDriver_MarlinDriver_Marlin_UpdateStatePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_updatestate");
+		pWrapperTable->m_Driver_Marlin_UpdatePositionState = (PLibMCDriver_MarlinDriver_Marlin_UpdatePositionStatePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_updatepositionstate");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Marlin_UpdateState = (PLibMCDriver_MarlinDriver_Marlin_UpdateStatePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_updatestate");
+		pWrapperTable->m_Driver_Marlin_UpdatePositionState = (PLibMCDriver_MarlinDriver_Marlin_UpdatePositionStatePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_updatepositionstate");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Marlin_UpdateState == nullptr)
+		if (pWrapperTable->m_Driver_Marlin_UpdatePositionState == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_UpdateTemperatureState = (PLibMCDriver_MarlinDriver_Marlin_UpdateTemperatureStatePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_updatetemperaturestate");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_UpdateTemperatureState = (PLibMCDriver_MarlinDriver_Marlin_UpdateTemperatureStatePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_updatetemperaturestate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_UpdateTemperatureState == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -726,21 +751,39 @@ public:
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Marlin_GetHeatedBedTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_getheatedbedtemperature");
+		pWrapperTable->m_Driver_Marlin_GetHeatedBedTargetTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTargetTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_getheatedbedtargettemperature");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Marlin_GetHeatedBedTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTemperaturePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_getheatedbedtemperature");
+		pWrapperTable->m_Driver_Marlin_GetHeatedBedTargetTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTargetTemperaturePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_getheatedbedtargettemperature");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Marlin_GetHeatedBedTemperature == nullptr)
+		if (pWrapperTable->m_Driver_Marlin_GetHeatedBedTargetTemperature == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Marlin_GetExtruderTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetExtruderTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_getextrudertemperature");
+		pWrapperTable->m_Driver_Marlin_GetHeatedBedCurrentTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedCurrentTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_getheatedbedcurrenttemperature");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Marlin_GetExtruderTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetExtruderTemperaturePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_getextrudertemperature");
+		pWrapperTable->m_Driver_Marlin_GetHeatedBedCurrentTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedCurrentTemperaturePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_getheatedbedcurrenttemperature");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Marlin_GetExtruderTemperature == nullptr)
+		if (pWrapperTable->m_Driver_Marlin_GetHeatedBedCurrentTemperature == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_GetExtruderCurrentTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetExtruderCurrentTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_getextrudercurrenttemperature");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_GetExtruderCurrentTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetExtruderCurrentTemperaturePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_getextrudercurrenttemperature");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_GetExtruderCurrentTemperature == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_GetExtruderTargetTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetExtruderTargetTemperaturePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_getextrudertargettemperature");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_GetExtruderTargetTemperature = (PLibMCDriver_MarlinDriver_Marlin_GetExtruderTargetTemperaturePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_getextrudertargettemperature");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_GetExtruderTargetTemperature == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -840,6 +883,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_Marlin_EmergencyStop == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_SetAxisPosition = (PLibMCDriver_MarlinDriver_Marlin_SetAxisPositionPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_setaxisposition");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_SetAxisPosition = (PLibMCDriver_MarlinDriver_Marlin_SetAxisPositionPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_setaxisposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_SetAxisPosition == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_ExtruderDoExtrude = (PLibMCDriver_MarlinDriver_Marlin_ExtruderDoExtrudePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_extruderdoextrude");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_ExtruderDoExtrude = (PLibMCDriver_MarlinDriver_Marlin_ExtruderDoExtrudePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_extruderdoextrude");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_ExtruderDoExtrude == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_SetAbsoluteExtrusion = (PLibMCDriver_MarlinDriver_Marlin_SetAbsoluteExtrusionPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_setabsoluteextrusion");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_SetAbsoluteExtrusion = (PLibMCDriver_MarlinDriver_Marlin_SetAbsoluteExtrusionPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_setabsoluteextrusion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_SetAbsoluteExtrusion == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_StopIdleHold = (PLibMCDriver_MarlinDriver_Marlin_StopIdleHoldPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_stopidlehold");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_StopIdleHold = (PLibMCDriver_MarlinDriver_Marlin_StopIdleHoldPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_stopidlehold");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_StopIdleHold == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Marlin_PowerOff = (PLibMCDriver_MarlinDriver_Marlin_PowerOffPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_marlin_poweroff");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Marlin_PowerOff = (PLibMCDriver_MarlinDriver_Marlin_PowerOffPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_marlin_poweroff");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Marlin_PowerOff == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -965,8 +1053,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_SetPidParameters == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_updatestate", (void**)&(pWrapperTable->m_Driver_Marlin_UpdateState));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_UpdateState == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_updatepositionstate", (void**)&(pWrapperTable->m_Driver_Marlin_UpdatePositionState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_UpdatePositionState == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_updatetemperaturestate", (void**)&(pWrapperTable->m_Driver_Marlin_UpdateTemperatureState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_UpdateTemperatureState == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getcurrentposition", (void**)&(pWrapperTable->m_Driver_Marlin_GetCurrentPosition));
@@ -981,12 +1073,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_GetExtruderTargetPosition == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getheatedbedtemperature", (void**)&(pWrapperTable->m_Driver_Marlin_GetHeatedBedTemperature));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_GetHeatedBedTemperature == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getheatedbedtargettemperature", (void**)&(pWrapperTable->m_Driver_Marlin_GetHeatedBedTargetTemperature));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_GetHeatedBedTargetTemperature == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getextrudertemperature", (void**)&(pWrapperTable->m_Driver_Marlin_GetExtruderTemperature));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_GetExtruderTemperature == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getheatedbedcurrenttemperature", (void**)&(pWrapperTable->m_Driver_Marlin_GetHeatedBedCurrentTemperature));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_GetHeatedBedCurrentTemperature == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getextrudercurrenttemperature", (void**)&(pWrapperTable->m_Driver_Marlin_GetExtruderCurrentTemperature));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_GetExtruderCurrentTemperature == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getextrudertargettemperature", (void**)&(pWrapperTable->m_Driver_Marlin_GetExtruderTargetTemperature));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_GetExtruderTargetTemperature == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_getpidparameters", (void**)&(pWrapperTable->m_Driver_Marlin_GetPidParameters));
@@ -1031,6 +1131,26 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_emergencystop", (void**)&(pWrapperTable->m_Driver_Marlin_EmergencyStop));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_EmergencyStop == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_setaxisposition", (void**)&(pWrapperTable->m_Driver_Marlin_SetAxisPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_SetAxisPosition == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_extruderdoextrude", (void**)&(pWrapperTable->m_Driver_Marlin_ExtruderDoExtrude));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_ExtruderDoExtrude == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_setabsoluteextrusion", (void**)&(pWrapperTable->m_Driver_Marlin_SetAbsoluteExtrusion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_SetAbsoluteExtrusion == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_stopidlehold", (void**)&(pWrapperTable->m_Driver_Marlin_StopIdleHold));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_StopIdleHold == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_poweroff", (void**)&(pWrapperTable->m_Driver_Marlin_PowerOff));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Marlin_PowerOff == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1216,12 +1336,20 @@ public:
 	}
 	
 	/**
-	* CDriver_Marlin::UpdateState - Polls a new state from the firmware.
+	* CDriver_Marlin::UpdatePositionState - Polls a new state from the printer.
+	*/
+	void CDriver_Marlin::UpdatePositionState()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_UpdatePositionState(m_pHandle));
+	}
+	
+	/**
+	* CDriver_Marlin::UpdateTemperatureState - Polls a new temperature state from the printer.
 	* @param[in] nExtruderID - ID of extruder.
 	*/
-	void CDriver_Marlin::UpdateState(const LibMCDriver_Marlin_uint32 nExtruderID)
+	void CDriver_Marlin::UpdateTemperatureState(const LibMCDriver_Marlin_uint32 nExtruderID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_UpdateState(m_pHandle, nExtruderID));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_UpdateTemperatureState(m_pHandle, nExtruderID));
 	}
 	
 	/**
@@ -1256,24 +1384,41 @@ public:
 	}
 	
 	/**
-	* CDriver_Marlin::GetHeatedBedTemperature - Returns the current and the target bed temperature.
+	* CDriver_Marlin::GetHeatedBedTargetTemperature - Returns the the target bed temperature.
 	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
-	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
 	*/
-	void CDriver_Marlin::GetHeatedBedTemperature(LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature)
+	void CDriver_Marlin::GetHeatedBedTargetTemperature(LibMCDriver_Marlin_double & dTargetTemperature)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_GetHeatedBedTemperature(m_pHandle, &dTargetTemperature, &dCurrentTemperature));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_GetHeatedBedTargetTemperature(m_pHandle, &dTargetTemperature));
 	}
 	
 	/**
-	* CDriver_Marlin::GetExtruderTemperature - Returns the current and the target temperature of an extruder.
-	* @param[in] nExtruderID - ID of Extruder
-	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
+	* CDriver_Marlin::GetHeatedBedCurrentTemperature - Returns the current bed temperature.
 	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
 	*/
-	void CDriver_Marlin::GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature)
+	void CDriver_Marlin::GetHeatedBedCurrentTemperature(LibMCDriver_Marlin_double & dCurrentTemperature)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_GetExtruderTemperature(m_pHandle, nExtruderID, &dTargetTemperature, &dCurrentTemperature));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_GetHeatedBedCurrentTemperature(m_pHandle, &dCurrentTemperature));
+	}
+	
+	/**
+	* CDriver_Marlin::GetExtruderCurrentTemperature - Returns the current temperature of an extruder.
+	* @param[in] nExtruderID - ID of Extruder
+	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
+	*/
+	void CDriver_Marlin::GetExtruderCurrentTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dCurrentTemperature)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_GetExtruderCurrentTemperature(m_pHandle, nExtruderID, &dCurrentTemperature));
+	}
+	
+	/**
+	* CDriver_Marlin::GetExtruderTargetTemperature - Returns the target temperature of an extruder.
+	* @param[in] nExtruderID - ID of Extruder
+	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
+	*/
+	void CDriver_Marlin::GetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dTargetTemperature)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_GetExtruderTargetTemperature(m_pHandle, nExtruderID, &dTargetTemperature));
 	}
 	
 	/**
@@ -1393,6 +1538,51 @@ public:
 	void CDriver_Marlin::EmergencyStop()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_EmergencyStop(m_pHandle));
+	}
+	
+	/**
+	* CDriver_Marlin::SetAxisPosition - Set the current position of given axis to the specified value.
+	* @param[in] sAxis - Axis whose value is to be set.
+	* @param[in] dValue - New value for given Axis.
+	*/
+	void CDriver_Marlin::SetAxisPosition(const std::string & sAxis, const LibMCDriver_Marlin_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_SetAxisPosition(m_pHandle, sAxis.c_str(), dValue));
+	}
+	
+	/**
+	* CDriver_Marlin::ExtruderDoExtrude - Extrudes the specified value with given Feedrate.
+	* @param[in] dE - E value in mm
+	* @param[in] dSpeed - Extrusion speed in mm/s
+	*/
+	void CDriver_Marlin::ExtruderDoExtrude(const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_ExtruderDoExtrude(m_pHandle, dE, dSpeed));
+	}
+	
+	/**
+	* CDriver_Marlin::SetAbsoluteExtrusion - Sets the extrusion (E axis) to absolute mode.
+	* @param[in] bAbsolute - If true, sets mode to absolute, if false to relative
+	*/
+	void CDriver_Marlin::SetAbsoluteExtrusion(const bool bAbsolute)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_SetAbsoluteExtrusion(m_pHandle, bAbsolute));
+	}
+	
+	/**
+	* CDriver_Marlin::StopIdleHold - Stop the idle hold on all axis and extruder.
+	*/
+	void CDriver_Marlin::StopIdleHold()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_StopIdleHold(m_pHandle));
+	}
+	
+	/**
+	* CDriver_Marlin::PowerOff - Turn off the high-voltage power supply.
+	*/
+	void CDriver_Marlin::PowerOff()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_PowerOff(m_pHandle));
 	}
 
 } // namespace LibMCDriver_Marlin
