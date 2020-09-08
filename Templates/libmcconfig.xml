@@ -19,10 +19,13 @@
   	  </parametergroup>
 
   	  <parametergroup name="temperaturecontrol" description="Temperature Control">
+  		<parameter name="fanid" description="Fan ID to set target speed" default="0" type="int" />
+  		<parameter name="fanspeed" description="Fan Speed" default="128" type="double" />
+  		<parameter name="extruderid" description="Extruder ID to set/get target temperature" default="0" type="int" />
   		<parameter name="currentextrudertemperature" description="Current Extruder Temperature" default="0.0" type="double" />
-  		<parameter name="targetextrudertemperature" description="Target Extruder Temperature" default="0.0" type="double" />
-  		<parameter name="currentbedtemperature" description="Current Extruder Temperature" default="0.0" type="double" />
-  		<parameter name="targetbedtemperature" description="Target Extruder Temperature" default="0.0" type="double" />
+  		<parameter name="targetextrudertemperature" description="Target Extruder Temperature" default="25.0" type="double" />
+  		<parameter name="currentbedtemperature" description="Current Bed Temperature" default="0.0" type="double" />
+  		<parameter name="targetbedtemperature" description="Target Bed Temperature" default="25.0" type="double" />
   	  </parametergroup>
 
 	  
@@ -41,10 +44,8 @@
   		<result name="success" type="bool" />
   	  </signaldefinition>	 
 
-
   	  <state name="init" repeatdelay="100">
   			<outstate target="idle" />
-  			<outstate target="startprocess" />
   	  </state>
   
   
@@ -100,6 +101,14 @@
   		<result name="success" type="bool" />
   	  </signaldefinition>	 
 
+  	  <signaldefinition name="signal_dohoming">
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
+  	  <signaldefinition name="signal_doextruderinit">
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
 	  <signaldefinition name="signal_setpidvalues">
 		<parameter name="dp" type="double" />
 		<parameter name="di" type="double" />
@@ -126,6 +135,24 @@
   		<result name="success" type="bool" />
   	  </signaldefinition>	 
 
+  	  <signaldefinition name="signal_setfanspeed">
+  		<parameter name="fanid" type="int" />
+  		<parameter name="fanspeed" type="double" />
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
+  	  <signaldefinition name="signal_dofinalizeextrude">
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
+  	  <signaldefinition name="signal_retractfilament">
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
+  	  <signaldefinition name="signal_restorefilament">
+  		<result name="success" type="bool" />
+  	  </signaldefinition>	 
+
   	  <parametergroup name="comdata" description="COM Configuration">		
   		<parameter name="port" description="COM Port" default="COM4" type="string" />
   		<parameter name="baudrate" description="Baud rate" default="115200" type="int" />
@@ -140,13 +167,6 @@
   		<parameter name="currentx" description="X Position" default="0" type="double" />
   		<parameter name="currenty" description="Y Position" default="0" type="double" />
   		<parameter name="currentz" description="Z Position" default="0" type="double" />
-  		<parameter name="defaultfanid" description="Fan ID to set target speed" default="0" type="int" />
-  		<parameter name="defaultfanspeed" description="Default Fan Speed" default="0" type="double" />
-  		<parameter name="defaulttargettemperatureextruderid" description="Default Extruder ID to set target temperature" default="0" type="int" />
-  		<parameter name="defaulttargettemperatureextruder" description="Default Target Extruder Temperature" default="0" type="double" />
-  		<parameter name="currenttemperatureextruder" description="Current Extruder Temperature" default="0" type="double" />
-  		<parameter name="defaulttargettemperaturebed" description="Default Target Bed Temperature" default="0" type="double" />
-  		<parameter name="currenttemperaturebed" description="Current Bed Temperature" default="0" type="double" />
   		<parameter name="ismoving" description="Moving" default="0" type="bool" />
       		<parameter name="ishomed" description="Homed" default="0" type="bool" />
       		<parameter name="isconnected" description="Connected" default="0" type="bool" />
@@ -160,18 +180,12 @@
   	     	    
   	  <state name="init" repeatdelay="100">
   			<outstate target="idle" />
-  			<outstate target="homing" />
   	  </state>
   
   
   	  <state name="idle" repeatdelay="50">	  	 
   			<outstate target="idle" />
-  			<outstate target="homing" />
   			<outstate target="doextrudelayer" />
-  	  </state>
-  
-  	  <state name="homing" repeatdelay="500">	  	  
-  			<outstate target="idle" />
   	  </state>
   
   	  <state name="doextrudelayer" repeatdelay="50">
