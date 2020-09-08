@@ -491,7 +491,7 @@ extern "C" {
 
         SAFEARRAYBOUND saBound;
         saBound.lLbound = 0;
-        saBound.cElements = nBytesBufferSize;
+        saBound.cElements = (uint32_t) nBytesBufferSize;
         
         SAFEARRAY* pBuffer = SafeArrayCreate(VT_UI1, 1, &saBound);
         if (pBuffer == nullptr)
