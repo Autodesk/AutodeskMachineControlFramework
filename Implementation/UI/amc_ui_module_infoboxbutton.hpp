@@ -28,45 +28,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MENUITEM
-#define __AMCIMPL_UI_PAGE
 
-#include "amc_ui_menuitem.hpp"
-#include "amc_ui_page.hpp"
-#include "libmc_interfaceexception.hpp"
+#ifndef __AMC_UI_MODULE_INFOBOXBUTTON
+#define __AMC_UI_MODULE_INFOBOXBUTTON
+
+#include "header_protection.hpp"
+
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
+
+#include "Core/amc_jsonwriter.hpp"
+
+namespace AMC {
+
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModule_InfoboxButton, PUIModule_InfoboxButton);
+	
+	class CUIModule_InfoboxButton {		
+	protected:		
+
+		std::string m_sUUID;
+		std::string m_sCaption;
+		std::string m_sTargetPage;
+
+	public:
+
+		CUIModule_InfoboxButton(const std::string & sCaption, const std::string & sTargetPage);
+		
+		virtual ~CUIModule_InfoboxButton();
+
+		std::string getUUID ();
+
+		std::string getCaption();
+
+		std::string getTargetPage();
+
+		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object);
+		
+	};
 
 
-using namespace AMC;
-
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
-{
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
+	
 }
 
-CUIMenuItem::~CUIMenuItem()
-{
 
-}
+#endif //__AMC_UI_MODULE_INFOBOXBUTTON
 
-std::string CUIMenuItem::getID()
-{
-	return m_sID;
-}
-
-std::string CUIMenuItem::getIcon()
-{
-	return m_sIcon;
-}
-
-std::string CUIMenuItem::getCaption()
-{
-	return m_sCaption;
-}
-
-PUIPage CUIMenuItem::getPage()
-{
-	return m_pPage;
-}

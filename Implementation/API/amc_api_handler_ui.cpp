@@ -74,6 +74,10 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			return APIHandler_UIType::utConfiguration;
 		}
 
+		if ((sParameterString == "/state/") || (sParameterString == "/state")) {
+			return APIHandler_UIType::utState;
+		}
+
 	}
 
 	return APIHandler_UIType::utUnknown;
@@ -93,7 +97,6 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 	else {
 		bNeedsToBeAuthorized = true;
 		bCreateNewSession = false;
-
 	}
 	
 }
@@ -104,11 +107,17 @@ void CAPIHandler_UI::handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pA
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	writer.addString(AMC_API_KEY_UI_SESSIONID, pAuth->getSessionUUID());
-	writer.addString(AMC_API_KEY_UI_SESSIONKEY, pAuth->getSessionKey());
-	m_pSystemState->uiHandler()->writeToJSON(writer);
-
+	m_pSystemState->uiHandler()->writeConfigurationToJSON(writer);
 }
+
+void CAPIHandler_UI::handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	m_pSystemState->uiHandler()->writeStateToJSON(writer);
+}
+
 
 
 
@@ -123,6 +132,10 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 	switch (uiType) {
 	case APIHandler_UIType::utConfiguration:
 		handleConfigurationRequest(writer, pAuth);
+		break;
+
+	case APIHandler_UIType::utState:
+		handleStateRequest(writer, pAuth);
 		break;
 
 	default:

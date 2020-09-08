@@ -300,6 +300,17 @@
 		<error name="INVALIDCLIENTKEY" code="290" description="Invalid client key" />
 		<error name="INVALIDLOGIN" code="291" description="Invalid login credentials" />
 
+		<error name="DUPLICATEPAGE" code="292" description="Duplicate page" />
+		<error name="PAGENOTFOUND" code="293" description="Page not found" />
+		<error name="MISSINGPAGENAME" code="294" description="Missing page name" />
+		<error name="INVALIDPAGENAME" code="295" description="Invalid page name" />
+		<error name="MODULENOTFOUND" code="296" description="Module not found" />
+		<error name="DUPLICATEMODULE" code="297" description="Duplicate module" />
+		<error name="INVALIDMODULENAME" code="298" description="Invalid module name" />
+		<error name="INVALIDMODULETYPE" code="299" description="Invalid module type" />
+		<error name="INVALIDHEADLINE" code="300" description="Invalid headline" />
+		
+		
 		
 	</errors>
 	

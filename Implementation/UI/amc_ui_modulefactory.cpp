@@ -28,45 +28,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MENUITEM
-#define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
 
-#include "amc_ui_menuitem.hpp"
-#include "amc_ui_page.hpp"
+#include "amc_ui_module.hpp"
+#include "amc_ui_modulefactory.hpp"
 #include "libmc_interfaceexception.hpp"
 
+#include "amc_ui_module_infobox.hpp"
 
 using namespace AMC;
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
-{
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-}
-
-CUIMenuItem::~CUIMenuItem()
+PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode)
 {
 
-}
+	std::string sType = xmlNode.name();
 
-std::string CUIMenuItem::getID()
-{
-	return m_sID;
-}
+	if (sType == CUIModule_Infobox::getStaticType())
+		return std::make_shared<CUIModule_Infobox>(xmlNode);
 
-std::string CUIMenuItem::getIcon()
-{
-	return m_sIcon;
-}
+	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 
-std::string CUIMenuItem::getCaption()
-{
-	return m_sCaption;
-}
-
-PUIPage CUIMenuItem::getPage()
-{
-	return m_pPage;
 }

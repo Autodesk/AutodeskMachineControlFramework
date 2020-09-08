@@ -2,7 +2,7 @@
 <v-app id="inspire">
     <v-navigation-drawer v-if="appIsReady" v-model="AppState.showDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app>
         <v-list dense>
-            <template v-for="item in AppDefinition.MenuItems">
+            <template v-for="item in AppState.MenuItems">
                 <v-list-group v-if="item.children" :key="item.caption" v-model="item.model" :prepend-icon="item.model ? item.icon : item['icon-alt']">
                     <template v-slot:activator>
                         <v-list-item-content>
@@ -40,13 +40,13 @@
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn tile large color="primary" dark v-on:click.stop="uiChangePage('main')">
+        <v-btn tile large color="primary" dark v-on:click.stop="uiChangePage(AppDefinition.MainPage)">
             {{ uiButtonCaptionCheck(AppDefinition.TextApplicationName) }}
         </v-btn>
 
         <v-spacer />
 
-        <template v-for="toolbaritem in AppDefinition.ToolbarItems">
+        <template v-for="toolbaritem in AppState.ToolbarItems">
             <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="uiChangePage(toolbaritem.targetpage)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
@@ -83,6 +83,120 @@
                 </v-col>
             </v-row>
         </v-container>
+
+        <v-container fluid v-if="appIsReady">
+			
+				<template v-for="uiPage in AppState.uiPages">
+
+					<v-row align="start" justify="center" :key="uiPage.name" v-if="(AppState.activePage == uiPage.name)">
+					
+						<template v-for="uiModule in uiPage.modules">
+																
+							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'infobox')">
+								<v-card-text>
+									<div v-if="uiModule.title != ''"> {{ uiModule.headline }}</div>
+									<p v-if="uiModule.title != ''" class="display-1 text--primary">
+										{{ uiModule.title }}
+									</p>
+									<p v-if="uiModule.subtitle != ''" >{{ uiModule.subtitle }}</p>
+								
+									<div v-if="uiModule.items.length > 0" class="text--primary">
+									
+										<template v-for="item in uiModule.items">
+											<p :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</p>												
+											<p :key="item.uuid" v-if="(item.type=='image')"><v-img src="this.API.baseURL + '/ui/image/' + item.uuid" contain></v-img></p>
+										</template>
+											
+									</div>
+								</v-card-text>
+							
+								<v-card-actions v-if="(uiModule.buttons.length > 0)">
+									<v-spacer></v-spacer>
+									
+									<template v-for="button in uiModule.buttons">
+									
+										<v-btn color="primary" :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">
+											{{ button.caption }}
+										</v-btn>
+									
+									</template>
+								</v-card-actions>
+							</v-card>
+					
+							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'listview')">
+								<v-card-text>
+									<div v-if="uiModule.title != ''"> {{ uiModule.headline }}</div>
+									<p v-if="uiModule.title != ''" class="display-1 text--primary">
+										{{ uiModule.title }}
+									</p>
+									<p v-if="uiModule.subtitle != ''" >{{ uiModule.subtitle }}</p>
+									
+									<v-data-table
+										:headers="uiModule.headers"
+										:items="uiModule.items"
+										:items-per-page="15"
+										class="elevation-1"
+										disable-pagination
+										hide-default-footer
+										width="100%"
+										loadingText="uiModule.loadingtext"
+									>
+									</v-data-table>									
+								
+								</v-card-text>
+							
+								<v-card-actions v-if="(uiModule.buttons.length > 0)">
+									<v-spacer></v-spacer>
+									
+									<template v-for="button in uiModule.buttons">
+									
+										<v-btn color="primary" :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">
+											{{ button.caption }}
+										</v-btn>
+									
+									</template>
+								</v-card-actions>
+							</v-card>
+
+							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'buildupload')">
+							
+								 <form enctype="multipart/form-data" novalidate v-if="uiModule.uploadisinitial || uiModule.uploadissaving">
+									<div class="dropbox">
+									  <input type="file" multiple :name="uiModule.uploadfieldname" :disabled="uiModule.uploadissaving" 
+										accept="" class="input-file">
+										<p v-if="uiModule.uploadisinitial">
+										  {{ uiModule.caption }}
+										</p>
+										<p v-if="uiModule.uploadissaving">
+										  Uploading {{ uiModule.filecount }} files...
+										</p>
+									</div>
+								  </form>
+							</v-card>
+
+							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'buildlist')">
+								  								  
+								<v-data-table
+									:headers="uiModule.headers"
+									:items="uiModule.items"
+									:items-per-page="15"
+									class="elevation-1"
+									disable-pagination
+									hide-default-footer
+									width="100%"
+									loadingText="uiModule.loadingtext">
+
+								</v-data-table>																  
+																  
+							</v-card>
+							
+						</template>
+					
+					</v-row>
+				</template>
+								
+        </v-container>
+
 
         <v-container class="fill-height" fluid v-if="appIsError">
             <v-row align="center" justify="center">
@@ -175,15 +289,35 @@ export default {
                     this.AppDefinition.TextApplicationName = resultJSON.data.appname;
                     this.AppDefinition.TextCopyRight = resultJSON.data.copyright;
                     this.AppDefinition.MainPage = resultJSON.data.mainpage;
-                    this.AppDefinition.MenuItems = resultJSON.data.menuitems;
-                    this.AppDefinition.ToolbarItems = resultJSON.data.toolbaritems;
-                    this.AppState.currentStatus = "login";
+					this.AppState.currentStatus = "login";
                 })
                 .catch(err => {
                     this.AppState.currentStatus = "error";
                     this.AppState.currentError = err.response.data.message;
                 });
         },
+		
+        appRetrieveStateUpdate () {
+            var url = this.API.baseURL + "/ui/state";
+            Axios({
+                    method: "GET",
+                    url: url,
+					headers: {
+						"Authorization": "Bearer " + this.API.authToken,
+					},
+                })
+                .then(resultJSON => {
+                    this.AppState.MenuItems = resultJSON.data.menuitems;
+                    this.AppState.ToolbarItems = resultJSON.data.toolbaritems;
+					this.AppState.uiPages = resultJSON.data.pages;                    
+                    this.AppState.activePage = this.AppDefinition.MainPage;
+                })
+                .catch(err => {
+                    this.AppState.currentStatus = "error";
+                    this.AppState.currentError = err.response.data.message;
+                });
+        },
+		
 
         uiLogInClick() {
 		
@@ -219,7 +353,10 @@ export default {
 					
 						this.AppState.uiLoginPassword = "";
 						this.AppState.currentStatus = "ready";
-						this.AppState.authToken = resultAuthenticate.data.token;
+						
+						this.API.authToken = resultAuthenticate.data.token;
+						
+						this.appRetrieveStateUpdate ();
 						
 					})
 					.catch(err => {
@@ -253,8 +390,15 @@ export default {
         },
 
         uiChangePage(page) {
-            this.AppState.activePage = page;
+            this.AppState.activePage = page;				
         },
+		
+		uiModuleButtonClick (button) {
+			if (button.targetpage != "") {
+				this.uiChangePage (button.targetpage);
+			}
+		
+		},
 
         uiOnTimer() {},
 
@@ -268,28 +412,31 @@ export default {
 
     data: () => ({
         API: {
-            baseURL: "/api"
+            baseURL: "/api",
+			authToken: "0000000000000000000000000000000000000000000000000000000000000000"
         },
 
         AppDefinition: {
             TextApplicationName: "",
             TextCopyRight: "",
-            MainPage: "",
-            PageDefinitions: {},
-            ToolbarItems: [],
-            MenuItems: []
+            MainPage: ""
         },
 
         AppState: {
+		
+            MenuItems: [],
+            ToolbarItems: [],
+		
             currentStatus: "initial", // one of "initial" / "login" / "ready" / "error"
             currentError: "",
             showDrawer: true,
             activePage: "",
-            globalTimer: "",
-			authToken: "0000000000000000000000000000000000000000000000000000000000000000",
+            globalTimer: "",			
+			uiPages: [],
 			
-            uiLoginUser: "",
-            uiLoginPassword: ""
+            uiLoginUser: "test",
+            uiLoginPassword: "test",					
+			
         }
     })
 };

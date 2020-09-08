@@ -28,45 +28,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MENUITEM
-#define __AMCIMPL_UI_PAGE
 
-#include "amc_ui_menuitem.hpp"
-#include "amc_ui_page.hpp"
-#include "libmc_interfaceexception.hpp"
+#ifndef __AMC_UI_MODULEFACTORY
+#define __AMC_UI_MODULEFACTORY
+
+#include "header_protection.hpp"
+
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
+
+#include "Libraries/PugiXML/pugixml.hpp"
 
 
-using namespace AMC;
+namespace AMC {
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
-{
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
 
+	class CUIModuleFactory {
+	protected:
+		
+	public:
+	
+		static PUIModule createModule (pugi::xml_node & xmlNode);
+										
+	};
+
+	
 }
 
-CUIMenuItem::~CUIMenuItem()
-{
 
-}
+#endif //__AMC_UI_MODULEFACTORY
 
-std::string CUIMenuItem::getID()
-{
-	return m_sID;
-}
-
-std::string CUIMenuItem::getIcon()
-{
-	return m_sIcon;
-}
-
-std::string CUIMenuItem::getCaption()
-{
-	return m_sCaption;
-}
-
-PUIPage CUIMenuItem::getPage()
-{
-	return m_pPage;
-}

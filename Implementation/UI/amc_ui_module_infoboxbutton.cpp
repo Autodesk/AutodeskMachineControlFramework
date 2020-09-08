@@ -28,45 +28,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MENUITEM
-#define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
+#define __AMCIMPL_API_CONSTANTS
 
-#include "amc_ui_menuitem.hpp"
-#include "amc_ui_page.hpp"
+#include "amc_ui_module_infoboxbutton.hpp"
 #include "libmc_interfaceexception.hpp"
 
+#include "amc_api_constants.hpp"
+#include "Common/common_utils.hpp"
 
 using namespace AMC;
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
-{
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-}
-
-CUIMenuItem::~CUIMenuItem()
+CUIModule_InfoboxButton::CUIModule_InfoboxButton(const std::string& sCaption, const std::string& sTargetPage)
+	: m_sUUID (AMCCommon::CUtils::createUUID ()), m_sCaption (sCaption), m_sTargetPage (sTargetPage)
 {
 
 }
 
-std::string CUIMenuItem::getID()
+CUIModule_InfoboxButton::~CUIModule_InfoboxButton()
 {
-	return m_sID;
+
 }
 
-std::string CUIMenuItem::getIcon()
+std::string CUIModule_InfoboxButton::getUUID()
 {
-	return m_sIcon;
+	return m_sUUID;
 }
 
-std::string CUIMenuItem::getCaption()
+std::string CUIModule_InfoboxButton::getCaption()
 {
 	return m_sCaption;
 }
 
-PUIPage CUIMenuItem::getPage()
+std::string CUIModule_InfoboxButton::getTargetPage()
 {
-	return m_pPage;
+	return m_sTargetPage;
+}
+
+
+void CUIModule_InfoboxButton::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_BUTTONUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_BUTTONCAPTION, m_sCaption);
+	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, m_sTargetPage);
 }

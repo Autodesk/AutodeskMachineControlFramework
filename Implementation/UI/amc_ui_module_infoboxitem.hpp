@@ -29,44 +29,69 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_API_HANDLER_UI
-#define __AMC_API_HANDLER_UI
+#ifndef __AMC_UI_MODULE_INFOBOXITEM
+#define __AMC_UI_MODULE_INFOBOXITEM
 
-#include "amc_api_handler.hpp"
-#include "amc_logger.hpp"
-#include "amc_api_response.hpp"
+#include "header_protection.hpp"
 
-#include "amc_systemstate.hpp"
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
+
+#include "Core/amc_jsonwriter.hpp"
 
 namespace AMC {
 
-	enum class APIHandler_UIType {
-		utUnknown = 0,
-		utConfiguration = 1,
-		utState = 2
-	};
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModule_InfoboxItem, PUIModule_InfoboxItem);
+	amcDeclareDependingClass(CUIModule_InfoboxParagraph, PUIModule_InfoboxParagraph);
+	amcDeclareDependingClass(CUIModule_InfoboxImage, PUIModule_InfoboxImage);
+	
+	class CUIModule_InfoboxItem {		
+	protected:		
 
-	class CAPIHandler_UI : public CAPIHandler {
-	private:
-		
-		PSystemState m_pSystemState;
-
-		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType);
-
-		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
-		void handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth);
+		std::string m_sUUID;
 
 	public:
 
-		CAPIHandler_UI(PSystemState pSystemState);
+		CUIModule_InfoboxItem(const std::string & sUUID);
+		
+		virtual ~CUIModule_InfoboxItem();
 
-		virtual ~CAPIHandler_UI();
-				
-		virtual void checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) override;
+		std::string getUUID ();
 
-		virtual std::string getBaseURI () override;
+		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object) = 0;
+		
+	};
 
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
+	class CUIModule_InfoboxParagraph : public CUIModule_InfoboxItem {
+	protected:		
+
+		std::string m_sText;
+
+	public:
+
+		CUIModule_InfoboxParagraph(const std::string & sText);
+		
+		virtual ~CUIModule_InfoboxParagraph();
+
+		std::string getText ();
+
+		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+	};
+
+
+	class CUIModule_InfoboxImage : public CUIModule_InfoboxItem {
+	protected:		
+
+	public:
+
+		CUIModule_InfoboxImage(const std::string & sUUID);
+		
+		virtual ~CUIModule_InfoboxImage();
+
+		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 
@@ -74,5 +99,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_API_HANDLER_UI
+#endif //__AMC_UI_MODULE_INFOBOXITEM
 
