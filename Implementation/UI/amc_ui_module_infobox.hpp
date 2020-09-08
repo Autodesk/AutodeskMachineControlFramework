@@ -28,45 +28,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MENUITEM
-#define __AMCIMPL_UI_PAGE
 
-#include "amc_ui_menuitem.hpp"
-#include "amc_ui_page.hpp"
-#include "libmc_interfaceexception.hpp"
+#ifndef __AMC_UI_MODULE_INFOBOX
+#define __AMC_UI_MODULE_INFOBOX
 
+#include "header_protection.hpp"
 
-using namespace AMC;
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
-{
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+#include "Libraries/PugiXML/pugixml.hpp"
 
+namespace AMC {
+
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModule_Infobox, PUIModule_Infobox);
+	amcDeclareDependingClass(CUIModule_InfoboxItem, PUIModule_InfoboxItem);
+	amcDeclareDependingClass(CUIModule_InfoboxButton, PUIModule_InfoboxButton);
+
+	class CUIModule_Infobox : public CUIModule {
+	protected:		
+
+		std::string m_sHeadLine;
+		std::string m_sTitle;
+		std::string m_sSubtitle;
+
+		std::vector<PUIModule_InfoboxItem> m_Items;
+		std::vector<PUIModule_InfoboxButton> m_Buttons;
+
+	public:
+
+		CUIModule_Infobox(pugi::xml_node & xmlNode);
+		
+		virtual ~CUIModule_Infobox();
+
+		virtual std::string getType() override;
+
+		static std::string getStaticType();
+
+		std::string getHeadLine ();
+		std::string getTitle ();
+		std::string getSubtitle ();
+
+		virtual void writeToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+
+	};
+
+	
 }
 
-CUIMenuItem::~CUIMenuItem()
-{
 
-}
+#endif //__AMC_UI_MODULE_INFOBOX
 
-std::string CUIMenuItem::getID()
-{
-	return m_sID;
-}
-
-std::string CUIMenuItem::getIcon()
-{
-	return m_sIcon;
-}
-
-std::string CUIMenuItem::getCaption()
-{
-	return m_sCaption;
-}
-
-PUIPage CUIMenuItem::getPage()
-{
-	return m_pPage;
-}

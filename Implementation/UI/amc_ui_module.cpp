@@ -46,3 +46,22 @@ CUIModule::~CUIModule()
 {
 
 }
+
+std::string CUIModule::getName()
+{
+	return m_sName;
+}
+
+
+std::string CUIModule::getNameFromXML(pugi::xml_node& xmlNode)
+{
+	auto nameAttrib = xmlNode.attribute("name");
+	if (nameAttrib.empty())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULENAME);
+	return nameAttrib.as_string();
+}
+
+std::string CUIModule::getTypeFromXML(pugi::xml_node& xmlNode)
+{
+	return xmlNode.name();
+}

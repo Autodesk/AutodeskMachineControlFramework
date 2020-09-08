@@ -316,6 +316,14 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDSESSIONTOKEN 289
 #define LIBMC_ERROR_INVALIDCLIENTKEY 290
 #define LIBMC_ERROR_INVALIDLOGIN 291
+#define LIBMC_ERROR_DUPLICATEPAGE 292
+#define LIBMC_ERROR_PAGENOTFOUND 293
+#define LIBMC_ERROR_MISSINGPAGENAME 294
+#define LIBMC_ERROR_INVALIDPAGENAME 295
+#define LIBMC_ERROR_MODULENOTFOUND 296
+#define LIBMC_ERROR_DUPLICATEMODULE 297
+#define LIBMC_ERROR_INVALIDMODULENAME 298
+#define LIBMC_ERROR_INVALIDMODULETYPE 299
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -544,6 +552,14 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDSESSIONTOKEN: return "Invalid session token";
     case LIBMC_ERROR_INVALIDCLIENTKEY: return "Invalid client key";
     case LIBMC_ERROR_INVALIDLOGIN: return "Invalid login credentials";
+    case LIBMC_ERROR_DUPLICATEPAGE: return "Duplicate page";
+    case LIBMC_ERROR_PAGENOTFOUND: return "Page not found";
+    case LIBMC_ERROR_MISSINGPAGENAME: return "Missing page name";
+    case LIBMC_ERROR_INVALIDPAGENAME: return "Invalid page name";
+    case LIBMC_ERROR_MODULENOTFOUND: return "Module not found";
+    case LIBMC_ERROR_DUPLICATEMODULE: return "Duplicate module";
+    case LIBMC_ERROR_INVALIDMODULENAME: return "Invalid module name";
+    case LIBMC_ERROR_INVALIDMODULETYPE: return "Invalid module type";
     default: return "unknown error";
   }
 }

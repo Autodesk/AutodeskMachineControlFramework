@@ -233,33 +233,46 @@
   </statemachine>
 
   
-  
-<userinterface appname="Autodesk Machine Control" copyright="2020 Autodesk Inc." mainpage="workflow.main" >
+  <userinterface appname="AMDroid 1.0" copyright="2020 Autodesk Inc." mainpage="main" >
+
+		<page name="main">
+
+			<infobox name="infobox" title="Welcome to AMDroid" headline="Autodesk Control360 Framework" subtitle="Make Additive Manufacturing accessible">
+				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
+				<image uuid="5db1a466-90a3-48d5-9eb5-8820733d4690" />
+				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
+				
+				<button caption="Build list" targetpage="buildlist" />
+				<button caption="Parameter list" targetpage="parameters" />
+				
+			</infobox>		
+
+		</page>
+
+		<page name="buildlist">
+
+		</page>
+
+		<page name="parameters">
+
+		</page>
 
 
-	<page id="buildlist" module="buildselector">
+		<menu>
+			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
+			<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
+			<item id="testpage" icon="mdi-apps" caption="Test" targetpage="parameters"/>
 
-	</page>
+		</menu>
 
-	<page id="parameters" module="datatable">
+		<toolbar>
+			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
+			<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
 
-	</page>
-
-
-	<menu>
-		<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-		<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
-
-	</menu>
-
-	<toolbar>
-		<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-		<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
-
-	</toolbar>
+		</toolbar>
 
 
-  </userinterface>
+	</userinterface>
 
 </machinedefinition>
 

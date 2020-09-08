@@ -28,45 +28,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MENUITEM
-#define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
+#define __AMCIMPL_API_CONSTANTS
 
-#include "amc_ui_menuitem.hpp"
-#include "amc_ui_page.hpp"
+#include "amc_ui_module_infoboxitem.hpp"
 #include "libmc_interfaceexception.hpp"
 
+#include "amc_api_constants.hpp"
+#include "Common/common_utils.hpp"
 
 using namespace AMC;
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
-{
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-}
-
-CUIMenuItem::~CUIMenuItem()
+CUIModule_InfoboxItem::CUIModule_InfoboxItem(const std::string& sUUID)
+	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
 {
 
 }
 
-std::string CUIMenuItem::getID()
+CUIModule_InfoboxItem::~CUIModule_InfoboxItem()
 {
-	return m_sID;
+
 }
 
-std::string CUIMenuItem::getIcon()
+std::string CUIModule_InfoboxItem::getUUID()
 {
-	return m_sIcon;
+	return m_sUUID;
 }
 
-std::string CUIMenuItem::getCaption()
+
+
+CUIModule_InfoboxParagraph::CUIModule_InfoboxParagraph(const std::string& sText)
+	: CUIModule_InfoboxItem (AMCCommon::CUtils::createUUID ()), m_sText (sText)
 {
-	return m_sCaption;
+
 }
 
-PUIPage CUIMenuItem::getPage()
+CUIModule_InfoboxParagraph::~CUIModule_InfoboxParagraph()
 {
-	return m_pPage;
+
 }
+
+std::string CUIModule_InfoboxParagraph::getText()
+{
+	return m_sText;
+}
+
+void CUIModule_InfoboxParagraph::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "paragraph");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_ITEMTEXT, m_sText);
+}
+
+
+
+CUIModule_InfoboxImage::CUIModule_InfoboxImage(const std::string& sUUID)
+	: CUIModule_InfoboxItem (sUUID)
+{
+
+}
+
+CUIModule_InfoboxImage::~CUIModule_InfoboxImage()
+{
+
+}
+
+
+void CUIModule_InfoboxImage::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+}
+
