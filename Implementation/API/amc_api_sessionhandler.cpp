@@ -47,6 +47,7 @@ using namespace AMC;
 
 CAPISessionHandler::CAPISessionHandler()
 {
+
 }
 
 CAPISessionHandler::~CAPISessionHandler()

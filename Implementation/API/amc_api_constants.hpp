@@ -92,6 +92,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_APPNAME "appname"
 #define AMC_API_KEY_UI_COPYRIGHT "copyright"
 #define AMC_API_KEY_UI_MAINPAGE "mainpage"
+#define AMC_API_KEY_UI_LOGOUUID "logouuid"
+#define AMC_API_KEY_UI_LOGOASPECTRATIO "logoaspectratio"
 #define AMC_API_KEY_UI_SESSIONID "sessionid"
 #define AMC_API_KEY_UI_SESSIONKEY "sessionkey"
 #define AMC_API_KEY_UI_ICON "icon"
@@ -116,6 +118,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_BUTTONUUID "uuid"
 #define AMC_API_KEY_UI_BUTTONTARGETPAGE "targetpage"
 #define AMC_API_KEY_UI_BUTTONCAPTION "caption"
+#define AMC_API_KEY_UI_ITEMUPLOADCLASS "uploadclass"
+#define AMC_API_KEY_UI_ITEMUPLOADCAPTION "uploadcaption"
+#define AMC_API_KEY_UI_ITEMUPLOADISINITIAL "uploadisinitial"
+#define AMC_API_KEY_UI_ITEMUPLOADISSAVING "uploadissaving"
+#define AMC_API_KEY_UI_ITEMUPLOADFILENAME "uploadfilename"
 
 #define AMC_API_KEY_BUILDUUID "builduuid"
 

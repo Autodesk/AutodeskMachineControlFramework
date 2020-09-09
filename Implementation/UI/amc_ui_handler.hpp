@@ -55,6 +55,8 @@ namespace AMC {
 
 		std::string m_sAppName;
 		std::string m_sCopyrightString;
+		std::string m_sLogoUUID;
+		double m_dLogoAspectRatio;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;

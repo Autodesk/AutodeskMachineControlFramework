@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_modulefactory.hpp"
 #include "libmc_interfaceexception.hpp"
 
-#include "amc_ui_module_infobox.hpp"
+#include "amc_ui_module_content.hpp"
 
 using namespace AMC;
 
@@ -43,8 +43,8 @@ PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode)
 
 	std::string sType = xmlNode.name();
 
-	if (sType == CUIModule_Infobox::getStaticType())
-		return std::make_shared<CUIModule_Infobox>(xmlNode);
+	if (sType == CUIModule_Content::getStaticType())
+		return std::make_shared<CUIModule_Content>(xmlNode);
 
 	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 

@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CStorage
+Abstract: This is the class declaration of CLoginHandler
 
 */
 
 
-#ifndef __LIBMCDATA_STORAGE
-#define __LIBMCDATA_STORAGE
+#ifndef __LIBMCDATA_LOGINHANDLER
+#define __LIBMCDATA_LOGINHANDLER
 
 #include "libmcdata_interfaces.hpp"
 
@@ -44,61 +44,34 @@ Abstract: This is the class declaration of CStorage
 #pragma warning(disable : 4250)
 #endif
 
-// Include custom headers here.
-#include "amcdata_storagepath.hpp"
 #include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagewriter.hpp"
 
-#include <thread>
+// Include custom headers here.
 #include <mutex>
-#include <map>
-#include <set>
 
 namespace LibMCData {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CStorage 
+ Class declaration of CLoginHandler 
 **************************************************************************************************************************/
 
-
-class CStorage : public virtual IStorage, public virtual CBase {
+class CLoginHandler : public virtual ILoginHandler, public virtual CBase {
 private:
-    AMCData::PStoragePath m_pStoragePath;
-    AMCData::PSQLHandler m_pSQLHandler;
-
-    std::mutex m_StorageWriteMutex;
-    std::map<std::string, AMCData::PStorageWriter> m_PartialWriters;
-
-    std::set<std::string> m_AcceptedContentTypes;
-    std::set<std::string> m_ImageContentTypes;
-
-    void insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID);
 
 protected:
 
+    std::mutex m_Mutex;
+    AMCData::PSQLHandler m_pSQLHandler;
+
 public:
 
-    CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    CLoginHandler(AMCData::PSQLHandler pSQLHandler);
 
-    bool StreamIsReady(const std::string& sUUID) override;
+	bool UserExists(const std::string & sUsername) override;
 
-    IStorageStream* RetrieveStream(const std::string& sUUID) override;
-    
-    void StoreNewStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID) override;
-
-    void BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID) override;
-
-	void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) override;
-
-	void FinishPartialStream(const std::string & sUUID) override;
-
-    LibMCData_uint64 GetMaxStreamSize() override;
-
-    bool ContentTypeIsAccepted(const std::string& sContentType) override;
-
-    bool StreamIsImage(const std::string& sUUID) override;
+	void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) override;
 
 };
 
@@ -108,4 +81,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_STORAGE
+#endif // __LIBMCDATA_LOGINHANDLER

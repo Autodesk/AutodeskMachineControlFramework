@@ -39,7 +39,7 @@ Abstract: This is a stub class definition of CStorage
 #include "common_utils.hpp"
 #include "amcdata_storagepath.hpp"
 
-
+#include "common_chrono.hpp"
 #include "PicoSHA2/picosha2.h"
 
 using namespace LibMCData::Impl;
@@ -58,6 +58,11 @@ CStorage::CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStor
 
     m_AcceptedContentTypes.insert("application/3mf");
     m_AcceptedContentTypes.insert("text/csv");
+    m_AcceptedContentTypes.insert("image/png");
+    m_AcceptedContentTypes.insert("image/jpeg");
+
+    m_ImageContentTypes.insert("image/png");
+    m_ImageContentTypes.insert("image/jpeg");
 
 }
 
@@ -69,7 +74,9 @@ void CStorage::insertDBEntry(const std::string& sUUID, const std::string& sConte
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
     std::string sParsedContextUUID = AMCCommon::CUtils::normalizeUUIDString(sContextUUID);
-    std::string sTimestamp = AMCCommon::CUtils::getCurrentISO8601TimeUTC();
+
+    AMCCommon::CChrono chrono;
+    std::string sTimestamp = chrono.getStartTimeISO8601TimeUTC ();
 
     std::string sQuery = "SELECT uuid FROM storage_streams WHERE uuid=?";
     auto pStatement = pTransaction->prepareStatement(sQuery);
@@ -237,6 +244,23 @@ bool CStorage::ContentTypeIsAccepted(const std::string& sContentType)
     return (iIter != m_AcceptedContentTypes.end());
 }
 
+bool CStorage::StreamIsImage(const std::string& sUUID) 
+{
+    std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
+
+    std::string sQuery = "SELECT mimetype FROM storage_streams WHERE uuid=?";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sParsedUUID);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND);
+
+    auto sMimeType = pStatement->getColumnString(1);
+    auto sLowerMimeType = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(sMimeType));
+
+    auto iIter = m_ImageContentTypes.find(sLowerMimeType);
+    return (iIter != m_ImageContentTypes.end());
+
+}
 
 
 

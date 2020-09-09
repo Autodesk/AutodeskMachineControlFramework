@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_INFOBOXITEM
-#define __AMC_UI_MODULE_INFOBOXITEM
+#ifndef __AMC_UI_MODULE_CONTENTBUTTON
+#define __AMC_UI_MODULE_CONTENTBUTTON
 
 #include "header_protection.hpp"
 
@@ -43,61 +43,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_InfoboxItem, PUIModule_InfoboxItem);
-	amcDeclareDependingClass(CUIModule_InfoboxParagraph, PUIModule_InfoboxParagraph);
-	amcDeclareDependingClass(CUIModule_InfoboxImage, PUIModule_InfoboxImage);
+	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
 	
-	class CUIModule_InfoboxItem {		
+	class CUIModule_ContentButton {		
 	protected:		
 
 		std::string m_sUUID;
+		std::string m_sCaption;
+		std::string m_sTargetPage;
 
 	public:
 
-		CUIModule_InfoboxItem(const std::string & sUUID);
+		CUIModule_ContentButton(const std::string & sCaption, const std::string & sTargetPage);
 		
-		virtual ~CUIModule_InfoboxItem();
+		virtual ~CUIModule_ContentButton();
 
 		std::string getUUID ();
 
-		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object) = 0;
+		std::string getCaption();
+
+		std::string getTargetPage();
+
+		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object);
 		
 	};
 
-	class CUIModule_InfoboxParagraph : public CUIModule_InfoboxItem {
-	protected:		
-
-		std::string m_sText;
-
-	public:
-
-		CUIModule_InfoboxParagraph(const std::string & sText);
-		
-		virtual ~CUIModule_InfoboxParagraph();
-
-		std::string getText ();
-
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
-
-	};
-
-
-	class CUIModule_InfoboxImage : public CUIModule_InfoboxItem {
-	protected:		
-
-	public:
-
-		CUIModule_InfoboxImage(const std::string & sUUID);
-		
-		virtual ~CUIModule_InfoboxImage();
-
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
-
-	};
 
 	
 }
 
 
-#endif //__AMC_UI_MODULE_INFOBOXITEM
+#endif //__AMC_UI_MODULE_CONTENTBUTTON
 

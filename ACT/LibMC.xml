@@ -309,9 +309,9 @@
 		<error name="INVALIDMODULENAME" code="298" description="Invalid module name" />
 		<error name="INVALIDMODULETYPE" code="299" description="Invalid module type" />
 		<error name="INVALIDHEADLINE" code="300" description="Invalid headline" />
-		
-		
-		
+		<error name="USERNOTFOUND" code="301" description="User not found" />
+		<error name="STREAMISNOTIMAGE" code="302" description="Stream is not image" />
+					
 	</errors>
 	
 	

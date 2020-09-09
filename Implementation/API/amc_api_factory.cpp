@@ -57,7 +57,7 @@ CAPIFactory::CAPIFactory(PAPI pAPI, PSystemState pSystemState, std::vector <AMC:
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(pSystemState));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Signal>(pSystemState));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_UI>(pSystemState));
-	pAPI->registerHandler(std::make_shared <CAPIHandler_Auth>(pAPI->getSessionHandler (), pSystemState->getInstallationSecret (), pSystemState->getGitHash ()));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Auth>(pAPI->getSessionHandler (), pSystemState->getLoginHandlerInstance(), pSystemState->getInstallationSecret (), pSystemState->getGitHash ()));
 	
 }
 

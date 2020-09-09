@@ -324,6 +324,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DUPLICATEMODULE 297
 #define LIBMC_ERROR_INVALIDMODULENAME 298
 #define LIBMC_ERROR_INVALIDMODULETYPE 299
+#define LIBMC_ERROR_INVALIDHEADLINE 300
+#define LIBMC_ERROR_USERNOTFOUND 301
+#define LIBMC_ERROR_STREAMISNOTIMAGE 302
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -560,6 +563,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DUPLICATEMODULE: return "Duplicate module";
     case LIBMC_ERROR_INVALIDMODULENAME: return "Invalid module name";
     case LIBMC_ERROR_INVALIDMODULETYPE: return "Invalid module type";
+    case LIBMC_ERROR_INVALIDHEADLINE: return "Invalid headline";
+    case LIBMC_ERROR_USERNOTFOUND: return "User not found";
+    case LIBMC_ERROR_STREAMISNOTIMAGE: return "Stream is not image";
     default: return "unknown error";
   }
 }

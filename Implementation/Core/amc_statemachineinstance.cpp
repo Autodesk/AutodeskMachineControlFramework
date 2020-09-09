@@ -74,7 +74,7 @@ namespace AMC {
 		if (sStateName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATENAME);
 
-		auto pResult = std::make_shared<CStateMachineState>(m_sName, sStateName, nRepeatDelayInMS, m_pEnvironmentWrapper);
+		auto pResult = std::make_shared<CStateMachineState>(m_sName, sStateName, nRepeatDelayInMS, m_pEnvironmentWrapper, m_pSystemState->getGlobalChronoInstance());
 
 		m_States.insert(std::make_pair(sStateName, pResult));
 		m_StateList.push_back(pResult);

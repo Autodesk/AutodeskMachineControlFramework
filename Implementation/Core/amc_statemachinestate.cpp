@@ -41,10 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CStateMachineState::CStateMachineState(const std::string& sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper)
-		: m_sInstanceName(sInstanceName), m_sName (sName), m_pEnvironmentWrapper (pEnvironmentWrapper), m_nRepeatDelay (nRepeatDelay)
+	CStateMachineState::CStateMachineState(const std::string& sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono)
+		: m_sInstanceName(sInstanceName), m_sName (sName), m_pEnvironmentWrapper (pEnvironmentWrapper), m_nRepeatDelay (nRepeatDelay), m_pGlobalChrono (pGlobalChrono), m_LastExecutionTimeInMilliseconds(0)
 	{
 		if (pEnvironmentWrapper.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pGlobalChrono.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 		if ((nRepeatDelay < AMC_MINREPEATDELAY_MS) || (nRepeatDelay > AMC_MAXREPEATDELAY_MS))
@@ -82,7 +84,7 @@ namespace AMC {
 
 	void CStateMachineState::updateExecutionTime()
 	{
-		m_LastExecutionTime = std::chrono::high_resolution_clock::now();
+		m_LastExecutionTimeInMilliseconds = m_pGlobalChrono->getExistenceTimeInMilliseconds ();
 	}
 
 
@@ -166,17 +168,14 @@ namespace AMC {
 		if (chunkInMilliseconds < AMC_MINREPEATDELAY_MS)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 		
-		auto currentExecutionTime = std::chrono::high_resolution_clock::now();
-		auto deltaExecutionTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentExecutionTime - m_LastExecutionTime).count();
+		auto deltaExecutionTime = m_pGlobalChrono->getDurationTimeInMilliseconds (m_LastExecutionTimeInMilliseconds);
 
 		while (deltaExecutionTime < m_nRepeatDelay) {		
-			AMCCommon::CUtils::sleepMilliseconds(chunkInMilliseconds);
+			m_pGlobalChrono->sleepMilliseconds(chunkInMilliseconds);
 
-			// TODO: Check for potential kill Signal
-			currentExecutionTime = std::chrono::high_resolution_clock::now();
 
-			auto newDeltaExecutionTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentExecutionTime - m_LastExecutionTime).count();
-			if (!(deltaExecutionTime < newDeltaExecutionTime))
+			auto newDeltaExecutionTime = m_pGlobalChrono->getDurationTimeInMilliseconds(m_LastExecutionTimeInMilliseconds);
+			if (newDeltaExecutionTime <= deltaExecutionTime)
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDEXECUTIONDELAY);
 
 			deltaExecutionTime = newDeltaExecutionTime;

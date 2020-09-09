@@ -40,6 +40,7 @@ Abstract: This is a stub class definition of CBuildJob
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -278,7 +279,8 @@ void CBuildJob::AddJobData(const std::string& sName, IStorageStream* pStream, co
 
     auto sStreamUUID = pStream->GetUUID();
 
-    auto sTimeStamp = AMCCommon::CUtils::getCurrentISO8601TimeUTC();
+    AMCCommon::CChrono chrono;
+    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
     std::unique_ptr<CBuildJobData> buildJobData (CBuildJobData::createInDatabase (sName, m_sUUID, eDataType, sTimeStamp, sStreamUUID, sUserID, m_pSQLHandler, m_pStoragePath));
 }
 

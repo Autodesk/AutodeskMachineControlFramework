@@ -68,6 +68,8 @@
                             <v-toolbar-title>{{ AppDefinition.TextApplicationName }}</v-toolbar-title>
                         </v-toolbar>
                         <v-card-text>
+							<v-img v-if="AppDefinition.LogoUUID != ''" v-bind:src="getImageURL (AppDefinition.LogoUUID)" v-bind:aspect-ratio="AppDefinition.LogoAspectRatio" contain></v-img>
+						
                             <v-form>
                                 <v-text-field label="User" name="login" prepend-icon="mdi-account" type="text" v-model="AppState.uiLoginUser" autofocus clearable />
                                 <v-text-field id="password" label="Password" name="password" prepend-icon="mdi-lock" type="password" clearable v-model="AppState.uiLoginPassword" />
@@ -92,7 +94,7 @@
 					
 						<template v-for="uiModule in uiPage.modules">
 																
-							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'infobox')">
+							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'content')">
 								<v-card-text>
 									<div v-if="uiModule.title != ''"> {{ uiModule.headline }}</div>
 									<p v-if="uiModule.title != ''" class="display-1 text--primary">
@@ -103,8 +105,28 @@
 									<div v-if="uiModule.items.length > 0" class="text--primary">
 									
 										<template v-for="item in uiModule.items">
+											
 											<p :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</p>												
-											<p :key="item.uuid" v-if="(item.type=='image')"><v-img src="this.API.baseURL + '/ui/image/' + item.uuid" contain></v-img></p>
+											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" contain></v-img></p>
+											
+											<div :key="item.uuid" v-if="(item.type=='upload')">
+											
+												<form enctype="multipart/form-data" novalidate>
+													<div class="dropbox">
+													  <input type="file" multiple :name="'upload_' + item.uuid" :disabled="item.uploadissaving" 
+														accept="" class="input-file">
+														<p v-if="item.uploadisinitial">
+														  {{ item.uploadcaption }}
+														</p>
+														<p v-if="item.uploadissaving">
+														  Uploading {{ item.uploadfilename }} files...
+														</p>
+													</div>
+												</form>
+											  	
+								
+											</div>
+											
 										</template>
 											
 									</div>
@@ -158,21 +180,6 @@
 								</v-card-actions>
 							</v-card>
 
-							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'buildupload')">
-							
-								 <form enctype="multipart/form-data" novalidate v-if="uiModule.uploadisinitial || uiModule.uploadissaving">
-									<div class="dropbox">
-									  <input type="file" multiple :name="uiModule.uploadfieldname" :disabled="uiModule.uploadissaving" 
-										accept="" class="input-file">
-										<p v-if="uiModule.uploadisinitial">
-										  {{ uiModule.caption }}
-										</p>
-										<p v-if="uiModule.uploadissaving">
-										  Uploading {{ uiModule.filecount }} files...
-										</p>
-									</div>
-								  </form>
-							</v-card>
 
 							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'buildlist')">
 								  								  
@@ -289,7 +296,11 @@ export default {
                     this.AppDefinition.TextApplicationName = resultJSON.data.appname;
                     this.AppDefinition.TextCopyRight = resultJSON.data.copyright;
                     this.AppDefinition.MainPage = resultJSON.data.mainpage;
+                    this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
+                    this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
 					this.AppState.currentStatus = "login";
+					
+					document.title = this.AppDefinition.TextApplicationName;
                 })
                 .catch(err => {
                     this.AppState.currentStatus = "error";
@@ -407,7 +418,12 @@ export default {
             // this.$vuetify.theme.themes.light.primary = '#4caf50'
             // Dark theme
             // this.$vuetify.theme.themes.dark.primary = '#4caf50'
-        }
+        },
+		
+		getImageURL (uuid) {
+			return this.API.baseURL + '/ui/image/' + uuid;
+		}
+		
     },
 
     data: () => ({
@@ -419,7 +435,9 @@ export default {
         AppDefinition: {
             TextApplicationName: "",
             TextCopyRight: "",
-            MainPage: ""
+            MainPage: "",
+			LogoUUID: "",
+			LogoAspectRatio: 1.0
         },
 
         AppState: {

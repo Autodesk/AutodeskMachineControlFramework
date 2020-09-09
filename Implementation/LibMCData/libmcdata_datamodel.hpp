@@ -62,6 +62,9 @@ protected:
 
 	LibMCData::eDataBaseType m_eDataBaseType;
 
+	std::string m_sInstallationUUID;
+	std::string m_sInstallationSecret;
+
 public:
 
 	CDataModel();
@@ -70,11 +73,15 @@ public:
 
 	LibMCData_uint32 GetDataModelVersion() override;
 
+	void GetInstallationInformation(std::string& sInstallationUUID, std::string& sInstallationSecret) override;
+
 	IStorage * CreateStorage() override;
 
 	ILogSession* CreateNewLogSession() override;
 
 	IBuildJobHandler* CreateBuildJobHandler() override;
+
+	ILoginHandler* CreateLoginHandler() override;
 
 };
 

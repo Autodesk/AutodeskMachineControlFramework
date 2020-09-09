@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driverhandler.hpp"
 #include "amc_parameterhandler.hpp"
 
+#include "common_chrono.hpp"
 #include <thread> 
 
 // Include custom headers here.
@@ -94,7 +95,8 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 			if (CheckForTermination())
 				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TERMINATED);
 
-			AMCCommon::CUtils::sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);			
+			AMCCommon::CChrono chrono;
+			chrono.sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);
 		}
 	}
 
@@ -156,7 +158,8 @@ void CStateEnvironment::LogInfo(const std::string& sLogString)
 
 void CStateEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 {
-	AMCCommon::CUtils::sleepMilliseconds(nDelay);	
+	AMCCommon::CChrono chrono;
+	chrono.sleepMilliseconds(nDelay);
 }
 
 bool CStateEnvironment::CheckForTermination()

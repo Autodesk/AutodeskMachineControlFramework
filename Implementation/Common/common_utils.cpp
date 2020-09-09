@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <algorithm>
 #include <vector>
-#include <chrono>
 #include <sstream>
 #include <exception>
 #include <iomanip>
@@ -84,49 +83,6 @@ namespace AMCCommon {
 	const unsigned char UTF8DecodeMask[7] = { 0, 0x7f, 0x1f, 0x0f, 0x07, 0x03, 0x01 };
 
 
-	std::string CUtils::getCurrentISO8601TimeUTC() {
-
-#ifdef _WIN32
-		struct tm utc_time;
-
-		__int64 ltime;
-		_time64(&ltime);
-
-		errno_t err;
-		err = _gmtime64_s(&utc_time, &ltime);		
-#else
-		std::time_t t = std::time(nullptr);
-		std::tm utc_time = *std::localtime(&t);
-#endif	
-
-		std::stringstream sstream;
-		sstream << std::put_time(&utc_time, "%FT%TZ") << " UTC";
-		return sstream.str();
-
-	}
-
-	std::string CUtils::getCurrentTimeFileName() {
-
-#ifdef _WIN32
-		struct tm utc_time;
-		__int64 ltime;
-		_time64(&ltime);
-
-		errno_t err;
-		err = _gmtime64_s(&utc_time, &ltime);
-
-#else
-		std::time_t t = std::time(nullptr);
-		std::tm utc_time = *std::localtime(&t);
-
-#endif	
-
-		std::stringstream sstream;
-		sstream << std::put_time(&utc_time, "%Y%m%d_%H%M%S");
-		return sstream.str();
-
-
-	}
 
 
 	bool fnUTF16CharIsSurrogate(wchar_t cChar)
@@ -498,22 +454,6 @@ namespace AMCCommon {
 		return normalizeUUIDString (guid.str());
 	}
 
-	void CUtils::sleepMilliseconds(const uint32_t milliSeconds)
-	{
-#ifdef _WIN32
-			std::this_thread::sleep_for(std::chrono::milliseconds(milliSeconds));
-#else
-		struct timespec tim, tim2;
-		tim.tv_sec = milliSeconds / 1000;
-		tim.tv_nsec = (milliSeconds % 1000) * 1000000;
-
-		if (nanosleep(&tim, &tim2) < 0) {
-			throw std::runtime_error("sleep failed");
-		}
-
-#endif
-
-	}
 
 
 	void CUtils::deleteFileFromDisk(const std::string& sFileName, bool bMustSucceed)

@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_INFOBOX
-#define __AMC_UI_MODULE_INFOBOX
+#ifndef __AMC_UI_MODULE_CONTENT
+#define __AMC_UI_MODULE_CONTENT
 
 #include "header_protection.hpp"
 
@@ -43,25 +43,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_Infobox, PUIModule_Infobox);
-	amcDeclareDependingClass(CUIModule_InfoboxItem, PUIModule_InfoboxItem);
-	amcDeclareDependingClass(CUIModule_InfoboxButton, PUIModule_InfoboxButton);
+	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
+	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
+	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
 
-	class CUIModule_Infobox : public CUIModule {
+	class CUIModule_Content : public CUIModule {
 	protected:		
 
 		std::string m_sHeadLine;
 		std::string m_sTitle;
 		std::string m_sSubtitle;
 
-		std::vector<PUIModule_InfoboxItem> m_Items;
-		std::vector<PUIModule_InfoboxButton> m_Buttons;
+		std::vector<PUIModule_ContentItem> m_Items;
+		std::vector<PUIModule_ContentButton> m_Buttons;
 
 	public:
 
-		CUIModule_Infobox(pugi::xml_node & xmlNode);
+		CUIModule_Content(pugi::xml_node & xmlNode);
 		
-		virtual ~CUIModule_Infobox();
+		virtual ~CUIModule_Content();
 
 		virtual std::string getType() override;
 
@@ -79,5 +79,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE_INFOBOX
+#endif //__AMC_UI_MODULE_CONTENT
 
