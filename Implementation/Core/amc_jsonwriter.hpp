@@ -60,6 +60,8 @@ namespace AMC {
 
 		void addInteger(const std::string& sName, int64_t nValue);
 
+		void addDouble(const std::string& sName, double dValue);
+
 		void addObject(const std::string& sName, CJSONWriterObject & object);
 
 		void addArray(const std::string& sName, CJSONWriterArray & array);
@@ -83,6 +85,8 @@ namespace AMC {
 		void addString(const std::string& sValue);
 
 		void addInteger(int64_t nValue);
+
+		void addDouble(const std::string& sName, double dValue);
 
 		void addObject(CJSONWriterObject& object);
 
@@ -109,6 +113,8 @@ namespace AMC {
 		void addString(const std::string& sName, const std::string& sValue);
 
 		void addInteger(const std::string& sName, int64_t nValue);
+
+		void addDouble(const std::string& sName, double dValue);
 
 		void addObject(const std::string& sName, CJSONWriterObject& object);
 

@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 CUIHandler::CUIHandler()
+    : m_dLogoAspectRatio (1.0)
 {
 
 }
@@ -106,6 +107,8 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
     writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
     writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
     writer.addString(AMC_API_KEY_UI_MAINPAGE, m_pMainPage->getName());
+    writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
+    writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
 
 }
 
@@ -189,6 +192,20 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
     std::string sMainPage(mainpageAttrib.as_string());
 
+    auto logoNode = xmlNode.child("logo");
+    if (!logoNode.empty()) {
+
+        auto uuidAttrib = logoNode.attribute("uuid");
+        m_sLogoUUID = uuidAttrib.as_string();
+
+        auto aspectratioAttrib = logoNode.attribute("aspectratio");
+        if (!aspectratioAttrib.empty()) {
+            m_dLogoAspectRatio = aspectratioAttrib.as_float();
+        }
+        else {
+            m_dLogoAspectRatio = 1.0;
+        }
+    }
 
     auto pageNodes = xmlNode.children("page");
     for (pugi::xml_node pageNode : pageNodes) {

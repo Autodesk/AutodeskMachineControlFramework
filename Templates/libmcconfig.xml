@@ -233,35 +233,62 @@
   </statemachine>
 
   
-  <userinterface appname="AMDroid 1.0" copyright="2020 Autodesk Inc." mainpage="main" >
-
+  <userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main">
+  
+		<logo uuid="24070b86-0040-4c6c-b92f-db84a526aa68" aspectratio="2.5" />
+		
 		<page name="main">
 
-			<infobox name="infobox" title="Welcome to AMDroid" headline="Autodesk Control360 Framework" subtitle="Make Additive Manufacturing accessible">
+			<content name="infobox" title="Welcome to AMdroid" headline="Autodesk Machine Control Framework" subtitle="Make Additive Manufacturing accessible">
 				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image uuid="5db1a466-90a3-48d5-9eb5-8820733d4690" />
+				<image uuid="24070b86-0040-4c6c-b92f-db84a526aa68" />
 				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
 				
-				<button caption="Build list" targetpage="buildlist" />
-				<button caption="Parameter list" targetpage="parameters" />
+				<upload class="build" caption="Drag 3MF files here to upload" />
 				
-			</infobox>		
+				<button caption="Build Library" targetpage="buildlist" />
+				<button caption="System Status" targetpage="systemstatus" />
+				
+			</content>		
 
 		</page>
 
 		<page name="buildlist">
+		
+			<content name="buildlibrary" title="Build Library" subtitle="Make Additive Manufacturing accessible">
+				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
+				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
+				
+				<upload class="build" caption="Drag 3MF files here to upload" />
+				
+				<button caption="Start Build" targetpage="startbuild" />				
+			</content>		
 
 		</page>
 
-		<page name="parameters">
+		<page name="systemstatus">
 
 		</page>
 
+		<page name="manualcontrol">
+
+		</page>
+
+		<page name="currentbuild">
+
+		</page>
+
+		<page name="settings">
+
+		</page>
 
 		<menu>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
-			<item id="testpage" icon="mdi-apps" caption="Test" targetpage="parameters"/>
+			<item id="build" icon="mdi-factory" caption="Build Library" targetpage="buildlist"/>
+			<item id="currentbuild" icon="mdi-factory" caption="Current Build" targetpage="currentbuild"/>
+			<item id="systemstatus" icon="mdi-apps" caption="System Status" targetpage="systemstatus"/>
+			<item id="settings" icon="mdi-settings" caption="Manual Control" targetpage="manualcontrol"/>
+			<item id="settings" icon="mdi-settings" caption="Settings" targetpage="settings"/>
 
 		</menu>
 

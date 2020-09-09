@@ -39,6 +39,7 @@ Abstract: This is a stub class definition of CBuildJobHandler
 #include "libmcdata_buildjobiterator.hpp"
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -73,7 +74,8 @@ IBuildJob* CBuildJobHandler::CreateJob(const std::string& sJobUUID, const std::s
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_DUPLICATEJOBUUID);
     pStatement = nullptr;
 
-    std::string sTimeStamp = AMCCommon::CUtils::getCurrentISO8601TimeUTC();
+    AMCCommon::CChrono chrono;
+    std::string sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
     LibMCData::eBuildJobStatus eJobStatus = LibMCData::eBuildJobStatus::Created;
 
     std::string sInsertQuery = "INSERT INTO buildjobs (uuid, name, status, timestamp, storagestreamuuid, userid) VALUES (?, ?, ?, ?, ?, ?)";

@@ -28,47 +28,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
-#define __AMCIMPL_API_CONSTANTS
+#include "amcdata_databasemigrator_users.hpp"
+#include "libmcdata_interfaceexception.hpp"
 
-#include "amc_ui_module_infoboxbutton.hpp"
-#include "libmc_interfaceexception.hpp"
+namespace AMCData {
+		
+	void CDatabaseMigrationClass_Users::increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex)
+	{
 
-#include "amc_api_constants.hpp"
-#include "Common/common_utils.hpp"
+		if (pTransaction.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-using namespace AMC;
+		switch (nCurrentVersionIndex) {
+		case 0: {
+				std::string sStreamsQuery = "CREATE TABLE `users` (";
+				sStreamsQuery += "`uuid`  varchar ( 64 ) UNIQUE NOT NULL,";
+				sStreamsQuery += "`login`  varchar ( 256 ) NOT NULL,";
+				sStreamsQuery += "`salt`  varchar ( 256 ) NOT NULL,";
+				sStreamsQuery += "`passwordhash`  varchar ( 256 ) NOT NULL,";
+				sStreamsQuery += "`updateuuid`  varchar ( 64 ))";
+				pTransaction->executeStatement(sStreamsQuery);
 
-CUIModule_InfoboxButton::CUIModule_InfoboxButton(const std::string& sCaption, const std::string& sTargetPage)
-	: m_sUUID (AMCCommon::CUtils::createUUID ()), m_sCaption (sCaption), m_sTargetPage (sTargetPage)
-{
+				break;
+			}
+
+		}
+	}
+
 
 }
 
-CUIModule_InfoboxButton::~CUIModule_InfoboxButton()
-{
 
-}
-
-std::string CUIModule_InfoboxButton::getUUID()
-{
-	return m_sUUID;
-}
-
-std::string CUIModule_InfoboxButton::getCaption()
-{
-	return m_sCaption;
-}
-
-std::string CUIModule_InfoboxButton::getTargetPage()
-{
-	return m_sTargetPage;
-}
-
-
-void CUIModule_InfoboxButton::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-	object.addString(AMC_API_KEY_UI_BUTTONUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_BUTTONCAPTION, m_sCaption);
-	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, m_sTargetPage);
-}

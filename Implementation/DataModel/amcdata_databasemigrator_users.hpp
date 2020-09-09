@@ -28,76 +28,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
-#define __AMCIMPL_API_CONSTANTS
 
-#include "amc_ui_module_infoboxitem.hpp"
-#include "libmc_interfaceexception.hpp"
+#ifndef __AMCDATA_DATABASEMIGRATOR_USERS
+#define __AMCDATA_DATABASEMIGRATOR_USERS
 
-#include "amc_api_constants.hpp"
-#include "Common/common_utils.hpp"
+#include "amcdata_databasemigrator.hpp"
 
-using namespace AMC;
+namespace AMCData {
 
-
-CUIModule_InfoboxItem::CUIModule_InfoboxItem(const std::string& sUUID)
-	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
-{
-
-}
-
-CUIModule_InfoboxItem::~CUIModule_InfoboxItem()
-{
-
-}
-
-std::string CUIModule_InfoboxItem::getUUID()
-{
-	return m_sUUID;
-}
-
-
-
-CUIModule_InfoboxParagraph::CUIModule_InfoboxParagraph(const std::string& sText)
-	: CUIModule_InfoboxItem (AMCCommon::CUtils::createUUID ()), m_sText (sText)
-{
-
-}
-
-CUIModule_InfoboxParagraph::~CUIModule_InfoboxParagraph()
-{
-
-}
-
-std::string CUIModule_InfoboxParagraph::getText()
-{
-	return m_sText;
-}
-
-void CUIModule_InfoboxParagraph::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "paragraph");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_ITEMTEXT, m_sText);
-}
-
-
-
-CUIModule_InfoboxImage::CUIModule_InfoboxImage(const std::string& sUUID)
-	: CUIModule_InfoboxItem (sUUID)
-{
-
-}
-
-CUIModule_InfoboxImage::~CUIModule_InfoboxImage()
-{
+	class CDatabaseMigrationClass_Users : public CDatabaseMigrationClass {
+	public:
+		void increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex) override;
+	};
 
 }
 
 
-void CUIModule_InfoboxImage::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-}
-
+#endif //__AMCDATA_DATABASEMIGRATOR_USERS

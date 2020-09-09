@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 
 using namespace LibMCEnv::Impl;
@@ -73,8 +74,8 @@ void CSignalTrigger::Trigger()
 
 bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOut)
 {
-	auto startTime = std::chrono::high_resolution_clock::now();
-	auto endTime = startTime + std::chrono::milliseconds(nTimeOut);
+
+	AMCCommon::CChrono chrono;
 
 	if (m_sTriggeredUUID.length() == 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED);
@@ -89,14 +90,14 @@ bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOut)
 			return true;
 		}
 
-		bIsTimeOut = std::chrono::high_resolution_clock::now() >= endTime;
+		bIsTimeOut = chrono.getExistenceTimeInMilliseconds () > nTimeOut;
 
 		if (!bIsTimeOut) {
 			// TODO
 			//if (CheckForTermination())
 				//throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TERMINATED);
 			
-			AMCCommon::CUtils::sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);
+			chrono.sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);
 		}
 	}
 

@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger.hpp"
 #include "amc_parameterhandler.hpp"
 
+#include "common_chrono.hpp"
+
 #include <map>
 #include <string>
 #include <thread>
@@ -78,7 +80,7 @@ namespace AMC {
 
 		// Current State Name
 		std::string m_sCurrentStateName;
-		std::mutex m_Mutex_CurrentStateName;
+		std::mutex m_Mutex_CurrentStateName;		
 
 		// Thread functions
 		bool threadIsRunning();

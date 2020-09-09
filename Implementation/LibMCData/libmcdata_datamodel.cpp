@@ -35,12 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_storage.hpp"
 #include "libmcdata_logsession.hpp"
 #include "libmcdata_buildjobhandler.hpp"
+#include "libmcdata_loginhandler.hpp"
 
 #include "amcdata_databasemigrator.hpp"
 #include "amcdata_sqlhandler_sqlite.hpp"
 
 #include "amcdata_databasemigrator_storage.hpp"
 #include "amcdata_databasemigrator_buildjobs.hpp"
+#include "amcdata_databasemigrator_users.hpp"
 
 #include "common_utils.hpp"
 
@@ -60,7 +62,6 @@ CDataModel::CDataModel()
 void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType eDataBaseType, const std::string & sConnectionString)
     
 {
-    m_eDataBaseType = eDataBaseType;
     m_pStoragePath = std::make_shared<AMCData::CStoragePath> (sDataDirectory);
     if (eDataBaseType == eDataBaseType::SqLite) {
         m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sConnectionString);
@@ -69,17 +70,30 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATABASETYPE);
     }
 
-
     // ADD DATABASE MIGRATORS HERE!
     AMCData::CDatabaseMigrator migrator;
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Storage>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_BuildJobs>());
-    migrator.migrateDatabaseSchemas(m_pSQLHandler);
+    migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Users>());
+    migrator.migrateDatabaseSchemas(m_pSQLHandler, m_sInstallationUUID, m_sInstallationSecret);
+
+    // Store Database type after successful initialisation
+    m_eDataBaseType = eDataBaseType;
 }
 
 LibMCData_uint32 CDataModel::GetDataModelVersion()
 {
 	return AMCData::CDatabaseMigrator::getCurrentSchemaVersion ();
+}
+
+void CDataModel::GetInstallationInformation(std::string& sInstallationUUID, std::string& sInstallationSecret)
+{
+    if (m_eDataBaseType == eDataBaseType::Unknown)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UNKNOWNDATABASETYPE);
+
+    sInstallationUUID = AMCCommon::CUtils::normalizeUUIDString (m_sInstallationUUID);
+    sInstallationSecret = AMCCommon::CUtils::normalizeSHA256String (m_sInstallationSecret);
+
 }
 
 IStorage * CDataModel::CreateStorage()
@@ -108,3 +122,9 @@ IBuildJobHandler* CDataModel::CreateBuildJobHandler()
 
     return new CBuildJobHandler(m_pSQLHandler, m_pStoragePath);
 }
+
+ILoginHandler* CDataModel::CreateLoginHandler()
+{
+    return new CLoginHandler(m_pSQLHandler);
+}
+

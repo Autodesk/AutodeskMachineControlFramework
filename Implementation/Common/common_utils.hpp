@@ -52,8 +52,6 @@ namespace AMCCommon {
 
 	public:
 
-		static std::string getCurrentISO8601TimeUTC();
-		static std::string getCurrentTimeFileName();
 		static std::string createUUID();
 		static std::string normalizeUUIDString(std::string sRawString);
 		static std::string normalizeSHA256String(std::string sRawString);		
@@ -72,7 +70,6 @@ namespace AMCCommon {
 		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);
 		static std::string decodeBase64ToASCIIString(const std::string& sString, eBase64Type eType);
 
-		static void sleepMilliseconds(const uint32_t milliSeconds);
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
 	};
 

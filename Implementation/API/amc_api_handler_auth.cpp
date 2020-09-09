@@ -44,11 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, const std::string& sInstallationSecret, const std::string& sGitHash)
-	: m_pSessionHandler(pSessionHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash)
+CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash)
+	: m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash)
 {
 
 	if (pSessionHandler.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pLoginHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
@@ -135,17 +137,18 @@ void CAPIHandler_Auth::handleNewSessionRequest(const uint8_t* pBodyData, const s
 
 	auto sUserName = pRequest.getNameString(AMC_API_KEY_AUTH_USERNAME, LIBMC_ERROR_INVALIDUSERNAME);
 	if (sUserName.empty ())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDUSERNAME);
-
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDUSERNAME);	
+	
 	std::string sLoginSalt;
-	if (sUserName == "test") {
-		sLoginSalt = AMCCommon::CUtils::calculateSHA256FromString ("123"); // Generate dummy salt
-		auto sHashedPassword = AMCCommon::CUtils::calculateSHA256FromString(sLoginSalt + "test"); // Generate hashes password "test"
+	if (m_pLoginHandler->UserExists (sUserName)) {
+		std::string sHashedPassword;
+		// password hash is calculateSHA256FromString(sLoginSalt + "password"); 
+		m_pLoginHandler->GetUserDetails(sUserName, sLoginSalt, sHashedPassword);
 		m_pSessionHandler->setUserDetailsForSession(pAuth->getSessionUUID(), sUserName, sHashedPassword);
 	}
 	else {
-		// If user has not been found, then generate a random salt to not show that the user is not existing.
-		sLoginSalt = AMCCommon::CUtils::calculateSHA256FromString(m_sGitHash + m_sInstallationSecret + sUserName);
+		// If user has not been found, then generate a repeatable salt to not show that the user is not existing.
+		sLoginSalt = AMCCommon::CUtils::calculateSHA256FromString(m_sGitHash + m_sInstallationSecret + AMCCommon::CUtils::calculateSHA256FromString (sUserName));
 	}
 
 	writer.addString(AMC_API_KEY_AUTH_SESSIONUUID, pAuth->getSessionUUID());

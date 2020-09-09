@@ -28,53 +28,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_UI_MODULE
+#define __AMCIMPL_API_CONSTANTS
 
-#ifndef __AMC_API_HANDLER_UI
-#define __AMC_API_HANDLER_UI
+#include "amc_ui_module_contentbutton.hpp"
+#include "libmc_interfaceexception.hpp"
 
-#include "amc_api_handler.hpp"
-#include "amc_logger.hpp"
-#include "amc_api_response.hpp"
+#include "amc_api_constants.hpp"
+#include "Common/common_utils.hpp"
 
-#include "amc_systemstate.hpp"
+using namespace AMC;
 
-namespace AMC {
+CUIModule_ContentButton::CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage)
+	: m_sUUID (AMCCommon::CUtils::createUUID ()), m_sCaption (sCaption), m_sTargetPage (sTargetPage)
+{
 
-	enum class APIHandler_UIType {
-		utUnknown = 0,
-		utConfiguration = 1,
-		utState = 2,
-		utImage = 3
-	};
+}
 
-	class CAPIHandler_UI : public CAPIHandler {
-	private:
-		
-		PSystemState m_pSystemState;
+CUIModule_ContentButton::~CUIModule_ContentButton()
+{
 
-		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sParameterUUID);
+}
 
-		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
-		void handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth);
-		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);
+std::string CUIModule_ContentButton::getUUID()
+{
+	return m_sUUID;
+}
 
-	public:
+std::string CUIModule_ContentButton::getCaption()
+{
+	return m_sCaption;
+}
 
-		CAPIHandler_UI(PSystemState pSystemState);
-
-		virtual ~CAPIHandler_UI();
-				
-		virtual void checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) override;
-
-		virtual std::string getBaseURI () override;
-
-		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
-
-	};
-
-	
+std::string CUIModule_ContentButton::getTargetPage()
+{
+	return m_sTargetPage;
 }
 
 
-#endif //__AMC_API_HANDLER_UI
-
+void CUIModule_ContentButton::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_BUTTONUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_BUTTONCAPTION, m_sCaption);
+	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, m_sTargetPage);
+}

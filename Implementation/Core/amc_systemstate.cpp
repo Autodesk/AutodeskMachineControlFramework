@@ -42,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdata_dynamic.hpp"
 
+#include "common_chrono.hpp"
+
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
@@ -57,12 +59,18 @@ namespace AMC {
 		if (pDriverEnvWrapper.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
+
 		m_pLogger = pLogger;
+		m_pDataModel = pDataModel;
+
+		// Retrieve Installation UUID and Secret
+		m_pDataModel->GetInstallationInformation(m_sInstallationUUID, m_sInstallationSecret);
 
 		// Create Data Model Instances
-		m_pDataModel = pDataModel;
 		m_pStorage = m_pDataModel->CreateStorage();
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
 
 		m_pDriverHandler = std::make_shared<CDriverHandler>(pDriverEnvWrapper);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
@@ -127,6 +135,17 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
+	LibMCData::PLoginHandler CSystemState::getLoginHandlerInstance()
+	{
+		return m_pLoginHandler;
+	}
+
+	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
+	{
+		return m_pGlobalChrono;
+
+	}
+
 	LibMCData::CStorage * CSystemState::storage()
 	{
 		return m_pStorage.get();
@@ -137,6 +156,15 @@ namespace AMC {
 		return m_pBuildJobHandler.get();
 	}
 
+	LibMCData::CLoginHandler* CSystemState::loginHandler()
+	{
+		return m_pLoginHandler.get();
+	}
+
+	AMCCommon::CChrono* CSystemState::globalChrono()
+	{
+		return m_pGlobalChrono.get();
+	}
 
 	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath)
 	{
@@ -160,16 +188,14 @@ namespace AMC {
 	}
 
 
-	std::string CSystemState::getInstallationID()
+	std::string CSystemState::getInstallationUUID()
 	{
-		// TODO: Find out a way to define a system ID
-		return getGitHash();
+		return m_sInstallationUUID;
 	}
 
 	std::string CSystemState::getInstallationSecret()
 	{
-		// TODO: Find out a way to define a system Secret
-		return getGitHash();
+		return m_sInstallationSecret;
 	}
 
 	std::string CSystemState::getGitHash()

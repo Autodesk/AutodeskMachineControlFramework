@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_INFOBOXBUTTON
-#define __AMC_UI_MODULE_INFOBOXBUTTON
+#ifndef __AMC_UI_MODULE_CONTENTITEM
+#define __AMC_UI_MODULE_CONTENTITEM
 
 #include "header_protection.hpp"
 
@@ -43,35 +43,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_InfoboxButton, PUIModule_InfoboxButton);
-	
-	class CUIModule_InfoboxButton {		
+	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
+	amcDeclareDependingClass(CUIModule_ContentParagraph, PUIModule_ContentParagraph);
+	amcDeclareDependingClass(CUIModule_ContentImage, PUIModule_ContentImage);
+	amcDeclareDependingClass(CUIModule_ContentUpload, PUIModule_ContentUpload);
+
+	class CUIModule_ContentItem {
 	protected:		
 
 		std::string m_sUUID;
-		std::string m_sCaption;
-		std::string m_sTargetPage;
 
 	public:
 
-		CUIModule_InfoboxButton(const std::string & sCaption, const std::string & sTargetPage);
+		CUIModule_ContentItem(const std::string & sUUID);
 		
-		virtual ~CUIModule_InfoboxButton();
+		virtual ~CUIModule_ContentItem();
 
 		std::string getUUID ();
 
-		std::string getCaption();
-
-		std::string getTargetPage();
-
-		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object);
+		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object) = 0;
 		
 	};
 
+	class CUIModule_ContentParagraph : public CUIModule_ContentItem {
+	protected:		
 
+		std::string m_sText;
+
+	public:
+
+		CUIModule_ContentParagraph(const std::string & sText);
+		
+		virtual ~CUIModule_ContentParagraph();
+
+		std::string getText ();
+
+		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+	};
+
+
+	class CUIModule_ContentImage : public CUIModule_ContentItem {
+	protected:		
+
+	public:
+
+		CUIModule_ContentImage(const std::string & sUUID);
+		
+		virtual ~CUIModule_ContentImage();
+
+		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+	};
+
+	class CUIModule_ContentUpload : public CUIModule_ContentItem {
+	protected:
+		std::string m_sUploadClass;
+		std::string m_sUploadCaption;
+
+	public:
+
+		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption);
+
+		virtual ~CUIModule_ContentUpload();
+
+		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+	};
 	
 }
 
 
-#endif //__AMC_UI_MODULE_INFOBOXBUTTON
+#endif //__AMC_UI_MODULE_CONTENTITEM
 

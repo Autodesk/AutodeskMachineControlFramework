@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module.hpp"
-#include "amc_ui_module_infobox.hpp"
-#include "amc_ui_module_infoboxitem.hpp"
-#include "amc_ui_module_infoboxbutton.hpp"
+#include "amc_ui_module_content.hpp"
+#include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_module_contentbutton.hpp"
 
 #include "amc_api_constants.hpp"
 
@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_Infobox::CUIModule_Infobox(pugi::xml_node& xmlNode)	
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
@@ -66,18 +66,24 @@ CUIModule_Infobox::CUIModule_Infobox(pugi::xml_node& xmlNode)
 		std::string sChildName = childNode.name();
 		if (sChildName == "paragraph") {
 			auto textAttrib = childNode.attribute("text");
-			m_Items.push_back(std::make_shared <CUIModule_InfoboxParagraph> (textAttrib.as_string ()));
+			m_Items.push_back(std::make_shared <CUIModule_ContentParagraph> (textAttrib.as_string ()));
 		}
 
 		if (sChildName == "image") {
 			auto uuidAttrib = childNode.attribute("uuid");
-			m_Items.push_back(std::make_shared <CUIModule_InfoboxImage>(uuidAttrib.as_string()));
+			m_Items.push_back(std::make_shared <CUIModule_ContentImage>(uuidAttrib.as_string()));
+		}
+
+		if (sChildName == "upload") {
+			auto classAttrib = childNode.attribute("class");
+			auto captionAttrib = childNode.attribute("caption");
+			m_Items.push_back(std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string()));
 		}
 
 		if (sChildName == "button") {
 			auto captionAttrib = childNode.attribute("caption");
 			auto targetpageAttrib = childNode.attribute("targetpage");
-			m_Buttons.push_back(std::make_shared <CUIModule_InfoboxButton>(captionAttrib.as_string (), targetpageAttrib.as_string ()));
+			m_Buttons.push_back(std::make_shared <CUIModule_ContentButton>(captionAttrib.as_string (), targetpageAttrib.as_string ()));
 		}
 
 	}
@@ -86,38 +92,38 @@ CUIModule_Infobox::CUIModule_Infobox(pugi::xml_node& xmlNode)
 }
 
 
-CUIModule_Infobox::~CUIModule_Infobox()
+CUIModule_Content::~CUIModule_Content()
 {
 }
 
 
 
-std::string CUIModule_Infobox::getStaticType()
+std::string CUIModule_Content::getStaticType()
 {
-	return "infobox";
+	return "content";
 }
 
-std::string CUIModule_Infobox::getType()
+std::string CUIModule_Content::getType()
 {
 	return getStaticType();
 }
 
-std::string CUIModule_Infobox::getHeadLine()
+std::string CUIModule_Content::getHeadLine()
 {
 	return m_sHeadLine;
 }
 
-std::string CUIModule_Infobox::getTitle()
+std::string CUIModule_Content::getTitle()
 {
 	return m_sTitle;
 }
 
-std::string CUIModule_Infobox::getSubtitle()
+std::string CUIModule_Content::getSubtitle()
 {
 	return m_sSubtitle;
 }
 
-void CUIModule_Infobox::writeToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
+void CUIModule_Content::writeToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());

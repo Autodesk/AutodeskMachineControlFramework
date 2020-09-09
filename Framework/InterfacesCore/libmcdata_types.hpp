@@ -324,6 +324,9 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_DUPLICATEMODULE 297
 #define LIBMCDATA_ERROR_INVALIDMODULENAME 298
 #define LIBMCDATA_ERROR_INVALIDMODULETYPE 299
+#define LIBMCDATA_ERROR_INVALIDHEADLINE 300
+#define LIBMCDATA_ERROR_USERNOTFOUND 301
+#define LIBMCDATA_ERROR_STREAMISNOTIMAGE 302
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -560,6 +563,9 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_DUPLICATEMODULE: return "Duplicate module";
     case LIBMCDATA_ERROR_INVALIDMODULENAME: return "Invalid module name";
     case LIBMCDATA_ERROR_INVALIDMODULETYPE: return "Invalid module type";
+    case LIBMCDATA_ERROR_INVALIDHEADLINE: return "Invalid headline";
+    case LIBMCDATA_ERROR_USERNOTFOUND: return "User not found";
+    case LIBMCDATA_ERROR_STREAMISNOTIMAGE: return "Stream is not image";
     default: return "unknown error";
   }
 }
@@ -578,6 +584,7 @@ typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
+typedef LibMCDataHandle LibMCData_LoginHandler;
 typedef LibMCDataHandle LibMCData_DataModel;
 
 namespace LibMCData {

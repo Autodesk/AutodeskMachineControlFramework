@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_stdout.hpp"
 #include "libmc_interfaceexception.hpp"
 
-#include <chrono>
 #include <string>
 #include <sstream>
 #include <iomanip>
