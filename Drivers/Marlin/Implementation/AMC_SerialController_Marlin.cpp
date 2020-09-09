@@ -185,7 +185,8 @@ namespace AMC {
 		sendCommand("M149 C"); // set temperature unit to Celsius
 		sendCommand("M113 S1"); // keep alive period 0-60 possible, no decimals!
 		setPositioningAbolute();
-
+		setAbsoluteExtrusion(true);
+		
 		if (m_nCurrentBufferSpace > 0) {
 			m_nMaxBufferSpace = m_nCurrentBufferSpace;
 		}
@@ -388,9 +389,16 @@ namespace AMC {
 	
 	void CSerialController_Marlin::queryTemperatureState(uint32_t nExtruderIndex)
 	{
-		if (nExtruderIndex < m_iExtruderCount)
+		if ((nExtruderIndex >= 0) && (nExtruderIndex < m_iExtruderCount))
 		{
+			// TODO XXXXXXXXXXXXXXXXXXXXXX to reduce output on cmd line switch debug off temporarily
+			bool bResetDebug = m_bDebug;
+			if (m_bDebug) {
+				m_bDebug = false;
+			}
 			auto sStream = sendCommand("M105 T" + std::to_string(nExtruderIndex));
+			m_bDebug = bResetDebug;
+			
 			auto sLine = sStream.str();
 			auto nPosition = sLine.find("T:");
 
@@ -570,7 +578,14 @@ namespace AMC {
 
 	void CSerialController_Marlin::queryPositionState()
 	{
+		// TODO XXXXXXXXXXXXXXXXXXXXXX to reduce output on cmd line switch debug off temporarily
+		bool bResetDebug = m_bDebug;
+		if (m_bDebug) {
+			m_bDebug = false;
+		}
 		auto sStream = sendCommand("M114");
+		m_bDebug = bResetDebug;
+		
 		auto sLine = sStream.str();
 
 		auto nPosition = sLine.find("Count");
@@ -635,16 +650,26 @@ namespace AMC {
 
 	}
 
-	void CSerialController_Marlin::getHeatedBedTemperature(double& dTargetTemperature, double& dCurrentTemperature)
+	void CSerialController_Marlin::getHeatedBedTargetTemperature(double& dTargetTemperature)
 	{
 		dTargetTemperature = m_dTargetBedTemp;
+	}
+
+	void CSerialController_Marlin::getHeatedBedCurrentTemperature(double& dCurrentTemperature)
+	{
 		dCurrentTemperature = m_dCurrentBedTemp;
 	}
 
-	void CSerialController_Marlin::getExtruderTemperature(uint32_t nExtruderIndex, double& dTargetTemperature, double& dCurrentTemperature)
+	void CSerialController_Marlin::getExtruderTargetTemperature(uint32_t nExtruderIndex, double& dTargetTemperature)
 	{
 		if (nExtruderIndex < m_iExtruderCount) {
 			dTargetTemperature = m_dTargetExtruderTemp[nExtruderIndex];
+		}
+	}
+
+	void CSerialController_Marlin::getExtruderCurrentTemperature(uint32_t nExtruderIndex, double& dCurrentTemperature)
+	{
+		if (nExtruderIndex < m_iExtruderCount) {
 			dCurrentTemperature = m_dCurrentExtruderTemp[nExtruderIndex];
 		}
 	}
@@ -731,8 +756,9 @@ namespace AMC {
 		}
 		if (bInE && !bFastMove) {
 			// E given => add E+value to command str
-			// TODO remove to activate Extrusion
+			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
 			//sCommand << " E" << dE;
+			std::cout << "CALCULATED E = " << dE << std::endl;
 		}
 		if (dSpeedInMMperSecond > 0) {
 			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
@@ -811,6 +837,51 @@ namespace AMC {
 	void CSerialController_Marlin::emergencyStop()
 	{
 		sendCommand("M112");
+	}
+
+
+	void CSerialController_Marlin::powerOff()
+	{
+		sendCommand("M81");
+	}
+
+	void CSerialController_Marlin::stopIdleHold()
+	{
+		sendCommand("M84");
+	}
+
+	void CSerialController_Marlin::setAbsoluteExtrusion(bool bAbsolute)
+	{
+		std::string sCommand;
+		if (bAbsolute) {
+			// absolute mode
+			sCommand  = "M82";
+		}
+		else {
+			// relative mode
+			sCommand = "M83";
+		}
+		sendCommand(sCommand);
+	}
+
+
+	void CSerialController_Marlin::setAxisPosition(const std::string& sAxis, double dValue)
+	{
+		sendCommand("G92 " + sAxis + std::to_string(dValue));		
+	}
+
+	void CSerialController_Marlin::extruderDoExtrude(double dE, double dSpeedInMMperSecond)
+	{
+		std::stringstream sCommand;
+
+		sCommand << "G1 E" << dE;
+
+		if (dSpeedInMMperSecond > 0) {
+			sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
+		}
+		// TODO XXXXXXXXXXXXXXXX activate to do extrusion
+		//sendCommand(sCommand.str());
+		std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
 	}
 
 

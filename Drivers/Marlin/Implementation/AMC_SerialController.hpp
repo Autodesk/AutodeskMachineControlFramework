@@ -44,8 +44,10 @@ namespace AMC {
 		virtual void queryTemperatureState (uint32_t nExtruderIndex) = 0;
 		virtual void queryPositionState () = 0;
 
-		virtual void getHeatedBedTemperature(double & dTargetTemperature, double & dCurrentTemperature) = 0;
-		virtual void getExtruderTemperature(uint32_t nExtruderIndex, double& dTargetTemperature, double& dCurrentTemperature) = 0;
+		virtual void getHeatedBedTargetTemperature(double& dTargetTemperature) = 0;
+		virtual void getHeatedBedCurrentTemperature(double& dCurrentTemperature) = 0;
+		virtual void getExtruderCurrentTemperature(uint32_t nExtruderIndex, double& dCurrentTemperature) = 0;
+		virtual void getExtruderTargetTemperature(uint32_t nExtruderIndex, double& dTargetTemperature) = 0;
 
 		virtual void getTargetPosition (double & dX, double& dY, double& dZ) = 0;
 		virtual void getCurrentPosition(double& dX, double& dY, double& dZ) = 0;
@@ -60,6 +62,13 @@ namespace AMC {
 
 		virtual void moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond) = 0;
 		virtual void moveFastZ(const double dZ, const double dSpeedInMMperSecond) = 0;
+
+		virtual void setAxisPosition(const std::string& sAxis, double dValue) = 0;
+		virtual void extruderDoExtrude(double dE, double dSpeedInMMperSecond) = 0;
+		virtual void setAbsoluteExtrusion(bool bAbsolute) = 0;
+
+		virtual void stopIdleHold() = 0;
+		virtual void powerOff() = 0;
 
 		virtual bool isHomed() = 0;
 		virtual bool isMoving() = 0;

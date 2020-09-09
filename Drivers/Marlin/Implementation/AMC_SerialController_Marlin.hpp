@@ -107,8 +107,10 @@ namespace AMC {
 		void queryTemperatureState(uint32_t nExtruderIndex) override;
 		void queryPositionState() override;
 
-		void getHeatedBedTemperature(double& dTargetTemperature, double& dCurrentTemperature) override;
-		void getExtruderTemperature(uint32_t nExtruderIndex, double& dTargetTemperature, double& dCurrentTemperature) override;
+		void getHeatedBedCurrentTemperature(double& dCurrentTemperature) override;
+		void getHeatedBedTargetTemperature(double& dTargetTemperature) override;
+		void getExtruderCurrentTemperature(uint32_t nExtruderIndex, double& dCurrentTemperature) override;
+		void getExtruderTargetTemperature(uint32_t nExtruderIndex, double& dTargetTemperature) override;
 
 		void getTargetPosition(double& dX, double& dY, double& dZ) override;
 		void getCurrentPosition(double& dX, double& dY, double& dZ) override;
@@ -123,6 +125,13 @@ namespace AMC {
 		void moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond) override;
 		void moveFastZ(const double dZ, const double dSpeedInMMperSecond) override;
 
+		void setAxisPosition(const std::string& sAxis, double dValue) override;
+		void extruderDoExtrude(double dE, double dSpeedInMMperSecond) override;
+		void setAbsoluteExtrusion(bool bAbsolute) override;
+
+		void stopIdleHold() override;
+		void powerOff() override;
+		
 		bool isHomed() override;
 		bool isMoving() override;
 		bool canReceiveMovement() override;
