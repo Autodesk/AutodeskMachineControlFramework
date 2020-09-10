@@ -46,16 +46,23 @@ namespace AMC {
 	private:
 
 		std::string m_sSessionUUID;
-			
+		std::string m_sSessionKey;
+		std::string m_sUserName;
+		bool m_bIsAuthorized;
+
+	protected:
+
 	public:
 
-		CAPIAuth(const std::string & sSessionUUID);
+		CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string & sUserName, bool bIsAuthorized);
 
 		virtual ~CAPIAuth();
 		
 		std::string getUserName ();
 
 		std::string getSessionUUID();
+
+		std::string getSessionKey();
 
 		bool userIsAuthorized();
 

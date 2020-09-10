@@ -72,6 +72,7 @@ private:
     std::map<std::string, AMCData::PStorageWriter> m_PartialWriters;
 
     std::set<std::string> m_AcceptedContentTypes;
+    std::set<std::string> m_ImageContentTypes;
 
     void insertDBEntry(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID);
 
@@ -96,6 +97,8 @@ public:
     LibMCData_uint64 GetMaxStreamSize() override;
 
     bool ContentTypeIsAccepted(const std::string& sContentType) override;
+
+    bool StreamIsImage(const std::string& sUUID) override;
 
 };
 

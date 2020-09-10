@@ -113,9 +113,10 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetHeaderInformatio
 * @param[in] pCOMPort - Device Port to connect to
 * @param[in] nBaudrate - Baudrate to use
 * @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+* @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_ConnectPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_ConnectPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
 
 /**
 * Disconnects from the Marlin board.
@@ -139,9 +140,10 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetAbsoluteP
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dTemperatureInDegreeCelcius - Bed target temperature.
+* @param[in] bWaitForTemp - If true, waits for the target bed temperature to be reached before proceeding
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetHeatedBedTargetTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetHeatedBedTargetTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, bool bWaitForTemp);
 
 /**
 * Sets target temperature of the given extruder.
@@ -149,9 +151,20 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetHeatedBed
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] nExtruderID - ID of extruder.
 * @param[in] dTemperatureInDegreeCelcius - Extruder target temperature.
+* @param[in] bWaitForTemp - If true, waits for the target extruder temperature to be reached before proceeding
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetExtruderTargetTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetExtruderTargetTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, bool bWaitForTemp);
+
+/**
+* Turns on one of the fans and set its speed.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] nFanID - ID of fan.
+* @param[in] nSpeed - Fan speed [0..255]. 0=0%!.(MISSING).255=100%!
+(MISSING)* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetFanSpeedPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nFanID, LibMCDriver_Marlin_uint32 nSpeed);
 
 /**
 * Sets PID parameters.
@@ -165,12 +178,21 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetExtruderT
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetPidParametersPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dP, LibMCDriver_Marlin_double dI, LibMCDriver_Marlin_double dD);
 
 /**
-* Polls a new state from the firmware.
+* Polls a new state from the printer.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_UpdateStatePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_UpdatePositionStatePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
+
+/**
+* Polls a new temperature state from the printer.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] nExtruderID - ID of extruder.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_UpdateTemperatureStatePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID);
 
 /**
 * Returns the current axis position.
@@ -195,34 +217,51 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetCurrentPo
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetTargetPositionPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pX, LibMCDriver_Marlin_double * pY, LibMCDriver_Marlin_double * pZ);
 
 /**
-* Returns the current extruder position.
+* Returns the target extruder position.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[out] pE - E Value in mm
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetExtruderPositionPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pE);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetExtruderTargetPositionPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pE);
 
 /**
-* Returns the current and the target bed temperature.
+* Returns the the target bed temperature.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[out] pTargetTemperature - Target Temperature in degree celsius.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTargetTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pTargetTemperature);
+
+/**
+* Returns the current bed temperature.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[out] pCurrentTemperature - Current Temperature in degree celsius.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pTargetTemperature, LibMCDriver_Marlin_double * pCurrentTemperature);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedCurrentTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pCurrentTemperature);
 
 /**
-* Returns the current and the target temperature of an extruder.
+* Returns the current temperature of an extruder.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] nExtruderID - ID of Extruder
+* @param[out] pCurrentTemperature - Current Temperature in degree celsius.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetExtruderCurrentTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double * pCurrentTemperature);
+
+/**
+* Returns the target temperature of an extruder.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] nExtruderID - ID of Extruder
 * @param[out] pTargetTemperature - Target Temperature in degree celsius.
-* @param[out] pCurrentTemperature - Current Temperature in degree celsius.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetExtruderTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double * pTargetTemperature, LibMCDriver_Marlin_double * pCurrentTemperature);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_GetExtruderTargetTemperaturePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double * pTargetTemperature);
 
 /**
 * Returns the current PID values.
@@ -263,15 +302,25 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_IsMovingPtr)
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_IsHomedPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool * pValue);
 
 /**
+* Returns if the printer is coneccted
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[out] pValue - True if printer is connected.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_IsConnectedPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool * pValue);
+
+/**
 * Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dX - X Value in mm
 * @param[in] dY - Y Value in mm
+* @param[in] dE - E Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dSpeed);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dX, LibMCDriver_Marlin_double dY, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed);
 
 /**
 * Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -289,10 +338,11 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveFastToXY
 *
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] dZ - Z Value in mm
+* @param[in] dE - E Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dSpeed);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dZ, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed);
 
 /**
 * Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -311,6 +361,59 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_MoveFastToZP
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_StartHomingPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
+
+/**
+* Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_EmergencyStopPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
+
+/**
+* Set the current position of given axis to the specified value.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] pAxis - Axis whose value is to be set.
+* @param[in] dValue - New value for given Axis.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetAxisPositionPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pAxis, LibMCDriver_Marlin_double dValue);
+
+/**
+* Extrudes the specified value with given Feedrate.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] dE - E value in mm
+* @param[in] dSpeed - Extrusion speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_ExtruderDoExtrudePtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed);
+
+/**
+* Sets the extrusion (E axis) to absolute mode.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @param[in] bAbsolute - If true, sets mode to absolute, if false to relative
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_SetAbsoluteExtrusionPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool bAbsolute);
+
+/**
+* Stop the idle hold on all axis and extruder.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_StopIdleHoldPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
+
+/**
+* Turn off the high-voltage power supply.
+*
+* @param[in] pDriver_Marlin - Driver_Marlin instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_PowerOffPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin);
 
 /*************************************************************************************************************************
  Global functions
@@ -397,22 +500,33 @@ typedef struct {
 	PLibMCDriver_MarlinDriver_Marlin_SetAbsolutePositioningPtr m_Driver_Marlin_SetAbsolutePositioning;
 	PLibMCDriver_MarlinDriver_Marlin_SetHeatedBedTargetTemperaturePtr m_Driver_Marlin_SetHeatedBedTargetTemperature;
 	PLibMCDriver_MarlinDriver_Marlin_SetExtruderTargetTemperaturePtr m_Driver_Marlin_SetExtruderTargetTemperature;
+	PLibMCDriver_MarlinDriver_Marlin_SetFanSpeedPtr m_Driver_Marlin_SetFanSpeed;
 	PLibMCDriver_MarlinDriver_Marlin_SetPidParametersPtr m_Driver_Marlin_SetPidParameters;
-	PLibMCDriver_MarlinDriver_Marlin_UpdateStatePtr m_Driver_Marlin_UpdateState;
+	PLibMCDriver_MarlinDriver_Marlin_UpdatePositionStatePtr m_Driver_Marlin_UpdatePositionState;
+	PLibMCDriver_MarlinDriver_Marlin_UpdateTemperatureStatePtr m_Driver_Marlin_UpdateTemperatureState;
 	PLibMCDriver_MarlinDriver_Marlin_GetCurrentPositionPtr m_Driver_Marlin_GetCurrentPosition;
 	PLibMCDriver_MarlinDriver_Marlin_GetTargetPositionPtr m_Driver_Marlin_GetTargetPosition;
-	PLibMCDriver_MarlinDriver_Marlin_GetExtruderPositionPtr m_Driver_Marlin_GetExtruderPosition;
-	PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTemperaturePtr m_Driver_Marlin_GetHeatedBedTemperature;
-	PLibMCDriver_MarlinDriver_Marlin_GetExtruderTemperaturePtr m_Driver_Marlin_GetExtruderTemperature;
+	PLibMCDriver_MarlinDriver_Marlin_GetExtruderTargetPositionPtr m_Driver_Marlin_GetExtruderTargetPosition;
+	PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedTargetTemperaturePtr m_Driver_Marlin_GetHeatedBedTargetTemperature;
+	PLibMCDriver_MarlinDriver_Marlin_GetHeatedBedCurrentTemperaturePtr m_Driver_Marlin_GetHeatedBedCurrentTemperature;
+	PLibMCDriver_MarlinDriver_Marlin_GetExtruderCurrentTemperaturePtr m_Driver_Marlin_GetExtruderCurrentTemperature;
+	PLibMCDriver_MarlinDriver_Marlin_GetExtruderTargetTemperaturePtr m_Driver_Marlin_GetExtruderTargetTemperature;
 	PLibMCDriver_MarlinDriver_Marlin_GetPidParametersPtr m_Driver_Marlin_GetPidParameters;
 	PLibMCDriver_MarlinDriver_Marlin_CanExecuteMovementPtr m_Driver_Marlin_CanExecuteMovement;
 	PLibMCDriver_MarlinDriver_Marlin_IsMovingPtr m_Driver_Marlin_IsMoving;
 	PLibMCDriver_MarlinDriver_Marlin_IsHomedPtr m_Driver_Marlin_IsHomed;
+	PLibMCDriver_MarlinDriver_Marlin_IsConnectedPtr m_Driver_Marlin_IsConnected;
 	PLibMCDriver_MarlinDriver_Marlin_MoveToXYPtr m_Driver_Marlin_MoveToXY;
 	PLibMCDriver_MarlinDriver_Marlin_MoveFastToXYPtr m_Driver_Marlin_MoveFastToXY;
 	PLibMCDriver_MarlinDriver_Marlin_MoveToZPtr m_Driver_Marlin_MoveToZ;
 	PLibMCDriver_MarlinDriver_Marlin_MoveFastToZPtr m_Driver_Marlin_MoveFastToZ;
 	PLibMCDriver_MarlinDriver_Marlin_StartHomingPtr m_Driver_Marlin_StartHoming;
+	PLibMCDriver_MarlinDriver_Marlin_EmergencyStopPtr m_Driver_Marlin_EmergencyStop;
+	PLibMCDriver_MarlinDriver_Marlin_SetAxisPositionPtr m_Driver_Marlin_SetAxisPosition;
+	PLibMCDriver_MarlinDriver_Marlin_ExtruderDoExtrudePtr m_Driver_Marlin_ExtruderDoExtrude;
+	PLibMCDriver_MarlinDriver_Marlin_SetAbsoluteExtrusionPtr m_Driver_Marlin_SetAbsoluteExtrusion;
+	PLibMCDriver_MarlinDriver_Marlin_StopIdleHoldPtr m_Driver_Marlin_StopIdleHold;
+	PLibMCDriver_MarlinDriver_Marlin_PowerOffPtr m_Driver_Marlin_PowerOff;
 	PLibMCDriver_MarlinGetVersionPtr m_GetVersion;
 	PLibMCDriver_MarlinGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_MarlinReleaseInstancePtr m_ReleaseInstance;

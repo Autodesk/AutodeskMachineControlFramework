@@ -38,20 +38,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <vector>
 #include <string>
+#include <mutex>
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIMenuItem, PUIMenuItem);
 	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
-	
+	amcDeclareDependingClass(CUIPage, PUIPage);
+	amcDeclareDependingClass(CUIModule, PUIModule);
+
 	class CUIHandler {
 	protected:
+
+		std::mutex m_Mutex;
+
 		std::string m_sAppName;
 		std::string m_sCopyrightString;
+		std::string m_sLogoUUID;
+		double m_dLogoAspectRatio;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
+
+		std::map <std::string, PUIPage> m_Pages;
+		PUIPage m_pMainPage;
+
+		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+		PUIPage addPage_Unsafe (const std::string& sName);
+
+		PUIPage findPage(const std::string& sName);
 
 	public:
 
@@ -62,10 +79,8 @@ namespace AMC {
 		std::string getAppName();
 		std::string getCopyrightString();
 
-		void addMenuItem (const std::string & sID, const std::string & sIcon, const std::string & sCaption, const std::string & sTargetPage);
-		void addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
-
-		void writeToJSON (CJSONWriter & writer);
+		void writeConfigurationToJSON (CJSONWriter & writer);
+		void writeStateToJSON(CJSONWriter& writer);
 
 		void loadFromXML (pugi::xml_node & xmlNode);
 	};

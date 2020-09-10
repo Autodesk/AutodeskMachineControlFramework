@@ -35,8 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID)
-	: m_sSessionUUID (AMCCommon::CUtils::normalizeUUIDString (sSessionUUID))
+
+CAPIAuth::CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string& sUserName, bool bIsAuthorized)
+	: m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)), 
+	m_sSessionKey (AMCCommon::CUtils::normalizeSHA256String(sSessionKey)),
+	m_sUserName (sUserName),
+	m_bIsAuthorized (bIsAuthorized)
+
 {
 
 }
@@ -57,12 +62,18 @@ std::string CAPIAuth::getSessionUUID()
 	return m_sSessionUUID;
 }
 
+std::string CAPIAuth::getSessionKey()
+{
+	return m_sSessionKey;
+}
+
+
 bool CAPIAuth::userIsAuthorized()
 {
-	return true;
+	return m_bIsAuthorized;
 }
 
 std::string CAPIAuth::getUserName()
 {
-	return "user";
+	return m_sUserName;
 }

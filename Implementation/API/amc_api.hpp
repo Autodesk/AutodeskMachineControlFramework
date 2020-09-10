@@ -44,12 +44,15 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIResponse, PAPIResponse);
 	amcDeclareDependingClass(CAPIFormFields, PAPIFormFields);	
 	amcDeclareDependingClass(CAPIFieldDetails, PAPIFieldDetails);
-	
+	amcDeclareDependingClass(CAPISessionHandler, PAPISessionHandler);
+
 
 	class CAPI {
 	private:
 
 		std::list<PAPIHandler> m_ApiHandlers;
+
+		PAPISessionHandler m_pSessionHandler;
 
 		PAPIResponse makeError (uint32_t nHTTPError, int32_t errorCode, const std::string & sErrorString);
 
@@ -61,6 +64,8 @@ namespace AMC {
 
 		virtual ~CAPI();
 								
+		void checkAuthorizationMode (const std::string& sURI, const eAPIRequestType requestType, bool & bNeedsToBeAuthorized, bool & bCreateNewSession);
+
 		bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType);
 
 		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth);
@@ -70,6 +75,12 @@ namespace AMC {
 		CAPIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex);
 
 		void registerHandler (PAPIHandler pAPIHandler);
+
+		PAPISessionHandler getSessionHandler();
+
+		static std::string removeLeadingSlashFromURI(const std::string& sURI);
+
+		static eAPIRequestType getRequestTypeFromString(const std::string & sRequestType);
 
 	};
 

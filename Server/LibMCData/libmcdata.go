@@ -42,6 +42,7 @@ package libmcdata
 
 /*
 #cgo linux LDFLAGS: -ldl
+
 #include "libmcdata_dynamic.cc"
 
 LibMCDataHandle loadLibMCDataLibrary (const char * pFileName)

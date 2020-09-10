@@ -306,6 +306,27 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON 279
 #define LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION 280
 #define LIBMCDATA_ERROR_MISSINGSERVICESNODE 281
+#define LIBMCDATA_ERROR_INVALIDSESSIONUUID 282
+#define LIBMCDATA_ERROR_INVALIDSESSIONKEY 283
+#define LIBMCDATA_ERROR_SESSIONNOTAUTHORIZED 284
+#define LIBMCDATA_ERROR_INVALIDUSERNAME 285
+#define LIBMCDATA_ERROR_INVALIDPASSWORD 286
+#define LIBMCDATA_ERROR_INVALIDAUTHORIZATION 287
+#define LIBMCDATA_ERROR_USERALREADYAUTHORIZED 288
+#define LIBMCDATA_ERROR_INVALIDSESSIONTOKEN 289
+#define LIBMCDATA_ERROR_INVALIDCLIENTKEY 290
+#define LIBMCDATA_ERROR_INVALIDLOGIN 291
+#define LIBMCDATA_ERROR_DUPLICATEPAGE 292
+#define LIBMCDATA_ERROR_PAGENOTFOUND 293
+#define LIBMCDATA_ERROR_MISSINGPAGENAME 294
+#define LIBMCDATA_ERROR_INVALIDPAGENAME 295
+#define LIBMCDATA_ERROR_MODULENOTFOUND 296
+#define LIBMCDATA_ERROR_DUPLICATEMODULE 297
+#define LIBMCDATA_ERROR_INVALIDMODULENAME 298
+#define LIBMCDATA_ERROR_INVALIDMODULETYPE 299
+#define LIBMCDATA_ERROR_INVALIDHEADLINE 300
+#define LIBMCDATA_ERROR_USERNOTFOUND 301
+#define LIBMCDATA_ERROR_STREAMISNOTIMAGE 302
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -524,6 +545,27 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
     case LIBMCDATA_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
     case LIBMCDATA_ERROR_MISSINGSERVICESNODE: return "Missing services node";
+    case LIBMCDATA_ERROR_INVALIDSESSIONUUID: return "Invalid session UUID";
+    case LIBMCDATA_ERROR_INVALIDSESSIONKEY: return "Invalid session Key";
+    case LIBMCDATA_ERROR_SESSIONNOTAUTHORIZED: return "Session not authorized";
+    case LIBMCDATA_ERROR_INVALIDUSERNAME: return "Invalid user name";
+    case LIBMCDATA_ERROR_INVALIDPASSWORD: return "Invalid password";
+    case LIBMCDATA_ERROR_INVALIDAUTHORIZATION: return "Invalid Authorization";
+    case LIBMCDATA_ERROR_USERALREADYAUTHORIZED: return "User already authorized";
+    case LIBMCDATA_ERROR_INVALIDSESSIONTOKEN: return "Invalid session token";
+    case LIBMCDATA_ERROR_INVALIDCLIENTKEY: return "Invalid client key";
+    case LIBMCDATA_ERROR_INVALIDLOGIN: return "Invalid login credentials";
+    case LIBMCDATA_ERROR_DUPLICATEPAGE: return "Duplicate page";
+    case LIBMCDATA_ERROR_PAGENOTFOUND: return "Page not found";
+    case LIBMCDATA_ERROR_MISSINGPAGENAME: return "Missing page name";
+    case LIBMCDATA_ERROR_INVALIDPAGENAME: return "Invalid page name";
+    case LIBMCDATA_ERROR_MODULENOTFOUND: return "Module not found";
+    case LIBMCDATA_ERROR_DUPLICATEMODULE: return "Duplicate module";
+    case LIBMCDATA_ERROR_INVALIDMODULENAME: return "Invalid module name";
+    case LIBMCDATA_ERROR_INVALIDMODULETYPE: return "Invalid module type";
+    case LIBMCDATA_ERROR_INVALIDHEADLINE: return "Invalid headline";
+    case LIBMCDATA_ERROR_USERNOTFOUND: return "User not found";
+    case LIBMCDATA_ERROR_STREAMISNOTIMAGE: return "Stream is not image";
     default: return "unknown error";
   }
 }
@@ -542,6 +584,7 @@ typedef LibMCDataHandle LibMCData_BuildJobDataIterator;
 typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
+typedef LibMCDataHandle LibMCData_LoginHandler;
 typedef LibMCDataHandle LibMCData_DataModel;
 
 namespace LibMCData {

@@ -40,22 +40,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+	amcDeclareDependingClass(CUIPage, PUIPage);
+
 	class CUIMenuItem {
 	protected:
 		std::string m_sID;
 		std::string m_sIcon;
 		std::string m_sCaption;
+
+		PUIPage m_pPage;
 		
 	public:
 
-		CUIMenuItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption);		
+		CUIMenuItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption, PUIPage pPage);
 		
 		virtual ~CUIMenuItem();
 						
 		std::string getID ();
 		std::string getIcon ();
 		std::string getCaption ();
-				
+
+		PUIPage getPage();
+
 	};
 	
 	typedef std::shared_ptr<CUIMenuItem> PUIMenuItem;

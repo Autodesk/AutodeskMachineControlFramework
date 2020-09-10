@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_interfaceexception.hpp"
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 namespace AMCData {
 		
@@ -49,7 +50,8 @@ namespace AMCData {
 
 	std::string CStoragePath::getLogPath()
 	{
-		auto sTimeFileName = AMCCommon::CUtils::getCurrentTimeFileName();
+		AMCCommon::CChrono chrono;
+		auto sTimeFileName = chrono.getStartTimeFileName();
 		return m_sDataPath + "/log_" + sTimeFileName + ".db";
 	}
 

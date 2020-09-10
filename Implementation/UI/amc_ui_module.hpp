@@ -38,21 +38,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error this header is protected and should only be included in the corresponding implementation CPP files.
 #endif
 
+#include "Libraries/PugiXML/pugixml.hpp"
+#include "Core/amc_jsonwriter.hpp"
+
+
 namespace AMC {
+
+	amcDeclareDependingClass(CUIModule, PUIModule);
 
 	class CUIModule {
 	protected:
 		std::string m_sName;
 		
+		static std::string getNameFromXML(pugi::xml_node& xmlNode);
+		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
+
 	public:
 
 		CUIModule(const std::string & sName);	
 		
 		virtual ~CUIModule();
-										
+
+		std::string getName();
+
+		virtual std::string getType() = 0;
+
+		virtual void writeToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+
 	};
-	
-	typedef std::shared_ptr<CUIModule> PUIModule;
+
 	
 }
 

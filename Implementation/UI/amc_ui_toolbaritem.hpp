@@ -40,21 +40,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
+	amcDeclareDependingClass(CUIPage, PUIPage);
+
 	class CUIToolbarItem {
 	protected:
 		std::string m_sID;
 		std::string m_sIcon;
 		std::string m_sCaption;
+		PUIPage m_pPage;
 		
 	public:
 
-		CUIToolbarItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption);		
+		CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage);
 		
 		virtual ~CUIToolbarItem();
 						
 		std::string getID ();
 		std::string getIcon ();
 		std::string getCaption ();
+
+		PUIPage getPage();
 				
 	};
 	

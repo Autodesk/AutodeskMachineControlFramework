@@ -109,6 +109,7 @@ Custom implementation
 			<param name="COMPort" type="string" pass="in" description="Device Port to connect to" />
 			<param name="Baudrate" type="uint32" pass="in" description="Baudrate to use" />
 			<param name="StatusUpdateInterval" type="double" pass="in" description="Timer interval [ms] for updating status" />
+			<param name="ConnectTimeout" type="uint32" pass="in" description="Timeout [ms] for connecting printer" />
 		</method>
 
 		<method name="Disconnect" description="Disconnects from the Marlin board.">
@@ -120,11 +121,18 @@ Custom implementation
 		
 		<method name="SetHeatedBedTargetTemperature" description="Sets heated bed target temperature.">
 			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Bed target temperature." />
+			<param name="WaitForTemp" type="bool" pass="in" description="If true, waits for the target bed temperature to be reached before proceeding" />
 		</method>
 
 		<method name="SetExtruderTargetTemperature" description="Sets target temperature of the given extruder.">
 			<param name="ExtruderID" type="uint32" pass="in" description="ID of extruder." />
 			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Extruder target temperature." />
+			<param name="WaitForTemp" type="bool" pass="in" description="If true, waits for the target extruder temperature to be reached before proceeding" />
+		</method>
+
+		<method name="SetFanSpeed" description="Turns on one of the fans and set its speed.">
+			<param name="FanID" type="uint32" pass="in" description="ID of fan." />
+			<param name="Speed" type="uint32" pass="in" description="Fan speed [0..255]. 0=0%...255=100%" />
 		</method>
 
 		<method name="SetPidParameters" description="Sets PID parameters.">
@@ -133,7 +141,11 @@ Custom implementation
 			<param name="D" type="double" pass="in" description="New value for D parameter." />
 		</method>
 
-		<method name="UpdateState" description="Polls a new state from the firmware.">
+		<method name="UpdatePositionState" description="Polls a new state from the printer.">
+		</method>
+
+		<method name="UpdateTemperatureState" description="Polls a new temperature state from the printer.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of extruder." />
 		</method>
 
 		<method name="GetCurrentPosition" description="Returns the current axis position.">
@@ -148,19 +160,26 @@ Custom implementation
 			<param name="Z" type="double" pass="out" description="Z Value in mm" />
 		</method>
 
-		<method name="GetExtruderPosition" description="Returns the current extruder position.">
+		<method name="GetExtruderTargetPosition" description="Returns the target extruder position.">
 			<param name="E" type="double" pass="out" description="E Value in mm" />
 		</method>
 
-		<method name="GetHeatedBedTemperature" description="Returns the current and the target bed temperature.">
+		<method name="GetHeatedBedTargetTemperature" description="Returns the the target bed temperature.">
 			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
+		</method>
+
+		<method name="GetHeatedBedCurrentTemperature" description="Returns the current bed temperature.">
 			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
 		</method>
 
-		<method name="GetExtruderTemperature" description="Returns the current and the target temperature of an extruder.">
+		<method name="GetExtruderCurrentTemperature" description="Returns the current temperature of an extruder.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
+			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
+		</method>
+
+		<method name="GetExtruderTargetTemperature" description="Returns the target temperature of an extruder.">
 			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
 			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
-			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
 		</method>
 
 		<method name="GetPidParameters" description="Returns the current PID values.">
@@ -182,9 +201,14 @@ Custom implementation
 			<param name="Value" type="bool" pass="return" description="True if printer is homed." />
 		</method>
 
+		<method name="IsConnected" description="Returns if the printer is coneccted">
+			<param name="Value" type="bool" pass="return" description="True if printer is connected." />
+		</method>
+
 		<method name="MoveToXY" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="X" type="double" pass="in" description="X Value in mm" />
 			<param name="Y" type="double" pass="in" description="Y Value in mm" />
+			<param name="E" type="double" pass="in" description="E Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 
@@ -196,6 +220,7 @@ Custom implementation
 		
 		<method name="MoveToZ" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="Z" type="double" pass="in" description="Z Value in mm" />
+			<param name="E" type="double" pass="in" description="E Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 
@@ -205,6 +230,29 @@ Custom implementation
 		</method>
 	
 		<method name="StartHoming" description="Start Homing of printer.">
+		</method>
+
+		<method name="EmergencyStop" description="Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.">
+		</method>
+
+		<method name="SetAxisPosition" description="Set the current position of given axis to the specified value.">
+			<param name="Axis" type="string" pass="in" description="Axis whose value is to be set." />
+			<param name="Value" type="double" pass="in" description="New value for given Axis." />
+		</method>
+
+		<method name="ExtruderDoExtrude" description="Extrudes the specified value with given Feedrate.">
+			<param name="E" type="double" pass="in" description="E value in mm" />
+			<param name="Speed" type="double" pass="in" description="Extrusion speed in mm/s" />
+		</method>
+
+		<method name="SetAbsoluteExtrusion" description="Sets the extrusion (E axis) to absolute mode.">
+			<param name="Absolute" type="bool" pass="in" description="If true, sets mode to absolute, if false to relative" />
+		</method>
+		
+		<method name="StopIdleHold" description="Stop the idle hold on all axis and extruder.">
+		</method>
+
+		<method name="PowerOff" description="Turn off the high-voltage power supply.">
 		</method>
 
 	</class>

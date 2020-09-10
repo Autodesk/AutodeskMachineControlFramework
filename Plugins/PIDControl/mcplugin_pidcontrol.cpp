@@ -52,7 +52,7 @@ public:
 
 	bool setPIDValues (LibMCEnv::PStateEnvironment pStateEnvironment, double dP, double dI, double dD)
 	{
-		auto pSignal = pStateEnvironment->PrepareSignal("movement", "signal_setpidvalues");
+		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_setpidvalues");
 		pSignal->SetDouble("dp", dP);
 		pSignal->SetDouble("di", dI);
 		pSignal->SetDouble("dd", dD);
@@ -149,7 +149,9 @@ public:
 			//pSignalHandler->SignalHandled();
 
 			pStateEnvironment->LogMessage("PIDControl Active...");
-			pStateEnvironment->SetNextState("controlling");
+			// TODO blocked while testing extrusion => remove sleep/idle and uncomment later pStateEnvironment->SetNextState("controlling");
+			pStateEnvironment->Sleep(2000);
+			pStateEnvironment->SetNextState("idle");
 
 		}
 		else {
