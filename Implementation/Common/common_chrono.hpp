@@ -46,7 +46,7 @@ namespace AMCCommon {
 		
 		public:
 		
-			CChrono ();
+			CChrono (bool bHighResolution = false);
 			~CChrono ();
 			
 			// Returns instance creation time in ISO8601 time format

@@ -196,6 +196,9 @@ set_target_properties(libmcdata PROPERTIES CXX_VISIBILITY_PRESET hidden)
 set_target_properties(libmcdata PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
 
 if(WIN32)
+target_link_libraries(libmc Winmm.lib)
+
+target_link_libraries(libmcdata Winmm.lib)
 target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
 elseif(UNIX AND NOT APPLE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
