@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _WIN32
 #include <Windows.h>
-
+#include <timeapi.h>
 #else
 #include <time.h>
 
@@ -52,26 +52,35 @@ namespace AMCCommon {
 	class CChrono_Impl {
 	private:
 #ifdef _WIN32
-		LARGE_INTEGER StartingTime;
-		LARGE_INTEGER Frequency;
-		struct tm utc_time;
+		SYSTEMTIME m_StartSytemTime;
+		bool m_bHighResTimerAvailable;
+		LARGE_INTEGER m_HighResStartingTicks;
+		LARGE_INTEGER m_HighResFrequency;
+		uint64_t m_LowResStartingMilliseconds;
+		
 #else		
 		std::tm utc_time;
 		timespec startTime;
 #endif
 	public:
 
-		CChrono_Impl()
+		CChrono_Impl(bool bHighResolution)
 		{
 #ifdef _WIN32
-			QueryPerformanceFrequency(&Frequency);
-			QueryPerformanceCounter(&StartingTime);
+			GetSystemTime(&m_StartSytemTime);
+			m_LowResStartingMilliseconds = timeGetTime();
+			m_bHighResTimerAvailable = false;
+			m_HighResFrequency.QuadPart = 0;
+			m_HighResStartingTicks.QuadPart = 0;
+			if (bHighResolution) {
 
-			__int64 ltime;
-			_time64(&ltime);
+				if (QueryPerformanceFrequency(&m_HighResFrequency)) {
+					if (QueryPerformanceCounter(&m_HighResStartingTicks)) {
+						m_bHighResTimerAvailable = true;
+					}
+				}
+			}
 
-			errno_t err;
-			err = _gmtime64_s(&utc_time, &ltime);
 #else
 			std::time_t t = std::time(nullptr);
 			utc_time = *std::localtime(&t);
@@ -84,16 +93,32 @@ namespace AMCCommon {
 		uint64_t getElapsedMicroseconds()
 		{
 #ifdef _WIN32
-			LARGE_INTEGER EndingTime, ElapsedMicroseconds;
 
-			QueryPerformanceCounter(&EndingTime);
+			if (m_bHighResTimerAvailable) {
 
-			ElapsedMicroseconds.QuadPart = EndingTime.QuadPart - StartingTime.QuadPart;
+				LARGE_INTEGER CurrentTicks, ElapsedMicroseconds;
+				if (QueryPerformanceCounter(&CurrentTicks)) {
 
-			ElapsedMicroseconds.QuadPart *= 1000000ULL;
-			ElapsedMicroseconds.QuadPart /= Frequency.QuadPart;
+					if (CurrentTicks.QuadPart < m_HighResStartingTicks.QuadPart)
+						throw std::runtime_error ("high resolution timer clock error");
 
-			return ElapsedMicroseconds.QuadPart;
+					ElapsedMicroseconds.QuadPart = CurrentTicks.QuadPart - m_HighResStartingTicks.QuadPart;
+
+					ElapsedMicroseconds.QuadPart *= 1000000ULL;
+					ElapsedMicroseconds.QuadPart /= m_HighResFrequency.QuadPart;
+
+					return ElapsedMicroseconds.QuadPart;
+				}
+
+				// If Performance Counter not available, fall back to low res counter
+			}
+
+			uint64_t currentMilliseconds = (uint64_t)timeGetTime();
+			if (currentMilliseconds < m_LowResStartingMilliseconds)
+				throw std::runtime_error("high resolution clock error");
+
+			return ((uint64_t)(currentMilliseconds - m_LowResStartingMilliseconds)) * 1000ULL;
+
 
 #else
 			timespec currentTime;
@@ -116,21 +141,43 @@ namespace AMCCommon {
 		std::string getStartTimeISO8601TimeUTC()
 		{
 			std::stringstream sstream;
+#ifdef _WIN32
+			sstream << std::setfill('0')
+				<< std::setw(4) << m_StartSytemTime.wYear << "-"
+				<< std::setw(2) << m_StartSytemTime.wMonth << "-"
+				<< std::setw(2) << m_StartSytemTime.wDay << "T"
+				<< std::setw(2) << m_StartSytemTime.wHour << ":"
+				<< std::setw(2) << m_StartSytemTime.wMinute << ":"
+				<< std::setw(2) << m_StartSytemTime.wSecond << "."
+				<< std::setw(3) << m_StartSytemTime.wMilliseconds << "Z UTC";
+#else
 			sstream << std::put_time(&utc_time, "%FT%TZ") << " UTC";
+#endif
 			return sstream.str();
 		}
 
 		std::string getStartTimeFileName()
 		{
 			std::stringstream sstream;
+#ifdef _WIN32
+			sstream << std::setfill('0')
+				<< std::setw(4) << m_StartSytemTime.wYear
+				<< std::setw(2) << m_StartSytemTime.wMonth
+				<< std::setw(2) << m_StartSytemTime.wDay << "_"
+				<< std::setw(2) << m_StartSytemTime.wHour 
+				<< std::setw(2) << m_StartSytemTime.wMinute 
+				<< std::setw(2) << m_StartSytemTime.wSecond;
+#else
 			sstream << std::put_time(&utc_time, "%Y%m%d_%H%M%S");
+#endif
+
 			return sstream.str();
 		}
 
 	};
 
-	CChrono::CChrono()
-		: m_pChronoImpl (std::make_unique <CChrono_Impl> ())
+	CChrono::CChrono(bool bHighResolution)
+		: m_pChronoImpl (std::make_unique <CChrono_Impl> (bHighResolution))
 	{
 	}
 

@@ -115,6 +115,7 @@ CUIModule_ContentUpload::~CUIModule_ContentUpload()
 void CUIModule_ContentUpload::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "upload");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
 	object.addString(AMC_API_KEY_UI_ITEMUPLOADCLASS, m_sUploadClass);
 	object.addString(AMC_API_KEY_UI_ITEMUPLOADCAPTION, m_sUploadCaption);
 	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISINITIAL, 1);
@@ -122,3 +123,19 @@ void CUIModule_ContentUpload::addToJSON(CJSONWriter& writer, CJSONWriterObject& 
 	object.addString(AMC_API_KEY_UI_ITEMUPLOADFILENAME, "");
 }
 
+CUIModule_ContentParameterList::CUIModule_ContentParameterList()
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID())
+{
+
+}
+
+CUIModule_ContentParameterList::~CUIModule_ContentParameterList()
+{
+
+}
+
+void CUIModule_ContentParameterList::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "parameterlist");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+}

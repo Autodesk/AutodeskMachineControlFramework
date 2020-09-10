@@ -111,6 +111,19 @@ namespace AMC {
 
 	};
 	
+
+	class CUIModule_ContentParameterList : public CUIModule_ContentItem {
+	protected:
+
+	public:
+
+		CUIModule_ContentParameterList();
+
+		virtual ~CUIModule_ContentParameterList();
+
+		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+	};
 }
 
 

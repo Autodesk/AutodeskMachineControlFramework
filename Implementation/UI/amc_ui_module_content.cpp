@@ -80,6 +80,10 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode)
 			m_Items.push_back(std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string()));
 		}
 
+		if (sChildName == "parameterlist") {
+			m_Items.push_back(std::make_shared <CUIModule_ContentParameterList>());
+		}
+
 		if (sChildName == "button") {
 			auto captionAttrib = childNode.attribute("caption");
 			auto targetpageAttrib = childNode.attribute("targetpage");
