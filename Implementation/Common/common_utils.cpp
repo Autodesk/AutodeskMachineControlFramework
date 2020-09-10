@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <exception>
 #include <iomanip>
 #include <thread>
+#include <cctype>
 
 #include "crossguid/guid.hpp"
 #include "PicoSHA2/picosha2.h"
