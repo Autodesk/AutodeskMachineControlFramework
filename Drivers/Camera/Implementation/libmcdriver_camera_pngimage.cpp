@@ -38,6 +38,7 @@ Abstract: This is a stub class definition of CPNGImage
 
 
 using namespace LibMCDriver_Camera::Impl;
+using namespace LibMCDriver_Camera;
 
 /*************************************************************************************************************************
  Class definition of CPNGImage 
