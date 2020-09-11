@@ -391,13 +391,7 @@ namespace AMC {
 	{
 		if ((nExtruderIndex >= 0) && (nExtruderIndex < m_iExtruderCount))
 		{
-			// TODO XXXXXXXXXXXXXXXXXXXXXX to reduce output on cmd line switch debug off temporarily
-			bool bResetDebug = m_bDebug;
-			if (m_bDebug) {
-				m_bDebug = false;
-			}
 			auto sStream = sendCommand("M105 T" + std::to_string(nExtruderIndex));
-			m_bDebug = bResetDebug;
 			
 			auto sLine = sStream.str();
 			auto nPosition = sLine.find("T:");
@@ -578,13 +572,7 @@ namespace AMC {
 
 	void CSerialController_Marlin::queryPositionState()
 	{
-		// TODO XXXXXXXXXXXXXXXXXXXXXX to reduce output on cmd line switch debug off temporarily
-		bool bResetDebug = m_bDebug;
-		if (m_bDebug) {
-			m_bDebug = false;
-		}
 		auto sStream = sendCommand("M114");
-		m_bDebug = bResetDebug;
 		
 		auto sLine = sStream.str();
 
@@ -757,8 +745,8 @@ namespace AMC {
 		if (bInE && !bFastMove) {
 			// E given => add E+value to command str
 			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
-			//sCommand << " E" << dE;
-			std::cout << "CALCULATED E = " << dE << std::endl;
+			sCommand << " E" << dE;
+			//std::cout << "CALCULATED E = " << dE << std::endl;
 		}
 		if (dSpeedInMMperSecond > 0) {
 			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
@@ -880,8 +868,8 @@ namespace AMC {
 			sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
 		}
 		// TODO XXXXXXXXXXXXXXXX activate to do extrusion
-		//sendCommand(sCommand.str());
-		std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
+		sendCommand(sCommand.str());
+		//std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
 	}
 
 

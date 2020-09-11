@@ -55,21 +55,21 @@
   	  </state>
   
   	  <state name="startprocess" repeatdelay="100">	  
-  			<outstate target="waitfortemperature" />
+  			<outstate target="handletemperature" />
   	  </state>
   	  
   
-  	  <state name="waitfortemperature" repeatdelay="100">
+  	  <state name="handletemperature" repeatdelay="10">
   			<outstate target="extrudelayer" />
   	  </state>
   	  
-  	  <state name="extrudelayer" repeatdelay="100">
+  	  <state name="extrudelayer" repeatdelay="10">
   			<outstate target="nextlayer" />
   	  </state>
   	  
   
-  	  <state name="nextlayer" repeatdelay="100">
-  			<outstate target="waitfortemperature" />
+  	  <state name="nextlayer" repeatdelay="10">
+  			<outstate target="handletemperature" />
   			<outstate target="finishprocess" />
   	  </state>
   
@@ -167,12 +167,12 @@
   	  </state>
   
   
-  	  <state name="idle" repeatdelay="50">	  	 
+  	  <state name="idle" repeatdelay="10">	  	 
   			<outstate target="idle" />
   			<outstate target="doextrudelayer" />
   	  </state>
   
-  	  <state name="doextrudelayer" repeatdelay="50">
+  	  <state name="doextrudelayer" repeatdelay="10">
   			<outstate target="idle" />
   	  </state>
   
