@@ -289,30 +289,33 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
 		pStateEnvironment->SetBoolParameter("jobinfo", "autostart", false);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", true);
-		
-		auto nExtruderId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "extruderid");
-		auto dExtruderTargetTemperature = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "targetextrudertemperature");
-		auto dBedTargetTemperature = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "targetbedtemperature");
-		// store read values => to be used in other state of main state machine (waitfortemperature)
-		pStateEnvironment->StoreInteger("extruderid", nExtruderId);
-		pStateEnvironment->StoreDouble("extrudertargettemperature", dExtruderTargetTemperature);
-		pStateEnvironment->StoreDouble("bedtargettemperature", dBedTargetTemperature);
-
-		auto nFanId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "fanid");
-		auto dFanSpeed = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "fanspeed");
-		// store read values => to be used in other state of main state machine (finish process)
-		pStateEnvironment->StoreInteger("fanid", nFanId);
-		pStateEnvironment->StoreDouble("fanspeed", dFanSpeed);
 
 		auto pSignalIsConnected = pStateEnvironment->PrepareSignal("printerconnection", "signal_isconnected");
 		pSignalIsConnected->Trigger();
 
 		if (pSignalIsConnected->WaitForHandling((uint32_t)(5000))) {
-			auto bSuccess = pSignalIsConnected->GetBoolResult("success");
 
-			if (bSuccess) {
+			if (pSignalIsConnected->GetBoolResult("success")) {
 				pStateEnvironment->LogMessage("Printer connected. ");
-				// set desired temperature and don't wait 
+				// Printer connected
+				// 
+				// set some parameters, to be used in HandleTemperature
+				auto nExtruderId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "extruderid");
+				auto dExtruderTargetTemperature = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "targetextrudertemperature");
+				auto dBedTargetTemperature = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "targetbedtemperature");
+				// store read values => to be used in other state of main state machine (HandleTemperature)
+				pStateEnvironment->StoreInteger("extruderid", nExtruderId);
+				pStateEnvironment->StoreDouble("extrudertargettemperature", dExtruderTargetTemperature);
+				pStateEnvironment->StoreDouble("bedtargettemperature", dBedTargetTemperature);
+
+				auto nFanId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "fanid");
+				auto dFanSpeed = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "fanspeed");
+				// store read values => to be used in other state of main state machine (finish process)
+				pStateEnvironment->StoreInteger("fanid", nFanId);
+				pStateEnvironment->StoreDouble("fanspeed", dFanSpeed);
+
+
+				// set desired temperature and don't wait (in the meantime to printer could do homing, if necessary)
 				m_pPluginData->setTemperatureWithoutWaiting(pStateEnvironment, nExtruderId, dExtruderTargetTemperature, dBedTargetTemperature);
 				
 				// check if printer is homed and do homing if necessary
@@ -320,18 +323,22 @@ public:
 				pSignalDoHoming->Trigger();
 
 				if (pSignalDoHoming->WaitForHandling((uint32_t)(20000))) {
-					bSuccess = pSignalDoHoming->GetBoolResult("success");
 
-					if (bSuccess) {
+					if (pSignalDoHoming->GetBoolResult("success")) {
 						pStateEnvironment->LogMessage("Printer homed. ");
 
 						// do some initialization stuff
-						// set flag to tell state "waitfortemperature" to initialize extruder (will be done just once, while starting)
+						// set flag to tell state "HandleTemperature" to initialize extruder (will be done just once, while starting)
 						pStateEnvironment->StoreBool("extruderdoinit", true);
+						// set flag to tell state "HandleTemperature" to set the defined temperature
+						pStateEnvironment->StoreBool("settargettemperature", true);
+						// set flag to tell state "HandleTemperature" to wait for defined temperature reached
+						pStateEnvironment->StoreBool("waitfortemperature", true);
 						// set fan speed
 						m_pPluginData->setFanSpeed(pStateEnvironment, nFanId, dFanSpeed);
+
 						// and now wait for temperature
-						pStateEnvironment->SetNextState("waitfortemperature");
+						pStateEnvironment->SetNextState("handletemperature");
 					}
 					else {
 						pStateEnvironment->LogWarning("Printer not homed. ");
@@ -356,20 +363,20 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMainState_WaitForTemperature
+ Class definition of CMainState_HandleTemperature
 **************************************************************************************************************************/
 
-class CMainState_WaitForTemperature : public virtual CMainState {
+class CMainState_HandleTemperature : public virtual CMainState {
 public:
 
-	CMainState_WaitForTemperature(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_HandleTemperature(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "waitfortemperature";
+		return "handletemperature";
 	}
 
 
@@ -378,89 +385,99 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		pStateEnvironment->LogMessage("Wait for temperature...");
+		pStateEnvironment->LogMessage("Handle temperature...");
+
+		// read some parameter (set by StartProcess)
 		uint32_t nExtruderId = pStateEnvironment->RetrieveBool("extruderid");
 		double dExtruderTargetTemperature = pStateEnvironment->RetrieveDouble("extrudertargettemperature");
 		double dBedTargetTemperature = pStateEnvironment->RetrieveDouble("bedtargettemperature");
-		
-		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_settemperature");
-		pSignal->SetBool("bedsetvalue", true);
-		pSignal->SetDouble("bedtemperature", dBedTargetTemperature);
-		pSignal->SetBool("beddowait", false);
-		pSignal->SetBool("extrudersetvalue", true);
-		pSignal->SetInteger("extruderid", nExtruderId);
-		pSignal->SetDouble("extrudertemperature", dExtruderTargetTemperature);
-		pSignal->SetBool("extruderdowait", false);
-		pSignal->Trigger();
 
-		if (pSignal->WaitForHandling(10000)) {
-			auto bSuccess = pSignal->GetBoolResult("success");
+		bool bExtruderDoInit = pStateEnvironment->RetrieveBool("extruderdoinit");
+		bool bSetTemperature = pStateEnvironment->RetrieveBool("settargettemperature");
+		bool bWaitForTemperature = pStateEnvironment->RetrieveBool("waitfortemperature");
 
-			// wait for defined temperature 
-			LibMCEnv::PSignalHandler pSignalHandler;
+		// set temperature if defined
+		auto pSignalSetTemperature = pStateEnvironment->PrepareSignal("printerconnection", "signal_settemperature");
+		bool bSuccess = true;
+		if (bSetTemperature) {
+			pSignalSetTemperature->SetBool("bedsetvalue", true);
+			pSignalSetTemperature->SetDouble("bedtemperature", dBedTargetTemperature);
+			pSignalSetTemperature->SetBool("beddowait", false);
+			pSignalSetTemperature->SetBool("extrudersetvalue", true);
+			pSignalSetTemperature->SetInteger("extruderid", nExtruderId);
+			pSignalSetTemperature->SetDouble("extrudertemperature", dExtruderTargetTemperature);
+			pSignalSetTemperature->SetBool("extruderdowait", false);
+			pSignalSetTemperature->Trigger();
+			if (pSignalSetTemperature->WaitForHandling(10000)) {
+				bSuccess = pSignalSetTemperature->GetBoolResult("success");
+				if (bSuccess) {
+					pStateEnvironment->LogMessage("Temperature set successful. ");
+				}
+				else {
+					pStateEnvironment->LogWarning("Set Temperature failure. ");
+				}
+			}
+			else {
+				pStateEnvironment->LogWarning("Set Temperature timeout!");
+				bSuccess = false;
+			}
+		}
+
+		// wait for defined temperature, if defined
+		if (bSuccess && bWaitForTemperature) {
+			LibMCEnv::PSignalHandler pSignalGetTemperature;
 			double dBedTemperature = -1;
 			double dExtruderTemperature = -1;
 
 			while ((dExtruderTemperature < dExtruderTargetTemperature) || (dBedTemperature < dBedTargetTemperature)) {
-				if (pStateEnvironment->WaitForSignal("signal_gettemperature", 0, pSignalHandler)) {
-					bool bBedGetValue = pSignalHandler->GetDouble("bedgetvalue");
+				if (pStateEnvironment->WaitForSignal("signal_gettemperature", 50, pSignalGetTemperature)) {
+					bool bBedGetValue = pSignalGetTemperature->GetDouble("bedgetvalue");
 					if (bBedGetValue) {
-						dBedTemperature = pSignalHandler->GetDouble("bedtemperature");
+						dBedTemperature = pSignalGetTemperature->GetDouble("bedtemperature");
 					}
+
 					uint32_t nExtruderId = -1;
-					bool bExtruderGetValue = pSignalHandler->GetDouble("extrudergetvalue");
+					bool bExtruderGetValue = pSignalGetTemperature->GetDouble("extrudergetvalue");
 					if (bExtruderGetValue) {
-						nExtruderId = pSignalHandler->GetDouble("extruderid");
-						dExtruderTemperature = pSignalHandler->GetDouble("extrudertemperature");
+						nExtruderId = pSignalGetTemperature->GetDouble("extruderid");
+						dExtruderTemperature = pSignalGetTemperature->GetDouble("extrudertemperature");
 					}
-					pSignalHandler->SetBoolResult("success", true);
-					pSignalHandler->SignalHandled();
+					pSignalGetTemperature->SetBoolResult("success", true);
+					pSignalGetTemperature->SignalHandled();
 
 					pStateEnvironment->LogMessage("Wait for temperature: Eid" + std::to_string(nExtruderId) + "=" + std::to_string(dExtruderTemperature) + " B=" + std::to_string(dBedTemperature));
 				}
-				pStateEnvironment->Sleep(250);
-
 				// TODO add timeout/cancellation of "Wait for temperature"
 			}
+		}
 
-			if (bSuccess) {
-				pStateEnvironment->LogMessage("Temperature set successful. ");
+		// initialize extruder, if defined => should be defined by "StartProcess" (just once)
+		if (bSuccess && bExtruderDoInit) {
+			// do extruder initialization just once (at the beginning/first call) of "handletemperature" => reset flag
+			pStateEnvironment->StoreBool("extruderdoinit", false);
+			auto pSignalDoExtruderInit = pStateEnvironment->PrepareSignal("printerconnection", "signal_doextruderinit");
+			pSignalDoExtruderInit->Trigger();
 
-				bool bSuccessExtruderInit = true;
-				// if called first time extruderdoinit should be set (by "startprocess") => initialize extruder
-				if (pStateEnvironment->RetrieveBool("extruderdoinit")) {
-					// do extruder initialization just once (at the beginning/first call) of "waitfortemperature" => reset flag
-					pStateEnvironment->StoreBool("extruderdoinit", false);
-					auto pSignalDoExtruderInit = pStateEnvironment->PrepareSignal("printerconnection", "signal_doextruderinit");
-					pSignalDoExtruderInit->Trigger();
-
-					if (pSignalDoExtruderInit->WaitForHandling((uint32_t)(5000))) {
-						bSuccessExtruderInit = pSignalDoExtruderInit->GetBoolResult("success");
-						if (bSuccessExtruderInit) {
-							pStateEnvironment->LogMessage("Extruder initilalized. ");
-						}
-					}
-					else {
-						bSuccessExtruderInit = false;
-					}
-				}
-				
-				if (bSuccessExtruderInit) {
-					// proceed to extrude current layer
-					pStateEnvironment->SetNextState("extrudelayer");
+			if (pSignalDoExtruderInit->WaitForHandling((uint32_t)(5000))) {
+				bSuccess = pSignalDoExtruderInit->GetBoolResult("success");
+				if (bSuccess) {
+					pStateEnvironment->LogMessage("Extruder initilalized. ");
 				}
 				else {
 					pStateEnvironment->LogWarning("Extruder initialization error. ");
-					pStateEnvironment->SetNextState("fatalerror");
 				}
 			}
 			else {
-				pStateEnvironment->LogWarning("Set Temperature failure. ");
-				pStateEnvironment->SetNextState("fatalerror");
+				pStateEnvironment->LogWarning("Extruder initialization timeout error. ");
+				bSuccess = false;
 			}
 		}
+		
+		if (bSuccess) {
+			// proceed to extrude current layer
+			pStateEnvironment->SetNextState("extrudelayer");
+		}
 		else {
-			pStateEnvironment->LogWarning("Set Temperature timeout!");
 			pStateEnvironment->SetNextState("fatalerror");
 		}
 	}
@@ -552,54 +569,32 @@ public:
 		if (nLayerTimeoutGraceTime < 0)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		// send signal to restore filament to internally stored absolute E axis value ("ExtrudeValue") before extruding current layer
-		// retract filament is done by send signal "signal_retractfilament" (see NextLayer)
-		auto pSignalRestoreFilament = pStateEnvironment->PrepareSignal("printerconnection", "signal_restorefilament");
-		pSignalRestoreFilament->Trigger();
+		// TODO get/calc timeout (from layer length, given speed....)
+		int64_t nLayerTimeout = 200000;
 
-		if (pSignalRestoreFilament->WaitForHandling((uint32_t)(2000))) {
-			const auto bSuccess = pSignalRestoreFilament->GetBoolResult("success");
+		pStateEnvironment->LogMessage("Extrude layer #" + std::to_string(nCurrentLayer) + "...");
+
+		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_doextrudelayer");
+		pSignal->SetInteger("layertimeout", nLayerTimeout);
+		pSignal->SetInteger("layerindex", nCurrentLayer);
+		pSignal->SetString("jobuuid", sJobUUID);
+		pSignal->Trigger();
+
+		if (pSignal->WaitForHandling((uint32_t)(nLayerTimeout + nLayerTimeoutGraceTime))) {
+			auto bSuccess = pSignal->GetBoolResult("success");
 
 			if (bSuccess) {
-				pStateEnvironment->LogMessage("Filament restored. ");
-				// proceed to extrude layer 
-
-				// TODO get/calc timeout (from layer length, given speed....)
-				int64_t nLayerTimeout = 200000;
-
-				pStateEnvironment->LogMessage("Extrude layer #" + std::to_string(nCurrentLayer) + "...");
-
-				auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_doextrudelayer");
-				pSignal->SetInteger("layertimeout", nLayerTimeout);
-				pSignal->SetInteger("layerindex", nCurrentLayer);
-				pSignal->SetString("jobuuid", sJobUUID);
-				pSignal->Trigger();
-
-				if (pSignal->WaitForHandling((uint32_t)(nLayerTimeout + nLayerTimeoutGraceTime))) {
-					auto bSuccess = pSignal->GetBoolResult("success");
-
-					if (bSuccess) {
-						pStateEnvironment->LogMessage("Extruding success. ");
-						pStateEnvironment->SetNextState("nextlayer");
-					}
-					else {
-						pStateEnvironment->LogWarning("Extruding failure. ");
-						pStateEnvironment->SetNextState("fatalerror");
-					}
-				}
-				else {
-
-					pStateEnvironment->LogWarning("Extruding timeout!");
-					pStateEnvironment->SetNextState("fatalerror");
-				}
+				pStateEnvironment->LogMessage("Extruding success. ");
+				pStateEnvironment->SetNextState("nextlayer");
 			}
 			else {
-				pStateEnvironment->LogWarning("Filament restore error.");
+				pStateEnvironment->LogWarning("Extruding failure. ");
 				pStateEnvironment->SetNextState("fatalerror");
 			}
 		}
 		else {
-			pStateEnvironment->LogWarning("Filament restore timeout. ");
+
+			pStateEnvironment->LogWarning("Extruding timeout!");
 			pStateEnvironment->SetNextState("fatalerror");
 		}
 	}
@@ -632,7 +627,10 @@ public:
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
+		// TODO just for testing set  LayCount = to small value => print stops earlier !!!
+		//nLayerCount = 5;
 
+		
 		// TODO activate/uncomment following lines to test emergency stop when proceeding to layer 3
 		//if (nCurrentLayer > 1) {
 		//	pStateEnvironment->LogMessage("Just for testing. call EMERGENCY STOP if layer #" + std::to_string(nCurrentLayer + 1) + " is next layer");
@@ -652,31 +650,18 @@ public:
 		//TODO uncomment to activate camera driver pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
 
 		if (nCurrentLayer < (nLayerCount - 1)) {
-			// send signal to retract filament relatively before waiting for temperature (and extruding new layer)
-			// restore filament is done by send signal "signal_restorefilament" (see ExtrudeLayer)
-			auto pSignalRetractFilament = pStateEnvironment->PrepareSignal("printerconnection", "signal_retractfilament");
-			pSignalRetractFilament->Trigger();
+			// TODO check if WaitFor/SetTemperature should be disabled or not for the next/following layers
+			// set flag to tell state "HandleTemperature" to don't set the defined temperature again (will be done just once initiated by "StartProcess")
+			pStateEnvironment->StoreBool("settargettemperature", false);
+			// set flag to tell state "HandleTemperature" to don't wait for the defined temperature again (will be done just once initiated by "StartProcess")
+			pStateEnvironment->StoreBool("waitfortemperature", false);
 
-			if (pSignalRetractFilament->WaitForHandling((uint32_t)(2000))) {
-				const auto bSuccess = pSignalRetractFilament->GetBoolResult("success");
 
-				if (bSuccess) {
-					pStateEnvironment->LogMessage("Filament retracted. ");
-					// proceed to next layer and wait for temperature
-					pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");
-					pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nCurrentLayer + 1);
+			// proceed to next layer and wait for temperature
+			pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");
+			pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nCurrentLayer + 1);
 
-					pStateEnvironment->SetNextState("waitfortemperature");
-				}
-				else {
-					pStateEnvironment->LogWarning("Filament retract error.");
-					pStateEnvironment->SetNextState("fatalerror");
-				}
-			}
-			else {
-				pStateEnvironment->LogWarning("Filament retract timeout. ");
-				pStateEnvironment->SetNextState("fatalerror");
-			}
+			pStateEnvironment->SetNextState("handletemperature");
 
 		}
 		else {
@@ -759,7 +744,7 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 	if (createStateInstanceByName<CMainState_NextLayer>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_WaitForTemperature>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_HandleTemperature>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDSTATENAME);

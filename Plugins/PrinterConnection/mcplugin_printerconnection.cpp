@@ -194,17 +194,18 @@ public:
 		
 		auto nExtruderId = pStateEnvironment->RetrieveInteger("extruderid");
 		if (bDoReportTemperatureValues && (nExtruderId > -1)) {
-			auto nExtruderId = pStateEnvironment->RetrieveInteger("extruderid");
-			pDriver->UpdateTemperatureState(nExtruderId);
-			// read current temperature values from plugin member (previously set in pDriver->UpdateState in updatePositionStateFromDriver)
-			double dCurrentExtruderTemperature;
-			double dCurrentBedTemperature;
-			pDriver->GetExtruderCurrentTemperature(nExtruderId, dCurrentExtruderTemperature);
-			pDriver->GetHeatedBedCurrentTemperature( dCurrentBedTemperature);
-
-			// send current temperature as signal => to be interpreted by "main" 
 			auto pSignal = pStateEnvironment->PrepareSignal("main", "signal_gettemperature");
 			if (pSignal->CanTrigger()) {
+				auto nExtruderId = pStateEnvironment->RetrieveInteger("extruderid");
+
+				pDriver->UpdateTemperatureState(nExtruderId);
+				// read current temperature values from plugin member (previously set in pDriver->UpdateState in updatePositionStateFromDriver)
+				double dCurrentExtruderTemperature;
+				double dCurrentBedTemperature;
+				pDriver->GetExtruderCurrentTemperature(nExtruderId, dCurrentExtruderTemperature);
+				pDriver->GetHeatedBedCurrentTemperature( dCurrentBedTemperature);
+
+				// send current temperature as signal => to be interpreted by "main" 
 				pSignal->SetBool("bedgetvalue", true);
 				pSignal->SetDouble("bedtemperature", dCurrentBedTemperature);
 				pSignal->SetBool("extrudergetvalue", true);
@@ -215,26 +216,17 @@ public:
 		}
 
 		LibMCEnv::PSignalHandler pSignalHandler;
-		if (pStateEnvironment->WaitForSignal("signal_disconnect", 0, pSignalHandler)) {
-			// and then disconnect
-			pDriver->Disconnect();
-			pSignalHandler->SetBoolResult("success", true);
-			pSignalHandler->SignalHandled();
-			pStateEnvironment->LogMessage("Printer disconnected.");
-		}
-		
-		if (pStateEnvironment->WaitForSignal("signal_emergencystop", 0, pSignalHandler)) {
-			pDriver->EmergencyStop();
-			pSignalHandler->SetBoolResult("success", true);
-			pSignalHandler->SignalHandled();
-			pStateEnvironment->LogWarning("EMERGENCY STOP!");
-		}
 		if (pStateEnvironment->WaitForSignal("signal_dohoming", 0, pSignalHandler)) {
 			if (!pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Do Homing.");
 				pDriver->StartHoming();
 			}
-			pSignalHandler->SetBoolResult("success", true);
+			if (pDriver->IsHomed()) {
+				pSignalHandler->SetBoolResult("success", true);
+			}
+			else {
+				pSignalHandler->SetBoolResult("success", false);
+			}
 			pSignalHandler->SignalHandled();
 		}
 		
@@ -242,7 +234,7 @@ public:
 			if (pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Initialize extruder.");
 				// move to a save pos
-				pDriver->MoveFastToZ(10.0, 50);
+				pDriver->MoveFastToZ(5, 50);
 				pDriver->MoveFastToXY(0.0, 0.0, 50);
 
 				// zero extruded length
@@ -266,9 +258,8 @@ public:
 				pStateEnvironment->LogMessage("Finalize extrude.");
 
 				// retract filament (relative)
-				pDriver->SetAbsoluteExtrusion(false);
-				pDriver->ExtruderDoExtrude(-1.0, 5);
-				pDriver->SetAbsoluteExtrusion(true);
+				double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
+				pDriver->ExtruderDoExtrude(dE -3.0, 50);
 				// move to a save pos (Z relative, x/y absolute)
 				pDriver->SetAbsolutePositioning(false);
 				pDriver->MoveFastToZ(5.0, 50);
@@ -290,32 +281,52 @@ public:
 		if (pStateEnvironment->WaitForSignal("signal_retractfilament", 0, pSignalHandler)) {
 			if (pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Retract filament.");
-
-				// retract filament (relatively by -0.5)
-				double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
-				pDriver->ExtruderDoExtrude(dE - 0.5, 30);
+				// will be called peridically => send Result immediately and then call the wanted function
 				pSignalHandler->SetBoolResult("success", true);
+				pSignalHandler->SignalHandled();
+
+				// retract filament (relatively by -3)
+				double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
+				pDriver->ExtruderDoExtrude(dE - 3, 50);
 			}
 			else {
 				pSignalHandler->SetBoolResult("success", false);
+				pSignalHandler->SignalHandled();
 			}
-			pSignalHandler->SignalHandled();
 		}
 
 		if (pStateEnvironment->WaitForSignal("signal_restorefilament", 0, pSignalHandler)) {
 			if (pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Restore filament.");
+				// will be called peridically => send Result immediately and then call the wanted function
+				pSignalHandler->SetBoolResult("success", true);
+				pSignalHandler->SignalHandled();
 
 				// restore filament to internally stored absolute E axis value ("ExtrudeValue")
 				double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
-				pDriver->ExtruderDoExtrude(dE, 30);
-				pSignalHandler->SetBoolResult("success", true);
+				pDriver->ExtruderDoExtrude(dE, 50);
 			}
 			else {
 				pSignalHandler->SetBoolResult("success", false);
+				pSignalHandler->SignalHandled();
 			}
-			pSignalHandler->SignalHandled();
 		}
+
+		if (pStateEnvironment->WaitForSignal("signal_emergencystop", 0, pSignalHandler)) {
+			pDriver->EmergencyStop();
+			pSignalHandler->SetBoolResult("success", true);
+			pSignalHandler->SignalHandled();
+			pStateEnvironment->LogWarning("EMERGENCY STOP!");
+		}
+
+		if (pStateEnvironment->WaitForSignal("signal_disconnect", 0, pSignalHandler)) {
+			// disconnect
+			pDriver->Disconnect();
+			pSignalHandler->SetBoolResult("success", true);
+			pSignalHandler->SignalHandled();
+			pStateEnvironment->LogMessage("Printer disconnected.");
+		}
+
 	}
 
 };
@@ -421,7 +432,7 @@ public:
 				std::string sParameterData;
 
 				LibMCEnv::PSignalHandler pSignalHandler;
-				if (pStateEnvironment->WaitForSignal("signal_doextrudelayer", 100, pSignalHandler)) {
+				if (pStateEnvironment->WaitForSignal("signal_doextrudelayer", 0, pSignalHandler)) {
 
 					pStateEnvironment->StoreSignal("globalsignal_doextrudelayer", pSignalHandler.get());
 					pStateEnvironment->SetNextState("doextrudelayer");
@@ -508,6 +519,18 @@ private:
 		return bSucces;
 	}
 
+	bool moveFastToZ(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_Marlin pDriver, std::chrono::steady_clock::time_point tStart, LibMCEnv_int64 nLayerTimeout, double dStatusUpdateInterval, double dZ, const double dSpeedFastMmPerSecond)
+	{
+		bool bSucces;
+		bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
+		if (bSucces) {
+			pDriver->MoveFastToZ(dZ, dSpeedFastMmPerSecond);
+			m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+			m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, false, false, false);
+		}
+		return bSucces;
+	}
+
 public:
 	
 	CPrinterConnectionState_DoExtrudeLayer(const std::string& sStateName, PPluginData pPluginData)
@@ -548,7 +571,8 @@ public:
 		//const double dExtrusionFactor = pLayer->GetSegmentProfileTypedValue(LibMCEnv::eToolpathProfileValueType::ExtrusionFactor);
 		const double dSpeedMmPerSecond = 20;
 		const double dSpeedFastMmPerSecond = 50;
-		const double dExtrusionFactor = 0.0166;
+		// TODO calculated value, use others for testing => const double dExtrusionFactor = 0.0166;
+		const double dExtrusionFactor = 0.012;
 		double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
@@ -557,17 +581,17 @@ public:
 		auto nSegmentCount = pLayer->GetSegmentCount();
 		auto tStart = std::chrono::high_resolution_clock::now();
 		if ((nSegmentCount > 0) && (dZ > 0)) {
-			bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
-			if (bSucces) {
-				pDriver->MoveFastToZ(dZ, dSpeedFastMmPerSecond);
-				m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
-				m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
-			}
-			else {
+			if (!moveFastToZ(pStateEnvironment, pDriver, tStart, nLayerTimeout, dStatusUpdateInterval, dZ, dSpeedFastMmPerSecond)) {
 				sNoSuccessMsg << "Timeout while moving to layer height Z=" << dZ << " of layer " << nLayerIndex;
 			}
 		}
-		
+
+		// restore filament, to value saved after printing the previous layer (compensate retract at end of print layer) 
+		if ((nSegmentCount > 0) && (dE > 0)) {
+			pDriver->ExtruderDoExtrude(dE, 30);
+			pStateEnvironment->LogMessage("Filament restored.");
+		}
+
 		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
 			LibMCEnv::eToolpathSegmentType eSegmentType;
 			uint32_t nPointCount;
@@ -703,12 +727,20 @@ public:
 					}
 					break;
 				}
-
 			}
 			if (!bSucces) {
 				break;
 			}
 		}
+
+		// retract filament
+		// TODO possibly the filament retract value should be defined/set by a parameter (in xml)
+		double dRetract = dE - 3.0;
+		if (dRetract < 0) {
+			dRetract = 0.0;
+		}
+		pDriver->ExtruderDoExtrude(dRetract, 30);
+		pStateEnvironment->LogMessage("Filament retracted.");
 
 		// save current extrusion value => to be available/used in next layer
 		pStateEnvironment->StoreDouble("ExtrudeValue", dE);
