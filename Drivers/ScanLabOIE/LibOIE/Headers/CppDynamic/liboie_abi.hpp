@@ -497,18 +497,20 @@ LIBOIE_DECLSPEC LibOIEResult liboie_server_listconnections(LibOIE_Server pServer
 *
 * @param[in] pServer - Server instance.
 * @param[in] pCallback - callback pointer.
+* @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-LIBOIE_DECLSPEC LibOIEResult liboie_server_setconnectionacceptedcallback(LibOIE_Server pServer, LibOIE::ConnectionAcceptedCallback pCallback);
+LIBOIE_DECLSPEC LibOIEResult liboie_server_setconnectionacceptedcallback(LibOIE_Server pServer, LibOIE::ConnectionAcceptedCallback pCallback, LibOIE_pvoid pUserData);
 
 /**
 * sets a callback that triggers when a new connection was rejected.
 *
 * @param[in] pServer - Server instance.
 * @param[in] pCallback - callback pointer.
+* @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-LIBOIE_DECLSPEC LibOIEResult liboie_server_setconnectionrejectedcallback(LibOIE_Server pServer, LibOIE::ConnectionRejectedCallback pCallback);
+LIBOIE_DECLSPEC LibOIEResult liboie_server_setconnectionrejectedcallback(LibOIE_Server pServer, LibOIE::ConnectionRejectedCallback pCallback, LibOIE_pvoid pUserData);
 
 /*************************************************************************************************************************
  Global functions

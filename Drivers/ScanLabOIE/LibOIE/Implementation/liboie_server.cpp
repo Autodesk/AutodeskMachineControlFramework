@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CServer
 
 #include "liboie_server.hpp"
 #include "liboie_interfaceexception.hpp"
+#include "liboie_connectioniterator.hpp"
 
 // Include custom headers here.
 #include <brynet/net/EventLoop.hpp>
@@ -46,8 +47,9 @@ using namespace LibOIE::Impl;
  Class definition of CServer 
 **************************************************************************************************************************/
 
+
 CServer::CServer()
-    : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT)
+    : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT), m_nAcceptRuleCounter (1)
 {
 
 }
@@ -60,18 +62,26 @@ void CServer::Start(const std::string& sIPAddress, const LibOIE_uint32 nPort, co
     m_pService = brynet::net::TcpService::Create();
 
     m_pService->startWorkerThread(m_nThreadCount, nullptr);
+    std::cout << "Listening!!" << std::endl;
 
     auto enterCallback = [](const  brynet::net::TcpConnection::Ptr& session) {
+
+        std::cout << "Client Connected!!" << std::endl;
+
         //total_client_num++;
 
         session->setDataCallback([session](const char* buffer, size_t len) {
-            session->send(buffer, len);
+            std::cout << "Data received: " << len << "!!" << std::endl;
+
+
+            //session->send(buffer, len);
             //TotalRecvSize += len;
             //total_packet_num++;
             return len;
         });
 
         session->setDisConnectCallback([](const  brynet::net::TcpConnection::Ptr& session) {
+            std::cout << "Client Disconnected!!" << std::endl;
             (void)session;
             //total_client_num--;
         });
@@ -131,31 +141,37 @@ void CServer::CloseAllConnections()
 
 LibOIE_uint32 CServer::AcceptDevice(const std::string & sDeviceName, const std::string & sApplicationName, const std::string & sVersionName)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+    auto pAcceptRule = std::make_shared <CAcceptRule>(m_nAcceptRuleCounter, sDeviceName, sApplicationName, sVersionName);
+    m_nAcceptRuleCounter++;
+
+    m_AcceptRules.insert(std::make_pair (pAcceptRule->getRuleID (), pAcceptRule));
+    return pAcceptRule->getRuleID();
+   
 }
 
 void CServer::UnAcceptDevice(const LibOIE_uint32 nRuleID)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+    m_AcceptRules.erase(nRuleID);
 }
 
 void CServer::ClearAcceptedDevices()
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+    m_AcceptRules.clear();
+    m_nAcceptRuleCounter = 1;
 }
 
 IConnectionIterator * CServer::ListConnections()
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+	return new CConnectionIterator ();
 }
 
-void CServer::SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback)
+void CServer::SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback, const LibOIE_pvoid pUserData)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+
 }
 
-void CServer::SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback)
+void CServer::SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback, const LibOIE_pvoid pUserData)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+
 }
 
