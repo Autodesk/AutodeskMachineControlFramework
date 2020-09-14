@@ -43,6 +43,11 @@ using namespace LibOIE::Impl;
  Class definition of CIterator 
 **************************************************************************************************************************/
 
+CIterator::CIterator()
+{
+}
+
+
 bool CIterator::MoveNext()
 {
 	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);

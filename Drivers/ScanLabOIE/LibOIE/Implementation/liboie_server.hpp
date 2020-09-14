@@ -36,6 +36,9 @@ Abstract: This is the class declaration of CServer
 #define __LIBOIE_SERVER
 
 #include "liboie_interfaces.hpp"
+#include "oie_acceptrule.hpp"
+
+#include <map>
 
 // Parent classes
 #include "liboie_base.hpp"
@@ -80,6 +83,9 @@ private:
     std::shared_ptr<brynet::net::TcpService> m_pService;
     std::shared_ptr<brynet::net::wrapper::ListenerBuilder> m_pListener;
 
+    uint32_t m_nAcceptRuleCounter;
+    std::map<uint32_t, PAcceptRule> m_AcceptRules;
+
 protected:
 
 
@@ -105,9 +111,10 @@ public:
 
 	IConnectionIterator * ListConnections() override;
 
-	void SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback) override;
+    void SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback, const LibOIE_pvoid pUserData) override;
+    
+    void SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback, const LibOIE_pvoid pUserData) override;
 
-	void SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback) override;
 
 };
 
