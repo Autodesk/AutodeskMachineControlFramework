@@ -37,8 +37,11 @@ Abstract: This is the class declaration of CServer
 
 #include "liboie_interfaces.hpp"
 #include "oie_acceptrule.hpp"
+#include "oie_connectionhandler.hpp"
 
 #include <map>
+#include <mutex>
+#include <thread>
 
 // Parent classes
 #include "liboie_base.hpp"
@@ -86,8 +89,12 @@ private:
     uint32_t m_nAcceptRuleCounter;
     std::map<uint32_t, PAcceptRule> m_AcceptRules;
 
-protected:
+    uint64_t m_nConnectionCounter;
+    std::mutex m_ConnectionMutex;
+    std::map<uint64_t, PConnectionHandler> m_CurrentConnections;
 
+
+protected:
 
 public:
 
@@ -114,6 +121,10 @@ public:
     void SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback, const LibOIE_pvoid pUserData) override;
     
     void SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback, const LibOIE_pvoid pUserData) override;
+
+    PConnectionHandler createConnectionHandler(const std::string& sIPAddress);
+    void releaseConnectionHandler(const uint64_t nConnectionID);
+    CConnectionHandler* findConnectionHandler(const uint64_t nConnectionID, bool bFailIfNotExisting);
 
 
 };

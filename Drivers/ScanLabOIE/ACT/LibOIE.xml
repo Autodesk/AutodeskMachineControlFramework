@@ -68,7 +68,12 @@
 		<error name="VARIABLEHEADERALREADYWRITTEN" code="1014" description="variable header already written." />
 		<error name="NOVARIABLEHEADERCONTENT" code="1015" description="no variable header content." />
 		<error name="RULEIDOVERFLOW" code="1016" description="rule id overflow." />
+		<error name="CONNECTIONNOTFOUND" code="1017" description="connection not found." />
+		<error name="SERVICEALREADYRUNNING" code="1018" description="service already running." />
+		<error name="INVALIDPACKETSIZE" code="1019" description="invalid packet size." />
+		<error name="INVALIDPAYLOADSIZE" code="1020" description="invalid payload size." />
 		
+				
 	</errors>
 
 
