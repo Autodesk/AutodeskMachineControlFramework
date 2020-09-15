@@ -28,25 +28,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "oie_packet_loginrequest.hpp"
+#include "oie_packet_startfirmware.hpp"
 #include "liboie_interfaceexception.hpp"
 
 using namespace LibOIE::Impl;
 
 
-CPacket_LoginRequest::CPacket_LoginRequest(uint32_t nSequenceNumber, const std::string& sDeviceName, const std::string& sApplicationName, const std::string& sApplicationVersion, bool bLoginStatus)
-	: CPacket (nSequenceNumber), m_sDeviceName (sDeviceName), m_sApplicationName (sApplicationName), m_sApplicationVersion (sApplicationVersion), m_bLoginStatus (bLoginStatus)
+CPacket_StartFirmware::CPacket_StartFirmware(uint32_t nSequenceNumber, bool bFirmwareStarted, std::string sFirmwareFileName)
+	: CPacket(nSequenceNumber), m_bFirmwareStarted(bFirmwareStarted), m_sFirmwareFileName(sFirmwareFileName)
 {
-	if (m_sDeviceName.length() > OIE_MAXNAMELENGTH)
-		throw ELibOIEInterfaceException(LIBOIE_ERROR_STRINGEXCEEDSCHARACTERLIMIT);
-	if (m_sApplicationName.length() > OIE_MAXNAMELENGTH)
-		throw ELibOIEInterfaceException(LIBOIE_ERROR_STRINGEXCEEDSCHARACTERLIMIT);
-	if (m_sApplicationVersion.length() > OIE_MAXNAMELENGTH)
+	if (m_sFirmwareFileName.length() > OIE_MAXNAMELENGTH)
 		throw ELibOIEInterfaceException(LIBOIE_ERROR_STRINGEXCEEDSCHARACTERLIMIT);
 }
 
-CPacket_LoginRequest::CPacket_LoginRequest(CPacketReader& pReader)
-	: CPacket (pReader.getSequenceNumber ()), m_bLoginStatus (false)
+CPacket_StartFirmware::CPacket_StartFirmware(CPacketReader& pReader)
+	: CPacket(pReader.getSequenceNumber()), m_bFirmwareStarted(false)
 {
 
 	pReader.beginVariableHeader();
@@ -54,15 +50,13 @@ CPacket_LoginRequest::CPacket_LoginRequest(CPacketReader& pReader)
 	auto nVersion = pReader.getPacketVersion();
 	switch (nVersion) {
 	case 1:
-		m_sDeviceName = pReader.readVariableString(OIE_MAXNAMELENGTH);
-		m_sApplicationName = pReader.readVariableString(OIE_MAXNAMELENGTH);
-		m_sApplicationVersion = pReader.readVariableString(OIE_MAXNAMELENGTH);
-		m_bLoginStatus = pReader.readVariableBoolean();
+		m_bFirmwareStarted = pReader.readVariableBoolean();
+		m_sFirmwareFileName = pReader.readVariableString(OIE_MAXNAMELENGTH);
 		pReader.checkNoPayload();
 		break;
 
 	default:
-		throw ELibOIEInterfaceException(LIBOIE_ERROR_UNSUPPORTEDPACKETVERSION, "LoginRequest #" + std::to_string (nVersion));
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_UNSUPPORTEDPACKETVERSION, "StopFirmware #" + std::to_string(nVersion));
 
 	}
 
@@ -71,23 +65,42 @@ CPacket_LoginRequest::CPacket_LoginRequest(CPacketReader& pReader)
 
 }
 
-CPacket_LoginRequest::~CPacket_LoginRequest()
+CPacket_StartFirmware::~CPacket_StartFirmware()
 {
 
 }
 
-ePacketType CPacket_LoginRequest::getType()
-{
-	return ePacketType::LoginRequest;
-}
 
-void CPacket_LoginRequest::serialize(CPacketWriter& packetWriter)
+void CPacket_StartFirmware::serialize(CPacketWriter& packetWriter)
 {
-	packetWriter.setVersion (1);
-	packetWriter.beginVariableHeader(OIE_MAXNAMELENGTH * 3 + 1);
-	packetWriter.writeVariableString(m_sDeviceName);
-	packetWriter.writeVariableString(m_sApplicationName);
-	packetWriter.writeVariableString(m_sApplicationVersion);
-	packetWriter.writeVariableBoolean(m_bLoginStatus);
+	packetWriter.setVersion(1);
+	packetWriter.beginVariableHeader(OIE_MAXNAMELENGTH + 1);
+	packetWriter.writeVariableBoolean(m_bFirmwareStarted);
+	packetWriter.writeVariableString(m_sFirmwareFileName);
 	packetWriter.endVariableHeader();
 }
+
+
+CPacket_StartFirmwareRequest::CPacket_StartFirmwareRequest(CPacketReader& pReader)
+	: CPacket_StartFirmware(pReader)
+{
+
+}
+
+ePacketType CPacket_StartFirmwareRequest::getType()
+{
+	return ePacketType::StartFirmwareRequest;
+}
+
+CPacket_StartFirmwareReply::CPacket_StartFirmwareReply(CPacketReader& pReader)
+	: CPacket_StartFirmware(pReader)
+{
+
+}
+
+ePacketType CPacket_StartFirmwareReply::getType()
+{
+	return ePacketType::StartFirmwareReply;
+}
+
+

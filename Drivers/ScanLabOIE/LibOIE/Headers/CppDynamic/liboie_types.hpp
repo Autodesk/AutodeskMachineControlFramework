@@ -121,6 +121,7 @@ typedef void * LibOIE_pvoid;
 #define LIBOIE_ERROR_PACKETVERSIONALREADYWRITTEN 1013
 #define LIBOIE_ERROR_VARIABLEHEADERALREADYWRITTEN 1014
 #define LIBOIE_ERROR_NOVARIABLEHEADERCONTENT 1015
+#define LIBOIE_ERROR_RULEIDOVERFLOW 1016
 
 /*************************************************************************************************************************
  Error strings for LibOIE
@@ -154,6 +155,7 @@ inline const char * LIBOIE_GETERRORSTRING (LibOIEResult nErrorCode) {
     case LIBOIE_ERROR_PACKETVERSIONALREADYWRITTEN: return "packet version already written.";
     case LIBOIE_ERROR_VARIABLEHEADERALREADYWRITTEN: return "variable header already written.";
     case LIBOIE_ERROR_NOVARIABLEHEADERCONTENT: return "no variable header content.";
+    case LIBOIE_ERROR_RULEIDOVERFLOW: return "rule id overflow.";
     default: return "unknown error";
   }
 }

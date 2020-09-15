@@ -28,42 +28,74 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKETWRITER
-#define __AMC_OIE_PACKETWRITER
+#include "oie_packet_alive.hpp"
+#include "liboie_interfaceexception.hpp"
 
-#include <memory>
-#include <string>
-#include <vector>
+using namespace LibOIE::Impl;
 
-namespace LibOIE::Impl {
-	
 
-	class CPacketWriter {
-	private:
-		uint32_t m_nVersion;
-		uint32_t m_nType;
+CPacket_Alive::CPacket_Alive(uint32_t nSequenceNumber, bool bAliveState)
+	: CPacket (nSequenceNumber), m_bAliveState(bAliveState)
+{
+}
 
-		std::vector<uint8_t> m_VariableHeader;
+CPacket_Alive::CPacket_Alive(CPacketReader& pReader)
+	: CPacket (pReader.getSequenceNumber ()), m_bAliveState(false)
+{
 
-	public:
+	pReader.beginVariableHeader();
 
-		CPacketWriter(uint32_t nType);
+	auto nVersion = pReader.getPacketVersion();
+	switch (nVersion) {
+	case 1:
+		m_bAliveState = pReader.readVariableBoolean();
+		pReader.checkNoPayload();
+		break;
 
-		void setVersion(uint32_t nVersion);
+	default:
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_UNSUPPORTEDPACKETVERSION, "Alive #" + std::to_string (nVersion));
 
-		void beginVariableHeader(const size_t nExpectedBufferSize);
-		void endVariableHeader();
-		void writeVariableString(const std::string sValue);
-		void writeVariableBoolean(const bool bValue);
-		void writeVariableUint32(const uint32_t nValue);
-		void writeVariableInt32(const int32_t nValue);
-		void writeVariableUint64(const uint64_t nValue);
-		void writeVariableInt64(const int64_t nValue);
+	}
 
-	};
+	pReader.endVariableHeader();
+
+
+}
+
+CPacket_Alive::~CPacket_Alive()
+{
 
 }
 
 
-#endif //__AMC_OIE_PACKETWRITER
+void CPacket_Alive::serialize(CPacketWriter& packetWriter)
+{	
+	packetWriter.setVersion (1);
+	packetWriter.beginVariableHeader(OIE_MAXNAMELENGTH * 3 + 1);
+	packetWriter.writeVariableBoolean(m_bAliveState);
+	packetWriter.endVariableHeader();
+}
+
+
+CPacket_AliveRequest::CPacket_AliveRequest(CPacketReader& pReader)
+	: CPacket_Alive (pReader)
+{
+
+}
+
+ePacketType CPacket_AliveRequest::getType()
+{
+	return ePacketType::AliveRequest;
+}
+
+CPacket_AliveReply::CPacket_AliveReply(CPacketReader& pReader)
+	: CPacket_Alive(pReader)
+{
+
+}
+
+ePacketType CPacket_AliveReply::getType()
+{
+	return ePacketType::AliveReply;
+}
 

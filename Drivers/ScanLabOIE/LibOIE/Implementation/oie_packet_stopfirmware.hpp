@@ -28,37 +28,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKET_LOGINREQUEST
-#define __AMC_OIE_PACKET_LOGINREQUEST
+#ifndef __AMC_OIE_PACKET_STOPFIRMWARE
+#define __AMC_OIE_PACKET_STOPFIRMWARE
 
 #include "oie_packet.hpp"
 
 namespace LibOIE::Impl {
 	
-	class CPacket_LoginRequest : public CPacket {
-		private:
+	class CPacket_StopFirmware : public CPacket {
+		protected:
 
-			std::string m_sDeviceName;
-			std::string m_sApplicationName;
-			std::string m_sApplicationVersion;
-			bool m_bLoginStatus;
+			bool m_bFirmwareStopped;
+			std::string m_sFirmwareFileName;
 
 		public:
 
-			CPacket_LoginRequest(uint32_t nSequenceNumber, const std::string& sDeviceName, const std::string& sApplicationName, const std::string& sApplicationVersion, bool bLoginStatus);
-			CPacket_LoginRequest(CPacketReader & pReader);
+			CPacket_StopFirmware(uint32_t nSequenceNumber, bool bFirmwareStopped, std::string sFirmwareFileName);
+			CPacket_StopFirmware(CPacketReader & pReader);
 
-			virtual ~CPacket_LoginRequest ();
-
-			virtual ePacketType getType() override;
+			virtual ~CPacket_StopFirmware();
 
 			virtual void serialize(CPacketWriter& packetWriter) override;
 
 	};
 	
+
+	class CPacket_StopFirmwareRequest : public CPacket_StopFirmware {
+
+	protected:
+
+	public:
+		CPacket_StopFirmwareRequest (CPacketReader & pReader);
+		
+		virtual ePacketType getType() override;
+	};
+
+	class CPacket_StopFirmwareReply : public CPacket_StopFirmware {
+		
+		protected:
+		
+		public:
+			CPacket_StopFirmwareReply (CPacketReader & pReader);		
+			
+			virtual ePacketType getType() override;
+	};
 	
 }
 
 
-#endif //__AMC_OIE_PACKET_LOGINREQUEST
+#endif //__AMC_OIE_PACKET_STOPFIRMWARE
 

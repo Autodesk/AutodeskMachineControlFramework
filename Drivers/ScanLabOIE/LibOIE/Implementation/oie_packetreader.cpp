@@ -170,6 +170,37 @@ int32_t CPacketReader::readVariableInt32(const int32_t nMinValue, const int32_t 
 	return nValue;
 }
 
+uint64_t CPacketReader::readVariableUInt64(const uint64_t nMinValue, const uint64_t nMaxValue)
+{
+	const uint64_t* pValue = (const uint64_t*)readVariableBytesSafe(8);
+	if (pValue == nullptr)
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_INTERNALERROR);
+	uint64_t nValue = *pValue;
+
+	if (*pValue < nMinValue)
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMINIMUM);
+	if (*pValue > nMaxValue)
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMAXIMUM);
+
+	return nValue;
+}
+
+int64_t CPacketReader::readVariableInt64(const int64_t nMinValue, const int64_t nMaxValue)
+{
+	const int64_t* pValue = (const int64_t*)readVariableBytesSafe(8);
+	if (pValue == nullptr)
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_INTERNALERROR);
+	int64_t nValue = *pValue;
+
+	if (*pValue < nMinValue)
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMINIMUM);
+	if (*pValue > nMaxValue)
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMAXIMUM);
+
+	return nValue;
+}
+
+
 
 std::string CPacketReader::readVariableString(const uint32_t nMaxLength)
 {

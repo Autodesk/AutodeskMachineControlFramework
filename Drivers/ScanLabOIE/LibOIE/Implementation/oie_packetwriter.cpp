@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace LibOIE::Impl;
 
 
-CPacketWriter::CPacketWriter()
-	: m_nVersion (0)
+CPacketWriter::CPacketWriter(uint32_t nType)
+	: m_nVersion (0), m_nType (nType)
 {
 	
 }
@@ -97,6 +97,24 @@ void CPacketWriter::writeVariableInt32(const int32_t nValue)
 {
 	const uint8_t* pValue = (const uint8_t*)&nValue;
 	for (uint32_t nIndex = 0; nIndex < 4; nIndex++) {
+		m_VariableHeader.push_back(*pValue);
+		pValue++;
+	}
+}
+
+void CPacketWriter::writeVariableUint64(const uint64_t nValue)
+{
+	const uint8_t* pValue = (const uint8_t*)&nValue;
+	for (uint32_t nIndex = 0; nIndex < 8; nIndex++) {
+		m_VariableHeader.push_back(*pValue);
+		pValue++;
+	}
+}
+
+void CPacketWriter::writeVariableInt64(const int64_t nValue)
+{
+	const uint8_t* pValue = (const uint8_t*)&nValue;
+	for (uint32_t nIndex = 0; nIndex < 8; nIndex++) {
 		m_VariableHeader.push_back(*pValue);
 		pValue++;
 	}

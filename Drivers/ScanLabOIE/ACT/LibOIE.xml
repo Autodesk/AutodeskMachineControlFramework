@@ -67,11 +67,7 @@
 		<error name="PACKETVERSIONALREADYWRITTEN" code="1013" description="packet version already written." />
 		<error name="VARIABLEHEADERALREADYWRITTEN" code="1014" description="variable header already written." />
 		<error name="NOVARIABLEHEADERCONTENT" code="1015" description="no variable header content." />
-		
-		
-		
-		
-		
+		<error name="RULEIDOVERFLOW" code="1016" description="rule id overflow." />
 		
 	</errors>
 

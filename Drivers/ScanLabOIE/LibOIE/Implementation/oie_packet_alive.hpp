@@ -28,42 +28,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKETWRITER
-#define __AMC_OIE_PACKETWRITER
+#ifndef __AMC_OIE_PACKET_ALIVE
+#define __AMC_OIE_PACKET_ALIVE
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "oie_packet.hpp"
 
 namespace LibOIE::Impl {
 	
+	class CPacket_Alive : public CPacket {
+		protected:
 
-	class CPacketWriter {
-	private:
-		uint32_t m_nVersion;
-		uint32_t m_nType;
+			bool m_bAliveState;
 
-		std::vector<uint8_t> m_VariableHeader;
+		public:
+
+			CPacket_Alive(uint32_t nSequenceNumber, bool bAliveState);
+			CPacket_Alive(CPacketReader & pReader);
+
+			virtual ~CPacket_Alive();
+
+			virtual void serialize(CPacketWriter& packetWriter) override;
+
+	};
+	
+
+	class CPacket_AliveRequest : public CPacket_Alive {
+
+	protected:
 
 	public:
 
-		CPacketWriter(uint32_t nType);
-
-		void setVersion(uint32_t nVersion);
-
-		void beginVariableHeader(const size_t nExpectedBufferSize);
-		void endVariableHeader();
-		void writeVariableString(const std::string sValue);
-		void writeVariableBoolean(const bool bValue);
-		void writeVariableUint32(const uint32_t nValue);
-		void writeVariableInt32(const int32_t nValue);
-		void writeVariableUint64(const uint64_t nValue);
-		void writeVariableInt64(const int64_t nValue);
-
+		CPacket_AliveRequest(CPacketReader & pReader);
+		
+		virtual ePacketType getType() override;
 	};
 
+	class CPacket_AliveReply : public CPacket_Alive {
+		
+	protected:
+		
+	public:
+		
+		CPacket_AliveReply(CPacketReader & pReader);
+		
+		virtual ePacketType getType() override;
+	};
+	
 }
 
 
-#endif //__AMC_OIE_PACKETWRITER
+#endif //__AMC_OIE_PACKET_ALIVE
 
