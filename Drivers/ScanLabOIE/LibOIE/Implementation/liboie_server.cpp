@@ -50,8 +50,48 @@ using namespace LibOIE::Impl;
 #define OIE_MAXRULECOUNT (1024 * 1024 * 1024)
 
 CServer::CServer()
-    : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT), m_nAcceptRuleCounter (1)
+    : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), 
+    m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT), 
+    m_nAcceptRuleCounter (1),
+    m_nConnectionCounter (1)
 {
+
+}
+
+
+PConnectionHandler CServer::createConnectionHandler(const std::string & sIPAddress)
+{
+    std::lock_guard<std::mutex> lockGuard (m_ConnectionMutex);
+    auto pConnectionHandler = std::make_shared<CConnectionHandler>(m_nConnectionCounter, sIPAddress);
+    m_nConnectionCounter++;
+
+    m_CurrentConnections.insert(std::make_pair (pConnectionHandler->getID (), pConnectionHandler));
+
+    return pConnectionHandler;
+}
+
+void CServer::releaseConnectionHandler(const uint64_t nConnectionID)
+{
+    std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+
+    m_CurrentConnections.erase(nConnectionID);
+
+}
+
+CConnectionHandler* CServer::findConnectionHandler(const uint64_t nConnectionID, bool bFailIfNotExisting)
+{
+    std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+
+    auto iIter = m_CurrentConnections.find(nConnectionID);
+
+    if (iIter != m_CurrentConnections.end()) {
+        return iIter->second.get();
+    }
+       
+    if (bFailIfNotExisting)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_CONNECTIONNOTFOUND);
+
+    return nullptr;
 
 }
 
@@ -59,33 +99,46 @@ CServer::CServer()
 void CServer::Start(const std::string& sIPAddress, const LibOIE_uint32 nPort, const bool bIPv6) 
 {
 
+    if (m_pService != nullptr)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_SERVICEALREADYRUNNING);
+    if (m_pListener != nullptr)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_SERVICEALREADYRUNNING);
 
     m_pService = brynet::net::TcpService::Create();
 
     m_pService->startWorkerThread(m_nThreadCount, nullptr);
     std::cout << "Listening!!" << std::endl;
 
-    auto enterCallback = [](const  brynet::net::TcpConnection::Ptr& session) {
+    auto enterCallback = [this](const  brynet::net::TcpConnection::Ptr& session) {
 
-        std::cout << "Client Connected:" << session->getIP() << std::endl;
+        std::cout << "Client connected:" << session->getIP() << std::endl;
+        auto pConnectionHandler = this->createConnectionHandler(session->getIP());
         
-        //total_client_num++;
-
-        session->setDataCallback([session](const char* buffer, size_t len) {
+        session->setDataCallback([session, pConnectionHandler](const char* buffer, size_t len) {
             std::cout << "Data received: " << len << "!!" << std::endl;
 
+            if (pConnectionHandler->needsToTerminate()) {
+                session->postDisConnect();
+                return len;
+            }
 
-            //session->send(buffer, len);
-            //TotalRecvSize += len;
-            //total_packet_num++;
+            try {
+                pConnectionHandler->receivedData((const uint8_t*)buffer, len);
+            }
+            catch (...) {
+                session->postDisConnect();
+            }
+
             return len;
         });
 
-        session->setDisConnectCallback([](const  brynet::net::TcpConnection::Ptr& session) {
-            std::cout << "Client Disconnected!!" << std::endl;
-            (void)session;
-            //total_client_num--;
+        session->setDisConnectCallback([this, pConnectionHandler](const  brynet::net::TcpConnection::Ptr& session) {
+            std::cout << "Client disconnected: " << session->getIP() << std::endl;
+            this->releaseConnectionHandler(pConnectionHandler->getID ());
         });
+
+        // ?
+        //session->setHeartBeat ()
 
     };
 
@@ -112,6 +165,16 @@ void CServer::Start(const std::string& sIPAddress, const LibOIE_uint32 nPort, co
 
 void CServer::Stop()
 {
+
+    if (m_pListener != nullptr) {
+        m_pListener->stop();
+        m_pListener = nullptr;
+    }
+
+    if (m_pService != nullptr) {
+        m_pService->stopWorkerThread();
+        m_pService = nullptr;
+    }
 
 }
 

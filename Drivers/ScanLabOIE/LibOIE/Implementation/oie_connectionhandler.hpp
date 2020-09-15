@@ -28,71 +28,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKETTYPES
-#define __AMC_OIE_PACKETTYPES
+#ifndef __AMC_OIE_CONNECTIONHANDLER
+#define __AMC_OIE_CONNECTIONHANDLER
 
 #include <memory>
 #include <string>
-#include <set>    
+#include <vector>
+#include <mutex>
+
+#include "oie_packet.hpp"
 
 namespace LibOIE::Impl {
+	
+	class CConnectionHandler {
+	private:
+		uint64_t m_nID;
+		std::string m_sIPAddress;
 
-#define OIE_MAXNAMELENGTH 1024
-#define OIE_MAXVARIABLEHEADERSIZE (1024 * 1024)
-#define OIE_MAXPACKETSIZE (1024ULL * 1024ULL * 1024ULL)
-#define OIE_INVALIDPACKETSIZE (OIE_MAXPACKETSIZE + 1)
+		bool m_bNeedsToTerminate;
+		std::mutex m_Mutex;
 
-#pragma pack(push, 1)
-	typedef struct {
-		uint32_t m_nTypeID;
-		uint64_t m_nVariableHeaderSize;
-		//uint32_t m_nCRC32;
-		//uint32_t m_nSequenceNumber;
-		uint32_t m_nVersion;
-	} sOIECommandFixedHeader;
-#pragma pack(pop)
+		std::vector<uint8_t> m_Buffer1;
+		std::vector<uint8_t> m_Buffer2;
 
-	enum class ePacketType {
-		UndefinedType = 0,
-		LoginRequest = 15,
-		LoginReply = 16,
-		FirmwareInfoRequest = 17,
-		FirmwareInfoReply = 18,
-		UpdateFirmwareRequest = 19,
-		UpdateFirmwareReply = 20,
-		StartFirmwareRequest = 21,
-		StartFirmwareReply = 22,
-		StopFirmwareRequest = 23,
-		StopFirmwareReply = 24,
-		ErrorMsg = 27,
-		AliveRequest = 29,
-		AliveReply = 30,
-		RemoteFunctionCall = 31,
-		RemoteFunctionCallReturnReceive = 32,
-		DeviceStatusRequest = 35,
-		DeviceStatusReply = 36,
-		PyroDataPackage = 40,
-		OctDataPackage = 41
+		std::vector<uint8_t> & m_CurrentBuffer;
+		std::vector<uint8_t> & m_OtherBuffer;
+
+		void pushToBuffer(std::vector<uint8_t>& Buffer, const uint8_t* pData, size_t nSize);
+
+		bool predictPacketSize(const uint8_t* pReadData, size_t nReadSize, size_t & predictedSize);
+
+	public:
+
+		CConnectionHandler(const uint64_t nID, const std::string& sIPAddress);
+		virtual ~CConnectionHandler ();
+
+		uint64_t getID();
+
+		void receivedData (const uint8_t * pData, size_t nSize);
+
+		bool needsToTerminate();
+
+		std::string getIPAddress();
+
+		void handlePacket (PPacket pPacket);
+
 	};
-
-
-	inline std::set<ePacketType> getPacketTypesWithPayload () {
-		return { 
-			ePacketType::UpdateFirmwareRequest, 
-			ePacketType::PyroDataPackage, 
-			ePacketType::OctDataPackage 
-		};
-	}
-
-	inline bool packetTypeHasPayload (ePacketType packetType)
-	{
-		auto packetTypesWithPayload = getPacketTypesWithPayload();
-		auto iIter = packetTypesWithPayload.find(packetType);
-		return (iIter != packetTypesWithPayload.end());
-	}
+	
+	typedef std::shared_ptr<CConnectionHandler> PConnectionHandler;
 
 }
 
 
-#endif //__AMC_OIE_PACKETTYPES
+#endif //__AMC_OIE_CONNECTIONHANDLER
 

@@ -122,6 +122,10 @@ typedef void * LibOIE_pvoid;
 #define LIBOIE_ERROR_VARIABLEHEADERALREADYWRITTEN 1014
 #define LIBOIE_ERROR_NOVARIABLEHEADERCONTENT 1015
 #define LIBOIE_ERROR_RULEIDOVERFLOW 1016
+#define LIBOIE_ERROR_CONNECTIONNOTFOUND 1017
+#define LIBOIE_ERROR_SERVICEALREADYRUNNING 1018
+#define LIBOIE_ERROR_INVALIDPACKETSIZE 1019
+#define LIBOIE_ERROR_INVALIDPAYLOADSIZE 1020
 
 /*************************************************************************************************************************
  Error strings for LibOIE
@@ -156,6 +160,10 @@ inline const char * LIBOIE_GETERRORSTRING (LibOIEResult nErrorCode) {
     case LIBOIE_ERROR_VARIABLEHEADERALREADYWRITTEN: return "variable header already written.";
     case LIBOIE_ERROR_NOVARIABLEHEADERCONTENT: return "no variable header content.";
     case LIBOIE_ERROR_RULEIDOVERFLOW: return "rule id overflow.";
+    case LIBOIE_ERROR_CONNECTIONNOTFOUND: return "connection not found.";
+    case LIBOIE_ERROR_SERVICEALREADYRUNNING: return "service already running.";
+    case LIBOIE_ERROR_INVALIDPACKETSIZE: return "invalid packet size.";
+    case LIBOIE_ERROR_INVALIDPAYLOADSIZE: return "invalid payload size.";
     default: return "unknown error";
   }
 }
