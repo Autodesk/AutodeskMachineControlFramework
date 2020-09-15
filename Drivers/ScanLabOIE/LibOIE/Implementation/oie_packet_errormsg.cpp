@@ -28,42 +28,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKETWRITER
-#define __AMC_OIE_PACKETWRITER
+#include "oie_packet_errormsg.hpp"
+#include "liboie_interfaceexception.hpp"
 
-#include <memory>
-#include <string>
-#include <vector>
+using namespace LibOIE::Impl;
 
-namespace LibOIE::Impl {
-	
+CPacket_ErrorMsg::CPacket_ErrorMsg(uint32_t nSequenceNumber, const std::string& sErrorMessage)
+	: CPacket (nSequenceNumber), m_sErrorMessage (sErrorMessage)
+{
+	if (m_sErrorMessage.length() > OIE_MAXNAMELENGTH)
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_STRINGEXCEEDSCHARACTERLIMIT);
+}
 
-	class CPacketWriter {
-	private:
-		uint32_t m_nVersion;
-		uint32_t m_nType;
+CPacket_ErrorMsg::CPacket_ErrorMsg(CPacketReader& pReader)
+	: CPacket (pReader.getSequenceNumber ())
+{
 
-		std::vector<uint8_t> m_VariableHeader;
+	pReader.beginVariableHeader();
 
-	public:
+	auto nVersion = pReader.getPacketVersion();
+	switch (nVersion) {
+	case 1:
+		m_sErrorMessage = pReader.readVariableString(OIE_MAXNAMELENGTH);
+		pReader.checkNoPayload();
+		break;
 
-		CPacketWriter(uint32_t nType);
+	default:
+		throw ELibOIEInterfaceException(LIBOIE_ERROR_UNSUPPORTEDPACKETVERSION, "ErrorMsg #" + std::to_string (nVersion));
 
-		void setVersion(uint32_t nVersion);
+	}
 
-		void beginVariableHeader(const size_t nExpectedBufferSize);
-		void endVariableHeader();
-		void writeVariableString(const std::string sValue);
-		void writeVariableBoolean(const bool bValue);
-		void writeVariableUint32(const uint32_t nValue);
-		void writeVariableInt32(const int32_t nValue);
-		void writeVariableUint64(const uint64_t nValue);
-		void writeVariableInt64(const int64_t nValue);
+	pReader.endVariableHeader();
 
-	};
+
+}
+
+CPacket_ErrorMsg::~CPacket_ErrorMsg()
+{
 
 }
 
 
-#endif //__AMC_OIE_PACKETWRITER
+void CPacket_ErrorMsg::serialize(CPacketWriter& packetWriter)
+{	
+	packetWriter.setVersion (1);
+	packetWriter.beginVariableHeader(OIE_MAXNAMELENGTH);
+	packetWriter.writeVariableString(m_sErrorMessage);
+	packetWriter.endVariableHeader();
+}
+
+
+ePacketType CPacket_ErrorMsg::getType()
+{
+	return ePacketType::ErrorMsg;
+}
 

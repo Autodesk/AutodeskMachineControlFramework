@@ -28,42 +28,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKETWRITER
-#define __AMC_OIE_PACKETWRITER
+#ifndef __AMC_OIE_PACKET_STARTFIRMWARE
+#define __AMC_OIE_PACKET_STARTFIRMWARE
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "oie_packet.hpp"
 
 namespace LibOIE::Impl {
 	
+	class CPacket_StartFirmware : public CPacket {
+		protected:
 
-	class CPacketWriter {
-	private:
-		uint32_t m_nVersion;
-		uint32_t m_nType;
+			bool m_bFirmwareStarted;
+			std::string m_sFirmwareFileName;
 
-		std::vector<uint8_t> m_VariableHeader;
+		public:
 
-	public:
+			CPacket_StartFirmware(uint32_t nSequenceNumber, bool bFirmwareStarted, std::string sFirmwareFileName);
+			CPacket_StartFirmware(CPacketReader & pReader);
 
-		CPacketWriter(uint32_t nType);
+			virtual ~CPacket_StartFirmware();
 
-		void setVersion(uint32_t nVersion);
-
-		void beginVariableHeader(const size_t nExpectedBufferSize);
-		void endVariableHeader();
-		void writeVariableString(const std::string sValue);
-		void writeVariableBoolean(const bool bValue);
-		void writeVariableUint32(const uint32_t nValue);
-		void writeVariableInt32(const int32_t nValue);
-		void writeVariableUint64(const uint64_t nValue);
-		void writeVariableInt64(const int64_t nValue);
+			virtual void serialize(CPacketWriter& packetWriter) override;
 
 	};
+	
 
+	class CPacket_StartFirmwareRequest : public CPacket_StartFirmware {
+
+	protected:
+
+	public:
+		CPacket_StartFirmwareRequest (CPacketReader & pReader);
+		
+		virtual ePacketType getType() override;
+	};
+
+	class CPacket_StartFirmwareReply : public CPacket_StartFirmware {
+		
+		protected:
+		
+		public:
+			CPacket_StartFirmwareReply (CPacketReader & pReader);		
+			
+			virtual ePacketType getType() override;
+	};
+	
 }
 
 
-#endif //__AMC_OIE_PACKETWRITER
+#endif //__AMC_OIE_PACKET_STARTFIRMWARE
 

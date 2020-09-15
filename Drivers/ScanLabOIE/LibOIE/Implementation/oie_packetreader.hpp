@@ -68,6 +68,8 @@ namespace LibOIE::Impl {
 		bool readVariableBoolean();
 		uint32_t readVariableUInt32 (const uint32_t nMinValue, const uint32_t nMaxValue);
 		int32_t readVariableInt32(const int32_t nMinValue, const int32_t nMaxValue);
+		uint64_t readVariableUInt64(const uint64_t nMinValue, const uint64_t nMaxValue);
+		int64_t readVariableInt64(const int64_t nMinValue, const int64_t nMaxValue);
 		std::string readVariableString(const uint32_t nMaxLength);
 
 		bool hasPayload();

@@ -47,6 +47,7 @@ using namespace LibOIE::Impl;
  Class definition of CServer 
 **************************************************************************************************************************/
 
+#define OIE_MAXRULECOUNT (1024 * 1024 * 1024)
 
 CServer::CServer()
     : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT), m_nAcceptRuleCounter (1)
@@ -66,8 +67,8 @@ void CServer::Start(const std::string& sIPAddress, const LibOIE_uint32 nPort, co
 
     auto enterCallback = [](const  brynet::net::TcpConnection::Ptr& session) {
 
-        std::cout << "Client Connected!!" << std::endl;
-
+        std::cout << "Client Connected:" << session->getIP() << std::endl;
+        
         //total_client_num++;
 
         session->setDataCallback([session](const char* buffer, size_t len) {
@@ -141,6 +142,9 @@ void CServer::CloseAllConnections()
 
 LibOIE_uint32 CServer::AcceptDevice(const std::string & sDeviceName, const std::string & sApplicationName, const std::string & sVersionName)
 {
+    if (m_nAcceptRuleCounter >= OIE_MAXRULECOUNT)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_RULEIDOVERFLOW);
+
     auto pAcceptRule = std::make_shared <CAcceptRule>(m_nAcceptRuleCounter, sDeviceName, sApplicationName, sVersionName);
     m_nAcceptRuleCounter++;
 

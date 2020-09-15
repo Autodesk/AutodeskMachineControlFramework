@@ -28,42 +28,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKETWRITER
-#define __AMC_OIE_PACKETWRITER
+#ifndef __AMC_OIE_PACKET_FIRMWAREINFO
+#define __AMC_OIE_PACKET_FIRMWAREINFO
 
-#include <memory>
-#include <string>
-#include <vector>
+#include "oie_packet.hpp"
 
 namespace LibOIE::Impl {
 	
+	class CPacket_FirmwareInfo : public CPacket {
+		protected:
 
-	class CPacketWriter {
-	private:
-		uint32_t m_nVersion;
-		uint32_t m_nType;
+			std::string m_sDeviceName;
+			std::string m_sFirmwareName;
+			std::string m_sFirmwareVersion;
+			std::string m_sFilename;
+			uint64_t m_nFileDate;
 
-		std::vector<uint8_t> m_VariableHeader;
+		public:
 
-	public:
+			CPacket_FirmwareInfo(uint32_t nSequenceNumber, const std::string& sDeviceName, const std::string& sFirmwareName, const std::string& sFirmwareVersion, const std::string& sFilename, const uint64_t nFileDate);
+			CPacket_FirmwareInfo(CPacketReader & pReader);
 
-		CPacketWriter(uint32_t nType);
+			virtual ~CPacket_FirmwareInfo();
 
-		void setVersion(uint32_t nVersion);
-
-		void beginVariableHeader(const size_t nExpectedBufferSize);
-		void endVariableHeader();
-		void writeVariableString(const std::string sValue);
-		void writeVariableBoolean(const bool bValue);
-		void writeVariableUint32(const uint32_t nValue);
-		void writeVariableInt32(const int32_t nValue);
-		void writeVariableUint64(const uint64_t nValue);
-		void writeVariableInt64(const int64_t nValue);
+			virtual void serialize(CPacketWriter& packetWriter) override;
 
 	};
+	
 
+	class CPacket_FirmwareInfoRequest : public CPacket_FirmwareInfo {
+
+	protected:
+
+	public:
+		CPacket_FirmwareInfoRequest(CPacketReader& pReader);
+
+		virtual ePacketType getType() override;
+	};
+
+	class CPacket_FirmwareInfoReply : public CPacket_FirmwareInfo {
+		
+	protected:
+		
+	public:
+		CPacket_FirmwareInfoReply(CPacketReader& pReader);
+
+		virtual ePacketType getType() override;
+	};
+	
 }
 
 
-#endif //__AMC_OIE_PACKETWRITER
+#endif //__AMC_OIE_PACKET_FIRMWAREINFO
 

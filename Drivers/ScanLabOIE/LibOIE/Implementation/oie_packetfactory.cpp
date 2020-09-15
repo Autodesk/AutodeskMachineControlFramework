@@ -31,9 +31,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "oie_packetfactory.hpp"
 #include "liboie_interfaceexception.hpp"
 
+#include "oie_packet_login.hpp"
+#include "oie_packet_alive.hpp"
+#include "oie_packet_firmwareinfo.hpp"
+#include "oie_packet_startfirmware.hpp"
+#include "oie_packet_stopfirmware.hpp"
+#include "oie_packet_devicestatus.hpp"
+#include "oie_packet_errormsg.hpp"
+
 using namespace LibOIE::Impl;
 
 PPacket CPacketFactory::makePacket(CPacketReader& packetReader)
 {
+	ePacketType packetType = (ePacketType)packetReader.getPacketType();
+	switch (packetType) {
+		case ePacketType::LoginRequest: return std::make_shared<CPacket_LoginRequest> (packetReader);
+		case ePacketType::LoginReply: return std::make_shared<CPacket_LoginReply>(packetReader);
+		case ePacketType::FirmwareInfoRequest: return std::make_shared<CPacket_FirmwareInfoRequest>(packetReader);
+		case ePacketType::FirmwareInfoReply: return std::make_shared<CPacket_FirmwareInfoReply>(packetReader);
+		case ePacketType::StartFirmwareRequest: return std::make_shared<CPacket_StartFirmwareRequest>(packetReader);
+		case ePacketType::StartFirmwareReply: return std::make_shared<CPacket_StartFirmwareReply>(packetReader);
+		case ePacketType::StopFirmwareRequest: return std::make_shared<CPacket_StopFirmwareRequest>(packetReader);
+		case ePacketType::StopFirmwareReply: return std::make_shared<CPacket_StopFirmwareReply>(packetReader);
+		case ePacketType::AliveRequest: return std::make_shared<CPacket_AliveRequest>(packetReader);
+		case ePacketType::AliveReply: return std::make_shared<CPacket_AliveReply>(packetReader);
+		case ePacketType::DeviceStatusRequest: return std::make_shared<CPacket_DeviceStatusRequest>(packetReader);
+		case ePacketType::DeviceStatusReply: return std::make_shared<CPacket_DeviceStatusReply>(packetReader);
+		case ePacketType::ErrorMsg: return std::make_shared<CPacket_ErrorMsg>(packetReader);
+
+	}
+
 	throw ELibOIEInterfaceException (LIBOIE_ERROR_UNKNOWNPACKETTYPE);
 }
+
