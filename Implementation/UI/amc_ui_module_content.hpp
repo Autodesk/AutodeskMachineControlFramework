@@ -46,6 +46,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
 	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 
 	class CUIModule_Content : public CUIModule {
 	protected:		
@@ -54,12 +55,15 @@ namespace AMC {
 		std::string m_sTitle;
 		std::string m_sSubtitle;
 
+		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
 		std::vector<PUIModule_ContentItem> m_Items;
 		std::vector<PUIModule_ContentButton> m_Buttons;
 
+		void addItem(PUIModule_ContentItem pItem);
+
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode);
+		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances);
 		
 		virtual ~CUIModule_Content();
 
@@ -71,7 +75,9 @@ namespace AMC {
 		std::string getTitle ();
 		std::string getSubtitle ();
 
-		virtual void writeToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+
+		virtual PUIModuleItem findItem(const std::string& sUUID) override;
 
 	};
 

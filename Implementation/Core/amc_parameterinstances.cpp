@@ -28,56 +28,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_PARAMETERHANDLER
-#define __AMC_PARAMETERHANDLER
 
-#include "amc_parametergroup.hpp"
+#include "amc_parameterinstances.hpp"
+#include "libmc_interfaceexception.hpp"
 
-#include <memory>
-#include <vector>
-#include <map>
-#include <string>
-#include <mutex>
 
 namespace AMC {
 
-	class CParameterHandler;
-	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	CParameterInstances::CParameterInstances()
+	{
 
-	class CParameterHandler {
-	private:
+	}
 
-		PParameterGroup m_DataStore;
-		std::map<std::string, PParameterGroup> m_Groups;
-		std::vector<PParameterGroup> m_GroupList;
+	CParameterInstances::~CParameterInstances()
+	{
 
-		std::mutex m_Mutex;
-		std::string m_sDescription;
-		
-	public:
+	}
 
-		CParameterHandler(std::string sDescription);
-		
-		virtual ~CParameterHandler();		
-		
-		bool hasGroup (const std::string & sName);
-		void addGroup (PParameterGroup pGroup);
-		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
 
-		uint32_t getGroupCount();
-		CParameterGroup* getGroup(const uint32_t nIndex);
-		CParameterGroup* findGroup(const std::string& sName, const bool bFailIfNotExisting);
+	void CParameterInstances::registerParameterHandler(const std::string& sInstanceName, PParameterHandler pParameterHandler)
+	{
+		if (pParameterHandler.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		CParameterGroup * getDataStore ();
+		m_StateMachineParameters.insert(std::make_pair(sInstanceName, pParameterHandler));
+	}
 
-		std::string getDescription();
-		void setDescription(const std::string & sDescription);
+	PParameterHandler CParameterInstances::getParameterHandler(const std::string& sInstanceName)
+	{
+		auto iter = m_StateMachineParameters.find(sInstanceName);
+		if(iter == m_StateMachineParameters.end ())
+			throw ELibMCInterfaceException(LIBMC_ERROR_STATEMACHINENOTFOUND);
 
-	};
+		return iter->second;
+	}
 
-	
 }
 
-
-#endif //__AMC_PARAMETERHANDLER
 

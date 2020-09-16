@@ -327,6 +327,11 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDHEADLINE 300
 #define LIBMC_ERROR_USERNOTFOUND 301
 #define LIBMC_ERROR_STREAMISNOTIMAGE 302
+#define LIBMC_ERROR_TOOMANYCONTENTPARAMETERS 303
+#define LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME 304
+#define LIBMC_ERROR_MISSINGCONTENTGROUPNAME 305
+#define LIBMC_ERROR_INVALIDENTRIESPERPAGE 306
+#define LIBMC_ERROR_MODULEITEMNOTFOUND 307
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -566,6 +571,11 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDHEADLINE: return "Invalid headline";
     case LIBMC_ERROR_USERNOTFOUND: return "User not found";
     case LIBMC_ERROR_STREAMISNOTIMAGE: return "Stream is not image";
+    case LIBMC_ERROR_TOOMANYCONTENTPARAMETERS: return "Too many content parameters";
+    case LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME: return "Missing content state machine name";
+    case LIBMC_ERROR_MISSINGCONTENTGROUPNAME: return "Missing content group name";
+    case LIBMC_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
+    case LIBMC_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
     default: return "unknown error";
   }
 }

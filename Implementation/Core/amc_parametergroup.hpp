@@ -80,6 +80,8 @@ namespace AMC {
 
 		uint32_t getParameterCount();
 		void getParameterInfo(const uint32_t nIndex, std::string & sName, std::string & sDescription, std::string & sDefaultValue);		
+		void getParameterInfoByName(const std::string& sName, std::string& sDescription, std::string& sDefaultValue);
+
 		std::string getParameterValueByIndex(const uint32_t nIndex);
 		std::string getParameterValueByName(const std::string & sName);
 		double getDoubleParameterValueByIndex(const uint32_t nIndex);

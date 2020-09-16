@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_handler_ui.hpp"
 #include "amc_api_jsonrequest.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_ui_module_item.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -86,6 +87,14 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			}
 		}
 
+		if (sParameterString.length() == 49) {
+			if (sParameterString.substr(0, 13) == "/contentitem/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(13, 36));
+				return APIHandler_UIType::utContentItem;
+			}
+		}
+
+
 	}
 
 	return APIHandler_UIType::utUnknown;
@@ -97,7 +106,7 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 	std::string sParameterUUID;
 	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
 
-	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage)) {
+	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage) || (uiType == APIHandler_UIType::utContentItem)) {
 
 		bNeedsToBeAuthorized = false;
 		bCreateNewSession = false;
@@ -149,6 +158,22 @@ PAPIResponse CAPIHandler_UI::handleImageRequest(const std::string& sParameterUUI
 }
 
 
+void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto pModuleItem = m_pSystemState->uiHandler()->findModuleItem (sParameterUUID);
+	if (pModuleItem.get () == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND);
+
+	CJSONWriterObject object(writer);
+	pModuleItem->addContentToJSON(writer, object);
+	writer.addString(AMC_API_KEY_UI_ITEMUUID, sParameterUUID);
+	writer.addObject(AMC_API_KEY_UI_CONTENT, object);
+}
+
+
 PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::string sParameterUUID;
@@ -164,6 +189,10 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 
 	case APIHandler_UIType::utState:
 		handleStateRequest(writer, pAuth);
+		break;
+
+	case APIHandler_UIType::utContentItem:
+		handleContentItemRequest(writer, sParameterUUID, pAuth);
 		break;
 
 	case APIHandler_UIType::utImage:

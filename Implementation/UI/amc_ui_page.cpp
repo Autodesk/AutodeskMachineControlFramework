@@ -103,8 +103,20 @@ void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleAr
 {
 	for (auto module : m_Modules) {
 		CJSONWriterObject moduleObject(writer);
-		module->writeToJSON(writer, moduleObject);
+		module->writeDefinitionToJSON(writer, moduleObject);
 
 		moduleArray.addObject(moduleObject);
 	}
+}
+
+PUIModuleItem CUIPage::findModuleItem(const std::string& sUUID)
+{
+	for (auto module : m_Modules) {
+		auto pItem = module->findItem(sUUID);
+		if (pItem.get() != nullptr)
+			return pItem;
+	}
+
+	return nullptr;
+
 }

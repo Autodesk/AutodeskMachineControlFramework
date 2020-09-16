@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 
 	class CUIModule {
 	protected:
@@ -63,7 +64,9 @@ namespace AMC {
 
 		virtual std::string getType() = 0;
 
-		virtual void writeToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+
+		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
 
 	};
 

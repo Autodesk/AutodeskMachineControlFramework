@@ -42,10 +42,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode)
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
+	if (pParameterInstances.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
 
@@ -66,22 +68,41 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode)
 		std::string sChildName = childNode.name();
 		if (sChildName == "paragraph") {
 			auto textAttrib = childNode.attribute("text");
-			m_Items.push_back(std::make_shared <CUIModule_ContentParagraph> (textAttrib.as_string ()));
+			addItem (std::make_shared <CUIModule_ContentParagraph> (textAttrib.as_string ()));
 		}
 
 		if (sChildName == "image") {
 			auto uuidAttrib = childNode.attribute("uuid");
-			m_Items.push_back(std::make_shared <CUIModule_ContentImage>(uuidAttrib.as_string()));
+			addItem (std::make_shared <CUIModule_ContentImage>(uuidAttrib.as_string()));
 		}
 
 		if (sChildName == "upload") {
 			auto classAttrib = childNode.attribute("class");
 			auto captionAttrib = childNode.attribute("caption");
-			m_Items.push_back(std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string()));
+			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string()));
 		}
 
 		if (sChildName == "parameterlist") {
-			m_Items.push_back(std::make_shared <CUIModule_ContentParameterList>());
+			auto loadingtextAttrib = childNode.attribute("loadingtext");
+			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
+			std::string sLoadingText = loadingtextAttrib.as_string();
+
+			int nEntriesPerPage;
+			if (!entriesperpageAttrib.empty()) {
+				nEntriesPerPage = entriesperpageAttrib.as_int();
+				if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
+					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+				if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
+					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+			}
+			else {
+				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
+			}
+
+			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pParameterInstances);
+			addItem (pParameterList);
+
+			pParameterList->loadFromXML(childNode);
 		}
 
 		if (sChildName == "button") {
@@ -127,7 +148,7 @@ std::string CUIModule_Content::getSubtitle()
 	return m_sSubtitle;
 }
 
-void CUIModule_Content::writeToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
+void CUIModule_Content::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
@@ -138,7 +159,7 @@ void CUIModule_Content::writeToJSON(CJSONWriter& writer, CJSONWriterObject& modu
 	CJSONWriterArray itemsNode(writer);
 	for (auto item : m_Items) {
 		CJSONWriterObject itemObject(writer);
-		item->addToJSON(writer, itemObject);
+		item->addDefinitionToJSON(writer, itemObject);
 		itemsNode.addObject(itemObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);
@@ -150,6 +171,25 @@ void CUIModule_Content::writeToJSON(CJSONWriter& writer, CJSONWriterObject& modu
 		buttonsNode.addObject(buttonObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_BUTTONS, buttonsNode);
+
+}
+
+PUIModuleItem CUIModule_Content::findItem(const std::string& sUUID)
+{
+	auto iIter = m_ItemMap.find(sUUID);
+	if (iIter != m_ItemMap.end())
+		return iIter->second;
+
+	return nullptr;
+}
+
+void CUIModule_Content::addItem(PUIModule_ContentItem pItem)
+{
+	if (pItem.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	m_Items.push_back(pItem);
+	m_ItemMap.insert(std::make_pair (pItem->getUUID (), pItem));
 
 }
 

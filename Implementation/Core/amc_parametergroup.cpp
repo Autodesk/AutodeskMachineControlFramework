@@ -113,6 +113,20 @@ namespace AMC {
 		sDefaultValue = pParameter->getDefaultValue();
 	}
 
+	void CParameterGroup::getParameterInfoByName(const std::string& sName, std::string& sDescription, std::string& sDefaultValue)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		auto iIter = m_Parameters.find(sName);
+
+		if (iIter == m_Parameters.end())
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+
+		sDescription = iIter->second->getDescription();
+		sDefaultValue = iIter->second->getDefaultValue();
+
+	}
+
+
 	std::string CParameterGroup::getParameterValueByIndex(const uint32_t nIndex)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);

@@ -44,7 +44,8 @@ namespace AMC {
 		utUnknown = 0,
 		utConfiguration = 1,
 		utState = 2,
-		utImage = 3
+		utImage = 3,
+		utContentItem = 4
 	};
 
 	class CAPIHandler_UI : public CAPIHandler {
@@ -56,7 +57,8 @@ namespace AMC {
 
 		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
 		void handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth);
-		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);
+		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);		
+		void handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth);
 
 	public:
 

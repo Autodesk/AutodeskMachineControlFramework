@@ -67,6 +67,8 @@ namespace AMC {
 	class CToolpathHandler;
 	class CServiceHandler;
 	class CUIHandler;
+	class CParameterHandler;
+	class CParameterInstances;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -74,6 +76,8 @@ namespace AMC {
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
+	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	typedef std::shared_ptr<CParameterInstances> PParameterInstances;
 
 	class CSystemState {
 	private:
@@ -83,6 +87,7 @@ namespace AMC {
 		AMC::PToolpathHandler m_pToolpathHandler;
 		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
+		AMC::PParameterInstances m_pParameterInstances;
 		
 		AMCCommon::PChrono m_pGlobalChrono;
 
@@ -94,7 +99,8 @@ namespace AMC {
 		std::map <std::string, std::string> m_LibraryPathes;
 
 		std::string m_sInstallationUUID;
-		std::string m_sInstallationSecret;
+		std::string m_sInstallationSecret;		
+
 
 	public:
 		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper);
@@ -107,6 +113,7 @@ namespace AMC {
 		CToolpathHandler* toolpathHandler();
 		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
+		CParameterInstances* parameterInstances();
 
 		LibMCData::CStorage * storage();
 		LibMCData::CBuildJobHandler * buildJobHandler();
@@ -118,6 +125,8 @@ namespace AMC {
 		PStateSignalHandler getStateSignalHandlerInstance();
 		PDriverHandler getDriverHandlerInstance();
 		PToolpathHandler getToolpathHandlerInstance();
+		PParameterInstances getParameterInstances ();
+
 		LibMCData::PLoginHandler getLoginHandlerInstance();
 		AMCCommon::PChrono getGlobalChronoInstance();
 
@@ -128,6 +137,7 @@ namespace AMC {
 		std::string getInstallationUUID(); // Returns a unique UUID of the installation
 		std::string getInstallationSecret(); // Returns a unique Secret SHA256 String of the installation. MUST NOT be shared externally.
 		std::string getGitHash();
+
 
 
 	};

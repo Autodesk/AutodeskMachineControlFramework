@@ -48,7 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIPage, PUIPage);
+	amcDeclareDependingClass(CUIPage, PUIPage);	
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 
 	class CUIPage {
 	protected:
@@ -72,6 +73,8 @@ namespace AMC {
 		PUIModule getModule (const uint32_t nIndex);
 
 		void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray);
+
+		PUIModuleItem findModuleItem(const std::string& sUUID);
 										
 	};
 		

@@ -28,56 +28,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_PARAMETERHANDLER
-#define __AMC_PARAMETERHANDLER
 
-#include "amc_parametergroup.hpp"
+#ifndef __AMC_UI_MODULE_ITEM
+#define __AMC_UI_MODULE_ITEM
 
-#include <memory>
-#include <vector>
-#include <map>
-#include <string>
-#include <mutex>
+#include "amc_jsonwriter.hpp"
+
 
 namespace AMC {
 
-	class CParameterHandler;
-	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	amcDeclareDependingClass(CUIModule_Item, PUIModule_Item);
 
-	class CParameterHandler {
-	private:
-
-		PParameterGroup m_DataStore;
-		std::map<std::string, PParameterGroup> m_Groups;
-		std::vector<PParameterGroup> m_GroupList;
-
-		std::mutex m_Mutex;
-		std::string m_sDescription;
-		
+	class CUIModuleItem {
+	protected:		
+	
 	public:
 
-		CParameterHandler(std::string sDescription);
+		CUIModuleItem()
+		{
+
+		}
 		
-		virtual ~CParameterHandler();		
-		
-		bool hasGroup (const std::string & sName);
-		void addGroup (PParameterGroup pGroup);
-		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
+		virtual ~CUIModuleItem()
+		{
 
-		uint32_t getGroupCount();
-		CParameterGroup* getGroup(const uint32_t nIndex);
-		CParameterGroup* findGroup(const std::string& sName, const bool bFailIfNotExisting);
+		}
 
-		CParameterGroup * getDataStore ();
+		virtual std::string getUUID () = 0;
 
-		std::string getDescription();
-		void setDescription(const std::string & sDescription);
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) = 0;
 
 	};
 
-	
 }
 
 
-#endif //__AMC_PARAMETERHANDLER
+#endif //__AMC_UI_MODULE_ITEM
 
