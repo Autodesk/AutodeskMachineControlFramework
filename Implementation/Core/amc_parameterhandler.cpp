@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CParameterHandler::CParameterHandler()
+	CParameterHandler::CParameterHandler(std::string sDescription)
+		: m_sDescription (sDescription)
 	{
 		m_DataStore = std::make_shared <CParameterGroup>();
 	}
@@ -118,6 +119,20 @@ namespace AMC {
 		return m_DataStore.get();
 	}
 
+
+	std::string CParameterHandler::getDescription()
+	{
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		// Return thread safe copy of instance description
+		return std::string(m_sDescription.c_str());
+	}
+
+	void CParameterHandler::setDescription(const std::string& sDescription)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		m_sDescription = sDescription.c_str();
+
+	}
 
 
 

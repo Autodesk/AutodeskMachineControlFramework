@@ -47,6 +47,8 @@ namespace AMC {
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
 	amcDeclareDependingClass(CUIPage, PUIPage);
 	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 
 	class CUIHandler {
 	protected:
@@ -57,6 +59,8 @@ namespace AMC {
 		std::string m_sCopyrightString;
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
+
+		PParameterInstances m_pParameterInstances;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
@@ -72,7 +76,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler();
+		CUIHandler(PParameterInstances pParameterInstances);
 		
 		virtual ~CUIHandler();
 		
@@ -83,6 +87,8 @@ namespace AMC {
 		void writeStateToJSON(CJSONWriter& writer);
 
 		void loadFromXML (pugi::xml_node & xmlNode);
+
+		PUIModuleItem findModuleItem(const std::string & sUUID);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

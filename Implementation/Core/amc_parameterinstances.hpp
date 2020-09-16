@@ -28,10 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_PARAMETERHANDLER
-#define __AMC_PARAMETERHANDLER
+#ifndef __AMC_PARAMETERINSTANCES
+#define __AMC_PARAMETERINSTANCES
 
-#include "amc_parametergroup.hpp"
+#include "amc_parameterhandler.hpp"
 
 #include <memory>
 #include <vector>
@@ -41,37 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	class CParameterHandler;
-	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	class CParameterInstances;
+	typedef std::shared_ptr<CParameterInstances> PParameterInstances;
 
-	class CParameterHandler {
+	class CParameterInstances {
 	private:
 
-		PParameterGroup m_DataStore;
-		std::map<std::string, PParameterGroup> m_Groups;
-		std::vector<PParameterGroup> m_GroupList;
-
-		std::mutex m_Mutex;
-		std::string m_sDescription;
+		std::map <std::string, PParameterHandler> m_StateMachineParameters;
 		
 	public:
+	
+		CParameterInstances ();
+		virtual ~CParameterInstances ();
 
-		CParameterHandler(std::string sDescription);
-		
-		virtual ~CParameterHandler();		
-		
-		bool hasGroup (const std::string & sName);
-		void addGroup (PParameterGroup pGroup);
-		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
-
-		uint32_t getGroupCount();
-		CParameterGroup* getGroup(const uint32_t nIndex);
-		CParameterGroup* findGroup(const std::string& sName, const bool bFailIfNotExisting);
-
-		CParameterGroup * getDataStore ();
-
-		std::string getDescription();
-		void setDescription(const std::string & sDescription);
+		void registerParameterHandler (const std::string & sInstanceName, PParameterHandler pParameterHandler);
+		PParameterHandler getParameterHandler (const std::string& sInstanceName);
 
 	};
 

@@ -75,8 +75,6 @@ namespace AMC {
 		// Externally accessible members		
 		// Machine Name (only set in the constructor)
 		std::string m_sName;
-		// Machine Description (only set in the constructor)
-		std::string m_sDescription;
 
 		// Current State Name
 		std::string m_sCurrentStateName;

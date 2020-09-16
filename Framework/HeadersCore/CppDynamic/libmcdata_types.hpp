@@ -327,6 +327,11 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDHEADLINE 300
 #define LIBMCDATA_ERROR_USERNOTFOUND 301
 #define LIBMCDATA_ERROR_STREAMISNOTIMAGE 302
+#define LIBMCDATA_ERROR_TOOMANYCONTENTPARAMETERS 303
+#define LIBMCDATA_ERROR_MISSINGCONTENTSTATEMACHINENAME 304
+#define LIBMCDATA_ERROR_MISSINGCONTENTGROUPNAME 305
+#define LIBMCDATA_ERROR_INVALIDENTRIESPERPAGE 306
+#define LIBMCDATA_ERROR_MODULEITEMNOTFOUND 307
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -566,6 +571,11 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDHEADLINE: return "Invalid headline";
     case LIBMCDATA_ERROR_USERNOTFOUND: return "User not found";
     case LIBMCDATA_ERROR_STREAMISNOTIMAGE: return "Stream is not image";
+    case LIBMCDATA_ERROR_TOOMANYCONTENTPARAMETERS: return "Too many content parameters";
+    case LIBMCDATA_ERROR_MISSINGCONTENTSTATEMACHINENAME: return "Missing content state machine name";
+    case LIBMCDATA_ERROR_MISSINGCONTENTGROUPNAME: return "Missing content group name";
+    case LIBMCDATA_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
+    case LIBMCDATA_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
     default: return "unknown error";
   }
 }

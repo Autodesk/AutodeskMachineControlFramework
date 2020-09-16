@@ -130,8 +130,8 @@
 											<div :key="item.uuid" v-if="(item.type=='parameterlist')">											
 												<v-data-table
 													:headers="item.headers"
-													:items="item.items"
-													:items-per-page="15"
+													:items="item.entries"
+													:items-per-page="item.entriesperpage"
 													class="elevation-1"
 													disable-pagination
 													hide-default-footer
@@ -299,7 +299,28 @@ export default {
                 .then(resultJSON => {
                     this.AppState.MenuItems = resultJSON.data.menuitems;
                     this.AppState.ToolbarItems = resultJSON.data.toolbaritems;
-					this.AppState.uiPages = resultJSON.data.pages;                    
+					
+					var page, module, item;
+					for (page of resultJSON.data.pages) {
+						for (module of page.modules) {
+							if (module.type === "content") {
+								for (item of module.items) {
+									if (item.type === "parameterlist") {
+									
+										this.AppState.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+										item.entries = this.AppState.ContentItems[item.uuid].entries;
+										
+									}
+								}
+								
+							}
+						}						
+					
+					}
+					
+					this.AppState.uiPages = resultJSON.data.pages;
+					
+					
                     this.AppState.activePage = this.AppDefinition.MainPage;
                 })
                 .catch(err => {
@@ -308,6 +329,34 @@ export default {
                 });
         },
 		
+
+		appUpdateContentItem (uuid) {
+		
+			this.AppState.ContentItems[uuid].refresh = false;
+		
+            var url = this.API.baseURL + "/ui/contentitem/" + uuid;
+            Axios({
+                    method: "GET",
+                    url: url
+                })
+                .then(resultJSON => {					
+
+					var oldentrycount = this.AppState.ContentItems[uuid].entries.length;					
+					for (var i = 0; i < oldentrycount; i++) {
+						this.AppState.ContentItems[uuid].entries.pop ();
+					}
+					
+					for (var entry of resultJSON.data.content.entries) {
+						this.AppState.ContentItems[uuid].entries.push (entry);
+					}
+					this.AppState.ContentItems[uuid].refresh = true;
+                })
+                .catch(err => {
+					err;
+                    this.AppState.ContentItems[uuid].refresh = true;                    
+                });
+				
+		},
 
         uiLogInClick() {
 		
@@ -390,7 +439,16 @@ export default {
 		
 		},
 
-        uiOnTimer() {},
+        uiOnTimer() {
+		
+			for (var key in this.AppState.ContentItems) {
+				var item = this.AppState.ContentItems [key];
+				if (item.refresh) {				
+					this.appUpdateContentItem (item.uuid);
+				}
+			}												
+		
+		},
 
         updateTheme() {
             // Light theme
@@ -423,7 +481,8 @@ export default {
 		
             MenuItems: [],
             ToolbarItems: [],
-		
+			ContentItems: [],
+					
             currentStatus: "initial", // one of "initial" / "login" / "ready" / "error"
             currentError: "",
             showDrawer: true,

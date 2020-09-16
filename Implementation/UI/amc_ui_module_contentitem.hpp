@@ -38,17 +38,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error this header is protected and should only be included in the corresponding implementation CPP files.
 #endif
 
-#include "Core/amc_jsonwriter.hpp"
+#include "Libraries/PugiXML/pugixml.hpp"
+
+#include "amc_parameterhandler.hpp"
+#include "amc_jsonwriter.hpp"
+#include "amc_ui_module_item.hpp"
+
+#define AMC_CONTENT_MAXENTRYCOUNT (1024 * 1024)
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModule_Item, PUIModule_Item);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
 	amcDeclareDependingClass(CUIModule_ContentParagraph, PUIModule_ContentParagraph);
 	amcDeclareDependingClass(CUIModule_ContentImage, PUIModule_ContentImage);
 	amcDeclareDependingClass(CUIModule_ContentUpload, PUIModule_ContentUpload);
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 
-	class CUIModule_ContentItem {
+	class CUIModule_ContentItem : public CUIModuleItem {
 	protected:		
 
 		std::string m_sUUID;
@@ -59,10 +67,12 @@ namespace AMC {
 		
 		virtual ~CUIModule_ContentItem();
 
-		std::string getUUID ();
+		virtual std::string getUUID () override;
 
-		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object) = 0;
-		
+		virtual void addDefinitionToJSON (CJSONWriter & writer, CJSONWriterObject & object);
+
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
 	};
 
 	class CUIModule_ContentParagraph : public CUIModule_ContentItem {
@@ -78,7 +88,7 @@ namespace AMC {
 
 		std::string getText ();
 
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 
@@ -92,7 +102,7 @@ namespace AMC {
 		
 		virtual ~CUIModule_ContentImage();
 
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 
@@ -107,21 +117,63 @@ namespace AMC {
 
 		virtual ~CUIModule_ContentUpload();
 
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 	
+	class CUIModule_ContentParameterListEntry {
+	private:
+		std::string m_sStateMachine;
+		std::string m_sParameterGroup;
+		std::string m_sParameter;
+	public:
+
+		CUIModule_ContentParameterListEntry(const std::string & sStateMachine, const std::string & sParameterGroup, const std::string & sParameter);
+		~CUIModule_ContentParameterListEntry();
+
+		std::string getStateMachine ();
+		std::string getParameterGroup ();
+		std::string getParameter ();
+
+		bool isFullGroup();
+
+	};
+
+	typedef std::shared_ptr<CUIModule_ContentParameterListEntry> PUIModule_ContentParameterListEntry;
+
 
 	class CUIModule_ContentParameterList : public CUIModule_ContentItem {
 	protected:
 
+		std::vector<PUIModule_ContentParameterListEntry> m_List;
+
+		std::string m_sLoadingText;
+		std::string m_sParameterDescCaption;
+		std::string m_sParameterValueCaption;
+		std::string m_sParameterGroupCaption;
+		std::string m_sParameterSystemCaption;
+
+		uint32_t m_nEntriesPerPage;
+
+		PParameterInstances m_pParameterInstances;
+
 	public:
 
-		CUIModule_ContentParameterList();
+		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PParameterInstances pParameterInstances);
 
 		virtual ~CUIModule_ContentParameterList();
 
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		void addEntry(const std::string& sStateMachine, const std::string& sParameterGroup, const std::string& sParameter);
+
+		uint32_t getEntryCount();
+
+		CUIModule_ContentParameterListEntry* getEntry(const uint32_t nIndex);
+
+		void loadFromXML(pugi::xml_node& xmlNode);
 
 	};
 }

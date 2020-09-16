@@ -39,8 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
 #include "amc_ui_modulefactory.hpp"
-
+#include "amc_parameterinstances.hpp"
 #include "amc_jsonwriter.hpp"
+#include "amc_ui_module_item.hpp"
 
 #include "amc_api_constants.hpp"
 
@@ -50,10 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIHandler::CUIHandler()
-    : m_dLogoAspectRatio (1.0)
+CUIHandler::CUIHandler(PParameterInstances pParameterInstances)
+    : m_dLogoAspectRatio (1.0), m_pParameterInstances (pParameterInstances)
 {
-
+    if (pParameterInstances.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 
 CUIHandler::~CUIHandler()
@@ -220,7 +222,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModule = CUIModuleFactory::createModule(pageChild);
+            auto pModule = CUIModuleFactory::createModule(pageChild, m_pParameterInstances);
             pPage->addModule(pModule);
 
         }
@@ -279,6 +281,17 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
     }
 
     m_pMainPage = findPage (sMainPage);
+}
+
+PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
+{
+    for (auto pPage : m_Pages) {
+        auto pModuleItem = pPage.second->findModuleItem(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pModuleItem;
+    }
+
+    return nullptr;
 }
 
 

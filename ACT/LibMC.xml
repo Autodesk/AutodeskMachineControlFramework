@@ -311,7 +311,12 @@
 		<error name="INVALIDHEADLINE" code="300" description="Invalid headline" />
 		<error name="USERNOTFOUND" code="301" description="User not found" />
 		<error name="STREAMISNOTIMAGE" code="302" description="Stream is not image" />
-					
+		<error name="TOOMANYCONTENTPARAMETERS" code="303" description="Too many content parameters" />
+		<error name="MISSINGCONTENTSTATEMACHINENAME" code="304" description="Missing content state machine name" />
+		<error name="MISSINGCONTENTGROUPNAME" code="305" description="Missing content group name" />
+		<error name="INVALIDENTRIESPERPAGE" code="306" description="Invalid entries per page" />
+		<error name="MODULEITEMNOTFOUND" code="307" description="Module item not found" />
+								
 	</errors>
 	
 	
