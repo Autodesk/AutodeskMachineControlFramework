@@ -293,6 +293,30 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_getheaderinformation(
 	}
 }
 
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_queryparameters(LibMCDriver_ScanLabOIE_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_ScanLab_OIE
@@ -320,6 +344,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_getversion;
 	if (sProcName == "libmcdriver_scanlaboie_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_scanlaboie_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_queryparameters;
 	if (sProcName == "libmcdriver_scanlaboie_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_getversion;
 	if (sProcName == "libmcdriver_scanlaboie_getlasterror") 

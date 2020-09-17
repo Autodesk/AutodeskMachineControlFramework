@@ -102,6 +102,14 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_GetVersionPtr) (L
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_GetHeaderInformationPtr) (LibMCDriver_ScanLab_Driver pDriver, const LibMCDriver_ScanLab_uint32 nNameSpaceBufferSize, LibMCDriver_ScanLab_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_ScanLab_uint32 nBaseNameBufferSize, LibMCDriver_ScanLab_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_QueryParametersPtr) (LibMCDriver_ScanLab_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for RTCContext
 **************************************************************************************************************************/
@@ -524,6 +532,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_ScanLabDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_ScanLabDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
+	PLibMCDriver_ScanLabDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_ScanLabRTCContext_LoadProgramFromPathPtr m_RTCContext_LoadProgramFromPath;
 	PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr m_RTCContext_LoadCorrectionFile;
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;

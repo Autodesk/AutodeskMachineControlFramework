@@ -321,6 +321,9 @@ void CUIModule_ContentParameterList::loadFromXML(pugi::xml_node& xmlNode)
 			throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCONTENTGROUPNAME);
 		std::string sGroupName = groupAttrib.as_string();
 
+		auto pStateMachineInstance = m_pParameterInstances->getParameterHandler(sStateMachineName);
+		pStateMachineInstance->findGroup(sGroupName, true);
+
 		// Parameter may be empty (then add full group)
 		auto parameterAttrib = entryNode.attribute("parameter");
 		addEntry(stateMachineAttrib.as_string(), groupAttrib.as_string(), parameterAttrib.as_string());

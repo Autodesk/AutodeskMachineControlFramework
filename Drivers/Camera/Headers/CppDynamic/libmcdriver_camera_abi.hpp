@@ -115,6 +115,14 @@ LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_driver_g
 */
 LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_driver_getheaderinformation(LibMCDriver_Camera_Driver pDriver, const LibMCDriver_Camera_uint32 nNameSpaceBufferSize, LibMCDriver_Camera_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_Camera_uint32 nBaseNameBufferSize, LibMCDriver_Camera_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CAMERA_DECLSPEC LibMCDriver_CameraResult libmcdriver_camera_driver_queryparameters(LibMCDriver_Camera_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for Iterator
 **************************************************************************************************************************/

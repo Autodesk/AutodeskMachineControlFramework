@@ -76,12 +76,18 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	if (findDriver(sName, false) != nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_DRIVERALREADYREGISTERED);
 
-	auto pInternalEnvironment = std::make_shared<LibMCDriverEnv::Impl::CDriverEnvironment>();
+	auto pParameterGroup = std::make_shared<CParameterGroup>();
+
+	auto pInternalEnvironment = std::make_shared<LibMCDriverEnv::Impl::CDriverEnvironment>(pParameterGroup);
 	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCDriverEnv::CDriverEnvironment>(pInternalEnvironment, m_pEnvironmentWrapper);
 
-	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibrary, pExternalEnvironment);
+	pInternalEnvironment->setIsInitializing(true);
+
+	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibrary, pParameterGroup, pExternalEnvironment);
 	m_DriverList.push_back(pDriver);
 	m_DriverMap.insert(std::make_pair(sName, pDriver));	
+
+	pInternalEnvironment->setIsInitializing(false);
 }
 
 CDriver* CDriverHandler::findDriver(const std::string& sName, bool bFailIfNotExisting)
@@ -104,6 +110,15 @@ HDriverHandle CDriverHandler::acquireDriver(const std::string& sName, const std:
 
 	auto pDriver = findDriver(sName, true);
 	return pDriver->acquireDriverHandle(sInstanceName);
+
+}
+
+PParameterGroup CDriverHandler::getDriverParameterGroup(const std::string& sName)
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	auto pDriver = findDriver(sName, true);
+	return pDriver->getParameterGroup();
 
 }
 

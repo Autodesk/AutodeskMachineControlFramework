@@ -90,6 +90,9 @@ private:
 	AMC::PAPIHandler_Root m_pClientDistHandler;
 
 	void loadParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
+	void loadParameterGroupDerives (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup, const std::string & sStateMachineInstance);
+	void loadDriverParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
+
 	void readSignalParameters(const pugi::xml_node& xmlNode, std::list<AMC::CStateSignalParameter> & Parameters, std::list<AMC::CStateSignalParameter>& Results);
 
 

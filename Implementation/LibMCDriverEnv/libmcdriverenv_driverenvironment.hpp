@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 #define __LIBMCDRIVERENV_DRIVERENVIRONMENT
 
 #include "libmcdriverenv_interfaces.hpp"
+#include "amc_parametergroup.hpp"
 
 // Parent classes
 #include "libmcdriverenv_base.hpp"
@@ -58,30 +59,40 @@ namespace Impl {
 class CDriverEnvironment : public virtual IDriverEnvironment, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+	bool m_bIsInitializing;
+
+	AMC::PParameterGroup m_pParameterGroup;
 
 public:
-
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup);
 
 	IWorkingDirectory * CreateWorkingDirectory() override;
 
 	void RetrieveDriverData(const std::string & sIdentifier, LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer) override;
+
+	void RegisterStringParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue) override;
+
+	void RegisterUUIDParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue) override;
+
+	void RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCDriverEnv_double dDefaultValue) override;
+
+	void RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCDriverEnv_int64 nDefaultValue) override;
+
+	void RegisterBoolParameter(const std::string& sParameterName, const std::string& sDescription, const bool bDefaultValue) override;
+
+	void SetStringParameter(const std::string& sParameterName, const std::string& sValue) override;
+
+	void SetUUIDParameter(const std::string& sParameterName, const std::string& sValue) override;
+
+	void SetDoubleParameter(const std::string& sParameterName, const LibMCDriverEnv_double dValue) override;
+
+	void SetIntegerParameter(const std::string& sParameterName, const LibMCDriverEnv_int64 nValue) override;
+
+	void SetBoolParameter(const std::string& sParameterName, const bool bValue) override;
+
+	void setIsInitializing(bool bIsInitializing);
 
 };
 

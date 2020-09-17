@@ -28,56 +28,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_PARAMETERHANDLER
-#define __AMC_PARAMETERHANDLER
 
-#include "amc_parametergroup.hpp"
+#ifndef __AMC_PARAMETER_VALUED
+#define __AMC_PARAMETER_VALUED
+
+#ifndef _PARAMETER_HEADERPROTECTION
+#error Never include amc_parameter.hpp from outside of amc_parameter.cpp and amc_parametergroup.cpp
+#endif
 
 #include <memory>
-#include <vector>
-#include <map>
 #include <string>
-#include <mutex>
+
+#include "amc_parameter.hpp"
 
 namespace AMC {
 
-	class CParameterHandler;
-	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
-
-	class CParameterHandler {
+	class CParameter_Valued : public CParameter {
 	private:
-
-		PParameterGroup m_DataStore;
-		std::map<std::string, PParameterGroup> m_Groups;
-		std::vector<PParameterGroup> m_GroupList;
-
-		std::mutex m_Mutex;
+		std::string m_sName;
 		std::string m_sDescription;
-		
+		std::string m_sDefaultValue;
+		std::string m_sValue;
 	public:
 
-		CParameterHandler(std::string sDescription);
-		
-		virtual ~CParameterHandler();		
-		
-		bool hasGroup (const std::string & sName);
-		void addGroup (PParameterGroup pGroup);
-		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
+		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue);
 
-		uint32_t getGroupCount();
-		PParameterGroup getGroup(const uint32_t nIndex);
-		PParameterGroup findGroup(const std::string& sName, const bool bFailIfNotExisting);
+		virtual ~CParameter_Valued();
 
-		CParameterGroup * getDataStore ();
+		// The following calls are not thread-safe and need to be mutexed in ParameterGroup!
 
-		std::string getDescription();
-		void setDescription(const std::string & sDescription);
+		std::string getName() const override;
+		std::string getDescription() const override;
+		std::string getDefaultValue() const override;
+
+		std::string getStringValue() const override;
+		void setStringValue(const std::string& sValue) override;
+
+		double getDoubleValue() const override;
+		void setDoubleValue(const double dValue) override;
+
+		int64_t getIntValue() const override;
+		void setIntValue(const int64_t nValue) override;
+
+		bool getBoolValue() const override;
+		void setBoolValue(const bool bValue) override;
+
+		virtual PParameter duplicate() override;
 
 	};
-
 	
 }
 
 
-#endif //__AMC_PARAMETERHANDLER
+#endif //__AMC_PARAMETER_VALUED
 

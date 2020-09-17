@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _PARAMETER_HEADERPROTECTION
 #include "amc_parametergroup.hpp"
 #include "amc_parameter.hpp"
+#include "amc_parameter_valued.hpp"
+#include "amc_parameter_derived.hpp"
 
 #include "amc_jsonwriter.hpp"
 
@@ -43,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_MAXPARAMETERCOUNT (1024 * 1024)
 
 namespace AMC {
+	
 
 	CParameterGroup::CParameterGroup()
 	{
@@ -339,33 +342,45 @@ namespace AMC {
 		}
 	}
 
+	void CParameterGroup::copyToGroup (CParameterGroup* pParameterGroup)
+	{
+		if (pParameterGroup == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		for (auto pParameter : m_ParameterList) {
+			pParameterGroup->addParameterInternal (pParameter->duplicate ());
+		}
+		
+	}
+
 
 	void CParameterGroup::addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter> (sName, sDescription, sDefaultValue));
+		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue));
 	}
 
 	void CParameterGroup::addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter>(sName, sDescription, dDefaultValue));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue));
 	}
 
 	void CParameterGroup::addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter>(sName, sDescription, nDefaultValue));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue));
 	}
 
 	void CParameterGroup::addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter>(sName, sDescription, bDefaultValue));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue));
 	}
 
 
@@ -404,6 +419,18 @@ namespace AMC {
 		else
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAMETERTYPE);
 	}
+
+
+	void CParameterGroup::addNewDerivedParameter(const std::string& sName, AMC::PParameterGroup pParameterGroup, const std::string& sSourceParameterName)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		if (pParameterGroup.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		addParameterInternal(std::make_shared<CParameter_Derived>(sName, pParameterGroup, sSourceParameterName));
+
+	}
+
 
 	void CParameterGroup::removeValue(const std::string& sName)
 	{

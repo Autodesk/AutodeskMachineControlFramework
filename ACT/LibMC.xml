@@ -316,7 +316,8 @@
 		<error name="MISSINGCONTENTGROUPNAME" code="305" description="Missing content group name" />
 		<error name="INVALIDENTRIESPERPAGE" code="306" description="Invalid entries per page" />
 		<error name="MODULEITEMNOTFOUND" code="307" description="Module item not found" />
-								
+		<error name="DERIVEDPARAMETERSREADONLY" code="308" description="Derived parameters are read only." />
+
 	</errors>
 	
 	

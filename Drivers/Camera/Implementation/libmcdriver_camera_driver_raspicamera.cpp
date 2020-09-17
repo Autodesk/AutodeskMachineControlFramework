@@ -85,3 +85,8 @@ IPNGImage* CDriver_RaspiCamera::CapturePNGImage()
     return pImage.release();
 }
 
+void CDriver_RaspiCamera::QueryParameters()
+{
+
+}
+

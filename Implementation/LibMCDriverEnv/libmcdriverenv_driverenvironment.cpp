@@ -36,13 +36,21 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcdriverenv_workingdirectory.hpp"
 
 // Include custom headers here.
-
+#include "common_utils.hpp"
 
 using namespace LibMCDriverEnv::Impl;
 
 /*************************************************************************************************************************
  Class definition of CDriverEnvironment 
 **************************************************************************************************************************/
+
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup)
+    : m_bIsInitializing (false), m_pParameterGroup (pParameterGroup)
+{
+    if (pParameterGroup.get() == nullptr)
+        throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+
+}
 
 IWorkingDirectory * CDriverEnvironment::CreateWorkingDirectory()
 {
@@ -54,3 +62,73 @@ void CDriverEnvironment::RetrieveDriverData(const std::string & sIdentifier, Lib
 	
 }
 
+void CDriverEnvironment::RegisterStringParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue)
+{
+    if (!m_bIsInitializing)
+        throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING);
+
+    m_pParameterGroup->addNewStringParameter(sParameterName, sDescription, sDefaultValue);
+}
+
+void CDriverEnvironment::RegisterUUIDParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue)
+{
+    if (!m_bIsInitializing)
+        throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING);
+
+    m_pParameterGroup->addNewStringParameter(sParameterName, sDescription, AMCCommon::CUtils::normalizeUUIDString (sDefaultValue));
+}
+
+void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCDriverEnv_double dDefaultValue)
+{
+    if (!m_bIsInitializing)
+        throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING);
+
+    m_pParameterGroup->addNewDoubleParameter(sParameterName, sDescription, dDefaultValue);
+}
+
+void CDriverEnvironment::RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCDriverEnv_int64 nDefaultValue)
+{
+    if (!m_bIsInitializing)
+        throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING);
+
+    m_pParameterGroup->addNewIntParameter(sParameterName, sDescription, nDefaultValue);
+}
+
+void CDriverEnvironment::RegisterBoolParameter(const std::string& sParameterName, const std::string& sDescription, const bool bDefaultValue)
+{
+    if (!m_bIsInitializing)
+        throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING);
+
+    m_pParameterGroup->addNewBoolParameter(sParameterName, sDescription, bDefaultValue);
+}
+
+void CDriverEnvironment::SetStringParameter(const std::string& sParameterName, const std::string& sValue)
+{
+    m_pParameterGroup->setParameterValueByName(sParameterName, sValue);
+}
+
+void CDriverEnvironment::SetUUIDParameter(const std::string& sParameterName, const std::string& sValue) 
+{
+    m_pParameterGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+
+void CDriverEnvironment::SetDoubleParameter(const std::string& sParameterName, const LibMCDriverEnv_double dValue) 
+{
+    m_pParameterGroup->setDoubleParameterValueByName(sParameterName, dValue);
+}
+
+void CDriverEnvironment::SetIntegerParameter(const std::string& sParameterName, const LibMCDriverEnv_int64 nValue) 
+{
+    m_pParameterGroup->setIntParameterValueByName(sParameterName, nValue);
+}
+
+void CDriverEnvironment::SetBoolParameter(const std::string& sParameterName, const bool bValue) 
+{
+    m_pParameterGroup->setBoolParameterValueByName(sParameterName, bValue);
+}
+
+
+void CDriverEnvironment::setIsInitializing(bool bIsInitializing)
+{
+    m_bIsInitializing = bIsInitializing;
+}

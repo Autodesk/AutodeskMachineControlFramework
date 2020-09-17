@@ -332,6 +332,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_MISSINGCONTENTGROUPNAME 305
 #define LIBMCDATA_ERROR_INVALIDENTRIESPERPAGE 306
 #define LIBMCDATA_ERROR_MODULEITEMNOTFOUND 307
+#define LIBMCDATA_ERROR_DERIVEDPARAMETERSREADONLY 308
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -576,6 +577,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_MISSINGCONTENTGROUPNAME: return "Missing content group name";
     case LIBMCDATA_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
     case LIBMCDATA_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
+    case LIBMCDATA_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
     default: return "unknown error";
   }
 }

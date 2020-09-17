@@ -89,23 +89,23 @@ namespace AMC {
 
 	}
 
-	CParameterGroup* CParameterHandler::getGroup(const uint32_t nIndex)
+	PParameterGroup CParameterHandler::getGroup(const uint32_t nIndex)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		if (nIndex >= m_GroupList.size())
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
 
-		return m_GroupList[nIndex].get();
+		return m_GroupList[nIndex];
 	}
 
-	CParameterGroup* CParameterHandler::findGroup(const std::string& sName, const bool bFailIfNotExisting)
+	PParameterGroup CParameterHandler::findGroup(const std::string& sName, const bool bFailIfNotExisting)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		auto iter = m_Groups.find(sName);
 		if (iter != m_Groups.end())
-			return iter->second.get();
+			return iter->second;
 
 		if (bFailIfNotExisting)
 			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERGROUPNOTFOUND);

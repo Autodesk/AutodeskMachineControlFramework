@@ -513,6 +513,303 @@ LibMCDriverEnvResult libmcdriverenv_driverenvironment_retrievedriverdata(LibMCDr
 	}
 }
 
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_registerstringparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pDefaultValue == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sDescription(pDescription);
+		std::string sDefaultValue(pDefaultValue);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RegisterStringParameter(sParameterName, sDescription, sDefaultValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_registeruuidparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pDefaultValue == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sDescription(pDescription);
+		std::string sDefaultValue(pDefaultValue);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RegisterUUIDParameter(sParameterName, sDescription, sDefaultValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_registerdoubleparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCDriverEnv_double dDefaultValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sDescription(pDescription);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RegisterDoubleParameter(sParameterName, sDescription, dDefaultValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_registerintegerparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCDriverEnv_int64 nDefaultValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sDescription(pDescription);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RegisterIntegerParameter(sParameterName, sDescription, nDefaultValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_registerboolparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, bool bDefaultValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pDescription == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sDescription(pDescription);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RegisterBoolParameter(sParameterName, sDescription, bDefaultValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_setstringparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sValue(pValue);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->SetStringParameter(sParameterName, sValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_setuuidparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sValue(pValue);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->SetUUIDParameter(sParameterName, sValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_setdoubleparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCDriverEnv_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->SetDoubleParameter(sParameterName, dValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_setintegerparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCDriverEnv_int64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->SetIntegerParameter(sParameterName, nValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriverEnvResult libmcdriverenv_driverenvironment_setboolparameter(LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriverEnvInterfaceException (LIBMCDRIVERENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->SetBoolParameter(sParameterName, bValue);
+
+		return LIBMCDRIVERENV_SUCCESS;
+	}
+	catch (ELibMCDriverEnvInterfaceException & Exception) {
+		return handleLibMCDriverEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -552,6 +849,26 @@ LibMCDriverEnvResult LibMCDriverEnv::Impl::LibMCDriverEnv_GetProcAddress (const 
 		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_createworkingdirectory;
 	if (sProcName == "libmcdriverenv_driverenvironment_retrievedriverdata") 
 		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_retrievedriverdata;
+	if (sProcName == "libmcdriverenv_driverenvironment_registerstringparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_registerstringparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_registeruuidparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_registeruuidparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_registerdoubleparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_registerdoubleparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_registerintegerparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_registerintegerparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_registerboolparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_registerboolparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_setstringparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_setstringparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_setuuidparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_setuuidparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_setdoubleparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_setdoubleparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_setintegerparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_setintegerparameter;
+	if (sProcName == "libmcdriverenv_driverenvironment_setboolparameter") 
+		*ppProcAddress = (void*) &libmcdriverenv_driverenvironment_setboolparameter;
 	if (sProcName == "libmcdriverenv_getversion") 
 		*ppProcAddress = (void*) &libmcdriverenv_getversion;
 	if (sProcName == "libmcdriverenv_getlasterror") 

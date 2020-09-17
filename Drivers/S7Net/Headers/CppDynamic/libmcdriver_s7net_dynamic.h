@@ -102,6 +102,14 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_GetVersionPtr) (LibMC
 */
 typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_GetHeaderInformationPtr) (LibMCDriver_S7Net_Driver pDriver, const LibMCDriver_S7Net_uint32 nNameSpaceBufferSize, LibMCDriver_S7Net_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_S7Net_uint32 nBaseNameBufferSize, LibMCDriver_S7Net_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_QueryParametersPtr) (LibMCDriver_S7Net_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/
@@ -202,6 +210,7 @@ typedef struct {
 	PLibMCDriver_S7NetDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_S7NetDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_S7NetDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
+	PLibMCDriver_S7NetDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_S7NetDriver_S7Net_ConnectPtr m_Driver_S7Net_Connect;
 	PLibMCDriver_S7NetDriver_S7Net_DisconnectPtr m_Driver_S7Net_Disconnect;
 	PLibMCDriver_S7NetGetVersionPtr m_GetVersion;

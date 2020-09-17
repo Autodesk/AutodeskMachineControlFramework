@@ -293,6 +293,30 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_getheaderinformation(LibMCD
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_queryparameters(LibMCDriver_ScanLab_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for RTCContext
@@ -1180,6 +1204,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_getversion;
 	if (sProcName == "libmcdriver_scanlab_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_scanlab_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_queryparameters;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadprogramfrompath") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadprogramfrompath;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadcorrectionfile") 
