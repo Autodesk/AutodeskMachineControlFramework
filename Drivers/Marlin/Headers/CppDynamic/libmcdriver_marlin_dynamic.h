@@ -102,6 +102,14 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetVersionPtr) (Lib
 */
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetHeaderInformationPtr) (LibMCDriver_Marlin_Driver pDriver, const LibMCDriver_Marlin_uint32 nNameSpaceBufferSize, LibMCDriver_Marlin_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_Marlin_uint32 nBaseNameBufferSize, LibMCDriver_Marlin_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_QueryParametersPtr) (LibMCDriver_Marlin_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for Driver_Marlin
 **************************************************************************************************************************/
@@ -495,6 +503,7 @@ typedef struct {
 	PLibMCDriver_MarlinDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_MarlinDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_MarlinDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
+	PLibMCDriver_MarlinDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_MarlinDriver_Marlin_ConnectPtr m_Driver_Marlin_Connect;
 	PLibMCDriver_MarlinDriver_Marlin_DisconnectPtr m_Driver_Marlin_Disconnect;
 	PLibMCDriver_MarlinDriver_Marlin_SetAbsolutePositioningPtr m_Driver_Marlin_SetAbsolutePositioning;

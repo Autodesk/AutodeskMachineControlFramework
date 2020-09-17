@@ -293,6 +293,30 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_getheaderinformation(LibMCDri
 	}
 }
 
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_Marlin_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_Marlin
@@ -1130,6 +1154,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getversion;
 	if (sProcName == "libmcdriver_marlin_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_marlin_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_queryparameters;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_connect") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_connect;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_disconnect") 

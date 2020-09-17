@@ -332,6 +332,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGCONTENTGROUPNAME 305
 #define LIBMC_ERROR_INVALIDENTRIESPERPAGE 306
 #define LIBMC_ERROR_MODULEITEMNOTFOUND 307
+#define LIBMC_ERROR_DERIVEDPARAMETERSREADONLY 308
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -576,6 +577,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGCONTENTGROUPNAME: return "Missing content group name";
     case LIBMC_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
     case LIBMC_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
+    case LIBMC_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
     default: return "unknown error";
   }
 }

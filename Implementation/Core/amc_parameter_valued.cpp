@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define _PARAMETER_HEADERPROTECTION
 
-#include "amc_parameter.hpp"
+#include "amc_parameter_valued.hpp"
 #include "libmc_interfaceexception.hpp"
 
 namespace AMC {
 
-	CParameter::CParameter(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue)
 		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue)
 	{
 		if (sName.length() == 0)
@@ -45,7 +45,7 @@ namespace AMC {
 		setStringValue(sDefaultValue);
 	}
 
-	CParameter::CParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue)
 		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue))
 	{
 		if (sName.length() == 0)
@@ -54,7 +54,7 @@ namespace AMC {
 		setDoubleValue(dDefaultValue);
 	}
 
-	CParameter::CParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
 		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue))
 	{
 		if (sName.length() == 0)
@@ -63,7 +63,7 @@ namespace AMC {
 		setIntValue(nDefaultValue);
 	}
 
-	CParameter::CParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
 		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0")
 	{
 		if (sName.length() == 0)
@@ -73,67 +73,74 @@ namespace AMC {
 	}
 
 
-	CParameter::~CParameter()
+	CParameter_Valued::~CParameter_Valued()
 	{
 	}
 
-	std::string CParameter::getName() const
+	std::string CParameter_Valued::getName() const
 	{
 		return std::string(m_sName.c_str());
 	}
 
-	std::string CParameter::getDescription() const
+	std::string CParameter_Valued::getDescription() const
 	{
 		return std::string(m_sDescription.c_str());
 	}
 
-	std::string CParameter::getDefaultValue() const
+	std::string CParameter_Valued::getDefaultValue() const
 	{
 		return std::string(m_sDefaultValue.c_str());
 	}
 
 	// The following calls are not thread-safe and need to be mutexed in ParameterGroup!
-	std::string CParameter::getStringValue() const
+	std::string CParameter_Valued::getStringValue() const
 	{
 		return std::string(m_sValue.c_str());
 	}
 
-	void CParameter::setStringValue(const std::string& sValue)
+	void CParameter_Valued::setStringValue(const std::string& sValue)
 	{
 		m_sValue = sValue;
 	}
 
-	double CParameter::getDoubleValue() const
+	double CParameter_Valued::getDoubleValue() const
 	{
 		return std::stod (m_sValue);
 	}
 
-	void CParameter::setDoubleValue(const double dValue)
+	void CParameter_Valued::setDoubleValue(const double dValue)
 	{
 		m_sValue = std::to_string(dValue);
 	}
 
-	int64_t CParameter::getIntValue() const
+	int64_t CParameter_Valued::getIntValue() const
 	{
 		return std::stoi(m_sValue);
 	}
 
-	void CParameter::setIntValue(const int64_t nValue)
+	void CParameter_Valued::setIntValue(const int64_t nValue)
 	{
 		m_sValue = std::to_string(nValue);
 	}
 
-	bool CParameter::getBoolValue() const
+	bool CParameter_Valued::getBoolValue() const
 	{
 		return getIntValue() != 0;
 	}
 
-	void CParameter::setBoolValue(const bool bValue) 
+	void CParameter_Valued::setBoolValue(const bool bValue)
 	{
 		if (bValue)
 			setIntValue(1);
 		else
 			setIntValue(0);
+	}
+
+	PParameter CParameter_Valued::duplicate()
+	{
+		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue);
+		pParameter->m_sValue = m_sValue;
+		return pParameter;
 	}
 
 

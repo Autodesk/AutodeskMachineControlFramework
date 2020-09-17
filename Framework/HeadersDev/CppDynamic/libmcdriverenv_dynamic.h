@@ -185,6 +185,111 @@ typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_CreateWorkingDir
 */
 typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_RetrieveDriverDataPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer);
 
+/**
+* registers a string parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] pDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_RegisterStringParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue);
+
+/**
+* registers a uuid parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] pDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_RegisterUUIDParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue);
+
+/**
+* registers a double parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] dDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_RegisterDoubleParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCDriverEnv_double dDefaultValue);
+
+/**
+* registers an int parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] nDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_RegisterIntegerParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCDriverEnv_int64 nDefaultValue);
+
+/**
+* registers a bool parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] bDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_RegisterBoolParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, bool bDefaultValue);
+
+/**
+* sets a string parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_SetStringParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
+
+/**
+* sets a uuid parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_SetUUIDParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
+
+/**
+* sets a double parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_SetDoubleParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCDriverEnv_double dValue);
+
+/**
+* sets an int parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_SetIntegerParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCDriverEnv_int64 nValue);
+
+/**
+* sets a bool parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverEnvResult (*PLibMCDriverEnvDriverEnvironment_SetBoolParameterPtr) (LibMCDriverEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -253,6 +358,16 @@ typedef struct {
 	PLibMCDriverEnvWorkingDirectory_StoreDriverDataPtr m_WorkingDirectory_StoreDriverData;
 	PLibMCDriverEnvDriverEnvironment_CreateWorkingDirectoryPtr m_DriverEnvironment_CreateWorkingDirectory;
 	PLibMCDriverEnvDriverEnvironment_RetrieveDriverDataPtr m_DriverEnvironment_RetrieveDriverData;
+	PLibMCDriverEnvDriverEnvironment_RegisterStringParameterPtr m_DriverEnvironment_RegisterStringParameter;
+	PLibMCDriverEnvDriverEnvironment_RegisterUUIDParameterPtr m_DriverEnvironment_RegisterUUIDParameter;
+	PLibMCDriverEnvDriverEnvironment_RegisterDoubleParameterPtr m_DriverEnvironment_RegisterDoubleParameter;
+	PLibMCDriverEnvDriverEnvironment_RegisterIntegerParameterPtr m_DriverEnvironment_RegisterIntegerParameter;
+	PLibMCDriverEnvDriverEnvironment_RegisterBoolParameterPtr m_DriverEnvironment_RegisterBoolParameter;
+	PLibMCDriverEnvDriverEnvironment_SetStringParameterPtr m_DriverEnvironment_SetStringParameter;
+	PLibMCDriverEnvDriverEnvironment_SetUUIDParameterPtr m_DriverEnvironment_SetUUIDParameter;
+	PLibMCDriverEnvDriverEnvironment_SetDoubleParameterPtr m_DriverEnvironment_SetDoubleParameter;
+	PLibMCDriverEnvDriverEnvironment_SetIntegerParameterPtr m_DriverEnvironment_SetIntegerParameter;
+	PLibMCDriverEnvDriverEnvironment_SetBoolParameterPtr m_DriverEnvironment_SetBoolParameter;
 	PLibMCDriverEnvGetVersionPtr m_GetVersion;
 	PLibMCDriverEnvGetLastErrorPtr m_GetLastError;
 	PLibMCDriverEnvReleaseInstancePtr m_ReleaseInstance;

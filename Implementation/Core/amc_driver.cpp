@@ -36,9 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
-	: m_sName (sName), m_sType (sType), m_sLibrary (sLibrary)
+CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary, PParameterGroup pParameterGroup, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+	: m_sName (sName), m_sType (sType), m_sLibrary (sLibrary), m_pParameterGroup (pParameterGroup)
 {
+	if (pParameterGroup.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibrary);
 	m_pDriverWrapper->InjectComponent("LibMCDriverEnv", pDriverEnvironment->wrapper()->GetSymbolLookupMethod());
@@ -77,6 +79,11 @@ std::string CDriver::getName()
 std::string CDriver::getType()
 {
 	return m_sType;
+}
+
+PParameterGroup CDriver::getParameterGroup()
+{
+	return m_pParameterGroup;
 }
 
 

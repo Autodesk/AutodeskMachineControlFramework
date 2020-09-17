@@ -73,6 +73,8 @@ namespace AMC {
 
 		HDriverHandle acquireDriver (const std::string& sName, const std::string& sInstanceName);
 
+		PParameterGroup getDriverParameterGroup(const std::string& sName);
+
 		void releaseDriverLocks (const std::string& sInstanceName);
 				
 	};

@@ -77,6 +77,7 @@ namespace AMC {
 		void addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue);
 
 		void addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue);
+		void addNewDerivedParameter(const std::string& sName, AMC::PParameterGroup pParameterGroup, const std::string& sSourceParameterName);
 
 		uint32_t getParameterCount();
 		void getParameterInfo(const uint32_t nIndex, std::string & sName, std::string & sDescription, std::string & sDefaultValue);		
@@ -104,6 +105,8 @@ namespace AMC {
 
 		std::string serializeToJSON();
 		void deserializeJSON(const std::string & sJSON);
+
+		void copyToGroup (CParameterGroup * pParameterGroup);
 
 	};
 

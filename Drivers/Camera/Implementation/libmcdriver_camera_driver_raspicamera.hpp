@@ -72,6 +72,9 @@ public:
 
     IPNGImage* CapturePNGImage() override;
 
+    void QueryParameters() override;
+
+
 };
 
 } // namespace Impl

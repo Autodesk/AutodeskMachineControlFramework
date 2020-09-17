@@ -115,6 +115,14 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_getheaderinformation(LibMCDriver_ScanLab_Driver pDriver, const LibMCDriver_ScanLab_uint32 nNameSpaceBufferSize, LibMCDriver_ScanLab_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_ScanLab_uint32 nBaseNameBufferSize, LibMCDriver_ScanLab_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_queryparameters(LibMCDriver_ScanLab_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for RTCContext
 **************************************************************************************************************************/

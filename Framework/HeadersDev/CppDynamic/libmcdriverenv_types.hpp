@@ -112,6 +112,7 @@ typedef void * LibMCDriverEnv_pvoid;
 #define LIBMCDRIVERENV_ERROR_TERMINATED 14
 #define LIBMCDRIVERENV_ERROR_SIGNALHASTRIGGEREDTWICE 15
 #define LIBMCDRIVERENV_ERROR_SIGNALHASNOTBEENTRIGGERED 16
+#define LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING 17
 
 /*************************************************************************************************************************
  Error strings for LibMCDriverEnv
@@ -136,6 +137,7 @@ inline const char * LIBMCDRIVERENV_GETERRORSTRING (LibMCDriverEnvResult nErrorCo
     case LIBMCDRIVERENV_ERROR_TERMINATED: return "operation has been terminated.";
     case LIBMCDRIVERENV_ERROR_SIGNALHASTRIGGEREDTWICE: return "signal has been triggered twice.";
     case LIBMCDRIVERENV_ERROR_SIGNALHASNOTBEENTRIGGERED: return "signal has not been triggered.";
+    case LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING: return "driver is not in initialisation mode.";
     default: return "unknown error";
   }
 }

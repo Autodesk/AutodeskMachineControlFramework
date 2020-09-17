@@ -28,56 +28,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_PARAMETERHANDLER
-#define __AMC_PARAMETERHANDLER
 
-#include "amc_parametergroup.hpp"
+#ifndef __AMC_PARAMETER_DERIVED
+#define __AMC_PARAMETER_DERIVED
+
+#ifndef _PARAMETER_HEADERPROTECTION
+#error Never include amc_parameter.hpp from outside of amc_parameter.cpp and amc_parametergroup.cpp
+#endif
 
 #include <memory>
-#include <vector>
-#include <map>
 #include <string>
-#include <mutex>
+
+#include "amc_parameter.hpp"
 
 namespace AMC {
 
-	class CParameterHandler;
-	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
-
-	class CParameterHandler {
+	class CParameter_Derived : public CParameter {
 	private:
 
-		PParameterGroup m_DataStore;
-		std::map<std::string, PParameterGroup> m_Groups;
-		std::vector<PParameterGroup> m_GroupList;
+		std::string m_sName;
+		PParameterGroup m_pParameterGroup;
+		std::string m_sSourceParameterName;
 
-		std::mutex m_Mutex;
-		std::string m_sDescription;
-		
 	public:
+		CParameter_Derived(const std::string & sName, PParameterGroup pParameterGroup, std::string sSourceParameterName);
+		virtual ~CParameter_Derived();
 
-		CParameterHandler(std::string sDescription);
-		
-		virtual ~CParameterHandler();		
-		
-		bool hasGroup (const std::string & sName);
-		void addGroup (PParameterGroup pGroup);
-		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
+		virtual std::string getName() const override;
+		virtual std::string getDescription() const override;
+		virtual std::string getDefaultValue() const override;
 
-		uint32_t getGroupCount();
-		PParameterGroup getGroup(const uint32_t nIndex);
-		PParameterGroup findGroup(const std::string& sName, const bool bFailIfNotExisting);
+		virtual std::string getStringValue() const override;
+		virtual void setStringValue(const std::string& sValue) override;
 
-		CParameterGroup * getDataStore ();
+		virtual double getDoubleValue() const override;
+		virtual void setDoubleValue(const double dValue) override;
 
-		std::string getDescription();
-		void setDescription(const std::string & sDescription);
+		virtual int64_t getIntValue() const override;
+		virtual void setIntValue(const int64_t nValue) override;
+
+		virtual bool getBoolValue() const override;
+		virtual void setBoolValue(const bool bValue) override;
+
+		virtual PParameter duplicate() override;
 
 	};
-
 	
 }
 
 
-#endif //__AMC_PARAMETERHANDLER
+#endif //__AMC_PARAMETER_DERIVED
 

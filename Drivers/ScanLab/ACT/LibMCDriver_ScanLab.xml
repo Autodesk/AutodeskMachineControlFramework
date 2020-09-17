@@ -139,7 +139,10 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
 			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
 		</method>
-	
+
+		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
+		</method>
+
 	</class>
 
 <!--

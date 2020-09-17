@@ -40,9 +40,27 @@ using namespace LibMCDriver_Marlin::Impl;
  Class definition of CDriver_Marlin 
 **************************************************************************************************************************/
 
-CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug)
-	: CDriver (sName, sType), m_doQueryFirmwareInfo (doQueryFirmwareInfo), m_bDisableHoming (bDisableHoming), m_bDebug (bDebug)
+CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+	: CDriver (sName, sType), m_doQueryFirmwareInfo (doQueryFirmwareInfo), m_bDisableHoming (bDisableHoming), m_bDebug (bDebug), m_pDriverEnvironment (pDriverEnvironment)
 {
+	if (pDriverEnvironment.get() == nullptr)
+		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+
+	pDriverEnvironment->RegisterDoubleParameter("targetx", "Target X Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("targety", "Target Y Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("targetz", "Target Z Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currentx", "X Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currenty", "Y Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currentz", "Z Position", 0.0);
+	pDriverEnvironment->RegisterBoolParameter("ismoving", "Moving", false);
+	pDriverEnvironment->RegisterBoolParameter("ishomed", "Homed", false);
+	pDriverEnvironment->RegisterBoolParameter("isconnected", "Connected", false);
+	pDriverEnvironment->RegisterBoolParameter("bufferavailable", "Buffer is available", false);
+	pDriverEnvironment->RegisterDoubleParameter("statusupdateinterval", "Timer interval [ms] for updating status", 100.0);
+	pDriverEnvironment->RegisterDoubleParameter("pidvaluep", "Printers PID, value P", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("pidvaluei", "Printers PID, value I", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("pidvalued", "Printers PID, value D", 0.0);
+
 }
 
 
@@ -314,3 +332,7 @@ void CDriver_Marlin::PowerOff()
 	m_pSerialController->powerOff();
 }
 
+void CDriver_Marlin::QueryParameters()
+{
+
+}

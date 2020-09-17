@@ -55,6 +55,7 @@
 		<error name="TERMINATED" code="14" description="operation has been terminated." />
 		<error name="SIGNALHASTRIGGEREDTWICE" code="15" description="signal has been triggered twice." />
 		<error name="SIGNALHASNOTBEENTRIGGERED" code="16" description="signal has not been triggered." />
+		<error name="DRIVERISNOTINITIALISING" code="17" description="driver is not in initialisation mode." />
 	
 		
 	</errors>
@@ -133,6 +134,64 @@
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
 		</method>
+		
+		
+		<method name="RegisterStringParameter" description="registers a string parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterUUIDParameter" description="registers a uuid parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterDoubleParameter" description="registers a double parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="double" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterIntegerParameter" description="registers an int parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="int64" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterBoolParameter" description="registers a bool parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="bool" pass="in" description="default value to set" />
+		</method>
+		
+		
+		<method name="SetStringParameter" description="sets a string parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetUUIDParameter" description="sets a uuid parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetDoubleParameter" description="sets a double parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetIntegerParameter" description="sets an int parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetBoolParameter" description="sets a bool parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="in" description="Value to set" />
+		</method>
+		
 
 	</class>
 

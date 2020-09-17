@@ -115,6 +115,14 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 */
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_getheaderinformation(LibMCDriver_ScanLabOIE_Driver pDriver, const LibMCDriver_ScanLabOIE_uint32 nNameSpaceBufferSize, LibMCDriver_ScanLabOIE_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_ScanLabOIE_uint32 nBaseNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_queryparameters(LibMCDriver_ScanLabOIE_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_OIE
 **************************************************************************************************************************/

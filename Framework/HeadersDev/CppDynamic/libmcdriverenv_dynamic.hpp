@@ -404,6 +404,16 @@ public:
 	
 	inline PWorkingDirectory CreateWorkingDirectory();
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCDriverEnv_uint8> & DataBufferBuffer);
+	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
+	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
+	inline void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCDriverEnv_double dDefaultValue);
+	inline void RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCDriverEnv_int64 nDefaultValue);
+	inline void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue);
+	inline void SetStringParameter(const std::string & sParameterName, const std::string & sValue);
+	inline void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue);
+	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCDriverEnv_double dValue);
+	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCDriverEnv_int64 nValue);
+	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
 };
 	
 	/**
@@ -499,6 +509,16 @@ public:
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetStringParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetUUIDParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -661,6 +681,96 @@ public:
 			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = (PLibMCDriverEnvDriverEnvironment_RegisterStringParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_registerstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = (PLibMCDriverEnvDriverEnvironment_RegisterStringParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_registerstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterStringParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = (PLibMCDriverEnvDriverEnvironment_RegisterUUIDParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_registeruuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = (PLibMCDriverEnvDriverEnvironment_RegisterUUIDParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_registeruuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = (PLibMCDriverEnvDriverEnvironment_RegisterDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_registerdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = (PLibMCDriverEnvDriverEnvironment_RegisterDoubleParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_registerdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = (PLibMCDriverEnvDriverEnvironment_RegisterIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_registerintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = (PLibMCDriverEnvDriverEnvironment_RegisterIntegerParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_registerintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = (PLibMCDriverEnvDriverEnvironment_RegisterBoolParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_registerboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = (PLibMCDriverEnvDriverEnvironment_RegisterBoolParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_registerboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterBoolParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetStringParameter = (PLibMCDriverEnvDriverEnvironment_SetStringParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_setstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetStringParameter = (PLibMCDriverEnvDriverEnvironment_SetStringParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_setstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetStringParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetUUIDParameter = (PLibMCDriverEnvDriverEnvironment_SetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_setuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetUUIDParameter = (PLibMCDriverEnvDriverEnvironment_SetUUIDParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_setuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetUUIDParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = (PLibMCDriverEnvDriverEnvironment_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = (PLibMCDriverEnvDriverEnvironment_SetDoubleParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetDoubleParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = (PLibMCDriverEnvDriverEnvironment_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = (PLibMCDriverEnvDriverEnvironment_SetIntegerParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetIntegerParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetBoolParameter = (PLibMCDriverEnvDriverEnvironment_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcdriverenv_driverenvironment_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetBoolParameter = (PLibMCDriverEnvDriverEnvironment_SetBoolParameterPtr) dlsym(hLibrary, "libmcdriverenv_driverenvironment_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr)
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriverEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcdriverenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriverEnvGetVersionPtr) dlsym(hLibrary, "libmcdriverenv_getversion");
@@ -767,6 +877,46 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_retrievedriverdata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_registerstringparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterStringParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_registeruuidparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_registerdoubleparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_registerintegerparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_registerboolparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterBoolParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_setstringparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetStringParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_setuuidparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetUUIDParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_setdoubleparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetDoubleParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_setintegerparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetIntegerParameter == nullptr) )
+			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriverenv_driverenvironment_setboolparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr) )
 			return LIBMCDRIVERENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriverenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -978,6 +1128,111 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
 		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterStringParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), sDefaultValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterUUIDParameter - registers a uuid parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterUUIDParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), sDefaultValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCDriverEnv_double dDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterDoubleParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), dDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterIntegerParameter - registers an int parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] nDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCDriverEnv_int64 nDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterIntegerParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), nDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterBoolParameter - registers a bool parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] bDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterBoolParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), bDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::SetStringParameter - sets a string parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CDriverEnvironment::SetStringParameter(const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetStringParameter(m_pHandle, sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CDriverEnvironment::SetUUIDParameter(const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetUUIDParameter(m_pHandle, sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	void CDriverEnvironment::SetDoubleParameter(const std::string & sParameterName, const LibMCDriverEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
+	}
+	
+	/**
+	* CDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	void CDriverEnvironment::SetIntegerParameter(const std::string & sParameterName, const LibMCDriverEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
+	}
+	
+	/**
+	* CDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	void CDriverEnvironment::SetBoolParameter(const std::string & sParameterName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
 	}
 
 } // namespace LibMCDriverEnv

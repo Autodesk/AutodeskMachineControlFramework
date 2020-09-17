@@ -115,6 +115,14 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_getv
 */
 LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_getheaderinformation(LibMCDriver_S7Net_Driver pDriver, const LibMCDriver_S7Net_uint32 nNameSpaceBufferSize, LibMCDriver_S7Net_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_S7Net_uint32 nBaseNameBufferSize, LibMCDriver_S7Net_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_queryparameters(LibMCDriver_S7Net_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/

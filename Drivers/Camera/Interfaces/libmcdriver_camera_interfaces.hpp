@@ -298,6 +298,11 @@ public:
 	*/
 	virtual void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) = 0;
 
+	/**
+	* IDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	virtual void QueryParameters() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver> PIDriver;
