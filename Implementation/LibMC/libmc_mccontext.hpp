@@ -84,6 +84,7 @@ private:
 
 	// All Global Handler objects of the system
  	AMC::PSystemState m_pSystemState;
+	AMC::PStateJournal m_pStateJournal;
 
 	// API Objects
 	AMC::PAPI m_pAPI;

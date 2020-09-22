@@ -339,6 +339,7 @@ public:
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_uint32 & nMajor, LibMCDriver_uint32 & nMinor, LibMCDriver_uint32 & nMicro, std::string & sBuild);
 	inline void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName);
+	inline void QueryParameters();
 };
 	
 	/**
@@ -466,6 +467,7 @@ public:
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
+		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -555,6 +557,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_GetHeaderInformation == nullptr)
+			return LIBMCDRIVER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriverDriver_QueryParametersPtr) GetProcAddress(hLibrary, "libmcdriver_driver_queryparameters");
+		#else // _WIN32
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriverDriver_QueryParametersPtr) dlsym(hLibrary, "libmcdriver_driver_queryparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
 			return LIBMCDRIVER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -650,6 +661,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_driver_getheaderinformation", (void**)&(pWrapperTable->m_Driver_GetHeaderInformation));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetHeaderInformation == nullptr) )
+			return LIBMCDRIVER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -757,6 +772,14 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetHeaderInformation(m_pHandle, bytesNeededNameSpace, &bytesWrittenNameSpace, &bufferNameSpace[0], bytesNeededBaseName, &bytesWrittenBaseName, &bufferBaseName[0]));
 		sNameSpace = std::string(&bufferNameSpace[0]);
 		sBaseName = std::string(&bufferBaseName[0]);
+	}
+	
+	/**
+	* CDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	void CDriver::QueryParameters()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParameters(m_pHandle));
 	}
 
 } // namespace LibMCDriver

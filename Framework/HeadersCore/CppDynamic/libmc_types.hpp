@@ -333,6 +333,14 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDENTRIESPERPAGE 306
 #define LIBMC_ERROR_MODULEITEMNOTFOUND 307
 #define LIBMC_ERROR_DERIVEDPARAMETERSREADONLY 308
+#define LIBMC_ERROR_TOOMANYJOURNALVARIABLES 309
+#define LIBMC_ERROR_JOURNALISNOTINITIALISING 310
+#define LIBMC_ERROR_JOURNALISNOTRECORDING 311
+#define LIBMC_ERROR_INVALIDVARIABLETYPE 312
+#define LIBMC_ERROR_INVALIDVARIABLEUNITS 313
+#define LIBMC_ERROR_UNITSHAVEALREADYBEENSET 314
+#define LIBMC_ERROR_UNITSHAVENOTBEENSET 315
+#define LIBMC_ERROR_INVALIDTIMESTAMP 316
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -578,6 +586,14 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
     case LIBMC_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
     case LIBMC_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
+    case LIBMC_ERROR_TOOMANYJOURNALVARIABLES: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTINITIALISING: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTRECORDING: return "Too many journal variables";
+    case LIBMC_ERROR_INVALIDVARIABLETYPE: return "Invalid variable type";
+    case LIBMC_ERROR_INVALIDVARIABLEUNITS: return "Invalid variable units";
+    case LIBMC_ERROR_UNITSHAVEALREADYBEENSET: return "Units have already been set";
+    case LIBMC_ERROR_UNITSHAVENOTBEENSET: return "Units have not been set";
+    case LIBMC_ERROR_INVALIDTIMESTAMP: return "Invalid time stamp";
     default: return "unknown error";
   }
 }

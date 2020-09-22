@@ -47,6 +47,9 @@ namespace AMC {
 	class CParameterGroup;
 	typedef std::shared_ptr<CParameterGroup> PParameterGroup;
 
+	class CStateJournal;
+	typedef std::shared_ptr<CStateJournal> PStateJournal;
+
 	class CParameterGroup {
 	private:
 		
@@ -54,6 +57,8 @@ namespace AMC {
 		std::string m_sDescription;
 		std::map<std::string, PParameter> m_Parameters;
 		std::vector<PParameter> m_ParameterList;
+
+		CStateJournal* m_pStateJournal;
 
 		std::mutex m_GroupMutex;
 
@@ -72,11 +77,11 @@ namespace AMC {
 		bool hasParameter (const std::string & sName);
 
 		void addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue);
-		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue);
+		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits);
 		void addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue);
 		void addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue);
 
-		void addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue);
+		void addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue, const std::string& sUnits);
 		void addNewDerivedParameter(const std::string& sName, AMC::PParameterGroup pParameterGroup, const std::string& sSourceParameterName);
 
 		uint32_t getParameterCount();
@@ -107,6 +112,8 @@ namespace AMC {
 		void deserializeJSON(const std::string & sJSON);
 
 		void copyToGroup (CParameterGroup * pParameterGroup);
+
+		void setJournal(CStateJournal* pStateJournal);
 
 	};
 

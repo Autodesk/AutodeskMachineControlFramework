@@ -293,6 +293,30 @@ LibMCDriverResult libmcdriver_driver_getheaderinformation(LibMCDriver_Driver pDr
 	}
 }
 
+LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriverInterfaceException(LIBMCDRIVER_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_SUCCESS;
+	}
+	catch (ELibMCDriverInterfaceException & Exception) {
+		return handleLibMCDriverException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -316,6 +340,8 @@ LibMCDriverResult LibMCDriver::Impl::LibMCDriver_GetProcAddress (const char * pP
 		*ppProcAddress = (void*) &libmcdriver_driver_getversion;
 	if (sProcName == "libmcdriver_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_driver_queryparameters;
 	if (sProcName == "libmcdriver_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_getversion;
 	if (sProcName == "libmcdriver_getlasterror") 

@@ -333,6 +333,14 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDENTRIESPERPAGE 306
 #define LIBMCDATA_ERROR_MODULEITEMNOTFOUND 307
 #define LIBMCDATA_ERROR_DERIVEDPARAMETERSREADONLY 308
+#define LIBMCDATA_ERROR_TOOMANYJOURNALVARIABLES 309
+#define LIBMCDATA_ERROR_JOURNALISNOTINITIALISING 310
+#define LIBMCDATA_ERROR_JOURNALISNOTRECORDING 311
+#define LIBMCDATA_ERROR_INVALIDVARIABLETYPE 312
+#define LIBMCDATA_ERROR_INVALIDVARIABLEUNITS 313
+#define LIBMCDATA_ERROR_UNITSHAVEALREADYBEENSET 314
+#define LIBMCDATA_ERROR_UNITSHAVENOTBEENSET 315
+#define LIBMCDATA_ERROR_INVALIDTIMESTAMP 316
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -578,6 +586,14 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
     case LIBMCDATA_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
     case LIBMCDATA_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
+    case LIBMCDATA_ERROR_TOOMANYJOURNALVARIABLES: return "Too many journal variables";
+    case LIBMCDATA_ERROR_JOURNALISNOTINITIALISING: return "Too many journal variables";
+    case LIBMCDATA_ERROR_JOURNALISNOTRECORDING: return "Too many journal variables";
+    case LIBMCDATA_ERROR_INVALIDVARIABLETYPE: return "Invalid variable type";
+    case LIBMCDATA_ERROR_INVALIDVARIABLEUNITS: return "Invalid variable units";
+    case LIBMCDATA_ERROR_UNITSHAVEALREADYBEENSET: return "Units have already been set";
+    case LIBMCDATA_ERROR_UNITSHAVENOTBEENSET: return "Units have not been set";
+    case LIBMCDATA_ERROR_INVALIDTIMESTAMP: return "Invalid time stamp";
     default: return "unknown error";
   }
 }

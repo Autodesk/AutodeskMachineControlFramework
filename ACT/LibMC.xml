@@ -317,6 +317,14 @@
 		<error name="INVALIDENTRIESPERPAGE" code="306" description="Invalid entries per page" />
 		<error name="MODULEITEMNOTFOUND" code="307" description="Module item not found" />
 		<error name="DERIVEDPARAMETERSREADONLY" code="308" description="Derived parameters are read only." />
+		<error name="TOOMANYJOURNALVARIABLES" code="309" description="Too many journal variables" />
+		<error name="JOURNALISNOTINITIALISING" code="310" description="Too many journal variables" />
+		<error name="JOURNALISNOTRECORDING" code="311" description="Too many journal variables" />
+		<error name="INVALIDVARIABLETYPE" code="312" description="Invalid variable type" />
+		<error name="INVALIDVARIABLEUNITS" code="313" description="Invalid variable units" />
+		<error name="UNITSHAVEALREADYBEENSET" code="314" description="Units have already been set" />
+		<error name="UNITSHAVENOTBEENSET" code="315" description="Units have not been set" />
+		<error name="INVALIDTIMESTAMP" code="316" description="Invalid time stamp" />
 
 	</errors>
 	

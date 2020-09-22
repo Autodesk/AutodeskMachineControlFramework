@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter.hpp"
 #include "amc_parameter_valued.hpp"
 #include "amc_parameter_derived.hpp"
+#include "amc_statejournal.hpp"
 
 #include "amc_jsonwriter.hpp"
 
@@ -48,12 +49,13 @@ namespace AMC {
 	
 
 	CParameterGroup::CParameterGroup()
+		: m_pStateJournal (nullptr)
 	{
 
 	}
 
 	CParameterGroup::CParameterGroup(const std::string& sName, const std::string& sDescription)
-		: m_sName(sName), m_sDescription(sDescription)
+		: m_sName(sName), m_sDescription(sDescription), m_pStateJournal (nullptr)
 	{
 	}
 
@@ -359,32 +361,48 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue));
+		CStateJournalVariable Variable;
+		if (m_pStateJournal != nullptr)
+			Variable = m_pStateJournal->registerStringValue(m_sName + "." + sName, sDefaultValue);
+
+		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, Variable));
 	}
 
-	void CParameterGroup::addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue)
+	void CParameterGroup::addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue));
+		CStateJournalVariable Variable;
+		if (m_pStateJournal != nullptr)
+			Variable = m_pStateJournal->registerDoubleValue(m_sName + "." + sName, dDefaultValue, dUnits);
+
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, Variable));
 	}
 
 	void CParameterGroup::addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue));
+		CStateJournalVariable Variable;
+		if (m_pStateJournal != nullptr)
+			Variable = m_pStateJournal->registerIntegerValue(m_sName + "." + sName, nDefaultValue);
+
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, Variable));
 	}
 
 	void CParameterGroup::addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue));
+		CStateJournalVariable Variable;
+		if (m_pStateJournal != nullptr)
+			Variable = m_pStateJournal->registerBooleanValue(m_sName + "." + sName, bDefaultValue);
+
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, Variable));
 	}
 
 
-	void CParameterGroup::addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue)
+	void CParameterGroup::addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue, const std::string& sUnits)
 	{
 		if (sType == "string") {
 
@@ -414,7 +432,11 @@ namespace AMC {
 			if (sDefaultValue.length() > 0)
 				dValue = std::stod(sDefaultValue);
 
-			addNewDoubleParameter(sName, sDescription, dValue);
+			double dUnits = 0.0;
+			if (sUnits.length() > 0)
+				dUnits = std::stod(sUnits);
+
+			addNewDoubleParameter(sName, sDescription, dValue, dUnits);
 		}
 		else
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAMETERTYPE);
@@ -445,6 +467,11 @@ namespace AMC {
 
 		m_Parameters.erase(sName);		
 
+	}
+
+	void CParameterGroup::setJournal(CStateJournal* pStateJournal)
+	{
+		m_pStateJournal = pStateJournal;
 	}
 
 

@@ -214,7 +214,7 @@ void CStateEnvironment::StoreDouble(const std::string& sName, const LibMCEnv_dou
 	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
 
 	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewDoubleParameter(sName, "", dValue);
+		pGroup->addNewDoubleParameter(sName, "", dValue, 1.0);
 	}
 	else {
 		pGroup->setDoubleParameterValueByName(sName, dValue);

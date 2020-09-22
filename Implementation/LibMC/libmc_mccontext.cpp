@@ -66,6 +66,8 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     if (pDataModel.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+    m_pStateJournal = std::make_shared<CStateJournal> (std::make_shared<CStateJournalStream> ());
+
     m_pStateEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
     m_pDriverEnvironmentWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*)LibMCDriverEnv::Impl::LibMCDriverEnv_GetProcAddress);
 
@@ -143,6 +145,9 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     if (userInterfaceNode.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
     m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode);
+
+
+    m_pStateJournal->startRecording();
 
 }
 
@@ -222,7 +227,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
         throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATESTATENAME);
     
     m_pSystemState->logger()->logMessage("Creating state machine \"" + sName + "\"", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pStateEnvironmentWrapper, m_pSystemState);
+    pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pStateEnvironmentWrapper, m_pSystemState, m_pStateJournal);
 
     auto signalNodes = xmlNode.children("signaldefinition");
     for (pugi::xml_node signalNode : signalNodes) {
@@ -253,6 +258,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPDESCRIPTION);
 
         auto pGroup = pParameterHandler->addGroup(groupNameAttrib.as_string(), groupDescriptionAttrib.as_string());
+        pGroup->setJournal(m_pStateJournal.get());
         loadParameterGroup(parameterGroupNode, pGroup);
     }
 
@@ -267,6 +273,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPDESCRIPTION);
 
         auto pGroup = pParameterHandler->addGroup(groupNameAttrib.as_string(), groupDescriptionAttrib.as_string());
+        pGroup->setJournal(m_pStateJournal.get());
         loadDriverParameterGroup(driverParameterGroupNode, pGroup);
     }
 
@@ -442,8 +449,9 @@ void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParamet
         auto typeAttrib = parameterNode.attribute("type");
         if (typeAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERTYPE);
+        auto unitsAttrib = parameterNode.attribute("units");
 
-        pGroup->addNewTypedParameter(nameAttrib.as_string(), typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string());
+        pGroup->addNewTypedParameter(nameAttrib.as_string(), typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string(), unitsAttrib.as_string());
     }
 
 }
