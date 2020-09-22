@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <chrono>
 #include <sstream>
-
+#include <cmath>
 
 #include "libmcplugin_statefactory.hpp"
 #include "libmcplugin_interfaceexception.hpp"
