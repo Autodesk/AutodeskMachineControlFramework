@@ -88,7 +88,7 @@ namespace AMC {
 		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
 		AMC::PParameterInstances m_pParameterInstances;
-		
+
 		AMCCommon::PChrono m_pGlobalChrono;
 
 		LibMCData::PDataModel m_pDataModel;

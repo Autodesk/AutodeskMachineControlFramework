@@ -52,6 +52,12 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getheaderinformation(L
 	return libmcdriver_marlin_driver_getheaderinformation(pDriver, nNameSpaceBufferSize, pNameSpaceNeededChars, pNameSpaceBuffer, nNameSpaceBufferSize, pBaseNameNeededChars, pBaseNameBuffer);
 }
 
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver)
+{
+	return libmcdriver_driver_queryparameters(pDriver);
+}
+
+
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_getversion(LibMCDriver_uint32 * pMajor, LibMCDriver_uint32 * pMinor, LibMCDriver_uint32 * pMicro)
 {
 	return libmcdriver_marlin_getversion(pMajor, pMinor, pMicro);
@@ -82,6 +88,7 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pNa
 {
 	return libmcdriver_marlin_createdriver(pName, pType, pDriverEnvironment, pInstance);
 }
+
 
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_getsymbollookupmethod(LibMCDriver_pvoid* pSymbolLookupMethod)
 {

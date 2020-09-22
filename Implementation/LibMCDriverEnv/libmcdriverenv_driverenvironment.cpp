@@ -83,7 +83,7 @@ void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterNa
     if (!m_bIsInitializing)
         throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_DRIVERISNOTINITIALISING);
 
-    m_pParameterGroup->addNewDoubleParameter(sParameterName, sDescription, dDefaultValue);
+    m_pParameterGroup->addNewDoubleParameter(sParameterName, sDescription, dDefaultValue, 1.0);
 }
 
 void CDriverEnvironment::RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCDriverEnv_int64 nDefaultValue)

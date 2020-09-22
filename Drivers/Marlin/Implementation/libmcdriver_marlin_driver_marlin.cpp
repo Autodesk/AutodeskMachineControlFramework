@@ -64,6 +64,16 @@ CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sTyp
 }
 
 
+void CDriver_Marlin::QueryParameters()
+{
+	double dX, dY, dZ;
+	m_pSerialController->getCurrentPosition(dX, dY, dZ);
+	m_pDriverEnvironment->SetDoubleParameter("targetx", dX);
+	m_pDriverEnvironment->SetDoubleParameter("targety", dY);
+	m_pDriverEnvironment->SetDoubleParameter("targetz", dZ);
+}
+
+
 void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	Disconnect ();
@@ -332,7 +342,4 @@ void CDriver_Marlin::PowerOff()
 	m_pSerialController->powerOff();
 }
 
-void CDriver_Marlin::QueryParameters()
-{
 
-}

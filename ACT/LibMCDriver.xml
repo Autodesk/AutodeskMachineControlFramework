@@ -80,9 +80,6 @@
 			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
 		</method>
 
-		<method name="GetName" description = "returns the name identifier of the driver">
-			<param name="Name" type="string" pass="return" description="Name of the driver." />
-		</method>
 
 		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
 		</method>

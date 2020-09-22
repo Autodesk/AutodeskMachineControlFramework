@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 
 #include "amc_parameter.hpp"
+#include "amc_statejournal.hpp"
 
 namespace AMC {
 
@@ -49,12 +50,13 @@ namespace AMC {
 		std::string m_sDescription;
 		std::string m_sDefaultValue;
 		std::string m_sValue;
+		CStateJournalVariable m_Variable;
 	public:
 
-		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue);
+		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, CStateJournalVariable Variable);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, CStateJournalVariable Variable);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, CStateJournalVariable Variable);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, CStateJournalVariable Variable);
 
 		virtual ~CParameter_Valued();
 

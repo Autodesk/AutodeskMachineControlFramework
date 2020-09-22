@@ -44,12 +44,14 @@ typedef LibMCPlugin::ETranslator_StateFactory<ELibMCInterfaceException, LibMCRes
 
 namespace AMC {
 
-	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState)
-		: m_sName(sName), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState)
+	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState, AMC::PStateJournal pStateJournal)
+		: m_sName(sName), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState), m_pStateJournal (pStateJournal)
 	{
 		if (pEnvironmentWrapper.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 		if (pSystemState.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pStateJournal.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 		m_ParameterHandler = std::make_shared<CParameterHandler>(sDescription);

@@ -32,12 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _PARAMETER_HEADERPROTECTION
 
 #include "amc_parameter_valued.hpp"
+#include "amc_statejournal.hpp"
 #include "libmc_interfaceexception.hpp"
 
 namespace AMC {
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue)
-		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, CStateJournalVariable Variable)
+		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_Variable (Variable)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -45,8 +46,8 @@ namespace AMC {
 		setStringValue(sDefaultValue);
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue))
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, CStateJournalVariable Variable)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_Variable(Variable)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -54,8 +55,8 @@ namespace AMC {
 		setDoubleValue(dDefaultValue);
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue))
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, CStateJournalVariable Variable)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_Variable(Variable)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -63,8 +64,8 @@ namespace AMC {
 		setIntValue(nDefaultValue);
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0")
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, CStateJournalVariable Variable)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_Variable(Variable)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -100,6 +101,7 @@ namespace AMC {
 
 	void CParameter_Valued::setStringValue(const std::string& sValue)
 	{
+		m_Variable.updateValue(sValue);
 		m_sValue = sValue;
 	}
 
@@ -110,6 +112,7 @@ namespace AMC {
 
 	void CParameter_Valued::setDoubleValue(const double dValue)
 	{
+		m_Variable.updateValue(dValue);
 		m_sValue = std::to_string(dValue);
 	}
 
@@ -120,6 +123,7 @@ namespace AMC {
 
 	void CParameter_Valued::setIntValue(const int64_t nValue)
 	{
+		m_Variable.updateValue(nValue);
 		m_sValue = std::to_string(nValue);
 	}
 
@@ -130,6 +134,7 @@ namespace AMC {
 
 	void CParameter_Valued::setBoolValue(const bool bValue)
 	{
+		m_Variable.updateValue(bValue);
 		if (bValue)
 			setIntValue(1);
 		else
@@ -138,7 +143,7 @@ namespace AMC {
 
 	PParameter CParameter_Valued::duplicate()
 	{
-		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue);
+		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue, m_Variable);
 		pParameter->m_sValue = m_sValue;
 		return pParameter;
 	}

@@ -102,6 +102,14 @@ typedef LibMCDriverResult (*PLibMCDriverDriver_GetVersionPtr) (LibMCDriver_Drive
 */
 typedef LibMCDriverResult (*PLibMCDriverDriver_GetHeaderInformationPtr) (LibMCDriver_Driver pDriver, const LibMCDriver_uint32 nNameSpaceBufferSize, LibMCDriver_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_uint32 nBaseNameBufferSize, LibMCDriver_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverResult (*PLibMCDriverDriver_QueryParametersPtr) (LibMCDriver_Driver pDriver);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -182,6 +190,7 @@ typedef struct {
 	PLibMCDriverDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriverDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriverDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
+	PLibMCDriverDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriverGetVersionPtr m_GetVersion;
 	PLibMCDriverGetLastErrorPtr m_GetLastError;
 	PLibMCDriverReleaseInstancePtr m_ReleaseInstance;
