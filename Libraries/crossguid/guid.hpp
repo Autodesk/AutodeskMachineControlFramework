@@ -28,6 +28,10 @@ THE SOFTWARE.
 #define GUID_WINDOWS
 #endif
 
+#ifdef __linux__
+#define GUID_LIBUUID
+#endif
+
 #ifdef GUID_ANDROID
 #include <thread>
 #include <jni.h>
