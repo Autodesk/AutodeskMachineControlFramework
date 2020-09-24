@@ -34,15 +34,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
+#include <mutex>
+#include <vector>
+
+#define STATEJOURNAL_MAXTIMESTAMPDELTA  (256 * 1024 * 1024)
+
+#define STATEJOURNAL_COMMANDFLAG_TIMESTAMP 0x00000000UL 
+
+#define STATEJOURNAL_COMMANDFLAG_INTEGER 0x10000000UL
+#define STATEJOURNAL_COMMANDFLAG_INTEGER_POSITIVE 0x00000000UL
+#define STATEJOURNAL_COMMANDFLAG_INTEGER_NEGATIVE 0x08000000UL
+
+#define STATEJOURNAL_COMMANDFLAG_STRING 0x20000000UL
+
+#define STATEJOURNAL_COMMANDFLAG_DOUBLE 0x30000000UL
+#define STATEJOURNAL_COMMANDFLAG_DOUBLE_POSITIVE 0x00000000UL
+#define STATEJOURNAL_COMMANDFLAG_DOUBLE_NEGATIVE 0x08000000UL
+
+#define STATEJOURNAL_COMMANDFLAG_BOOL 0x40000000UL
+#define STATEJOURNAL_COMMANDFLAG_BOOL_FALSE 0x00000000UL
+#define STATEJOURNAL_COMMANDFLAG_BOOL_TRUE 0x08000000UL
+
+#define STATEJOURNAL_COMMANDFLAG_EVENT 0x50000000UL
+#define STATEJOURNAL_COMMANDFLAG_DEFINITION 0x60000000UL
+#define STATEJOURNAL_COMMANDFLAG_UNITS 0x70000000UL
+
 
 namespace AMC {
 
+	class CStateJournalStreamChunk;
+	typedef std::shared_ptr< CStateJournalStreamChunk> PStateJournalStreamChunk;
+
+
 	class CStateJournalStream
 	{
+	private:
+		PStateJournalStreamChunk m_pCurrentChunk;
+		std::vector<PStateJournalStreamChunk> m_Chunks;
+
+		std::mutex m_Mutex;
+
+		uint64_t m_nCurrentTimeStamp;
+
 	public:
-		virtual void writeCommand(const uint32_t nCommand);
-		virtual void writeUint64(const uint64_t nValue);
-		virtual void writeString(const std::string & sValue);
+		CStateJournalStream();
+		virtual ~CStateJournalStream();
+
+		virtual void writeTimeStamp(const uint64_t nAbsoluteTimeStamp);
+		virtual void writeBool(const uint32_t nID, bool bValue);
+		virtual void writeInt64Delta(const uint32_t nID, int64_t nDelta);
+		virtual void writeDoubleDelta(const uint32_t nID, int64_t nDelta);
+		virtual void writeString(const uint32_t nID, const std::string & sValue);
+		virtual void writeUnits(const uint32_t nID, double dUnits);
+
+		virtual void writeNameDefinition(const uint32_t nID, const std::string& sName);
+
+		void startNewChunk();
+
 	};
 	typedef std::shared_ptr<CStateJournalStream> PStateJournalStream;
 

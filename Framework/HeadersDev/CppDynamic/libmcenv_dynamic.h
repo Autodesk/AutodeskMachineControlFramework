@@ -736,56 +736,6 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_SleepPtr) (LibMCEnv_StateEnvi
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CheckForTerminationPtr) (LibMCEnv_StateEnvironment pStateEnvironment, bool * pShallTerminate);
 
 /**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreStringPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a uuid in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreIntegerPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 nValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] dValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreDoublePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double dValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] bValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreBoolPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool bValue);
-
-/**
 * stores a signal handler in the current state machine
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -794,60 +744,6 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreBoolPtr) (LibMCEnv_State
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreSignalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler pHandler);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveStringPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a uuid from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveIntegerPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveDoublePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveBoolPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool * pValue);
 
 /**
 * retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
@@ -1103,17 +999,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_LogInfoPtr m_StateEnvironment_LogInfo;
 	PLibMCEnvStateEnvironment_SleepPtr m_StateEnvironment_Sleep;
 	PLibMCEnvStateEnvironment_CheckForTerminationPtr m_StateEnvironment_CheckForTermination;
-	PLibMCEnvStateEnvironment_StoreStringPtr m_StateEnvironment_StoreString;
-	PLibMCEnvStateEnvironment_StoreUUIDPtr m_StateEnvironment_StoreUUID;
-	PLibMCEnvStateEnvironment_StoreIntegerPtr m_StateEnvironment_StoreInteger;
-	PLibMCEnvStateEnvironment_StoreDoublePtr m_StateEnvironment_StoreDouble;
-	PLibMCEnvStateEnvironment_StoreBoolPtr m_StateEnvironment_StoreBool;
 	PLibMCEnvStateEnvironment_StoreSignalPtr m_StateEnvironment_StoreSignal;
-	PLibMCEnvStateEnvironment_RetrieveStringPtr m_StateEnvironment_RetrieveString;
-	PLibMCEnvStateEnvironment_RetrieveUUIDPtr m_StateEnvironment_RetrieveUUID;
-	PLibMCEnvStateEnvironment_RetrieveIntegerPtr m_StateEnvironment_RetrieveInteger;
-	PLibMCEnvStateEnvironment_RetrieveDoublePtr m_StateEnvironment_RetrieveDouble;
-	PLibMCEnvStateEnvironment_RetrieveBoolPtr m_StateEnvironment_RetrieveBool;
 	PLibMCEnvStateEnvironment_RetrieveSignalPtr m_StateEnvironment_RetrieveSignal;
 	PLibMCEnvStateEnvironment_ClearStoredValuePtr m_StateEnvironment_ClearStoredValue;
 	PLibMCEnvStateEnvironment_SetStringParameterPtr m_StateEnvironment_SetStringParameter;

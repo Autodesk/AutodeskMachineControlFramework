@@ -42,27 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	#define STATEJOURNAL_MAXVARIABLECOUNT  (16 * 1024 * 1024)
-    #define STATEJOURNAL_MAXTIMESTAMPDELTA  (256 * 1024 * 1024)
 
 	#define STATEJOURNAL_VARIABLE_MINUNITS 1.0E-6
 	#define STATEJOURNAL_VARIABLE_MAXUNITS 1.0E6
-
-	#define STATEJOURNAL_VARIABLEFLAG_TIMESTAMP 0
-	#define STATEJOURNAL_VARIABLEFLAG_INTEGER 1
-	#define STATEJOURNAL_VARIABLEFLAG_STRING 2
-	#define STATEJOURNAL_VARIABLEFLAG_DOUBLE 3
-	#define STATEJOURNAL_VARIABLEFLAG_BOOL 4
-	#define STATEJOURNAL_VARIABLEFLAG_EVENT 5
-
-	#define STATEJOURNAL_VARIABLEFLAG_BOOL_FALSE 0
-	#define STATEJOURNAL_VARIABLEFLAG_BOOL_TRUE 8
-	#define STATEJOURNAL_VARIABLEFLAG_INTEGER_POSITIVE 0
-	#define STATEJOURNAL_VARIABLEFLAG_INTEGER_NEGATIVE 8
-	#define STATEJOURNAL_VARIABLEFLAG_DOUBLE_POSITIVE 0
-	#define STATEJOURNAL_VARIABLEFLAG_DOUBLE_NEGATIVE 8
-
-	#define STATEJOURNAL_VARIABLEIDFACTOR 16
-	#define STATEJOURNAL_TIMESTAMPFACTOR 8
 
 	class CStateJournalImplVariable {
 	protected:
@@ -75,8 +57,6 @@ namespace AMC {
 		{
 			if (pStream == nullptr)
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-			std::cout << "registered " << sName << ": " << nID << std::endl;
 		}
 
 		uint32_t getID()
@@ -89,6 +69,8 @@ namespace AMC {
 			return m_sName;
 		}
 
+
+		virtual void defineVariableInStream() = 0;
 
 		virtual eStateJournalVariableType getType() = 0;
 	};
@@ -109,24 +91,22 @@ namespace AMC {
 			return eStateJournalVariableType::vtBoolParameter;
 		}
 
-		void setValue(const bool bValue, const uint32_t nDeltaTimeStamp)
+		void setValue(const bool bValue, const uint64_t nAbsoluteTimeStamp)
 		{
 			if (bValue != m_bCurrentValue) {
 
-				if (nDeltaTimeStamp >= STATEJOURNAL_MAXTIMESTAMPDELTA)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-				m_pStream->writeCommand (nDeltaTimeStamp * STATEJOURNAL_TIMESTAMPFACTOR | STATEJOURNAL_VARIABLEFLAG_TIMESTAMP);
-				if (bValue) {
-					m_pStream->writeCommand ((m_nID * STATEJOURNAL_VARIABLEIDFACTOR) | STATEJOURNAL_VARIABLEFLAG_BOOL | STATEJOURNAL_VARIABLEFLAG_BOOL_TRUE);
-				}
-				else {
-					m_pStream->writeCommand((m_nID * STATEJOURNAL_VARIABLEIDFACTOR) | STATEJOURNAL_VARIABLEFLAG_BOOL | STATEJOURNAL_VARIABLEFLAG_BOOL_FALSE);
-				}
-
+				m_pStream->writeTimeStamp (nAbsoluteTimeStamp);
+				m_pStream->writeBool (m_nID, bValue);
 				m_bCurrentValue = bValue;
 			}
 		}
+
+		void defineVariableInStream() override
+		{
+			m_pStream->writeNameDefinition(m_nID, m_sName);
+			m_pStream->writeBool(m_nID, m_bCurrentValue);
+		}
+
 
 	};
 
@@ -145,29 +125,25 @@ namespace AMC {
 			return eStateJournalVariableType::vtIntegerParameter;
 		}
 
-		void setValue(const int64_t nValue, const uint32_t nDeltaTimeStamp)
+		void setValue(const int64_t nValue, const uint64_t nAbsoluteTimeStamp)
 		{
 			if (m_nCurrentValue != nValue) {
 
-				if (nDeltaTimeStamp >= STATEJOURNAL_MAXTIMESTAMPDELTA)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+				int64_t nDelta = (nValue - m_nCurrentValue);
 
-				m_pStream->writeCommand(nDeltaTimeStamp * STATEJOURNAL_TIMESTAMPFACTOR | STATEJOURNAL_VARIABLEFLAG_TIMESTAMP);
-
-				if (m_nCurrentValue < nValue) {
-					int64_t nDelta = (nValue - m_nCurrentValue);
-
-					m_pStream->writeCommand((m_nID * STATEJOURNAL_VARIABLEIDFACTOR) | STATEJOURNAL_VARIABLEFLAG_INTEGER | STATEJOURNAL_VARIABLEFLAG_INTEGER_POSITIVE);
-				}
-				else {
-					int64_t nDelta = (m_nCurrentValue - nValue);
-
-					m_pStream->writeCommand((m_nID * STATEJOURNAL_VARIABLEIDFACTOR) | STATEJOURNAL_VARIABLEFLAG_INTEGER | STATEJOURNAL_VARIABLEFLAG_INTEGER_NEGATIVE);
-				}
+				m_pStream->writeTimeStamp(nAbsoluteTimeStamp);
+				m_pStream->writeInt64Delta(m_nID, nDelta);
 
 				m_nCurrentValue = nValue;
 			}
 		}
+
+		void defineVariableInStream() override
+		{
+			m_pStream->writeNameDefinition(m_nID, m_sName);
+			m_pStream->writeInt64Delta(m_nID, m_nCurrentValue);
+		}
+
 
 	};
 
@@ -200,7 +176,7 @@ namespace AMC {
 
 		}
 
-		void setValue(const double dValue, const uint32_t nDeltaTimeStamp)
+		void setValue(const double dValue, const uint64_t nAbsoluteTimeStamp)
 		{
 			if (!m_bHasUnits)
 				throw ELibMCInterfaceException(LIBMC_ERROR_UNITSHAVENOTBEENSET);
@@ -208,26 +184,24 @@ namespace AMC {
 			int64_t nValueInUnits = (int64_t) (dValue / m_dUnits);
 			if (m_nCurrentValueInUnits != nValueInUnits) {
 
-				if (nDeltaTimeStamp >= STATEJOURNAL_MAXTIMESTAMPDELTA)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-				m_pStream->writeCommand(nDeltaTimeStamp * STATEJOURNAL_TIMESTAMPFACTOR | STATEJOURNAL_VARIABLEFLAG_TIMESTAMP);
-
-				if (m_nCurrentValueInUnits < nValueInUnits) {
-					int64_t nDelta = (nValueInUnits - m_nCurrentValueInUnits);
-
-					m_pStream->writeCommand((m_nID * STATEJOURNAL_VARIABLEIDFACTOR) | STATEJOURNAL_VARIABLEFLAG_DOUBLE | STATEJOURNAL_VARIABLEFLAG_DOUBLE_POSITIVE);
-				}
-				else {
-					int64_t nDelta = (m_nCurrentValueInUnits - nValueInUnits);
-
-					m_pStream->writeCommand((m_nID * STATEJOURNAL_VARIABLEIDFACTOR) | STATEJOURNAL_VARIABLEFLAG_DOUBLE | STATEJOURNAL_VARIABLEFLAG_DOUBLE_NEGATIVE);
-				}
+				m_pStream->writeTimeStamp (nAbsoluteTimeStamp);
+				m_pStream->writeDoubleDelta (m_nID, (nValueInUnits - m_nCurrentValueInUnits));			
 
 				m_nCurrentValueInUnits = nValueInUnits;
 			}
 
 		}
+
+		void defineVariableInStream() override
+		{
+			if (!m_bHasUnits)
+				throw ELibMCInterfaceException(LIBMC_ERROR_UNITSHAVENOTBEENSET);
+
+			m_pStream->writeNameDefinition(m_nID, m_sName);
+			m_pStream->writeUnits(m_nID, m_dUnits);
+			m_pStream->writeInt64Delta(m_nID, m_nCurrentValueInUnits);
+		}
+
 
 	};
 
@@ -245,19 +219,22 @@ namespace AMC {
 			return eStateJournalVariableType::vtStringParameter;
 		}
 
-		void setValue(const std::string & sValue, const uint32_t nDeltaTimeStamp)
+		void setValue(const std::string & sValue, const uint64_t nAbsoluteTimeStamp)
 		{
 			if (m_sCurrentValue != sValue) {
 
-				if (nDeltaTimeStamp >= STATEJOURNAL_MAXTIMESTAMPDELTA)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-				m_pStream->writeCommand(nDeltaTimeStamp * STATEJOURNAL_TIMESTAMPFACTOR | STATEJOURNAL_VARIABLEFLAG_TIMESTAMP);
-				m_pStream->writeCommand((m_nID * STATEJOURNAL_VARIABLEIDFACTOR) | STATEJOURNAL_VARIABLEFLAG_STRING);
-				m_pStream->writeString(sValue.c_str ());
+				m_pStream->writeTimeStamp(nAbsoluteTimeStamp);
+				m_pStream->writeString(m_nID, sValue.c_str ());
 				m_sCurrentValue = sValue;
 			}
 		}
+
+		void defineVariableInStream() override
+		{
+			m_pStream->writeNameDefinition(m_nID, m_sName);
+			m_pStream->writeString(m_nID, m_sCurrentValue);
+		}
+
 
 	};
 
@@ -276,8 +253,6 @@ namespace AMC {
 
 		eStateJournalMode m_JournalMode;
 		AMCCommon::CChrono m_Chrono;
-		uint64_t m_nRecordingStartTimeinMS;
-		uint64_t m_nLastTimeStampInMS;
 
 		PStateJournalStream m_pStream;
 
@@ -297,7 +272,7 @@ namespace AMC {
 		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
 		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
 
-		uint32_t retrieveDeltaTimeStamp();
+		uint64_t retrieveTimeStamp();
 
 	};
 
@@ -306,13 +281,17 @@ namespace AMC {
 		: m_JournalMode(eStateJournalMode::sjmInitialising),
 	     m_Chrono (false),
 		m_nVariableCount (1),
-		m_nRecordingStartTimeinMS (0),
-		m_nLastTimeStampInMS (0),
 		m_pStream (pStream)
 
 	{
 		if (pStream.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		// Create a new stream chunk
+		m_pStream->startNewChunk();
+		for (auto pVariable : m_VariableIDMap) 
+			pVariable.second->defineVariableInStream();
+
 	}
 
 	PStateJournalImplVariable CStateJournalImpl::generateVariable(const eStateJournalVariableType eVariableType, const std::string& sName)
@@ -366,8 +345,6 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTINITIALISING);
 
 		m_JournalMode = eStateJournalMode::sjmRecording;
-		m_nRecordingStartTimeinMS = m_Chrono.getExistenceTimeInMilliseconds();
-		m_nLastTimeStampInMS = m_nRecordingStartTimeinMS;
 	}
 
 	void CStateJournalImpl::finishRecording()
@@ -385,47 +362,43 @@ namespace AMC {
 	{
 
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		return;
 
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (iIter->second);
 		if (pBoolVariable.get () == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pBoolVariable->setValue (bValue, retrieveDeltaTimeStamp ());
+		pBoolVariable->setValue (bValue, retrieveTimeStamp());
 	}
 
 	void CStateJournalImpl::updateIntegerValue(const uint32_t nVariableID, const int64_t nValue)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		return;
 
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (iIter->second);
 		if (pIntegerVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pIntegerVariable->setValue(nValue, retrieveDeltaTimeStamp());
+		pIntegerVariable->setValue(nValue, retrieveTimeStamp());
 
 	}
 
 	void CStateJournalImpl::updateStringValue(const uint32_t nVariableID, const std::string& sValue)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		return;
 
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pStringVariable = std::dynamic_pointer_cast<CStateJournalImplStringVariable> (iIter->second);
 		if (pStringVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pStringVariable->setValue(sValue, retrieveDeltaTimeStamp());
+		pStringVariable->setValue(sValue, retrieveTimeStamp());
 	}
 
 	void CStateJournalImpl::updateDoubleValue(const uint32_t nVariableID, const double dValue)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
-		return;
 
 		if (m_JournalMode != eStateJournalMode::sjmRecording)
 			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
@@ -435,62 +408,17 @@ namespace AMC {
 		if (pDoubleVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pDoubleVariable->setValue(dValue, retrieveDeltaTimeStamp());
+		pDoubleVariable->setValue(dValue, retrieveTimeStamp());
 
 	}
 
 
-	uint32_t CStateJournalImpl::retrieveDeltaTimeStamp()
+	uint64_t CStateJournalImpl::retrieveTimeStamp()
 	{
-		uint64_t nTimeStamp = m_Chrono.getExistenceTimeInMilliseconds();
-		if (nTimeStamp < m_nLastTimeStampInMS) 
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
-
-		int64_t nDeltaTimeStamp = nTimeStamp - m_nLastTimeStampInMS;
-		if (nDeltaTimeStamp > STATEJOURNAL_MAXTIMESTAMPDELTA)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
-
-		m_nLastTimeStampInMS = nTimeStamp;
-		return (uint32_t) nDeltaTimeStamp;
-
+		return m_Chrono.getExistenceTimeInMilliseconds();
 	}
 
 
-	CStateJournalVariable::CStateJournalVariable()
-		: m_pStateJournalImpl (nullptr), m_nVariableID (0)
-	{
-
-	}
-
-	CStateJournalVariable::CStateJournalVariable(PStateJournalImpl pImpl, uint32_t nVariableID)
-		: m_pStateJournalImpl (pImpl), m_nVariableID (nVariableID)
-	{
-
-	}
-
-	void CStateJournalVariable::updateValue(const bool bValue)
-	{
-		if (m_pStateJournalImpl.get () != nullptr)
-			m_pStateJournalImpl->updateBoolValue(m_nVariableID, bValue);
-	}
-
-	void CStateJournalVariable::updateValue(const int64_t nValue)
-	{
-		if (m_pStateJournalImpl.get() != nullptr)
-			m_pStateJournalImpl->updateIntegerValue(m_nVariableID, nValue);
-	}
-
-	void CStateJournalVariable::updateValue(const std::string& sValue)
-	{
-		if (m_pStateJournalImpl.get() != nullptr)
-			m_pStateJournalImpl->updateStringValue(m_nVariableID, sValue);
-	}
-
-	void CStateJournalVariable::updateValue(const double dValue)
-	{
-		if (m_pStateJournalImpl.get() != nullptr)
-			m_pStateJournalImpl->updateDoubleValue(m_nVariableID, dValue);
-	}
 
 	
 	CStateJournal::CStateJournal(PStateJournalStream pStream)
@@ -514,43 +442,43 @@ namespace AMC {
 		m_pImpl->finishRecording();
 	}
 
-	CStateJournalVariable CStateJournal::registerBooleanValue(const std::string& sName, const bool bInitialValue)
+	uint32_t CStateJournal::registerBooleanValue(const std::string& sName, const bool bInitialValue)
 	{
 		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtBoolParameter, sName);
 		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (pVariable);
 		if (pBoolVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pBoolVariable->setValue(bInitialValue, m_pImpl->retrieveDeltaTimeStamp());
+		pBoolVariable->setValue(bInitialValue, m_pImpl->retrieveTimeStamp());
 
-		return CStateJournalVariable(m_pImpl, pVariable->getID ());
+		return pVariable->getID ();
 	}
 
-	CStateJournalVariable CStateJournal::registerIntegerValue(const std::string& sName, const int64_t nInitialValue)
+	uint32_t CStateJournal::registerIntegerValue(const std::string& sName, const int64_t nInitialValue)
 	{
 		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtIntegerParameter, sName);		
 		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (pVariable);
 		if (pIntegerVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pIntegerVariable->setValue(nInitialValue, m_pImpl->retrieveDeltaTimeStamp());
+		pIntegerVariable->setValue(nInitialValue, m_pImpl->retrieveTimeStamp());
 
-		return CStateJournalVariable(m_pImpl, pVariable->getID());
+		return pVariable->getID();
 	}
 
-	CStateJournalVariable CStateJournal::registerStringValue(const std::string& sName, const std::string & sInitialValue)
+	uint32_t CStateJournal::registerStringValue(const std::string& sName, const std::string & sInitialValue)
 	{
 		auto pVariable = m_pImpl->generateVariable(eStateJournalVariableType::vtStringParameter, sName);	
 		auto pStringVariable = std::dynamic_pointer_cast<CStateJournalImplStringVariable> (pVariable);
 		if (pStringVariable.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
 
-		pStringVariable->setValue(sInitialValue, m_pImpl->retrieveDeltaTimeStamp());
+		pStringVariable->setValue(sInitialValue, m_pImpl->retrieveTimeStamp());
 
-		return CStateJournalVariable(m_pImpl, pVariable->getID());
+		return pVariable->getID();
 	}
 
-	CStateJournalVariable CStateJournal::registerDoubleValue(const std::string& sName, const double dInitialValue, double dUnits)
+	uint32_t CStateJournal::registerDoubleValue(const std::string& sName, const double dInitialValue, double dUnits)
 	{
 		dUnits = 1.0;
 		if ((dUnits < STATEJOURNAL_VARIABLE_MINUNITS) || (dUnits > STATEJOURNAL_VARIABLE_MAXUNITS))
@@ -562,10 +490,31 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
 
 		pDoubleVariable->setUnits(dUnits);
-		pDoubleVariable->setValue(dInitialValue, m_pImpl->retrieveDeltaTimeStamp());
-		return CStateJournalVariable(m_pImpl, pVariable->getID());
+		pDoubleVariable->setValue(dInitialValue, m_pImpl->retrieveTimeStamp());
+		return pVariable->getID();
 	}
 
+
+
+	void CStateJournal::updateBoolValue(const uint32_t nVariableID, const bool bValue)
+	{
+		m_pImpl->updateBoolValue(nVariableID, bValue);
+	}
+
+	void CStateJournal::updateIntegerValue(const uint32_t nVariableID, const int64_t nValue)
+	{
+		m_pImpl->updateIntegerValue(nVariableID, nValue);
+	}
+
+	void CStateJournal::updateStringValue(const uint32_t nVariableID, const std::string& sValue)
+	{
+		m_pImpl->updateStringValue(nVariableID, sValue);
+	}
+
+	void CStateJournal::updateDoubleValue(const uint32_t nVariableID, const double dValue)
+	{
+		m_pImpl->updateDoubleValue(nVariableID, dValue);
+	}
 
 }
 

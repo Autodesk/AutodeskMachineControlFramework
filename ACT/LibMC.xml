@@ -325,6 +325,7 @@
 		<error name="UNITSHAVEALREADYBEENSET" code="314" description="Units have already been set" />
 		<error name="UNITSHAVENOTBEENSET" code="315" description="Units have not been set" />
 		<error name="INVALIDTIMESTAMP" code="316" description="Invalid time stamp" />
+		<error name="NOCURRENTJOURNALCHUNK" code="317" description="No current journal chunk" />
 
 	</errors>
 	

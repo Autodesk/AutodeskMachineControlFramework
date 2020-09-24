@@ -58,7 +58,8 @@ namespace AMC {
 		std::map<std::string, PParameter> m_Parameters;
 		std::vector<PParameter> m_ParameterList;
 
-		CStateJournal* m_pStateJournal;
+		PStateJournal m_pStateJournal;
+		std::string m_sInstanceName;
 
 		std::mutex m_GroupMutex;
 
@@ -113,7 +114,7 @@ namespace AMC {
 
 		void copyToGroup (CParameterGroup * pParameterGroup);
 
-		void setJournal(CStateJournal* pStateJournal);
+		void setJournal(PStateJournal pStateJournal, const std::string & sInstanceName);
 
 	};
 

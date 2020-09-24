@@ -732,81 +732,11 @@ public:
 	virtual bool CheckForTermination() = 0;
 
 	/**
-	* IStateEnvironment::StoreString - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	virtual void StoreString(const std::string & sName, const std::string & sValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreUUID - stores a uuid in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	virtual void StoreUUID(const std::string & sName, const std::string & sValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreInteger - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] nValue - Value
-	*/
-	virtual void StoreInteger(const std::string & sName, const LibMCEnv_int64 nValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreDouble - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] dValue - Value
-	*/
-	virtual void StoreDouble(const std::string & sName, const LibMCEnv_double dValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreBool - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] bValue - Value
-	*/
-	virtual void StoreBool(const std::string & sName, const bool bValue) = 0;
-
-	/**
 	* IStateEnvironment::StoreSignal - stores a signal handler in the current state machine
 	* @param[in] sName - Name
 	* @param[in] pHandler - Signal handler to store.
 	*/
 	virtual void StoreSignal(const std::string & sName, ISignalHandler* pHandler) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveString - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual std::string RetrieveString(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveUUID - retrieves a uuid from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual std::string RetrieveUUID(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveInteger - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual LibMCEnv_int64 RetrieveInteger(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveDouble - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual LibMCEnv_double RetrieveDouble(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveBool - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual bool RetrieveBool(const std::string & sName) = 0;
 
 	/**
 	* IStateEnvironment::RetrieveSignal - retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.

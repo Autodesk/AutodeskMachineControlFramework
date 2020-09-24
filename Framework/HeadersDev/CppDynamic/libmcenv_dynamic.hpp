@@ -499,17 +499,7 @@ public:
 	inline void LogInfo(const std::string & sLogString);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
 	inline bool CheckForTermination();
-	inline void StoreString(const std::string & sName, const std::string & sValue);
-	inline void StoreUUID(const std::string & sName, const std::string & sValue);
-	inline void StoreInteger(const std::string & sName, const LibMCEnv_int64 nValue);
-	inline void StoreDouble(const std::string & sName, const LibMCEnv_double dValue);
-	inline void StoreBool(const std::string & sName, const bool bValue);
 	inline void StoreSignal(const std::string & sName, classParam<CSignalHandler> pHandler);
-	inline std::string RetrieveString(const std::string & sName);
-	inline std::string RetrieveUUID(const std::string & sName);
-	inline LibMCEnv_int64 RetrieveInteger(const std::string & sName);
-	inline LibMCEnv_double RetrieveDouble(const std::string & sName);
-	inline bool RetrieveBool(const std::string & sName);
 	inline PSignalHandler RetrieveSignal(const std::string & sName);
 	inline void ClearStoredValue(const std::string & sName);
 	inline void SetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue);
@@ -670,17 +660,7 @@ public:
 		pWrapperTable->m_StateEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_StateEnvironment_Sleep = nullptr;
 		pWrapperTable->m_StateEnvironment_CheckForTermination = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreString = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreUUID = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreInteger = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreDouble = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreBool = nullptr;
 		pWrapperTable->m_StateEnvironment_StoreSignal = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveString = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveUUID = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveInteger = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveDouble = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveBool = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_ClearStoredValue = nullptr;
 		pWrapperTable->m_StateEnvironment_SetStringParameter = nullptr;
@@ -1332,102 +1312,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreString = (PLibMCEnvStateEnvironment_StoreStringPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storestring");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreString = (PLibMCEnvStateEnvironment_StoreStringPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storestring");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreString == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreUUID = (PLibMCEnvStateEnvironment_StoreUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storeuuid");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreUUID = (PLibMCEnvStateEnvironment_StoreUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storeuuid");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreUUID == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreInteger = (PLibMCEnvStateEnvironment_StoreIntegerPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storeinteger");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreInteger = (PLibMCEnvStateEnvironment_StoreIntegerPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storeinteger");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreInteger == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreDouble = (PLibMCEnvStateEnvironment_StoreDoublePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storedouble");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreDouble = (PLibMCEnvStateEnvironment_StoreDoublePtr) dlsym(hLibrary, "libmcenv_stateenvironment_storedouble");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreDouble == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreBool = (PLibMCEnvStateEnvironment_StoreBoolPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storebool");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreBool = (PLibMCEnvStateEnvironment_StoreBoolPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storebool");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreBool == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storesignal");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storesignal");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveString = (PLibMCEnvStateEnvironment_RetrieveStringPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievestring");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveString = (PLibMCEnvStateEnvironment_RetrieveStringPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievestring");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveString == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveUUID = (PLibMCEnvStateEnvironment_RetrieveUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrieveuuid");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveUUID = (PLibMCEnvStateEnvironment_RetrieveUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrieveuuid");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveUUID == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveInteger = (PLibMCEnvStateEnvironment_RetrieveIntegerPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrieveinteger");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveInteger = (PLibMCEnvStateEnvironment_RetrieveIntegerPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrieveinteger");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveInteger == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveDouble = (PLibMCEnvStateEnvironment_RetrieveDoublePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievedouble");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveDouble = (PLibMCEnvStateEnvironment_RetrieveDoublePtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievedouble");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveDouble == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveBool = (PLibMCEnvStateEnvironment_RetrieveBoolPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievebool");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveBool = (PLibMCEnvStateEnvironment_RetrieveBoolPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievebool");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveBool == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1859,48 +1749,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckForTermination == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storestring", (void**)&(pWrapperTable->m_StateEnvironment_StoreString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreString == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storeuuid", (void**)&(pWrapperTable->m_StateEnvironment_StoreUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreUUID == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storeinteger", (void**)&(pWrapperTable->m_StateEnvironment_StoreInteger));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreInteger == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storedouble", (void**)&(pWrapperTable->m_StateEnvironment_StoreDouble));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreDouble == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storebool", (void**)&(pWrapperTable->m_StateEnvironment_StoreBool));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreBool == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_storesignal", (void**)&(pWrapperTable->m_StateEnvironment_StoreSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievestring", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveString == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrieveuuid", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveUUID == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrieveinteger", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveInteger));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveInteger == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievedouble", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveDouble));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveDouble == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievebool", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveBool));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveBool == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievesignal", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveSignal));
@@ -2833,56 +2683,6 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::StoreString - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	void CStateEnvironment::StoreString(const std::string & sName, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreString(m_pHandle, sName.c_str(), sValue.c_str()));
-	}
-	
-	/**
-	* CStateEnvironment::StoreUUID - stores a uuid in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	void CStateEnvironment::StoreUUID(const std::string & sName, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreUUID(m_pHandle, sName.c_str(), sValue.c_str()));
-	}
-	
-	/**
-	* CStateEnvironment::StoreInteger - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] nValue - Value
-	*/
-	void CStateEnvironment::StoreInteger(const std::string & sName, const LibMCEnv_int64 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreInteger(m_pHandle, sName.c_str(), nValue));
-	}
-	
-	/**
-	* CStateEnvironment::StoreDouble - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] dValue - Value
-	*/
-	void CStateEnvironment::StoreDouble(const std::string & sName, const LibMCEnv_double dValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreDouble(m_pHandle, sName.c_str(), dValue));
-	}
-	
-	/**
-	* CStateEnvironment::StoreBool - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] bValue - Value
-	*/
-	void CStateEnvironment::StoreBool(const std::string & sName, const bool bValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreBool(m_pHandle, sName.c_str(), bValue));
-	}
-	
-	/**
 	* CStateEnvironment::StoreSignal - stores a signal handler in the current state machine
 	* @param[in] sName - Name
 	* @param[in] pHandler - Signal handler to store.
@@ -2891,77 +2691,6 @@ public:
 	{
 		LibMCEnvHandle hHandler = pHandler.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreSignal(m_pHandle, sName.c_str(), hHandler));
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveString - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	std::string CStateEnvironment::RetrieveString(const std::string & sName)
-	{
-		LibMCEnv_uint32 bytesNeededValue = 0;
-		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveString(m_pHandle, sName.c_str(), 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveString(m_pHandle, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveUUID - retrieves a uuid from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	std::string CStateEnvironment::RetrieveUUID(const std::string & sName)
-	{
-		LibMCEnv_uint32 bytesNeededValue = 0;
-		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveUUID(m_pHandle, sName.c_str(), 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveUUID(m_pHandle, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveInteger - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	LibMCEnv_int64 CStateEnvironment::RetrieveInteger(const std::string & sName)
-	{
-		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveInteger(m_pHandle, sName.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveDouble - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	LibMCEnv_double CStateEnvironment::RetrieveDouble(const std::string & sName)
-	{
-		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveDouble(m_pHandle, sName.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveBool - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	bool CStateEnvironment::RetrieveBool(const std::string & sName)
-	{
-		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveBool(m_pHandle, sName.c_str(), &resultValue));
-		
-		return resultValue;
 	}
 	
 	/**

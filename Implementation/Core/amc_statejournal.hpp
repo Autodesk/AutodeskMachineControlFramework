@@ -61,25 +61,6 @@ namespace AMC {
 	class CStateJournalImpl;
 	typedef std::shared_ptr<CStateJournalImpl> PStateJournalImpl;
 
-
-	class CStateJournalVariable
-	{
-		private:
-			uint32_t m_nVariableID;
-			PStateJournalImpl m_pStateJournalImpl;
-
-		public:
-
-			CStateJournalVariable();
-			CStateJournalVariable(PStateJournalImpl pImpl, uint32_t nVariableID);
-
-			void updateValue(const bool bValue);
-			void updateValue(const int64_t nValue);
-			void updateValue(const std::string& sValue);
-			void updateValue(const double dValue);
-	};
-
-
 	
 	class CStateJournal {		
 	protected:
@@ -93,10 +74,17 @@ namespace AMC {
 		void startRecording ();
 		void finishRecording ();
 
-		CStateJournalVariable registerBooleanValue (const std::string & sName, const bool bInitialValue);
-		CStateJournalVariable registerIntegerValue (const std::string& sName, const int64_t bInitialValue);
-		CStateJournalVariable registerStringValue (const std::string& sName, const std::string & bInitialValue);
-		CStateJournalVariable registerDoubleValue (const std::string& sName, const double dInitialValue, double dUnits);
+		uint32_t registerBooleanValue (const std::string & sName, const bool bInitialValue);
+		uint32_t registerIntegerValue (const std::string& sName, const int64_t bInitialValue);
+		uint32_t registerStringValue (const std::string& sName, const std::string & bInitialValue);
+		uint32_t registerDoubleValue (const std::string& sName, const double dInitialValue, double dUnits);
+
+		void updateBoolValue(const uint32_t nVariableID, const bool bValue);
+		void updateIntegerValue(const uint32_t nVariableID, const int64_t nValue);
+		void updateStringValue(const uint32_t nVariableID, const std::string& sValue);
+		void updateDoubleValue(const uint32_t nVariableID, const double dValue);
+
+		uint32_t registerState (const std::string& sName);
 
 	};
 

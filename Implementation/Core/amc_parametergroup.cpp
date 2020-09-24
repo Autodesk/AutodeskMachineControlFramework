@@ -361,44 +361,44 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		CStateJournalVariable Variable;
+		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			Variable = m_pStateJournal->registerStringValue(m_sName + "." + sName, sDefaultValue);
+			nVariableID = m_pStateJournal->registerStringValue(m_sInstanceName + "." + m_sName + "." + sName, sDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, Variable));
+		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, m_pStateJournal, nVariableID));
 	}
 
 	void CParameterGroup::addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		CStateJournalVariable Variable;
+		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			Variable = m_pStateJournal->registerDoubleValue(m_sName + "." + sName, dDefaultValue, dUnits);
+			nVariableID = m_pStateJournal->registerDoubleValue(m_sInstanceName + "." + m_sName + "." + sName, dDefaultValue, dUnits);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, Variable));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, m_pStateJournal, nVariableID));
 	}
 
 	void CParameterGroup::addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		CStateJournalVariable Variable;
+		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			Variable = m_pStateJournal->registerIntegerValue(m_sName + "." + sName, nDefaultValue);
+			nVariableID = m_pStateJournal->registerIntegerValue(m_sInstanceName + "." + m_sName + "." + sName, nDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, Variable));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, m_pStateJournal, nVariableID));
 	}
 
 	void CParameterGroup::addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
-		CStateJournalVariable Variable;
+		uint32_t nVariableID = 0;
 		if (m_pStateJournal != nullptr)
-			Variable = m_pStateJournal->registerBooleanValue(m_sName + "." + sName, bDefaultValue);
+			nVariableID = m_pStateJournal->registerBooleanValue(m_sInstanceName + "." + m_sName + "." + sName, bDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, Variable));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, m_pStateJournal, nVariableID));
 	}
 
 
@@ -469,9 +469,10 @@ namespace AMC {
 
 	}
 
-	void CParameterGroup::setJournal(CStateJournal* pStateJournal)
+	void CParameterGroup::setJournal(PStateJournal pStateJournal, const std::string& sInstanceName)
 	{
 		m_pStateJournal = pStateJournal;
+		m_sInstanceName = sInstanceName;
 	}
 
 
