@@ -43,7 +43,7 @@ CDriver::CDriver(const std::string& sName, const std::string& sType, const std::
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibrary);
-	m_pDriverWrapper->InjectComponent("LibMCDriverEnv", pDriverEnvironment->wrapper()->GetSymbolLookupMethod());
+	m_pDriverWrapper->InjectComponent("LibMCEnv", pDriverEnvironment->wrapper()->GetSymbolLookupMethod());
 	m_pDriverInstance = m_pDriverWrapper->CreateDriver (sName, sType, pDriverEnvironment.get());
 }
 
