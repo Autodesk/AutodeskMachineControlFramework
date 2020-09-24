@@ -51,7 +51,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_s7net_types.hpp"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -211,7 +211,7 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_getsymbollo
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance);
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance);
 
 #ifdef __cplusplus
 }

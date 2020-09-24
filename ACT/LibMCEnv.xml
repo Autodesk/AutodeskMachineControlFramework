@@ -55,6 +55,7 @@
 		<error name="TERMINATED" code="14" description="operation has been terminated." />
 		<error name="SIGNALHASTRIGGEREDTWICE" code="15" description="signal has been triggered twice." />
 		<error name="SIGNALHASNOTBEENTRIGGERED" code="16" description="signal has not been triggered." />
+		<error name="DRIVERISNOTINITIALISING" code="17" description="driver is not in initialisation mode." />
 	
 		
 	</errors>
@@ -205,6 +206,137 @@
 
 				
 	</class>
+	
+	
+	<class name="WorkingFileExecution" parent="Base" description="Working File Execution Object">
+
+		<method name="GetStatus" description = "Returns the execution status">
+		</method>
+
+		<method name="ReturnStdOut" description = "Returns the output of the executable as string buffer">
+			<param name="StringBuffer" type="string" pass="return" description="stdout buffer" />
+		</method>
+
+
+	</class>
+
+
+	<class name="WorkingFile" parent="Base" description="Working File Access Object">
+
+		<method name="GetAbsoluteFileName" description = "Retrieves absolute file name of the working file">
+			<param name="FileName" type="string" pass="return" description="global path of the file" />
+		</method>
+
+		<method name="GetSize" description = "Returns the size of temporary file.">
+			<param name="FileSize" type="uint64" pass="return" description="file size" />
+		</method>
+
+		<method name="CalculateSHA2" description = "Calculates the SHA256 checksum of the file.">
+			<param name="SHA2" type="string" pass="return" description="sha256 checksum" />
+		</method>
+
+		<method name="DeleteFile" description = "Deletes the temporary file.">
+		</method>
+
+		<method name="ExecuteFile" description = "Executes the temporary file, if it is an executable.">
+			<param name="Execution" type="class" class="WorkingFileExecution" pass="return" description="execution object" />
+		</method>
+
+	</class>
+
+
+
+	<class name="WorkingDirectory" parent="Base" description="Working Directory Access Object">
+
+		<method name="GetAbsoluteFilePath" description = "Retrieves absolute file path.">
+			<param name="FilePath" type="string" pass="return" description="global path of the directory, including path delimiter." />
+		</method>
+
+		<method name="StoreCustomData" description = "Stores a data buffer in a temporary file.">
+			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreDriverData" description = "Stores attached driver data in a temporary file.">
+			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+	</class>
+
+	<class name="DriverEnvironment" parent="Base" description="Environment of the driver">
+	  
+		<method name="CreateWorkingDirectory" description = "creates a temporary working directory.">
+			<param name="WorkingDirectory" type="class" class="WorkingDirectory" pass="return" description="creates a working directory" />
+		</method>
+
+		<method name="RetrieveDriverData" description = "retrieves attached driver data into a memory buffer.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
+		</method>
+		
+		
+		<method name="RegisterStringParameter" description="registers a string parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterUUIDParameter" description="registers a uuid parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterDoubleParameter" description="registers a double parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="double" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterIntegerParameter" description="registers an int parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="int64" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterBoolParameter" description="registers a bool parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="bool" pass="in" description="default value to set" />
+		</method>
+		
+		
+		<method name="SetStringParameter" description="sets a string parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetUUIDParameter" description="sets a uuid parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetDoubleParameter" description="sets a double parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetIntegerParameter" description="sets an int parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetBoolParameter" description="sets a bool parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="in" description="Value to set" />
+		</method>
+		
+
+	</class>
+	
 	
 
 	<class name="SignalTrigger" parent="Base" description="Class for signal triggering">
@@ -492,6 +624,8 @@
 
 
 	</class>
+
+
 
 
 		

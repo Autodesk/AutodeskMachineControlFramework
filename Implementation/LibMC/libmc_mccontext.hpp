@@ -79,8 +79,7 @@ private:
 	std::map <std::string, LibMCPlugin::PWrapper> m_Plugins;
 
 	LibMCPlugin::PWrapper loadPlugin (std::string sPluginName);
-	LibMCEnv::PWrapper m_pStateEnvironmentWrapper;
-	LibMCDriverEnv::PWrapper m_pDriverEnvironmentWrapper;
+	LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
 	// All Global Handler objects of the system
  	AMC::PSystemState m_pSystemState;

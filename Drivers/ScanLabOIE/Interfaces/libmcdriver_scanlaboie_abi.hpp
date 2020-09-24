@@ -51,7 +51,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_scanlaboie_types.hpp"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -195,7 +195,7 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance);
 
 #ifdef __cplusplus
 }

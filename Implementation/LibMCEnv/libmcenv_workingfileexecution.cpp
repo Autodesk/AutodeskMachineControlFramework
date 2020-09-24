@@ -27,74 +27,29 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CWorkingFile
+Abstract: This is a stub class definition of CWorkingFileExecution
 
 */
 
-
-#ifndef __LIBMCDRIVERENV_WORKINGFILE
-#define __LIBMCDRIVERENV_WORKINGFILE
-
-#include "libmcdriverenv_interfaces.hpp"
-
-// Parent classes
-#include "libmcdriverenv_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcenv_workingfileexecution.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
 
 
-namespace LibMCDriverEnv {
-namespace Impl {
-
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CWorkingFile 
+ Class definition of CWorkingFileExecution 
 **************************************************************************************************************************/
 
-class CWorkingFile : public virtual IWorkingFile, public virtual CBase {
-private:
+void CWorkingFileExecution::GetStatus()
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
 
-	/**
-	* Put private members here.
-	*/
+std::string CWorkingFileExecution::ReturnStdOut()
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
 
-protected:
-
-	/**
-	* Put protected members here.
-	*/
-
-public:
-
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
-
-	std::string GetAbsoluteFileName() override;
-
-	LibMCDriverEnv_uint64 GetSize() override;
-
-	std::string CalculateSHA2() override;
-
-	void DeleteFile() override;
-
-	IWorkingFileExecution * ExecuteFile() override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCDriverEnv
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVERENV_WORKINGFILE

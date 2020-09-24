@@ -32,14 +32,14 @@ Abstract: This is the class declaration of CDriverEnvironment
 */
 
 
-#ifndef __LIBMCDRIVERENV_DRIVERENVIRONMENT
-#define __LIBMCDRIVERENV_DRIVERENVIRONMENT
+#ifndef __LIBMCENV_DRIVERENVIRONMENT
+#define __LIBMCENV_DRIVERENVIRONMENT
 
-#include "libmcdriverenv_interfaces.hpp"
+#include "libmcenv_interfaces.hpp"
 #include "amc_parametergroup.hpp"
 
 // Parent classes
-#include "libmcdriverenv_base.hpp"
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -48,7 +48,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 // Include custom headers here.
 
 
-namespace LibMCDriverEnv {
+namespace LibMCEnv {
 namespace Impl {
 
 
@@ -59,6 +59,7 @@ namespace Impl {
 class CDriverEnvironment : public virtual IDriverEnvironment, public virtual CBase {
 private:
 
+
 protected:
 
 	bool m_bIsInitializing;
@@ -66,19 +67,20 @@ protected:
 	AMC::PParameterGroup m_pParameterGroup;
 
 public:
+
 	CDriverEnvironment(AMC::PParameterGroup pParameterGroup);
 
-	IWorkingDirectory * CreateWorkingDirectory() override;
+	IWorkingDirectory* CreateWorkingDirectory() override;
 
-	void RetrieveDriverData(const std::string & sIdentifier, LibMCDriverEnv_uint64 nDataBufferBufferSize, LibMCDriverEnv_uint64* pDataBufferNeededCount, LibMCDriverEnv_uint8 * pDataBufferBuffer) override;
+	void RetrieveDriverData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer) override;
 
 	void RegisterStringParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue) override;
 
 	void RegisterUUIDParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue) override;
 
-	void RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCDriverEnv_double dDefaultValue) override;
+	void RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue) override;
 
-	void RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCDriverEnv_int64 nDefaultValue) override;
+	void RegisterIntegerParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_int64 nDefaultValue) override;
 
 	void RegisterBoolParameter(const std::string& sParameterName, const std::string& sDescription, const bool bDefaultValue) override;
 
@@ -86,9 +88,9 @@ public:
 
 	void SetUUIDParameter(const std::string& sParameterName, const std::string& sValue) override;
 
-	void SetDoubleParameter(const std::string& sParameterName, const LibMCDriverEnv_double dValue) override;
+	void SetDoubleParameter(const std::string& sParameterName, const LibMCEnv_double dValue) override;
 
-	void SetIntegerParameter(const std::string& sParameterName, const LibMCDriverEnv_int64 nValue) override;
+	void SetIntegerParameter(const std::string& sParameterName, const LibMCEnv_int64 nValue) override;
 
 	void SetBoolParameter(const std::string& sParameterName, const bool bValue) override;
 
@@ -97,9 +99,9 @@ public:
 };
 
 } // namespace Impl
-} // namespace LibMCDriverEnv
+} // namespace LibMCEnv
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVERENV_DRIVERENVIRONMENT
+#endif // __LIBMCENV_DRIVERENVIRONMENT

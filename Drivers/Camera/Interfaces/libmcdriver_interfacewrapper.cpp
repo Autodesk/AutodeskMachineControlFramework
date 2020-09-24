@@ -78,7 +78,7 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_injectcomponent(const char * 
 	return libmcdriver_camera_injectcomponent(pNameSpace, pSymbolAddressMethod);
 }
 
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
 {
 	return libmcdriver_camera_createdriver(pName, pType, pDriverEnvironment, pInstance);
 }

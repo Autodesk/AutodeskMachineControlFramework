@@ -547,11 +547,11 @@ LibMCDriver_S7NetResult libmcdriver_s7net_injectcomponent(const char * pNameSpac
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -592,7 +592,7 @@ LibMCDriver_S7NetResult libmcdriver_s7net_getsymbollookupmethod(LibMCDriver_S7Ne
 	}
 }
 
-LibMCDriver_S7NetResult libmcdriver_s7net_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance)
+LibMCDriver_S7NetResult libmcdriver_s7net_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -605,8 +605,8 @@ LibMCDriver_S7NetResult libmcdriver_s7net_createdriver(const char * pName, const
 			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
 		

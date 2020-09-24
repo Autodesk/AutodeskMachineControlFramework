@@ -495,11 +495,11 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_injectcomponent(const char *
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -540,7 +540,7 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_getsymbollookupmethod(LibMCD
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -553,8 +553,8 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pN
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		

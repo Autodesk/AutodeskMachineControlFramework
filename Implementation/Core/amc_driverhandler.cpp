@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_driverhandler.hpp"
 
-#include "libmcdriverenv_driverenvironment.hpp"
+#include "libmcenv_driverenvironment.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include <vector>
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CDriverHandler::CDriverHandler(LibMCDriverEnv::PWrapper pEnvironmentWrapper)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper)
 	: m_pEnvironmentWrapper (pEnvironmentWrapper)
 {
 	if (pEnvironmentWrapper.get() == nullptr)
@@ -58,12 +58,12 @@ CDriverHandler::~CDriverHandler()
 
 }
 
-template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCDriverEnv::Impl::IBase> pImplInstance, LibMCDriverEnv::PWrapper pWrapper)
+template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
 {
 	if (pWrapper.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCDriverEnv::Impl::IBase*) (pImplInstance.get()));
+	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
 	pImplInstance->IncRefCount();
 	return pExternalInstance;
 }
@@ -78,8 +78,8 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
 
-	auto pInternalEnvironment = std::make_shared<LibMCDriverEnv::Impl::CDriverEnvironment>(pParameterGroup);
-	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCDriverEnv::CDriverEnvironment>(pInternalEnvironment, m_pEnvironmentWrapper);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup);
+	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCEnv::CDriverEnvironment>(pInternalEnvironment, m_pEnvironmentWrapper);
 
 	pInternalEnvironment->setIsInitializing(true);
 

@@ -60,11 +60,11 @@ private:
 
 
 protected:
-    LibMCDriverEnv::PDriverEnvironment m_pDriverEnvironment;
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 public:
 
-    CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+    CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
     IRaspiCameraDeviceIterator* QueryDevices() override;
 

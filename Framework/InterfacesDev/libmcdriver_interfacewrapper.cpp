@@ -491,11 +491,11 @@ LibMCDriverResult libmcdriver_injectcomponent(const char * pNameSpace, LibMCDriv
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriverInterfaceException(LIBMCDRIVER_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -536,7 +536,7 @@ LibMCDriverResult libmcdriver_getsymbollookupmethod(LibMCDriver_pvoid * pSymbolL
 	}
 }
 
-LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
+LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -549,8 +549,8 @@ LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pTyp
 			throw ELibMCDriverInterfaceException (LIBMCDRIVER_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriverInterfaceException (LIBMCDRIVER_ERROR_INVALIDCAST);
 		

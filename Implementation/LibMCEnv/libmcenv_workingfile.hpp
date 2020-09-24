@@ -27,44 +27,74 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CWorkingFile
+Abstract: This is the class declaration of CWorkingFile
 
 */
 
-#include "libmcdriverenv_workingfile.hpp"
-#include "libmcdriverenv_interfaceexception.hpp"
+
+#ifndef __LIBMCENV_WORKINGFILE
+#define __LIBMCENV_WORKINGFILE
+
+#include "libmcenv_interfaces.hpp"
+
+// Parent classes
+#include "libmcenv_base.hpp"
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4250)
+#endif
 
 // Include custom headers here.
 
 
-using namespace LibMCDriverEnv::Impl;
+namespace LibMCEnv {
+namespace Impl {
+
 
 /*************************************************************************************************************************
- Class definition of CWorkingFile 
+ Class declaration of CWorkingFile 
 **************************************************************************************************************************/
 
-std::string CWorkingFile::GetAbsoluteFileName()
-{
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
-}
+class CWorkingFile : public virtual IWorkingFile, public virtual CBase {
+private:
 
-LibMCDriverEnv_uint64 CWorkingFile::GetSize()
-{
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
-}
+	/**
+	* Put private members here.
+	*/
 
-std::string CWorkingFile::CalculateSHA2()
-{
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
-}
+protected:
 
-void CWorkingFile::DeleteFile()
-{
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
-}
+	/**
+	* Put protected members here.
+	*/
 
-IWorkingFileExecution * CWorkingFile::ExecuteFile()
-{
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
-}
+public:
 
+	/**
+	* Put additional public members here. They will not be visible in the external API.
+	*/
+
+
+	/**
+	* Public member functions to implement.
+	*/
+
+	std::string GetAbsoluteFileName() override;
+
+	LibMCEnv_uint64 GetSize() override;
+
+	std::string CalculateSHA2() override;
+
+	void DeleteFile() override;
+
+	IWorkingFileExecution * ExecuteFile() override;
+
+};
+
+} // namespace Impl
+} // namespace LibMCEnv
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#endif // __LIBMCENV_WORKINGFILE

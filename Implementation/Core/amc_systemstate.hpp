@@ -48,16 +48,16 @@ namespace LibMCData {
 	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 }
 
-namespace LibMCDriverEnv {
-	class CWrapper;
-	typedef std::shared_ptr<CWrapper> PWrapper;
-}
 
 namespace AMCCommon {
 	class CChrono;
 	typedef std::shared_ptr<CChrono> PChrono;
 }
 
+namespace LibMCEnv {
+	class CWrapper;
+	typedef std::shared_ptr<CWrapper> PWrapper;
+}
 
 namespace AMC {
 
@@ -103,7 +103,7 @@ namespace AMC {
 
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper);
 
 		virtual ~CSystemState();
 

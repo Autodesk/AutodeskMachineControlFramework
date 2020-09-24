@@ -45,7 +45,7 @@ using namespace LibMCDriver_Camera::Impl;
  Class definition of CDriver_RaspiCamera 
 **************************************************************************************************************************/
 
-CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
     : CDriver_Camera (sName, sType), m_pDriverEnvironment (pDriverEnvironment)
 {
     if (pDriverEnvironment.get() == nullptr)

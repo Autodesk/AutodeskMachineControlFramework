@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary, PParameterGroup pParameterGroup, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary, PParameterGroup pParameterGroup, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: m_sName (sName), m_sType (sType), m_sLibrary (sLibrary), m_pParameterGroup (pParameterGroup)
 {
 	if (pParameterGroup.get() == nullptr)

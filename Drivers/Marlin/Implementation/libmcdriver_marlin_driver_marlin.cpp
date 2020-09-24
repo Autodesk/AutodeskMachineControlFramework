@@ -40,7 +40,7 @@ using namespace LibMCDriver_Marlin::Impl;
  Class definition of CDriver_Marlin 
 **************************************************************************************************************************/
 
-CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: CDriver (sName, sType), m_doQueryFirmwareInfo (doQueryFirmwareInfo), m_bDisableHoming (bDisableHoming), m_bDebug (bDebug), m_pDriverEnvironment (pDriverEnvironment)
 {
 	if (pDriverEnvironment.get() == nullptr)
