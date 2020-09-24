@@ -258,7 +258,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPDESCRIPTION);
 
         auto pGroup = pParameterHandler->addGroup(groupNameAttrib.as_string(), groupDescriptionAttrib.as_string());
-        pGroup->setJournal(m_pStateJournal.get());
+        pGroup->setJournal(m_pStateJournal, sName);
         loadParameterGroup(parameterGroupNode, pGroup);
     }
 
@@ -273,7 +273,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPDESCRIPTION);
 
         auto pGroup = pParameterHandler->addGroup(groupNameAttrib.as_string(), groupDescriptionAttrib.as_string());
-        pGroup->setJournal(m_pStateJournal.get());
+        pGroup->setJournal(m_pStateJournal, sName);
         loadDriverParameterGroup(driverParameterGroupNode, pGroup);
     }
 

@@ -749,56 +749,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_sleep(LibMCEnv_StateE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkfortermination(LibMCEnv_StateEnvironment pStateEnvironment, bool * pShallTerminate);
 
 /**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a uuid in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storeuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storeinteger(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 nValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] dValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storedouble(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double dValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] bValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storebool(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool bValue);
-
-/**
 * stores a signal handler in the current state machine
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -807,60 +757,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storebool(LibMCEnv_St
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler pHandler);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a uuid from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrieveuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrieveinteger(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievedouble(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievebool(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool * pValue);
 
 /**
 * retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.

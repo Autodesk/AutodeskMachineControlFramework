@@ -414,60 +414,9 @@
 		</method>
 
 
-
-		<method name="StoreString" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreUUID" description="stores a uuid in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreInteger" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="int64" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreDouble" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="double" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreBool" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="bool" pass="in" description="Value" />
-		</method>
-
 		<method name="StoreSignal" description="stores a signal handler in the current state machine">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Handler" type="class" class="SignalHandler" pass="in" description="Signal handler to store." />
-		</method>
-
-		<method name="RetrieveString" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveUUID" description="retrieves a uuid from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveInteger" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="int64" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveDouble" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="double" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveBool" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="bool" pass="return" description="Value" />
 		</method>
 
 		<method name="RetrieveSignal" description="retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.">

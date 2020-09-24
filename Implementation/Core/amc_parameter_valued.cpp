@@ -37,40 +37,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, CStateJournalVariable Variable)
-		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_Variable (Variable)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
 
-		setStringValue(sDefaultValue);
+		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, CStateJournalVariable Variable)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_Variable(Variable)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
 
-		setDoubleValue(dDefaultValue);
+		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, CStateJournalVariable Variable)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_Variable(Variable)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
 
-		setIntValue(nDefaultValue);
+		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, CStateJournalVariable Variable)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_Variable(Variable)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
 
-		setBoolValue(bDefaultValue);
+		m_sValue = m_sDefaultValue;
 	}
 
 
@@ -101,7 +101,8 @@ namespace AMC {
 
 	void CParameter_Valued::setStringValue(const std::string& sValue)
 	{
-		m_Variable.updateValue(sValue);
+		if (m_pJournal.get () != nullptr)
+			m_pJournal->updateStringValue(m_nJournalVariableID, sValue);
 		m_sValue = sValue;
 	}
 
@@ -112,7 +113,8 @@ namespace AMC {
 
 	void CParameter_Valued::setDoubleValue(const double dValue)
 	{
-		m_Variable.updateValue(dValue);
+		if (m_pJournal.get() != nullptr)
+			m_pJournal->updateDoubleValue(m_nJournalVariableID, dValue);
 		m_sValue = std::to_string(dValue);
 	}
 
@@ -123,7 +125,8 @@ namespace AMC {
 
 	void CParameter_Valued::setIntValue(const int64_t nValue)
 	{
-		m_Variable.updateValue(nValue);
+		if (m_pJournal.get() != nullptr)
+			m_pJournal->updateIntegerValue(m_nJournalVariableID, nValue);
 		m_sValue = std::to_string(nValue);
 	}
 
@@ -134,16 +137,17 @@ namespace AMC {
 
 	void CParameter_Valued::setBoolValue(const bool bValue)
 	{
-		m_Variable.updateValue(bValue);
+		if (m_pJournal.get() != nullptr)
+			m_pJournal->updateBoolValue(m_nJournalVariableID, bValue);
 		if (bValue)
-			setIntValue(1);
+			m_sValue = "1";
 		else
-			setIntValue(0);
+			m_sValue = "0";
 	}
 
 	PParameter CParameter_Valued::duplicate()
 	{
-		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue, m_Variable);
+		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue, m_pJournal, m_nJournalVariableID);
 		pParameter->m_sValue = m_sValue;
 		return pParameter;
 	}

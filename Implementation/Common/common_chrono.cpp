@@ -85,7 +85,7 @@ namespace AMCCommon {
 			std::time_t t = std::time(nullptr);
 			utc_time = *std::localtime(&t);
 
-			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &startTime);
+			clock_gettime(CLOCK_MONOTONIC, &startTime);
 #endif
 
 		}
@@ -122,7 +122,7 @@ namespace AMCCommon {
 
 #else
 			timespec currentTime;
-			clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &currentTime);
+			clock_gettime(CLOCK_MONOTONIC, &currentTime);
 
 			timespec temp;
 			if ((currentTime.tv_nsec - startTime.tv_nsec) < 0) {

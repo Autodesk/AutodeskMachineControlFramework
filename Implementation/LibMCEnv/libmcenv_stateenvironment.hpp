@@ -97,27 +97,7 @@ public:
 
 	bool CheckForTermination() override;
 
-	void StoreString(const std::string& sName, const std::string& sValue) override;
-
-	void StoreUUID(const std::string& sName, const std::string& sValue) override;
-
-	void StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue) override;
-
-	void StoreDouble(const std::string& sName, const LibMCEnv_double dValue) override;
-
-	void StoreBool(const std::string& sName, const bool bValue) override;
-
 	void StoreSignal(const std::string& sName, ISignalHandler* pHandler) override;
-
-	std::string RetrieveString(const std::string& sName) override;
-
-	std::string RetrieveUUID(const std::string& sName) override;
-
-	LibMCEnv_int64 RetrieveInteger(const std::string& sName) override;
-
-	LibMCEnv_double RetrieveDouble(const std::string& sName) override;
-
-	bool RetrieveBool(const std::string& sName) override;
 
 	ISignalHandler* RetrieveSignal(const std::string& sName) override;
 

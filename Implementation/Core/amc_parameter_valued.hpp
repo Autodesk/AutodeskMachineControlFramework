@@ -50,13 +50,15 @@ namespace AMC {
 		std::string m_sDescription;
 		std::string m_sDefaultValue;
 		std::string m_sValue;
-		CStateJournalVariable m_Variable;
+		
+		PStateJournal m_pJournal;
+		uint32_t m_nJournalVariableID;
 	public:
 
-		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, CStateJournalVariable Variable);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, CStateJournalVariable Variable);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, CStateJournalVariable Variable);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, CStateJournalVariable Variable);
+		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
 
 		virtual ~CParameter_Valued();
 

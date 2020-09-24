@@ -169,70 +169,6 @@ bool CStateEnvironment::CheckForTermination()
 }
 
 
-void CStateEnvironment::StoreString(const std::string& sName, const std::string& sValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewStringParameter(sName, "", sValue);
-	}
-	else {
-		pGroup->setParameterValueByName(sName, sValue);
-	}
-
-}
-
-void CStateEnvironment::StoreUUID(const std::string& sName, const std::string& sValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewStringParameter(sName, "", AMCCommon::CUtils::normalizeUUIDString (sValue));
-	}
-	else {
-		pGroup->setParameterValueByName(sName, AMCCommon::CUtils::normalizeUUIDString (sValue));
-	}
-
-}
-
-
-void CStateEnvironment::StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewIntParameter(sName, "", nValue);
-	}
-	else {
-		pGroup->setIntParameterValueByName(sName, nValue);
-	}
-
-}
-
-void CStateEnvironment::StoreDouble(const std::string& sName, const LibMCEnv_double dValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewDoubleParameter(sName, "", dValue, 1.0);
-	}
-	else {
-		pGroup->setDoubleParameterValueByName(sName, dValue);
-	}
-}
-
-
-void CStateEnvironment::StoreBool(const std::string& sName, const bool bValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewBoolParameter(sName, "", bValue);
-	}
-	else {
-		pGroup->setBoolParameterValueByName(sName, bValue);
-	}
-}
 
 void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pHandler)
 {
@@ -248,43 +184,6 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 		pGroup->setParameterValueByName(sName, pHandler->GetSignalID());
 	}
 
-}
-
-std::string CStateEnvironment::RetrieveString(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getParameterValueByName(sName);
-}
-
-
-std::string CStateEnvironment::RetrieveUUID(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sName));
-}
-
-
-LibMCEnv_int64 CStateEnvironment::RetrieveInteger(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getIntParameterValueByName(sName);
-}
-
-LibMCEnv_double CStateEnvironment::RetrieveDouble(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getDoubleParameterValueByName(sName);
-}
-
-bool CStateEnvironment::RetrieveBool(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getBoolParameterValueByName(sName);
 }
 
 ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
