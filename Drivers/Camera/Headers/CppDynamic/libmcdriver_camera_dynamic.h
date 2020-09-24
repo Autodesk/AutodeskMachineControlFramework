@@ -41,7 +41,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_camera_types.hpp"
 
-#include "libmcdriverenv_types.hpp"
+#include "libmcenv_types.hpp"
 
 
 /*************************************************************************************************************************
@@ -346,7 +346,7 @@ typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraGetSymbolLookupMethodPtr) 
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraCreateDriverPtr) (const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance);
+typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraCreateDriverPtr) (const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance);
 
 /*************************************************************************************************************************
  Function Table Structure

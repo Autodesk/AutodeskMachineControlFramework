@@ -27,18 +27,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CWorkingDirectory
+Abstract: This is the class declaration of CWorkingFileExecution
 
 */
 
 
-#ifndef __LIBMCDRIVERENV_WORKINGDIRECTORY
-#define __LIBMCDRIVERENV_WORKINGDIRECTORY
+#ifndef __LIBMCENV_WORKINGFILEEXECUTION
+#define __LIBMCENV_WORKINGFILEEXECUTION
 
-#include "libmcdriverenv_interfaces.hpp"
+#include "libmcenv_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriverenv_base.hpp"
+#include "libmcenv_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -47,15 +47,15 @@ Abstract: This is the class declaration of CWorkingDirectory
 // Include custom headers here.
 
 
-namespace LibMCDriverEnv {
+namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CWorkingDirectory 
+ Class declaration of CWorkingFileExecution 
 **************************************************************************************************************************/
 
-class CWorkingDirectory : public virtual IWorkingDirectory, public virtual CBase {
+class CWorkingFileExecution : public virtual IWorkingFileExecution, public virtual CBase {
 private:
 
 	/**
@@ -79,18 +79,16 @@ public:
 	* Public member functions to implement.
 	*/
 
-	std::string GetAbsoluteFilePath() override;
+	void GetStatus() override;
 
-	IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCDriverEnv_uint64 nDataBufferBufferSize, const LibMCDriverEnv_uint8 * pDataBufferBuffer) override;
-
-	IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) override;
+	std::string ReturnStdOut() override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCDriverEnv
+} // namespace LibMCEnv
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVERENV_WORKINGDIRECTORY
+#endif // __LIBMCENV_WORKINGFILEEXECUTION

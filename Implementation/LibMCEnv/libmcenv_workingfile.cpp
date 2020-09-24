@@ -27,34 +27,44 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CWorkingDirectory
+Abstract: This is a stub class definition of CWorkingFile
 
 */
 
-#include "libmcdriverenv_workingdirectory.hpp"
-#include "libmcdriverenv_interfaceexception.hpp"
+#include "libmcenv_workingfile.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
 
 
-using namespace LibMCDriverEnv::Impl;
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class definition of CWorkingDirectory 
+ Class definition of CWorkingFile 
 **************************************************************************************************************************/
 
-std::string CWorkingDirectory::GetAbsoluteFilePath()
+std::string CWorkingFile::GetAbsoluteFileName()
 {
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-IWorkingFile * CWorkingDirectory::StoreCustomData(const std::string & sFileName, const LibMCDriverEnv_uint64 nDataBufferBufferSize, const LibMCDriverEnv_uint8 * pDataBufferBuffer)
+LibMCEnv_uint64 CWorkingFile::GetSize()
 {
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-IWorkingFile * CWorkingDirectory::StoreDriverData(const std::string & sFileName, const std::string & sIdentifier)
+std::string CWorkingFile::CalculateSHA2()
 {
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+void CWorkingFile::DeleteFile()
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IWorkingFileExecution * CWorkingFile::ExecuteFile()
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 

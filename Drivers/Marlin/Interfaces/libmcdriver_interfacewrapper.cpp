@@ -54,7 +54,7 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getheaderinformation(L
 
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver)
 {
-	return libmcdriver_driver_queryparameters(pDriver);
+	return libmcdriver_marlin_driver_queryparameters(pDriver);
 }
 
 
@@ -84,7 +84,7 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_injectcomponent(const char * 
 	return libmcdriver_marlin_injectcomponent(pNameSpace, pSymbolAddressMethod);
 }
 
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
 {
 	return libmcdriver_marlin_createdriver(pName, pType, pDriverEnvironment, pInstance);
 }

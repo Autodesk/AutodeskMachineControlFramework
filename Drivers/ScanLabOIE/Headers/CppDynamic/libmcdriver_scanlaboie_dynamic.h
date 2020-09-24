@@ -41,7 +41,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_scanlaboie_types.hpp"
 
-#include "libmcdriverenv_types.hpp"
+#include "libmcenv_types.hpp"
 
 
 /*************************************************************************************************************************
@@ -182,7 +182,7 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEGetSymbolLookupMet
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIECreateDriverPtr) (const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIECreateDriverPtr) (const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance);
 
 /*************************************************************************************************************************
  Function Table Structure

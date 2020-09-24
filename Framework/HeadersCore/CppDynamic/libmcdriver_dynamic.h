@@ -41,7 +41,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_types.hpp"
 
-#include "libmcdriverenv_types.hpp"
+#include "libmcenv_types.hpp"
 
 
 /*************************************************************************************************************************
@@ -178,7 +178,7 @@ typedef LibMCDriverResult (*PLibMCDriverGetSymbolLookupMethodPtr) (LibMCDriver_p
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriverResult (*PLibMCDriverCreateDriverPtr) (const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance);
+typedef LibMCDriverResult (*PLibMCDriverCreateDriverPtr) (const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance);
 
 /*************************************************************************************************************************
  Function Table Structure

@@ -34,8 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_apirequesthandler.hpp"
 #include "pugixml.hpp"
 
-#include "libmcdriverenv_interfaces.hpp"
-
 #include "amc_statemachineinstance.hpp"
 #include "amc_logger.hpp"
 #include "amc_parameterhandler.hpp"
@@ -68,8 +66,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 
     m_pStateJournal = std::make_shared<CStateJournal> (std::make_shared<CStateJournalStream> ());
 
-    m_pStateEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
-    m_pDriverEnvironmentWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*)LibMCDriverEnv::Impl::LibMCDriverEnv_GetProcAddress);
+    m_pEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
 
     // Create Log Multiplexer to StdOut and Database
     auto pMultiLogger = std::make_shared<AMC::CLogger_Multi>();
@@ -77,7 +74,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel->CreateNewLogSession ()));
 
     // Create system state
-    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pDriverEnvironmentWrapper);
+    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper);
 
     // Create API Handlers for data model requests
     m_pAPI = std::make_shared<AMC::CAPI>();
@@ -227,7 +224,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
         throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATESTATENAME);
     
     m_pSystemState->logger()->logMessage("Creating state machine \"" + sName + "\"", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pStateEnvironmentWrapper, m_pSystemState, m_pStateJournal);
+    pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pEnvironmentWrapper, m_pSystemState, m_pStateJournal);
 
     auto signalNodes = xmlNode.children("signaldefinition");
     for (pugi::xml_node signalNode : signalNodes) {

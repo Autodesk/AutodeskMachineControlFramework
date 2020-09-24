@@ -51,7 +51,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_types.hpp"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -191,7 +191,7 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_getsymbollookupmethod(LibMCDr
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance);
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance);
 
 #ifdef __cplusplus
 }

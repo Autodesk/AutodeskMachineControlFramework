@@ -47,7 +47,7 @@ Interface version: 1.0.0
 #include "libmcdriver_s7net_types.hpp"
 
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 namespace LibMCDriver_S7Net {
 namespace Impl {
@@ -330,7 +330,7 @@ typedef IBaseSharedPtr<IDriver_S7Net> PIDriver_S7Net;
 class CWrapper {
 public:
 	// Injected Components
-	static LibMCDriverEnv::PWrapper sPLibMCDriverEnvWrapper;
+	static LibMCEnv::PWrapper sPLibMCEnvWrapper;
 
 	/**
 	* Ilibmcdriver_s7net::GetVersion - retrieves the binary version of this library.
@@ -367,7 +367,7 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 };
 

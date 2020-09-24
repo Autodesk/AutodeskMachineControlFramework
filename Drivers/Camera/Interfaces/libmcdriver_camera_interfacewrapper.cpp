@@ -990,11 +990,11 @@ LibMCDriver_CameraResult libmcdriver_camera_injectcomponent(const char * pNameSp
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -1035,7 +1035,7 @@ LibMCDriver_CameraResult libmcdriver_camera_getsymbollookupmethod(LibMCDriver_Ca
 	}
 }
 
-LibMCDriver_CameraResult libmcdriver_camera_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance)
+LibMCDriver_CameraResult libmcdriver_camera_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -1048,8 +1048,8 @@ LibMCDriver_CameraResult libmcdriver_camera_createdriver(const char * pName, con
 			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
 		

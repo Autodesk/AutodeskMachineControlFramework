@@ -84,7 +84,7 @@ namespace AMC {
 			writeData((const uint8_t*) sValue.c_str (), nLength);
 		}
 
-		void writeDouble(const uint64_t dValue)
+		void writeDouble(const double dValue)
 		{
 			writeData((const uint8_t*)&dValue, 8);
 		}
@@ -137,7 +137,7 @@ namespace AMC {
 		if (nDeltaTime >= STATEJOURNAL_MAXTIMESTAMPDELTA)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
 
-		m_pCurrentChunk->writeCommand(nDeltaTime | STATEJOURNAL_COMMANDFLAG_TIMESTAMP);
+		m_pCurrentChunk->writeCommand(((uint32_t) nDeltaTime) | STATEJOURNAL_COMMANDFLAG_TIMESTAMP);
 		m_pCurrentChunk->setStopTime(nAbsoluteTimeStamp);
 
 		m_nCurrentTimeStamp = nAbsoluteTimeStamp;

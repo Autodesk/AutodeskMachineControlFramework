@@ -42,7 +42,7 @@ Interface version: 1.0.0
 #include "libmcdriver_types.hpp"
 #include "libmcdriver_dynamic.h"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -237,12 +237,12 @@ public:
 	inline void AcquireInstance(classParam<CBase> pInstance);
 	inline void InjectComponent(const std::string & sNameSpace, const LibMCDriver_pvoid pSymbolAddressMethod);
 	inline LibMCDriver_pvoid GetSymbolLookupMethod();
-	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment);
+	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment);
 
 private:
 	sLibMCDriverDynamicWrapperTable m_WrapperTable;
 	// Injected Components
-	LibMCDriverEnv::PWrapper m_pLibMCDriverEnvWrapper;
+	LibMCEnv::PWrapper m_pLibMCEnvWrapper;
 
 	
 	LibMCDriverResult checkBinaryVersion()
@@ -403,11 +403,11 @@ public:
 		CheckError(nullptr,m_WrapperTable.m_InjectComponent(sNameSpace.c_str(), pSymbolAddressMethod));
 		
 		bool bNameSpaceFound = false;
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (m_pLibMCDriverEnvWrapper != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (m_pLibMCEnvWrapper != nullptr) {
 				throw ELibMCDriverException(LIBMCDRIVER_ERROR_COULDNOTLOADLIBRARY, "Library with namespace " + sNameSpace + " is already registered.");
 			}
-			m_pLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			m_pLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		if (!bNameSpaceFound)
@@ -433,9 +433,9 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment)
+	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment)
 	{
-		LibMCDriverEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
+		LibMCEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
 		LibMCDriverHandle hInstance = nullptr;
 		CheckError(nullptr,m_WrapperTable.m_CreateDriver(sName.c_str(), sType.c_str(), hDriverEnvironment, &hInstance));
 		

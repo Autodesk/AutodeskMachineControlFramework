@@ -41,7 +41,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_s7net_types.hpp"
 
-#include "libmcdriverenv_types.hpp"
+#include "libmcenv_types.hpp"
 
 
 /*************************************************************************************************************************
@@ -198,7 +198,7 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetGetSymbolLookupMethodPtr) (L
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetCreateDriverPtr) (const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance);
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetCreateDriverPtr) (const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance);
 
 /*************************************************************************************************************************
  Function Table Structure

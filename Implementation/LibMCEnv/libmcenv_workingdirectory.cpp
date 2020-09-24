@@ -27,29 +27,34 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CWorkingFileExecution
+Abstract: This is a stub class definition of CWorkingDirectory
 
 */
 
-#include "libmcdriverenv_workingfileexecution.hpp"
-#include "libmcdriverenv_interfaceexception.hpp"
+#include "libmcenv_workingdirectory.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
 
 
-using namespace LibMCDriverEnv::Impl;
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class definition of CWorkingFileExecution 
+ Class definition of CWorkingDirectory 
 **************************************************************************************************************************/
 
-void CWorkingFileExecution::GetStatus()
+std::string CWorkingDirectory::GetAbsoluteFilePath()
 {
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 
-std::string CWorkingFileExecution::ReturnStdOut()
+IWorkingFile * CWorkingDirectory::StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer)
 {
-	throw ELibMCDriverEnvInterfaceException(LIBMCDRIVERENV_ERROR_NOTIMPLEMENTED);
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+}
+
+IWorkingFile * CWorkingDirectory::StoreDriverData(const std::string & sFileName, const std::string & sIdentifier)
+{
+	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
 }
 

@@ -47,7 +47,7 @@ Interface version: 1.0.0
 #include "libmcdriver_marlin_types.hpp"
 
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 namespace LibMCDriver_Marlin {
 namespace Impl {
@@ -533,7 +533,7 @@ typedef IBaseSharedPtr<IDriver_Marlin> PIDriver_Marlin;
 class CWrapper {
 public:
 	// Injected Components
-	static LibMCDriverEnv::PWrapper sPLibMCDriverEnvWrapper;
+	static LibMCEnv::PWrapper sPLibMCEnvWrapper;
 
 	/**
 	* Ilibmcdriver_marlin::GetVersion - retrieves the binary version of this library.
@@ -570,7 +570,7 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 };
 

@@ -112,6 +112,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_TERMINATED 14
 #define LIBMCENV_ERROR_SIGNALHASTRIGGEREDTWICE 15
 #define LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED 16
+#define LIBMCENV_ERROR_DRIVERISNOTINITIALISING 17
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -136,6 +137,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_TERMINATED: return "operation has been terminated.";
     case LIBMCENV_ERROR_SIGNALHASTRIGGEREDTWICE: return "signal has been triggered twice.";
     case LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED: return "signal has not been triggered.";
+    case LIBMCENV_ERROR_DRIVERISNOTINITIALISING: return "driver is not in initialisation mode.";
     default: return "unknown error";
   }
 }
@@ -148,6 +150,10 @@ typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
 typedef LibMCEnvHandle LibMCEnv_Build;
+typedef LibMCEnvHandle LibMCEnv_WorkingFileExecution;
+typedef LibMCEnvHandle LibMCEnv_WorkingFile;
+typedef LibMCEnvHandle LibMCEnv_WorkingDirectory;
+typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
