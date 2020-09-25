@@ -6,26 +6,16 @@
 
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
   
-    <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
+    <statemachine name="demo" description="Demo System" initstate="init" failedstate="fatalerror" library="plugin_demo">
   	 	  		  
   	  <parametergroup name="jobinfo" description="Job Information">
   		<parameter name="jobname" description="Job Name" default="Job Name" type="string" />
-  		<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string" />
+  		<parameter name="jobuuid" description="Job UUID" default="820898d9-e4b8-44a2-86e4-cec0a94d9743" type="string" />
   		<parameter name="layercount" description="Layer Count" default="0" type="int" />
   		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
-  		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
+  		<parameter name="autostart" description="Automatically start job after init" default="1" type="bool" />
   		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
   		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
-  	  </parametergroup>
-
-  	  <parametergroup name="temperaturecontrol" description="Temperature Control">
-  		<parameter name="fanid" description="Fan ID to set target speed" default="0" type="int" />
-  		<parameter name="fanspeed" description="Fan Speed" default="128" type="double" />
-  		<parameter name="extruderid" description="Extruder ID to set/get target temperature" default="0" type="int" />
-  		<parameter name="currentextrudertemperature" description="Current Extruder Temperature" default="0.0" type="double" />
-  		<parameter name="targetextrudertemperature" description="Target Extruder Temperature" default="25.0" type="double" />
-  		<parameter name="currentbedtemperature" description="Current Bed Temperature" default="0.0" type="double" />
-  		<parameter name="targetbedtemperature" description="Target Bed Temperature" default="25.0" type="double" />
   	  </parametergroup>
 
 	  
@@ -35,14 +25,6 @@
   		<result name="success" type="bool" />		
   	  </signaldefinition>	 	  	  	     
     
-  	  <signaldefinition name="signal_gettemperature">
-  		<parameter name="extrudergetvalue" type="bool" />
-  		<parameter name="extruderid" type="int" />
-  		<parameter name="extrudertemperature" type="double" />
-  		<parameter name="bedgetvalue" type="bool" />
-  		<parameter name="bedtemperature" type="double" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
 
   	  <state name="init" repeatdelay="100">
   			<outstate target="idle" />
@@ -55,21 +37,16 @@
   	  </state>
   
   	  <state name="startprocess" repeatdelay="100">	  
-  			<outstate target="handletemperature" />
+  			<outstate target="drawlayer" />
   	  </state>
   	  
-  
-  	  <state name="handletemperature" repeatdelay="10">
-  			<outstate target="extrudelayer" />
-  	  </state>
-  	  
-  	  <state name="extrudelayer" repeatdelay="10">
+  	  <state name="drawlayer" repeatdelay="100">
   			<outstate target="nextlayer" />
   	  </state>
   	  
   
-  	  <state name="nextlayer" repeatdelay="10">
-  			<outstate target="handletemperature" />
+  	  <state name="nextlayer" repeatdelay="2000">
+  			<outstate target="drawlayer" />
   			<outstate target="finishprocess" />
   	  </state>
   
@@ -86,156 +63,7 @@
   	  
     </statemachine>
   
-  
-  
-    <statemachine name="printerconnection" description="Printer Connection System" initstate="init" failedstate="fatalerror" library="plugin_printerconnection">
-  	  
-  	  <signaldefinition name="signal_isconnected">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_doextrudelayer">
-  		<parameter name="jobuuid" type="string" />
-   		<parameter name="layerindex" type="int" />
-   		<parameter name="layertimeout" type="double" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_dohoming">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_doextruderinit">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-	  <signaldefinition name="signal_setpidvalues">
-		<parameter name="dp" type="double" />
-		<parameter name="di" type="double" />
-		<parameter name="dd" type="double" />
-		<result name="success" type="bool" />	
-	  </signaldefinition>	  
-
-	  <signaldefinition name="signal_disconnect">
-		<result name="success" type="bool" />	
-	  </signaldefinition>	  
-
-	  <signaldefinition name="signal_emergencystop">
-		<result name="success" type="bool" />	
-	  </signaldefinition>	  
-
-  	  <signaldefinition name="signal_settemperature">
-  		<parameter name="extrudersetvalue" type="bool" />
-  		<parameter name="extruderid" type="int" />
-  		<parameter name="extrudertemperature" type="double" />
-  		<parameter name="extruderdowait" type="bool" />
-  		<parameter name="bedsetvalue" type="bool" />
-  		<parameter name="bedtemperature" type="double" />
-  		<parameter name="beddowait" type="bool" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_setfanspeed">
-  		<parameter name="fanid" type="int" />
-  		<parameter name="fanspeed" type="double" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_dofinalizeextrude">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_retractfilament">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_restorefilament">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-
-  	  <driverparametergroup name="printerstate" description="Printer State Data" driver="marlin" /> 
-
-  	  <parametergroup name="comdata" description="COM Configuration">		
-  		<parameter name="port" description="COM Port" default="COM4" type="string" />
-  		<parameter name="baudrate" description="Baud rate" default="115200" type="int" />
-		<parameter name="connecttimeout" type="int" default="2000" description="Timeout [ms] for connecting printer" />
-  	  </parametergroup>
-	  	    	     	    
-  	  <state name="init" repeatdelay="100">
-  			<outstate target="idle" />
-  	  </state>
-  
-  
-  	  <state name="idle" repeatdelay="10">	  	 
-  			<outstate target="idle" />
-  			<outstate target="doextrudelayer" />
-  	  </state>
-  
-  	  <state name="doextrudelayer" repeatdelay="10">
-  			<outstate target="idle" />
-  	  </state>
-  
-  	  <state name="fatalerror" repeatdelay="5000">	  
-  			<outstate target="init" />
-  			<outstate target="fatalerror" />
-  	  </state>
-    
-  	  
-    </statemachine>
-
-
-
-  <statemachine name="pidcontrol_extruder" description="Temperature PID Control System for Extruder" initstate="init" failedstate="fatalerror" library="plugin_pidcontrol">
-
-	  <parametergroup name="status" description="Status of PID Control">
-		<parameter name="isactive" description="PID Control is active" default="0" type="bool" />
-		<parameter name="dp" description="dP Value" default="0" type="double" />
-		<parameter name="di" description="dI Value" default="0" type="double" />
-		<parameter name="dd" description="dD Value" default="0" type="double" />
-	  </parametergroup>
-
-      <parametergroup name="printerstate" description="Printer State Data">
-  		<derivedparameter name="currentx" statemachine="printerconnection" group="printerstate" parameter="currentx" />
-	  </parametergroup>
-
-	  
-	  <signaldefinition name="signal_startcontrolling">
-		<result name="success" type="bool" />		
-	  </signaldefinition>
-	  
-	  
-	  <signaldefinition name="signal_stopcontrolling">
-		<result name="success" type="bool" />		
-	  </signaldefinition>	  	     	    
-	  
-				
-	  <state name="init" repeatdelay="100">
-			<outstate target="idle" />
-	  </state>
-
-
-	  <state name="idle" repeatdelay="50">	  	 
-			<outstate target="idle" />
-			<outstate target="controlling" />
-	  </state>
-
-	  <state name="controlling" repeatdelay="50">	  	 
-			<outstate target="idle" />
-			<outstate target="controlling" />
-	  </state>	  
-
-	  <state name="fatalerror" repeatdelay="5000">	  
-			<outstate target="init" />
-			<outstate target="idle" />
-			<outstate target="fatalerror" />
-	  </state>
-  
-	  
-  </statemachine>
-
-  
-  <userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main">
+  	<userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main">
   
 		<logo uuid="24070b86-0040-4c6c-b92f-db84a526aa68" aspectratio="2.5" />
 		
@@ -249,10 +77,7 @@
 				<upload class="build" caption="Drag 3MF files here to upload" />
 				
 				<parameterlist loadingtext="Loading parameters">
-					<entry statemachine="printerconnection" group="printerstate" />
-					<entry statemachine="printerconnection" group="comdata" />
-					<entry statemachine="pidcontrol_extruder" group="status" />
-					<entry statemachine="pidcontrol_extruder" group="printerstate" />
+					<entry statemachine="demo" group="jobinfo" />
 				</parameterlist>
 				
 				<button caption="Build Library" targetpage="buildlist" />
@@ -311,11 +136,3 @@
 	</userinterface>
 
 </machinedefinition>
-
-
-
-
-
-
-
-
