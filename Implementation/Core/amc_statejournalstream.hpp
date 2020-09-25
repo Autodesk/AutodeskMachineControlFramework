@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <mutex>
 #include <vector>
+#include <map>
 
 #define STATEJOURNAL_MAXTIMESTAMPDELTA  (256 * 1024 * 1024)
 

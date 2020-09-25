@@ -326,6 +326,7 @@
 		<error name="UNITSHAVENOTBEENSET" code="315" description="Units have not been set" />
 		<error name="INVALIDTIMESTAMP" code="316" description="Invalid time stamp" />
 		<error name="NOCURRENTJOURNALCHUNK" code="317" description="No current journal chunk" />
+		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />
 
 	</errors>
 	
