@@ -342,6 +342,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_UNITSHAVENOTBEENSET 315
 #define LIBMC_ERROR_INVALIDTIMESTAMP 316
 #define LIBMC_ERROR_NOCURRENTJOURNALCHUNK 317
+#define LIBMC_ERROR_DUPLICATEJOURNALID 318
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -596,6 +597,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_UNITSHAVENOTBEENSET: return "Units have not been set";
     case LIBMC_ERROR_INVALIDTIMESTAMP: return "Invalid time stamp";
     case LIBMC_ERROR_NOCURRENTJOURNALCHUNK: return "No current journal chunk";
+    case LIBMC_ERROR_DUPLICATEJOURNALID: return "Duplicate journal id";
     default: return "unknown error";
   }
 }

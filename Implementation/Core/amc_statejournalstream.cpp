@@ -43,10 +43,9 @@ namespace AMC {
 	{
 	private:
 
-		uint64_t m_nStartTimeStamp;
-		uint64_t m_nStopTimeStamp;
-
+		std::vector<uint64_t> m_TimeStamps;
 		std::vector<uint8_t> m_Data;
+		std::map<uint32_t, std::string> m_NameDefinitions;
 
 		void writeData(const uint8_t* pData, uint32_t nLength)
 		{
@@ -61,9 +60,10 @@ namespace AMC {
 		}
 
 	public:
+
 		CStateJournalStreamChunk(uint64_t nStartTimeStamp)
-			: m_nStartTimeStamp (nStartTimeStamp), m_nStopTimeStamp (nStartTimeStamp)
 		{
+			m_TimeStamps.push_back(nStartTimeStamp);
 
 		}
 
@@ -89,14 +89,37 @@ namespace AMC {
 			writeData((const uint8_t*)&dValue, 8);
 		}
 
-		void setStopTime(const uint64_t nStopTimeStamp)
+		void storeTimeStamp (const uint64_t nTimeStamp)
 		{
-			if (nStopTimeStamp < m_nStartTimeStamp)
+			auto iLast = m_TimeStamps.rbegin();
+			if (iLast == m_TimeStamps.rend())
+				throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
+
+			auto nLastTimeStamp = *iLast;
+
+			if (nTimeStamp < nLastTimeStamp)
 				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
 
-			m_nStopTimeStamp = nStopTimeStamp;
+			if (nTimeStamp > nLastTimeStamp) {
+				m_TimeStamps.push_back(nTimeStamp);
+			}
 
 		}
+
+
+		void writeNameDefinition (const uint32_t nID, const std::string& sName)
+		{
+			auto iIter = m_NameDefinitions.find(nID);
+			if (iIter != m_NameDefinitions.end())
+				throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEJOURNALID);
+
+			m_NameDefinitions.insert(std::make_pair (nID, sName));
+
+			writeCommand(nID | STATEJOURNAL_COMMANDFLAG_DEFINITION);
+			writeString(sName);
+
+		}
+
 
 	};
 
@@ -138,7 +161,7 @@ namespace AMC {
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTIMESTAMP);
 
 		m_pCurrentChunk->writeCommand(((uint32_t) nDeltaTime) | STATEJOURNAL_COMMANDFLAG_TIMESTAMP);
-		m_pCurrentChunk->setStopTime(nAbsoluteTimeStamp);
+		m_pCurrentChunk->storeTimeStamp(nAbsoluteTimeStamp);
 
 		m_nCurrentTimeStamp = nAbsoluteTimeStamp;
 	}
@@ -196,8 +219,8 @@ namespace AMC {
 		if (m_pCurrentChunk == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_NOCURRENTJOURNALCHUNK);
 
-		m_pCurrentChunk->writeCommand(nID | STATEJOURNAL_COMMANDFLAG_DEFINITION);
-		m_pCurrentChunk->writeString(sName);
+
+		m_pCurrentChunk->writeNameDefinition(nID, sName);
 	}
 
 	void CStateJournalStream::writeUnits(const uint32_t nID, double dUnits)
