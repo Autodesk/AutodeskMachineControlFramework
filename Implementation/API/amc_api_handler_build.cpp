@@ -68,12 +68,12 @@ std::string CAPIHandler_Build::getBaseURI ()
 APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& jobUUID)
 {
 	// Leave away base URI
-	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(9));
+ 	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(9));
 	jobUUID = "";
 
 	if (requestType == eAPIRequestType::rtPost) {
 
-		if (sParameterString == "/prepare") {
+		if ((sParameterString == "/prepare") || (sParameterString == "/prepare/")) {
 			return btStartPrepareJob;
 		}
 	
