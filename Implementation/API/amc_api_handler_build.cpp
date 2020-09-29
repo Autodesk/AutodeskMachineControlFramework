@@ -136,7 +136,9 @@ void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8
 	auto pLib3MFWrapper = m_pSystemState->toolpathHandler()->getLib3MFWrapper();
 
 	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pBuildJob, pLib3MFWrapper, pAuth->getUserName()));
-	
+
+	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName());
+
 }
 
 

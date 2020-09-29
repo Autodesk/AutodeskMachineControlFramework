@@ -321,7 +321,8 @@ export default {
                     this.AppState.currentError = err.response.data.message;
                 });
         },
-
+		
+		
 		appPerformJobUpload (itemuuid, itemstate, uploadid, chosenfile) {
 					
 		
@@ -329,18 +330,35 @@ export default {
 			var url = this.API.baseURL + "/upload/";
 			var prepareurl = this.API.baseURL + "/build/prepare/";
 						
+			itemstate.messages = ["Reading file..."];
+			
 			var reader = new FileReader();
 			reader.readAsArrayBuffer (chosenfile);		
 			
 			reader.onload = () => {
 				var fileContent = reader.result;						
-			
-				//var sha256 = asmCrypto.SHA256.hex(fileContent); 
+
+				itemstate.messages = ["Hashing file..."];
 				
-				var shaInstance = asmCrypto.SHA256 (); 
+				var shaInstance = new asmCrypto.SHA256 (); 
 				shaInstance.reset ();
 				shaInstance.process (fileContent);
+				shaInstance.finish ();
+				
+				var bytesToHex = function (buffer) {
+					var hex = "";
+					var n;
+					for (n in buffer) {
+						hex += ("0" + (0xff & buffer[n]).toString(16)).slice(-2);
+					}
+					return hex;
+				}
+				
+				var sha256 = bytesToHex (shaInstance.result);
+
+				shaInstance = null;
 			
+				itemstate.messages = ["Starting Upload..."];
 				Axios({			
 						method: "POST",
 						url: url,
@@ -361,7 +379,9 @@ export default {
 						
 						const formData = new FormData();
 						formData.append("size", chosenfile.size);					
-						formData.append("data", fileContent, chosenfile.name);					
+						formData.append("data",  new Blob([fileContent], {type: "application/3mf"} ), chosenfile.name);					
+						
+						itemstate.messages = ["Uploading..."];
 						
 						Axios({			
 							method: "POST",
@@ -388,7 +408,11 @@ export default {
 								}
 							})
 							.then(resultUploadFinish => {
+
 								resultUploadFinish;
+								
+								itemstate.messages = ["Preparing build..."];
+								
 								Axios({			
 									method: "POST",
 									url: prepareurl,
@@ -400,7 +424,7 @@ export default {
 									}
 								})
 								.then(resultBuildPrepare => {
-									alert (resultBuildPrepare.data);
+									alert ("uploaded " + resultBuildPrepare.data.name);
 									itemstate.messages = [];
 									itemstate.chosenFile = null;
 									itemstate.uploadid = 0;
