@@ -110,20 +110,8 @@
 											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" contain></v-img></p>
 											
 											<div :key="item.uuid" v-if="(item.type=='upload')">
-											
-												<form enctype="multipart/form-data" novalidate>
-													<div class="dropbox">
-													  <input type="file" multiple :name="'upload_' + item.uuid" :disabled="item.uploadissaving" 
-														accept="" class="input-file">
-														<p v-if="item.uploadisinitial">
-														  {{ item.uploadcaption }}
-														</p>
-														<p v-if="item.uploadissaving">
-														  Uploading {{ item.uploadfilename }} files...
-														</p>
-													</div>
-												</form>
-											  	
+																						
+												<v-file-input accept=".3mf" show-size full-width v-model="item.state.chosenFile" v-bind:label="item.uploadcaption" v-bind:messages="item.state.messages" @change="uiUploadStart (item)"></v-file-input>
 								
 											</div>
 											
@@ -219,7 +207,7 @@
 
 <script>
 import * as Axios from "axios";
-var SHAJS = require('sha.js')
+import * as asmCrypto from "asmcrypto-lite";
 
 export default {
     props: {
@@ -311,6 +299,11 @@ export default {
 										item.entries = this.AppState.ContentItems[item.uuid].entries;
 										
 									}
+									
+									if (item.type === "upload") {
+										item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
+									
+									}
 								}
 								
 							}
@@ -328,7 +321,112 @@ export default {
                     this.AppState.currentError = err.response.data.message;
                 });
         },
+
+		appPerformJobUpload (itemuuid, itemstate, uploadid, chosenfile) {
+					
 		
+			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!
+			var url = this.API.baseURL + "/upload/";
+			var prepareurl = this.API.baseURL + "/build/prepare/";
+						
+			var reader = new FileReader();
+			reader.readAsArrayBuffer (chosenfile);		
+			
+			reader.onload = () => {
+				var fileContent = reader.result;						
+			
+				//var sha256 = asmCrypto.SHA256.hex(fileContent); 
+				
+				var shaInstance = asmCrypto.SHA256 (); 
+				shaInstance.reset ();
+				shaInstance.process (fileContent);
+			
+				Axios({			
+						method: "POST",
+						url: url,
+						headers: {
+							"Authorization": "Bearer " + this.API.authToken,
+						},
+						data: {
+							"context": "build",
+							"name": chosenfile.name,
+							"size": chosenfile.size,
+							"mimetype": "application/3mf",
+							
+						}
+					})
+					.then(resultUploadInit => {
+						var streamuuid = resultUploadInit.data.streamuuid;
+						var contextuuid = resultUploadInit.data.contextuuid;
+						
+						const formData = new FormData();
+						formData.append("size", chosenfile.size);					
+						formData.append("data", fileContent, chosenfile.name);					
+						
+						Axios({			
+							method: "POST",
+							url: url + streamuuid,
+							headers: {
+								"Authorization": "Bearer " + this.API.authToken,
+								"Content-Type": "multipart/form-data"
+							},
+							data: formData
+							
+						})
+						.then(resultUploadHandle => {
+							resultUploadHandle;
+							
+							Axios({			
+								method: "POST",
+								url: url + "finish",
+								headers: {
+									"Authorization": "Bearer " + this.API.authToken,
+								},
+								data: {
+									"streamuuid": streamuuid,						
+									"sha256": sha256
+								}
+							})
+							.then(resultUploadFinish => {
+								resultUploadFinish;
+								Axios({			
+									method: "POST",
+									url: prepareurl,
+									headers: {
+										"Authorization": "Bearer " + this.API.authToken,
+									},
+									data: {
+										"builduuid": contextuuid,						
+									}
+								})
+								.then(resultBuildPrepare => {
+									alert (resultBuildPrepare.data);
+									itemstate.messages = [];
+									itemstate.chosenFile = null;
+									itemstate.uploadid = 0;
+									
+								})
+								.catch(err => {
+									err;                    
+								});
+							})
+							.catch(err => {
+								err;                    
+							});
+					
+						})
+						.catch(err => {
+							err;                    
+						});					
+					
+					})
+					.catch(err => {
+						err;                    
+					});
+					
+				};
+		
+		},
 
 		appUpdateContentItem (uuid) {
 		
@@ -376,9 +474,9 @@ export default {
 					var loginsalt = resultCreateSession.data.loginsalt;
 					var clientkey = sessionkey;
 					
-					var saltedpassword = SHAJS("sha256").update(loginsalt + this.AppState.uiLoginPassword).digest("hex");
-					var clientkeyhash = SHAJS("sha256").update(clientkey + saltedpassword).digest("hex");
-					var sessionkeyhash = SHAJS("sha256").update(sessionkey + clientkeyhash).digest("hex");
+					var saltedpassword = asmCrypto.SHA256.hex (loginsalt + this.AppState.uiLoginPassword);
+					var clientkeyhash = asmCrypto.SHA256.hex (clientkey + saltedpassword);
+					var sessionkeyhash = asmCrypto.SHA256.hex (sessionkey + clientkeyhash);
 														
 					Axios({
 						method: "POST",
@@ -423,6 +521,32 @@ export default {
 
             return caption;
         },
+		
+		uiUploadStart (item) {
+			item.state.idcounter = item.state.idcounter + 1;
+			if (item.state.chosenFile) {
+			
+				if (item.state.uploadid === 0) {
+					item.state.messages = ["Uploading..."];					
+			
+				} else {
+					item.state.messages = ["Replacing upload..."];
+				}
+				item.state.uploadid = item.state.idcounter; 
+				
+				this.appPerformJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile);
+				
+			} else {
+			
+				if (!(item.state.uploadid === 0)) {
+					item.state.uploadid = 0; 
+					item.state.messages = ["Canceled upload..."];
+				}
+			
+			}
+			
+		
+		},
 
         uiToggleDrawer() {
             this.AppState.showDrawer = !this.AppState.showDrawer;

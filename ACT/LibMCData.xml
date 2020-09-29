@@ -465,7 +465,6 @@
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
-			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data." />	
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
 		</method>	
 
@@ -477,6 +476,7 @@
 	
 		<method name="FinishPartialStream" description="Finishes storing a stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
+			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data. If given initially, MUST be identical." />
 		</method>	
 		
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
