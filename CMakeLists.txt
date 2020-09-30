@@ -193,8 +193,10 @@ target_link_libraries(libmc Winmm.lib)
 target_link_libraries(libmcdata Winmm.lib)
 target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
 elseif(UNIX AND NOT APPLE)
+target_link_libraries(libmc -luuid)
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
-target_link_libraries(libmcdata SQLite3)
+target_link_libraries(libmcdata SQLite3 -luuid)
 endif()
 
 # This makes sure symbols are exported
