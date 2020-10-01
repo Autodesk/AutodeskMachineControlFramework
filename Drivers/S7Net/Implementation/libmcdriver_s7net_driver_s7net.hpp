@@ -58,30 +58,16 @@ namespace Impl {
 class CDriver_S7Net : public virtual IDriver_S7Net, public virtual CDriver {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
 protected:
-
-	/**
-	* Put protected members here.
-	*/
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
 
 	void Connect() override;
 
 	void Disconnect() override;
+
+	void QueryParameters() override;
 
 };
 

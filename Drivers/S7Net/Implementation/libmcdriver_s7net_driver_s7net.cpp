@@ -45,11 +45,15 @@ using namespace LibMCDriver_S7Net::Impl;
 
 void CDriver_S7Net::Connect()
 {
-	throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOTIMPLEMENTED);
+	
 }
 
 void CDriver_S7Net::Disconnect()
 {
-	throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOTIMPLEMENTED);
+	
+}
+
+void CDriver_S7Net::QueryParameters()
+{
 }
 
