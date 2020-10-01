@@ -172,10 +172,15 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
 }
 
 
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage)
 {
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
     m_sAppName = "";
     m_sCopyrightString = "";
+    m_pCoreResourcePackage = pResourcePackage;
+
     m_ToolbarItems.clear();
     m_MenuItems.clear();
 
@@ -197,8 +202,9 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
     auto logoNode = xmlNode.child("logo");
     if (!logoNode.empty()) {
 
-        auto uuidAttrib = logoNode.attribute("uuid");
-        m_sLogoUUID = uuidAttrib.as_string();
+        auto resourceAttrib = logoNode.attribute("resource");
+        auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+        m_sLogoUUID = pResourceEntry->getUUID ();
 
         auto aspectratioAttrib = logoNode.attribute("aspectratio");
         if (!aspectratioAttrib.empty()) {
@@ -222,7 +228,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModule = CUIModuleFactory::createModule(pageChild, m_pParameterInstances);
+            auto pModule = CUIModuleFactory::createModule(pageChild, m_pParameterInstances, m_pCoreResourcePackage);
             pPage->addModule(pModule);
 
         }
@@ -292,6 +298,16 @@ PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
     }
 
     return nullptr;
+}
+
+
+PResourcePackage CUIHandler::getCoreResourcePackage()
+{
+    if (m_pCoreResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
+
+    return m_pCoreResourcePackage;
+
 }
 
 

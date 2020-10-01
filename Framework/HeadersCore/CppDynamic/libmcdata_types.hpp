@@ -344,6 +344,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_NOCURRENTJOURNALCHUNK 317
 #define LIBMCDATA_ERROR_DUPLICATEJOURNALID 318
 #define LIBMCDATA_ERROR_RESOURCEENTRYNOTFOUND 319
+#define LIBMCDATA_ERROR_NOCORERESOURCEPACKAGE 320
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -600,6 +601,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_NOCURRENTJOURNALCHUNK: return "No current journal chunk";
     case LIBMCDATA_ERROR_DUPLICATEJOURNALID: return "Duplicate journal id";
     case LIBMCDATA_ERROR_RESOURCEENTRYNOTFOUND: return "Resource entry not found";
+    case LIBMCDATA_ERROR_NOCORERESOURCEPACKAGE: return "No core resource package";
     default: return "unknown error";
   }
 }

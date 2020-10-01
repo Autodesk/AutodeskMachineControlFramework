@@ -344,6 +344,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_NOCURRENTJOURNALCHUNK 317
 #define LIBMC_ERROR_DUPLICATEJOURNALID 318
 #define LIBMC_ERROR_RESOURCEENTRYNOTFOUND 319
+#define LIBMC_ERROR_NOCORERESOURCEPACKAGE 320
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -600,6 +601,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_NOCURRENTJOURNALCHUNK: return "No current journal chunk";
     case LIBMC_ERROR_DUPLICATEJOURNALID: return "Duplicate journal id";
     case LIBMC_ERROR_RESOURCEENTRYNOTFOUND: return "Resource entry not found";
+    case LIBMC_ERROR_NOCORERESOURCEPACKAGE: return "No core resource package";
     default: return "unknown error";
   }
 }

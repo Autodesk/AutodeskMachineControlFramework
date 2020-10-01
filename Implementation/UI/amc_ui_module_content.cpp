@@ -37,16 +37,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentbutton.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include "libmc_interfaceexception.hpp"
 
 using namespace AMC;
 
-CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances)
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
 	if (pParameterInstances.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pResourcePackage.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
@@ -72,8 +75,9 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 		}
 
 		if (sChildName == "image") {
-			auto uuidAttrib = childNode.attribute("uuid");
-			addItem (std::make_shared <CUIModule_ContentImage>(uuidAttrib.as_string()));
+			auto resourceAttrib = childNode.attribute("resource");
+			auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+			addItem (std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID ()));
 		}
 
 		if (sChildName == "upload") {
