@@ -29,46 +29,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMCCOMMON_IMPORTSTREAM
-#define __AMCCOMMON_IMPORTSTREAM
+#ifndef __AMC_RESOURCESTREAM
+#define __AMC_RESOURCESTREAM
 
-#include <vector>
 #include <memory>
+#include <mutex>
 
-namespace AMCCommon {
 
-	class CImportStream;
-	typedef std::shared_ptr <CImportStream> PImportStream;
+namespace AMC {
 
-	class CImportStream {
+	class CResourceStream;
+	typedef std::shared_ptr<CResourceStream> PResourceStream;
+
+
+	class CResourceStream {
 	private:
+		std::mutex m_Mutex;
+		
+	protected:
 	public:
-		CImportStream()
-		{
-		}
 
-		virtual ~CImportStream()
-		{
+		CResourceStream ();
+		virtual ~CResourceStream();
 
-		}
-
-		virtual bool seekPosition(const uint64_t position, const bool bHasToSucceed) = 0;
-		virtual bool seekForward(const uint64_t bytes, const bool bHasToSucceed) = 0;
-		virtual bool seekFromEnd(const uint64_t bytes, const bool bHasToSucceed) = 0;
-		virtual uint64_t readBuffer(uint8_t * pBuffer, const uint64_t cbTotalBytesToRead, const bool bNeedsToReadAll) = 0;
-		virtual uint64_t retrieveSize() = 0;
-		virtual uint64_t getPosition() = 0;
-
-		virtual void readIntoMemory(std::vector<uint8_t>& Buffer) {
-			uint64_t nSize = retrieveSize();
-			Buffer.resize(nSize);
-			if (nSize > 0) {
-				seekPosition(0, true);
-				readBuffer (Buffer.data(), nSize, true);
-			}
-		}
 	};
 
+	
 }
 
-#endif // __AMCCOMMON_IMPORTSTREAM
+
+#endif //__AMC_RESOURCESTREAM
+

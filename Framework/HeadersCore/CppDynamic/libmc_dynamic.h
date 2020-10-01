@@ -141,9 +141,10 @@ typedef LibMCResult (*PLibMCAPIRequestHandler_GetResultDataPtr) (LibMC_APIReques
 * @param[in] pMCContext - MCContext instance.
 * @param[in] pLibraryName - Library Name.
 * @param[in] pLibraryPath - Path to the shared library.
+* @param[in] pLibraryResource - Path to the library resource file.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_RegisterLibraryPathPtr) (LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath);
+typedef LibMCResult (*PLibMCMCContext_RegisterLibraryPathPtr) (LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResource);
 
 /**
 * parses and initialises the state machines from a configuration XML.
@@ -174,11 +175,10 @@ typedef LibMCResult (*PLibMCMCContext_TerminateAllThreadsPtr) (LibMC_MCContext p
 * load a client package to serve the client website.
 *
 * @param[in] pMCContext - MCContext instance.
-* @param[in] nZIPStreamBufferSize - Number of elements in buffer
-* @param[in] pZIPStreamBuffer - uint8 buffer of client package ZIP stream.
+* @param[in] pResourcePath - Path to the resource package.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_LoadClientPackagePtr) (LibMC_MCContext pMCContext, LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8 * pZIPStreamBuffer);
+typedef LibMCResult (*PLibMCMCContext_LoadClientPackagePtr) (LibMC_MCContext pMCContext, const char * pResourcePath);
 
 /**
 * log message with a certain log level.

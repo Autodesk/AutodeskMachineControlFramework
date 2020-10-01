@@ -29,74 +29,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "amc_api_handler_root.hpp"
+#include "amc_resourcestream.hpp"
 
+#include "common_utils.hpp"
 #include "libmc_interfaceexception.hpp"
 
-#include <vector>
-#include <memory>
-#include <string>
-#include <iostream>
-
-#include "Libraries/libzip/zip.h"
-#include "pugixml.hpp"
 
 
-using namespace AMC;
-
-
-
-CAPIHandler_Root::CAPIHandler_Root()
-{
+namespace AMC {
 	
-}
+	CResourceStream::CResourceStream()
+	{
 
-CAPIHandler_Root::~CAPIHandler_Root()
-{
-	
-}
-				
-std::string CAPIHandler_Root::getBaseURI () 
-{
-	return "";
-}
-		
-void CAPIHandler_Root::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession)
-{
-	bNeedsToBeAuthorized = false;
-	bCreateNewSession = false;
-}
-
-
-PAPIResponse CAPIHandler_Root::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
-{
-
-	if (requestType == eAPIRequestType::rtGet) {
-		auto iIterator = m_FilesToServe.find(sURI);
-		if (iIterator != m_FilesToServe.end())
-			return iIterator->second;
 	}
 
-	return nullptr;
-}
+	CResourceStream::~CResourceStream()
+	{
 
-void CAPIHandler_Root::LoadClientPackage(PResourcePackage pResourcePackage)
-{
-	if (pResourcePackage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-	size_t nCount = pResourcePackage->getEntryCount();
-	for (size_t nIndex = 0; nIndex < nCount; nIndex++) {
-		auto sName = pResourcePackage->getEntryName(nIndex);
-
-		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(pResourcePackage->getContentType(sName));
-		pResourcePackage->readEntry(sName, apiResponse->getBuffer());
-		m_FilesToServe.insert(std::make_pair(sName, apiResponse));
 	}
 
-
-
 }
-		
 
 

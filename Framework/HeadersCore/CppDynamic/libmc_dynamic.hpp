@@ -362,11 +362,11 @@ public:
 	{
 	}
 	
-	inline void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath);
+	inline void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource);
 	inline void ParseConfiguration(const std::string & sXMLString);
 	inline void StartAllThreads();
 	inline void TerminateAllThreads();
-	inline void LoadClientPackage(const CInputVector<LibMC_uint8> & ZIPStreamBuffer);
+	inline void LoadClientPackage(const std::string & sResourcePath);
 	inline void Log(const std::string & sMessage, const eLogSubSystem eSubsystem, const eLogLevel eLogLevel);
 	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization);
 };
@@ -934,10 +934,11 @@ public:
 	* CMCContext::RegisterLibraryPath - registers a library for a given name.
 	* @param[in] sLibraryName - Library Name.
 	* @param[in] sLibraryPath - Path to the shared library.
+	* @param[in] sLibraryResource - Path to the library resource file.
 	*/
-	void CMCContext::RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath)
+	void CMCContext::RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_RegisterLibraryPath(m_pHandle, sLibraryName.c_str(), sLibraryPath.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_RegisterLibraryPath(m_pHandle, sLibraryName.c_str(), sLibraryPath.c_str(), sLibraryResource.c_str()));
 	}
 	
 	/**
@@ -967,11 +968,11 @@ public:
 	
 	/**
 	* CMCContext::LoadClientPackage - load a client package to serve the client website.
-	* @param[in] ZIPStreamBuffer - client package ZIP stream.
+	* @param[in] sResourcePath - Path to the resource package.
 	*/
-	void CMCContext::LoadClientPackage(const CInputVector<LibMC_uint8> & ZIPStreamBuffer)
+	void CMCContext::LoadClientPackage(const std::string & sResourcePath)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_LoadClientPackage(m_pHandle, (LibMC_uint64)ZIPStreamBuffer.size(), ZIPStreamBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_LoadClientPackage(m_pHandle, sResourcePath.c_str()));
 	}
 	
 	/**
