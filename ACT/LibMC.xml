@@ -50,7 +50,7 @@
 	<importcomponent uri="LibMCData.xml" namespace="LibMCData"/>
 	
 	<errors>
-		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+				<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
 		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
 		<error name="INVALIDCAST" code="3" description="a type cast failed" />
 		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
@@ -204,15 +204,15 @@
 		<error name="COULDNOTREADZIPSTREAM" code="206" description="Could not read ZIP stream" />		
 		<error name="COULDNOTREADFULLZIPDATA" code="207" description="Could not read full zip data" />		
 		
-		<error name="COULDNOTFINDDISTRIBUTIONINDEX" code="208" description="Could not find distribution index." />		
-		<error name="COULDNOTPARSEDISTRIBUTIONINDEX" code="209" description="Could not parse distribution index." />
-		<error name="EMPTYDISTRIBUTIONINDEX" code="210" description="Empty distribution index." />
-		<error name="MISSINGDISTRIBUTIONINDEX" code="211" description="Missing distribution index." />
+		<error name="COULDNOTFINDRESOURCEINDEX" code="208" description="Could not find resource index." />		
+		<error name="COULDNOTPARSERESOURCEINDEX" code="209" description="Could not parse resource index." />
+		<error name="EMPTYRESOURCEINDEX" code="210" description="Empty resource index." />
+		<error name="MISSINGRESOURCEINDEX" code="211" description="Missing resource index." />
 		
-		<error name="MISSINGDISTRIBUTIONURL" code="212" description="Missing distribution url." />
-		<error name="MISSINGDISTRIBUTIONFILENAME" code="213" description="Missing distribution filename." />
-		<error name="MISSINGDISTRIBUTIONSIZE" code="214" description="Missing distribution size." />
-		<error name="MISSINGDISTRIBUTIONCONTENTTYPE" code="215" description="Missing distribution content type." />
+		<error name="MISSINGRESOURCENAME" code="212" description="Missing resource name." />
+		<error name="MISSINGRESOURCEFILENAME" code="213" description="Missing resource filename." />
+		<error name="MISSINGRESOURCESIZE" code="214" description="Missing resource size." />
+		<error name="MISSINGRESOURCECONTENTTYPE" code="215" description="Missing resource content type." />
 		
 		<error name="DRIVERALREADYREGISTERED" code="216" description="Driver already registered." />
 		<error name="DRIVERNOTFOUND" code="217" description="Driver not found." />
@@ -230,24 +230,22 @@
 		
 		<error name="INVALIDPOINTCOUNT" code="227" description="Invalid point count" />
 		<error name="DUPLICATEJOBUUID" code="228" description="Duplicate job uuid" />
-		<error name="INVALIDJOBSTATUS" code="229" description="Invalid Job status" />
+		<error name="INVALIDJOBSTATUS" code="229" description="Invalid job status" />
 		<error name="INVALIDSTREAMCONTEXT" code="230" description="Invalid stream context" />		
 		<error name="JOBUUIDNOTFOUND" code="231" description="Job uuid not found" />
 		<error name="INVALIDJOBNAME" code="232" description="Invalid job name" />
 		<error name="INVALIDJOBTIMESTAMP" code="233" description="Invalid job timestamp" />
-		<error name="INVALIDUSERID" code="234" description="Invalid job name" />
+		<error name="INVALIDUSERID" code="234" description="Invalid job name" />		
 		<error name="INVALIDSTORAGECALLBACKSIGNATURE" code="235" description="Invalid storage callback signature" />
 		<error name="INVALIDSTORAGECALLBACKSTREAM" code="236" description="Invalid storage callback stream" />
-		<error name="INVALIDSTORAGEPATH" code="237" description="Invalid storage path" />
-
+		<error name="INVALIDSTORAGEPATH" code="237" description="Invalid storage path" />		
 		<error name="STORAGESTREAMNOTFOUND" code="238" description="Storage Stream not found" />
 		<error name="DUPLICATESTORAGESTREAM" code="239" description="Duplicate Storage Stream" />
 		<error name="INVALIDPARTIALUPLOAD" code="240" description="Invalid Partial Upload" />
 		<error name="PARTIALUPLOADNOTFINISHED" code="241" description="Partial Upload not finished" />
-		
 		<error name="APIREQUESTNOTHANDLED" code="242" description="API Request not handled" />
 		<error name="APIREQUESTALREADYHANDLED" code="243" description="API Request already handled" />
-		<error name="INVALIDAPIREQUESTTYPE" code="244" description="Invalid API Request type" />		
+		<error name="INVALIDAPIREQUESTTYPE" code="244" description="Invalid API Request type" />
 		<error name="INVALIDUPLOADSTREAM" code="245" description="Invalid Upload Stream" />
 		<error name="COULDNOTPARSEJSONREQUEST" code="246" description="Could not parse JSON request" />
 		
@@ -260,21 +258,22 @@
 		<error name="INVALIDFIELDNAME" code="253" description="Invalid field name" />		
 		<error name="UPLOADSIZEMISMATCH" code="254" description="Upload size mismatch" />
 		<error name="CONTENTTYPENOTACCEPTED" code="255" description="Content type not accepted" />
-		<error name="NOCURRENTUPLOAD" code="256" description="No current upload" />
+		<error name="NOCURRENTUPLOAD" code="256" description="No current upload" />		
 		<error name="UPLOADCHECKSUMMISMATCH" code="257" description="Upload checksum mismatch" />
 		<error name="INVALIDSTORAGESTREAMSTATUS" code="258" description="Invalid storage stream status" />
 		<error name="CONTEXTUUIDNOTACCEPTED" code="259" description="Context uuid not accepted" />
 		<error name="INVALIDBUILDUUID" code="260" description="Invalid build uuid" />
 		
 		<error name="MISSINGTHREADCOUNT" code="261" description="Missing thread count" />
-		<error name="INVALIDTHREADCOUNT" code="262" description="Invalid thread count" />
+		<error name="INVALIDTHREADCOUNT" code="262" description="Invalid thread count" />		
 		<error name="COULDNOTUPDATEBUILDSTATUS" code="263" description="Could not update build status" />							
 		<error name="INVALIDITERATOR" code="264" description="Invalid iterator" />
 		<error name="INVALIDDATATYPE" code="265" description="Invalid data type" />
+		
 		<error name="COULDNOTSENDSIGNAL" code="266" description="Could not send signal" />
 		<error name="MISSINGSIGNALPARAMETER" code="267" description="Missing signal parameter" />
 		<error name="NOUSERINTERFACEDEFINITION" code="268" description="No user interface definition" />
-
+		
 		<error name="MISSINGAPPNAME" code="269" description="Missing app name" />
 		<error name="MISSINGCOPYRIGHT" code="270" description="Missing copyright" />
 		<error name="MISSINGMAINPAGE" code="271" description="Missing main page" />
@@ -286,8 +285,8 @@
 		<error name="MISSINGTOOLBARNODE" code="277" description="Missing toolbar node" />
 		<error name="MISSINGTOOLBARITEMID" code="278" description="Missing toolbar item id" />
 		<error name="MISSINGTOOLBARITEMICON" code="279" description="Missing toolbar item icon" />
-		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />		
-		<error name="MISSINGSERVICESNODE" code="281" description="Missing services node" />
+		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />
+		<error name="MISSINGSERVICESNODE" code="281" description="Missing services node" />		
 
 		<error name="INVALIDSESSIONUUID" code="282" description="Invalid session UUID" />
 		<error name="INVALIDSESSIONKEY" code="283" description="Invalid session Key" />
@@ -296,10 +295,9 @@
 		<error name="INVALIDPASSWORD" code="286" description="Invalid password" />
 		<error name="INVALIDAUTHORIZATION" code="287" description="Invalid Authorization" />
 		<error name="USERALREADYAUTHORIZED" code="288" description="User already authorized" />
-		<error name="INVALIDSESSIONTOKEN" code="289" description="Invalid session token" />
-		<error name="INVALIDCLIENTKEY" code="290" description="Invalid client key" />
+		<error name="INVALIDSESSIONTOKEN" code="289" description="Invalid session token" />	
+		<error name="INVALIDCLIENTKEY" code="290" description="Invalid client key" />		
 		<error name="INVALIDLOGIN" code="291" description="Invalid login credentials" />
-
 		<error name="DUPLICATEPAGE" code="292" description="Duplicate page" />
 		<error name="PAGENOTFOUND" code="293" description="Page not found" />
 		<error name="MISSINGPAGENAME" code="294" description="Missing page name" />
@@ -307,10 +305,10 @@
 		<error name="MODULENOTFOUND" code="296" description="Module not found" />
 		<error name="DUPLICATEMODULE" code="297" description="Duplicate module" />
 		<error name="INVALIDMODULENAME" code="298" description="Invalid module name" />
-		<error name="INVALIDMODULETYPE" code="299" description="Invalid module type" />
+		<error name="INVALIDMODULETYPE" code="299" description="Invalid module type" />	
 		<error name="INVALIDHEADLINE" code="300" description="Invalid headline" />
 		<error name="USERNOTFOUND" code="301" description="User not found" />
-		<error name="STREAMISNOTIMAGE" code="302" description="Stream is not image" />
+		<error name="STREAMISNOTIMAGE" code="302" description="Stream is not image" />		
 		<error name="TOOMANYCONTENTPARAMETERS" code="303" description="Too many content parameters" />
 		<error name="MISSINGCONTENTSTATEMACHINENAME" code="304" description="Missing content state machine name" />
 		<error name="MISSINGCONTENTGROUPNAME" code="305" description="Missing content group name" />
@@ -326,7 +324,9 @@
 		<error name="UNITSHAVENOTBEENSET" code="315" description="Units have not been set" />
 		<error name="INVALIDTIMESTAMP" code="316" description="Invalid time stamp" />
 		<error name="NOCURRENTJOURNALCHUNK" code="317" description="No current journal chunk" />
-		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />
+		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />		
+		<error name="RESOURCEENTRYNOTFOUND" code="319" description="Resource entry not found" />
+
 
 	</errors>
 	
@@ -403,6 +403,7 @@
 		<method name="RegisterLibraryPath" description="registers a library for a given name.">
 			<param name="LibraryName" type="string" pass="in" description="Library Name." />
 			<param name="LibraryPath" type="string" pass="in" description="Path to the shared library." />
+			<param name="LibraryResource" type="string" pass="in" description="Path to the library resource file." />
 		</method>
 
 
@@ -417,7 +418,7 @@
 		</method>
 		
 		<method name="LoadClientPackage" description="load a client package to serve the client website.">
-			<param name="ZIPStream" type="basicarray" class="uint8" pass="in" description="client package ZIP stream." />
+			<param name="ResourcePath" type="string" pass="in" description="Path to the resource package." />
 		</method>
 		
 

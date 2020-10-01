@@ -5,6 +5,8 @@
 
 
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
+  <driver name="s7net" library="driver_s7net" type="s7net" />
+  <driver name="camera" library="driver_camera" type="raspi-camera-1.0" />
   
     <statemachine name="demo" description="Demo System" initstate="init" failedstate="fatalerror" library="plugin_demo">
   	 	  		  
@@ -18,6 +20,7 @@
   		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
   	  </parametergroup>
 
+	  <driverparametergroup name="plcstate" description="PLC State Data" driver="s7net" /> 
 	  
   	  <signaldefinition name="signal_startjob">
   		<parameter name="jobuuid" type="string" />
@@ -74,7 +77,7 @@
 				<image uuid="24070b86-0040-4c6c-b92f-db84a526aa68" />
 				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
 				
-				<upload class="build" caption="Drag 3MF files here to upload" />
+				<upload class="build" caption="Select 3MF files to upload" />
 				
 				<parameterlist loadingtext="Loading parameters">
 					<entry statemachine="demo" group="jobinfo" />

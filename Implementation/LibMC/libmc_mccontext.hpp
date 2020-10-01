@@ -105,7 +105,7 @@ public:
 
 	void ParseConfiguration(const std::string & sXMLString) override;
 
-	void RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath) override;
+	void RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource) override;
 
 	void StartAllThreads() override;	
 
@@ -113,7 +113,7 @@ public:
 
 	void Log(const std::string& sMessage, const LibMC::eLogSubSystem eSubsystem, const LibMC::eLogLevel eLogLevel) override;
 
-	void LoadClientPackage(const LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8* pZIPStreamBuffer) override;
+	void LoadClientPackage(const std::string& sResourcePath) override;
 
 	IAPIRequestHandler* CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod, const std::string& sAuthorization) override;
 

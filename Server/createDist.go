@@ -17,7 +17,7 @@ import (
 
 type DistXMLEntry struct {
 	XMLName xml.Name `xml:"entry"`
-	URL string `xml:"url,attr"`
+	Name string `xml:"name,attr"`
 	FileName string `xml:"filename,attr"`
 	Size uint32 `xml:"size,attr"`
 	ContentType string `xml:"contenttype,attr"`
@@ -25,7 +25,7 @@ type DistXMLEntry struct {
 
 
 type DistXMLRoot struct {
-	XMLName xml.Name `xml:"serve"`
+	XMLName xml.Name `xml:"package"`
 	XMLNs string `xml:"xmlns,attr"`
 	Entries []DistXMLEntry `xml:"entry"`
 }
@@ -88,7 +88,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 func main() {
 
 	var Root DistXMLRoot;
-	Root.XMLNs = "http://schemas.autodesk.com/amc/clientdistribution/2020/07";
+	Root.XMLNs = "http://schemas.autodesk.com/amc/resourcepackage/2020/07";
 	
 	var dllExtension string
 	if runtime.GOOS == "windows" {
@@ -112,7 +112,7 @@ func main() {
 	LibraryName := hexSum + "_core_libmc." + dllExtension;
 	ConfigName := hexSum + "_config.xml";
 	
-	DistXMLName := "dist.xml";
+	DistXMLName := "package.xml";
 	
 	packageName := "Build " + hexSum;
 	
@@ -159,7 +159,7 @@ func main() {
 				if (fileext!=".map") {
 				
 					var entry DistXMLEntry;
-					entry.URL = url;
+					entry.Name = url;
 					entry.FileName = file;
 					entry.Size = uint32 (info.Size());
 					entry.ContentType = contenttype;

@@ -29,46 +29,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMCCOMMON_IMPORTSTREAM
-#define __AMCCOMMON_IMPORTSTREAM
-
-#include <vector>
+#ifndef __AMC_RESOURCEPACKAGE
+#define __AMC_RESOURCEPACKAGE
 #include <memory>
+#include <mutex>
+#include <map>
+#include <vector>
 
-namespace AMCCommon {
+#include "common_importstream.hpp"
 
-	class CImportStream;
-	typedef std::shared_ptr <CImportStream> PImportStream;
+namespace AMC {
 
-	class CImportStream {
+	class CResourcePackageZIP;
+	typedef std::shared_ptr<CResourcePackageZIP> PResourcePackageZIP;
+
+	class CResourcePackageEntry;
+	typedef std::shared_ptr<CResourcePackageEntry> PResourcePackageEntry;
+
+	class CResourcePackage;
+	typedef std::shared_ptr<CResourcePackage> PResourcePackage;
+
+
+	class CResourcePackage {
 	private:
+		std::mutex m_Mutex;
+		std::vector<uint8_t> m_Buffer;
+		std::vector<std::string> m_EntryNames;
+		std::map<std::string, PResourcePackageEntry> m_Entries;
+		PResourcePackageZIP m_pResourcePackageZIP;
+		
+	protected:
+
 	public:
-		CImportStream()
-		{
-		}
 
-		virtual ~CImportStream()
-		{
+		static PResourcePackage makeFromStream (AMCCommon::CImportStream * pStream);
+		static PResourcePackage makeFromStream (AMCCommon::PImportStream pStream);
 
-		}
+		CResourcePackage(AMCCommon::CImportStream* pStream);
+		virtual ~CResourcePackage();
 
-		virtual bool seekPosition(const uint64_t position, const bool bHasToSucceed) = 0;
-		virtual bool seekForward(const uint64_t bytes, const bool bHasToSucceed) = 0;
-		virtual bool seekFromEnd(const uint64_t bytes, const bool bHasToSucceed) = 0;
-		virtual uint64_t readBuffer(uint8_t * pBuffer, const uint64_t cbTotalBytesToRead, const bool bNeedsToReadAll) = 0;
-		virtual uint64_t retrieveSize() = 0;
-		virtual uint64_t getPosition() = 0;
+		size_t getEntryCount();
+		std::string getEntryName(const size_t nIndex);
 
-		virtual void readIntoMemory(std::vector<uint8_t>& Buffer) {
-			uint64_t nSize = retrieveSize();
-			Buffer.resize(nSize);
-			if (nSize > 0) {
-				seekPosition(0, true);
-				readBuffer (Buffer.data(), nSize, true);
-			}
-		}
+		bool hasEntry(const std::string & sName);
+		void readEntry (const std::string& sName, std::vector<uint8_t>& Buffer);
+		std::string getContentType (const std::string& sName);
+		uint32_t getSize (const std::string& sName);
+
 	};
 
+	
 }
 
-#endif // __AMCCOMMON_IMPORTSTREAM
+
+#endif //__AMC_RESOURCEPACKAGE
+
