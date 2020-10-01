@@ -87,6 +87,8 @@ public:
 
 	void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) override;
 
+
+
 };
 
 } // namespace Impl

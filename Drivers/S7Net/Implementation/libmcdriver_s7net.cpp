@@ -39,12 +39,13 @@ Interface version: 1.0.0
 #include "libmcdriver_s7net_abi.hpp"
 #include "libmcdriver_s7net_interfaces.hpp"
 #include "libmcdriver_s7net_interfaceexception.hpp"
+#include "libmcdriver_s7net_driver_s7net.hpp"
 
 using namespace LibMCDriver_S7Net;
 using namespace LibMCDriver_S7Net::Impl;
 
 // Injected Components
-LibMCDriverEnv::PWrapper CWrapper::sPLibMCDriverEnvWrapper;
+LibMCEnv::PWrapper CWrapper::sPLibMCEnvWrapper;
 
 void CWrapper::GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro)
 {
@@ -72,9 +73,9 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 	IBase::AcquireBaseClassInterface(pInstance);
 }
 
-IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOTIMPLEMENTED);
+	return new CDriver_S7Net();
 }
 
 

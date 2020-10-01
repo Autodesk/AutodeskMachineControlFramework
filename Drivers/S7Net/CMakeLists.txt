@@ -35,7 +35,7 @@ cmake_minimum_required(VERSION 3.5)
 ### Change the next line for making a new driver
 ##########################################################################################
 
-set (DRIVERPROJECT Marlin)
+set (DRIVERPROJECT S7Net)
 
 ##########################################################################################
 ### generic CMake boilerplate code
