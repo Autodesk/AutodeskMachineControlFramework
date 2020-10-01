@@ -47,6 +47,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
 	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
 	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
 	class CUIModule_Content : public CUIModule {
 	protected:		
@@ -63,7 +64,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances);
+		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage);
 		
 		virtual ~CUIModule_Content();
 

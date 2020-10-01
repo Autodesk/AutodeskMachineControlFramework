@@ -87,11 +87,11 @@ void CAPIHandler_Root::LoadClientPackage(PResourcePackage pResourcePackage)
 
 	size_t nCount = pResourcePackage->getEntryCount();
 	for (size_t nIndex = 0; nIndex < nCount; nIndex++) {
-		auto sName = pResourcePackage->getEntryName(nIndex);
+		auto pEntry = pResourcePackage->getEntry(nIndex);
 
-		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(pResourcePackage->getContentType(sName));
-		pResourcePackage->readEntry(sName, apiResponse->getBuffer());
-		m_FilesToServe.insert(std::make_pair(sName, apiResponse));
+		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(pEntry->getContentType());
+		pResourcePackage->readEntry(pEntry->getName (), apiResponse->getBuffer());
+		m_FilesToServe.insert(std::make_pair(pEntry->getName (), apiResponse));
 	}
 
 

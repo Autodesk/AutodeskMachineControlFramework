@@ -68,13 +68,13 @@
   
   	<userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main">
   
-		<logo uuid="24070b86-0040-4c6c-b92f-db84a526aa68" aspectratio="2.5" />
+		<logo resource="ui_logo" aspectratio="2.5" />
 		
 		<page name="main">
 
 			<content name="infobox" title="Welcome to AMdroid" headline="Autodesk Machine Control Framework" subtitle="Make Additive Manufacturing accessible">
 				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image uuid="24070b86-0040-4c6c-b92f-db84a526aa68" />
+				<image resource="ui_logo" aspectratio="2.5" />
 				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
 				
 				<upload class="build" caption="Select 3MF files to upload" />

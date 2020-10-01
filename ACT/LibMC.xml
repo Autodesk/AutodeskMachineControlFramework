@@ -326,6 +326,7 @@
 		<error name="NOCURRENTJOURNALCHUNK" code="317" description="No current journal chunk" />
 		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />		
 		<error name="RESOURCEENTRYNOTFOUND" code="319" description="Resource entry not found" />
+		<error name="NOCORERESOURCEPACKAGE" code="320" description="No core resource package" />
 
 
 	</errors>

@@ -1,0 +1,3 @@
+<package xmlns="http://schemas.autodesk.com/amc/resourcepackage/2020/07">
+	<entry name="ui_logo" filename="ui_logo.png" size="72647" contenttype="image/png"/>
+</package>

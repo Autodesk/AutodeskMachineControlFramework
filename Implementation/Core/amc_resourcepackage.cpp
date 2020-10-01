@@ -196,41 +196,37 @@ namespace AMC {
 	};
 	
 
-	class CResourcePackageEntry {
-	private:
-		std::string m_sName;
-		std::string m_sFileName;
-		std::string m_sContentType;
-		uint32_t m_nSize;
-	public:
 
-		CResourcePackageEntry(const std::string& sName, const std::string& sFileName, const std::string& sContentType, uint32_t nSize)
-			: m_sName (sName), m_sFileName (sFileName), m_sContentType (sContentType), m_nSize (nSize)
-		{
+	CResourcePackageEntry::CResourcePackageEntry(const std::string& sUUID,  const std::string& sName, const std::string& sFileName, const std::string& sContentType, uint32_t nSize)
+			: m_sName (sName), m_sFileName (sFileName), m_sContentType (sContentType), m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
+	{
+	}
 
-		}
+	std::string CResourcePackageEntry::getName()
+	{
+		return m_sName;
+	}
 
-		std::string getName()
-		{
-			return m_sName;
-		}
+	std::string CResourcePackageEntry::getFileName()
+	{
+		return m_sFileName;
+	}
 
-		std::string getFileName()
-		{
-			return m_sFileName;
-		}
+	std::string CResourcePackageEntry::getContentType()
+	{
+		return m_sContentType;
+	}
 
-		std::string getContentType()
-		{
-			return m_sContentType;
-		}
+	std::string CResourcePackageEntry::getUUID()
+	{
+		return m_sUUID;
+	}
 
-		uint32_t getSize()
-		{
-			return m_nSize;
-		}
+	uint32_t CResourcePackageEntry::getSize()
+	{
+		return m_nSize;
+	}
 
-	};
 
 
     PResourcePackage CResourcePackage::makeFromStream(AMCCommon::PImportStream pStream)
@@ -252,12 +248,12 @@ namespace AMC {
 		if (pStream == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		pStream->readIntoMemory(m_Buffer);
+		pStream->readIntoMemory(m_ZIPBuffer);
 
-		if (m_Buffer.size () == 0)
+		if (m_ZIPBuffer.size () == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX);
 
-		m_pResourcePackageZIP = std::make_shared<CResourcePackageZIP>(m_Buffer.size(), m_Buffer.data());
+		m_pResourcePackageZIP = std::make_shared<CResourcePackageZIP>(m_ZIPBuffer.size(), m_ZIPBuffer.data());
 
 		if (!m_pResourcePackageZIP->hasFile(ROOT_PACKAGEFILENAME))
 			throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTFINDRESOURCEINDEX);
@@ -306,11 +302,13 @@ namespace AMC {
 			std::string sName = nameAttrib.as_string();
 			std::string sFileName = fileNameAttrib.as_string();
 			std::string sContentType = contenttypeAttrib.as_string();
+			std::string sUUID = AMCCommon::CUtils::createUUID();
 			uint32_t nSize = sizeAttrib.as_uint();
 
-			auto pEntry = std::make_shared <CResourcePackageEntry> (sName, sFileName, sContentType, nSize);
-			m_Entries.insert (std::make_pair (sName, pEntry));
-			m_EntryNames.push_back(sName);
+			auto pEntry = std::make_shared <CResourcePackageEntry> (sUUID, sName, sFileName, sContentType, nSize);
+			m_Entries.push_back(pEntry);
+			m_NameMap.insert(std::make_pair(sName, pEntry));
+			m_UUIDMap.insert(std::make_pair (sUUID, pEntry));
 
 		}
 
@@ -323,33 +321,57 @@ namespace AMC {
 	}
 
 
-	size_t CResourcePackage::getEntryCount()
+	uint64_t CResourcePackage::getEntryCount()
 	{
-		return m_EntryNames.size();
+		return m_Entries.size();
 	}
 
 
-	std::string CResourcePackage::getEntryName(const size_t nIndex)
+	PResourcePackageEntry CResourcePackage::getEntry(uint64_t nIndex)
 	{
-		if (nIndex >= m_EntryNames.size())
+		if (nIndex >= m_Entries.size())
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
 
-		return std::string (m_EntryNames[nIndex].c_str());
+		return m_Entries[nIndex];
 	}
 
-
-	bool CResourcePackage::hasEntry(const std::string& sName)
+	PResourcePackageEntry CResourcePackage::findEntryByUUID(const std::string& sUUID, const bool bHasToExist)
 	{
-		auto iIter = m_Entries.find(sName);
-		return (iIter != m_Entries.end ());
+		auto iIter = m_UUIDMap.find(AMCCommon::CUtils::normalizeUUIDString (sUUID));
+		if (iIter == m_UUIDMap.end()) {
+			if (bHasToExist)
+				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND);
+
+			return nullptr;
+		}
+
+		return iIter->second;
 	}
+
+
+	PResourcePackageEntry CResourcePackage::findEntryByName(const std::string& sName, const bool bHasToExist)
+	{
+		auto iIter = m_NameMap.find(sName);
+		if (iIter == m_NameMap.end()) {
+			if (bHasToExist)
+				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND);
+
+			return nullptr;
+		}
+
+		return iIter->second;
+	}
+
+
+
+
 
 	void CResourcePackage::readEntry(const std::string& sName, std::vector<uint8_t>& Buffer)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-		auto iIter = m_Entries.find(sName);
-		if (iIter == m_Entries.end()) 
+		auto iIter = m_NameMap.find(sName);
+		if (iIter == m_NameMap.end())
 			throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
 
 		auto sFileName = iIter->second->getFileName ();
@@ -357,23 +379,6 @@ namespace AMC {
 
 	}
 
-	std::string CResourcePackage::getContentType(const std::string& sName)
-	{
-		auto iIter = m_Entries.find(sName);
-		if (iIter == m_Entries.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
-
-		return iIter->second->getContentType();
-	}
-
-	uint32_t CResourcePackage::getSize(const std::string& sName)
-	{
-		auto iIter = m_Entries.find(sName);
-		if (iIter == m_Entries.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
-
-		return iIter->second->getSize();
-	}
 
 
 }

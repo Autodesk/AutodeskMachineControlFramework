@@ -259,7 +259,7 @@ endif()
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Templates/libmcconfig.xml
+			${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
 			
 

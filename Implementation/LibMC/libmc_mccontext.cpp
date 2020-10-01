@@ -145,8 +145,11 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     auto userInterfaceNode = machinedefinitionNode.child("userinterface");
     if (userInterfaceNode.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
-    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode);
 
+    // Load user interface
+    auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native> (m_pSystemState->getLibraryResourcePath("core"));
+    m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
+    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage);
 
     m_pStateJournal->startRecording();
 

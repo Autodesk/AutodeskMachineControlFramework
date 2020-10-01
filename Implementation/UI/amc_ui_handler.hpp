@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include <memory>
 #include <vector>
@@ -61,6 +62,7 @@ namespace AMC {
 		double m_dLogoAspectRatio;
 
 		PParameterInstances m_pParameterInstances;
+		PResourcePackage m_pCoreResourcePackage;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
@@ -86,7 +88,9 @@ namespace AMC {
 		void writeConfigurationToJSON (CJSONWriter & writer);
 		void writeStateToJSON(CJSONWriter& writer);
 
-		void loadFromXML (pugi::xml_node & xmlNode);
+		void loadFromXML (pugi::xml_node & xmlNode, PResourcePackage pResourcePackage);
+
+		PResourcePackage getCoreResourcePackage ();
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
 	};

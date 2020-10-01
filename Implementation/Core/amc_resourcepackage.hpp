@@ -50,12 +50,32 @@ namespace AMC {
 	typedef std::shared_ptr<CResourcePackage> PResourcePackage;
 
 
+	class CResourcePackageEntry {
+	private:
+		std::string m_sName;
+		std::string m_sFileName;
+		std::string m_sContentType;
+		std::string m_sUUID;
+		uint32_t m_nSize;
+	public:
+		CResourcePackageEntry(const std::string& sUUID, const std::string& sName, const std::string& sFileName, const std::string& sContentType, uint32_t nSize);
+
+		std::string getName();
+		std::string getFileName();
+		std::string getContentType();
+		std::string getUUID();
+		uint32_t getSize();
+	};
+
 	class CResourcePackage {
 	private:
 		std::mutex m_Mutex;
-		std::vector<uint8_t> m_Buffer;
-		std::vector<std::string> m_EntryNames;
-		std::map<std::string, PResourcePackageEntry> m_Entries;
+		std::vector<uint8_t> m_ZIPBuffer;
+
+		std::map<std::string, PResourcePackageEntry> m_UUIDMap;
+		std::map<std::string, PResourcePackageEntry> m_NameMap;
+		std::vector<PResourcePackageEntry> m_Entries;
+
 		PResourcePackageZIP m_pResourcePackageZIP;
 		
 	protected:
@@ -68,13 +88,13 @@ namespace AMC {
 		CResourcePackage(AMCCommon::CImportStream* pStream);
 		virtual ~CResourcePackage();
 
-		size_t getEntryCount();
-		std::string getEntryName(const size_t nIndex);
 
-		bool hasEntry(const std::string & sName);
-		void readEntry (const std::string& sName, std::vector<uint8_t>& Buffer);
-		std::string getContentType (const std::string& sName);
-		uint32_t getSize (const std::string& sName);
+		uint64_t getEntryCount();
+		PResourcePackageEntry getEntry(const uint64_t nIndex);
+		PResourcePackageEntry findEntryByUUID(const std::string& sUUID, const bool bHasToExist);
+		PResourcePackageEntry findEntryByName(const std::string& sName, const bool bHasToExist);
+
+		void readEntry(const std::string& sName, std::vector<uint8_t>& Buffer);
 
 	};
 

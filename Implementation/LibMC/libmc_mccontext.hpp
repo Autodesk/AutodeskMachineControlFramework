@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_multi.hpp"
 
 #include "amc_statesignalhandler.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include "API/amc_api_handler_root.hpp"
 #include "API/amc_api.hpp"
@@ -88,6 +89,8 @@ private:
 	// API Objects
 	AMC::PAPI m_pAPI;
 	AMC::PAPIHandler_Root m_pClientDistHandler;
+
+	AMC::PResourcePackage m_pCoreResourcePackage;
 
 	void loadParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
 	void loadParameterGroupDerives (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup, const std::string & sStateMachineInstance);

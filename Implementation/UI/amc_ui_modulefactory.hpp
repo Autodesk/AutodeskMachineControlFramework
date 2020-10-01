@@ -46,13 +46,14 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
 	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
 	class CUIModuleFactory {
 	protected:
 		
 	public:
 	
-		static PUIModule createModule (pugi::xml_node & xmlNode, PParameterInstances pParameterInstances);
+		static PUIModule createModule (pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage);
 										
 	};
 
