@@ -139,31 +139,10 @@
 													hide-default-footer
 													search 
 													width="100%"
-													loadingText="item.loadingtext">
-													
-													<template v-slot:item.buildName="props">
-														<v-edit-dialog>
-															{{ props.item.buildName }}
-															<template v-slot:input>
-																<v-btn color="primary" v-on:click.stop="uiModuleStartBuildClick (props.item.buildName, props.item.buildUUID);">
-																	Start build
-																</v-btn>
-															</template>
-														</v-edit-dialog>
-													</template>
-
-													<template v-slot:item.buildLayers="props">
-														<v-edit-dialog>
-															{{ props.item.buildLayers }}
-															<template v-slot:input>
-																<v-btn color="primary" v-on:click.stop="uiModuleStartBuildClick (props.item.buildName, props.item.buildUUID);">
-																	Start build
-																</v-btn>
-															</template>
-														</v-edit-dialog>
-													</template>
-       										
-													
+													loadingText="item.loadingtext"
+													@click:row="uiModuleBuildListClick"
+													>													
+																					
 												</v-data-table>					
 												
 											</div>											
@@ -361,7 +340,7 @@ export default {
 					this.AppState.uiPages = resultJSON.data.pages;
 					
 					
-                    this.AppState.activePage = this.AppDefinition.MainPage;
+                    this.uiChangePage (this.AppDefinition.MainPage);
                 })
                 .catch(err => {
                     this.AppState.currentStatus = "error";
@@ -370,7 +349,7 @@ export default {
         },
 		
 		
-		appPerformJobUpload (itemuuid, itemstate, uploadid, chosenfile) {
+		appPerformJobUpload (itemuuid, itemstate, uploadid, chosenfile, successpage) {
 					
 		
 			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!
@@ -471,10 +450,15 @@ export default {
 									}
 								})
 								.then(resultBuildPrepare => {
-									alert ("uploaded " + resultBuildPrepare.data.name);
+									resultBuildPrepare;
 									itemstate.messages = [];
 									itemstate.chosenFile = null;
 									itemstate.uploadid = 0;
+									
+									if (successpage != "") {
+										this.uiChangePage (successpage + ":" + contextuuid);
+										
+									}
 									
 								})
 								.catch(err => {
@@ -605,7 +589,7 @@ export default {
 				}
 				item.state.uploadid = item.state.idcounter; 
 				
-				this.appPerformJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile);
+				this.appPerformJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile, item.uploadsuccesspage);
 				
 			} else {
 			
@@ -624,7 +608,19 @@ export default {
         },
 
         uiChangePage(page) {
-            this.AppState.activePage = page;				
+		
+			var pageString = String (page);
+			var colonIndex = pageString.search(":");
+			
+			if (colonIndex === -1) {
+				this.AppState.activePage = pageString;
+				this.AppState.activeObject = "";
+			}
+			
+			if (colonIndex > 0) {
+				this.AppState.activePage = pageString.substring (0, colonIndex);
+				this.AppState.activeObject = pageString.substring (colonIndex + 1);
+			}
         },
 		
 		uiModuleButtonClick (button) {
@@ -632,6 +628,13 @@ export default {
 				this.uiChangePage (button.targetpage);
 			}
 		
+		},
+		
+		
+		uiModuleBuildListClick (item) {
+			if (item.detailpage != "") {
+				this.uiChangePage (String (item.detailpage) + ":" + String (item.buildUUID));
+			}
 		},
 		
 		
@@ -708,6 +711,7 @@ export default {
             currentError: "",
             showDrawer: true,
             activePage: "",
+			activeObject: "",
             globalTimer: "",			
 			uiPages: [],
 			

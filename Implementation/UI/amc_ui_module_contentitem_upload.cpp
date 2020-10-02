@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption)
+CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string& sSuccessPage)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption), m_sSuccessPage (sSuccessPage)
 {
 
 }
@@ -64,6 +64,7 @@ void CUIModule_ContentUpload::addDefinitionToJSON(CJSONWriter& writer, CJSONWrit
 	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISINITIAL, 1);
 	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISSAVING, 0);
 	object.addString(AMC_API_KEY_UI_ITEMUPLOADFILENAME, "");
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADSUCCESSPAGE, m_sSuccessPage);
 }
 
 

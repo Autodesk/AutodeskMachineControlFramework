@@ -49,10 +49,11 @@ namespace AMC {
 	protected:
 		std::string m_sUploadClass;
 		std::string m_sUploadCaption;
+		std::string m_sSuccessPage;
 
 	public:
 
-		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption);
+		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string & sSuccessPage);
 
 		virtual ~CUIModule_ContentUpload();
 

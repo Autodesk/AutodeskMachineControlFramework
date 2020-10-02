@@ -20,6 +20,7 @@
   	  </parametergroup>
 
 	  <driverparametergroup name="plcstate" description="PLC State Data" driver="s7net" /> 
+	  <driverparametergroup name="marlinstate" description="Marlin State Data" driver="marlin" /> 
 	  
   	  <signaldefinition name="signal_startjob">
   		<parameter name="jobuuid" type="string" />
@@ -76,10 +77,12 @@
 				<image resource="ui_logo" aspectratio="4.5" />
 				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
 				
-				<upload class="build" caption="Select 3MF files to upload" />
+				<upload class="build" caption="Select 3MF files to upload" successpage="buildinfo" />
 				
 				<parameterlist loadingtext="Loading parameters">
 					<entry statemachine="demo" group="jobinfo" />
+					<entry statemachine="demo" group="plcstate" />
+					<entry statemachine="demo" group="marlinstate" />
 				</parameterlist>
 				
 				<button caption="Build Library" targetpage="buildlist" />
@@ -95,9 +98,21 @@
 				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
 				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
 				
-				<upload class="build" caption="Drag 3MF files here to upload" />
+				<upload class="build" caption="Drag 3MF files here to upload" successpage="buildinfo" />
 				
-				<buildlist loadingtext="Loading builds" entriesperpage="20" />
+				<buildlist loadingtext="Loading builds" entriesperpage="20" detailpage="buildinfo" />
+				
+			</content>		
+
+		</page>
+
+
+		<page name="buildinfo">
+		
+			<content name="buildinformation" title="Build Information" subtitle="Detailed information">
+				<paragraph text="Here you find more information about your build." />
+
+				<button caption="Start Build" targetpage="buildinfo" />
 				
 			</content>		
 
