@@ -35,7 +35,7 @@ type DistXMLRoot struct {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-func createMCServerTemplate (outputDir string, packageName string, clientName string, libraryName string, configName string, gitHash string, dllExtension string) (error) {
+func createMCServerTemplate (outputDir string, packageName string, clientName string, libraryName string, configName string, gitHash string, dllExtension string, coreResourcesName string) (error) {
 
 	pkgfile, err := os.Create(outputDir + gitHash + "_package.xml");
 	if (err != nil) {
@@ -48,7 +48,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "<amcpackage xmlns=\"http://schemas.autodesk.com/amcpackage/2020/06\">\n");
 	fmt.Fprintf(pkgfile, "  <build name=\"%s\" configuration=\"%s\" coreclient=\"%s\">\n", packageName, configName, clientName);
 	
-	fmt.Fprintf(pkgfile, "    <library name=\"core\" import=\"%s\" />\n", libraryName);
+	fmt.Fprintf(pkgfile, "    <library name=\"core\" import=\"%s\" resources=\"%s\" />\n", libraryName, coreResourcesName);
 	fmt.Fprintf(pkgfile, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.%s\" />\n", gitHash, dllExtension);
@@ -109,6 +109,7 @@ func main() {
 	
 		
 	ClientZIPName := hexSum + "_core_client.zip";
+	CoreResourcesName := hexSum + "_core_resources.zip";
 	LibraryName := hexSum + "_core_libmc." + dllExtension;
 	ConfigName := hexSum + "_config.xml";
 	
@@ -235,7 +236,7 @@ func main() {
 	
 	fmt.Printf("creating server config in %s\n", OutputDir);
 	
-	err = createMCServerTemplate (OutputDir, packageName, ClientZIPName, LibraryName, ConfigName, hexSum, dllExtension);
+	err = createMCServerTemplate (OutputDir, packageName, ClientZIPName, LibraryName, ConfigName, hexSum, dllExtension, CoreResourcesName);
 	if err != nil {
 		log.Fatal(err)
 	}
