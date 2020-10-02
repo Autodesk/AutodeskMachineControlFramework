@@ -117,6 +117,26 @@ foreach(headerfile ${headerfiles})
 endforeach()	
 
 
+add_custom_command(
+	TARGET ${DRIVERNAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "building driver resources")
+
+if(WIN32)
+add_custom_command(
+	TARGET ${DRIVERNAME} POST_BUILD
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.exe
+			${CMAKE_CURRENT_SOURCE_DIR}/Resources
+			${PROJECT_BINARY_DIR}/../../Output/${GLOBALGITHASH}_driver_${DRIVERSUFFIX}.data)
+endif()
+
+if(UNIX)
+add_custom_command(
+	TARGET ${DRIVERNAME} POST_BUILD
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.linux
+			${CMAKE_CURRENT_SOURCE_DIR}/Resources
+			${PROJECT_BINARY_DIR}/../../Output/${GLOBALGITHASH}_driver_${DRIVERSUFFIX}.data)
+endif()
+
 ##########################################################################################
 ### Add custom code below
 ##########################################################################################

@@ -80,7 +80,7 @@ func main() {
 				fileext := filepath.Ext(file);
 
 				lenwithoutext := len (file) - len (fileext);
-				resourcename := file[0:lenwithoutext];
+				resourcename := strings.ToLower (file[0:lenwithoutext]);
 
 				if (resourcename == "") {
 					return errors.New ("Invalid resource name for: " + file);
@@ -103,7 +103,7 @@ func main() {
 				}
 				
 				if (contenttype == "") {
-					return errors.New ("Invalid content type for file extension: " + fileext);
+					contenttype = "application/binary";
 				}
 
 				

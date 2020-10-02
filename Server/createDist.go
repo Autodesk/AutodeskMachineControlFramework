@@ -56,7 +56,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_printerconnection\" import=\"%s_plugin_printerconnection.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.%s\" />\n", gitHash, dllExtension);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.%s\" resources=\"%s_driver_scanlab.data\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_camera\" import=\"%s_driver_camera.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.%s\" />\n", gitHash, dllExtension);
@@ -108,8 +108,8 @@ func main() {
 	hexSum := argsWithProg[2];
 	
 		
-	ClientZIPName := hexSum + "_core_client.zip";
-	CoreResourcesName := hexSum + "_core_resources.zip";
+	ClientZIPName := hexSum + "_core.client";
+	CoreResourcesName := hexSum + "_core.data";
 	LibraryName := hexSum + "_core_libmc." + dllExtension;
 	ConfigName := hexSum + "_config.xml";
 	
