@@ -12,10 +12,10 @@
   	 	  		  
   	  <parametergroup name="jobinfo" description="Job Information">
   		<parameter name="jobname" description="Job Name" default="Job Name" type="string" />
-  		<parameter name="jobuuid" description="Job UUID" default="820898d9-e4b8-44a2-86e4-cec0a94d9743" type="string" />
+  		<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string" />
   		<parameter name="layercount" description="Layer Count" default="0" type="int" />
   		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
-  		<parameter name="autostart" description="Automatically start job after init" default="1" type="bool" />
+  		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
   		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
   		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
   	  </parametergroup>
