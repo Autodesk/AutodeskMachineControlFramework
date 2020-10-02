@@ -25,7 +25,11 @@ echo git hash: %GITHASH%
 
 cd /d "%basepath%"
 
-echo "Building Go Server..."
+echo "Building Resource builder..."
+go build -o "%builddir%/DevPackage/Framework/BuildResources.exe" "%basepath%/Server/buildresources.go"
+
+
+echo "Building Server..."
 go get github.com/gorilla/handlers
 go build -o "%builddir%/Output/amc_server.exe" -ldflags="-s -w" "%basepath%/Server/mcserver.go"
 
@@ -40,6 +44,9 @@ cd "%builddir%"
 echo "Building Core Modules"
 call cmake ..
 call cmake --build . --config Release
+
+echo "Building Core Resources"
+go run ../Server/buildresources.go ../Plugins/Resources %GITHASH%_core.zip
 
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
