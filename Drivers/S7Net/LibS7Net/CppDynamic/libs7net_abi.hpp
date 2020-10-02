@@ -216,10 +216,11 @@ LIBS7NET_DECLSPEC LibS7NetResult libs7net_releaseinstance(LibS7Net_Base pInstanc
 /**
 * Returns a PLC instance
 *
-* @param[out] pValue - PLC Instance
+* @param[in] pCOMHost - Path to COM Host
+* @param[out] pPLCInstance - PLC Instance
 * @return error code or 0 (success)
 */
-LIBS7NET_DECLSPEC LibS7NetResult libs7net_createplc(LibS7Net_PLC * pValue);
+LIBS7NET_DECLSPEC LibS7NetResult libs7net_createplc(const char * pCOMHost, LibS7Net_PLC * pPLCInstance);
 
 #ifdef __cplusplus
 }
