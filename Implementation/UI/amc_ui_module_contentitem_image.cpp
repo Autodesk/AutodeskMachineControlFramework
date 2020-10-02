@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_MODULE
 #define __AMCIMPL_API_CONSTANTS
 
-#include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_module_contentitem_image.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
@@ -44,31 +44,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentItem::CUIModule_ContentItem(const std::string& sUUID)
-	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
+
+CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID, double dAspectRatio)
+	: CUIModule_ContentItem(sUUID), m_dAspectRatio(dAspectRatio)
+{
+	if ((dAspectRatio < AMC_UI_IMAGE_MINASPECTRATIO) || (dAspectRatio > AMC_UI_IMAGE_MAXASPECTRATIO))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDASPECTRATIO, std::to_string (dAspectRatio));
+
+}
+
+CUIModule_ContentImage::~CUIModule_ContentImage()
 {
 
 }
 
-CUIModule_ContentItem::~CUIModule_ContentItem()
+
+void CUIModule_ContentImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
-
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addDouble(AMC_API_KEY_UI_ITEMASPECTRATIO, m_dAspectRatio);
 }
-
-std::string CUIModule_ContentItem::getUUID()
-{
-	return m_sUUID;
-}
-
-void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-
-}
-
-void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-
-}
-
 
 

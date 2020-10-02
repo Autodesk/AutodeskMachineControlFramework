@@ -28,47 +28,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
-#define __AMCIMPL_API_CONSTANTS
+
+#ifndef __AMC_UI_MODULE_CONTENTITEM_UPLOAD
+#define __AMC_UI_MODULE_CONTENTITEM_UPLOAD
+
+#include "header_protection.hpp"
+
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
 #include "amc_ui_module_contentitem.hpp"
-#include "libmc_interfaceexception.hpp"
 
-#include "amc_api_constants.hpp"
-#include "Common/common_utils.hpp"
-#include "amc_parameterhandler.hpp"
-#include "amc_parameterinstances.hpp"
-
-#include "libmcdata_dynamic.hpp"
-
-using namespace AMC;
+namespace AMC {
 
 
-CUIModule_ContentItem::CUIModule_ContentItem(const std::string& sUUID)
-	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
-{
+	amcDeclareDependingClass(CUIModule_ContentUpload, PUIModule_ContentUpload);
 
-}
+	class CUIModule_ContentUpload : public CUIModule_ContentItem {
+	protected:
+		std::string m_sUploadClass;
+		std::string m_sUploadCaption;
 
-CUIModule_ContentItem::~CUIModule_ContentItem()
-{
+	public:
 
-}
+		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption);
 
-std::string CUIModule_ContentItem::getUUID()
-{
-	return m_sUUID;
-}
+		virtual ~CUIModule_ContentUpload();
 
-void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
-}
-
-void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
+	};
 
 }
 
 
+#endif //__AMC_UI_MODULE_CONTENTITEM_UPLOAD
 

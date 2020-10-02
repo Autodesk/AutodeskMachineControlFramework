@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_MODULE
 #define __AMCIMPL_API_CONSTANTS
 
-#include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_module_contentitem_paragraph.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
@@ -44,31 +44,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentItem::CUIModule_ContentItem(const std::string& sUUID)
-	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
+CUIModule_ContentParagraph::CUIModule_ContentParagraph(const std::string& sText)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID ()), m_sText (sText)
 {
 
 }
 
-CUIModule_ContentItem::~CUIModule_ContentItem()
+CUIModule_ContentParagraph::~CUIModule_ContentParagraph()
 {
 
 }
 
-std::string CUIModule_ContentItem::getUUID()
+std::string CUIModule_ContentParagraph::getText()
 {
-	return m_sUUID;
+	return m_sText;
 }
 
-void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentParagraph::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
-
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "paragraph");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_ITEMTEXT, m_sText);
 }
-
-void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-
-}
-
 
 

@@ -36,6 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem.hpp"
 #include "amc_ui_module_contentbutton.hpp"
 
+#include "amc_ui_module_contentitem_paragraph.hpp"
+#include "amc_ui_module_contentitem_image.hpp"
+#include "amc_ui_module_contentitem_buildlist.hpp"
+#include "amc_ui_module_contentitem_parameterlist.hpp"
+#include "amc_ui_module_contentitem_upload.hpp"
+
+
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 
