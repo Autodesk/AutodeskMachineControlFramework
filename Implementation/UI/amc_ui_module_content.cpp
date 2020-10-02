@@ -77,7 +77,14 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 		if (sChildName == "image") {
 			auto resourceAttrib = childNode.attribute("resource");
 			auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
-			addItem (std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID ()));
+			double dLogoAspectRatio = 1.0;
+			auto aspectratioAttrib = childNode.attribute("aspectratio");
+			if (!aspectratioAttrib.empty()) {
+				dLogoAspectRatio = aspectratioAttrib.as_float();
+			}
+
+
+			addItem (std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID (), dLogoAspectRatio));
 		}
 
 		if (sChildName == "upload") {
