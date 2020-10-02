@@ -214,6 +214,14 @@ LIBS7NET_DECLSPEC LibS7NetResult libs7net_acquireinstance(LibS7Net_Base pInstanc
 LIBS7NET_DECLSPEC LibS7NetResult libs7net_releaseinstance(LibS7Net_Base pInstance);
 
 /**
+* Returns the address of the SymbolLookupMethod
+*
+* @param[out] pSymbolLookupMethod - Address of the SymbolAddressMethod
+* @return error code or 0 (success)
+*/
+LIBS7NET_DECLSPEC LibS7NetResult libs7net_getsymbollookupmethod(LibS7Net_pvoid * pSymbolLookupMethod);
+
+/**
 * Returns a PLC instance
 *
 * @param[in] pCOMHost - Path to COM Host

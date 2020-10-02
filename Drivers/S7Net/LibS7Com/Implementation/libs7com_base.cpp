@@ -27,62 +27,58 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver
+Abstract: This is a stub class definition of CBase
 
 */
 
-
-#ifndef __LIBMCDRIVER_S7NET_DRIVER
-#define __LIBMCDRIVER_S7NET_DRIVER
-
-#include "libmcdriver_s7net_interfaces.hpp"
-
-// Parent classes
-#include "libmcdriver_s7net_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libs7com_base.hpp"
+#include "libs7com_interfaceexception.hpp"
 
 // Include custom headers here.
 
 
-namespace LibMCDriver_S7Net {
-namespace Impl {
-
+using namespace LibS7Com::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CDriver 
+ Class definition of CBase 
 **************************************************************************************************************************/
 
-class CDriver : public virtual IDriver, public virtual CBase {
-private:
+bool CBase::GetLastErrorMessage(std::string & sErrorMessage)
+{
+	if (m_pLastError.get() != nullptr) {
+		sErrorMessage = *m_pLastError;
+		return true;
+	} else {
+		sErrorMessage = "";
+		return false;
+	}
+}
 
+void CBase::ClearErrorMessages()
+{
+	m_pLastError.reset();
+}
 
-protected:
-    std::string m_sName;
-    std::string m_sType;
+void CBase::RegisterErrorMessage(const std::string & sErrorMessage)
+{
+	if (m_pLastError.get() == nullptr) {
+		m_pLastError.reset(new std::string());
+	}
+	*m_pLastError = sErrorMessage;
+}
 
-public:
+void CBase::IncRefCount()
+{
+	++m_nReferenceCount;
+}
 
-    CDriver(const std::string& sName, const std::string& sType);
+bool CBase::DecRefCount()
+{
+	m_nReferenceCount--;
+	if (!m_nReferenceCount) {
+		delete this;
+		return true;
+	}
+	return false;
+}
 
-	std::string GetName() override;
-
-	std::string GetType() override;
-
-	void GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild) override;
-
-	void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) override;
-
-
-
-};
-
-} // namespace Impl
-} // namespace LibMCDriver_S7Net
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_S7NET_DRIVER

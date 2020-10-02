@@ -27,18 +27,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver
+Abstract: This is the class declaration of CPLCCommunication
 
 */
 
 
-#ifndef __LIBMCDRIVER_S7NET_DRIVER
-#define __LIBMCDRIVER_S7NET_DRIVER
+#ifndef __LIBS7COM_PLCCOMMUNICATION
+#define __LIBS7COM_PLCCOMMUNICATION
 
-#include "libmcdriver_s7net_interfaces.hpp"
+#include "libs7com_interfaces.hpp"
 
 // Parent classes
-#include "libmcdriver_s7net_base.hpp"
+#include "libs7com_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -47,42 +47,72 @@ Abstract: This is the class declaration of CDriver
 // Include custom headers here.
 
 
-namespace LibMCDriver_S7Net {
+namespace LibS7Com {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver 
+ Class declaration of CPLCCommunication 
 **************************************************************************************************************************/
 
-class CDriver : public virtual IDriver, public virtual CBase {
+class CPLCCommunication : public virtual IPLCCommunication, public virtual CBase {
 private:
 
+	/**
+	* Put private members here.
+	*/
 
 protected:
-    std::string m_sName;
-    std::string m_sType;
+
+	/**
+	* Put protected members here.
+	*/
 
 public:
 
-    CDriver(const std::string& sName, const std::string& sType);
-
-	std::string GetName() override;
-
-	std::string GetType() override;
-
-	void GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild) override;
-
-	void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) override;
+	/**
+	* Put additional public members here. They will not be visible in the external API.
+	*/
 
 
+	/**
+	* Public member functions to implement.
+	*/
+
+	void SetProtocolConfiguration(const std::string& sProtocolConfiguration) override;
+
+	void StartCommunication(LibS7Net::PPLC pPLC) override;
+
+	void StopCommunication() override;
+
+	void GetStatus() override;
+
+	std::string LoadProgram(const std::string & sProgram) override;
+
+	void ExecuteProgram(const std::string & sIdentifier) override;
+
+	void ClearPrograms() override;
+
+	LibS7Com_uint32 GetVariableCount() override;
+
+	std::string GetVariableName(const LibS7Com_uint32 nIndex) override;
+
+	LibS7Com::eVariableType GetVariableType(const LibS7Com_uint32 nIndex) override;
+
+	std::string GetVariableString(const LibS7Com_uint32 nIndex) override;
+
+	bool GetVariableBool(const LibS7Com_uint32 nIndex) override;
+
+	LibS7Com_int64 GetVariableInteger(const LibS7Com_uint32 nIndex) override;
+
+	LibS7Com_double GetVariableDouble(const LibS7Com_uint32 nIndex) override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCDriver_S7Net
+} // namespace LibS7Com
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_S7NET_DRIVER
+#endif // __LIBS7COM_PLCCOMMUNICATION

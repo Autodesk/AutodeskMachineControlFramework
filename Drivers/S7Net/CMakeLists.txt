@@ -144,4 +144,15 @@ IF(WIN32)
 	target_link_libraries(${DRIVERNAME} setupapi.lib)
 ENDIF(WIN32)
 
+file(GLOB LIBS7COM_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Interfaces/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Implementation/*.cpp
+)
+target_sources(${DRIVERNAME} PRIVATE ${LIBS7COM_SRC})
+
+
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Implementation)
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Interfaces)
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/CppDynamic)
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Net/CppDynamic)
 
