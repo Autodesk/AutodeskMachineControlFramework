@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_MODULE
 #define __AMCIMPL_API_CONSTANTS
 
-#include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_module_contentitem_upload.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
@@ -44,31 +44,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentItem::CUIModule_ContentItem(const std::string& sUUID)
-	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
+CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption)
 {
 
 }
 
-CUIModule_ContentItem::~CUIModule_ContentItem()
+CUIModule_ContentUpload::~CUIModule_ContentUpload()
 {
 
 }
 
-std::string CUIModule_ContentItem::getUUID()
+void CUIModule_ContentUpload::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
-	return m_sUUID;
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "upload");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADCLASS, m_sUploadClass);
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADCAPTION, m_sUploadCaption);
+	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISINITIAL, 1);
+	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISSAVING, 0);
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADFILENAME, "");
 }
-
-void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-
-}
-
-void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-
-}
-
 
 

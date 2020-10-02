@@ -28,47 +28,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
-#define __AMCIMPL_API_CONSTANTS
+
+#ifndef __AMC_UI_MODULE_CONTENTITEM_BUILDLIST
+#define __AMC_UI_MODULE_CONTENTITEM_BUILDLIST
+
+#include "header_protection.hpp"
+
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
 #include "amc_ui_module_contentitem.hpp"
-#include "libmc_interfaceexception.hpp"
 
-#include "amc_api_constants.hpp"
-#include "Common/common_utils.hpp"
-#include "amc_parameterhandler.hpp"
-#include "amc_parameterinstances.hpp"
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
 
-#include "libmcdata_dynamic.hpp"
+namespace AMC {
 
-using namespace AMC;
+	amcDeclareDependingClass(CUIModule_ContentBuildList, PUIModule_ContentBuildList);
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 
+	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
+	protected:
 
-CUIModule_ContentItem::CUIModule_ContentItem(const std::string& sUUID)
-	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
-{
+		std::string m_sLoadingText;
+		std::string m_sBuildNameCaption;
+		std::string m_sBuildLayersCaption;
+		std::string m_sBuildUUIDCaption;
+
+		uint32_t m_nEntriesPerPage;
+
+		PParameterInstances m_pParameterInstances;
+
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+
+	public:
+
+		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, LibMCData::PBuildJobHandler pBuildJobHandler);
+
+		virtual ~CUIModule_ContentBuildList();
+
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+	};
+
 
 }
 
-CUIModule_ContentItem::~CUIModule_ContentItem()
-{
 
-}
-
-std::string CUIModule_ContentItem::getUUID()
-{
-	return m_sUUID;
-}
-
-void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-
-}
-
-void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-
-}
-
-
+#endif //__AMC_UI_MODULE_CONTENTITEM_BUILDLIST
 
