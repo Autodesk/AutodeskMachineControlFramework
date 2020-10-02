@@ -74,7 +74,7 @@
 
 			<content name="infobox" title="Welcome to AMdroid" headline="Autodesk Machine Control Framework" subtitle="Make Additive Manufacturing accessible">
 				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_logo" aspectratio="2.5" />
+				<image resource="ui_logo" aspectratio="4.5" />
 				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
 				
 				<upload class="build" caption="Select 3MF files to upload" />
