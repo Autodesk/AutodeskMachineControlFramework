@@ -75,17 +75,17 @@ void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 
 	CJSONWriterObject headerObject1(writer);
 	headerObject1.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildNameCaption);
-	headerObject1.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDNAMECAPTION);
+	headerObject1.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDNAME);
 	headersArray.addObject(headerObject1);
 
 	CJSONWriterObject headerObject2(writer);
 	headerObject2.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildLayersCaption);
-	headerObject2.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDLAYERSCAPTION);
+	headerObject2.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDLAYERS);
 	headersArray.addObject(headerObject2);
 
 	CJSONWriterObject headerObject3(writer);
 	headerObject3.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildUUIDCaption);
-	headerObject3.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDUUIDCAPTION);
+	headerObject3.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDUUID);
 	headersArray.addObject(headerObject3);
 
 	object.addArray(AMC_API_KEY_UI_ITEMHEADERS, headersArray);
@@ -106,8 +106,8 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 
 		CJSONWriterObject entryObject(writer);
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDNAME, pBuildJob->GetName ());
-		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILDLAYERSCAPTION, pBuildJob->GetLayerCount());
-		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUUIDCAPTION, pBuildJob->GetUUID());
+		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILDLAYERS, pBuildJob->GetLayerCount());
+		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUUID, pBuildJob->GetUUID());
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTIMESTAMP, pBuildJob->GetUUID());
 
 		pBuildJob->GetTimeStamp();
