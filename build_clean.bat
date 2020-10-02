@@ -46,7 +46,7 @@ call cmake ..
 call cmake --build . --config Release
 
 echo "Building Core Resources"
-go run ../Server/buildresources.go ../Plugins/Resources %GITHASH%_core.zip
+go run ../Server/buildresources.go ../Plugins/Resources "%outputdir%/%GITHASH%_core_resources.zip"
 
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
