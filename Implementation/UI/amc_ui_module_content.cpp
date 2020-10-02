@@ -99,7 +99,8 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 		if (sChildName == "upload") {
 			auto classAttrib = childNode.attribute("class");
 			auto captionAttrib = childNode.attribute("caption");
-			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string()));
+			auto successpageAttrib = childNode.attribute("successpage");
+			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string(), successpageAttrib.as_string ()));
 		}
 
 		if (sChildName == "parameterlist") {
@@ -129,7 +130,9 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 		if (sChildName == "buildlist") {
 			auto loadingtextAttrib = childNode.attribute("loadingtext");
 			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
+			auto detailpageAttrib = childNode.attribute("detailpage");
 			std::string sLoadingText = loadingtextAttrib.as_string();
+			std::string sDetailPage = detailpageAttrib.as_string();
 
 			int nEntriesPerPage;
 			if (!entriesperpageAttrib.empty()) {
@@ -143,7 +146,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 			}
 
-			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, pBuildJobHandler);
+			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pBuildJobHandler);
 			addItem(pBuildList);
 			
 		}

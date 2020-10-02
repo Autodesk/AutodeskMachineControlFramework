@@ -45,8 +45,8 @@ using namespace AMC;
 
 
 
-CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, LibMCData::PBuildJobHandler pBuildJobHandler)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_pBuildJobHandler (pBuildJobHandler)
+CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sDetailPage (sDetailPage), m_pBuildJobHandler (pBuildJobHandler)
 {
 	if (pBuildJobHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -68,6 +68,7 @@ void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buildlist");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
 	object.addString(AMC_API_KEY_UI_ITEMLOADINGTEXT, m_sLoadingText);
+	object.addString(AMC_API_KEY_UI_ITEMDETAILPAGE, m_sDetailPage);
 	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
 
 	CJSONWriterArray headersArray(writer);
@@ -104,9 +105,14 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 		auto pBuildJob = pBuildJobIterator->GetCurrentJob();
 
 		CJSONWriterObject entryObject(writer);
-		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDNAMECAPTION, pBuildJob->GetName ());
+		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDNAME, pBuildJob->GetName ());
 		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILDLAYERSCAPTION, pBuildJob->GetLayerCount());
 		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUUIDCAPTION, pBuildJob->GetUUID());
+		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDTIMESTAMP, pBuildJob->GetUUID());
+
+		pBuildJob->GetTimeStamp();
+
+		entryObject.addString(AMC_API_KEY_UI_ITEMDETAILPAGE, m_sDetailPage);
 		entryArray.addObject(entryObject);
 
 	}

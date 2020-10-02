@@ -57,6 +57,8 @@ namespace AMC {
 		std::string m_sBuildLayersCaption;
 		std::string m_sBuildUUIDCaption;
 
+		std::string m_sDetailPage;
+
 		uint32_t m_nEntriesPerPage;
 
 		PParameterInstances m_pParameterInstances;
@@ -65,7 +67,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler);
 
 		virtual ~CUIModule_ContentBuildList();
 
