@@ -94,9 +94,11 @@ void CUIModule_ContentParagraph::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 
 
 
-CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID)
-	: CUIModule_ContentItem (sUUID)
+CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID, double dAspectRatio)
+	: CUIModule_ContentItem(sUUID), m_dAspectRatio(dAspectRatio)
 {
+	if ((dAspectRatio < AMC_UI_IMAGE_MINASPECTRATIO) || (dAspectRatio > AMC_UI_IMAGE_MAXASPECTRATIO))
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDASPECTRATIO, std::to_string (dAspectRatio));
 
 }
 
@@ -110,6 +112,7 @@ void CUIModule_ContentImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWrite
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addDouble(AMC_API_KEY_UI_ITEMASPECTRATIO, m_dAspectRatio);
 }
 
 CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption)

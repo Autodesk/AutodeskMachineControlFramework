@@ -95,10 +95,11 @@ namespace AMC {
 
 	class CUIModule_ContentImage : public CUIModule_ContentItem {
 	protected:		
+		double m_dAspectRatio;
 
 	public:
 
-		CUIModule_ContentImage(const std::string & sUUID);
+		CUIModule_ContentImage(const std::string & sUUID, double dAspectRatio);
 		
 		virtual ~CUIModule_ContentImage();
 

@@ -107,7 +107,7 @@
 										<template v-for="item in uiModule.items">
 											
 											<p :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</p>												
-											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" contain></v-img></p>
+											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" v-bind:aspect-ratio="item.aspectratio" contain></v-img></p>
 											
 											<div :key="item.uuid" v-if="(item.type=='upload')">
 																						
