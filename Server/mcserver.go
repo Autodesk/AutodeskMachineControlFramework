@@ -413,15 +413,11 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 				
 					fieldName, isFile, isMandatory, err := requestHandler.GetFormDataDetails (fieldIndex);
 					if (err == nil) {
-		
-						fmt.Println ("field name: ", fieldName);
-		
-		
+				
 						if (isFile) {
 		
 							formFile, _, err := r.FormFile(fieldName);
-							fmt.Println ("err: ", err);
-							
+						
 							if (err == nil) {
 
 							
@@ -447,7 +443,6 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 						
 								formValue := r.FormValue (fieldName);
 								if (formValue != "") {																
-									fmt.Println ("formvalue: " + formValue);														
 									err = requestHandler.SetFormStringField (fieldName, formValue);							
 								}
 								

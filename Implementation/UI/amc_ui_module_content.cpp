@@ -43,13 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage)
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
 	if (pParameterInstances.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pResourcePackage.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pBuildJobHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
@@ -114,6 +116,29 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 			addItem (pParameterList);
 
 			pParameterList->loadFromXML(childNode);
+		}
+
+
+		if (sChildName == "buildlist") {
+			auto loadingtextAttrib = childNode.attribute("loadingtext");
+			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
+			std::string sLoadingText = loadingtextAttrib.as_string();
+
+			int nEntriesPerPage;
+			if (!entriesperpageAttrib.empty()) {
+				nEntriesPerPage = entriesperpageAttrib.as_int();
+				if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
+					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+				if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
+					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+			}
+			else {
+				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
+			}
+
+			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, pBuildJobHandler);
+			addItem(pBuildList);
+			
 		}
 
 		if (sChildName == "button") {

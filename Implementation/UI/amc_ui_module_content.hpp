@@ -40,6 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Libraries/PugiXML/pugixml.hpp"
 
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
+
+
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
@@ -64,7 +69,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage);
+		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 		
 		virtual ~CUIModule_Content();
 

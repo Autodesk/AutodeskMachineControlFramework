@@ -70,7 +70,7 @@ copy ..\Output\amc_server.xml Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmc.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_lib3mf.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmcdata.dll Framework\Dist\
-copy ..\Output\%GITHASH%_core_client.zip Framework\Dist\
+copy ..\Output\%GITHASH%_*.data Framework\Dist\
 copy ..\Output\%GITHASH%_package.xml Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\Output\lib3mf.dll Framework\Dist\%GITHASH%_core_lib3mf.dll

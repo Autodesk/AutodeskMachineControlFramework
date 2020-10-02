@@ -172,7 +172,7 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
 }
 
 
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage)
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
 {
     if (pResourcePackage.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -231,7 +231,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModule = CUIModuleFactory::createModule(pageChild, m_pParameterInstances, m_pCoreResourcePackage);
+            auto pModule = CUIModuleFactory::createModule(pageChild, m_pParameterInstances, m_pCoreResourcePackage, pBuildJobHandler);
             pPage->addModule(pModule);
 
         }

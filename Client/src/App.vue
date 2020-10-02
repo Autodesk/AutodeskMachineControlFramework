@@ -121,11 +121,51 @@
 													:items="item.entries"
 													:items-per-page="item.entriesperpage"
 													class="elevation-1"
+													search 
 													disable-pagination
 													hide-default-footer
 													width="100%"
 													loadingText="item.loadingtext">
 												</v-data-table>											
+											</div>											
+
+											<div :key="item.uuid" v-if="(item.type=='buildlist')">											
+												<v-data-table
+													:headers="item.headers"
+													:items="item.entries"
+													:items-per-page="item.entriesperpage"
+													class="elevation-1"
+													disable-pagination
+													hide-default-footer
+													search 
+													width="100%"
+													loadingText="item.loadingtext">
+													
+													<template v-slot:item.buildName="props">
+														<v-edit-dialog>
+															{{ props.item.buildName }}
+															<template v-slot:input>
+																<v-btn color="primary" v-on:click.stop="uiModuleStartBuildClick (props.item.buildName, props.item.buildUUID);">
+																	Start build
+																</v-btn>
+															</template>
+														</v-edit-dialog>
+													</template>
+
+													<template v-slot:item.buildLayers="props">
+														<v-edit-dialog>
+															{{ props.item.buildLayers }}
+															<template v-slot:input>
+																<v-btn color="primary" v-on:click.stop="uiModuleStartBuildClick (props.item.buildName, props.item.buildUUID);">
+																	Start build
+																</v-btn>
+															</template>
+														</v-edit-dialog>
+													</template>
+       										
+													
+												</v-data-table>					
+												
 											</div>											
 											
 										</template>
@@ -294,6 +334,13 @@ export default {
 							if (module.type === "content") {
 								for (item of module.items) {
 									if (item.type === "parameterlist") {
+									
+										this.AppState.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+										item.entries = this.AppState.ContentItems[item.uuid].entries;
+										
+									}
+
+									if (item.type === "buildlist") {
 									
 										this.AppState.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
 										item.entries = this.AppState.ContentItems[item.uuid].entries;
@@ -585,6 +632,32 @@ export default {
 				this.uiChangePage (button.targetpage);
 			}
 		
+		},
+		
+		
+		uiModuleStartBuildClick (buildName, buildUUID) {
+		
+			var url = this.API.baseURL + "/signal/";
+			Axios({			
+				method: "POST",
+				url: url,
+				headers: {
+					"Authorization": "Bearer " + this.API.authToken,
+				},
+				data: {
+					"instancename": "demo",
+					"signalname": "signal_startjob",
+					"jobname": buildName,
+					"jobuuid": buildUUID
+				}
+			})
+			.then(resultBuildStart => {
+				resultBuildStart;
+				alert ("started build!");
+			})
+			.catch(err => {
+				err;                    
+			});				
 		},
 
         uiOnTimer() {

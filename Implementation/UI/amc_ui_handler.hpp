@@ -41,6 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <mutex>
 
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
+
+
 namespace AMC {
 
 	amcDeclareDependingClass(CUIMenuItem, PUIMenuItem);
@@ -88,7 +93,7 @@ namespace AMC {
 		void writeConfigurationToJSON (CJSONWriter & writer);
 		void writeStateToJSON(CJSONWriter& writer);
 
-		void loadFromXML (pugi::xml_node & xmlNode, PResourcePackage pResourcePackage);
+		void loadFromXML (pugi::xml_node & xmlNode, PResourcePackage pCoreResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 
 		PResourcePackage getCoreResourcePackage ();
 

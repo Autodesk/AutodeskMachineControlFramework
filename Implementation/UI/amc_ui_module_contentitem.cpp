@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "amc_parameterinstances.hpp"
 
+#include "libmcdata_dynamic.hpp"
+
 using namespace AMC;
 
 
@@ -333,3 +335,75 @@ void CUIModule_ContentParameterList::loadFromXML(pugi::xml_node& xmlNode)
 
 	}
 }
+
+
+CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, LibMCData::PBuildJobHandler pBuildJobHandler)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_pBuildJobHandler (pBuildJobHandler)
+{
+	if (pBuildJobHandler.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	m_sBuildNameCaption = "Build name";
+	m_sBuildLayersCaption = "Layers";
+	m_sBuildUUIDCaption = "UUID";
+
+}
+
+CUIModule_ContentBuildList::~CUIModule_ContentBuildList()
+{
+
+}
+
+void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buildlist");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_ITEMLOADINGTEXT, m_sLoadingText);
+	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
+
+	CJSONWriterArray headersArray(writer);
+
+	CJSONWriterObject headerObject1(writer);
+	headerObject1.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildNameCaption);
+	headerObject1.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDNAMECAPTION);
+	headersArray.addObject(headerObject1);
+
+	CJSONWriterObject headerObject2(writer);
+	headerObject2.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildLayersCaption);
+	headerObject2.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDLAYERSCAPTION);
+	headersArray.addObject(headerObject2);
+
+	CJSONWriterObject headerObject3(writer);
+	headerObject3.addString(AMC_API_KEY_UI_ITEMTEXT, m_sBuildUUIDCaption);
+	headerObject3.addString(AMC_API_KEY_UI_ITEMVALUE, AMC_API_KEY_UI_ITEMBUILDUUIDCAPTION);
+	headersArray.addObject(headerObject3);
+
+	object.addArray(AMC_API_KEY_UI_ITEMHEADERS, headersArray);
+
+	CJSONWriterArray entriesArray(writer);
+	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entriesArray);
+}
+
+void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+
+	CJSONWriterArray entryArray(writer);
+
+	auto pBuildJobIterator = m_pBuildJobHandler->ListJobsByStatus(LibMCData::eBuildJobStatus::Validated);
+	while (pBuildJobIterator->MoveNext ()) {
+		
+		auto pBuildJob = pBuildJobIterator->GetCurrentJob();
+
+		CJSONWriterObject entryObject(writer);
+		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDNAMECAPTION, pBuildJob->GetName ());
+		entryObject.addInteger(AMC_API_KEY_UI_ITEMBUILDLAYERSCAPTION, pBuildJob->GetLayerCount());
+		entryObject.addString(AMC_API_KEY_UI_ITEMBUILDUUIDCAPTION, pBuildJob->GetUUID());
+		entryArray.addObject(entryObject);
+
+	}
+
+	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entryArray);
+}
+
+
