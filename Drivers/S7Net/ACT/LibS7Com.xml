@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
-	libraryname="S7Net Library Wrapper" namespace="LibS7Net" copyright="Autodesk Inc." year="2020" basename="libs7net"
-	version="1.2.0">
+	libraryname="S7Net Communication Protocol" namespace="LibS7Com" copyright="Autodesk Inc." year="2020" basename="libs7com"
+	version="3.1.3">
 	<license>
 		<line value="All rights reserved." />
 		<line value="" />
@@ -61,82 +61,65 @@
 				
 	</errors>
 	
-	<enum name="CPUType">
-		<option name="S7200" value="0" />
-		<option name="S7300" value="10" />
-		<option name="S7400" value="20" />
-		<option name="S71200" value="30" />
-		<option name="S71500" value="40" />
-	</enum>	
+	<importcomponent uri="LibS7Net.xml" namespace="LibS7Net"/>	
 	  
+	<enum name="VariableType">
+		<option name="BooleanVariable" value="1" />
+		<option name="IntegerVariable" value="2" />
+		<option name="StringVariable" value="3" />
+		<option name="DoubleVariable" value="4" />
+	</enum>		  
 	
 		
-	<class name="Base" clsid="1c0b49dc-9be4-4157-97b4-79225aad7907" iid="c27effb2-951b-4af9-bb47-faeabbde5598">
+	<class name="Base">
 	</class>
 	
 
-	<class name="PLCReadData" parent="Base" clsid="cb767ba1-e821-4849-8b81-9852f5053384" iid="1c670d16-177d-44b2-b9e5-b264520178d6">
-
-		<method name="GetData" description="Returns the binary data.">
-			<param name="Data" type="basicarray" class="uint8" pass="out" description="Binary data." />
-		</method>
-
-	
-	</class>
-
-	<class name="PLC" parent="Base" clsid="0cdeecf2-4252-4a1a-ae01-c98a9b02c78f" iid="c7adb662-c099-41c1-831d-0f11baa29640">
+	<class name="PLCCommunication" parent="Base">
 						
-		<method name="Connect" description="Connects to a PLC Instance">
-			<param name="CPUType" type="enum" class="CPUType" pass="in" description="CPU type to connect to." />		
-			<param name="IP" type="string" pass="in" description="IP address to connect to." />
-			<param name="Rack" type="uint32" pass="in" description="Rack to connect to." />
-			<param name="Slot" type="uint32" pass="in" description="Slot to connect to." />
+		<method name="StartCommunication" description="Starts communication with the S7 PLC Instance">
+			<param name="ProtocolConfiguration" type="string" pass="in" description="Configuration XML as string." />
+			<param name="PLC" type="class" class="LibS7Net:PLC" pass="in" description="PLC Instance" />
 		</method>
 		
-		<method name="IsConnected" description="Checks if the socket is connected and polls the other peer (the plc) to see if it is connected.">
-			<param name="Connected" type="bool" pass="return" description="Flag if the socket is connected." />
+		<method name="StopCommunication" description="Stops communication with the S7 PLC Instance">
 		</method>
 		
-		<method name="IsAvailable" description="Returns true if a connection to the plc can be established.">
-			<param name="Connected" type="bool" pass="return" description="Flag if the socket is connected." />
+		<method name="GetStatus" description="Returns the status of the PLC">
 		</method>
 
-		<method name="GetSlot" description="Returns slot of the CPU of the plc.">
-			<param name="Slot" type="uint32" pass="return" description="Slot of the CPU of the plc." />
-		</method>
-		
-		<method name="GetRack" description="Returns rack of the plc.">
-			<param name="Slot" type="uint32" pass="return" description="Rack of the plc." />
+		<method name="LoadProgram" description="Loads a GCode Program on the PLC">
+			<param name="Program" type="string" pass="in" description="GCode Program to send." />
+			<param name="Identifier" type="string" pass="return" description="Program identifier." />
 		</method>
 
-		<method name="GetCPUType" description="Returns Cpu type of the plc.">
-			<param name="CPUType" type="enum" class="CPUType" pass="return" description="Cpu type of the plc." />
-		</method>
-		
-		<method name="GetIPAddress" description="Returns Ip address of the plc.">
-			<param name="IPAddress" type="string" pass="return" description="Ip address of the plc." />
+		<method name="ExecuteProgram" description="Executes a GCode Program on the PLC">
+			<param name="Identifier" type="string" pass="in" description="Program identifier." />
 		</method>
 
-		<method name="WriteBytes" description="Writes bytes into a PLC DB.">
-			<param name="DB" type="uint32" pass="in" description="ID of DB." />
-			<param name="Offset" type="uint32" pass="in" description="Address to write into." /> 
-			<param name="Bytes" type="basicarray" class="uint8" pass="in" description="ByteArray to write." />
+		<method name="ClearPrograms" description="Clears loaded programs">
 		</method>
 
-		<method name="ReadBytes" description="Read bytes from a PLC DB.">
-			<param name="DB" type="uint32" pass="in" description="ID of DB." />
-			<param name="Offset" type="uint32" pass="in" description="Address to write into." /> 
-			<param name="Count" type="uint32" pass="in" description="Number of bytes to read." /> 
-			<param name="ReadData" type="class" class="PLCReadData" pass="return" description="Read Data Instance." />
+		<method name="GetVariableCount" description="Returns number of reported variables.">
+			<param name="Count" type="uint32" pass="return" description="Number of variables." />
 		</method>
-				
+
+		<method name="GetVariableName" description="Returns name of variable.">
+			<param name="Index" type="uint32" pass="index" description="Index of variable (0-based)." />
+			<param name="Name" type="string" pass="return" description="Name of variable." />
+		</method>
+
+		<method name="GetVariableType" description="Returns type of variable.">
+			<param name="Index" type="uint32" pass="index" description="Index of variable (0-based)." />
+			<param name="VariableType" type="enum" class="VariableType" pass="return" description="Type of variable." />
+		</method>
+						
 	</class>
 	
 	
 	<global baseclassname="Base" stringoutclassname="Base" acquiremethod="AcquireInstance"
-		releasemethod="ReleaseInstance" versionmethod="GetVersion" errormethod="GetLastError" journalmethod="SetJournal"
-		clsid="eb056ea7-29d5-480e-a351-c95a544dcc95" iid="10c868f6-6fca-47fb-b7aa-0160193ba204"
-		symbollookupmethod="GetSymbolLookupMethod"
+		releasemethod="ReleaseInstance" versionmethod="GetVersion" errormethod="GetLastError"
+		injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod"		
 		>
 		<method name="GetVersion" description = "retrieves the binary version of this library.">
 			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
@@ -154,15 +137,14 @@
 		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
 			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
 		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>				
 
-		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
-			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		<method name="CreatePLCCommunication" description="Returns a PLC Communication instance">
+			<param name="PLCCommunication" type="class" class="PLC" pass="return" description="PLC Communication Instance" />
 		</method>
-		
-		<method name="CreatePLC" description="Returns a PLC instance">
-			<param name="COMHost" type="string" pass="in" description="Path to COM Host" />
-			<param name="PLCInstance" type="class" class="PLC" pass="return" description="PLC Instance" />
-		</method>
-		
+
 	</global>
 </component>
