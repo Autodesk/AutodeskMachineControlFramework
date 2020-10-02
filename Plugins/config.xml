@@ -17,7 +17,6 @@
   		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
   		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
   		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
-  		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
   	  </parametergroup>
 
 	  <driverparametergroup name="plcstate" description="PLC State Data" driver="s7net" /> 
@@ -98,7 +97,8 @@
 				
 				<upload class="build" caption="Drag 3MF files here to upload" />
 				
-				<button caption="Start Build" targetpage="startbuild" />				
+				<buildlist loadingtext="Loading builds" entriesperpage="20" />
+				
 			</content>		
 
 		</page>

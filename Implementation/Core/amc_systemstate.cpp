@@ -156,6 +156,11 @@ namespace AMC {
 		return m_pLoginHandler;
 	}
 
+	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()
+	{
+		return m_pBuildJobHandler;
+	}
+
 	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
 	{
 		return m_pGlobalChrono;

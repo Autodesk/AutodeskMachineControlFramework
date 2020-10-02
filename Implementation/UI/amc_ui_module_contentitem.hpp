@@ -43,8 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
+#include "amc_systemstate.hpp"
 
 #define AMC_CONTENT_MAXENTRYCOUNT (1024 * 1024)
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
 
 namespace AMC {
 
@@ -177,6 +182,35 @@ namespace AMC {
 		void loadFromXML(pugi::xml_node& xmlNode);
 
 	};
+
+
+	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
+	protected:
+
+		std::string m_sLoadingText;
+		std::string m_sBuildNameCaption;
+		std::string m_sBuildLayersCaption;
+		std::string m_sBuildUUIDCaption;
+
+		uint32_t m_nEntriesPerPage;
+
+		PParameterInstances m_pParameterInstances;
+
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+
+	public:
+
+		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, LibMCData::PBuildJobHandler pBuildJobHandler);
+
+		virtual ~CUIModule_ContentBuildList();
+
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+	};
+
+
 }
 
 

@@ -128,6 +128,7 @@ namespace AMC {
 		PParameterInstances getParameterInstances ();
 
 		LibMCData::PLoginHandler getLoginHandlerInstance();
+		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
 		AMCCommon::PChrono getGlobalChronoInstance();
 
 		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);
