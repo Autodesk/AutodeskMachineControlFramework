@@ -48,12 +48,12 @@ add_custom_command(
 
 add_custom_command(
 	TARGET configuration_xml PRE_BUILD
-	COMMAND ${CMAKE_COMMAND} -E echo "copying configuration.xml...")
+	COMMAND ${CMAKE_COMMAND} -E echo "copying config.xml...")
 
 add_custom_command(
     TARGET configuration_xml PRE_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_SOURCE_DIR}/configuration.xml
+            ${CMAKE_SOURCE_DIR}/Plugins/config.xml
 			${CMAKE_CURRENT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
 
 
