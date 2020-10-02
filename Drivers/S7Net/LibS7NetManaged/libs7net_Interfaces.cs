@@ -172,7 +172,7 @@ namespace LibS7Net
 	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 	public interface IWrapper
 	{
-		public IPLC CreatePLC();
+		public IPLC CreatePLC(String COMHostName);
 	}
 
 }

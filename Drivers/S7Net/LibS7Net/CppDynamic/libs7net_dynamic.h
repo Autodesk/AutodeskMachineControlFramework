@@ -203,10 +203,11 @@ typedef LibS7NetResult (*PLibS7NetReleaseInstancePtr) (LibS7Net_Base pInstance);
 /**
 * Returns a PLC instance
 *
-* @param[out] pValue - PLC Instance
+* @param[in] pCOMHost - Path to COM Host
+* @param[out] pPLCInstance - PLC Instance
 * @return error code or 0 (success)
 */
-typedef LibS7NetResult (*PLibS7NetCreatePLCPtr) (LibS7Net_PLC * pValue);
+typedef LibS7NetResult (*PLibS7NetCreatePLCPtr) (const char * pCOMHost, LibS7Net_PLC * pPLCInstance);
 
 /*************************************************************************************************************************
  Function Table Structure

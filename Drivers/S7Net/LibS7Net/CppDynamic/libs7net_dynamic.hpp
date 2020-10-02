@@ -238,7 +238,7 @@ public:
 	inline bool GetLastError(classParam<CBase> pInstance, std::string & sErrorMessage);
 	inline void AcquireInstance(classParam<CBase> pInstance);
 	inline void ReleaseInstance(classParam<CBase> pInstance);
-	inline PPLC CreatePLC();
+	inline PPLC CreatePLC(const std::string & sCOMHost);
 
 private:
 	sLibS7NetDynamicWrapperTable m_WrapperTable;
@@ -415,17 +415,18 @@ public:
 	
 	/**
 	* CWrapper::CreatePLC - Returns a PLC instance
+	* @param[in] sCOMHost - Path to COM Host
 	* @return PLC Instance
 	*/
-	inline PPLC CWrapper::CreatePLC()
+	inline PPLC CWrapper::CreatePLC(const std::string & sCOMHost)
 	{
-		LibS7NetHandle hValue = nullptr;
-		CheckError(nullptr,m_WrapperTable.m_CreatePLC(&hValue));
+		LibS7NetHandle hPLCInstance = nullptr;
+		CheckError(nullptr,m_WrapperTable.m_CreatePLC(sCOMHost.c_str(), &hPLCInstance));
 		
-		if (!hValue) {
+		if (!hPLCInstance) {
 			CheckError(nullptr,LIBS7NET_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CPLC>(this, hValue);
+		return std::make_shared<CPLC>(this, hPLCInstance);
 	}
 	
 	inline void CWrapper::CheckError(CBase * pBaseClass, LibS7NetResult nResult)

@@ -47,6 +47,8 @@
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="1007" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="1008" description="the version of the binary interface does not match the bindings interface" />
 		<error name="NOTCONNECTED" code="1009" description="PLC is not connected" />
+		<error name="COMNOTINITIALIZED" code="1010" description="COM is not initialized" />
+		<error name="COULDNOTINITIALIZECOM" code="1011" description="Could not initialize COM" />			
 				
 		<error name="WRONGCPUTYPE" code="1" description="Wrong type of CPU." />
 		<error name="CONNECTIONERROR" code="2" description="Connection error." />
@@ -129,7 +131,8 @@
 		</method>
 				
 	</class>
-
+	
+	
 	<global baseclassname="Base" stringoutclassname="Base" acquiremethod="AcquireInstance"
 		releasemethod="ReleaseInstance" versionmethod="GetVersion" errormethod="GetLastError" journalmethod="SetJournal"
 		clsid="eb056ea7-29d5-480e-a351-c95a544dcc95" iid="10c868f6-6fca-47fb-b7aa-0160193ba204"
@@ -152,7 +155,8 @@
 		</method>
 
 		<method name="CreatePLC" description="Returns a PLC instance">
-			<param name="Value" type="class" class="PLC" pass="return" description="PLC Instance" />
+			<param name="COMHost" type="string" pass="in" description="Path to COM Host" />
+			<param name="PLCInstance" type="class" class="PLC" pass="return" description="PLC Instance" />
 		</method>
 
 	</global>
