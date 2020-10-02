@@ -76,9 +76,12 @@
 	
 
 	<class name="PLCCommunication" parent="Base">
+
+		<method name="SetProtocolConfiguration" description="Configures the protocol">
+			<param name="ProtocolConfiguration" type="string" pass="in" description="Configuration XML as string." />
+		</method>
 						
 		<method name="StartCommunication" description="Starts communication with the S7 PLC Instance">
-			<param name="ProtocolConfiguration" type="string" pass="in" description="Configuration XML as string." />
 			<param name="PLC" type="class" class="LibS7Net:PLC" pass="in" description="PLC Instance" />
 		</method>
 		
@@ -105,15 +108,35 @@
 		</method>
 
 		<method name="GetVariableName" description="Returns name of variable.">
-			<param name="Index" type="uint32" pass="index" description="Index of variable (0-based)." />
+			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
 			<param name="Name" type="string" pass="return" description="Name of variable." />
 		</method>
 
 		<method name="GetVariableType" description="Returns type of variable.">
-			<param name="Index" type="uint32" pass="index" description="Index of variable (0-based)." />
+			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
 			<param name="VariableType" type="enum" class="VariableType" pass="return" description="Type of variable." />
 		</method>
+
+		<method name="GetVariableString" description="Returns value of string variable.">
+			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
+			<param name="Value" type="string" pass="return" description="Value of variable." />
+		</method>
 						
+		<method name="GetVariableBool" description="Returns value of bool variable.">
+			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
+			<param name="Value" type="bool" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="GetVariableInteger" description="Returns value of bool variable.">
+			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
+			<param name="Value" type="int64" pass="return" description="Value of variable." />
+		</method>
+		
+		<method name="GetVariableDouble" description="Returns value of double variable.">
+			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
+			<param name="Value" type="double" pass="return" description="Value of variable." />
+		</method>
+		
 	</class>
 	
 	
@@ -141,9 +164,11 @@
 			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
 			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
 		</method>				
-
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>	
 		<method name="CreatePLCCommunication" description="Returns a PLC Communication instance">
-			<param name="PLCCommunication" type="class" class="PLC" pass="return" description="PLC Communication Instance" />
+			<param name="PLCCommunication" type="class" class="PLCCommunication" pass="return" description="PLC Communication Instance" />
 		</method>
 
 	</global>

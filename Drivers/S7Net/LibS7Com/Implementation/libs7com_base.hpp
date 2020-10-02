@@ -27,62 +27,71 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver
+Abstract: This is the class declaration of CBase
 
 */
 
 
-#ifndef __LIBMCDRIVER_S7NET_DRIVER
-#define __LIBMCDRIVER_S7NET_DRIVER
+#ifndef __LIBS7COM_BASE
+#define __LIBS7COM_BASE
 
-#include "libmcdriver_s7net_interfaces.hpp"
+#include "libs7com_interfaces.hpp"
+#include <vector>
+#include <list>
+#include <memory>
 
-// Parent classes
-#include "libmcdriver_s7net_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
 
 // Include custom headers here.
 
 
-namespace LibMCDriver_S7Net {
+namespace LibS7Com {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver 
+ Class declaration of CBase 
 **************************************************************************************************************************/
 
-class CDriver : public virtual IDriver, public virtual CBase {
+class CBase : public virtual IBase {
 private:
 
+	std::unique_ptr<std::string> m_pLastError;
+	uint32_t m_nReferenceCount = 1;
+
+	/**
+	* Put private members here.
+	*/
 
 protected:
-    std::string m_sName;
-    std::string m_sType;
+
+	/**
+	* Put protected members here.
+	*/
 
 public:
 
-    CDriver(const std::string& sName, const std::string& sType);
+	/**
+	* Put additional public members here. They will not be visible in the external API.
+	*/
 
-	std::string GetName() override;
+	bool GetLastErrorMessage(std::string & sErrorMessage) override;
 
-	std::string GetType() override;
+	void ClearErrorMessages() override;
 
-	void GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild) override;
+	void RegisterErrorMessage(const std::string & sErrorMessage) override;
 
-	void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) override;
+	void IncRefCount() override;
+
+	bool DecRefCount() override;
 
 
+	/**
+	* Public member functions to implement.
+	*/
 
 };
 
 } // namespace Impl
-} // namespace LibMCDriver_S7Net
+} // namespace LibS7Com
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_S7NET_DRIVER
+#endif // __LIBS7COM_BASE

@@ -33,6 +33,8 @@ Abstract: This is a stub class definition of CDriver_S7Net
 
 #include "libmcdriver_s7net_driver_s7net.hpp"
 #include "libmcdriver_s7net_interfaceexception.hpp"
+#include "libs7com_abi.hpp"
+#include "libs7com_interfaces.hpp"
 
 // Include custom headers here.
 
@@ -43,14 +45,41 @@ using namespace LibMCDriver_S7Net::Impl;
  Class definition of CDriver_S7Net 
 **************************************************************************************************************************/
 
+CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+    : CDriver (sName, sType), m_pDriverEnvironment (pDriverEnvironment)
+{
+    if (pDriverEnvironment.get() == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    std::string sLibS7LibraryPath;
+    std::string sLibS7LibraryComHostPath;
+    std::string sProtocolConfiguration;
+
+    m_pPLCWrapper = LibS7Net::CWrapper::loadLibrary (sLibS7LibraryPath);
+    m_pPLC = m_pPLCWrapper->CreatePLC(sLibS7LibraryComHostPath);
+
+    m_pCommunicationWrapper = LibS7Com::CWrapper::loadLibraryFromSymbolLookupMethod(&LibS7Com::Impl::LibS7Com_GetProcAddress);
+    m_pCommunicationWrapper->InjectComponent("LibS7Net", m_pPLCWrapper->GetSymbolLookupMethod());
+    m_pCommunication = m_pCommunicationWrapper->CreatePLCCommunication();
+    m_pCommunication->SetProtocolConfiguration(sProtocolConfiguration);
+}
+
+CDriver_S7Net::~CDriver_S7Net()
+{
+    m_pCommunication = nullptr;
+    m_pCommunicationWrapper = nullptr;
+    m_pPLC = nullptr;
+    m_pPLCWrapper = nullptr;
+}
+
 void CDriver_S7Net::Connect()
 {
-	
+    m_pCommunication->StartCommunication(m_pPLC);
 }
 
 void CDriver_S7Net::Disconnect()
-{
-	
+{	
+    m_pCommunication->StopCommunication();
 }
 
 void CDriver_S7Net::QueryParameters()

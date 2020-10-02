@@ -201,6 +201,14 @@ typedef LibS7NetResult (*PLibS7NetAcquireInstancePtr) (LibS7Net_Base pInstance);
 typedef LibS7NetResult (*PLibS7NetReleaseInstancePtr) (LibS7Net_Base pInstance);
 
 /**
+* Returns the address of the SymbolLookupMethod
+*
+* @param[out] pSymbolLookupMethod - Address of the SymbolAddressMethod
+* @return error code or 0 (success)
+*/
+typedef LibS7NetResult (*PLibS7NetGetSymbolLookupMethodPtr) (LibS7Net_pvoid * pSymbolLookupMethod);
+
+/**
 * Returns a PLC instance
 *
 * @param[in] pCOMHost - Path to COM Host
@@ -229,6 +237,7 @@ typedef struct {
 	PLibS7NetGetLastErrorPtr m_GetLastError;
 	PLibS7NetAcquireInstancePtr m_AcquireInstance;
 	PLibS7NetReleaseInstancePtr m_ReleaseInstance;
+	PLibS7NetGetSymbolLookupMethodPtr m_GetSymbolLookupMethod;
 	PLibS7NetCreatePLCPtr m_CreatePLC;
 } sLibS7NetDynamicWrapperTable;
 

@@ -42,15 +42,19 @@ using namespace LibMCDriver_S7Net::Impl;
 /*************************************************************************************************************************
  Class definition of CDriver 
 **************************************************************************************************************************/
+CDriver::CDriver(const std::string& sName, const std::string& sType)
+    : m_sName(sName), m_sType(sType)
+{
+}
 
 std::string CDriver::GetName()
 {
-    return "s7net";
+    return m_sName;
 }
 
 std::string CDriver::GetType()
 {
-    return "s7net";
+    return m_sType;
 }
 
 void CDriver::GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild)
