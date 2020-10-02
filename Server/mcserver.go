@@ -424,9 +424,7 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 								defer formFile.Close ();
 					
 								byteArray, err := ioutil.ReadAll(formFile);
-								if (err == nil) {
-									fmt.Println ("bytearray len: ", len (byteArray));
-									
+								if (err == nil) {									
 									err = requestHandler.SetFormDataField (fieldName, byteArray);							
 								}													
 								
