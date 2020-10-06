@@ -63,9 +63,10 @@ public:
 		return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
 	}
 
-	void setFanSpeed(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nFanId, double dFanSpeed)
+	bool deviceSetFanSpeed(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nFanId, double dFanSpeed)
 	{
 		// set temperature without waiting => already heating while homing
+		bool bSuccess = true;
 		pStateEnvironment->LogMessage("Set fan speed. ");
 		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_setfanspeed");
 		pSignal->SetInteger("fanid", nFanId);
@@ -73,7 +74,8 @@ public:
 		pSignal->Trigger();
 
 		if (pSignal->WaitForHandling(1000)) {
-			if (pSignal->GetBoolResult("success")) {
+			bSuccess = pSignal->GetBoolResult("success");
+			if (bSuccess) {
 				pStateEnvironment->LogMessage("Fan speed set successful. ");
 			}
 			else {
@@ -82,18 +84,45 @@ public:
 		}
 		else {
 			pStateEnvironment->LogWarning("Set fan speed timeout!");
+			bSuccess = false;
 		}
+		return bSuccess;
 	}
 
-	void doFinalizeExtrude(LibMCEnv::PStateEnvironment pStateEnvironment)
+	bool deviceInitExtruder(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		// do extruder initialization 
+		bool bSuccess = true;
+		auto pSignalDoExtruderInit = pStateEnvironment->PrepareSignal("printerconnection", "signal_doextruderinit");
+		pSignalDoExtruderInit->Trigger();
+
+		if (pSignalDoExtruderInit->WaitForHandling((uint32_t)(5000))) {
+			bSuccess = pSignalDoExtruderInit->GetBoolResult("success");
+			if (bSuccess) {
+				pStateEnvironment->LogMessage("Extruder initilalized. ");
+			}
+			else {
+				pStateEnvironment->LogWarning("Extruder initialization error. ");
+			}
+		}
+		else {
+			pStateEnvironment->LogWarning("Extruder initialization timeout error. ");
+			bSuccess = false;
+		}
+		return bSuccess;
+	}
+
+	bool deviceDoFinalizeExtrude(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		// send signal to finalize extrude process
+		bool bSuccess = true;
 		pStateEnvironment->LogMessage("Finalize extrude. ");
 		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_dofinalizeextrude");
 		pSignal->Trigger();
 
 		if (pSignal->WaitForHandling(5000)) {
-			if (pSignal->GetBoolResult("success")) {
+			bSuccess = pSignal->GetBoolResult("success");
+			if (bSuccess) {
 				pStateEnvironment->LogMessage("Finalize extrude successful. ");
 			}
 			else {
@@ -102,13 +131,21 @@ public:
 		}
 		else {
 			pStateEnvironment->LogWarning("Finalize extrudetimeout!");
+			bSuccess = false;
 		}
+		return bSuccess;
 	}
 
-	void setTemperatureWithoutWaiting(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nExtruderId, double dExtruderTargetTemperature, double dBedTargetTemperature)
+	bool deviceSetTemperature(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nExtruderId, double dExtruderTargetTemperature, double dBedTargetTemperature, bool bDoWait)
 	{
+		bool bSuccess = true;
 		// set temperature without waiting => already heating while homing
-		pStateEnvironment->LogMessage("Set bed and extruder temperature without waiting. ");
+		if (bDoWait) {
+			pStateEnvironment->LogMessage("Set bed and extruder temperature and wait. ");
+		}
+		else {
+			pStateEnvironment->LogMessage("Set bed and extruder temperature and do not wait. ");
+		}
 		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_settemperature");
 		pSignal->SetBool("bedsetvalue", true);
 		pSignal->SetDouble("bedtemperature", dBedTargetTemperature);
@@ -120,7 +157,8 @@ public:
 		pSignal->Trigger();
 
 		if (pSignal->WaitForHandling(1000)) {
-			if (pSignal->GetBoolResult("success")) {
+			bSuccess = pSignal->GetBoolResult("success");
+			if (bSuccess) {
 				pStateEnvironment->LogMessage("Temperature set successful. ");
 			}
 			else {
@@ -129,7 +167,38 @@ public:
 		}
 		else {
 			pStateEnvironment->LogWarning("Set Temperature timeout!");
+			bSuccess = false;
 		}
+
+
+		// wait for defined temperature, if defined
+		if (bSuccess && bDoWait) {
+			LibMCEnv::PSignalHandler pSignalGetTemperature;
+			double dBedTemperature = -1;
+			double dExtruderTemperature = -1;
+
+			while ((dExtruderTemperature < dExtruderTargetTemperature) || (dBedTemperature < dBedTargetTemperature)) {
+				if (pStateEnvironment->WaitForSignal("signal_gettemperature", 50, pSignalGetTemperature)) {
+					bool bBedGetValue = pSignalGetTemperature->GetDouble("bedgetvalue");
+					if (bBedGetValue) {
+						dBedTemperature = pSignalGetTemperature->GetDouble("bedtemperature");
+					}
+
+					int32_t nExtruderId = -1;
+					bool bExtruderGetValue = pSignalGetTemperature->GetDouble("extrudergetvalue");
+					if (bExtruderGetValue) {
+						nExtruderId = pSignalGetTemperature->GetDouble("extruderid");
+						dExtruderTemperature = pSignalGetTemperature->GetDouble("extrudertemperature");
+					}
+					pSignalGetTemperature->SetBoolResult("success", true);
+					pSignalGetTemperature->SignalHandled();
+
+					pStateEnvironment->LogMessage("Wait for temperature: Eid" + std::to_string(nExtruderId) + "=" + std::to_string(dExtruderTemperature) + " B=" + std::to_string(dBedTemperature));
+				}
+				// TODO add timeout/cancellation of "Wait for temperature"
+			}
+		}
+		return bSuccess;
 	}
 
 };
@@ -299,55 +368,48 @@ public:
 				pStateEnvironment->LogMessage("Printer connected. ");
 				// Printer connected
 				// 
-				// set some parameters, to be used in HandleTemperature
+				// read and store some values => to be used in other state of main state machine (HandleTemperature)
 				auto nExtruderId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "extruderid");
 				auto dExtruderTargetTemperature = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "targetextrudertemperature");
 				auto dBedTargetTemperature = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "targetbedtemperature");
-				// store read values => to be used in other state of main state machine (HandleTemperature)
-				pStateEnvironment->StoreInteger("extruderid", nExtruderId);
-				pStateEnvironment->StoreDouble("extrudertargettemperature", dExtruderTargetTemperature);
-				pStateEnvironment->StoreDouble("bedtargettemperature", dBedTargetTemperature);
 
 				auto nFanId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "fanid");
 				auto dFanSpeed = pStateEnvironment->GetDoubleParameter("temperaturecontrol", "fanspeed");
-				// store read values => to be used in other state of main state machine (finish process)
-				pStateEnvironment->StoreInteger("fanid", nFanId);
-				pStateEnvironment->StoreDouble("fanspeed", dFanSpeed);
-
 
 				// set desired temperature and don't wait (in the meantime to printer could do homing, if necessary)
-				m_pPluginData->setTemperatureWithoutWaiting(pStateEnvironment, nExtruderId, dExtruderTargetTemperature, dBedTargetTemperature);
-				
-				// check if printer is homed and do homing if necessary
-				auto pSignalDoHoming = pStateEnvironment->PrepareSignal("printerconnection", "signal_dohoming");
-				pSignalDoHoming->Trigger();
+				if (m_pPluginData->deviceSetTemperature(pStateEnvironment, nExtruderId, dExtruderTargetTemperature, dBedTargetTemperature, false)) {
+					// check if printer is homed and do homing if necessary
+					auto pSignalDoHoming = pStateEnvironment->PrepareSignal("printerconnection", "signal_dohoming");
+					pSignalDoHoming->Trigger();
 
-				if (pSignalDoHoming->WaitForHandling((uint32_t)(20000))) {
+					if (pSignalDoHoming->WaitForHandling((uint32_t)(20000))) {
 
-					if (pSignalDoHoming->GetBoolResult("success")) {
-						pStateEnvironment->LogMessage("Printer homed. ");
+						if (pSignalDoHoming->GetBoolResult("success")) {
+							pStateEnvironment->LogMessage("Printer homed. ");
 
-						// do some initialization stuff
-						// set flag to tell state "HandleTemperature" to initialize extruder (will be done just once, while starting)
-						pStateEnvironment->StoreBool("extruderdoinit", true);
-						// set flag to tell state "HandleTemperature" to set the defined temperature
-						pStateEnvironment->StoreBool("settargettemperature", true);
-						// set flag to tell state "HandleTemperature" to wait for defined temperature reached
-						pStateEnvironment->StoreBool("waitfortemperature", true);
-						// set fan speed
-						m_pPluginData->setFanSpeed(pStateEnvironment, nFanId, dFanSpeed);
+							// set desired temperature and don wait (in the meantime to printer could do homing, if necessary)
+							if (m_pPluginData->deviceSetTemperature(pStateEnvironment, nExtruderId, dExtruderTargetTemperature, dBedTargetTemperature, true)) {
 
-						// and now wait for temperature
-						pStateEnvironment->SetNextState("handletemperature");
-					}
-					else {
-						pStateEnvironment->LogWarning("Printer not homed. ");
-						pStateEnvironment->SetNextState("fatalerror");
+								// initialize extruder
+								if (m_pPluginData->deviceInitExtruder(pStateEnvironment)) {
+
+									// set fan speed
+									if (m_pPluginData->deviceSetFanSpeed(pStateEnvironment, nFanId, dFanSpeed)) {
+										// and now extrude layer
+										pStateEnvironment->SetNextState("extrudelayer");
+									}
+								}
+							}
+						}
+						else {
+							pStateEnvironment->LogWarning("Printer not homed. ");
+							pStateEnvironment->SetNextState("fatalerror");
+						}
 					}
 				}
 			}
 			else {
-				pStateEnvironment->LogWarning("Printer not connected. ");
+				pStateEnvironment->LogWarning("Printer not connected");
 				pStateEnvironment->SetNextState("fatalerror");
 			}
 		}
@@ -357,129 +419,6 @@ public:
 		}
 
 
-	}
-
-};
-
-
-/*************************************************************************************************************************
- Class definition of CMainState_HandleTemperature
-**************************************************************************************************************************/
-
-class CMainState_HandleTemperature : public virtual CMainState {
-public:
-
-	CMainState_HandleTemperature(const std::string& sStateName, PPluginData pPluginData)
-		: CMainState(getStateName(), sStateName, pPluginData)
-	{
-	}
-
-	static const std::string getStateName()
-	{
-		return "handletemperature";
-	}
-
-
-	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
-		pStateEnvironment->LogMessage("Handle temperature...");
-
-		// read some parameter (set by StartProcess)
-		uint32_t nExtruderId = pStateEnvironment->RetrieveBool("extruderid");
-		double dExtruderTargetTemperature = pStateEnvironment->RetrieveDouble("extrudertargettemperature");
-		double dBedTargetTemperature = pStateEnvironment->RetrieveDouble("bedtargettemperature");
-
-		bool bExtruderDoInit = pStateEnvironment->RetrieveBool("extruderdoinit");
-		bool bSetTemperature = pStateEnvironment->RetrieveBool("settargettemperature");
-		bool bWaitForTemperature = pStateEnvironment->RetrieveBool("waitfortemperature");
-
-		// set temperature if defined
-		auto pSignalSetTemperature = pStateEnvironment->PrepareSignal("printerconnection", "signal_settemperature");
-		bool bSuccess = true;
-		if (bSetTemperature) {
-			pSignalSetTemperature->SetBool("bedsetvalue", true);
-			pSignalSetTemperature->SetDouble("bedtemperature", dBedTargetTemperature);
-			pSignalSetTemperature->SetBool("beddowait", false);
-			pSignalSetTemperature->SetBool("extrudersetvalue", true);
-			pSignalSetTemperature->SetInteger("extruderid", nExtruderId);
-			pSignalSetTemperature->SetDouble("extrudertemperature", dExtruderTargetTemperature);
-			pSignalSetTemperature->SetBool("extruderdowait", false);
-			pSignalSetTemperature->Trigger();
-			if (pSignalSetTemperature->WaitForHandling(10000)) {
-				bSuccess = pSignalSetTemperature->GetBoolResult("success");
-				if (bSuccess) {
-					pStateEnvironment->LogMessage("Temperature set successful. ");
-				}
-				else {
-					pStateEnvironment->LogWarning("Set Temperature failure. ");
-				}
-			}
-			else {
-				pStateEnvironment->LogWarning("Set Temperature timeout!");
-				bSuccess = false;
-			}
-		}
-
-		// wait for defined temperature, if defined
-		if (bSuccess && bWaitForTemperature) {
-			LibMCEnv::PSignalHandler pSignalGetTemperature;
-			double dBedTemperature = -1;
-			double dExtruderTemperature = -1;
-
-			while ((dExtruderTemperature < dExtruderTargetTemperature) || (dBedTemperature < dBedTargetTemperature)) {
-				if (pStateEnvironment->WaitForSignal("signal_gettemperature", 50, pSignalGetTemperature)) {
-					bool bBedGetValue = pSignalGetTemperature->GetDouble("bedgetvalue");
-					if (bBedGetValue) {
-						dBedTemperature = pSignalGetTemperature->GetDouble("bedtemperature");
-					}
-
-					uint32_t nExtruderId = -1;
-					bool bExtruderGetValue = pSignalGetTemperature->GetDouble("extrudergetvalue");
-					if (bExtruderGetValue) {
-						nExtruderId = pSignalGetTemperature->GetDouble("extruderid");
-						dExtruderTemperature = pSignalGetTemperature->GetDouble("extrudertemperature");
-					}
-					pSignalGetTemperature->SetBoolResult("success", true);
-					pSignalGetTemperature->SignalHandled();
-
-					pStateEnvironment->LogMessage("Wait for temperature: Eid" + std::to_string(nExtruderId) + "=" + std::to_string(dExtruderTemperature) + " B=" + std::to_string(dBedTemperature));
-				}
-				// TODO add timeout/cancellation of "Wait for temperature"
-			}
-		}
-
-		// initialize extruder, if defined => should be defined by "StartProcess" (just once)
-		if (bSuccess && bExtruderDoInit) {
-			// do extruder initialization just once (at the beginning/first call) of "handletemperature" => reset flag
-			pStateEnvironment->StoreBool("extruderdoinit", false);
-			auto pSignalDoExtruderInit = pStateEnvironment->PrepareSignal("printerconnection", "signal_doextruderinit");
-			pSignalDoExtruderInit->Trigger();
-
-			if (pSignalDoExtruderInit->WaitForHandling((uint32_t)(5000))) {
-				bSuccess = pSignalDoExtruderInit->GetBoolResult("success");
-				if (bSuccess) {
-					pStateEnvironment->LogMessage("Extruder initilalized. ");
-				}
-				else {
-					pStateEnvironment->LogWarning("Extruder initialization error. ");
-				}
-			}
-			else {
-				pStateEnvironment->LogWarning("Extruder initialization timeout error. ");
-				bSuccess = false;
-			}
-		}
-		
-		if (bSuccess) {
-			// proceed to extrude current layer
-			pStateEnvironment->SetNextState("extrudelayer");
-		}
-		else {
-			pStateEnvironment->SetNextState("fatalerror");
-		}
 	}
 
 };
@@ -509,29 +448,27 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		pStateEnvironment->LogMessage("Process finished");
+		// finalize extrude/print process (retract...)
+		m_pPluginData->deviceDoFinalizeExtrude(pStateEnvironment);
+		// stop fan
+		auto nFanId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "fanid");
+		m_pPluginData->deviceSetFanSpeed(pStateEnvironment, nFanId, 0);
+		// switch off heating
+		auto nExtruderId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "extruderid");
+		m_pPluginData->deviceSetTemperature(pStateEnvironment, nExtruderId, 0.0, 0.0, false);
+
+		// TODO following commands disconnect automatically. maybe this should be done on demand
+		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_disconnect");
+		pSignal->Trigger();
 
 		// Unload Toolpath from memory
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		pStateEnvironment->GetBuildJob(sJobUUID)->UnloadToolpath ();
 
-		// stop fan
-		auto nFanId = pStateEnvironment->RetrieveInteger("fanid");
-		m_pPluginData->setFanSpeed(pStateEnvironment, nFanId, 0);
-		// switch off heating
-		uint32_t nExtruderId = pStateEnvironment->RetrieveBool("extruderid");
-		m_pPluginData->setTemperatureWithoutWaiting(pStateEnvironment, nExtruderId, 0.0, 0.0);
-		
-		// finalize extrude/print process (retract...)
-		m_pPluginData->doFinalizeExtrude(pStateEnvironment);
-
-
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 
-		// TODO following commands disconnect automatically. maybe this should be done on demand
-		auto pSignal = pStateEnvironment->PrepareSignal("printerconnection", "signal_disconnect");
-		pSignal->Trigger();
-		
+		pStateEnvironment->LogMessage("Process finished");
+
 		pStateEnvironment->SetNextState("idle");
 
 	}
@@ -650,18 +587,12 @@ public:
 		//TODO uncomment to activate camera driver pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
 
 		if (nCurrentLayer < (nLayerCount - 1)) {
-			// TODO check if WaitFor/SetTemperature should be disabled or not for the next/following layers
-			// set flag to tell state "HandleTemperature" to don't set the defined temperature again (will be done just once initiated by "StartProcess")
-			pStateEnvironment->StoreBool("settargettemperature", false);
-			// set flag to tell state "HandleTemperature" to don't wait for the defined temperature again (will be done just once initiated by "StartProcess")
-			pStateEnvironment->StoreBool("waitfortemperature", false);
-
 
 			// proceed to next layer and wait for temperature
 			pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");
 			pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nCurrentLayer + 1);
 
-			pStateEnvironment->SetNextState("handletemperature");
+			pStateEnvironment->SetNextState("extrudelayer");
 
 		}
 		else {
@@ -742,9 +673,6 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 		return pStateInstance;
 
 	if (createStateInstanceByName<CMainState_NextLayer>(sStateName, pStateInstance, m_pPluginData))
-		return pStateInstance;
-
-	if (createStateInstanceByName<CMainState_HandleTemperature>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDSTATENAME);

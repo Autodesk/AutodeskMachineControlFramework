@@ -63,7 +63,88 @@ private:
 	// We need to globally store driver wrappers in the plugin
 	PDriverCast_Marlin m_DriverCast_Marlin;
 
+	// used to store id of extruder its temperature is set => the id of this extruder will be used to report currrent temperature to asking functions 
+	int32_t m_nExtruderId = -1;
+
+private:
+	void updatePIDValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
+		if (pStateEnvironment->WaitForSignal("signal_setpidvalues", 0, pSignalHandler)) {
+			double dP = pSignalHandler->GetDouble("dp");
+			double dI = pSignalHandler->GetDouble("di");
+			double dD = pSignalHandler->GetDouble("dd");
+
+			pStateEnvironment->LogMessage("Setting PID Value to P: " + std::to_string(dP) + " I: " + std::to_string(dI) + "D: " + std::to_string(dD));
+			pDriver->SetPidParameters(dP, dI, dD);
+
+			pSignalHandler->SetBoolResult("success", true);
+			pSignalHandler->SignalHandled();
+
+			pDriver->GetPidParameters(dP, dI, dD);
+			pStateEnvironment->SetDoubleParameter("printerstate", "pidvaluep", dP);
+			pStateEnvironment->SetDoubleParameter("printerstate", "pidvaluei", dI);
+			pStateEnvironment->SetDoubleParameter("printerstate", "pidvalued", dD);
+		}
+
+	}
+
+	void updateTemperatureValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
+		if (pStateEnvironment->WaitForSignal("signal_settemperature", 0, pSignalHandler)) {
+			bool bBedSetValue = pSignalHandler->GetDouble("bedsetvalue");
+			double dBedTemperature = pSignalHandler->GetDouble("bedtemperature");
+			bool bBedDoWait = pSignalHandler->GetDouble("beddowait");
+
+			bool bExtruderSetValue = pSignalHandler->GetDouble("extrudersetvalue");
+			// store read value => to be used in other state/function of this state machine (handleSignals)
+			// this id is used to report to ask the driver for the current temperature and report it to asking state machine (main) 
+			m_nExtruderId = pSignalHandler->GetInteger("extruderid");
+			double dExtruderTemperature = pSignalHandler->GetDouble("extrudertemperature");
+			bool bExtruderDoWait = pSignalHandler->GetDouble("extruderdowait");
+
+			if (bBedSetValue) {
+				pStateEnvironment->LogMessage("Setting bed temperature value to " + std::to_string(dBedTemperature));
+				pDriver->SetHeatedBedTargetTemperature(dBedTemperature, bBedDoWait);
+			}
+
+			if (bExtruderSetValue) {
+				pStateEnvironment->LogMessage("Setting temperature value of extruder: " + std::to_string(m_nExtruderId) + " to " + std::to_string(dExtruderTemperature));
+				pDriver->SetExtruderTargetTemperature((uint32_t)m_nExtruderId, dExtruderTemperature, bExtruderDoWait);
+			}
+
+			pSignalHandler->SetBoolResult("success", true);
+			pSignalHandler->SignalHandled();
+		}
+
+	}
+
+	void updateFanSpeed(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
+		if (pStateEnvironment->WaitForSignal("signal_setfanspeed", 0, pSignalHandler)) {
+			uint32_t nFanId = pSignalHandler->GetInteger("fanid");
+			double dFanSpeed = pSignalHandler->GetDouble("fanspeed");
+			pStateEnvironment->LogMessage("Setting speed value of fan: " + std::to_string(nFanId) + " to " + std::to_string(dFanSpeed));
+			pDriver->SetFanSpeed(nFanId, dFanSpeed);
+			pSignalHandler->SetBoolResult("success", true);
+			pSignalHandler->SignalHandled();
+		}
+
+	}
+
 public:
+
+	//double getExtrudeValue() const
+	//{
+	//	return m_dExtrudeValue;
+	//}
+
+	//void setExtrudeValue(double dExtrudeValue)
+	//{
+	//	m_dExtrudeValue = dExtrudeValue;
+	//}
 
 	PDriver_Marlin acquireDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
@@ -86,6 +167,7 @@ public:
 		double dCurrentX;
 		double dCurrentY;
 		double dCurrentZ;
+		double dCurrentBedTemp;
 
 		pDriver->UpdatePositionState();
 		pDriver->GetCurrentPosition(dCurrentX, dCurrentY, dCurrentZ);
@@ -101,74 +183,6 @@ public:
 		pStateEnvironment->SetBoolParameter("printerstate", "ismoving", pDriver->IsMoving());
 		pStateEnvironment->SetBoolParameter("printerstate", "isconnected", pDriver->IsConnected());
 		pStateEnvironment->SetBoolParameter("printerstate", "bufferavailable", pDriver->CanExecuteMovement());
-	}
-
-	void updatePIDValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		LibMCEnv::PSignalHandler pSignalHandler;
-		if (pStateEnvironment->WaitForSignal("signal_setpidvalues", 0, pSignalHandler)) {
-			double dP = pSignalHandler->GetDouble("dp");
-			double dI = pSignalHandler->GetDouble("di");
-			double dD = pSignalHandler->GetDouble("dd");
-
-			pStateEnvironment->LogMessage("Setting PID Value to P: " + std::to_string (dP) + " I: " + std::to_string(dI) + "D: " + std::to_string(dD));
-			pDriver->SetPidParameters (dP, dI, dD);
-
-			pSignalHandler->SetBoolResult("success", true);
-			pSignalHandler->SignalHandled();
-
-			pDriver->GetPidParameters(dP, dI, dD);
-			pStateEnvironment->SetDoubleParameter("printerstate", "pidvaluep", dP);
-			pStateEnvironment->SetDoubleParameter("printerstate", "pidvaluei", dI);
-			pStateEnvironment->SetDoubleParameter("printerstate", "pidvalued", dD);
-		}
-
-	}
-
-	void updateTemperatureValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		LibMCEnv::PSignalHandler pSignalHandler;
-		if (pStateEnvironment->WaitForSignal("signal_settemperature", 0, pSignalHandler)) {
-			bool bBedSetValue = pSignalHandler->GetDouble("bedsetvalue");
-			double dBedTemperature = pSignalHandler->GetDouble("bedtemperature");
-			bool bBedDoWait = pSignalHandler->GetDouble("beddowait");
-
-			bool bExtruderSetValue = pSignalHandler->GetDouble("extrudersetvalue");
-			uint32_t nExtruderId = pSignalHandler->GetInteger("extruderid");
-			double dExtruderTemperature = pSignalHandler->GetDouble("extrudertemperature");
-			bool bExtruderDoWait = pSignalHandler->GetDouble("extruderdowait");
-
-			// store read value => to be used in other state/function of main state machine (handleSignals)
-			pStateEnvironment->StoreInteger("extruderid", nExtruderId);
-
-			if (bBedSetValue) {
-				pStateEnvironment->LogMessage("Setting bed temperature value to " + std::to_string(dBedTemperature));
-				pDriver->SetHeatedBedTargetTemperature(dBedTemperature, bBedDoWait);
-			}
-
-			if (bExtruderSetValue) {
-				pStateEnvironment->LogMessage("Setting temperature value of extruder: " + std::to_string(nExtruderId) + " to " + std::to_string(dExtruderTemperature));
-				pDriver->SetExtruderTargetTemperature(nExtruderId, dExtruderTemperature, bExtruderDoWait);
-			}
-
-			pSignalHandler->SetBoolResult("success", true);
-			pSignalHandler->SignalHandled();
-		}
-
-	}
-
-	void updateFanSpeed(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		LibMCEnv::PSignalHandler pSignalHandler;
-		if (pStateEnvironment->WaitForSignal("signal_setfanspeed", 0, pSignalHandler)) {
-			uint32_t nFanId = pSignalHandler->GetInteger("fanid");
-			double dFanSpeed = pSignalHandler->GetDouble("fanspeed");
-			pStateEnvironment->LogMessage("Setting speed value of fan: " + std::to_string(nFanId) + " to " + std::to_string(dFanSpeed));
-			pDriver->SetFanSpeed(nFanId, dFanSpeed);
-			pSignalHandler->SetBoolResult("success", true);
-			pSignalHandler->SignalHandled();
-		}
-
 	}
 
 	void handleSignals(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment, bool bDoUpdatePIDValues, bool bDoUpdateTemperatureValues, bool bDoReportTemperatureValues, bool bDoUpdateFanValue)
@@ -192,24 +206,22 @@ public:
 			updateFanSpeed(pDriver, pStateEnvironment);
 		}
 		
-		auto nExtruderId = pStateEnvironment->RetrieveInteger("extruderid");
-		if (bDoReportTemperatureValues && (nExtruderId > -1)) {
+		if (bDoReportTemperatureValues && (m_nExtruderId > -1)) {
 			auto pSignal = pStateEnvironment->PrepareSignal("main", "signal_gettemperature");
 			if (pSignal->CanTrigger()) {
-				auto nExtruderId = pStateEnvironment->RetrieveInteger("extruderid");
 
-				pDriver->UpdateTemperatureState(nExtruderId);
+				pDriver->UpdateTemperatureState(m_nExtruderId);
 				// read current temperature values from plugin member (previously set in pDriver->UpdateState in updatePositionStateFromDriver)
 				double dCurrentExtruderTemperature;
 				double dCurrentBedTemperature;
-				pDriver->GetExtruderCurrentTemperature(nExtruderId, dCurrentExtruderTemperature);
+				pDriver->GetExtruderCurrentTemperature(m_nExtruderId, dCurrentExtruderTemperature);
 				pDriver->GetHeatedBedCurrentTemperature( dCurrentBedTemperature);
 
 				// send current temperature as signal => to be interpreted by "main" 
 				pSignal->SetBool("bedgetvalue", true);
 				pSignal->SetDouble("bedtemperature", dCurrentBedTemperature);
 				pSignal->SetBool("extrudergetvalue", true);
-				pSignal->SetInteger("extruderid", nExtruderId);
+				pSignal->SetInteger("extruderid", m_nExtruderId);
 				pSignal->SetDouble("extrudertemperature", dCurrentExtruderTemperature);
 				pSignal->Trigger();
 			}
@@ -233,6 +245,8 @@ public:
 		if (pStateEnvironment->WaitForSignal("signal_doextruderinit", 0, pSignalHandler)) {
 			if (pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Initialize extruder.");
+				
+				double dInitialExtrude = pStateEnvironment->GetDoubleParameter("extrudedata", "initialextrude");
 				// move to a save pos
 				pDriver->MoveFastToZ(5, 50);
 				pDriver->MoveFastToXY(0.0, 0.0, 50);
@@ -240,11 +254,9 @@ public:
 				// zero extruded length
 				pDriver->SetAxisPosition("E", 0.0);
 				// extrude 3mm of feed stock
-				pDriver->ExtruderDoExtrude(3.0, 5);
+				pDriver->ExtruderDoExtrude(dInitialExtrude, 5);
 				// zero extruded length again
 				pDriver->SetAxisPosition("E", 0.0);
-				// store reset value
-				pStateEnvironment->StoreDouble("ExtrudeValue", 0.0);
 				pSignalHandler->SetBoolResult("success", true);
 			}
 			else {
@@ -257,9 +269,9 @@ public:
 			if (pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Finalize extrude.");
 
+				double dRetractlExtrude = pStateEnvironment->GetDoubleParameter("extrudedata", "retractextrude");
 				// retract filament (relative)
-				double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
-				pDriver->ExtruderDoExtrude(dE -3.0, 50);
+				pDriver->ExtruderDoExtrude(-dRetractlExtrude, 50);
 				// move to a save pos (Z relative, x/y absolute)
 				pDriver->SetAbsolutePositioning(false);
 				pDriver->MoveFastToZ(5.0, 50);
@@ -276,40 +288,6 @@ public:
 				pSignalHandler->SetBoolResult("success", false);
 			}
 			pSignalHandler->SignalHandled();
-		}
-
-		if (pStateEnvironment->WaitForSignal("signal_retractfilament", 0, pSignalHandler)) {
-			if (pDriver->IsHomed()) {
-				pStateEnvironment->LogMessage("Retract filament.");
-				// will be called peridically => send Result immediately and then call the wanted function
-				pSignalHandler->SetBoolResult("success", true);
-				pSignalHandler->SignalHandled();
-
-				// retract filament (relatively by -3)
-				double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
-				pDriver->ExtruderDoExtrude(dE - 3, 50);
-			}
-			else {
-				pSignalHandler->SetBoolResult("success", false);
-				pSignalHandler->SignalHandled();
-			}
-		}
-
-		if (pStateEnvironment->WaitForSignal("signal_restorefilament", 0, pSignalHandler)) {
-			if (pDriver->IsHomed()) {
-				pStateEnvironment->LogMessage("Restore filament.");
-				// will be called peridically => send Result immediately and then call the wanted function
-				pSignalHandler->SetBoolResult("success", true);
-				pSignalHandler->SignalHandled();
-
-				// restore filament to internally stored absolute E axis value ("ExtrudeValue")
-				double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
-				pDriver->ExtruderDoExtrude(dE, 50);
-			}
-			else {
-				pSignalHandler->SetBoolResult("success", false);
-				pSignalHandler->SignalHandled();
-			}
 		}
 
 		if (pStateEnvironment->WaitForSignal("signal_emergencystop", 0, pSignalHandler)) {
@@ -360,8 +338,6 @@ public:
 
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-		// preset store value 
-		pStateEnvironment->StoreInteger("extruderid", -1);
 
 		auto sCOMPort = pStateEnvironment->GetStringParameter ("comdata", "port");
 		auto nBaudRate = pStateEnvironment->GetIntegerParameter("comdata", "baudrate");
@@ -427,6 +403,7 @@ public:
 		if (pDriver->IsConnected()) {
 			m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
 			m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
+			
 			if (pDriver->IsHomed() && pDriver->CanExecuteMovement()) {
 
 				std::string sParameterData;
@@ -553,6 +530,7 @@ public:
 		std::stringstream sNoSuccessMsg;
 
 		double dStatusUpdateInterval = pStateEnvironment->GetDoubleParameter("printerstate", "statusupdateinterval");
+		double dRetractExtrude = pStateEnvironment->GetDoubleParameter("extrudedata", "retractextrude");
 
 		auto pSignal = pStateEnvironment->RetrieveSignal("globalsignal_doextrudelayer");
 		auto sJobUUID = pSignal->GetString("jobuuid");
@@ -573,7 +551,6 @@ public:
 		const double dSpeedFastMmPerSecond = 50;
 		// TODO calculated value, use others for testing => const double dExtrusionFactor = 0.0166;
 		const double dExtrusionFactor = 0.012;
-		double dE = pStateEnvironment->RetrieveDouble("ExtrudeValue");
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 
@@ -586,9 +563,10 @@ public:
 			}
 		}
 
-		// restore filament, to value saved after printing the previous layer (compensate retract at end of print layer) 
-		if ((nSegmentCount > 0) && (dE > 0)) {
-			pDriver->ExtruderDoExtrude(dE, 30);
+		double dE = 0.0;
+		// restore filament, to negated retract value (compensate retract at end of print layer), if it's not 1. layer (1. layer has no previous layer => no retract done)
+		if ((nSegmentCount > 0) && (nLayerIndex > 1) && (dRetractExtrude > 0)) {
+			pDriver->ExtruderDoExtrude(dRetractExtrude, 30);
 			pStateEnvironment->LogMessage("Filament restored.");
 		}
 
@@ -621,7 +599,7 @@ public:
 									auto dDistance = sqrt(
 										pow(PointData[i + 1].m_Coordinates[0] - PointData[i].m_Coordinates[0], 2) +
 										pow(PointData[i + 1].m_Coordinates[1] - PointData[i].m_Coordinates[1], 2)) * dUnit;
-									dE = dE + dDistance * dExtrusionFactor;
+									dE = dDistance * dExtrusionFactor;
 									pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + (int)1].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 									m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
 									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
@@ -660,7 +638,7 @@ public:
 								auto dDistance = sqrt(
 									pow(PointData[i].m_Coordinates[0] - PointData[i - 1].m_Coordinates[0], 2) +
 									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
-								dE = dE + dDistance * dExtrusionFactor;
+								dE = dDistance * dExtrusionFactor;
 								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 								m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
 								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
@@ -678,7 +656,7 @@ public:
 							auto dDistance = sqrt(
 								pow(PointData[0].m_Coordinates[0] - PointData[nPointCount - 1].m_Coordinates[0], 2) +
 								pow(PointData[0].m_Coordinates[1] - PointData[nPointCount - 1].m_Coordinates[1], 2)) * dUnit;
-							dE = dE + dDistance * dExtrusionFactor;
+							dE = dDistance * dExtrusionFactor;
 							pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 							m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
 							m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
@@ -708,7 +686,7 @@ public:
 								auto dDistance = sqrt(
 									pow(PointData[i].m_Coordinates[0] - PointData[i -1].m_Coordinates[0], 2) +
 									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
-								dE = dE + dDistance * dExtrusionFactor;
+								dE = dDistance * dExtrusionFactor;
 								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 								m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
 								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
@@ -734,16 +712,10 @@ public:
 		}
 
 		// retract filament
-		// TODO possibly the filament retract value should be defined/set by a parameter (in xml)
-		double dRetract = dE - 3.0;
-		if (dRetract < 0) {
-			dRetract = 0.0;
+		if ((nSegmentCount > 0) && (nLayerIndex > 0) && (dRetractExtrude > 0)) {
+			pDriver->ExtruderDoExtrude(-dRetractExtrude, 30);
+			pStateEnvironment->LogMessage("Filament retracted.");
 		}
-		pDriver->ExtruderDoExtrude(dRetract, 30);
-		pStateEnvironment->LogMessage("Filament retracted.");
-
-		// save current extrusion value => to be available/used in next layer
-		pStateEnvironment->StoreDouble("ExtrudeValue", dE);
 		
 		if (!bSucces) {
 			pStateEnvironment->LogWarning("Extrude error: " + sNoSuccessMsg.str());
