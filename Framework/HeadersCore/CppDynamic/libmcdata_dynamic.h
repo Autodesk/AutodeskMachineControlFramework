@@ -250,11 +250,10 @@ typedef LibMCDataResult (*PLibMCDataStorage_StoreNewStreamPtr) (LibMCData_Storag
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nSize - Final size of the stream. MUST NOT be 0.
-* @param[in] pSHA2 - SHA256 of the uploaded data.
 * @param[in] pUserID - Currently authenticated user
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataStorage_BeginPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pSHA2, const char * pUserID);
+typedef LibMCDataResult (*PLibMCDataStorage_BeginPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID);
 
 /**
 * stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -273,9 +272,10 @@ typedef LibMCDataResult (*PLibMCDataStorage_StorePartialStreamPtr) (LibMCData_St
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @param[in] pSHA2 - SHA256 of the uploaded data. If given initially, MUST be identical.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID);
+typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2);
 
 /**
 * Returns the maximum stream size that the data model allows.

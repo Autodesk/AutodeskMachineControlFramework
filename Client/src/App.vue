@@ -107,23 +107,11 @@
 										<template v-for="item in uiModule.items">
 											
 											<p :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</p>												
-											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" contain></v-img></p>
+											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" v-bind:aspect-ratio="item.aspectratio" contain></v-img></p>
 											
 											<div :key="item.uuid" v-if="(item.type=='upload')">
-											
-												<form enctype="multipart/form-data" novalidate>
-													<div class="dropbox">
-													  <input type="file" multiple :name="'upload_' + item.uuid" :disabled="item.uploadissaving" 
-														accept="" class="input-file">
-														<p v-if="item.uploadisinitial">
-														  {{ item.uploadcaption }}
-														</p>
-														<p v-if="item.uploadissaving">
-														  Uploading {{ item.uploadfilename }} files...
-														</p>
-													</div>
-												</form>
-											  	
+																						
+												<v-file-input accept=".3mf" show-size full-width v-model="item.state.chosenFile" v-bind:label="item.uploadcaption" v-bind:messages="item.state.messages" @change="uiUploadStart (item)"></v-file-input>
 								
 											</div>
 											
@@ -133,11 +121,30 @@
 													:items="item.entries"
 													:items-per-page="item.entriesperpage"
 													class="elevation-1"
+													search 
 													disable-pagination
 													hide-default-footer
 													width="100%"
 													loadingText="item.loadingtext">
 												</v-data-table>											
+											</div>											
+
+											<div :key="item.uuid" v-if="(item.type=='buildlist')">											
+												<v-data-table
+													:headers="item.headers"
+													:items="item.entries"
+													:items-per-page="item.entriesperpage"
+													class="elevation-1"
+													disable-pagination
+													hide-default-footer
+													search 
+													width="100%"
+													loadingText="item.loadingtext"
+													@click:row="uiModuleBuildListClick"
+													>													
+																					
+												</v-data-table>					
+												
 											</div>											
 											
 										</template>
@@ -219,7 +226,7 @@
 
 <script>
 import * as Axios from "axios";
-var SHAJS = require('sha.js')
+import * as asmCrypto from "asmcrypto-lite";
 
 export default {
     props: {
@@ -311,6 +318,18 @@ export default {
 										item.entries = this.AppState.ContentItems[item.uuid].entries;
 										
 									}
+
+									if (item.type === "buildlist") {
+									
+										this.AppState.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+										item.entries = this.AppState.ContentItems[item.uuid].entries;
+										
+									}
+									
+									if (item.type === "upload") {
+										item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
+									
+									}
 								}
 								
 							}
@@ -321,7 +340,7 @@ export default {
 					this.AppState.uiPages = resultJSON.data.pages;
 					
 					
-                    this.AppState.activePage = this.AppDefinition.MainPage;
+                    this.uiChangePage (this.AppDefinition.MainPage);
                 })
                 .catch(err => {
                     this.AppState.currentStatus = "error";
@@ -329,6 +348,140 @@ export default {
                 });
         },
 		
+		
+		appPerformJobUpload (itemuuid, itemstate, uploadid, chosenfile, successpage) {
+					
+		
+			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!
+			var url = this.API.baseURL + "/upload/";
+			var prepareurl = this.API.baseURL + "/build/prepare/";
+						
+			itemstate.messages = ["Reading file..."];
+			
+			var reader = new FileReader();
+			reader.readAsArrayBuffer (chosenfile);		
+			
+			reader.onload = () => {
+				var fileContent = reader.result;						
+
+				itemstate.messages = ["Hashing file..."];
+				
+				var shaInstance = new asmCrypto.SHA256 (); 
+				shaInstance.reset ();
+				shaInstance.process (fileContent);
+				shaInstance.finish ();
+				
+				var bytesToHex = function (buffer) {
+					var hex = "";
+					var n;
+					for (n in buffer) {
+						hex += ("0" + (0xff & buffer[n]).toString(16)).slice(-2);
+					}
+					return hex;
+				}
+				
+				var sha256 = bytesToHex (shaInstance.result);
+
+				shaInstance = null;
+			
+				itemstate.messages = ["Starting Upload..."];
+				Axios({			
+						method: "POST",
+						url: url,
+						headers: {
+							"Authorization": "Bearer " + this.API.authToken,
+						},
+						data: {
+							"context": "build",
+							"name": chosenfile.name,
+							"size": chosenfile.size,
+							"mimetype": "application/3mf",
+							
+						}
+					})
+					.then(resultUploadInit => {
+						var streamuuid = resultUploadInit.data.streamuuid;
+						var contextuuid = resultUploadInit.data.contextuuid;
+						
+						const formData = new FormData();
+						formData.append("size", chosenfile.size);					
+						formData.append("data",  new Blob([fileContent], {type: "application/3mf"} ), chosenfile.name);					
+						
+						itemstate.messages = ["Uploading..."];
+						
+						Axios({			
+							method: "POST",
+							url: url + streamuuid,
+							headers: {
+								"Authorization": "Bearer " + this.API.authToken,
+								"Content-Type": "multipart/form-data"
+							},
+							data: formData
+							
+						})
+						.then(resultUploadHandle => {
+							resultUploadHandle;
+							
+							Axios({			
+								method: "POST",
+								url: url + "finish",
+								headers: {
+									"Authorization": "Bearer " + this.API.authToken,
+								},
+								data: {
+									"streamuuid": streamuuid,						
+									"sha256": sha256
+								}
+							})
+							.then(resultUploadFinish => {
+
+								resultUploadFinish;
+								
+								itemstate.messages = ["Preparing build..."];
+								
+								Axios({			
+									method: "POST",
+									url: prepareurl,
+									headers: {
+										"Authorization": "Bearer " + this.API.authToken,
+									},
+									data: {
+										"builduuid": contextuuid,						
+									}
+								})
+								.then(resultBuildPrepare => {
+									resultBuildPrepare;
+									itemstate.messages = [];
+									itemstate.chosenFile = null;
+									itemstate.uploadid = 0;
+									
+									if (successpage != "") {
+										this.uiChangePage (successpage + ":" + contextuuid);
+										
+									}
+									
+								})
+								.catch(err => {
+									err;                    
+								});
+							})
+							.catch(err => {
+								err;                    
+							});
+					
+						})
+						.catch(err => {
+							err;                    
+						});					
+					
+					})
+					.catch(err => {
+						err;                    
+					});
+					
+				};
+		
+		},
 
 		appUpdateContentItem (uuid) {
 		
@@ -376,9 +529,9 @@ export default {
 					var loginsalt = resultCreateSession.data.loginsalt;
 					var clientkey = sessionkey;
 					
-					var saltedpassword = SHAJS("sha256").update(loginsalt + this.AppState.uiLoginPassword).digest("hex");
-					var clientkeyhash = SHAJS("sha256").update(clientkey + saltedpassword).digest("hex");
-					var sessionkeyhash = SHAJS("sha256").update(sessionkey + clientkeyhash).digest("hex");
+					var saltedpassword = asmCrypto.SHA256.hex (loginsalt + this.AppState.uiLoginPassword);
+					var clientkeyhash = asmCrypto.SHA256.hex (clientkey + saltedpassword);
+					var sessionkeyhash = asmCrypto.SHA256.hex (sessionkey + clientkeyhash);
 														
 					Axios({
 						method: "POST",
@@ -423,13 +576,51 @@ export default {
 
             return caption;
         },
+		
+		uiUploadStart (item) {
+			item.state.idcounter = item.state.idcounter + 1;
+			if (item.state.chosenFile) {
+			
+				if (item.state.uploadid === 0) {
+					item.state.messages = ["Uploading..."];					
+			
+				} else {
+					item.state.messages = ["Replacing upload..."];
+				}
+				item.state.uploadid = item.state.idcounter; 
+				
+				this.appPerformJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile, item.uploadsuccesspage);
+				
+			} else {
+			
+				if (!(item.state.uploadid === 0)) {
+					item.state.uploadid = 0; 
+					item.state.messages = ["Canceled upload..."];
+				}
+			
+			}
+			
+		
+		},
 
         uiToggleDrawer() {
             this.AppState.showDrawer = !this.AppState.showDrawer;
         },
 
         uiChangePage(page) {
-            this.AppState.activePage = page;				
+		
+			var pageString = String (page);
+			var colonIndex = pageString.search(":");
+			
+			if (colonIndex === -1) {
+				this.AppState.activePage = pageString;
+				this.AppState.activeObject = "";
+			}
+			
+			if (colonIndex > 0) {
+				this.AppState.activePage = pageString.substring (0, colonIndex);
+				this.AppState.activeObject = pageString.substring (colonIndex + 1);
+			}
         },
 		
 		uiModuleButtonClick (button) {
@@ -437,6 +628,39 @@ export default {
 				this.uiChangePage (button.targetpage);
 			}
 		
+		},
+		
+		
+		uiModuleBuildListClick (item) {
+			if (item.detailpage != "") {
+				this.uiChangePage (String (item.detailpage) + ":" + String (item.buildUUID));
+			}
+		},
+		
+		
+		uiModuleStartBuildClick (buildName, buildUUID) {
+		
+			var url = this.API.baseURL + "/signal/";
+			Axios({			
+				method: "POST",
+				url: url,
+				headers: {
+					"Authorization": "Bearer " + this.API.authToken,
+				},
+				data: {
+					"instancename": "demo",
+					"signalname": "signal_startjob",
+					"jobname": buildName,
+					"jobuuid": buildUUID
+				}
+			})
+			.then(resultBuildStart => {
+				resultBuildStart;
+				alert ("started build!");
+			})
+			.catch(err => {
+				err;                    
+			});				
 		},
 
         uiOnTimer() {
@@ -487,6 +711,7 @@ export default {
             currentError: "",
             showDrawer: true,
             activePage: "",
+			activeObject: "",
             globalTimer: "",			
 			uiPages: [],
 			

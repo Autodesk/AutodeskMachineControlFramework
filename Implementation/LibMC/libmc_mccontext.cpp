@@ -43,9 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_database.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include "amc_api_factory.hpp"
 #include "amc_api_sessionhandler.hpp"
+
+#include "common_importstream_native.hpp"
+
 
 // Include custom headers here.
 #include <iostream>
@@ -141,25 +145,33 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     auto userInterfaceNode = machinedefinitionNode.child("userinterface");
     if (userInterfaceNode.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
-    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode);
 
+    // Load user interface
+    auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
+    m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath  + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+    auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native> (sCoreResourcePath);
+    m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
+    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, m_pSystemState->getBuildJobHandlerInstance ());
 
     m_pStateJournal->startRecording();
 
 }
 
 
-void CMCContext::RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath)
+void CMCContext::RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource)
 {
     m_pSystemState->logger()->logMessage("mapping " + sLibraryName + " to " + sLibraryPath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    m_pSystemState->addLibraryPath(sLibraryName, sLibraryPath);
+    m_pSystemState->addLibraryPath(sLibraryName, sLibraryPath, sLibraryResource);
     
 }
 
 
-void CMCContext::LoadClientPackage(const LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8* pZIPStreamBuffer)
+void CMCContext::LoadClientPackage(const std::string& sResourcePath)
 {
-    m_pClientDistHandler->LoadClientPackage (nZIPStreamBufferSize, pZIPStreamBuffer);
+    auto pStream = std::make_shared<AMCCommon::CImportStream_Native>(sResourcePath);
+    auto pPackage = CResourcePackage::makeFromStream(pStream);
+
+    m_pClientDistHandler->LoadClientPackage (pPackage);
 }
 
 
@@ -182,7 +194,14 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
     std::string sLibraryName(libraryAttrib.as_string());
     
     m_pSystemState->logger()->logMessage("Initializing " + sName + " (" + sType + "@" + sLibraryName + ")", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath (sLibraryName));
+
+    try {
+        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName));
+    } 
+    catch (std::exception & E) {
+        m_pSystemState->logger()->logMessage(std::string ("Driver error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);
+    }
+
 }
 
 AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& xmlNode)

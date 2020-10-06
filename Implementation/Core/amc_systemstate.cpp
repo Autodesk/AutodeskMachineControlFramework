@@ -156,6 +156,11 @@ namespace AMC {
 		return m_pLoginHandler;
 	}
 
+	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()
+	{
+		return m_pBuildJobHandler;
+	}
+
 	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
 	{
 		return m_pGlobalChrono;
@@ -182,9 +187,9 @@ namespace AMC {
 		return m_pGlobalChrono.get();
 	}
 
-	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath)
+	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResourcePath)
 	{
-		m_LibraryPathes.insert(std::make_pair(sLibraryName, sLibraryPath));
+		m_LibraryPathes.insert(std::make_pair(sLibraryName, std::make_pair (sLibraryPath, sLibraryResourcePath)));
 		m_pToolpathHandler->setLibraryPath(sLibraryName, sLibraryPath);
 	}
 
@@ -194,7 +199,17 @@ namespace AMC {
 		if (iIter == m_LibraryPathes.end())
 			throw ELibMCInterfaceException(LIBMC_ERROR_LIBRARYPATHNOTFOUND);
 
-		return iIter->second;
+		return iIter->second.first;
+	}
+
+	std::string CSystemState::getLibraryResourcePath(const std::string& sLibraryName)
+	{
+		auto iIter = m_LibraryPathes.find(sLibraryName);
+		if (iIter == m_LibraryPathes.end())
+			throw ELibMCInterfaceException(LIBMC_ERROR_LIBRARYPATHNOTFOUND);
+
+		return iIter->second.second;
+
 	}
 
 	std::string CSystemState::getSystemUserID()

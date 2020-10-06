@@ -88,11 +88,11 @@ public:
     
     void StoreNewStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8* pContentBuffer, const std::string& sUserID) override;
 
-    void BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID) override;
+    void BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserID) override;
 
 	void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) override;
 
-	void FinishPartialStream(const std::string & sUUID) override;
+	void FinishPartialStream(const std::string & sUUID, const std::string& sSHA2) override;
 
     LibMCData_uint64 GetMaxStreamSize() override;
 

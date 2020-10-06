@@ -105,6 +105,8 @@ typedef void * LibS7Net_pvoid;
 #define LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT 1007
 #define LIBS7NET_ERROR_INCOMPATIBLEBINARYVERSION 1008
 #define LIBS7NET_ERROR_NOTCONNECTED 1009
+#define LIBS7NET_ERROR_COMNOTINITIALIZED 1010
+#define LIBS7NET_ERROR_COULDNOTINITIALIZECOM 1011
 #define LIBS7NET_ERROR_WRONGCPUTYPE 1
 #define LIBS7NET_ERROR_CONNECTIONERROR 2
 #define LIBS7NET_ERROR_IPADDRESSNOTAVAILABLE 3
@@ -130,6 +132,8 @@ inline const char * LIBS7NET_GETERRORSTRING (LibS7NetResult nErrorCode) {
     case LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBS7NET_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
     case LIBS7NET_ERROR_NOTCONNECTED: return "PLC is not connected";
+    case LIBS7NET_ERROR_COMNOTINITIALIZED: return "COM is not initialized";
+    case LIBS7NET_ERROR_COULDNOTINITIALIZECOM: return "Could not initialize COM";
     case LIBS7NET_ERROR_WRONGCPUTYPE: return "Wrong type of CPU.";
     case LIBS7NET_ERROR_CONNECTIONERROR: return "Connection error.";
     case LIBS7NET_ERROR_IPADDRESSNOTAVAILABLE: return "IP Address not available.";

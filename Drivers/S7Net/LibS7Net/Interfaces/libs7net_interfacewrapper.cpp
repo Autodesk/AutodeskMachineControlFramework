@@ -513,6 +513,8 @@ LibS7NetResult LibS7Net::Impl::LibS7Net_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libs7net_acquireinstance;
 	if (sProcName == "libs7net_releaseinstance") 
 		*ppProcAddress = (void*) &libs7net_releaseinstance;
+	if (sProcName == "libs7net_getsymbollookupmethod") 
+		*ppProcAddress = (void*) &libs7net_getsymbollookupmethod;
 	if (sProcName == "libs7net_createplc") 
 		*ppProcAddress = (void*) &libs7net_createplc;
 	
@@ -675,7 +677,36 @@ LibS7NetResult libs7net_releaseinstance(LibS7Net_Base pInstance)
 	}
 }
 
-LibS7NetResult libs7net_createplc(LibS7Net_PLC * pValue)
+LibS7NetResult libs7net_getsymbollookupmethod(LibS7Net_pvoid * pSymbolLookupMethod)
+{
+	IBase* pIBaseClass = nullptr;
+
+	PLibS7NetInterfaceJournalEntry pJournalEntry;
+	try {
+		if (m_GlobalJournal.get() != nullptr)  {
+			pJournalEntry = m_GlobalJournal->beginStaticFunction("GetSymbolLookupMethod");
+		}
+		if (pSymbolLookupMethod == nullptr)
+			throw ELibS7NetInterfaceException (LIBS7NET_ERROR_INVALIDPARAM);
+		*pSymbolLookupMethod = (void*)&LibS7Net::Impl::LibS7Net_GetProcAddress;
+		if (pJournalEntry.get() != nullptr) {
+			pJournalEntry->addPointerResult("SymbolLookupMethod", *pSymbolLookupMethod);
+			pJournalEntry->writeSuccess();
+		}
+		return LIBS7NET_SUCCESS;
+	}
+	catch (ELibS7NetInterfaceException & Exception) {
+		return handleLibS7NetException(pIBaseClass, Exception, pJournalEntry.get());
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException, pJournalEntry.get());
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass, pJournalEntry.get());
+	}
+}
+
+LibS7NetResult libs7net_createplc(const char * pCOMHost, LibS7Net_PLC * pPLCInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -683,15 +714,19 @@ LibS7NetResult libs7net_createplc(LibS7Net_PLC * pValue)
 	try {
 		if (m_GlobalJournal.get() != nullptr)  {
 			pJournalEntry = m_GlobalJournal->beginStaticFunction("CreatePLC");
+			pJournalEntry->addStringParameter("COMHost", pCOMHost);
 		}
-		if (pValue == nullptr)
+		if (pCOMHost == nullptr)
 			throw ELibS7NetInterfaceException (LIBS7NET_ERROR_INVALIDPARAM);
-		IBase* pBaseValue(nullptr);
-		pBaseValue = CWrapper::CreatePLC();
+		if (pPLCInstance == nullptr)
+			throw ELibS7NetInterfaceException (LIBS7NET_ERROR_INVALIDPARAM);
+		std::string sCOMHost(pCOMHost);
+		IBase* pBasePLCInstance(nullptr);
+		pBasePLCInstance = CWrapper::CreatePLC(sCOMHost);
 
-		*pValue = (IBase*)(pBaseValue);
+		*pPLCInstance = (IBase*)(pBasePLCInstance);
 		if (pJournalEntry.get() != nullptr) {
-			pJournalEntry->addHandleResult("Value", *pValue);
+			pJournalEntry->addHandleResult("PLCInstance", *pPLCInstance);
 			pJournalEntry->writeSuccess();
 		}
 		return LIBS7NET_SUCCESS;

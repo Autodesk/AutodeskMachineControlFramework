@@ -158,13 +158,13 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
     }
 
     // Store data asynchroniously on disk and finalize when writing has finished
-    auto pWriter = std::make_shared<AMCData::CStorageWriter>(sUUID, m_pStoragePath->getStreamPath (sUUID), nContentBufferSize, sSHA256);
+    auto pWriter = std::make_shared<AMCData::CStorageWriter>(sUUID, m_pStoragePath->getStreamPath (sUUID), nContentBufferSize);
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, 0);
-    pWriter->finalize();
+    pWriter->finalize(sSHA256);
  
 }
 
-void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sSHA2, const std::string& sUserID)
+void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const LibMCData_uint64 nSize, const std::string& sUserID)
 {
 
     if (nSize == 0)
@@ -180,9 +180,9 @@ void CStorage::BeginPartialStream(const std::string& sUUID, const std::string& s
     {
         std::lock_guard<std::mutex> lockGuard(m_StorageWriteMutex);    
         std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
-        insertDBEntry(sParsedUUID, sContextUUID, sName, sMimeType, nSize, sSHA2, sUserID);
+        insertDBEntry(sParsedUUID, sContextUUID, sName, sMimeType, nSize, "", sUserID);
 
-        auto pWriter = std::make_shared<AMCData::CStorageWriter>(sParsedUUID, m_pStoragePath->getStreamPath(sUUID), nSize, sSHA2);
+        auto pWriter = std::make_shared<AMCData::CStorageWriter>(sParsedUUID, m_pStoragePath->getStreamPath(sUUID), nSize);
         m_PartialWriters.insert(std::make_pair(sParsedUUID, pWriter));
     }
     
@@ -206,12 +206,14 @@ void CStorage::StorePartialStream(const std::string & sUUID, const LibMCData_uin
     iIterator->second->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
 }
 
-void CStorage::FinishPartialStream(const std::string & sUUID)
+void CStorage::FinishPartialStream(const std::string & sUUID, const std::string & sSHA2)
 {
     std::lock_guard<std::mutex> lockGuard(m_StorageWriteMutex);
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
     auto iIterator = m_PartialWriters.find(sParsedUUID);
+
+    std::string sNormalizedSHA2 = AMCCommon::CUtils::normalizeSHA256String(sSHA2);
 
     if (iIterator == m_PartialWriters.end())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD);
@@ -219,13 +221,14 @@ void CStorage::FinishPartialStream(const std::string & sUUID)
     auto pWriter = iIterator->second;
     m_PartialWriters.erase(iIterator);
 
-    pWriter->finalize ();
+    pWriter->finalize (sNormalizedSHA2);
 
-    std::string sUpdateQuery = "UPDATE storage_streams SET status=? WHERE uuid=? AND status=?";
+    std::string sUpdateQuery = "UPDATE storage_streams SET status=?, sha2=? WHERE uuid=? AND status=?";
     auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
     pUpdateStatement->setString(1, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
-    pUpdateStatement->setString(2, sUUID);
-    pUpdateStatement->setString(3, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssNew));
+    pUpdateStatement->setString(2, sNormalizedSHA2);
+    pUpdateStatement->setString(3, sUUID);
+    pUpdateStatement->setString(4, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssNew));
     pUpdateStatement->execute();
 
 }

@@ -68,12 +68,12 @@ std::string CAPIHandler_Build::getBaseURI ()
 APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& jobUUID)
 {
 	// Leave away base URI
-	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(9));
+ 	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(9));
 	jobUUID = "";
 
 	if (requestType == eAPIRequestType::rtPost) {
 
-		if (sParameterString == "/prepare") {
+		if ((sParameterString == "/prepare") || (sParameterString == "/prepare/")) {
 			return btStartPrepareJob;
 		}
 	
@@ -136,7 +136,9 @@ void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8
 	auto pLib3MFWrapper = m_pSystemState->toolpathHandler()->getLib3MFWrapper();
 
 	pServiceHandler->addServiceToQueue (std::make_shared <CService_BuildFileParsing> (pServiceHandler, pBuildJob, pLib3MFWrapper, pAuth->getUserName()));
-	
+
+	writer.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName());
+
 }
 
 

@@ -201,12 +201,21 @@ typedef LibS7NetResult (*PLibS7NetAcquireInstancePtr) (LibS7Net_Base pInstance);
 typedef LibS7NetResult (*PLibS7NetReleaseInstancePtr) (LibS7Net_Base pInstance);
 
 /**
-* Returns a PLC instance
+* Returns the address of the SymbolLookupMethod
 *
-* @param[out] pValue - PLC Instance
+* @param[out] pSymbolLookupMethod - Address of the SymbolAddressMethod
 * @return error code or 0 (success)
 */
-typedef LibS7NetResult (*PLibS7NetCreatePLCPtr) (LibS7Net_PLC * pValue);
+typedef LibS7NetResult (*PLibS7NetGetSymbolLookupMethodPtr) (LibS7Net_pvoid * pSymbolLookupMethod);
+
+/**
+* Returns a PLC instance
+*
+* @param[in] pCOMHost - Path to COM Host
+* @param[out] pPLCInstance - PLC Instance
+* @return error code or 0 (success)
+*/
+typedef LibS7NetResult (*PLibS7NetCreatePLCPtr) (const char * pCOMHost, LibS7Net_PLC * pPLCInstance);
 
 /*************************************************************************************************************************
  Function Table Structure
@@ -228,6 +237,7 @@ typedef struct {
 	PLibS7NetGetLastErrorPtr m_GetLastError;
 	PLibS7NetAcquireInstancePtr m_AcquireInstance;
 	PLibS7NetReleaseInstancePtr m_ReleaseInstance;
+	PLibS7NetGetSymbolLookupMethodPtr m_GetSymbolLookupMethod;
 	PLibS7NetCreatePLCPtr m_CreatePLC;
 } sLibS7NetDynamicWrapperTable;
 

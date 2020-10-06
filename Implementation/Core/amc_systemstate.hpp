@@ -96,7 +96,7 @@ namespace AMC {
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		LibMCData::PLoginHandler m_pLoginHandler;
 
-		std::map <std::string, std::string> m_LibraryPathes;
+		std::map <std::string, std::pair <std::string, std::string>> m_LibraryPathes;
 
 		std::string m_sInstallationUUID;
 		std::string m_sInstallationSecret;		
@@ -128,10 +128,12 @@ namespace AMC {
 		PParameterInstances getParameterInstances ();
 
 		LibMCData::PLoginHandler getLoginHandlerInstance();
+		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
 		AMCCommon::PChrono getGlobalChronoInstance();
 
-		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath);
+		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);
 		std::string getLibraryPath(const std::string& sLibraryName);
+		std::string getLibraryResourcePath(const std::string& sLibraryName);
 
 		std::string getSystemUserID();
 		std::string getInstallationUUID(); // Returns a unique UUID of the installation

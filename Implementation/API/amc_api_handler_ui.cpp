@@ -142,18 +142,32 @@ PAPIResponse CAPIHandler_UI::handleImageRequest(const std::string& sParameterUUI
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+	// First look in resources for UUID
+	auto pCoreResourcePackage = m_pSystemState->uiHandler()->getCoreResourcePackage();
+	auto pResourceEntry = pCoreResourcePackage->findEntryByUUID(sParameterUUID, false);
+
+	if (pResourceEntry != nullptr) {
+		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(pResourceEntry->getContentType ());
+		pCoreResourcePackage->readEntry(pResourceEntry->getName(), apiResponse->getBuffer());
+
+		return apiResponse;
+	}
+
+	// Then look in storage for uuid
 	auto pStorage = m_pSystemState->storage();
-	
-	if (!pStorage->StreamIsImage(sParameterUUID))
-		throw ELibMCInterfaceException(LIBMC_ERROR_STREAMISNOTIMAGE);
+	if (pStorage->StreamIsImage(sParameterUUID)) {
 
-	auto pStream = pStorage->RetrieveStream(sParameterUUID);
-	auto sContentType = pStream->GetMIMEType();
+		auto pStream = pStorage->RetrieveStream(sParameterUUID);
+		auto sContentType = pStream->GetMIMEType();
 
-	auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(sContentType);
-	pStream->GetContent(apiResponse->getBuffer());
+		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(sContentType);
+		pStream->GetContent(apiResponse->getBuffer());
 
-	return apiResponse;
+		return apiResponse;		
+	}
+
+	// if not found, return 404
+	return nullptr;
 
 }
 

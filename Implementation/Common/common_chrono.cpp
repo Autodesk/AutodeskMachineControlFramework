@@ -125,7 +125,7 @@ namespace AMCCommon {
 			clock_gettime(CLOCK_MONOTONIC, &currentTime);
 
 			timespec temp;
-			if ((currentTime.tv_nsec - startTime.tv_nsec) < 0) {
+			if (currentTime.tv_nsec < startTime.tv_nsec) {
 				temp.tv_sec = currentTime.tv_sec - startTime.tv_sec - 1;
 				temp.tv_nsec = 1000000000 + currentTime.tv_nsec - startTime.tv_nsec;
 			}

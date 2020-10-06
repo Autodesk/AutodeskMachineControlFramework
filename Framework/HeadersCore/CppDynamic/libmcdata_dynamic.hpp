@@ -445,9 +445,9 @@ public:
 	inline bool StreamIsReady(const std::string & sUUID);
 	inline PStorageStream RetrieveStream(const std::string & sUUID);
 	inline void StoreNewStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const CInputVector<LibMCData_uint8> & ContentBuffer, const std::string & sUserID);
-	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sSHA2, const std::string & sUserID);
+	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
-	inline void FinishPartialStream(const std::string & sUUID);
+	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
@@ -1965,12 +1965,11 @@ public:
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
-	* @param[in] sSHA2 - SHA256 of the uploaded data.
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sSHA2, const std::string & sUserID)
+	void CStorage::BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sSHA2.c_str(), sUserID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_BeginPartialStream(m_pHandle, sUUID.c_str(), sContextUUID.c_str(), sName.c_str(), sMimeType.c_str(), nSize, sUserID.c_str()));
 	}
 	
 	/**
@@ -1987,10 +1986,11 @@ public:
 	/**
 	* CStorage::FinishPartialStream - Finishes storing a stream.
 	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	* @param[in] sSHA2 - SHA256 of the uploaded data. If given initially, MUST be identical.
 	*/
-	void CStorage::FinishPartialStream(const std::string & sUUID)
+	void CStorage::FinishPartialStream(const std::string & sUUID, const std::string & sSHA2)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStream(m_pHandle, sUUID.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStream(m_pHandle, sUUID.c_str(), sSHA2.c_str()));
 	}
 	
 	/**
