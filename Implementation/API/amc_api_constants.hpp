@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define AMC_API_HTTP_SUCCESS 200
 #define AMC_API_HTTP_BADREQUEST 400
+#define AMC_API_HTTP_FORBIDDEN 403
 #define AMC_API_HTTP_NOTFOUND 404
 
 #define AMC_API_PROTOCOL_VERSION "2.0.0"
@@ -48,6 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_PROTOCOL_UPLOAD "com.autodesk.machinecontrol.upload"
 #define AMC_API_PROTOCOL_BUILD "com.autodesk.machinecontrol.build"
 #define AMC_API_PROTOCOL_SIGNAL "com.autodesk.machinecontrol.signal"
+#define AMC_API_PROTOCOL_AUTH "com.autodesk.machinecontrol.auth"
+#define AMC_API_PROTOCOL_UI "com.autodesk.machinecontrol.ui"
+#define AMC_API_PROTOCOL_TOKEN "com.autodesk.machinecontrol.token"
 
 #define AMC_API_CONTENTTYPE "application/json"
 
@@ -88,13 +92,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_APPNAME "appname"
 #define AMC_API_KEY_UI_COPYRIGHT "copyright"
 #define AMC_API_KEY_UI_MAINPAGE "mainpage"
+#define AMC_API_KEY_UI_LOGOUUID "logouuid"
+#define AMC_API_KEY_UI_LOGOASPECTRATIO "logoaspectratio"
 #define AMC_API_KEY_UI_SESSIONID "sessionid"
+#define AMC_API_KEY_UI_SESSIONKEY "sessionkey"
 #define AMC_API_KEY_UI_ICON "icon"
 #define AMC_API_KEY_UI_ID "id"
 #define AMC_API_KEY_UI_CAPTION "caption"
 #define AMC_API_KEY_UI_TARGETPAGE "targetpage"
 #define AMC_API_KEY_UI_MENUITEMS "menuitems"
 #define AMC_API_KEY_UI_TOOLBARITEMS "toolbaritems"
+#define AMC_API_KEY_UI_PAGENAME "name"
+#define AMC_API_KEY_UI_PAGES "pages"
+#define AMC_API_KEY_UI_MODULES "modules"
+#define AMC_API_KEY_UI_MODULENAME "name"
+#define AMC_API_KEY_UI_MODULETYPE "type"
+#define AMC_API_KEY_UI_HEADLINE "headline"
+#define AMC_API_KEY_UI_TITLE "title"
+#define AMC_API_KEY_UI_SUBTITLE "subtitle"
+#define AMC_API_KEY_UI_ITEMS "items"
+#define AMC_API_KEY_UI_BUTTONS "buttons"
+#define AMC_API_KEY_UI_ITEMTYPE "type"
+#define AMC_API_KEY_UI_ITEMTEXT "text"
+#define AMC_API_KEY_UI_ITEMUUID "uuid"
+#define AMC_API_KEY_UI_ITEMLOADINGTEXT "loadingtext"
+#define AMC_API_KEY_UI_ITEMHEADERS "headers"
+#define AMC_API_KEY_UI_ITEMENTRIES "entries"
+#define AMC_API_KEY_UI_ITEMENTRIESPERPAGE "entriesperpage"
+#define AMC_API_KEY_UI_BUTTONUUID "uuid"
+#define AMC_API_KEY_UI_BUTTONTARGETPAGE "targetpage"
+#define AMC_API_KEY_UI_BUTTONCAPTION "caption"
+#define AMC_API_KEY_UI_ITEMUPLOADCLASS "uploadclass"
+#define AMC_API_KEY_UI_ITEMUPLOADCAPTION "uploadcaption"
+#define AMC_API_KEY_UI_ITEMUPLOADISINITIAL "uploadisinitial"
+#define AMC_API_KEY_UI_ITEMUPLOADISSAVING "uploadissaving"
+#define AMC_API_KEY_UI_ITEMUPLOADFILENAME "uploadfilename"
+#define AMC_API_KEY_UI_ITEMVALUE "value"
+#define AMC_API_KEY_UI_ITEMPARAMETERDESCRIPTION "paramDescription"
+#define AMC_API_KEY_UI_ITEMPARAMETERVALUE "paramValue"
+#define AMC_API_KEY_UI_ITEMPARAMETERGROUP "paramGroup"
+#define AMC_API_KEY_UI_ITEMPARAMETERSYSTEM "paramSystem"
+#define AMC_API_KEY_UI_CONTENT "content"
+
+#define AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE 4
+#define AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE 1024
+#define AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE 16
 
 #define AMC_API_KEY_BUILDUUID "builduuid"
 
@@ -108,6 +150,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_STATUSPARAMETERGROUPS "parametergroups"
 #define AMC_API_KEY_STATUSINSTANCES "instances"
 
+#define AMC_API_KEY_SESSIONUUID "sessionuuid"
+#define AMC_API_KEY_SESSIONKEY "sessionkey"
+
+#define AMC_API_KEY_AUTH_SESSIONUUID "sessionuuid"
+#define AMC_API_KEY_AUTH_SESSIONKEY "sessionkey"
+#define AMC_API_KEY_AUTH_USERNAME "username"
+#define AMC_API_KEY_AUTH_SALTEDPASSWORD "password"
+#define AMC_API_KEY_AUTH_CLIENTKEY "clientkey"
+#define AMC_API_KEY_AUTH_LOGINSALT "loginsalt"
+#define AMC_API_KEY_AUTH_TOKEN "token"
+
+#define AMC_API_KEY_TOKEN_SESSION "session"
+#define AMC_API_KEY_TOKEN_TOKEN "token"
 
 #endif //__AMC_API_CONSTANTS
 

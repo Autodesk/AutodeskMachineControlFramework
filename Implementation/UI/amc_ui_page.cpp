@@ -29,19 +29,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
 
 #include "amc_ui_page.hpp"
+#include "amc_ui_module.hpp"
 #include "libmc_interfaceexception.hpp"
 
 
 using namespace AMC;
 
 
-CUIPage::CUIPage(const std::string& sInstanceName, const std::string& sName)
-	: m_sInstanceName (sInstanceName), m_sName(sName)
+CUIPage::CUIPage(const std::string& sName)
+	:  m_sName(sName)
 {
-	if (sInstanceName.empty())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (sName.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
@@ -50,5 +50,73 @@ CUIPage::CUIPage(const std::string& sInstanceName, const std::string& sName)
 
 CUIPage::~CUIPage()
 {
+
+}
+
+std::string CUIPage::getName()
+{
+	return m_sName;
+}
+
+void CUIPage::addModule(PUIModule pModule)
+{
+	if (pModule.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto sName = pModule->getName();
+	if (sName.empty ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULENAME);
+
+	auto iIter = m_ModuleMap.find(sName);
+	if (iIter != m_ModuleMap.end())
+		throw ELibMCInterfaceException(LIBMC_ERROR_MODULENOTFOUND);
+
+	m_Modules.push_back(pModule);
+	m_ModuleMap.insert(std::make_pair (sName, pModule));
+
+}
+
+
+PUIModule CUIPage::findModule(const std::string& sName)
+{
+	auto iIter = m_ModuleMap.find(sName);
+	if (iIter == m_ModuleMap.end())
+		throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEMODULE);
+
+	return iIter->second;
+}
+
+uint32_t CUIPage::getModuleCount()
+{
+	return (uint32_t)m_Modules.size();
+}
+
+PUIModule CUIPage::getModule(const uint32_t nIndex)
+{
+	if (nIndex >= m_Modules.size())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+
+	return m_Modules.at (nIndex);
+}
+
+void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleArray)
+{
+	for (auto module : m_Modules) {
+		CJSONWriterObject moduleObject(writer);
+		module->writeDefinitionToJSON(writer, moduleObject);
+
+		moduleArray.addObject(moduleObject);
+	}
+}
+
+PUIModuleItem CUIPage::findModuleItem(const std::string& sUUID)
+{
+	for (auto module : m_Modules) {
+		auto pItem = module->findItem(sUUID);
+		if (pItem.get() != nullptr)
+			return pItem;
+	}
+
+	return nullptr;
 
 }

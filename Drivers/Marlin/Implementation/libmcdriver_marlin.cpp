@@ -38,7 +38,7 @@ using namespace LibMCDriver_Marlin;
 using namespace LibMCDriver_Marlin::Impl;
 
 // Injected Components
-LibMCDriverEnv::PWrapper CWrapper::sPLibMCDriverEnvWrapper;
+LibMCEnv::PWrapper CWrapper::sPLibMCEnvWrapper;
 
 void CWrapper::GetVersion(LibMCDriver_Marlin_uint32 & nMajor, LibMCDriver_Marlin_uint32 & nMinor, LibMCDriver_Marlin_uint32 & nMicro)
 {
@@ -68,7 +68,7 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 
 
-IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
 
 	if (sType == "marlin-2.0") {
@@ -76,7 +76,7 @@ IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sT
 		bool bDoFirmwareQuery = false;
 		bool bDisableHoming = true;
 
-		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug);
+		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug, pDriverEnvironment);
 	}
 
 	if (sType == "marlin-ender-2.0") {
@@ -84,7 +84,7 @@ IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sT
 		bool bDoFirmwareQuery = true;
 		bool bDisableHoming = false;
 
-		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug);
+		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug, pDriverEnvironment);
 	}
 
 	throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_DRIVERERROR);

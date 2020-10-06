@@ -58,6 +58,10 @@ class IBase;
 class IToolpathLayer;
 class IToolpathAccessor;
 class IBuild;
+class IWorkingFileExecution;
+class IWorkingFile;
+class IWorkingDirectory;
+class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
 class IStateEnvironment;
@@ -431,6 +435,203 @@ typedef IBaseSharedPtr<IBuild> PIBuild;
 
 
 /*************************************************************************************************************************
+ Class interface for WorkingFileExecution 
+**************************************************************************************************************************/
+
+class IWorkingFileExecution : public virtual IBase {
+public:
+	/**
+	* IWorkingFileExecution::GetStatus - Returns the execution status
+	*/
+	virtual void GetStatus() = 0;
+
+	/**
+	* IWorkingFileExecution::ReturnStdOut - Returns the output of the executable as string buffer
+	* @return stdout buffer
+	*/
+	virtual std::string ReturnStdOut() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFileExecution> PIWorkingFileExecution;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingFile 
+**************************************************************************************************************************/
+
+class IWorkingFile : public virtual IBase {
+public:
+	/**
+	* IWorkingFile::GetAbsoluteFileName - Retrieves absolute file name of the working file
+	* @return global path of the file
+	*/
+	virtual std::string GetAbsoluteFileName() = 0;
+
+	/**
+	* IWorkingFile::GetSize - Returns the size of temporary file.
+	* @return file size
+	*/
+	virtual LibMCEnv_uint64 GetSize() = 0;
+
+	/**
+	* IWorkingFile::CalculateSHA2 - Calculates the SHA256 checksum of the file.
+	* @return sha256 checksum
+	*/
+	virtual std::string CalculateSHA2() = 0;
+
+	/**
+	* IWorkingFile::DeleteFile - Deletes the temporary file.
+	*/
+	virtual void DeleteFile() = 0;
+
+	/**
+	* IWorkingFile::ExecuteFile - Executes the temporary file, if it is an executable.
+	* @return execution object
+	*/
+	virtual IWorkingFileExecution * ExecuteFile() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFile> PIWorkingFile;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingDirectory 
+**************************************************************************************************************************/
+
+class IWorkingDirectory : public virtual IBase {
+public:
+	/**
+	* IWorkingDirectory::GetAbsoluteFilePath - Retrieves absolute file path.
+	* @return global path of the directory, including path delimiter.
+	*/
+	virtual std::string GetAbsoluteFilePath() = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[in] pDataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingDirectory> PIWorkingDirectory;
+
+
+/*************************************************************************************************************************
+ Class interface for DriverEnvironment 
+**************************************************************************************************************************/
+
+class IDriverEnvironment : public virtual IBase {
+public:
+	/**
+	* IDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
+	* @return creates a working directory
+	*/
+	virtual IWorkingDirectory * CreateWorkingDirectory() = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+	*/
+	virtual void RetrieveDriverData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	virtual void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterUUIDParameter - registers a uuid parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	virtual void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	*/
+	virtual void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterIntegerParameter - registers an int parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] nDefaultValue - default value to set
+	*/
+	virtual void RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterBoolParameter - registers a bool parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] bDefaultValue - default value to set
+	*/
+	virtual void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetStringParameter - sets a string parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;
+
+
+/*************************************************************************************************************************
  Class interface for SignalTrigger 
 **************************************************************************************************************************/
 
@@ -732,81 +933,11 @@ public:
 	virtual bool CheckForTermination() = 0;
 
 	/**
-	* IStateEnvironment::StoreString - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	virtual void StoreString(const std::string & sName, const std::string & sValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreUUID - stores a uuid in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	virtual void StoreUUID(const std::string & sName, const std::string & sValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreInteger - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] nValue - Value
-	*/
-	virtual void StoreInteger(const std::string & sName, const LibMCEnv_int64 nValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreDouble - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] dValue - Value
-	*/
-	virtual void StoreDouble(const std::string & sName, const LibMCEnv_double dValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreBool - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] bValue - Value
-	*/
-	virtual void StoreBool(const std::string & sName, const bool bValue) = 0;
-
-	/**
 	* IStateEnvironment::StoreSignal - stores a signal handler in the current state machine
 	* @param[in] sName - Name
 	* @param[in] pHandler - Signal handler to store.
 	*/
 	virtual void StoreSignal(const std::string & sName, ISignalHandler* pHandler) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveString - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual std::string RetrieveString(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveUUID - retrieves a uuid from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual std::string RetrieveUUID(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveInteger - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual LibMCEnv_int64 RetrieveInteger(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveDouble - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual LibMCEnv_double RetrieveDouble(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveBool - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual bool RetrieveBool(const std::string & sName) = 0;
 
 	/**
 	* IStateEnvironment::RetrieveSignal - retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.

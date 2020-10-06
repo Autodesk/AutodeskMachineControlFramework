@@ -308,6 +308,249 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_CreateToolpathAccessorPtr) (LibMCEnv_Bui
 typedef LibMCEnvResult (*PLibMCEnvBuild_AddBinaryDataPtr) (LibMCEnv_Build pBuild, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
 
 /*************************************************************************************************************************
+ Class definition for WorkingFileExecution
+**************************************************************************************************************************/
+
+/**
+* Returns the execution status
+*
+* @param[in] pWorkingFileExecution - WorkingFileExecution instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFileExecution_GetStatusPtr) (LibMCEnv_WorkingFileExecution pWorkingFileExecution);
+
+/**
+* Returns the output of the executable as string buffer
+*
+* @param[in] pWorkingFileExecution - WorkingFileExecution instance.
+* @param[in] nStringBufferBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStringBufferNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStringBufferBuffer -  buffer of stdout buffer, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFileExecution_ReturnStdOutPtr) (LibMCEnv_WorkingFileExecution pWorkingFileExecution, const LibMCEnv_uint32 nStringBufferBufferSize, LibMCEnv_uint32* pStringBufferNeededChars, char * pStringBufferBuffer);
+
+/*************************************************************************************************************************
+ Class definition for WorkingFile
+**************************************************************************************************************************/
+
+/**
+* Retrieves absolute file name of the working file
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[in] nFileNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pFileNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pFileNameBuffer -  buffer of global path of the file, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_GetAbsoluteFileNamePtr) (LibMCEnv_WorkingFile pWorkingFile, const LibMCEnv_uint32 nFileNameBufferSize, LibMCEnv_uint32* pFileNameNeededChars, char * pFileNameBuffer);
+
+/**
+* Returns the size of temporary file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pFileSize - file size
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_GetSizePtr) (LibMCEnv_WorkingFile pWorkingFile, LibMCEnv_uint64 * pFileSize);
+
+/**
+* Calculates the SHA256 checksum of the file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of sha256 checksum, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_CalculateSHA2Ptr) (LibMCEnv_WorkingFile pWorkingFile, const LibMCEnv_uint32 nSHA2BufferSize, LibMCEnv_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* Deletes the temporary file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_DeleteFilePtr) (LibMCEnv_WorkingFile pWorkingFile);
+
+/**
+* Executes the temporary file, if it is an executable.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pExecution - execution object
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_ExecuteFilePtr) (LibMCEnv_WorkingFile pWorkingFile, LibMCEnv_WorkingFileExecution * pExecution);
+
+/*************************************************************************************************************************
+ Class definition for WorkingDirectory
+**************************************************************************************************************************/
+
+/**
+* Retrieves absolute file path.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] nFilePathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pFilePathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pFilePathBuffer -  buffer of global path of the directory, including path delimiter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const LibMCEnv_uint32 nFilePathBufferSize, LibMCEnv_uint32* pFilePathNeededChars, char * pFilePathBuffer);
+
+/**
+* Stores a data buffer in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[in] pDataBufferBuffer - uint8 buffer of file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomDataPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores attached driver data in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreDriverDataPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile);
+
+/*************************************************************************************************************************
+ Class definition for DriverEnvironment
+**************************************************************************************************************************/
+
+/**
+* creates a temporary working directory.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pWorkingDirectory - creates a working directory
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_WorkingDirectory * pWorkingDirectory);
+
+/**
+* retrieves attached driver data into a memory buffer.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[out] pDataBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* registers a string parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] pDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterStringParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue);
+
+/**
+* registers a uuid parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] pDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue);
+
+/**
+* registers a double parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] dDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterDoubleParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_double dDefaultValue);
+
+/**
+* registers an int parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] nDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterIntegerParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_int64 nDefaultValue);
+
+/**
+* registers a bool parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] bDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, bool bDefaultValue);
+
+/**
+* sets a string parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetStringParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
+
+/**
+* sets a uuid parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetUUIDParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
+
+/**
+* sets a double parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetDoubleParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_double dValue);
+
+/**
+* sets an int parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetIntegerParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_int64 nValue);
+
+/**
+* sets a bool parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetBoolParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue);
+
+/*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
 
@@ -736,56 +979,6 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_SleepPtr) (LibMCEnv_StateEnvi
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CheckForTerminationPtr) (LibMCEnv_StateEnvironment pStateEnvironment, bool * pShallTerminate);
 
 /**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreStringPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a uuid in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreIntegerPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 nValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] dValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreDoublePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double dValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] bValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreBoolPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool bValue);
-
-/**
 * stores a signal handler in the current state machine
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -794,60 +987,6 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreBoolPtr) (LibMCEnv_State
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_StoreSignalPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler pHandler);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveStringPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a uuid from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveUUIDPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveIntegerPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveDoublePtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_RetrieveBoolPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool * pValue);
 
 /**
 * retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
@@ -1062,6 +1201,28 @@ typedef struct {
 	PLibMCEnvBuild_ToolpathIsLoadedPtr m_Build_ToolpathIsLoaded;
 	PLibMCEnvBuild_CreateToolpathAccessorPtr m_Build_CreateToolpathAccessor;
 	PLibMCEnvBuild_AddBinaryDataPtr m_Build_AddBinaryData;
+	PLibMCEnvWorkingFileExecution_GetStatusPtr m_WorkingFileExecution_GetStatus;
+	PLibMCEnvWorkingFileExecution_ReturnStdOutPtr m_WorkingFileExecution_ReturnStdOut;
+	PLibMCEnvWorkingFile_GetAbsoluteFileNamePtr m_WorkingFile_GetAbsoluteFileName;
+	PLibMCEnvWorkingFile_GetSizePtr m_WorkingFile_GetSize;
+	PLibMCEnvWorkingFile_CalculateSHA2Ptr m_WorkingFile_CalculateSHA2;
+	PLibMCEnvWorkingFile_DeleteFilePtr m_WorkingFile_DeleteFile;
+	PLibMCEnvWorkingFile_ExecuteFilePtr m_WorkingFile_ExecuteFile;
+	PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr m_WorkingDirectory_GetAbsoluteFilePath;
+	PLibMCEnvWorkingDirectory_StoreCustomDataPtr m_WorkingDirectory_StoreCustomData;
+	PLibMCEnvWorkingDirectory_StoreDriverDataPtr m_WorkingDirectory_StoreDriverData;
+	PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr m_DriverEnvironment_CreateWorkingDirectory;
+	PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr m_DriverEnvironment_RetrieveDriverData;
+	PLibMCEnvDriverEnvironment_RegisterStringParameterPtr m_DriverEnvironment_RegisterStringParameter;
+	PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr m_DriverEnvironment_RegisterUUIDParameter;
+	PLibMCEnvDriverEnvironment_RegisterDoubleParameterPtr m_DriverEnvironment_RegisterDoubleParameter;
+	PLibMCEnvDriverEnvironment_RegisterIntegerParameterPtr m_DriverEnvironment_RegisterIntegerParameter;
+	PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr m_DriverEnvironment_RegisterBoolParameter;
+	PLibMCEnvDriverEnvironment_SetStringParameterPtr m_DriverEnvironment_SetStringParameter;
+	PLibMCEnvDriverEnvironment_SetUUIDParameterPtr m_DriverEnvironment_SetUUIDParameter;
+	PLibMCEnvDriverEnvironment_SetDoubleParameterPtr m_DriverEnvironment_SetDoubleParameter;
+	PLibMCEnvDriverEnvironment_SetIntegerParameterPtr m_DriverEnvironment_SetIntegerParameter;
+	PLibMCEnvDriverEnvironment_SetBoolParameterPtr m_DriverEnvironment_SetBoolParameter;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
 	PLibMCEnvSignalTrigger_TriggerPtr m_SignalTrigger_Trigger;
 	PLibMCEnvSignalTrigger_WaitForHandlingPtr m_SignalTrigger_WaitForHandling;
@@ -1103,17 +1264,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_LogInfoPtr m_StateEnvironment_LogInfo;
 	PLibMCEnvStateEnvironment_SleepPtr m_StateEnvironment_Sleep;
 	PLibMCEnvStateEnvironment_CheckForTerminationPtr m_StateEnvironment_CheckForTermination;
-	PLibMCEnvStateEnvironment_StoreStringPtr m_StateEnvironment_StoreString;
-	PLibMCEnvStateEnvironment_StoreUUIDPtr m_StateEnvironment_StoreUUID;
-	PLibMCEnvStateEnvironment_StoreIntegerPtr m_StateEnvironment_StoreInteger;
-	PLibMCEnvStateEnvironment_StoreDoublePtr m_StateEnvironment_StoreDouble;
-	PLibMCEnvStateEnvironment_StoreBoolPtr m_StateEnvironment_StoreBool;
 	PLibMCEnvStateEnvironment_StoreSignalPtr m_StateEnvironment_StoreSignal;
-	PLibMCEnvStateEnvironment_RetrieveStringPtr m_StateEnvironment_RetrieveString;
-	PLibMCEnvStateEnvironment_RetrieveUUIDPtr m_StateEnvironment_RetrieveUUID;
-	PLibMCEnvStateEnvironment_RetrieveIntegerPtr m_StateEnvironment_RetrieveInteger;
-	PLibMCEnvStateEnvironment_RetrieveDoublePtr m_StateEnvironment_RetrieveDouble;
-	PLibMCEnvStateEnvironment_RetrieveBoolPtr m_StateEnvironment_RetrieveBool;
 	PLibMCEnvStateEnvironment_RetrieveSignalPtr m_StateEnvironment_RetrieveSignal;
 	PLibMCEnvStateEnvironment_ClearStoredValuePtr m_StateEnvironment_ClearStoredValue;
 	PLibMCEnvStateEnvironment_SetStringParameterPtr m_StateEnvironment_SetStringParameter;

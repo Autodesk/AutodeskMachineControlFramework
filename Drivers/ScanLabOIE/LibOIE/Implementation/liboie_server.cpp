@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CServer
 
 #include "liboie_server.hpp"
 #include "liboie_interfaceexception.hpp"
+#include "liboie_connectioniterator.hpp"
 
 // Include custom headers here.
 #include <brynet/net/EventLoop.hpp>
@@ -46,9 +47,51 @@ using namespace LibOIE::Impl;
  Class definition of CServer 
 **************************************************************************************************************************/
 
+#define OIE_MAXRULECOUNT (1024 * 1024 * 1024)
+
 CServer::CServer()
-    : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT)
+    : m_nThreadCount (LIBOIE_THREADCOUNT_DEFAULT), 
+    m_nReceiveBufferSize (LIBOIE_RECEIVEBUFFERSIZE_DEFAULT), 
+    m_nAcceptRuleCounter (1),
+    m_nConnectionCounter (1)
 {
+
+}
+
+
+PConnectionHandler CServer::createConnectionHandler(const std::string & sIPAddress)
+{
+    std::lock_guard<std::mutex> lockGuard (m_ConnectionMutex);
+    auto pConnectionHandler = std::make_shared<CConnectionHandler>(m_nConnectionCounter, sIPAddress);
+    m_nConnectionCounter++;
+
+    m_CurrentConnections.insert(std::make_pair (pConnectionHandler->getID (), pConnectionHandler));
+
+    return pConnectionHandler;
+}
+
+void CServer::releaseConnectionHandler(const uint64_t nConnectionID)
+{
+    std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+
+    m_CurrentConnections.erase(nConnectionID);
+
+}
+
+CConnectionHandler* CServer::findConnectionHandler(const uint64_t nConnectionID, bool bFailIfNotExisting)
+{
+    std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+
+    auto iIter = m_CurrentConnections.find(nConnectionID);
+
+    if (iIter != m_CurrentConnections.end()) {
+        return iIter->second.get();
+    }
+       
+    if (bFailIfNotExisting)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_CONNECTIONNOTFOUND);
+
+    return nullptr;
 
 }
 
@@ -56,25 +99,46 @@ CServer::CServer()
 void CServer::Start(const std::string& sIPAddress, const LibOIE_uint32 nPort, const bool bIPv6) 
 {
 
+    if (m_pService != nullptr)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_SERVICEALREADYRUNNING);
+    if (m_pListener != nullptr)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_SERVICEALREADYRUNNING);
 
     m_pService = brynet::net::TcpService::Create();
 
     m_pService->startWorkerThread(m_nThreadCount, nullptr);
+    std::cout << "Listening!!" << std::endl;
 
-    auto enterCallback = [](const  brynet::net::TcpConnection::Ptr& session) {
-        //total_client_num++;
+    auto enterCallback = [this](const  brynet::net::TcpConnection::Ptr& session) {
 
-        session->setDataCallback([session](const char* buffer, size_t len) {
-            session->send(buffer, len);
-            //TotalRecvSize += len;
-            //total_packet_num++;
+        std::cout << "Client connected:" << session->getIP() << std::endl;
+        auto pConnectionHandler = this->createConnectionHandler(session->getIP());
+        
+        session->setDataCallback([session, pConnectionHandler](const char* buffer, size_t len) {
+            std::cout << "Data received: " << len << "!!" << std::endl;
+
+            if (pConnectionHandler->needsToTerminate()) {
+                session->postDisConnect();
+                return len;
+            }
+
+            try {
+                pConnectionHandler->receivedData((const uint8_t*)buffer, len);
+            }
+            catch (...) {
+                session->postDisConnect();
+            }
+
             return len;
         });
 
-        session->setDisConnectCallback([](const  brynet::net::TcpConnection::Ptr& session) {
-            (void)session;
-            //total_client_num--;
+        session->setDisConnectCallback([this, pConnectionHandler](const  brynet::net::TcpConnection::Ptr& session) {
+            std::cout << "Client disconnected: " << session->getIP() << std::endl;
+            this->releaseConnectionHandler(pConnectionHandler->getID ());
         });
+
+        // ?
+        //session->setHeartBeat ()
 
     };
 
@@ -101,6 +165,16 @@ void CServer::Start(const std::string& sIPAddress, const LibOIE_uint32 nPort, co
 
 void CServer::Stop()
 {
+
+    if (m_pListener != nullptr) {
+        m_pListener->stop();
+        m_pListener = nullptr;
+    }
+
+    if (m_pService != nullptr) {
+        m_pService->stopWorkerThread();
+        m_pService = nullptr;
+    }
 
 }
 
@@ -131,31 +205,40 @@ void CServer::CloseAllConnections()
 
 LibOIE_uint32 CServer::AcceptDevice(const std::string & sDeviceName, const std::string & sApplicationName, const std::string & sVersionName)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+    if (m_nAcceptRuleCounter >= OIE_MAXRULECOUNT)
+        throw ELibOIEInterfaceException(LIBOIE_ERROR_RULEIDOVERFLOW);
+
+    auto pAcceptRule = std::make_shared <CAcceptRule>(m_nAcceptRuleCounter, sDeviceName, sApplicationName, sVersionName);
+    m_nAcceptRuleCounter++;
+
+    m_AcceptRules.insert(std::make_pair (pAcceptRule->getRuleID (), pAcceptRule));
+    return pAcceptRule->getRuleID();
+   
 }
 
 void CServer::UnAcceptDevice(const LibOIE_uint32 nRuleID)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+    m_AcceptRules.erase(nRuleID);
 }
 
 void CServer::ClearAcceptedDevices()
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+    m_AcceptRules.clear();
+    m_nAcceptRuleCounter = 1;
 }
 
 IConnectionIterator * CServer::ListConnections()
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+	return new CConnectionIterator ();
 }
 
-void CServer::SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback)
+void CServer::SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback, const LibOIE_pvoid pUserData)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+
 }
 
-void CServer::SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback)
+void CServer::SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback, const LibOIE_pvoid pUserData)
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+
 }
 

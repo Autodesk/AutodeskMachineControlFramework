@@ -50,6 +50,8 @@ namespace AMC {
 		virtual ~CAPIHandler_Root();
 				
 		virtual std::string getBaseURI () override;
+
+		virtual void checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) override;
 		
 		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
 

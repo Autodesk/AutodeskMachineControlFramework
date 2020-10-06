@@ -64,6 +64,7 @@ class IBuildJobDataIterator;
 class IBuildJob;
 class IBuildJobIterator;
 class IBuildJobHandler;
+class ILoginHandler;
 class IDataModel;
 
 
@@ -441,6 +442,13 @@ public:
 	*/
 	virtual bool ContentTypeIsAccepted(const std::string & sContentType) = 0;
 
+	/**
+	* IStorage::StreamIsImage - checks if a stream is an image.
+	* @param[in] sUUID - UUID of storage stream.
+	* @return Returns if the stream is an image.
+	*/
+	virtual bool StreamIsImage(const std::string & sUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStorage> PIStorage;
@@ -684,6 +692,32 @@ typedef IBaseSharedPtr<IBuildJobHandler> PIBuildJobHandler;
 
 
 /*************************************************************************************************************************
+ Class interface for LoginHandler 
+**************************************************************************************************************************/
+
+class ILoginHandler : public virtual IBase {
+public:
+	/**
+	* ILoginHandler::UserExists - Checks if a user exist.
+	* @param[in] sUsername - User name
+	* @return Flag if users exists
+	*/
+	virtual bool UserExists(const std::string & sUsername) = 0;
+
+	/**
+	* ILoginHandler::GetUserDetails - Retrieves a users data.
+	* @param[in] sUsername - User name
+	* @param[out] sSalt - Salt of the user.
+	* @param[out] sHashedPassword - Hashed Password.
+	*/
+	virtual void GetUserDetails(const std::string & sUsername, std::string & sSalt, std::string & sHashedPassword) = 0;
+
+};
+
+typedef IBaseSharedPtr<ILoginHandler> PILoginHandler;
+
+
+/*************************************************************************************************************************
  Class interface for DataModel 
 **************************************************************************************************************************/
 
@@ -704,6 +738,13 @@ public:
 	virtual LibMCData_uint32 GetDataModelVersion() = 0;
 
 	/**
+	* IDataModel::GetInstallationInformation - returns unique identifiers for the current installation.
+	* @param[out] sInstallationUUID - Installation UUID. Public value to document which installation was used for something.
+	* @param[out] sInstallationSecret - Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application.
+	*/
+	virtual void GetInstallationInformation(std::string & sInstallationUUID, std::string & sInstallationSecret) = 0;
+
+	/**
 	* IDataModel::CreateStorage - creates a storage access class.
 	* @return Storage class instance.
 	*/
@@ -720,6 +761,12 @@ public:
 	* @return LogSession class instance.
 	*/
 	virtual ILogSession * CreateNewLogSession() = 0;
+
+	/**
+	* IDataModel::CreateLoginHandler - creates a login handler instance.
+	* @return LoginHandler instance.
+	*/
+	virtual ILoginHandler * CreateLoginHandler() = 0;
 
 };
 

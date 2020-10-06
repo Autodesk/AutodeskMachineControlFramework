@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="MC Driver S7Net 2.0" namespace="LibMCDriver_S7Net" copyright="Autodesk Inc." year="2020" basename="libmcdriver_s7net"
+	version="1.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
+
+		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+	</errors>
+
+	
+<!--
+
+This base Driver interface MUST be in Sync with LibMCDriver.xml
+
+-->
+	
+	<class name="Base">
+	</class>
+	
+	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+	
+		<method name="GetName" description = "returns the name identifier of the driver">
+			<param name="Name" type="string" pass="return" description="Name of the driver." />
+		</method>
+
+		<method name="GetType" description = "returns the type identifier of the driver">
+			<param name="Type" type="string" pass="return" description="Type of the driver." />
+		</method>
+
+		<method name="GetVersion" description = "returns the version identifiers of the driver">
+			<param name="Major" type="uint32" pass="out" description="Major version." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version." />
+			<param name="Micro" type="uint32" pass="out" description="Micro version." />
+			<param name="Build" type="string" pass="out" description="Build identifier." />
+		</method>
+
+		<method name="GetHeaderInformation" description = "returns the header information">
+			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
+			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
+		</method>
+
+		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
+		</method>
+
+	</class>
+
+<!--
+
+End Interface
+
+-->
+
+
+<!--
+
+Custom implementation
+
+-->
+
+
+
+	<class name="Driver_S7Net" parent="Driver" description="A Driver for a S7 PLC.">
+
+		<method name="Connect" description="Creates and initializes a new S7 PLC.">
+		</method>
+
+		<method name="Disconnect" description="Disconnects from the S7 PLC.">
+		</method>
+
+	</class>
+
+
+<!--
+
+End of Custom implementation
+
+-->
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
+			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
+			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="Instance" type="class" class="Driver" pass="return" description="New Driver instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

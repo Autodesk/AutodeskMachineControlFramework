@@ -34,9 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
-
+#include <vector>
 
 namespace AMCCommon {
+
+	enum class eBase64Type : int {
+		Unknown = 0,
+		RFC4648 = 1,	
+		URL = 2
+	} ;
 
 
 	class CUtils {
@@ -46,8 +52,6 @@ namespace AMCCommon {
 
 	public:
 
-		static std::string getCurrentISO8601TimeUTC();
-		static std::string getCurrentTimeFileName();
 		static std::string createUUID();
 		static std::string normalizeUUIDString(std::string sRawString);
 		static std::string normalizeSHA256String(std::string sRawString);		
@@ -60,8 +64,12 @@ namespace AMCCommon {
 
 		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
 		static std::string calculateSHA256FromString(const std::string& sString);
+		static std::string calculateRandomSHA256String(const uint32_t nIterations);
 
-		static void sleepMilliseconds(const uint32_t milliSeconds);
+		static std::string encodeBase64 (const std::string& sString, eBase64Type eType);
+		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);
+		static std::string decodeBase64ToASCIIString(const std::string& sString, eBase64Type eType);
+
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
 	};
 

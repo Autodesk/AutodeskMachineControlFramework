@@ -63,4 +63,6 @@ copy ..\..\Framework\PluginPython\*.* Framework\PluginPython
 
 echo "Build done!"
 
-pause
+if "%1" neq "NOPAUSE" (
+	pause
+)

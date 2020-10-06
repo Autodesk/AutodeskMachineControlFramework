@@ -104,6 +104,28 @@ typedef void * LibOIE_pvoid;
 #define LIBOIE_ERROR_COULDNOTLOADLIBRARY 6
 #define LIBOIE_ERROR_COULDNOTFINDLIBRARYEXPORT 7
 #define LIBOIE_ERROR_INCOMPATIBLEBINARYVERSION 8
+#define LIBOIE_ERROR_INTERNALERROR 9
+#define LIBOIE_ERROR_UNKNOWNPACKETTYPE 1000
+#define LIBOIE_ERROR_UNSUPPORTEDPACKETVERSION 1001
+#define LIBOIE_ERROR_STRINGEXCEEDSCHARACTERLIMIT 1002
+#define LIBOIE_ERROR_READINGPACKETHEADERALREADY 1003
+#define LIBOIE_ERROR_VARIABLEDATANOTFULLYREAD 1004
+#define LIBOIE_ERROR_VARIABLEDATAINVALIDBOOLEANVALUE 1005
+#define LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMINIMUM 1006
+#define LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMAXIMUM 1007
+#define LIBOIE_ERROR_PACKETSHOULDNOTHAVEPAYLOAD 1008
+#define LIBOIE_ERROR_INVALIDVARIABLEHEADERSIZE 1009
+#define LIBOIE_ERROR_VARIABLEHEADERREADERROR 1010
+#define LIBOIE_ERROR_INSUFFICIENTPACKETDATA 1011
+#define LIBOIE_ERROR_INVALIDPACKETVERSION 1012
+#define LIBOIE_ERROR_PACKETVERSIONALREADYWRITTEN 1013
+#define LIBOIE_ERROR_VARIABLEHEADERALREADYWRITTEN 1014
+#define LIBOIE_ERROR_NOVARIABLEHEADERCONTENT 1015
+#define LIBOIE_ERROR_RULEIDOVERFLOW 1016
+#define LIBOIE_ERROR_CONNECTIONNOTFOUND 1017
+#define LIBOIE_ERROR_SERVICEALREADYRUNNING 1018
+#define LIBOIE_ERROR_INVALIDPACKETSIZE 1019
+#define LIBOIE_ERROR_INVALIDPAYLOADSIZE 1020
 
 /*************************************************************************************************************************
  Error strings for LibOIE
@@ -120,6 +142,28 @@ inline const char * LIBOIE_GETERRORSTRING (LibOIEResult nErrorCode) {
     case LIBOIE_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
     case LIBOIE_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBOIE_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
+    case LIBOIE_ERROR_INTERNALERROR: return "Internal error";
+    case LIBOIE_ERROR_UNKNOWNPACKETTYPE: return "received unknown packet type.";
+    case LIBOIE_ERROR_UNSUPPORTEDPACKETVERSION: return "received unsupported packet version.";
+    case LIBOIE_ERROR_STRINGEXCEEDSCHARACTERLIMIT: return "string exceeds maximum character size.";
+    case LIBOIE_ERROR_READINGPACKETHEADERALREADY: return "packed header is already being read.";
+    case LIBOIE_ERROR_VARIABLEDATANOTFULLYREAD: return "variable data has not been fully read.";
+    case LIBOIE_ERROR_VARIABLEDATAINVALIDBOOLEANVALUE: return "invalid boolean value in variable data.";
+    case LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMINIMUM: return "variable data exceeds minimum.";
+    case LIBOIE_ERROR_VARIABLEVALUEEXCEEDSMAXIMUM: return "variable data exceeds maximum.";
+    case LIBOIE_ERROR_PACKETSHOULDNOTHAVEPAYLOAD: return "packet should not have payload.";
+    case LIBOIE_ERROR_INVALIDVARIABLEHEADERSIZE: return "invalid variable header size.";
+    case LIBOIE_ERROR_VARIABLEHEADERREADERROR: return "variable header read error.";
+    case LIBOIE_ERROR_INSUFFICIENTPACKETDATA: return "insufficient packet data.";
+    case LIBOIE_ERROR_INVALIDPACKETVERSION: return "invalid packet version.";
+    case LIBOIE_ERROR_PACKETVERSIONALREADYWRITTEN: return "packet version already written.";
+    case LIBOIE_ERROR_VARIABLEHEADERALREADYWRITTEN: return "variable header already written.";
+    case LIBOIE_ERROR_NOVARIABLEHEADERCONTENT: return "no variable header content.";
+    case LIBOIE_ERROR_RULEIDOVERFLOW: return "rule id overflow.";
+    case LIBOIE_ERROR_CONNECTIONNOTFOUND: return "connection not found.";
+    case LIBOIE_ERROR_SERVICEALREADYRUNNING: return "service already running.";
+    case LIBOIE_ERROR_INVALIDPACKETSIZE: return "invalid packet size.";
+    case LIBOIE_ERROR_INVALIDPAYLOADSIZE: return "invalid payload size.";
     default: return "unknown error";
   }
 }

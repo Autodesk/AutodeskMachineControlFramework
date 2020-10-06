@@ -357,12 +357,17 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 	var dataBytes []byte;
 	bodyBytes := make ([]byte, 1);
 	
+	w.Header().Set("Access-Control-Allow-Headers", "*");	
 	w.Header().Set("Access-Control-Allow-Origin", "*");	
 	w.Header().Set("Cache-Control", "no-cache");
 	
-	fmt.Println ("field name: ", r.URL.Path);
+	if (r.Method == "OPTIONS") { // CORS handler	
+		return;
+	}
+	
+	authHeader := r.Header.Get("Authorization");	
 				
-	requestHandler, err := GlobalContext.CreateAPIRequestHandler (r.URL.Path, r.Method);
+	requestHandler, err := GlobalContext.CreateAPIRequestHandler (r.URL.Path, r.Method, authHeader);
 	if (err == nil) {
 	
 		var expectsRawBody bool = false;

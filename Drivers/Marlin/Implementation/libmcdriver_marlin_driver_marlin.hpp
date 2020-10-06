@@ -42,9 +42,11 @@ protected:
 	bool m_bDisableHoming;
 	bool m_bDebug;
 
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
 public:
 
-	CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug);
+	CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	void Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) override;
 
@@ -109,6 +111,8 @@ public:
 	void StopIdleHold() override;
 
 	void PowerOff() override;
+
+	void QueryParameters() override;
 
 };
 

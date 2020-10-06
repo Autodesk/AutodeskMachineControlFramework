@@ -34,17 +34,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_apirequesthandler.hpp"
 #include "pugixml.hpp"
 
-#include "libmcdriverenv_interfaces.hpp"
-
 #include "amc_statemachineinstance.hpp"
 #include "amc_logger.hpp"
+#include "amc_parameterhandler.hpp"
+#include "amc_parameterinstances.hpp"
 #include "amc_logger_multi.hpp"
 #include "amc_logger_stdout.hpp"
 #include "amc_logger_database.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
 
-#include "API/amc_api_factory.hpp"
+#include "amc_api_factory.hpp"
+#include "amc_api_sessionhandler.hpp"
 
 // Include custom headers here.
 #include <iostream>
@@ -63,8 +64,9 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     if (pDataModel.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-    m_pStateEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
-    m_pDriverEnvironmentWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*)LibMCDriverEnv::Impl::LibMCDriverEnv_GetProcAddress);
+    m_pStateJournal = std::make_shared<CStateJournal> (std::make_shared<CStateJournalStream> ());
+
+    m_pEnvironmentWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod((void*) LibMCEnv::Impl::LibMCEnv_GetProcAddress);
 
     // Create Log Multiplexer to StdOut and Database
     auto pMultiLogger = std::make_shared<AMC::CLogger_Multi>();
@@ -72,7 +74,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel->CreateNewLogSession ()));
 
     // Create system state
-    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pDriverEnvironmentWrapper);
+    m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper);
 
     // Create API Handlers for data model requests
     m_pAPI = std::make_shared<AMC::CAPI>();
@@ -119,12 +121,6 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t) nMaxThreadCount);
 
 
-    // Load User Interface
-    auto userInterfaceNode = machinedefinitionNode.child("userinterface");
-    if (userInterfaceNode.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
-    m_pSystemState->uiHandler ()->loadFromXML (userInterfaceNode);
-
 
     m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
     auto driversNodes = machinedefinitionNode.children("driver");
@@ -140,7 +136,16 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
     {
         addMachineInstance(instanceNode);
     }
-   
+
+    // Load User Interface
+    auto userInterfaceNode = machinedefinitionNode.child("userinterface");
+    if (userInterfaceNode.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
+    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode);
+
+
+    m_pStateJournal->startRecording();
+
 }
 
 
@@ -219,7 +224,7 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
         throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATESTATENAME);
     
     m_pSystemState->logger()->logMessage("Creating state machine \"" + sName + "\"", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pStateEnvironmentWrapper, m_pSystemState);
+    pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pEnvironmentWrapper, m_pSystemState, m_pStateJournal);
 
     auto signalNodes = xmlNode.children("signaldefinition");
     for (pugi::xml_node signalNode : signalNodes) {
@@ -237,8 +242,10 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
     }
 
 
-    auto parameterGroupNodes = xmlNode.children("parametergroup");
     auto pParameterHandler = pInstance->getParameterHandler();
+
+    // Load all value parameters
+    auto parameterGroupNodes = xmlNode.children("parametergroup");
     for (pugi::xml_node parameterGroupNode : parameterGroupNodes) {
         auto groupNameAttrib = parameterGroupNode.attribute("name");
         if (groupNameAttrib.empty())
@@ -248,8 +255,36 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPDESCRIPTION);
 
         auto pGroup = pParameterHandler->addGroup(groupNameAttrib.as_string(), groupDescriptionAttrib.as_string());
+        pGroup->setJournal(m_pStateJournal, sName);
         loadParameterGroup(parameterGroupNode, pGroup);
     }
+
+    // Load all driver parameters
+    auto driverParameterGroupNodes = xmlNode.children("driverparametergroup");
+    for (pugi::xml_node driverParameterGroupNode : driverParameterGroupNodes) {
+        auto groupNameAttrib = driverParameterGroupNode.attribute("name");
+        if (groupNameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPNAME);
+        auto groupDescriptionAttrib = driverParameterGroupNode.attribute("description");
+        if (groupDescriptionAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPDESCRIPTION);
+
+        auto pGroup = pParameterHandler->addGroup(groupNameAttrib.as_string(), groupDescriptionAttrib.as_string());
+        pGroup->setJournal(m_pStateJournal, sName);
+        loadDriverParameterGroup(driverParameterGroupNode, pGroup);
+    }
+
+
+    // Load all derived parameters
+    for (pugi::xml_node parameterGroupNode : parameterGroupNodes) {
+        auto groupNameAttrib = parameterGroupNode.attribute("name");
+        if (groupNameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPNAME);
+
+        auto pGroup = pParameterHandler->findGroup(groupNameAttrib.as_string(), true);
+        loadParameterGroupDerives(parameterGroupNode, pGroup, sName);
+    }
+
 
     auto statesNodes = xmlNode.children("state");
     for (pugi::xml_node stateNode : statesNodes)
@@ -377,6 +412,20 @@ void CMCContext::readSignalParameters(const pugi::xml_node& xmlNode, std::list<A
 }
 
 
+void CMCContext::loadDriverParameterGroup(const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup)
+{
+    if (pGroup.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+    auto driverNameAttrib = xmlNode.attribute("driver");
+    if (driverNameAttrib.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGDRIVERNAME);
+
+    auto driverGroup = m_pSystemState->driverHandler()->getDriverParameterGroup(driverNameAttrib.as_string ());
+    driverGroup->copyToGroup(pGroup.get());
+
+}
+
 
 void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup)
 {
@@ -397,12 +446,47 @@ void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParamet
         auto typeAttrib = parameterNode.attribute("type");
         if (typeAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERTYPE);
+        auto unitsAttrib = parameterNode.attribute("units");
 
-        pGroup->addNewTypedParameter(nameAttrib.as_string(), typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string());
+        pGroup->addNewTypedParameter(nameAttrib.as_string(), typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string(), unitsAttrib.as_string());
     }
 
 }
 
+void CMCContext::loadParameterGroupDerives(const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup, const std::string& sStateMachineInstance)
+{
+    if (pGroup.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+    auto parameterNodes = xmlNode.children("derivedparameter");
+    for (pugi::xml_node parameterNode : parameterNodes) {
+        auto nameAttrib = parameterNode.attribute("name");
+        if (nameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERNAME);
+
+        AMC::PParameterHandler pParameterHandler;
+
+        auto sourceStateMachineAttrib = parameterNode.attribute("statemachine");
+        if (sourceStateMachineAttrib.empty()) {
+            pParameterHandler = m_pSystemState->parameterInstances()->getParameterHandler(sStateMachineInstance);
+        }
+        else {
+            pParameterHandler = m_pSystemState->parameterInstances()->getParameterHandler(sourceStateMachineAttrib.as_string());
+        }
+
+        auto groupAttrib = parameterNode.attribute("group");
+        if (groupAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPNAME);
+        AMC::PParameterGroup pSourceGroup = pParameterHandler->findGroup (groupAttrib.as_string(), true);
+
+        auto sourceParameterAttrib = parameterNode.attribute("parameter");
+        if (sourceParameterAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERNAME);
+
+        pGroup->addNewDerivedParameter (nameAttrib.as_string(), pSourceGroup, sourceParameterAttrib.as_string ());
+    }
+
+}
 
 
 
@@ -480,12 +564,44 @@ void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSu
     m_pSystemState->logger()->logMessage (sMessage, sSubSystem, (AMC::eLogLevel) eLogLevel);
 }
 
-IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod)
+IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod, const std::string& sAuthorization)
 {
-    auto sNewSessionUUID = AMCCommon::CUtils::createUUID();
 
-    auto pAuth = std::make_shared<CAPIAuth>(sNewSessionUUID);
+    auto pSessionHandler = m_pAPI->getSessionHandler();
+    auto requestType = m_pAPI->getRequestTypeFromString(sRequestMethod);
+  
+    PAPIAuth pAuth;
+    if (sAuthorization.empty()) {
 
-    return new CAPIRequestHandler(m_pAPI, sURI, sRequestMethod, pAuth);
+        bool bNeedsToBeAuthorized = true;
+        bool bCreateNewSession = false;
+        m_pAPI->checkAuthorizationMode(sURI, requestType, bNeedsToBeAuthorized, bCreateNewSession);
+
+        if (bNeedsToBeAuthorized)
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAUTHORIZATION);
+
+        if (bCreateNewSession)
+            pAuth = pSessionHandler->createNewAuthenticationSession ();
+        else
+            pAuth = pSessionHandler->createEmptyAuthenticationSession();
+
+    }
+    else {
+
+        if (sAuthorization.length () < 7)
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAUTHORIZATION);
+        if (sAuthorization.substr (0, 7) != "Bearer ")
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAUTHORIZATION);
+
+        auto sAuthJSONString = AMCCommon::CUtils::decodeBase64ToASCIIString(sAuthorization.substr (7), AMCCommon::eBase64Type::URL);
+
+
+        pAuth = pSessionHandler->createAuthentication(sAuthJSONString);
+    }
+
+     
+
+    return new CAPIRequestHandler(m_pAPI, sURI, requestType, pAuth);
 
 }
+

@@ -47,7 +47,7 @@ Interface version: 1.0.0
 #include "libmcdriver_scanlab_types.hpp"
 
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 namespace LibMCDriver_ScanLab {
 namespace Impl {
@@ -294,6 +294,11 @@ public:
 	* @param[out] sBaseName - BaseName of the driver.
 	*/
 	virtual void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) = 0;
+
+	/**
+	* IDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	virtual void QueryParameters() = 0;
 
 };
 
@@ -570,7 +575,7 @@ typedef IBaseSharedPtr<IDriver_ScanLab_RTC5> PIDriver_ScanLab_RTC5;
 class CWrapper {
 public:
 	// Injected Components
-	static LibMCDriverEnv::PWrapper sPLibMCDriverEnvWrapper;
+	static LibMCEnv::PWrapper sPLibMCEnvWrapper;
 
 	/**
 	* Ilibmcdriver_scanlab::GetVersion - retrieves the binary version of this library.
@@ -607,7 +612,7 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 };
 

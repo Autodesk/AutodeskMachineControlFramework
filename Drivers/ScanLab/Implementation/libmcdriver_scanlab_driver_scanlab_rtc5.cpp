@@ -76,3 +76,8 @@ void CDriver_ScanLab_RTC5::GetHeaderInformation(std::string& sNameSpace, std::st
 	sBaseName = "libmcdriver_scanlab";
 }
 
+void CDriver_ScanLab_RTC5::QueryParameters()
+{
+
+}
+

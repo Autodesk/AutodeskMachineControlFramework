@@ -288,7 +288,46 @@
 		<error name="MISSINGTOOLBARITEMICON" code="279" description="Missing toolbar item icon" />
 		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />		
 		<error name="MISSINGSERVICESNODE" code="281" description="Missing services node" />
-		
+
+		<error name="INVALIDSESSIONUUID" code="282" description="Invalid session UUID" />
+		<error name="INVALIDSESSIONKEY" code="283" description="Invalid session Key" />
+		<error name="SESSIONNOTAUTHORIZED" code="284" description="Session not authorized" />
+		<error name="INVALIDUSERNAME" code="285" description="Invalid user name" />
+		<error name="INVALIDPASSWORD" code="286" description="Invalid password" />
+		<error name="INVALIDAUTHORIZATION" code="287" description="Invalid Authorization" />
+		<error name="USERALREADYAUTHORIZED" code="288" description="User already authorized" />
+		<error name="INVALIDSESSIONTOKEN" code="289" description="Invalid session token" />
+		<error name="INVALIDCLIENTKEY" code="290" description="Invalid client key" />
+		<error name="INVALIDLOGIN" code="291" description="Invalid login credentials" />
+
+		<error name="DUPLICATEPAGE" code="292" description="Duplicate page" />
+		<error name="PAGENOTFOUND" code="293" description="Page not found" />
+		<error name="MISSINGPAGENAME" code="294" description="Missing page name" />
+		<error name="INVALIDPAGENAME" code="295" description="Invalid page name" />
+		<error name="MODULENOTFOUND" code="296" description="Module not found" />
+		<error name="DUPLICATEMODULE" code="297" description="Duplicate module" />
+		<error name="INVALIDMODULENAME" code="298" description="Invalid module name" />
+		<error name="INVALIDMODULETYPE" code="299" description="Invalid module type" />
+		<error name="INVALIDHEADLINE" code="300" description="Invalid headline" />
+		<error name="USERNOTFOUND" code="301" description="User not found" />
+		<error name="STREAMISNOTIMAGE" code="302" description="Stream is not image" />
+		<error name="TOOMANYCONTENTPARAMETERS" code="303" description="Too many content parameters" />
+		<error name="MISSINGCONTENTSTATEMACHINENAME" code="304" description="Missing content state machine name" />
+		<error name="MISSINGCONTENTGROUPNAME" code="305" description="Missing content group name" />
+		<error name="INVALIDENTRIESPERPAGE" code="306" description="Invalid entries per page" />
+		<error name="MODULEITEMNOTFOUND" code="307" description="Module item not found" />
+		<error name="DERIVEDPARAMETERSREADONLY" code="308" description="Derived parameters are read only." />
+		<error name="TOOMANYJOURNALVARIABLES" code="309" description="Too many journal variables" />
+		<error name="JOURNALISNOTINITIALISING" code="310" description="Too many journal variables" />
+		<error name="JOURNALISNOTRECORDING" code="311" description="Too many journal variables" />
+		<error name="INVALIDVARIABLETYPE" code="312" description="Invalid variable type" />
+		<error name="INVALIDVARIABLEUNITS" code="313" description="Invalid variable units" />
+		<error name="UNITSHAVEALREADYBEENSET" code="314" description="Units have already been set" />
+		<error name="UNITSHAVENOTBEENSET" code="315" description="Units have not been set" />
+		<error name="INVALIDTIMESTAMP" code="316" description="Invalid time stamp" />
+		<error name="NOCURRENTJOURNALCHUNK" code="317" description="No current journal chunk" />
+		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />
+
 	</errors>
 	
 	
@@ -392,6 +431,7 @@
 		<method name="CreateAPIRequestHandler" description="creates an API request handler.">
 			<param name="URI" type="string" pass="in" description="URI to serve" />
 			<param name="RequestMethod" type="string" pass="in" description="Request Method" />
+			<param name="Authorization" type="string" pass="in" description="Authorization Header String" />
 			<param name="HandlerInstance" type="class" class="APIRequestHandler" pass="return" description="Request Handler instance." />
 		</method>
 						

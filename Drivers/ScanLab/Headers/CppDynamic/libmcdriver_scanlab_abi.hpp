@@ -51,7 +51,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_scanlab_types.hpp"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,6 +114,14 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_getheaderinformation(LibMCDriver_ScanLab_Driver pDriver, const LibMCDriver_ScanLab_uint32 nNameSpaceBufferSize, LibMCDriver_ScanLab_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_ScanLab_uint32 nBaseNameBufferSize, LibMCDriver_ScanLab_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
+
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_queryparameters(LibMCDriver_ScanLab_Driver pDriver);
 
 /*************************************************************************************************************************
  Class definition for RTCContext
@@ -525,7 +533,7 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_getsy
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLab_Driver * pInstance);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLab_Driver * pInstance);
 
 #ifdef __cplusplus
 }

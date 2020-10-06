@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_statemachineinstance.hpp"
+#include "amc_parameterinstances.hpp"
 
 #include "libmc_interfaceexception.hpp"
 
@@ -43,15 +44,18 @@ typedef LibMCPlugin::ETranslator_StateFactory<ELibMCInterfaceException, LibMCRes
 
 namespace AMC {
 
-	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState)
-		: m_sName(sName), m_sDescription (sDescription), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState)
+	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState, AMC::PStateJournal pStateJournal)
+		: m_sName(sName), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState), m_pStateJournal (pStateJournal)
 	{
 		if (pEnvironmentWrapper.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 		if (pSystemState.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pStateJournal.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		m_ParameterHandler = std::make_shared<CParameterHandler>();
+		m_ParameterHandler = std::make_shared<CParameterHandler>(sDescription);
+		m_pSystemState->parameterInstances()->registerParameterHandler (sName, m_ParameterHandler);
 
 	}
 
@@ -74,7 +78,7 @@ namespace AMC {
 		if (sStateName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATENAME);
 
-		auto pResult = std::make_shared<CStateMachineState>(m_sName, sStateName, nRepeatDelayInMS, m_pEnvironmentWrapper);
+		auto pResult = std::make_shared<CStateMachineState>(m_sName, sStateName, nRepeatDelayInMS, m_pEnvironmentWrapper, m_pSystemState->getGlobalChronoInstance());
 
 		m_States.insert(std::make_pair(sStateName, pResult));
 		m_StateList.push_back(pResult);
@@ -298,9 +302,8 @@ namespace AMC {
 	}
 
 	std::string CStateMachineInstance::getDescription() const
-	{
-		// Return thread safe copy of instance description
-		return std::string(m_sDescription.c_str());
+	{		
+		return m_ParameterHandler->getDescription ();
 	}
 
 

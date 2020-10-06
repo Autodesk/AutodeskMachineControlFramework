@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_stateenvironment.hpp"
 #include "amc_logger.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_statejournal.hpp"
+
+#include "common_chrono.hpp"
 
 #include <map>
 #include <string>
@@ -61,6 +64,7 @@ namespace AMC {
 
 		AMC::PSystemState m_pSystemState;
 		AMC::PParameterHandler m_ParameterHandler;
+		AMC::PStateJournal m_pStateJournal;
 
 		LibMCPlugin::PStateFactory m_pStateFactory;
 		LibMCEnv::PLibMCEnvWrapper m_pEnvironmentWrapper;		
@@ -73,12 +77,10 @@ namespace AMC {
 		// Externally accessible members		
 		// Machine Name (only set in the constructor)
 		std::string m_sName;
-		// Machine Description (only set in the constructor)
-		std::string m_sDescription;
 
 		// Current State Name
 		std::string m_sCurrentStateName;
-		std::mutex m_Mutex_CurrentStateName;
+		std::mutex m_Mutex_CurrentStateName;		
 
 		// Thread functions
 		bool threadIsRunning();
@@ -97,7 +99,7 @@ namespace AMC {
 
 	public:
 
-		CStateMachineInstance(const std::string & sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState);
+		CStateMachineInstance(const std::string & sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState, AMC::PStateJournal pStateJournal);
 		virtual ~CStateMachineInstance();
 
 		// Initialization functions (call before startThread)

@@ -52,10 +52,11 @@ namespace AMC {
 		std::vector<PParameterGroup> m_GroupList;
 
 		std::mutex m_Mutex;
+		std::string m_sDescription;
 		
 	public:
 
-		CParameterHandler();
+		CParameterHandler(std::string sDescription);
 		
 		virtual ~CParameterHandler();		
 		
@@ -64,10 +65,13 @@ namespace AMC {
 		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
 
 		uint32_t getGroupCount();
-		CParameterGroup* getGroup(const uint32_t nIndex);
-		CParameterGroup* findGroup(const std::string& sName, const bool bFailIfNotExisting);
+		PParameterGroup getGroup(const uint32_t nIndex);
+		PParameterGroup findGroup(const std::string& sName, const bool bFailIfNotExisting);
 
 		CParameterGroup * getDataStore ();
+
+		std::string getDescription();
+		void setDescription(const std::string & sDescription);
 
 	};
 

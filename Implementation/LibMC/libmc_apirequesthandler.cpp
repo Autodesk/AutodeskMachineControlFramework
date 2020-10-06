@@ -46,28 +46,16 @@ using namespace LibMC::Impl;
  Class definition of CAPIRequestHandler 
 **************************************************************************************************************************/
 
-CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const std::string& sRequestMethod, AMC::PAPIAuth pAuth)
-    : m_RequestType(AMC::eAPIRequestType::rtUnknown), m_pAPI (pAPI), m_pAuth (pAuth)
+CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth)
+    : m_RequestType(eRequestType), m_pAPI (pAPI), m_pAuth (pAuth)
 {
     if (pAPI.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pAuth.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-    if (sURI.length() > 0) {
-        if (sURI.substr(0, 1) == "/")
-            m_sURIWithoutLeadingSlash = sURI.substr(1);
-        else
-            m_sURIWithoutLeadingSlash = sURI;
-    }
+    m_sURIWithoutLeadingSlash = pAPI->removeLeadingSlashFromURI(sURI);
 
-    if (sRequestMethod == "GET")
-        m_RequestType = AMC::eAPIRequestType::rtGet;
-    if (sRequestMethod == "POST")
-        m_RequestType = AMC::eAPIRequestType::rtPost;
-
-    if (m_RequestType == AMC::eAPIRequestType::rtUnknown)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAPIREQUESTTYPE);
 
 }
 

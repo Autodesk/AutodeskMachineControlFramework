@@ -58,7 +58,7 @@ namespace AMCData {
 		CDatabaseMigrator ();
 	
 		void addMigrationClass(PDatabaseMigrationClass pMigrationClass);
-		void migrateDatabaseSchemas (PSQLHandler pSQLHandler);
+		void migrateDatabaseSchemas (PSQLHandler pSQLHandler, std::string& sInstallationUUID, std::string& sInstallationSecret);
 
 		static uint32_t getCurrentSchemaVersion ();
 	};

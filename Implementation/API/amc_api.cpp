@@ -34,7 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_auth.hpp"
 #include "amc_api_handler.hpp"
 #include "amc_api_response.hpp"
+#include "amc_api_jsonrequest.hpp"
+#include "amc_api_sessionhandler.hpp"
+
 #include "libmc_interfaceexception.hpp"
+
+
+#include "common_utils.hpp"
 
 #include <vector>
 #include <memory>
@@ -45,7 +51,7 @@ using namespace AMC;
 
 CAPI::CAPI()
 {
-
+	m_pSessionHandler = std::make_shared<CAPISessionHandler>();
 }
 
 CAPI::~CAPI()
@@ -91,11 +97,65 @@ bool CAPI::expectsRawBody(const std::string& sURI, const eAPIRequestType request
 	return pHandler->expectsRawBody(sURI, requestType);
 }
 
+
+std::string CAPI::removeLeadingSlashFromURI(const std::string& sURI)
+{
+	std::string sURIWithoutLeadingSlash;
+	if (sURI.length() > 0) {
+		if (sURI.substr(0, 1) == "/")
+			sURIWithoutLeadingSlash = sURI.substr(1);
+		else
+			sURIWithoutLeadingSlash = sURI;
+	}
+
+	return sURIWithoutLeadingSlash;
+
+}
+
+eAPIRequestType CAPI::getRequestTypeFromString(const std::string& sRequestType)
+{
+	std::string sLowerCaseType = AMCCommon::CUtils::trimString(AMCCommon::CUtils::toLowerString(sRequestType));
+
+	if (sLowerCaseType == "get")
+		return AMC::eAPIRequestType::rtGet;
+	if (sLowerCaseType == "post")
+		return AMC::eAPIRequestType::rtPost;
+
+	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAPIREQUESTTYPE);
+}
+
+
+void CAPI::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession)
+{
+
+	bNeedsToBeAuthorized = true;
+	bCreateNewSession = false;
+
+	std::string sURIWithoutLeadingSlash = removeLeadingSlashFromURI(sURI);
+
+	auto pHandler = getURIMatch(sURIWithoutLeadingSlash);
+	if (pHandler.get() == nullptr)
+		return;
+
+	pHandler->checkAuthorizationMode(sURIWithoutLeadingSlash, requestType, bNeedsToBeAuthorized, bCreateNewSession);
+}
+
+
+
+
 PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth)
 {
 	auto pHandler = getURIMatch(sURI);
 	if (pHandler.get() == nullptr)
 		return makeError(AMC_API_HTTP_NOTFOUND, LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
+
+	bool bNeedsToBeAuthorized = true;
+	bool bCreateNewSession = false;
+	pHandler->checkAuthorizationMode (sURI, requestType, bNeedsToBeAuthorized, bCreateNewSession);
+
+	if (bNeedsToBeAuthorized && (!pAuth->userIsAuthorized ()))
+		return makeError(AMC_API_HTTP_FORBIDDEN, LIBMC_ERROR_SESSIONNOTAUTHORIZED, "session not authorized");
+
 
 	try {
 		
@@ -153,3 +213,10 @@ PAPIResponse CAPI::makeError(uint32_t nHTTPError, LibMCResult errorCode, const s
 	writer.addString(AMC_API_KEY_MESSAGE, sErrorString);
 	return std::make_shared<CAPIStringResponse> (nHTTPError, AMC_API_CONTENTTYPE, writer.saveToString () );
 }
+
+
+PAPISessionHandler CAPI::getSessionHandler()
+{
+	return m_pSessionHandler;
+}
+

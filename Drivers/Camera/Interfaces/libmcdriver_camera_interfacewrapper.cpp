@@ -293,6 +293,30 @@ LibMCDriver_CameraResult libmcdriver_camera_driver_getheaderinformation(LibMCDri
 	}
 }
 
+LibMCDriver_CameraResult libmcdriver_camera_driver_queryparameters(LibMCDriver_Camera_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_CAMERA_SUCCESS;
+	}
+	catch (ELibMCDriver_CameraInterfaceException & Exception) {
+		return handleLibMCDriver_CameraException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Iterator
@@ -785,6 +809,8 @@ LibMCDriver_CameraResult LibMCDriver_Camera::Impl::LibMCDriver_Camera_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_camera_driver_getversion;
 	if (sProcName == "libmcdriver_camera_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_camera_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_camera_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_camera_driver_queryparameters;
 	if (sProcName == "libmcdriver_camera_iterator_movenext") 
 		*ppProcAddress = (void*) &libmcdriver_camera_iterator_movenext;
 	if (sProcName == "libmcdriver_camera_iterator_moveprevious") 
@@ -964,11 +990,11 @@ LibMCDriver_CameraResult libmcdriver_camera_injectcomponent(const char * pNameSp
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -1009,7 +1035,7 @@ LibMCDriver_CameraResult libmcdriver_camera_getsymbollookupmethod(LibMCDriver_Ca
 	}
 }
 
-LibMCDriver_CameraResult libmcdriver_camera_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance)
+LibMCDriver_CameraResult libmcdriver_camera_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -1022,8 +1048,8 @@ LibMCDriver_CameraResult libmcdriver_camera_createdriver(const char * pName, con
 			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
 		

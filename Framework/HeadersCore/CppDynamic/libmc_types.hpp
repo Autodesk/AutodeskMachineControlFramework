@@ -306,6 +306,43 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGTOOLBARITEMICON 279
 #define LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION 280
 #define LIBMC_ERROR_MISSINGSERVICESNODE 281
+#define LIBMC_ERROR_INVALIDSESSIONUUID 282
+#define LIBMC_ERROR_INVALIDSESSIONKEY 283
+#define LIBMC_ERROR_SESSIONNOTAUTHORIZED 284
+#define LIBMC_ERROR_INVALIDUSERNAME 285
+#define LIBMC_ERROR_INVALIDPASSWORD 286
+#define LIBMC_ERROR_INVALIDAUTHORIZATION 287
+#define LIBMC_ERROR_USERALREADYAUTHORIZED 288
+#define LIBMC_ERROR_INVALIDSESSIONTOKEN 289
+#define LIBMC_ERROR_INVALIDCLIENTKEY 290
+#define LIBMC_ERROR_INVALIDLOGIN 291
+#define LIBMC_ERROR_DUPLICATEPAGE 292
+#define LIBMC_ERROR_PAGENOTFOUND 293
+#define LIBMC_ERROR_MISSINGPAGENAME 294
+#define LIBMC_ERROR_INVALIDPAGENAME 295
+#define LIBMC_ERROR_MODULENOTFOUND 296
+#define LIBMC_ERROR_DUPLICATEMODULE 297
+#define LIBMC_ERROR_INVALIDMODULENAME 298
+#define LIBMC_ERROR_INVALIDMODULETYPE 299
+#define LIBMC_ERROR_INVALIDHEADLINE 300
+#define LIBMC_ERROR_USERNOTFOUND 301
+#define LIBMC_ERROR_STREAMISNOTIMAGE 302
+#define LIBMC_ERROR_TOOMANYCONTENTPARAMETERS 303
+#define LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME 304
+#define LIBMC_ERROR_MISSINGCONTENTGROUPNAME 305
+#define LIBMC_ERROR_INVALIDENTRIESPERPAGE 306
+#define LIBMC_ERROR_MODULEITEMNOTFOUND 307
+#define LIBMC_ERROR_DERIVEDPARAMETERSREADONLY 308
+#define LIBMC_ERROR_TOOMANYJOURNALVARIABLES 309
+#define LIBMC_ERROR_JOURNALISNOTINITIALISING 310
+#define LIBMC_ERROR_JOURNALISNOTRECORDING 311
+#define LIBMC_ERROR_INVALIDVARIABLETYPE 312
+#define LIBMC_ERROR_INVALIDVARIABLEUNITS 313
+#define LIBMC_ERROR_UNITSHAVEALREADYBEENSET 314
+#define LIBMC_ERROR_UNITSHAVENOTBEENSET 315
+#define LIBMC_ERROR_INVALIDTIMESTAMP 316
+#define LIBMC_ERROR_NOCURRENTJOURNALCHUNK 317
+#define LIBMC_ERROR_DUPLICATEJOURNALID 318
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -524,6 +561,43 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
     case LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
     case LIBMC_ERROR_MISSINGSERVICESNODE: return "Missing services node";
+    case LIBMC_ERROR_INVALIDSESSIONUUID: return "Invalid session UUID";
+    case LIBMC_ERROR_INVALIDSESSIONKEY: return "Invalid session Key";
+    case LIBMC_ERROR_SESSIONNOTAUTHORIZED: return "Session not authorized";
+    case LIBMC_ERROR_INVALIDUSERNAME: return "Invalid user name";
+    case LIBMC_ERROR_INVALIDPASSWORD: return "Invalid password";
+    case LIBMC_ERROR_INVALIDAUTHORIZATION: return "Invalid Authorization";
+    case LIBMC_ERROR_USERALREADYAUTHORIZED: return "User already authorized";
+    case LIBMC_ERROR_INVALIDSESSIONTOKEN: return "Invalid session token";
+    case LIBMC_ERROR_INVALIDCLIENTKEY: return "Invalid client key";
+    case LIBMC_ERROR_INVALIDLOGIN: return "Invalid login credentials";
+    case LIBMC_ERROR_DUPLICATEPAGE: return "Duplicate page";
+    case LIBMC_ERROR_PAGENOTFOUND: return "Page not found";
+    case LIBMC_ERROR_MISSINGPAGENAME: return "Missing page name";
+    case LIBMC_ERROR_INVALIDPAGENAME: return "Invalid page name";
+    case LIBMC_ERROR_MODULENOTFOUND: return "Module not found";
+    case LIBMC_ERROR_DUPLICATEMODULE: return "Duplicate module";
+    case LIBMC_ERROR_INVALIDMODULENAME: return "Invalid module name";
+    case LIBMC_ERROR_INVALIDMODULETYPE: return "Invalid module type";
+    case LIBMC_ERROR_INVALIDHEADLINE: return "Invalid headline";
+    case LIBMC_ERROR_USERNOTFOUND: return "User not found";
+    case LIBMC_ERROR_STREAMISNOTIMAGE: return "Stream is not image";
+    case LIBMC_ERROR_TOOMANYCONTENTPARAMETERS: return "Too many content parameters";
+    case LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME: return "Missing content state machine name";
+    case LIBMC_ERROR_MISSINGCONTENTGROUPNAME: return "Missing content group name";
+    case LIBMC_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
+    case LIBMC_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
+    case LIBMC_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
+    case LIBMC_ERROR_TOOMANYJOURNALVARIABLES: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTINITIALISING: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTRECORDING: return "Too many journal variables";
+    case LIBMC_ERROR_INVALIDVARIABLETYPE: return "Invalid variable type";
+    case LIBMC_ERROR_INVALIDVARIABLEUNITS: return "Invalid variable units";
+    case LIBMC_ERROR_UNITSHAVEALREADYBEENSET: return "Units have already been set";
+    case LIBMC_ERROR_UNITSHAVENOTBEENSET: return "Units have not been set";
+    case LIBMC_ERROR_INVALIDTIMESTAMP: return "Invalid time stamp";
+    case LIBMC_ERROR_NOCURRENTJOURNALCHUNK: return "No current journal chunk";
+    case LIBMC_ERROR_DUPLICATEJOURNALID: return "Duplicate journal id";
     default: return "unknown error";
   }
 }

@@ -39,12 +39,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_toolpathhandler.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_parameterinstances.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
+#include "common_chrono.hpp"
+
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
+
+
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pDriverEnvWrapper)
 	{
 		if (pLogger.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -53,18 +60,26 @@ namespace AMC {
 		if (pDriverEnvWrapper.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
+		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
+
 		m_pLogger = pLogger;
+		m_pDataModel = pDataModel;
+
+		// Retrieve Installation UUID and Secret
+		m_pDataModel->GetInstallationInformation(m_sInstallationUUID, m_sInstallationSecret);
 
 		// Create Data Model Instances
-		m_pDataModel = pDataModel;
 		m_pStorage = m_pDataModel->CreateStorage();
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
+		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
 
 		m_pDriverHandler = std::make_shared<CDriverHandler>(pDriverEnvWrapper);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
-		m_pUIHandler = std::make_shared<CUIHandler>();
+		m_pParameterInstances = std::make_shared<CParameterInstances>();
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pParameterInstances);
+
 	}
 
 	CSystemState::~CSystemState()
@@ -102,6 +117,13 @@ namespace AMC {
 		return m_pUIHandler.get();
 	}
 
+	CParameterInstances* CSystemState::parameterInstances()
+	{
+		return m_pParameterInstances.get();
+
+	}
+
+
 
 	PLogger CSystemState::getLoggerInstance()
 	{
@@ -123,6 +145,23 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
+	PParameterInstances CSystemState::getParameterInstances()
+	{
+		return m_pParameterInstances;
+	}
+
+
+	LibMCData::PLoginHandler CSystemState::getLoginHandlerInstance()
+	{
+		return m_pLoginHandler;
+	}
+
+	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
+	{
+		return m_pGlobalChrono;
+
+	}
+
 	LibMCData::CStorage * CSystemState::storage()
 	{
 		return m_pStorage.get();
@@ -133,6 +172,15 @@ namespace AMC {
 		return m_pBuildJobHandler.get();
 	}
 
+	LibMCData::CLoginHandler* CSystemState::loginHandler()
+	{
+		return m_pLoginHandler.get();
+	}
+
+	AMCCommon::CChrono* CSystemState::globalChrono()
+	{
+		return m_pGlobalChrono.get();
+	}
 
 	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath)
 	{
@@ -154,5 +202,22 @@ namespace AMC {
 		// TODO: Retrieve a unique User ID for the current running session
 		return "amc";
 	}
+
+
+	std::string CSystemState::getInstallationUUID()
+	{
+		return m_sInstallationUUID;
+	}
+
+	std::string CSystemState::getInstallationSecret()
+	{
+		return m_sInstallationSecret;
+	}
+
+	std::string CSystemState::getGitHash()
+	{
+		return __STRINGIZE_VALUE_OF(__GITHASH);
+	}
+
 
 }

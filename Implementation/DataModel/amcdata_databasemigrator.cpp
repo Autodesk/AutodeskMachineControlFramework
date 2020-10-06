@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amcdata_databasemigrator.hpp"
 #include "libmcdata_interfaceexception.hpp"
+#include "common_utils.hpp"
+
 
 namespace AMCData {
 		
@@ -52,7 +54,7 @@ namespace AMCData {
 		return 1;
 	}
 
-	void CDatabaseMigrator::migrateDatabaseSchemas(PSQLHandler pSQLHandler)
+	void CDatabaseMigrator::migrateDatabaseSchemas(PSQLHandler pSQLHandler, std::string& sInstallationUUID, std::string& sInstallationSecret)
 	{
 		if (pSQLHandler.get() == nullptr)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -70,13 +72,39 @@ namespace AMCData {
 		bool bSchemaTableExists = (pStatement1->getColumnInt(1) != 0);
 		pStatement1 = nullptr;
 
-		if (!bSchemaTableExists) {
-			pTransaction->executeStatement("CREATE TABLE " + schemaTableName + " (schemaversion INTEGER DEFAULT 0)");
-		}
+		auto newInstallationUUID = AMCCommon::CUtils::createUUID();
+		auto newInstallationSecret = AMCCommon::CUtils::calculateRandomSHA256String(32);
 
-		auto pStatement2 = pTransaction->prepareStatement("SELECT MAX (schemaversion) FROM " + schemaTableName);
-		if (pStatement2->nextRow()) {
-			currentSchemaVersion = pStatement2->getColumnInt(1);
+		if (!bSchemaTableExists) { 
+			// We have no schema table, so create a table
+			pTransaction->executeStatement("CREATE TABLE " + schemaTableName + " (schemaversion INTEGER DEFAULT 0, installationuuid VARCHAR(128) NOT NULL, installationsecret VARCHAR(128) NOT NULL)");
+			sInstallationUUID = newInstallationUUID;
+			sInstallationSecret = newInstallationSecret;
+		}
+		else { 
+
+			auto pStatement2 = pTransaction->prepareStatement("SELECT MAX (schemaversion) FROM " + schemaTableName);
+			if (!pStatement2->nextRow()) {
+
+				// We do not have a schema table entry..
+				sInstallationUUID = newInstallationUUID;
+				sInstallationSecret = newInstallationSecret;
+
+			} else {
+
+				// We do have a schema table entry..
+				currentSchemaVersion = pStatement2->getColumnInt(1);
+				pStatement2 = nullptr;
+
+				auto pStatement3 = pTransaction->prepareStatement("SELECT installationuuid, installationsecret FROM " + schemaTableName + " WHERE schemaversion = ?");
+				pStatement3->setInt(1, currentSchemaVersion);
+				if (!pStatement3->nextRow())
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INTERNALERROR);
+
+				sInstallationUUID = pStatement3->getColumnString (1);
+				sInstallationSecret = pStatement3->getColumnString(2);
+
+			}
 		}
 
 		uint32_t targetSchemaVersion = getCurrentSchemaVersion ();
@@ -87,9 +115,11 @@ namespace AMCData {
 					pMigrator->increaseSchemaVersion(pTransaction, versionIndex);
 			}
 
-			auto pStatement3 = pTransaction->prepareStatement("INSERT INTO " + schemaTableName + " (schemaversion) VALUES (?)");
-			pStatement3->setInt(1, targetSchemaVersion);
-			pStatement3->execute();
+			auto pStatement4 = pTransaction->prepareStatement("INSERT INTO " + schemaTableName + " (schemaversion, installationuuid, installationsecret) VALUES (?, ?, ?)");
+			pStatement4->setInt(1, targetSchemaVersion);
+			pStatement4->setString(2, sInstallationUUID);
+			pStatement4->setString(3, sInstallationSecret);
+			pStatement4->execute();
 		}
 
 		pTransaction->commit();			

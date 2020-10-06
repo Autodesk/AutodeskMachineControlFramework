@@ -1,5 +1,5 @@
 {
-  "name": "vtest2",
+  "name": "AutodeskMachineControlFramework",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,6 +14,7 @@
     "graphdracula": "^1.3.0",
     "raphael": "^2.3.0",
     "roboto-fontface": "*",
+    "sha": "^3.0.0",
     "vue": "^2.6.11",
     "vuetify": "^2.2.11"
   },

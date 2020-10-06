@@ -368,7 +368,7 @@ public:
 	inline void TerminateAllThreads();
 	inline void LoadClientPackage(const CInputVector<LibMC_uint8> & ZIPStreamBuffer);
 	inline void Log(const std::string & sMessage, const eLogSubSystem eSubsystem, const eLogLevel eLogLevel);
-	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod);
+	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization);
 };
 	
 	/**
@@ -989,12 +989,13 @@ public:
 	* CMCContext::CreateAPIRequestHandler - creates an API request handler.
 	* @param[in] sURI - URI to serve
 	* @param[in] sRequestMethod - Request Method
+	* @param[in] sAuthorization - Authorization Header String
 	* @return Request Handler instance.
 	*/
-	PAPIRequestHandler CMCContext::CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod)
+	PAPIRequestHandler CMCContext::CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization)
 	{
 		LibMCHandle hHandlerInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_CreateAPIRequestHandler(m_pHandle, sURI.c_str(), sRequestMethod.c_str(), &hHandlerInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_CreateAPIRequestHandler(m_pHandle, sURI.c_str(), sRequestMethod.c_str(), sAuthorization.c_str(), &hHandlerInstance));
 		
 		if (!hHandlerInstance) {
 			CheckError(LIBMC_ERROR_INVALIDPARAM);

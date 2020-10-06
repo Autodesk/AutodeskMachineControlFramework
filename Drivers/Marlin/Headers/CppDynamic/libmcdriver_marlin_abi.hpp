@@ -51,7 +51,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_marlin_types.hpp"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,6 +114,14 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_g
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_getheaderinformation(LibMCDriver_Marlin_Driver pDriver, const LibMCDriver_Marlin_uint32 nNameSpaceBufferSize, LibMCDriver_Marlin_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_Marlin_uint32 nBaseNameBufferSize, LibMCDriver_Marlin_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
+
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_Marlin_Driver pDriver);
 
 /*************************************************************************************************************************
  Class definition for Driver_Marlin
@@ -496,7 +504,7 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_getsymbo
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance);
 
 #ifdef __cplusplus
 }

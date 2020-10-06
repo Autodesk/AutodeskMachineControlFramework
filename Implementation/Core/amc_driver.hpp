@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error Never include amc_driver.hpp from outside of amc_driver.cpp and amc_driverhandler.cpp
 #endif
 
-
+#include "amc_parametergroup.hpp"
 #include "libmcdriver_dynamic.hpp" 
 
 namespace AMC {
@@ -59,10 +59,12 @@ namespace AMC {
 
 		LibMCDriver::PWrapper m_pDriverWrapper;
 		LibMCDriver::PDriver m_pDriverInstance;
+
+		PParameterGroup m_pParameterGroup;
 		
 	public:
 
-		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibrary, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibrary, PParameterGroup pParameterGroup, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 		virtual ~CDriver();
 
@@ -73,6 +75,8 @@ namespace AMC {
 
 		HDriverHandle acquireDriverHandle(const std::string & sInstanceName);
 		void releaseDriverHandle(const std::string& sInstanceName);
+
+		PParameterGroup getParameterGroup();
 				
 	};
 	

@@ -293,6 +293,30 @@ LibMCDriverResult libmcdriver_driver_getheaderinformation(LibMCDriver_Driver pDr
 	}
 }
 
+LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriverInterfaceException(LIBMCDRIVER_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_SUCCESS;
+	}
+	catch (ELibMCDriverInterfaceException & Exception) {
+		return handleLibMCDriverException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -316,6 +340,8 @@ LibMCDriverResult LibMCDriver::Impl::LibMCDriver_GetProcAddress (const char * pP
 		*ppProcAddress = (void*) &libmcdriver_driver_getversion;
 	if (sProcName == "libmcdriver_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_driver_queryparameters;
 	if (sProcName == "libmcdriver_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_getversion;
 	if (sProcName == "libmcdriver_getlasterror") 
@@ -465,11 +491,11 @@ LibMCDriverResult libmcdriver_injectcomponent(const char * pNameSpace, LibMCDriv
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriverInterfaceException(LIBMCDRIVER_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -510,7 +536,7 @@ LibMCDriverResult libmcdriver_getsymbollookupmethod(LibMCDriver_pvoid * pSymbolL
 	}
 }
 
-LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
+LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -523,8 +549,8 @@ LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pTyp
 			throw ELibMCDriverInterfaceException (LIBMCDRIVER_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriverInterfaceException (LIBMCDRIVER_ERROR_INVALIDCAST);
 		

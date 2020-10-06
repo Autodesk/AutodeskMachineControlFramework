@@ -630,14 +630,16 @@ public:
 	/**
 	* IServer::SetConnectionAcceptedCallback - sets a callback that triggers when a new connection was established.
 	* @param[in] pCallback - callback function
+	* @param[in] nUserData - Userdata that is passed to the callback function
 	*/
-	virtual void SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback) = 0;
+	virtual void SetConnectionAcceptedCallback(const LibOIE::ConnectionAcceptedCallback pCallback, const LibOIE_pvoid pUserData) = 0;
 
 	/**
 	* IServer::SetConnectionRejectedCallback - sets a callback that triggers when a new connection was rejected.
 	* @param[in] pCallback - callback function
+	* @param[in] nUserData - Userdata that is passed to the callback function
 	*/
-	virtual void SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback) = 0;
+	virtual void SetConnectionRejectedCallback(const LibOIE::ConnectionRejectedCallback pCallback, const LibOIE_pvoid pUserData) = 0;
 
 };
 

@@ -58,26 +58,12 @@ namespace Impl {
 class CIterator : public virtual IIterator, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
 
 public:
-
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+    CIterator();
 
 	bool MoveNext() override;
 

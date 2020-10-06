@@ -75,7 +75,7 @@ protected:
 
 public:
 
-	CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const std::string& sRequestMethod, AMC::PAPIAuth pAuth);
+	CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth);
 
 	bool ExpectsRawBody() override;
 

@@ -53,6 +53,9 @@ public:
 	std::string GetType() override;
 
 	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
+
+	void QueryParameters() override;
+
 };
 
 } // namespace Impl

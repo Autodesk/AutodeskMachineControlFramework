@@ -200,12 +200,12 @@ LibMCResult CCall_libmc_mccontext_log(LibMCHandle libraryHandle, LibMC_MCContext
 }
 
 
-LibMCResult CCall_libmc_mccontext_createapirequesthandler(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance)
+LibMCResult CCall_libmc_mccontext_createapirequesthandler(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorizationString, LibMC_APIRequestHandler * pHandlerInstance)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_CreateAPIRequestHandler (pMCContext, pURI, pRequestMethod, pHandlerInstance);
+	return wrapperTable->m_MCContext_CreateAPIRequestHandler (pMCContext, pURI, pRequestMethod, pAuthorizationString, pHandlerInstance);
 }
 
 
@@ -1076,9 +1076,9 @@ func (inst MCContext) Log(message string, subsystem LogSubSystem, logLevel LogLe
 }
 
 // CreateAPIRequestHandler creates an API request handler.
-func (inst MCContext) CreateAPIRequestHandler(uRI string, requestMethod string) (APIRequestHandler, error) {
+func (inst MCContext) CreateAPIRequestHandler(uRI string, requestMethod string, authorizationString string) (APIRequestHandler, error) {
 	var handlerInstance ref
-	returnValue := C.CCall_libmc_mccontext_createapirequesthandler(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(uRI), C.CString(requestMethod), &handlerInstance)
+	returnValue := C.CCall_libmc_mccontext_createapirequesthandler(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(uRI), C.CString(requestMethod), C.CString(authorizationString), &handlerInstance)
 	if returnValue != 0 {
 		return APIRequestHandler{}, makeError(uint32(returnValue))
 	}

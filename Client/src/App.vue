@@ -2,7 +2,7 @@
 <v-app id="inspire">
     <v-navigation-drawer v-if="appIsReady" v-model="AppState.showDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app>
         <v-list dense>
-            <template v-for="item in AppDefinition.MenuItems">
+            <template v-for="item in AppState.MenuItems">
                 <v-list-group v-if="item.children" :key="item.caption" v-model="item.model" :prepend-icon="item.model ? item.icon : item['icon-alt']">
                     <template v-slot:activator>
                         <v-list-item-content>
@@ -40,13 +40,13 @@
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn tile large color="primary" dark v-on:click.stop="uiChangePage('main')">
+        <v-btn tile large color="primary" dark v-on:click.stop="uiChangePage(AppDefinition.MainPage)">
             {{ uiButtonCaptionCheck(AppDefinition.TextApplicationName) }}
         </v-btn>
 
         <v-spacer />
 
-        <template v-for="toolbaritem in AppDefinition.ToolbarItems">
+        <template v-for="toolbaritem in AppState.ToolbarItems">
             <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="uiChangePage(toolbaritem.targetpage)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
@@ -56,7 +56,7 @@
     <v-main>
         <v-container class="fill-height" fluid v-if="appIsLoading">
             <v-row align="center" justify="center">
-                <v-progress-circular :value="20" indeterminate="true"></v-progress-circular>
+                <v-progress-circular :value="20" indeterminate></v-progress-circular>
             </v-row>
         </v-container>
 
@@ -68,6 +68,8 @@
                             <v-toolbar-title>{{ AppDefinition.TextApplicationName }}</v-toolbar-title>
                         </v-toolbar>
                         <v-card-text>
+							<v-img v-if="AppDefinition.LogoUUID != ''" v-bind:src="getImageURL (AppDefinition.LogoUUID)" v-bind:aspect-ratio="AppDefinition.LogoAspectRatio" contain></v-img>
+						
                             <v-form>
                                 <v-text-field label="User" name="login" prepend-icon="mdi-account" type="text" v-model="AppState.uiLoginUser" autofocus clearable />
                                 <v-text-field id="password" label="Password" name="password" prepend-icon="mdi-lock" type="password" clearable v-model="AppState.uiLoginPassword" />
@@ -84,6 +86,104 @@
             </v-row>
         </v-container>
 
+        <v-container fluid v-if="appIsReady">
+			
+				<template v-for="uiPage in AppState.uiPages">
+
+					<v-row align="start" justify="center" :key="uiPage.name" v-if="(AppState.activePage == uiPage.name)">
+					
+						<template v-for="uiModule in uiPage.modules">
+																
+							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'content')">
+								<v-card-text>
+									<div v-if="uiModule.title != ''"> {{ uiModule.headline }}</div>
+									<p v-if="uiModule.title != ''" class="display-1 text--primary">
+										{{ uiModule.title }}
+									</p>
+									<p v-if="uiModule.subtitle != ''" >{{ uiModule.subtitle }}</p>
+								
+									<div v-if="uiModule.items.length > 0" class="text--primary">
+									
+										<template v-for="item in uiModule.items">
+											
+											<p :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</p>												
+											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" contain></v-img></p>
+											
+											<div :key="item.uuid" v-if="(item.type=='upload')">
+											
+												<form enctype="multipart/form-data" novalidate>
+													<div class="dropbox">
+													  <input type="file" multiple :name="'upload_' + item.uuid" :disabled="item.uploadissaving" 
+														accept="" class="input-file">
+														<p v-if="item.uploadisinitial">
+														  {{ item.uploadcaption }}
+														</p>
+														<p v-if="item.uploadissaving">
+														  Uploading {{ item.uploadfilename }} files...
+														</p>
+													</div>
+												</form>
+											  	
+								
+											</div>
+											
+											<div :key="item.uuid" v-if="(item.type=='parameterlist')">											
+												<v-data-table
+													:headers="item.headers"
+													:items="item.entries"
+													:items-per-page="item.entriesperpage"
+													class="elevation-1"
+													disable-pagination
+													hide-default-footer
+													width="100%"
+													loadingText="item.loadingtext">
+												</v-data-table>											
+											</div>											
+											
+										</template>
+											
+									</div>
+								</v-card-text>
+							
+								<v-card-actions v-if="(uiModule.buttons.length > 0)">
+									<v-spacer></v-spacer>
+									
+									<template v-for="button in uiModule.buttons">
+									
+										<v-btn color="primary" :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">
+											{{ button.caption }}
+										</v-btn>
+									
+									</template>
+								</v-card-actions>
+							</v-card>
+					
+
+
+							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'buildlist')">
+								  								  
+								<v-data-table
+									:headers="uiModule.headers"
+									:items="uiModule.items"
+									:items-per-page="15"
+									class="elevation-1"
+									disable-pagination
+									hide-default-footer
+									width="100%"
+									loadingText="uiModule.loadingtext">
+
+								</v-data-table>																  
+																  
+							</v-card>
+							
+						</template>
+					
+					</v-row>
+				</template>
+								
+        </v-container>
+
+
         <v-container class="fill-height" fluid v-if="appIsError">
             <v-row align="center" justify="center">
                 <v-col cols="12" sm="8" md="4">
@@ -93,6 +193,8 @@
                         </v-toolbar>
                         <v-card-text>
                             Could not connect to server. Please try again later!
+							
+							{{ AppState.currentError }}
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer />
@@ -117,6 +219,7 @@
 
 <script>
 import * as Axios from "axios";
+var SHAJS = require('sha.js')
 
 export default {
     props: {
@@ -172,19 +275,141 @@ export default {
                     this.AppDefinition.TextApplicationName = resultJSON.data.appname;
                     this.AppDefinition.TextCopyRight = resultJSON.data.copyright;
                     this.AppDefinition.MainPage = resultJSON.data.mainpage;
-                    this.AppDefinition.MenuItems = resultJSON.data.menuitems;
-                    this.AppDefinition.ToolbarItems = resultJSON.data.toolbaritems;
-                    this.AppState.currentStatus = "login";
+                    this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
+                    this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
+					this.AppState.currentStatus = "login";
+					
+					document.title = this.AppDefinition.TextApplicationName;
                 })
                 .catch(err => {
                     this.AppState.currentStatus = "error";
-                    this.AppState.currentError = err.response;
+                    this.AppState.currentError = err.response.data.message;
                 });
         },
+		
+        appRetrieveStateUpdate () {
+            var url = this.API.baseURL + "/ui/state";
+            Axios({
+                    method: "GET",
+                    url: url,
+					headers: {
+						"Authorization": "Bearer " + this.API.authToken,
+					},
+                })
+                .then(resultJSON => {
+                    this.AppState.MenuItems = resultJSON.data.menuitems;
+                    this.AppState.ToolbarItems = resultJSON.data.toolbaritems;
+					
+					var page, module, item;
+					for (page of resultJSON.data.pages) {
+						for (module of page.modules) {
+							if (module.type === "content") {
+								for (item of module.items) {
+									if (item.type === "parameterlist") {
+									
+										this.AppState.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+										item.entries = this.AppState.ContentItems[item.uuid].entries;
+										
+									}
+								}
+								
+							}
+						}						
+					
+					}
+					
+					this.AppState.uiPages = resultJSON.data.pages;
+					
+					
+                    this.AppState.activePage = this.AppDefinition.MainPage;
+                })
+                .catch(err => {
+                    this.AppState.currentStatus = "error";
+                    this.AppState.currentError = err.response.data.message;
+                });
+        },
+		
+
+		appUpdateContentItem (uuid) {
+		
+			this.AppState.ContentItems[uuid].refresh = false;
+		
+            var url = this.API.baseURL + "/ui/contentitem/" + uuid;
+            Axios({
+                    method: "GET",
+                    url: url
+                })
+                .then(resultJSON => {					
+
+					var oldentrycount = this.AppState.ContentItems[uuid].entries.length;					
+					for (var i = 0; i < oldentrycount; i++) {
+						this.AppState.ContentItems[uuid].entries.pop ();
+					}
+					
+					for (var entry of resultJSON.data.content.entries) {
+						this.AppState.ContentItems[uuid].entries.push (entry);
+					}
+					this.AppState.ContentItems[uuid].refresh = true;
+                })
+                .catch(err => {
+					err;
+                    this.AppState.ContentItems[uuid].refresh = true;                    
+                });
+				
+		},
 
         uiLogInClick() {
-            this.AppState.uiLoginPassword = "";
-            this.AppState.currentStatus = "ready";
+		
+			var url = this.API.baseURL + "/auth/";
+			
+            Axios({			
+                    method: "POST",
+                    url: url,
+					data: {
+						username: this.AppState.uiLoginUser
+					}
+                })
+                .then(resultCreateSession => {
+																
+					var sessionuuid = resultCreateSession.data.sessionuuid;
+					var sessionkey = resultCreateSession.data.sessionkey;
+					var loginsalt = resultCreateSession.data.loginsalt;
+					var clientkey = sessionkey;
+					
+					var saltedpassword = SHAJS("sha256").update(loginsalt + this.AppState.uiLoginPassword).digest("hex");
+					var clientkeyhash = SHAJS("sha256").update(clientkey + saltedpassword).digest("hex");
+					var sessionkeyhash = SHAJS("sha256").update(sessionkey + clientkeyhash).digest("hex");
+														
+					Axios({
+						method: "POST",
+						url: url + sessionuuid,
+						data: {
+							"clientkey": clientkey,
+							"password": sessionkeyhash
+						}
+					})
+					.then(resultAuthenticate => {
+					
+						this.AppState.uiLoginPassword = "";
+						this.AppState.currentStatus = "ready";
+						
+						this.API.authToken = resultAuthenticate.data.token;
+						
+						this.appRetrieveStateUpdate ();
+						
+					})
+					.catch(err => {
+						this.AppState.currentStatus = "error";
+						this.AppState.currentError = err.response.data.message;
+					}); 
+									  
+					
+                })
+                .catch(err => {
+                    this.AppState.currentStatus = "error";
+                    this.AppState.currentError = err.response.data.message;
+                });
+		
         },
 
         uiReloadPageClick() {
@@ -204,42 +429,70 @@ export default {
         },
 
         uiChangePage(page) {
-            this.AppState.activePage = page;
+            this.AppState.activePage = page;				
         },
+		
+		uiModuleButtonClick (button) {
+			if (button.targetpage != "") {
+				this.uiChangePage (button.targetpage);
+			}
+		
+		},
 
-        uiOnTimer() {},
+        uiOnTimer() {
+		
+			for (var key in this.AppState.ContentItems) {
+				var item = this.AppState.ContentItems [key];
+				if (item.refresh) {				
+					this.appUpdateContentItem (item.uuid);
+				}
+			}												
+		
+		},
 
         updateTheme() {
             // Light theme
             // this.$vuetify.theme.themes.light.primary = '#4caf50'
             // Dark theme
             // this.$vuetify.theme.themes.dark.primary = '#4caf50'
-        }
+        },
+		
+		getImageURL (uuid) {
+			return this.API.baseURL + '/ui/image/' + uuid;
+		}
+		
     },
 
     data: () => ({
         API: {
-            baseURL: "/api"
+            baseURL: "/api",
+			authToken: "0000000000000000000000000000000000000000000000000000000000000000"
         },
 
         AppDefinition: {
             TextApplicationName: "",
             TextCopyRight: "",
             MainPage: "",
-            PageDefinitions: {},
-            ToolbarItems: [],
-            MenuItems: []
+			LogoUUID: "",
+			LogoAspectRatio: 1.0
         },
 
         AppState: {
+		
+            MenuItems: [],
+            ToolbarItems: [],
+			ContentItems: [],
+					
             currentStatus: "initial", // one of "initial" / "login" / "ready" / "error"
             currentError: "",
             showDrawer: true,
             activePage: "",
-            globalTimer: "",
-
-            uiLoginUser: "",
-            uiLoginPassword: ""
+            globalTimer: "",			
+			uiPages: [],
+			
+            uiLoginUser: "test",
+            uiLoginPassword: "test",					
+			
         }
     })
 };

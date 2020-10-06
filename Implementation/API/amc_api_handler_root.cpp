@@ -214,6 +214,13 @@ std::string CAPIHandler_Root::getBaseURI ()
 	return "";
 }
 		
+void CAPIHandler_Root::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession)
+{
+	bNeedsToBeAuthorized = false;
+	bCreateNewSession = false;
+}
+
+
 PAPIResponse CAPIHandler_Root::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 

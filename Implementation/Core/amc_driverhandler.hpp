@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 #include <mutex>
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 namespace AMC {
 
@@ -50,7 +50,7 @@ namespace AMC {
 	class CDriverHandler {
 	private:
 
-		LibMCDriverEnv::PWrapper m_pEnvironmentWrapper;
+		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
 		// List and Map of registered drivers
 		std::list<PDriver> m_DriverList;
@@ -63,7 +63,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCDriverEnv::PWrapper pEnvironmentWrapper);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper);
 
 		virtual ~CDriverHandler();
 
@@ -72,6 +72,8 @@ namespace AMC {
 		void GetDriverInformation (const std::string& sName, std::string& sType, HSymbolLookupHandle & pSymbolLookup);
 
 		HDriverHandle acquireDriver (const std::string& sName, const std::string& sInstanceName);
+
+		PParameterGroup getDriverParameterGroup(const std::string& sName);
 
 		void releaseDriverLocks (const std::string& sInstanceName);
 				

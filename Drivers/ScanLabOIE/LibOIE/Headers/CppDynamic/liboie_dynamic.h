@@ -484,18 +484,20 @@ typedef LibOIEResult (*PLibOIEServer_ListConnectionsPtr) (LibOIE_Server pServer,
 *
 * @param[in] pServer - Server instance.
 * @param[in] pCallback - callback pointer.
+* @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef LibOIEResult (*PLibOIEServer_SetConnectionAcceptedCallbackPtr) (LibOIE_Server pServer, LibOIE::ConnectionAcceptedCallback pCallback);
+typedef LibOIEResult (*PLibOIEServer_SetConnectionAcceptedCallbackPtr) (LibOIE_Server pServer, LibOIE::ConnectionAcceptedCallback pCallback, LibOIE_pvoid pUserData);
 
 /**
 * sets a callback that triggers when a new connection was rejected.
 *
 * @param[in] pServer - Server instance.
 * @param[in] pCallback - callback pointer.
+* @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef LibOIEResult (*PLibOIEServer_SetConnectionRejectedCallbackPtr) (LibOIE_Server pServer, LibOIE::ConnectionRejectedCallback pCallback);
+typedef LibOIEResult (*PLibOIEServer_SetConnectionRejectedCallbackPtr) (LibOIE_Server pServer, LibOIE::ConnectionRejectedCallback pCallback, LibOIE_pvoid pUserData);
 
 /*************************************************************************************************************************
  Global functions
