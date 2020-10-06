@@ -80,7 +80,7 @@ IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sT
 	}
 
 	if (sType == "marlin-ender-2.0") {
-		bool bDebug = true;
+		bool bDebug = false;
 		bool bDoFirmwareQuery = true;
 		bool bDisableHoming = false;
 

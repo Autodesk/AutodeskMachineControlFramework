@@ -186,6 +186,7 @@ namespace AMC {
 		sendCommand("M113 S1"); // keep alive period 0-60 possible, no decimals!
 		setPositioningAbolute();
 		setAbsoluteExtrusion(true);
+		m_dExtruderSumE = 0.0; // reset var to store summed extrude values (E axis)
 		
 		if (m_nCurrentBufferSpace > 0) {
 			m_nMaxBufferSpace = m_nCurrentBufferSpace;
@@ -743,10 +744,11 @@ namespace AMC {
 			sCommand << " Z" << dZ;
 		}
 		if (bInE && !bFastMove) {
+			m_dExtruderSumE += dE;
 			// E given => add E+value to command str
 			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
-			sCommand << " E" << dE;
-			//std::cout << "CALCULATED E = " << dE << std::endl;
+			sCommand << " E" << m_dExtruderSumE;
+			//std::cout << "G1 E = " << m_dExtruderSumE << std::endl;
 		}
 		if (dSpeedInMMperSecond > 0) {
 			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
@@ -855,17 +857,23 @@ namespace AMC {
 
 	void CSerialController_Marlin::setAxisPosition(const std::string& sAxis, double dValue)
 	{
-		sendCommand("G92 " + sAxis + std::to_string(dValue));		
+		sendCommand("G92 " + sAxis + std::to_string(dValue));
+		if (sAxis == "E") {
+			m_dExtruderSumE = dValue;
+		}
 	}
 
 	void CSerialController_Marlin::extruderDoExtrude(double dE, double dSpeedInMMperSecond)
 	{
 		std::stringstream sCommand;
-
-		sCommand << "G1 E" << dE;
+		m_dExtruderSumE += dE;
+		sCommand << "G1 E" << m_dExtruderSumE;
 
 		if (dSpeedInMMperSecond > 0) {
-			sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
+			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
+				m_dCurrentSpeedInMMperSecond = dSpeedInMMperSecond;
+				sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
+			}
 		}
 		// TODO XXXXXXXXXXXXXXXX activate to do extrusion
 		sendCommand(sCommand.str());
