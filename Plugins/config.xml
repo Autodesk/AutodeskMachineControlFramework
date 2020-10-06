@@ -6,7 +6,6 @@
 
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
   <driver name="s7net" library="driver_s7net" type="s7net" />
-  <driver name="camera" library="driver_camera" type="raspi-camera-1.0" />
   
     <statemachine name="demo" description="Demo System" initstate="init" failedstate="fatalerror" library="plugin_demo">
   	 	  		  
@@ -19,8 +18,6 @@
   		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
   	  </parametergroup>
 
-	  <driverparametergroup name="plcstate" description="PLC State Data" driver="s7net" /> 
-	  <driverparametergroup name="marlinstate" description="Marlin State Data" driver="marlin" /> 
 	  
   	  <signaldefinition name="signal_startjob">
   		<parameter name="jobuuid" type="string" />
@@ -81,8 +78,6 @@
 				
 				<parameterlist loadingtext="Loading parameters">
 					<entry statemachine="demo" group="jobinfo" />
-					<entry statemachine="demo" group="plcstate" />
-					<entry statemachine="demo" group="marlinstate" />
 				</parameterlist>
 				
 				<button caption="Build Library" targetpage="buildlist" />

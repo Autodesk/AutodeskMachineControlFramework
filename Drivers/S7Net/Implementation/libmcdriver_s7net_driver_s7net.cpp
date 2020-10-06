@@ -58,7 +58,7 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
     m_pPLCWrapper = LibS7Net::CWrapper::loadLibrary (sLibS7LibraryPath);
     m_pPLC = m_pPLCWrapper->CreatePLC(sLibS7LibraryComHostPath);
 
-    m_pCommunicationWrapper = LibS7Com::CWrapper::loadLibraryFromSymbolLookupMethod(&LibS7Com::Impl::LibS7Com_GetProcAddress);
+    m_pCommunicationWrapper = LibS7Com::CWrapper::loadLibraryFromSymbolLookupMethod((void*) &LibS7Com::Impl::LibS7Com_GetProcAddress);
     m_pCommunicationWrapper->InjectComponent("LibS7Net", m_pPLCWrapper->GetSymbolLookupMethod());
     m_pCommunication = m_pCommunicationWrapper->CreatePLCCommunication();
     m_pCommunication->SetProtocolConfiguration(sProtocolConfiguration);
