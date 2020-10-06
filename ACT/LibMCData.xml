@@ -192,15 +192,15 @@
 		<error name="COULDNOTREADZIPSTREAM" code="206" description="Could not read ZIP stream" />		
 		<error name="COULDNOTREADFULLZIPDATA" code="207" description="Could not read full zip data" />		
 		
-		<error name="COULDNOTFINDDISTRIBUTIONINDEX" code="208" description="Could not find distribution index." />		
-		<error name="COULDNOTPARSEDISTRIBUTIONINDEX" code="209" description="Could not parse distribution index." />
-		<error name="EMPTYDISTRIBUTIONINDEX" code="210" description="Empty distribution index." />
-		<error name="MISSINGDISTRIBUTIONINDEX" code="211" description="Missing distribution index." />
+		<error name="COULDNOTFINDRESOURCEINDEX" code="208" description="Could not find resource index." />		
+		<error name="COULDNOTPARSERESOURCEINDEX" code="209" description="Could not parse resource index." />
+		<error name="EMPTYRESOURCEINDEX" code="210" description="Empty resource index." />
+		<error name="MISSINGRESOURCEINDEX" code="211" description="Missing resource index." />
 		
-		<error name="MISSINGDISTRIBUTIONURL" code="212" description="Missing distribution url." />
-		<error name="MISSINGDISTRIBUTIONFILENAME" code="213" description="Missing distribution filename." />
-		<error name="MISSINGDISTRIBUTIONSIZE" code="214" description="Missing distribution size." />
-		<error name="MISSINGDISTRIBUTIONCONTENTTYPE" code="215" description="Missing distribution content type." />
+		<error name="MISSINGRESOURCENAME" code="212" description="Missing resource name." />
+		<error name="MISSINGRESOURCEFILENAME" code="213" description="Missing resource filename." />
+		<error name="MISSINGRESOURCESIZE" code="214" description="Missing resource size." />
+		<error name="MISSINGRESOURCECONTENTTYPE" code="215" description="Missing resource content type." />
 		
 		<error name="DRIVERALREADYREGISTERED" code="216" description="Driver already registered." />
 		<error name="DRIVERNOTFOUND" code="217" description="Driver not found." />
@@ -312,9 +312,11 @@
 		<error name="UNITSHAVENOTBEENSET" code="315" description="Units have not been set" />
 		<error name="INVALIDTIMESTAMP" code="316" description="Invalid time stamp" />
 		<error name="NOCURRENTJOURNALCHUNK" code="317" description="No current journal chunk" />
-		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />
-			
-			
+		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />		
+		<error name="RESOURCEENTRYNOTFOUND" code="319" description="Resource entry not found" />
+		<error name="NOCORERESOURCEPACKAGE" code="320" description="No core resource package" />
+		<error name="INVALIDASPECTRATIO" code="321" description="Invalid aspect ratio" />
+						
 	</errors>
 	
 
@@ -465,7 +467,6 @@
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
-			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data." />	
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
 		</method>	
 
@@ -477,6 +478,7 @@
 	
 		<method name="FinishPartialStream" description="Finishes storing a stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
+			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data. If given initially, MUST be identical." />
 		</method>	
 		
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">

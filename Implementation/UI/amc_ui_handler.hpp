@@ -34,11 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include <memory>
 #include <vector>
 #include <string>
 #include <mutex>
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
+
 
 namespace AMC {
 
@@ -61,6 +67,7 @@ namespace AMC {
 		double m_dLogoAspectRatio;
 
 		PParameterInstances m_pParameterInstances;
+		PResourcePackage m_pCoreResourcePackage;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
@@ -86,7 +93,9 @@ namespace AMC {
 		void writeConfigurationToJSON (CJSONWriter & writer);
 		void writeStateToJSON(CJSONWriter& writer);
 
-		void loadFromXML (pugi::xml_node & xmlNode);
+		void loadFromXML (pugi::xml_node & xmlNode, PResourcePackage pCoreResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
+
+		PResourcePackage getCoreResourcePackage ();
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
 	};

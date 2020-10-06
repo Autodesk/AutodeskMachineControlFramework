@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMCCOMMON_IMPORTSTREAM
 #define __AMCCOMMON_IMPORTSTREAM
 
-
+#include <vector>
 #include <memory>
 
 namespace AMCCommon {
@@ -58,6 +58,15 @@ namespace AMCCommon {
 		virtual uint64_t readBuffer(uint8_t * pBuffer, const uint64_t cbTotalBytesToRead, const bool bNeedsToReadAll) = 0;
 		virtual uint64_t retrieveSize() = 0;
 		virtual uint64_t getPosition() = 0;
+
+		virtual void readIntoMemory(std::vector<uint8_t>& Buffer) {
+			uint64_t nSize = retrieveSize();
+			Buffer.resize(nSize);
+			if (nSize > 0) {
+				seekPosition(0, true);
+				readBuffer (Buffer.data(), nSize, true);
+			}
+		}
 	};
 
 }

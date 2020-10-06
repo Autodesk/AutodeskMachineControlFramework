@@ -685,7 +685,7 @@ LibMCDataResult libmcdata_storage_storenewstream(LibMCData_Storage pStorage, con
 	}
 }
 
-LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pSHA2, const char * pUserID)
+LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
@@ -698,21 +698,18 @@ LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage,
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pMimeType == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
-		if (pSHA2 == nullptr)
-			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		if (pUserID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUUID(pUUID);
 		std::string sContextUUID(pContextUUID);
 		std::string sName(pName);
 		std::string sMimeType(pMimeType);
-		std::string sSHA2(pSHA2);
 		std::string sUserID(pUserID);
 		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->BeginPartialStream(sUUID, sContextUUID, sName, sMimeType, nSize, sSHA2, sUserID);
+		pIStorage->BeginPartialStream(sUUID, sContextUUID, sName, sMimeType, nSize, sUserID);
 
 		return LIBMCDATA_SUCCESS;
 	}
@@ -756,19 +753,22 @@ LibMCDataResult libmcdata_storage_storepartialstream(LibMCData_Storage pStorage,
 	}
 }
 
-LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage, const char * pUUID)
+LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
 
 	try {
 		if (pUUID == nullptr)
 			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pSHA2 == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
 		std::string sUUID(pUUID);
+		std::string sSHA2(pSHA2);
 		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
 		if (!pIStorage)
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
 		
-		pIStorage->FinishPartialStream(sUUID);
+		pIStorage->FinishPartialStream(sUUID, sSHA2);
 
 		return LIBMCDATA_SUCCESS;
 	}

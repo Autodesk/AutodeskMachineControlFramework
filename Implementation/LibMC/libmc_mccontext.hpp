@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger_multi.hpp"
 
 #include "amc_statesignalhandler.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include "API/amc_api_handler_root.hpp"
 #include "API/amc_api.hpp"
@@ -89,6 +90,8 @@ private:
 	AMC::PAPI m_pAPI;
 	AMC::PAPIHandler_Root m_pClientDistHandler;
 
+	AMC::PResourcePackage m_pCoreResourcePackage;
+
 	void loadParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
 	void loadParameterGroupDerives (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup, const std::string & sStateMachineInstance);
 	void loadDriverParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
@@ -105,7 +108,7 @@ public:
 
 	void ParseConfiguration(const std::string & sXMLString) override;
 
-	void RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath) override;
+	void RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource) override;
 
 	void StartAllThreads() override;	
 
@@ -113,7 +116,7 @@ public:
 
 	void Log(const std::string& sMessage, const LibMC::eLogSubSystem eSubsystem, const LibMC::eLogLevel eLogLevel) override;
 
-	void LoadClientPackage(const LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8* pZIPStreamBuffer) override;
+	void LoadClientPackage(const std::string& sResourcePath) override;
 
 	IAPIRequestHandler* CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod, const std::string& sAuthorization) override;
 

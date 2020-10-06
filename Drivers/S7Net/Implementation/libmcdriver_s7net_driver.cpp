@@ -42,24 +42,26 @@ using namespace LibMCDriver_S7Net::Impl;
 /*************************************************************************************************************************
  Class definition of CDriver 
 **************************************************************************************************************************/
+CDriver::CDriver(const std::string& sName, const std::string& sType)
+    : m_sName(sName), m_sType(sType)
+{
+}
 
 std::string CDriver::GetName()
 {
-	throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOTIMPLEMENTED);
+    return m_sName;
 }
 
 std::string CDriver::GetType()
 {
-	throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOTIMPLEMENTED);
+    return m_sType;
 }
 
 void CDriver::GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild)
 {
-	throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOTIMPLEMENTED);
 }
 
 void CDriver::GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName)
 {
-	throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOTIMPLEMENTED);
 }
 

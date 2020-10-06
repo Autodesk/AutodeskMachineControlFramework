@@ -238,7 +238,8 @@ public:
 	inline bool GetLastError(classParam<CBase> pInstance, std::string & sErrorMessage);
 	inline void AcquireInstance(classParam<CBase> pInstance);
 	inline void ReleaseInstance(classParam<CBase> pInstance);
-	inline PPLC CreatePLC();
+	inline LibS7Net_pvoid GetSymbolLookupMethod();
+	inline PPLC CreatePLC(const std::string & sCOMHost);
 
 private:
 	sLibS7NetDynamicWrapperTable m_WrapperTable;
@@ -414,18 +415,31 @@ public:
 	}
 	
 	/**
+	* CWrapper::GetSymbolLookupMethod - Returns the address of the SymbolLookupMethod
+	* @return Address of the SymbolAddressMethod
+	*/
+	inline LibS7Net_pvoid CWrapper::GetSymbolLookupMethod()
+	{
+		LibS7Net_pvoid resultSymbolLookupMethod = 0;
+		CheckError(nullptr,m_WrapperTable.m_GetSymbolLookupMethod(&resultSymbolLookupMethod));
+		
+		return resultSymbolLookupMethod;
+	}
+	
+	/**
 	* CWrapper::CreatePLC - Returns a PLC instance
+	* @param[in] sCOMHost - Path to COM Host
 	* @return PLC Instance
 	*/
-	inline PPLC CWrapper::CreatePLC()
+	inline PPLC CWrapper::CreatePLC(const std::string & sCOMHost)
 	{
-		LibS7NetHandle hValue = nullptr;
-		CheckError(nullptr,m_WrapperTable.m_CreatePLC(&hValue));
+		LibS7NetHandle hPLCInstance = nullptr;
+		CheckError(nullptr,m_WrapperTable.m_CreatePLC(sCOMHost.c_str(), &hPLCInstance));
 		
-		if (!hValue) {
+		if (!hPLCInstance) {
 			CheckError(nullptr,LIBS7NET_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CPLC>(this, hValue);
+		return std::make_shared<CPLC>(this, hPLCInstance);
 	}
 	
 	inline void CWrapper::CheckError(CBase * pBaseClass, LibS7NetResult nResult)
@@ -460,6 +474,7 @@ public:
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_AcquireInstance = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
+		pWrapperTable->m_GetSymbolLookupMethod = nullptr;
 		pWrapperTable->m_CreatePLC = nullptr;
 		
 		return LIBS7NET_SUCCESS;
@@ -636,6 +651,15 @@ public:
 			return LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_GetSymbolLookupMethod = (PLibS7NetGetSymbolLookupMethodPtr) GetProcAddress(hLibrary, "libs7net_getsymbollookupmethod");
+		#else // _WIN32
+		pWrapperTable->m_GetSymbolLookupMethod = (PLibS7NetGetSymbolLookupMethodPtr) dlsym(hLibrary, "libs7net_getsymbollookupmethod");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_GetSymbolLookupMethod == nullptr)
+			return LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_CreatePLC = (PLibS7NetCreatePLCPtr) GetProcAddress(hLibrary, "libs7net_createplc");
 		#else // _WIN32
 		pWrapperTable->m_CreatePLC = (PLibS7NetCreatePLCPtr) dlsym(hLibrary, "libs7net_createplc");
@@ -714,6 +738,10 @@ public:
 		
 		eLookupError = (*pLookup)("libs7net_releaseinstance", (void**)&(pWrapperTable->m_ReleaseInstance));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ReleaseInstance == nullptr) )
+			return LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7net_getsymbollookupmethod", (void**)&(pWrapperTable->m_GetSymbolLookupMethod));
+		if ( (eLookupError != 0) || (pWrapperTable->m_GetSymbolLookupMethod == nullptr) )
 			return LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libs7net_createplc", (void**)&(pWrapperTable->m_CreatePLC));

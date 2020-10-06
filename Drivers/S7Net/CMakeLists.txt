@@ -35,7 +35,7 @@ cmake_minimum_required(VERSION 3.5)
 ### Change the next line for making a new driver
 ##########################################################################################
 
-set (DRIVERPROJECT Marlin)
+set (DRIVERPROJECT S7Net)
 
 ##########################################################################################
 ### generic CMake boilerplate code
@@ -87,7 +87,6 @@ set_target_properties(${DRIVERNAME}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_OUTPUT_DIR}"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_OUTPUT_DIR}"
 	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"
-	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"
 	VS_DEBUGGER_COMMAND "${CMAKE_CURRENT_OUTPUT_DIR}/amc_server.exe"
 	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"	
 	OUTPUT_NAME "${GLOBALGITHASH}_driver_${DRIVERSUFFIX}"	
@@ -117,6 +116,26 @@ foreach(headerfile ${headerfiles})
 endforeach()	
 
 
+add_custom_command(
+	TARGET ${DRIVERNAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "building driver resources")
+
+if(WIN32)
+add_custom_command(
+	TARGET ${DRIVERNAME} POST_BUILD
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.exe
+			${CMAKE_CURRENT_SOURCE_DIR}/Resources
+			${PROJECT_BINARY_DIR}/../../Output/${GLOBALGITHASH}_driver_${DRIVERSUFFIX}.data)
+endif()
+
+if(UNIX)
+add_custom_command(
+	TARGET ${DRIVERNAME} POST_BUILD
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.linux
+			${CMAKE_CURRENT_SOURCE_DIR}/Resources
+			${PROJECT_BINARY_DIR}/../../Output/${GLOBALGITHASH}_driver_${DRIVERSUFFIX}.data)
+endif()
+
 ##########################################################################################
 ### Add custom code below
 ##########################################################################################
@@ -125,4 +144,15 @@ IF(WIN32)
 	target_link_libraries(${DRIVERNAME} setupapi.lib)
 ENDIF(WIN32)
 
+file(GLOB LIBS7COM_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Interfaces/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Implementation/*.cpp
+)
+target_sources(${DRIVERNAME} PRIVATE ${LIBS7COM_SRC})
+
+
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Implementation)
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/Interfaces)
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Com/CppDynamic)
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibS7Net/CppDynamic)
 

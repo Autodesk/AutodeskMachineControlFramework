@@ -409,10 +409,9 @@ public:
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
-	* @param[in] sSHA2 - SHA256 of the uploaded data.
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sSHA2, const std::string & sUserID) = 0;
+	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID) = 0;
 
 	/**
 	* IStorage::StorePartialStream - stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -426,8 +425,9 @@ public:
 	/**
 	* IStorage::FinishPartialStream - Finishes storing a stream.
 	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	* @param[in] sSHA2 - SHA256 of the uploaded data. If given initially, MUST be identical.
 	*/
-	virtual void FinishPartialStream(const std::string & sUUID) = 0;
+	virtual void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2) = 0;
 
 	/**
 	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.

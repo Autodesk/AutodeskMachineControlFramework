@@ -36,17 +36,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem.hpp"
 #include "amc_ui_module_contentbutton.hpp"
 
+#include "amc_ui_module_contentitem_paragraph.hpp"
+#include "amc_ui_module_contentitem_image.hpp"
+#include "amc_ui_module_contentitem_buildlist.hpp"
+#include "amc_ui_module_contentitem_parameterlist.hpp"
+#include "amc_ui_module_contentitem_upload.hpp"
+
+
 #include "amc_api_constants.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include "libmc_interfaceexception.hpp"
 
 using namespace AMC;
 
-CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances)
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
 	if (pParameterInstances.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pBuildJobHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
@@ -72,14 +84,23 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 		}
 
 		if (sChildName == "image") {
-			auto uuidAttrib = childNode.attribute("uuid");
-			addItem (std::make_shared <CUIModule_ContentImage>(uuidAttrib.as_string()));
+			auto resourceAttrib = childNode.attribute("resource");
+			auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+			double dLogoAspectRatio = 1.0;
+			auto aspectratioAttrib = childNode.attribute("aspectratio");
+			if (!aspectratioAttrib.empty()) {
+				dLogoAspectRatio = aspectratioAttrib.as_float();
+			}
+
+
+			addItem (std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID (), dLogoAspectRatio));
 		}
 
 		if (sChildName == "upload") {
 			auto classAttrib = childNode.attribute("class");
 			auto captionAttrib = childNode.attribute("caption");
-			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string()));
+			auto successpageAttrib = childNode.attribute("successpage");
+			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string(), successpageAttrib.as_string ()));
 		}
 
 		if (sChildName == "parameterlist") {
@@ -103,6 +124,31 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 			addItem (pParameterList);
 
 			pParameterList->loadFromXML(childNode);
+		}
+
+
+		if (sChildName == "buildlist") {
+			auto loadingtextAttrib = childNode.attribute("loadingtext");
+			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
+			auto detailpageAttrib = childNode.attribute("detailpage");
+			std::string sLoadingText = loadingtextAttrib.as_string();
+			std::string sDetailPage = detailpageAttrib.as_string();
+
+			int nEntriesPerPage;
+			if (!entriesperpageAttrib.empty()) {
+				nEntriesPerPage = entriesperpageAttrib.as_int();
+				if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
+					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+				if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
+					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+			}
+			else {
+				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
+			}
+
+			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pBuildJobHandler);
+			addItem(pBuildList);
+			
 		}
 
 		if (sChildName == "button") {

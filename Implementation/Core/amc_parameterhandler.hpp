@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <mutex>
 
+#define AMC_UI_IMAGE_MINASPECTRATIO 0.001
+#define AMC_UI_IMAGE_MAXASPECTRATIO 1000.0
+
 namespace AMC {
 
 	class CParameterHandler;

@@ -25,7 +25,25 @@ echo git hash: %GITHASH%
 
 cd /d "%basepath%"
 
-echo "Building Go Server..."
+echo "Building Resource builder (Win32)..."
+set GOARCH=amd64
+set GOOS=windows
+go build -o "%builddir%/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+
+echo "Building Resource builder (Linux64)..."
+set GOARCH=amd64
+set GOOS=linux
+go build -o "%builddir%/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+
+echo "Building Resource builder (LinuxARM)..."
+set GOARCH=arm
+set GOOS=linux
+set GOARM=5
+go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+
+echo "Building Server..."
+set GOARCH=amd64
+set GOOS=windows
 go get github.com/gorilla/handlers
 go build -o "%builddir%/Output/amc_server.exe" -ldflags="-s -w" "%basepath%/Server/mcserver.go"
 
@@ -41,6 +59,9 @@ echo "Building Core Modules"
 call cmake ..
 call cmake --build . --config Release
 
+echo "Building Core Resources"
+go run ../Server/buildresources.go ../Plugins/Resources "%outputdir%/%GITHASH%_core.data"
+
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
 copy ..\githash.txt Framework\Dist\disthash.txt
@@ -49,7 +70,8 @@ copy ..\Output\amc_server.xml Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmc.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_lib3mf.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmcdata.dll Framework\Dist\
-copy ..\Output\%GITHASH%_core_client.zip Framework\Dist\
+copy ..\Output\%GITHASH%_*.data Framework\Dist\
+copy ..\Output\%GITHASH%_*.client Framework\Dist\
 copy ..\Output\%GITHASH%_package.xml Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\Output\lib3mf.dll Framework\Dist\%GITHASH%_core_lib3mf.dll

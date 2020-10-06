@@ -45,7 +45,8 @@ Abstract: This is the class declaration of CDriver_S7Net
 #endif
 
 // Include custom headers here.
-
+#include "libs7com_dynamic.hpp"
+#include "libs7net_dynamic.hpp"
 
 namespace LibMCDriver_S7Net {
 namespace Impl {
@@ -58,30 +59,27 @@ namespace Impl {
 class CDriver_S7Net : public virtual IDriver_S7Net, public virtual CDriver {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
+    std::string m_sDriverType;
+
+    LibS7Net::PWrapper m_pPLCWrapper;
+    LibS7Net::PPLC m_pPLC;
+    LibS7Com::PWrapper m_pCommunicationWrapper;
+    LibS7Com::PPLCCommunication m_pCommunication;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+    CDriver_S7Net(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+    virtual ~CDriver_S7Net();
 
 	void Connect() override;
 
 	void Disconnect() override;
+
+	void QueryParameters() override;
 
 };
 

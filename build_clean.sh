@@ -34,6 +34,22 @@ echo "git hash: $GITHASH"
 
 cd "$basepath"
 
+echo "Building Resource builder (Win32)..."
+set GOARCH=amd64
+set GOOS=windows
+go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+
+echo "Building Resource builder (Linux64)..."
+set GOARCH=amd64
+set GOOS=linux
+go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+
+echo "Building Resource builder (LinuxARM)..."
+set GOARCH=arm
+set GOOS=linux
+set GOARM=5
+go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+
 echo "Building Go Server..."
 go get "github.com/gorilla/handlers"
 go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
@@ -43,12 +59,19 @@ go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcs
 #cd "$basepath/Client"
 # TODO: Need to implement script to build client
 # Having issues with node packages
+mkdir $builddir/Client
+mkdir $builddir/Client/dist
+cd $builddir/Client
+go run ../../Server/createDist.go ../Output $GITHASH 
 
 cd "$builddir"
 
 echo "Building Core Modules"
 cmake ..
 cmake --build . --config Release
+
+echo "Building Core Resources"
+go run ../Server/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
 
 #echo "Building Developer Package"
 # TODO: Copy files to builddir
