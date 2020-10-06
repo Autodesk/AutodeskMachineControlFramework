@@ -60,6 +60,7 @@ go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcs
 # TODO: Need to implement script to build client
 # Having issues with node packages
 mkdir $builddir/Client
+mkdir $builddir/Client/dist
 cd $builddir/Client
 go run ../../Server/createDist.go ../Output $GITHASH 
 
