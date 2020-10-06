@@ -55,21 +55,17 @@
   	  </state>
   
   	  <state name="startprocess" repeatdelay="100">	  
-  			<outstate target="handletemperature" />
-  	  </state>
-  	  
-  
-  	  <state name="handletemperature" repeatdelay="10">
   			<outstate target="extrudelayer" />
   	  </state>
   	  
+  
   	  <state name="extrudelayer" repeatdelay="10">
   			<outstate target="nextlayer" />
   	  </state>
   	  
   
   	  <state name="nextlayer" repeatdelay="10">
-  			<outstate target="handletemperature" />
+  			<outstate target="extrudelayer" />
   			<outstate target="finishprocess" />
   	  </state>
   
@@ -145,13 +141,10 @@
   		<result name="success" type="bool" />
   	  </signaldefinition>	 
 
-  	  <signaldefinition name="signal_retractfilament">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
-  	  <signaldefinition name="signal_restorefilament">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+	  <parametergroup name="extrudedata" description="Extruder settings">
+  		<parameter name="initialextrude" description="Value for initial extrusion" default="3" type="double" />
+  		<parameter name="retractextrude" description="Value for retract/restore extrusion after/before each layer" default="1" type="double" />
+	  </parametergroup>
 
 
   	  <driverparametergroup name="printerstate" description="Printer State Data" driver="marlin" /> 
@@ -196,7 +189,7 @@
 	  </parametergroup>
 
       <parametergroup name="printerstate" description="Printer State Data">
-  		<derivedparameter name="currentx" statemachine="printerconnection" group="printerstate" parameter="currentx" />
+  		<derivedparameter name="current_x" statemachine="printerconnection" group="printerstate" parameter="currentx" />
 	  </parametergroup>
 
 	  
