@@ -340,7 +340,7 @@ namespace AMC {
 		auto iIter = m_UUIDMap.find(AMCCommon::CUtils::normalizeUUIDString (sUUID));
 		if (iIter == m_UUIDMap.end()) {
 			if (bHasToExist)
-				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND);
+				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sUUID);
 
 			return nullptr;
 		}
@@ -354,7 +354,7 @@ namespace AMC {
 		auto iIter = m_NameMap.find(sName);
 		if (iIter == m_NameMap.end()) {
 			if (bHasToExist)
-				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND);
+				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
 
 			return nullptr;
 		}
