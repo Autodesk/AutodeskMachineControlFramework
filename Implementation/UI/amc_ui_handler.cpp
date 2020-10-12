@@ -203,6 +203,9 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
     if (!logoNode.empty()) {
 
         auto resourceAttrib = logoNode.attribute("resource");
+        if (resourceAttrib.empty ())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGLOGORESOURCE);
+
         auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
         m_sLogoUUID = pResourceEntry->getUUID ();
 

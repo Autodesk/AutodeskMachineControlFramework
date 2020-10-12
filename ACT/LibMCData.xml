@@ -316,6 +316,7 @@
 		<error name="RESOURCEENTRYNOTFOUND" code="319" description="Resource entry not found" />
 		<error name="NOCORERESOURCEPACKAGE" code="320" description="No core resource package" />
 		<error name="INVALIDASPECTRATIO" code="321" description="Invalid aspect ratio" />
+		<error name="MISSINGLOGORESOURCE" code="322" description="Missing logo resource" />
 						
 	</errors>
 	

@@ -346,6 +346,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_RESOURCEENTRYNOTFOUND 319
 #define LIBMCDATA_ERROR_NOCORERESOURCEPACKAGE 320
 #define LIBMCDATA_ERROR_INVALIDASPECTRATIO 321
+#define LIBMCDATA_ERROR_MISSINGLOGORESOURCE 322
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -604,6 +605,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_RESOURCEENTRYNOTFOUND: return "Resource entry not found";
     case LIBMCDATA_ERROR_NOCORERESOURCEPACKAGE: return "No core resource package";
     case LIBMCDATA_ERROR_INVALIDASPECTRATIO: return "Invalid aspect ratio";
+    case LIBMCDATA_ERROR_MISSINGLOGORESOURCE: return "Missing logo resource";
     default: return "unknown error";
   }
 }
