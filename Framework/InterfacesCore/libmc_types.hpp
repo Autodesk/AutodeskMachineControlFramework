@@ -346,6 +346,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_RESOURCEENTRYNOTFOUND 319
 #define LIBMC_ERROR_NOCORERESOURCEPACKAGE 320
 #define LIBMC_ERROR_INVALIDASPECTRATIO 321
+#define LIBMC_ERROR_MISSINGLOGORESOURCE 322
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -604,6 +605,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_RESOURCEENTRYNOTFOUND: return "Resource entry not found";
     case LIBMC_ERROR_NOCORERESOURCEPACKAGE: return "No core resource package";
     case LIBMC_ERROR_INVALIDASPECTRATIO: return "Invalid aspect ratio";
+    case LIBMC_ERROR_MISSINGLOGORESOURCE: return "Missing logo resource";
     default: return "unknown error";
   }
 }
