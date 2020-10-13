@@ -50,7 +50,6 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
-	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
 	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
@@ -63,7 +62,6 @@ namespace AMC {
 
 		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
 		std::vector<PUIModule_ContentItem> m_Items;
-		std::vector<PUIModule_ContentButton> m_Buttons;
 
 		void addItem(PUIModule_ContentItem pItem);
 
