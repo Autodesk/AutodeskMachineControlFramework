@@ -1,4 +1,4 @@
-#[[++
+/*++
 
 Copyright (C) 2020 Autodesk Inc.
 
@@ -26,12 +26,70 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-]]
+*/
 
-cmake_minimum_required(VERSION 3.5)
+#ifndef __AMC_UI_MODULE_CONTENTITEM_BUTTONGROUP
+#define __AMC_UI_MODULE_CONTENTITEM_BUTTONGROUP
 
-project("AMCPlugins")
+#include "header_protection.hpp"
 
-add_subdirectory(Demo)
-add_subdirectory(UI)
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
+
+#include "amc_ui_module_contentitem.hpp"
+
+
+namespace AMC {
+
+	amcDeclareDependingClass(CUIModule_ContentButtonGroup, PUIModule_ContentButtonGroup);
+	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
+
+	class CUIModule_ContentButton {
+	protected:
+
+		std::string m_sUUID;
+		std::string m_sCaption;
+		std::string m_sTargetPage;
+		std::string m_sEvent;
+
+	public:
+
+		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent);
+
+		virtual ~CUIModule_ContentButton();
+
+		std::string getUUID();
+
+		std::string getCaption();
+
+		std::string getTargetPage();
+
+		std::string getEvent();
+
+	};
+
+	class CUIModule_ContentButtonGroup : public CUIModule_ContentItem {
+	protected:		
+		std::list<PUIModule_ContentButton> m_Buttons;
+
+	public:
+
+		CUIModule_ContentButtonGroup();
+
+		virtual ~CUIModule_ContentButtonGroup();
+
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		void addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent);
+
+	};
+
+
+}
+
+
+#endif //__AMC_UI_MODULE_CONTENTITEM_BUTTONGROUP
+
+
 

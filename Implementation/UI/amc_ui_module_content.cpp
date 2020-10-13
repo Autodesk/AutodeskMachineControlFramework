@@ -34,10 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module.hpp"
 #include "amc_ui_module_content.hpp"
 #include "amc_ui_module_contentitem.hpp"
-#include "amc_ui_module_contentbutton.hpp"
 
 #include "amc_ui_module_contentitem_paragraph.hpp"
 #include "amc_ui_module_contentitem_image.hpp"
+#include "amc_ui_module_contentitem_buttongroup.hpp"
 #include "amc_ui_module_contentitem_buildlist.hpp"
 #include "amc_ui_module_contentitem_parameterlist.hpp"
 #include "amc_ui_module_contentitem_upload.hpp"
@@ -126,6 +126,21 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 			pParameterList->loadFromXML(childNode);
 		}
 
+		if (sChildName == "buttongroup") {
+
+			auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>();
+			addItem(pButtonGroup);
+
+			auto buttonsNodes = childNode.children("button");
+			for (auto buttonNode : buttonsNodes) {
+				auto captionAttrib = buttonNode.attribute("caption");
+				auto targetpageAttrib = buttonNode.attribute("targetpage");
+				auto eventAttrib = buttonNode.attribute("event");
+				pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string());
+			}
+
+		}
+
 
 		if (sChildName == "buildlist") {
 			auto loadingtextAttrib = childNode.attribute("loadingtext");
@@ -149,12 +164,6 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pBuildJobHandler);
 			addItem(pBuildList);
 			
-		}
-
-		if (sChildName == "button") {
-			auto captionAttrib = childNode.attribute("caption");
-			auto targetpageAttrib = childNode.attribute("targetpage");
-			m_Buttons.push_back(std::make_shared <CUIModule_ContentButton>(captionAttrib.as_string (), targetpageAttrib.as_string ()));
 		}
 
 	}
@@ -209,14 +218,6 @@ void CUIModule_Content::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 		itemsNode.addObject(itemObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);
-
-	CJSONWriterArray buttonsNode(writer);
-	for (auto button : m_Buttons) {
-		CJSONWriterObject buttonObject(writer);
-		button->addToJSON(writer, buttonObject);
-		buttonsNode.addObject(buttonObject);
-	}
-	moduleObject.addArray(AMC_API_KEY_UI_BUTTONS, buttonsNode);
 
 }
 

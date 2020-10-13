@@ -76,12 +76,11 @@
 				
 				<upload class="build" caption="Select 3MF files to upload" successpage="buildinfo" />
 				
-				<parameterlist loadingtext="Loading parameters">
-					<entry statemachine="demo" group="jobinfo" />
-				</parameterlist>
-				
-				<button caption="Build Library" targetpage="buildlist" />
-				<button caption="System Status" targetpage="systemstatus" />
+			
+				<buttongroup>
+					<button caption="Build Library" targetpage="buildlist" />
+					<button caption="System Status" targetpage="systemstatus" />
+				</buttongroup>
 				
 			</content>		
 
@@ -102,12 +101,13 @@
 		</page>
 
 
-		<page name="buildinfo">
+		<page name="buildinfo" onload="loadbuildinfo">
 		
 			<content name="buildinformation" title="Build Information" subtitle="Detailed information">
 				<paragraph text="Here you find more information about your build." />
 
-				<button caption="Start Build" targetpage="buildinfo" />
+
+	
 				
 			</content>		
 

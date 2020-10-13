@@ -28,50 +28,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include "libmcui_interfaceexception.hpp"
+#include "libmcui_eventhandler.hpp"
+#include "libmcui_event.hpp"
 
-#ifndef __AMC_UI_MODULE_CONTENTBUTTON
-#define __AMC_UI_MODULE_CONTENTBUTTON
+using namespace LibMCUI::Impl;
 
-#include "header_protection.hpp"
-
-#ifndef __AMCIMPL_UI_MODULE
-#error this header is protected and should only be included in the corresponding implementation CPP files.
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4250)
 #endif
 
-#include "Core/amc_jsonwriter.hpp"
-
-namespace AMC {
-
-	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
-	
-	class CUIModule_ContentButton {		
-	protected:		
-
-		std::string m_sUUID;
-		std::string m_sCaption;
-		std::string m_sTargetPage;
-
-	public:
-
-		CUIModule_ContentButton(const std::string & sCaption, const std::string & sTargetPage);
-		
-		virtual ~CUIModule_ContentButton();
-
-		std::string getUUID ();
-
-		std::string getCaption();
-
-		std::string getTargetPage();
-
-		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object);
-		
-	};
 
 
-	
+/*************************************************************************************************************************
+ Class declaration of CEventHandler
+**************************************************************************************************************************/
+
+class CEvent_StartBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "startbuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+
+
+
+	}
+
+};
+
+
+IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
+{
+	IEvent* pEventInstance = nullptr;
+	if (createEventInstanceByName<CEvent_StartBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
 }
 
-
-#endif //__AMC_UI_MODULE_CONTENTBUTTON
-
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif

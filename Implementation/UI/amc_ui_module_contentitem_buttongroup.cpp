@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_MODULE
 #define __AMCIMPL_API_CONSTANTS
 
-#include "amc_ui_module_contentbutton.hpp"
+#include "amc_ui_module_contentitem_buttongroup.hpp"
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_ContentButton::CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage)
-	: m_sUUID (AMCCommon::CUtils::createUUID ()), m_sCaption (sCaption), m_sTargetPage (sTargetPage)
+CUIModule_ContentButton::CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent)
+	: m_sUUID (AMCCommon::CUtils::createUUID ()), m_sCaption (sCaption), m_sTargetPage (sTargetPage), m_sEvent (sEvent)
 {
 
 }
@@ -65,10 +65,46 @@ std::string CUIModule_ContentButton::getTargetPage()
 	return m_sTargetPage;
 }
 
-
-void CUIModule_ContentButton::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+std::string CUIModule_ContentButton::getEvent()
 {
-	object.addString(AMC_API_KEY_UI_BUTTONUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_BUTTONCAPTION, m_sCaption);
-	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, m_sTargetPage);
+	return m_sEvent;
+}
+
+CUIModule_ContentButtonGroup::CUIModule_ContentButtonGroup()
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID())
+{
+
+}
+
+CUIModule_ContentButtonGroup::~CUIModule_ContentButtonGroup()
+{
+
+}
+
+
+void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buttongroup");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+
+	CJSONWriterArray buttonArray(writer);
+
+	for (auto pButton : m_Buttons) {
+		CJSONWriterObject buttonobject(writer);
+		buttonobject.addString(AMC_API_KEY_UI_BUTTONUUID, pButton->getUUID ());
+		buttonobject.addString(AMC_API_KEY_UI_BUTTONCAPTION, pButton->getCaption ());
+		buttonobject.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pButton->getTargetPage ());
+		buttonArray.addObject(buttonobject);
+	}
+
+
+	object.addArray(AMC_API_KEY_UI_ITEMBUTTONS, buttonArray);
+
+}
+
+
+
+void CUIModule_ContentButtonGroup::addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent)
+{
+	m_Buttons.push_back(std::make_shared<CUIModule_ContentButton> (sCaption, sTargetPage, sEvent));
 }

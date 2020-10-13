@@ -628,6 +628,71 @@
 
 
 
+	<class name="UIEnvironment" parent="Base" description="Environment of the UI">
+	  
+		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="SignalName" type="string" pass="in" description="Name Of signal channel." />
+			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />
+		</method>
+	  
+		
+		<method name="GetMachineState" description="Retrieves the machine state">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="StateName" type="string" pass="return" description="Name of current state" />
+		</method>
+
+		<method name="LogMessage" description="logs a string as message">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogWarning" description="logs a string as warning">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogInfo" description="logs a string as info">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+				
+		<method name="GetStringParameter" description="returns a string parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetUUIDParameter" description="returns a uuid parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetDoubleParameter" description="returns a double parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetIntegerParameter" description="returns an int parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetBoolParameter" description="returns a bool parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="return" description="Value to set" />
+		</method>
+
+	</class>
+
+
+
 		
 	<global baseclassname="Base" 
 		stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" symbollookupmethod="GetSymbolLookupMethod">

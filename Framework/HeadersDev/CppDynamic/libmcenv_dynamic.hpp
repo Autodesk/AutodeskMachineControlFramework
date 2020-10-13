@@ -70,6 +70,7 @@ class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
 class CStateEnvironment;
+class CUIEnvironment;
 
 /*************************************************************************************************************************
  Declaration of deprecated class types
@@ -86,6 +87,7 @@ typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
+typedef CUIEnvironment CLibMCEnvUIEnvironment;
 
 /*************************************************************************************************************************
  Declaration of shared pointer types
@@ -102,6 +104,7 @@ typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
+typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 
 /*************************************************************************************************************************
  Declaration of deprecated shared pointer types
@@ -118,6 +121,7 @@ typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
+typedef PUIEnvironment PLibMCEnvUIEnvironment;
 
 
 /*************************************************************************************************************************
@@ -300,6 +304,7 @@ private:
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
 	friend class CStateEnvironment;
+	friend class CUIEnvironment;
 
 };
 
@@ -620,6 +625,32 @@ public:
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 };
 	
+/*************************************************************************************************************************
+ Class CUIEnvironment 
+**************************************************************************************************************************/
+class CUIEnvironment : public CBase {
+public:
+	
+	/**
+	* CUIEnvironment::CUIEnvironment - Constructor for UIEnvironment class.
+	*/
+	CUIEnvironment(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
+	inline std::string GetMachineState(const std::string & sMachineInstance);
+	inline void LogMessage(const std::string & sLogString);
+	inline void LogWarning(const std::string & sLogString);
+	inline void LogInfo(const std::string & sLogString);
+	inline std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+};
+	
 	/**
 	* CWrapper::GetVersion - retrieves the binary version of this library.
 	* @param[out] nMajor - returns the major version of this library
@@ -801,6 +832,16 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
+		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
+		pWrapperTable->m_UIEnvironment_LogWarning = nullptr;
+		pWrapperTable->m_UIEnvironment_LogInfo = nullptr;
+		pWrapperTable->m_UIEnvironment_GetStringParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetUUIDParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetDoubleParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetIntegerParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetBoolParameter = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1755,6 +1796,96 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_PrepareSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineState = (PLibMCEnvUIEnvironment_GetMachineStatePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachinestate");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineState = (PLibMCEnvUIEnvironment_GetMachineStatePtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachinestate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetMachineState == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LogMessage = (PLibMCEnvUIEnvironment_LogMessagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_logmessage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LogMessage = (PLibMCEnvUIEnvironment_LogMessagePtr) dlsym(hLibrary, "libmcenv_uienvironment_logmessage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LogMessage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LogWarning = (PLibMCEnvUIEnvironment_LogWarningPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_logwarning");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LogWarning = (PLibMCEnvUIEnvironment_LogWarningPtr) dlsym(hLibrary, "libmcenv_uienvironment_logwarning");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LogWarning == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LogInfo = (PLibMCEnvUIEnvironment_LogInfoPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loginfo");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LogInfo = (PLibMCEnvUIEnvironment_LogInfoPtr) dlsym(hLibrary, "libmcenv_uienvironment_loginfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LogInfo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetStringParameter = (PLibMCEnvUIEnvironment_GetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetStringParameter = (PLibMCEnvUIEnvironment_GetStringParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetUUIDParameter = (PLibMCEnvUIEnvironment_GetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetUUIDParameter = (PLibMCEnvUIEnvironment_GetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetDoubleParameter = (PLibMCEnvUIEnvironment_GetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetDoubleParameter = (PLibMCEnvUIEnvironment_GetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetIntegerParameter = (PLibMCEnvUIEnvironment_GetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetIntegerParameter = (PLibMCEnvUIEnvironment_GetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetBoolParameter = (PLibMCEnvUIEnvironment_GetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetBoolParameter = (PLibMCEnvUIEnvironment_GetBoolParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -2213,6 +2344,46 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getboolparameter", (void**)&(pWrapperTable->m_StateEnvironment_GetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_PrepareSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachinestate", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineState == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_logmessage", (void**)&(pWrapperTable->m_UIEnvironment_LogMessage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogMessage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_logwarning", (void**)&(pWrapperTable->m_UIEnvironment_LogWarning));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogWarning == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loginfo", (void**)&(pWrapperTable->m_UIEnvironment_LogInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getstringparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getuuidparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getdoubleparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getintegerparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getboolparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -3546,6 +3717,151 @@ public:
 	{
 		bool resultValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBoolParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	 * Method definitions for class CUIEnvironment
+	 */
+	
+	/**
+	* CUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sSignalName - Name Of signal channel.
+	* @return Signal trigger object.
+	*/
+	PSignalTrigger CUIEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
+	{
+		LibMCEnvHandle hSignalInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_PrepareSignal(m_pHandle, sMachineInstance.c_str(), sSignalName.c_str(), &hSignalInstance));
+		
+		if (!hSignalInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CSignalTrigger>(m_pWrapper, hSignalInstance);
+	}
+	
+	/**
+	* CUIEnvironment::GetMachineState - Retrieves the machine state
+	* @param[in] sMachineInstance - State machine instance name
+	* @return Name of current state
+	*/
+	std::string CUIEnvironment::GetMachineState(const std::string & sMachineInstance)
+	{
+		LibMCEnv_uint32 bytesNeededStateName = 0;
+		LibMCEnv_uint32 bytesWrittenStateName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineState(m_pHandle, sMachineInstance.c_str(), 0, &bytesNeededStateName, nullptr));
+		std::vector<char> bufferStateName(bytesNeededStateName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineState(m_pHandle, sMachineInstance.c_str(), bytesNeededStateName, &bytesWrittenStateName, &bufferStateName[0]));
+		
+		return std::string(&bufferStateName[0]);
+	}
+	
+	/**
+	* CUIEnvironment::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	void CUIEnvironment::LogMessage(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LogMessage(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	void CUIEnvironment::LogWarning(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LogWarning(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	void CUIEnvironment::LogInfo(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LogInfo(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::GetStringParameter - returns a string parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	std::string CUIEnvironment::GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetStringParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetStringParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetUUIDParameter - returns a uuid parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	std::string CUIEnvironment::GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUUIDParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUUIDParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetDoubleParameter - returns a double parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	LibMCEnv_double CUIEnvironment::GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetDoubleParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetIntegerParameter - returns an int parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	LibMCEnv_int64 CUIEnvironment::GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetIntegerParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetBoolParameter - returns a bool parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	bool CUIEnvironment::GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetBoolParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
 	}

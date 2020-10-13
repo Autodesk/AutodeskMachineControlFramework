@@ -147,41 +147,28 @@
 												
 											</div>											
 											
+											<div :key="item.uuid" v-if="(item.type=='buttongroup')">
+												<v-spacer></v-spacer>
+												
+												<template v-for="button in item.buttons">
+												
+													<v-btn color="primary" :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">
+														{{ button.caption }}
+													</v-btn>
+												
+												</template>
+											</div>											
+											
 										</template>
 											
 									</div>
 								</v-card-text>
+								
+								
 							
-								<v-card-actions v-if="(uiModule.buttons.length > 0)">
-									<v-spacer></v-spacer>
-									
-									<template v-for="button in uiModule.buttons">
-									
-										<v-btn color="primary" :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">
-											{{ button.caption }}
-										</v-btn>
-									
-									</template>
-								</v-card-actions>
 							</v-card>
 					
 
-
-							<v-card :key="uiModule.name" width="99%" v-if="(uiModule.type == 'buildlist')">
-								  								  
-								<v-data-table
-									:headers="uiModule.headers"
-									:items="uiModule.items"
-									:items-per-page="15"
-									class="elevation-1"
-									disable-pagination
-									hide-default-footer
-									width="100%"
-									loadingText="uiModule.loadingtext">
-
-								</v-data-table>																  
-																  
-							</v-card>
 							
 						</template>
 					

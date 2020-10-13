@@ -157,6 +157,7 @@ typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
+typedef LibMCEnvHandle LibMCEnv_UIEnvironment;
 
 namespace LibMCEnv {
 
