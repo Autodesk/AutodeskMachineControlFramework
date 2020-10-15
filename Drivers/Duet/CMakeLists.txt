@@ -88,8 +88,8 @@ set_target_properties(${DRIVERNAME}
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_OUTPUT_DIR}"
 	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"
 	VS_DEBUGGER_COMMAND "${CMAKE_CURRENT_OUTPUT_DIR}/amc_server.exe"
-	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"	
-	OUTPUT_NAME "${GLOBALGITHASH}_driver_${DRIVERSUFFIX}"	
+	VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"
+	OUTPUT_NAME "${GLOBALGITHASH}_driver_${DRIVERSUFFIX}"
 )
 
 
@@ -101,7 +101,7 @@ file (GLOB headerfiles LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Heade
 foreach(headerfile ${headerfiles})
 
 	get_filename_component(headerfilename ${headerfile} NAME)
-	
+
 	add_custom_command(
         TARGET ${DRIVERNAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "copying ${headerfile}...")
@@ -111,9 +111,9 @@ foreach(headerfile ${headerfiles})
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${headerfile}
                 ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/HeadersDriver/CppDynamic/${headerfilename})
-				
-				
-endforeach()	
+
+
+endforeach()
 
 
 add_custom_command(
@@ -145,3 +145,4 @@ IF(WIN32)
 ENDIF(WIN32)
 
 
+target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)

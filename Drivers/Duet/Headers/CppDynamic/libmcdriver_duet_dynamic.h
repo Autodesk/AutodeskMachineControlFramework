@@ -144,23 +144,12 @@ typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_DisconnectPtr) (Li
 typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_SetAbsolutePositioningPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, bool bAbsolute);
 
 /**
-* Polls a new state from the printer.
+* Stores the driver parameters in the driver environment.
 *
 * @param[in] pDriver_Duet - Driver_Duet instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_UpdatePositionStatePtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet);
-
-/**
-* Returns the current axis position.
-*
-* @param[in] pDriver_Duet - Driver_Duet instance.
-* @param[out] pX - X Value in mm
-* @param[out] pY - Y Value in mm
-* @param[out] pZ - Z Value in mm
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ);
+typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_QueryParametersPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet);
 
 /**
 * Returns the current target position.
@@ -169,9 +158,24 @@ typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_GetCurrentPosition
 * @param[out] pX - X Value in mm
 * @param[out] pY - Y Value in mm
 * @param[out] pZ - Z Value in mm
+* @param[out] pA - A Value in mm
+* @param[out] pB - B Value in mm
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_GetTargetPositionPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ);
+typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_GetTargetPositionPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ, LibMCDriver_Duet_double * pA, LibMCDriver_Duet_double * pB);
+
+/**
+* Returns the current position.
+*
+* @param[in] pDriver_Duet - Driver_Duet instance.
+* @param[out] pX - X Value in mm
+* @param[out] pY - Y Value in mm
+* @param[out] pZ - Z Value in mm
+* @param[out] pA - A Value in mm
+* @param[out] pB - B Value in mm
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ, LibMCDriver_Duet_double * pA, LibMCDriver_Duet_double * pB);
 
 /**
 * Returns if the movement buffer can receive another movement command..
@@ -201,7 +205,7 @@ typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_IsMovingPtr) (LibM
 typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_IsHomedPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, bool * pValue);
 
 /**
-* Returns if the printer is coneccted
+* Returns if the printer is connected
 *
 * @param[in] pDriver_Duet - Driver_Duet instance.
 * @param[out] pValue - True if printer is connected.
@@ -215,11 +219,11 @@ typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_IsConnectedPtr) (L
 * @param[in] pDriver_Duet - Driver_Duet instance.
 * @param[in] dX - X Value in mm
 * @param[in] dY - Y Value in mm
-* @param[in] dE - E Value in mm
+* @param[in] dLaserPower - Laser power in percent of maximum power
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_MoveToXYPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dX, LibMCDriver_Duet_double dY, LibMCDriver_Duet_double dE, LibMCDriver_Duet_double dSpeed);
+typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_MoveToXYPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dX, LibMCDriver_Duet_double dY, LibMCDriver_Duet_double dLaserPower, LibMCDriver_Duet_double dSpeed);
 
 /**
 * Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -243,14 +247,24 @@ typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_MoveFastToXYPtr) (
 typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_MoveToZPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dZ, LibMCDriver_Duet_double dSpeed);
 
 /**
-* Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+* Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 *
 * @param[in] pDriver_Duet - Driver_Duet instance.
-* @param[in] dZ - Z Value in mm
+* @param[in] dA - A Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_MoveFastToZPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dZ, LibMCDriver_Duet_double dSpeed);
+typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_MoveToAPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dA, LibMCDriver_Duet_double dSpeed);
+
+/**
+* Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+*
+* @param[in] pDriver_Duet - Driver_Duet instance.
+* @param[in] dB - B Value in mm
+* @param[in] dSpeed - Movement speed in mm/s
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_DuetResult (*PLibMCDriver_DuetDriver_Duet_MoveToBPtr) (LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dB, LibMCDriver_Duet_double dSpeed);
 
 /**
 * Start Homing of printer.
@@ -370,9 +384,9 @@ typedef struct {
 	PLibMCDriver_DuetDriver_Duet_ConnectPtr m_Driver_Duet_Connect;
 	PLibMCDriver_DuetDriver_Duet_DisconnectPtr m_Driver_Duet_Disconnect;
 	PLibMCDriver_DuetDriver_Duet_SetAbsolutePositioningPtr m_Driver_Duet_SetAbsolutePositioning;
-	PLibMCDriver_DuetDriver_Duet_UpdatePositionStatePtr m_Driver_Duet_UpdatePositionState;
-	PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr m_Driver_Duet_GetCurrentPosition;
+	PLibMCDriver_DuetDriver_Duet_QueryParametersPtr m_Driver_Duet_QueryParameters;
 	PLibMCDriver_DuetDriver_Duet_GetTargetPositionPtr m_Driver_Duet_GetTargetPosition;
+	PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr m_Driver_Duet_GetCurrentPosition;
 	PLibMCDriver_DuetDriver_Duet_CanExecuteMovementPtr m_Driver_Duet_CanExecuteMovement;
 	PLibMCDriver_DuetDriver_Duet_IsMovingPtr m_Driver_Duet_IsMoving;
 	PLibMCDriver_DuetDriver_Duet_IsHomedPtr m_Driver_Duet_IsHomed;
@@ -380,7 +394,8 @@ typedef struct {
 	PLibMCDriver_DuetDriver_Duet_MoveToXYPtr m_Driver_Duet_MoveToXY;
 	PLibMCDriver_DuetDriver_Duet_MoveFastToXYPtr m_Driver_Duet_MoveFastToXY;
 	PLibMCDriver_DuetDriver_Duet_MoveToZPtr m_Driver_Duet_MoveToZ;
-	PLibMCDriver_DuetDriver_Duet_MoveFastToZPtr m_Driver_Duet_MoveFastToZ;
+	PLibMCDriver_DuetDriver_Duet_MoveToAPtr m_Driver_Duet_MoveToA;
+	PLibMCDriver_DuetDriver_Duet_MoveToBPtr m_Driver_Duet_MoveToB;
 	PLibMCDriver_DuetDriver_Duet_StartHomingPtr m_Driver_Duet_StartHoming;
 	PLibMCDriver_DuetDriver_Duet_EmergencyStopPtr m_Driver_Duet_EmergencyStop;
 	PLibMCDriver_DuetDriver_Duet_SetAxisPositionPtr m_Driver_Duet_SetAxisPosition;
