@@ -467,8 +467,8 @@ public:
 class CPrinterConnectionState_DoExtrudeLayer : public virtual CPrinterConnectionState {
 private:
 
-	bool timeElapsed(int64_t nLayerTimeout, std::chrono::high_resolution_clock::time_point tStart) {
-		auto tEnd = std::chrono::high_resolution_clock::now();
+	bool timeElapsed(int64_t nLayerTimeout, std::chrono::system_clock::time_point tStart) {
+		auto tEnd = std::chrono::system_clock::now();
 		if ((std::chrono::duration_cast<std::chrono::milliseconds> (tEnd -tStart).count() > nLayerTimeout)) {
 			return true;
 		}
@@ -477,7 +477,7 @@ private:
 		}
 	}
 
-	bool canExecuteMovement(LibMCEnv::PStateEnvironment pStateEnvironment, double dStatusUpdateInterval, PDriver_Marlin pDriver, int64_t nLayerTimeout, std::chrono::high_resolution_clock::time_point tStart)
+	bool canExecuteMovement(LibMCEnv::PStateEnvironment pStateEnvironment, double dStatusUpdateInterval, PDriver_Marlin pDriver, int64_t nLayerTimeout, std::chrono::system_clock::time_point tStart)
 	{
 		bool bSucces = true;
 		while (!pDriver->CanExecuteMovement()) {
@@ -496,7 +496,7 @@ private:
 		return bSucces;
 	}
 
-	bool moveFastToZ(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_Marlin pDriver, std::chrono::steady_clock::time_point tStart, LibMCEnv_int64 nLayerTimeout, double dStatusUpdateInterval, double dZ, const double dSpeedFastMmPerSecond)
+	bool moveFastToZ(LibMCEnv::PStateEnvironment pStateEnvironment, PDriver_Marlin pDriver, std::chrono::system_clock::time_point tStart, LibMCEnv_int64 nLayerTimeout, double dStatusUpdateInterval, double dZ, const double dSpeedFastMmPerSecond)
 	{
 		bool bSucces;
 		bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
@@ -556,7 +556,7 @@ public:
 
 		// do initial move to read z value/layer height
 		auto nSegmentCount = pLayer->GetSegmentCount();
-		auto tStart = std::chrono::high_resolution_clock::now();
+		auto tStart = std::chrono::system_clock::now();
 		if ((nSegmentCount > 0) && (dZ > 0)) {
 			if (!moveFastToZ(pStateEnvironment, pDriver, tStart, nLayerTimeout, dStatusUpdateInterval, dZ, dSpeedFastMmPerSecond)) {
 				sNoSuccessMsg << "Timeout while moving to layer height Z=" << dZ << " of layer " << nLayerIndex;
