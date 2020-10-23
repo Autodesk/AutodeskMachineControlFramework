@@ -3892,6 +3892,54 @@ LibMCEnvResult libmcenv_uienvironment_getboolparameter(LibMCEnv_UIEnvironment pU
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_geteventcontext(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nContextUUIDBufferSize, LibMCEnv_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if ( (!pContextUUIDBuffer) && !(pContextUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sContextUUID("");
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pContextUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sContextUUID = pIUIEnvironment->GetEventContext();
+
+			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sContextUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sContextUUID);
+			pIUIEnvironment->_setCache (nullptr);
+		}
+		
+		if (pContextUUIDNeededChars)
+			*pContextUUIDNeededChars = (LibMCEnv_uint32) (sContextUUID.size()+1);
+		if (pContextUUIDBuffer) {
+			if (sContextUUID.size() >= nContextUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iContextUUID = 0; iContextUUID < sContextUUID.size(); iContextUUID++)
+				pContextUUIDBuffer[iContextUUID] = sContextUUID[iContextUUID];
+			pContextUUIDBuffer[sContextUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -4127,6 +4175,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getintegerparameter;
 	if (sProcName == "libmcenv_uienvironment_getboolparameter") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getboolparameter;
+	if (sProcName == "libmcenv_uienvironment_geteventcontext") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_geteventcontext;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

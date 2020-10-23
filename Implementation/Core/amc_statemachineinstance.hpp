@@ -78,10 +78,6 @@ namespace AMC {
 		// Machine Name (only set in the constructor)
 		std::string m_sName;
 
-		// Current State Name
-		std::string m_sCurrentStateName;
-		std::mutex m_Mutex_CurrentStateName;		
-
 		// Thread functions
 		bool threadIsRunning();
 		bool threadShallTerminate();

@@ -649,6 +649,7 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline std::string GetEventContext();
 };
 	
 	/**
@@ -842,6 +843,7 @@ public:
 		pWrapperTable->m_UIEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetEventContext = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1886,6 +1888,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_geteventcontext");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) dlsym(hLibrary, "libmcenv_uienvironment_geteventcontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetEventContext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -2384,6 +2395,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getboolparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_geteventcontext", (void**)&(pWrapperTable->m_UIEnvironment_GetEventContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetEventContext == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -3864,6 +3879,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetBoolParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetEventContext - returns the event context uuid as string
+	* @return Context UUID
+	*/
+	std::string CUIEnvironment::GetEventContext()
+	{
+		LibMCEnv_uint32 bytesNeededContextUUID = 0;
+		LibMCEnv_uint32 bytesWrittenContextUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetEventContext(m_pHandle, 0, &bytesNeededContextUUID, nullptr));
+		std::vector<char> bufferContextUUID(bytesNeededContextUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetEventContext(m_pHandle, bytesNeededContextUUID, &bytesWrittenContextUUID, &bufferContextUUID[0]));
+		
+		return std::string(&bufferContextUUID[0]);
 	}
 
 } // namespace LibMCEnv

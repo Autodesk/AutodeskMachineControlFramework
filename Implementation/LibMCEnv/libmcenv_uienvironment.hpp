@@ -36,6 +36,9 @@ Abstract: This is the class declaration of CUIEnvironment
 #define __LIBMCENV_UIENVIRONMENT
 
 #include "libmcenv_interfaces.hpp"
+#include "amc_logger.hpp"
+#include "amc_parameterinstances.hpp"
+#include "amc_statesignalhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -57,27 +60,18 @@ namespace Impl {
 
 class CUIEnvironment : public virtual IUIEnvironment, public virtual CBase {
 private:
-
-	/**
-	* Put private members here.
-	*/
+	AMC::PLogger m_pLogger;
+	AMC::PParameterInstances m_pParameterInstances;
+	AMC::PStateSignalHandler m_pSignalHandler;
+	std::string m_sLogSubSystem;
+	std::string m_sSenderUUID;
+	std::string m_sContextUUID;
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
-
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PParameterInstances pParameterInstances, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID);
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
@@ -98,6 +92,8 @@ public:
 	LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
 	bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
+
+	std::string GetEventContext() override;
 
 };
 

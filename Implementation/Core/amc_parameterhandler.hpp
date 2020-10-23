@@ -56,6 +56,7 @@ namespace AMC {
 
 		std::mutex m_Mutex;
 		std::string m_sDescription;
+		std::string m_sInstanceState;
 		
 	public:
 
@@ -75,6 +76,9 @@ namespace AMC {
 
 		std::string getDescription();
 		void setDescription(const std::string & sDescription);
+
+		void setInstanceStateName(const std::string & sInstanceState);
+		std::string getInstanceStateName();
 
 	};
 

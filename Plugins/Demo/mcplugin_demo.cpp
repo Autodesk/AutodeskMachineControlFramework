@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcplugin_interfaceexception.hpp"
 #include "libmcplugin_state.hpp"
 
+#include "libmcdriver_marlin_dynamic.hpp"
+#include "libmcenv_drivercast.hpp"
+
 using namespace LibMCPlugin::Impl;
 
 #ifdef _MSC_VER
@@ -39,12 +42,30 @@ using namespace LibMCPlugin::Impl;
 #pragma warning(disable : 4250)
 #endif
 
+
+
+/*************************************************************************************************************************
+ Import functionality for Driver into current plugin
+**************************************************************************************************************************/
+typedef LibMCDriver_Marlin::PDriver_Marlin PDriver_Marlin;
+typedef LibMCEnv::CDriverCast <LibMCDriver_Marlin::CDriver_Marlin, LibMCDriver_Marlin::CWrapper> PDriverCast_Marlin;
+
+
 /*************************************************************************************************************************
  Class definition of CMainData
 **************************************************************************************************************************/
 class CMainData : public virtual CPluginData {
 protected:
+	// We need to globally store driver wrappers in the plugin
+	PDriverCast_Marlin m_DriverCast_Marlin; 
+
 public:
+
+	PDriver_Marlin acquireMarlinDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		return m_DriverCast_Marlin.acquireDriver(pStateEnvironment, "marlin");
+	}
+
 };
 
 /*************************************************************************************************************************
@@ -113,6 +134,9 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
+
+		auto pDriver = m_pPluginData->acquireMarlinDriver(pStateEnvironment);
+		pDriver->QueryParameters();
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
 		if (pStateEnvironment->GetBoolParameter("jobinfo", "autostart")) {
@@ -268,7 +292,6 @@ public:
 
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
-		auto nLayerTimeoutGraceTime = pStateEnvironment->GetIntegerParameter("jobinfo", "layertimeoutgracetime");
 
 		pStateEnvironment->SetNextState("nextlayer");
 	}

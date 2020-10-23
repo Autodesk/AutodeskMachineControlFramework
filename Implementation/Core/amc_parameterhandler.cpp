@@ -134,6 +134,17 @@ namespace AMC {
 
 	}
 
+	void CParameterHandler::setInstanceStateName(const std::string& sInstanceState)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		m_sInstanceState = sInstanceState;
+	}
+
+	std::string CParameterHandler::getInstanceStateName()
+	{
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		return m_sInstanceState;
+	}
 
 
 }

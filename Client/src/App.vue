@@ -601,7 +601,7 @@ export default {
 			
 			if (colonIndex === -1) {
 				this.AppState.activePage = pageString;
-				this.AppState.activeObject = "";
+				this.AppState.activeObject = "00000000-0000-0000-0000-000000000000";
 			}
 			
 			if (colonIndex > 0) {
@@ -610,7 +610,39 @@ export default {
 			}
         },
 		
+		
+		uiTriggerUIEvent (eventname, senderuuid, contextuuid) {
+			var url = this.API.baseURL + "/ui/event";
+			
+            Axios({			
+                    method: "POST",
+                    url: url,
+					headers: {
+						"Authorization": "Bearer " + this.API.authToken,
+					},
+					data: {
+						"eventname": eventname,
+						"senderuuid": senderuuid,
+						"contextuuid": contextuuid						
+					}
+                })
+                .then(resultHandleEvent => {
+					resultHandleEvent;
+					//alert (resultHandleEvent.data);
+				})
+                .catch(err => {
+					alert (err);
+                });				
+		},
+		
 		uiModuleButtonClick (button) {
+			
+			var contextuuid = this.AppState.activeObject;
+			
+			if (button.event != "") {		
+				this.uiTriggerUIEvent (button.event, button.uuid, contextuuid);
+			}
+			
 			if (button.targetpage != "") {
 				this.uiChangePage (button.targetpage);
 			}
@@ -623,33 +655,7 @@ export default {
 				this.uiChangePage (String (item.detailpage) + ":" + String (item.buildUUID));
 			}
 		},
-		
-		
-		uiModuleStartBuildClick (buildName, buildUUID) {
-		
-			var url = this.API.baseURL + "/signal/";
-			Axios({			
-				method: "POST",
-				url: url,
-				headers: {
-					"Authorization": "Bearer " + this.API.authToken,
-				},
-				data: {
-					"instancename": "demo",
-					"signalname": "signal_startjob",
-					"jobname": buildName,
-					"jobuuid": buildUUID
-				}
-			})
-			.then(resultBuildStart => {
-				resultBuildStart;
-				alert ("started build!");
-			})
-			.catch(err => {
-				err;                    
-			});				
-		},
-
+			
         uiOnTimer() {
 		
 			for (var key in this.AppState.ContentItems) {
@@ -698,7 +704,7 @@ export default {
             currentError: "",
             showDrawer: true,
             activePage: "",
-			activeObject: "",
+			activeObject: "00000000-0000-0000-0000-000000000000",
             globalTimer: "",			
 			uiPages: [],
 			

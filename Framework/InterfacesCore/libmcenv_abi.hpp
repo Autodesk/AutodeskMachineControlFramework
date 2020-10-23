@@ -1252,6 +1252,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getintegerparameter(LibM
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getboolparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
+/**
+* returns the event context uuid as string
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nContextUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pContextUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pContextUUIDBuffer -  buffer of Context UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_geteventcontext(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nContextUUIDBufferSize, LibMCEnv_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
