@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter.hpp"
 #include "amc_parameter_valued.hpp"
 #include "amc_parameter_derived.hpp"
+#include "amc_parameter_instancestate.hpp"
 #include "amc_statejournal.hpp"
 
 #include "amc_jsonwriter.hpp"
@@ -452,6 +453,15 @@ namespace AMC {
 		addParameterInternal(std::make_shared<CParameter_Derived>(sName, pParameterGroup, sSourceParameterName));
 
 	}
+
+	void CParameterGroup::addNewInstanceStateParameter(const std::string& sName, const std::string& sDescription)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		addParameterInternal(std::make_shared<CParameter_InstanceState>(sName, sDescription));
+
+	}
+
 
 
 	void CParameterGroup::removeValue(const std::string& sName)

@@ -94,6 +94,7 @@ void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSO
 		buttonobject.addString(AMC_API_KEY_UI_BUTTONUUID, pButton->getUUID ());
 		buttonobject.addString(AMC_API_KEY_UI_BUTTONCAPTION, pButton->getCaption ());
 		buttonobject.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pButton->getTargetPage ());
+		buttonobject.addString(AMC_API_KEY_UI_BUTTONEVENT, pButton->getEvent());
 		buttonArray.addObject(buttonobject);
 	}
 

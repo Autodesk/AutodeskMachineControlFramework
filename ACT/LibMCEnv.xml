@@ -688,6 +688,11 @@
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="return" description="Value to set" />
 		</method>
+		
+		<method name="GetEventContext" description="returns the event context uuid as string">
+			<param name="ContextUUID" type="string" pass="return" description="Context UUID" />
+		</method>
+		
 
 	</class>
 

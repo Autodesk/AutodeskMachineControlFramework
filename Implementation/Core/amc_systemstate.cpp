@@ -51,13 +51,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pDriverEnvWrapper)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper)
 	{
 		if (pLogger.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 		if (pDataModel.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pDriverEnvWrapper.get() == nullptr)
+		if (pEnvWrapper.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
@@ -73,12 +73,12 @@ namespace AMC {
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
 
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pDriverEnvWrapper);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pParameterInstances = std::make_shared<CParameterInstances>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pParameterInstances);
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pParameterInstances, m_pSignalHandler,  pEnvWrapper, m_pLogger);
 
 	}
 
@@ -197,7 +197,7 @@ namespace AMC {
 	{
 		auto iIter = m_LibraryPathes.find(sLibraryName);
 		if (iIter == m_LibraryPathes.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_LIBRARYPATHNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_LIBRARYPATHNOTFOUND, sLibraryName);
 
 		return iIter->second.first;
 	}

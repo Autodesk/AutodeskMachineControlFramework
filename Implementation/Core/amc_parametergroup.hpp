@@ -84,6 +84,7 @@ namespace AMC {
 
 		void addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue, const std::string& sUnits);
 		void addNewDerivedParameter(const std::string& sName, AMC::PParameterGroup pParameterGroup, const std::string& sSourceParameterName);
+		void addNewInstanceStateParameter(const std::string& sName, const std::string& m_sDescription);
 
 		uint32_t getParameterCount();
 		void getParameterInfo(const uint32_t nIndex, std::string & sName, std::string & sDescription, std::string & sDefaultValue);		

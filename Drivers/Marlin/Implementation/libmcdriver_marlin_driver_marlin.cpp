@@ -66,11 +66,15 @@ CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sTyp
 
 void CDriver_Marlin::QueryParameters()
 {
-	double dX, dY, dZ;
-	m_pSerialController->getCurrentPosition(dX, dY, dZ);
-	m_pDriverEnvironment->SetDoubleParameter("targetx", dX);
-	m_pDriverEnvironment->SetDoubleParameter("targety", dY);
-	m_pDriverEnvironment->SetDoubleParameter("targetz", dZ);
+
+	
+	if (m_pSerialController.get() != nullptr) {
+		double dX, dY, dZ;
+		m_pSerialController->getCurrentPosition(dX, dY, dZ);
+		m_pDriverEnvironment->SetDoubleParameter("targetx", dX);
+		m_pDriverEnvironment->SetDoubleParameter("targety", dY);
+		m_pDriverEnvironment->SetDoubleParameter("targetz", dZ);
+	}
 }
 
 

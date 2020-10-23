@@ -1239,6 +1239,17 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetIntegerParameterPtr) (LibMCEn
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBoolParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
+/**
+* returns the event context uuid as string
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nContextUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pContextUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pContextUUIDBuffer -  buffer of Context UUID, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetEventContextPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nContextUUIDBufferSize, LibMCEnv_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -1405,6 +1416,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_GetDoubleParameterPtr m_UIEnvironment_GetDoubleParameter;
 	PLibMCEnvUIEnvironment_GetIntegerParameterPtr m_UIEnvironment_GetIntegerParameter;
 	PLibMCEnvUIEnvironment_GetBoolParameterPtr m_UIEnvironment_GetBoolParameter;
+	PLibMCEnvUIEnvironment_GetEventContextPtr m_UIEnvironment_GetEventContext;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

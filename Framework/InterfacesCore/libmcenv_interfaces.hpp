@@ -1122,6 +1122,12 @@ public:
 	*/
 	virtual bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
+	/**
+	* IUIEnvironment::GetEventContext - returns the event context uuid as string
+	* @return Context UUID
+	*/
+	virtual std::string GetEventContext() = 0;
+
 };
 
 typedef IBaseSharedPtr<IUIEnvironment> PIUIEnvironment;

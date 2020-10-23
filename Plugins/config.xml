@@ -5,7 +5,6 @@
 
 
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
-  <driver name="s7net" library="driver_s7net" type="s7net" />
   
     <statemachine name="demo" description="Demo System" initstate="init" failedstate="fatalerror" library="plugin_demo">
   	 	  		  
@@ -63,7 +62,7 @@
   	  
     </statemachine>
   
-  	<userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main">
+  	<userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main" library="plugin_userinterface">
   
 		<logo resource="ui_logo" aspectratio="2.5" />
 		
@@ -106,6 +105,9 @@
 			<content name="buildinformation" title="Build Information" subtitle="Detailed information">
 				<paragraph text="Here you find more information about your build." />
 
+				<buttongroup>
+					<button caption="Start Build" event="startbuild" targetpage="systemstatus" />
+				</buttongroup>
 
 	
 				
@@ -114,16 +116,23 @@
 		</page>
 
 		<page name="systemstatus">
-
+			<content name="currentbuild" title="Current System Status" >
+			
+				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
+				<image resource="ui_machine" aspectratio="4.5" />
+				<paragraph text="This is the current machine state." />						
+				
+				<parameterlist loadingtext="Loading parameters">
+					<entry statemachine="demo" group="jobinfo" />
+				</parameterlist>	
+			</content>					
+			
 		</page>
 
 		<page name="manualcontrol">
 
 		</page>
 
-		<page name="currentbuild">
-
-		</page>
 
 		<page name="settings">
 
@@ -132,7 +141,6 @@
 		<menu>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
 			<item id="build" icon="mdi-factory" caption="Build Library" targetpage="buildlist"/>
-			<item id="currentbuild" icon="mdi-factory" caption="Current Build" targetpage="currentbuild"/>
 			<item id="systemstatus" icon="mdi-apps" caption="System Status" targetpage="systemstatus"/>
 			<item id="settings" icon="mdi-settings" caption="Manual Control" targetpage="manualcontrol"/>
 			<item id="settings" icon="mdi-settings" caption="Settings" targetpage="settings"/>

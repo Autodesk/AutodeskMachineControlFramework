@@ -42,20 +42,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterinstances.hpp"
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
+#include "amc_logger.hpp"
+#include "amc_statesignalhandler.hpp"
 
 #include "amc_api_constants.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "libmcenv_uienvironment.hpp"
+
+#include "libmcui_dynamic.hpp"
 
 #include "PugiXML/pugixml.hpp"
 
 using namespace AMC;
 
-CUIHandler::CUIHandler(PParameterInstances pParameterInstances)
-    : m_dLogoAspectRatio (1.0), m_pParameterInstances (pParameterInstances)
+CUIHandler::CUIHandler(PParameterInstances pParameterInstances, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
+    : m_dLogoAspectRatio (1.0), 
+    m_pParameterInstances (pParameterInstances),
+    m_pEnvironmentWrapper (pEnvironmentWrapper),
+    m_pSignalHandler (pSignalHandler),
+    m_pLogger(pLogger)
 {
     if (pParameterInstances.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pEnvironmentWrapper.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pSignalHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pLogger.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
 }
 
 CUIHandler::~CUIHandler()
@@ -172,7 +188,7 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
 }
 
 
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
 {
     if (pResourcePackage.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -180,6 +196,19 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
     m_sAppName = "";
     m_sCopyrightString = "";
     m_pCoreResourcePackage = pResourcePackage;
+
+    try {
+        auto pUIPluginWrapper = LibMCUI::CWrapper::loadLibrary(sUILibraryPath);
+        auto pUIEventHandler = pUIPluginWrapper->CreateEventHandler();
+
+        pUIPluginWrapper->InjectComponent ("LibMCEnv", m_pEnvironmentWrapper->GetSymbolLookupMethod ());
+
+        m_pUIPluginWrapper = pUIPluginWrapper;
+        m_pUIEventHandler = pUIEventHandler;
+    }
+    catch (std::exception& E) {
+        throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTLOADUILIBRARY, E.what ());
+    }
 
     m_ToolbarItems.clear();
     m_MenuItems.clear();
@@ -313,6 +342,28 @@ PResourcePackage CUIHandler::getCoreResourcePackage()
         throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
 
     return m_pCoreResourcePackage;
+
+}
+
+template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
+{
+    if (pWrapper.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+    auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
+    pImplInstance->IncRefCount();
+    return pExternalInstance;
+}
+
+
+void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID)
+{    
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pParameterInstances, m_pSignalHandler, sSenderUUID, sContextUUID);
+    auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
+
+    auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+
+    pEvent->Handle(pExternalEnvironment);
 
 }
 
