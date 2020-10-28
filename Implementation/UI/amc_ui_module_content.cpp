@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem_buildlist.hpp"
 #include "amc_ui_module_contentitem_parameterlist.hpp"
 #include "amc_ui_module_contentitem_upload.hpp"
+#include "amc_ui_module_contentitem_layerview.hpp"
 
 
 #include "amc_api_constants.hpp"
@@ -101,6 +102,10 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 			auto captionAttrib = childNode.attribute("caption");
 			auto successpageAttrib = childNode.attribute("successpage");
 			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string(), successpageAttrib.as_string ()));
+		}
+
+		if (sChildName == "layerview") {
+			addItem(std::make_shared <CUIModule_ContentLayerView>());
 		}
 
 		if (sChildName == "parameterlist") {
