@@ -123,7 +123,7 @@
 			<content name="currentbuild" title="Current System Status" >
 			
 				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_machine" aspectratio="4.5" />
+				<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
 				<paragraph text="This is the current machine state." />						
 				
 				<parameterlist loadingtext="Loading parameters">

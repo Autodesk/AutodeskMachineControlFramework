@@ -1,8 +1,8 @@
 <template>
 <v-app id="inspire">
-    <v-navigation-drawer v-if="appIsReady" v-model="AppState.showDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app>
+    <v-navigation-drawer v-if="appIsReady" v-model="ShowDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app>
         <v-list dense>
-            <template v-for="item in AppState.MenuItems">
+            <template v-for="item in Application.AppContent.MenuItems">
                 <v-list-group v-if="item.children" :key="item.caption" v-model="item.model" :prepend-icon="item.model ? item.icon : item['icon-alt']">
                     <template v-slot:activator>
                         <v-list-item-content>
@@ -46,7 +46,7 @@
 
         <v-spacer />
 
-        <template v-for="toolbaritem in AppState.ToolbarItems">
+        <template v-for="toolbaritem in Application.AppContent.ToolbarItems">
             <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="uiChangePage(toolbaritem.targetpage)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
@@ -88,9 +88,9 @@
 
         <v-container fluid v-if="appIsReady">
 			
-				<template v-for="uiPage in AppState.uiPages">
+				<template v-for="uiPage in Application.AppContent.Pages">
 
-					<v-row align="start" justify="center" :key="uiPage.name" v-if="(AppState.activePage == uiPage.name)">
+					<v-row align="start" justify="center" :key="uiPage.name" v-if="(Application.AppState.activePage == uiPage.name)">
 					
 						<template v-for="uiModule in uiPage.modules">
 																
@@ -106,8 +106,8 @@
 									
 										<template v-for="item in uiModule.items">
 											
-											<p :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</p>												
-											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" v-bind:aspect-ratio="item.aspectratio" v-bind:max-width="item.maxwidth" v-bind:max-height="item.maxheight" contain></v-img></p>
+											<div :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</div>		
+											<div :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" v-bind:aspect-ratio="item.aspectratio" v-bind:max-width="item.maxwidth" v-bind:max-height="item.maxheight" contain></v-img></div>
 											
 											<div :key="item.uuid" v-if="(item.type=='upload')">
 																						
@@ -200,7 +200,7 @@
                         <v-card-text>
                             Could not connect to server. Please try again later!
 							
-							{{ AppState.currentError }}
+							{{ Application.AppState.currentError }}
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer />
@@ -231,33 +231,7 @@ import * as asmCrypto from "asmcrypto-lite";
 
 import LayerView from './LayerView.vue';
 
-
-class AMCApplication {
-	
-	constructor (apiBaseURL)
-	{
-		this.API = {
-			baseURL : apiBaseURL,
-			authToken: "0000000000000000000000000000000000000000000000000000000000000000"			
-		}
-
-		this.AppState = {
-            currentStatus: "initial", // one of "initial" / "login" / "ready" / "error"
-            currentError: ""
-		}
-
-        this.AppDefinition = {
-            TextApplicationName: "",
-            TextCopyRight: "",
-            MainPage: "",
-			LogoUUID: "",
-			LogoAspectRatio: 1.0
-        }
-
-		
-	}
-
-}
+import AMCApplication from './Application.js'
 
 
 export default {
@@ -273,8 +247,7 @@ export default {
         }
 		
 		this.Application = new AMCApplication (baseURL);
-
-        this.appRetrieveConfiguration();
+        this.Application.retrieveConfiguration();
     },
 	
 
@@ -311,81 +284,9 @@ export default {
 	},	
 
     methods: {
-        appRetrieveConfiguration() {
-            var url = this.Application.API.baseURL + "/ui/config";
-            Axios({
-                    method: "GET",
-                    url: url
-                })
-                .then(resultJSON => {
-                    this.Application.AppDefinition.TextApplicationName = resultJSON.data.appname;
-                    this.Application.AppDefinition.TextCopyRight = resultJSON.data.copyright;
-                    this.Application.AppDefinition.MainPage = resultJSON.data.mainpage;
-                    this.Application.AppDefinition.LogoUUID = resultJSON.data.logouuid;
-                    this.Application.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
-					this.Application.AppState.currentStatus = "login";
-					
-					document.title = this.Application.AppDefinition.TextApplicationName;
-                })
-                .catch(err => {
-                    this.Application.AppState.currentStatus = "error";
-                    this.Application.AppState.currentError = err.response.data.message;
-                });
-        },
+        
 		
-        appRetrieveStateUpdate () {
-            var url = this.Application.API.baseURL + "/ui/state";
-            Axios({
-                    method: "GET",
-                    url: url,
-					headers: {
-						"Authorization": "Bearer " + this.Application.API.authToken,
-					},
-                })
-                .then(resultJSON => {
-                    this.AppState.MenuItems = resultJSON.data.menuitems;
-                    this.AppState.ToolbarItems = resultJSON.data.toolbaritems;
-					
-					var page, module, item;
-					for (page of resultJSON.data.pages) {
-						for (module of page.modules) {
-							if (module.type === "content") {
-								for (item of module.items) {
-									if (item.type === "parameterlist") {
-									
-										this.AppState.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-										item.entries = this.AppState.ContentItems[item.uuid].entries;
-										
-									}
-
-									if (item.type === "buildlist") {
-									
-										this.AppState.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-										item.entries = this.AppState.ContentItems[item.uuid].entries;
-										
-									}
-									
-									if (item.type === "upload") {
-										item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
-									
-									}
-								}
-								
-							}
-						}						
-					
-					}
-					
-					this.AppState.uiPages = resultJSON.data.pages;
-					
-					
-                    this.uiChangePage (this.Application.AppDefinition.MainPage);
-                })
-                .catch(err => {
-                    this.Application.AppState.currentStatus = "error";
-                    this.Application.AppState.currentError = err.response.data.message;
-                });
-        },
+        
 		
 		
 		appPerformJobUpload (itemuuid, itemstate, uploadid, chosenfile, successpage) {
@@ -524,7 +425,7 @@ export default {
 
 		appUpdateContentItem (uuid) {
 		
-			this.AppState.ContentItems[uuid].refresh = false;
+			this.Application.AppContent.ContentItems[uuid].refresh = false;
 		
             var url = this.Application.API.baseURL + "/ui/contentitem/" + uuid;
             Axios({
@@ -533,79 +434,31 @@ export default {
                 })
                 .then(resultJSON => {					
 
-					var oldentrycount = this.AppState.ContentItems[uuid].entries.length;					
+					var oldentrycount = this.Application.AppContent.ContentItems[uuid].entries.length;					
 					for (var i = 0; i < oldentrycount; i++) {
-						this.AppState.ContentItems[uuid].entries.pop ();
+						this.Application.AppContent.ContentItems[uuid].entries.pop ();
 					}
 					
 					for (var entry of resultJSON.data.content.entries) {
-						this.AppState.ContentItems[uuid].entries.push (entry);
+						this.Application.AppContent.ContentItems[uuid].entries.push (entry);
 					}
-					this.AppState.ContentItems[uuid].refresh = true;
+					this.Application.AppContent.ContentItems[uuid].refresh = true;
                 })
                 .catch(err => {
 					err;
-                    this.AppState.ContentItems[uuid].refresh = true;                    
+                    this.Application.AppContent.ContentItems[uuid].refresh = true;                    
                 });
 				
 		},
 
         uiLogInClick() {
-				
-			var url = this.Application.API.baseURL + "/auth/";
-			
-            Axios({			
-                    method: "POST",
-                    url: url,
-					data: {
-						username: this.AppState.uiLoginUser
-					}
-                })
-                .then(resultCreateSession => {
-																
-					var sessionuuid = resultCreateSession.data.sessionuuid;
-					var sessionkey = resultCreateSession.data.sessionkey;
-					var loginsalt = resultCreateSession.data.loginsalt;
-					var clientkey = sessionkey;
-					
-					var saltedpassword = asmCrypto.SHA256.hex (loginsalt + this.AppState.uiLoginPassword);
-					var clientkeyhash = asmCrypto.SHA256.hex (clientkey + saltedpassword);
-					var sessionkeyhash = asmCrypto.SHA256.hex (sessionkey + clientkeyhash);
-														
-					Axios({
-						method: "POST",
-						url: url + sessionuuid,
-						data: {
-							"clientkey": clientkey,
-							"password": sessionkeyhash
-						}
-					})
-					.then(resultAuthenticate => {
-					
-						this.AppState.uiLoginPassword = "";
-						this.Application.AppState.currentStatus = "ready";
-						
-						this.Application.API.authToken = resultAuthenticate.data.token;
-						
-						this.appRetrieveStateUpdate ();
-						
-					})
-					.catch(err => {
-						this.Application.AppState.currentStatus = "error";
-						this.Application.AppState.currentError = err.response.data.message;
-					}); 
-									  
-					
-                })
-                .catch(err => {
-                    this.Application.AppState.currentStatus = "error";
-                    this.Application.AppState.currentError = err.response.data.message;
-                });
 		
+			this.Application.requestLogin (this.AppState.uiLoginUser, this.AppState.uiLoginPassword);			
+					
         },
 
         uiReloadPageClick() {
-            this.Application.AppState.currentStatus = "initial";
+            this.setStatus ("initial");
             this.appRetrieveConfiguration();
         },
 
@@ -643,7 +496,7 @@ export default {
 		},
 
         uiToggleDrawer() {
-            this.AppState.showDrawer = !this.AppState.showDrawer;
+            this.ShowDrawer = !this.ShowDrawer;
         },
 
         uiChangePage(page) {
@@ -652,13 +505,13 @@ export default {
 			var colonIndex = pageString.search(":");
 						
 			if (colonIndex === -1) {
-				this.AppState.activePage = pageString;
-				this.AppState.activeObject = "00000000-0000-0000-0000-000000000000";
+				this.Application.AppState.activePage = pageString;
+				this.Application.AppState.activeObject = "00000000-0000-0000-0000-000000000000";
 			}
 			
 			if (colonIndex > 0) {
-				this.AppState.activePage = pageString.substring (0, colonIndex);
-				this.AppState.activeObject = pageString.substring (colonIndex + 1);
+				this.Application.AppState.activePage = pageString.substring (0, colonIndex);
+				this.Application.AppState.activeObject = pageString.substring (colonIndex + 1);
 			}
 										
         },
@@ -690,7 +543,7 @@ export default {
 		
 		uiModuleButtonClick (button) {
 			
-			var contextuuid = this.AppState.activeObject;
+			var contextuuid = this.Application.AppState.activeObject;
 			
 			if (button.event != "") {		
 				this.uiTriggerUIEvent (button.event, button.uuid, contextuuid);
@@ -713,8 +566,8 @@ export default {
 			
         uiOnTimer() {
 		
-			for (var key in this.AppState.ContentItems) {
-				var item = this.AppState.ContentItems [key];
+			for (var key in this.Application.AppContent.ContentItems) {
+				var item = this.Application.AppContent.ContentItems [key];
 				if (item.refresh) {				
 					this.appUpdateContentItem (item.uuid);
 				}
@@ -739,18 +592,12 @@ export default {
 	
 		Application: null,
         GlobalTimer: null,
+        ShowDrawer: true,
 	
 
         AppState: {
 		
-            MenuItems: [],
-            ToolbarItems: [],
-			ContentItems: [],
-					
-            showDrawer: true,
-            activePage: "",
-			activeObject: "00000000-0000-0000-0000-000000000000",
-			uiPages: [],
+
 			
             uiLoginUser: "test",
             uiLoginPassword: "test",					
