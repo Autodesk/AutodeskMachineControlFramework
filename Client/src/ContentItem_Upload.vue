@@ -25,7 +25,7 @@ export default {
 					}
 					item.state.uploadid = item.state.idcounter; 
 					
-					this.performJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile, item.uploadsuccesspage);
+					this.Application.performJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile, item.uploadsuccesspage);
 					
 				} else {
 				
