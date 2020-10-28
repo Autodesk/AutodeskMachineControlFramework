@@ -23,17 +23,18 @@
 
 <script>
 
-export default {
-  props: ["Application", "moduleitem"],
-  
-  methods: {	
-  
-	uiModuleBuildListClick: function (item) {
-		if (item.detailpage != "") {
-			this.Application.changePage (String (item.detailpage) + ":" + String (item.buildUUID));
-		}
-	},
-			
-  }
-};
+	export default {
+	  props: ["Application", "moduleitem"],
+	  
+	  methods: {	
+	  
+		uiModuleBuildListClick: function (item) {
+			if (item.detailpage != "") {
+				this.Application.changePage (String (item.detailpage) + ":" + String (item.buildUUID));
+			}
+		},
+				
+	  }
+	};
+	
 </script>

@@ -20,23 +20,9 @@
 
 <script>
 
-export default {
-  props: ["Application", "moduleitem"],
-  
-  mounted() {
+	export default {
+	  props: ["Application", "moduleitem"],
+	  
+	};
 	
-    },
-	
-	
-   data() {
-        return {
-        };
-    },
-	
-	
-
-  methods: {	
-	
-  }
-};
 </script>
