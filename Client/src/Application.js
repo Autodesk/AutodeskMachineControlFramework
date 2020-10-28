@@ -62,7 +62,7 @@ export default class AMCApplication {
 		var authToken = this.API.authToken; 
 		
 		if (authToken != nullToken)
-			headers = { "Authorization": "Bearer " + authToken };		
+			headers.Authorization = "Bearer " + authToken;
 		
 		return Axios ({
                     method: "GET",
@@ -77,13 +77,30 @@ export default class AMCApplication {
 		var authToken = this.API.authToken; 
 		
 		if (authToken != nullToken)
-			headers = { "Authorization": "Bearer " + authToken };
+			headers.Authorization = "Bearer " + authToken;
 		
 		return Axios ({
                     "method": "POST",
                     "url": this.API.baseURL + subURL,
 					"headers": headers,
 					"data": data
+               });
+	}		
+
+
+	axiosPostFormData (subURL, formData)
+	{
+		var headers = {	"Content-Type": "multipart/form-data" }
+		var authToken = this.API.authToken; 
+		
+		if (authToken != nullToken)
+			headers.Authorization = "Bearer " + authToken;
+		
+		return Axios ({
+                    "method": "POST",
+                    "url": this.API.baseURL + subURL,
+					"headers": headers,
+					"data": formData
                });
 	}		
 
@@ -101,7 +118,7 @@ export default class AMCApplication {
 					
 				document.title = this.AppDefinition.TextApplicationName;
 				
-				//this.uiChangePage (this.AppDefinition.MainPage);
+				this.changePage (this.AppDefinition.MainPage);
 			})
 			.catch(err => {
 				this.setStatusToError (err.response.data.message);
@@ -197,6 +214,169 @@ export default class AMCApplication {
                     this.setStatusToError (err.response.data.message);
                 });
         }	
+
+
+		updateContentItem (uuid) {
+		
+			this.AppContent.ContentItems[uuid].refresh = false;
+		
+            var url = this.API.baseURL + "/ui/contentitem/" + uuid;
+            Axios({
+                    method: "GET",
+                    url: url
+                })
+                .then(resultJSON => {					
+
+					var oldentrycount = this.AppContent.ContentItems[uuid].entries.length;					
+					for (var i = 0; i < oldentrycount; i++) {
+						this.AppContent.ContentItems[uuid].entries.pop ();
+					}
+					
+					for (var entry of resultJSON.data.content.entries) {
+						this.AppContent.ContentItems[uuid].entries.push (entry);
+					}
+					this.AppContent.ContentItems[uuid].refresh = true;
+                })
+                .catch(err => {
+					err;
+                    this.AppContent.ContentItems[uuid].refresh = true;                    
+                });
+				
+		}
+
+		updateContentItems () {
+
+			for (var key in this.AppContent.ContentItems) {
+				var item = this.AppContent.ContentItems [key];
+				if (item.refresh) {				
+					this.updateContentItem (item.uuid);
+				}
+			}
+			
+		}
+
+
+		performJobUpload (itemuuid, itemstate, uploadid, chosenfile, successpage) {
+					
+		
+			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!						
+			itemstate.messages = ["Reading file..."];
+			
+			var reader = new FileReader();
+			reader.readAsArrayBuffer (chosenfile);		
+			
+			reader.onload = () => {
+				var fileContent = reader.result;						
+
+				itemstate.messages = ["Hashing file..."];
+				
+				var shaInstance = new asmCrypto.SHA256 (); 
+				shaInstance.reset ();
+				shaInstance.process (fileContent);
+				shaInstance.finish ();
+				
+				var bytesToHex = function (buffer) {
+					var hex = "";
+					var n;
+					for (n in buffer) {
+						hex += ("0" + (0xff & buffer[n]).toString(16)).slice(-2);
+					}
+					return hex;
+				}
+				
+				var sha256 = bytesToHex (shaInstance.result);
+
+				shaInstance = null;
+			
+				itemstate.messages = ["Starting Upload..."];
+				this.axiosPostRequest ("/upload/", {
+							"context": "build",
+							"name": chosenfile.name,
+							"size": chosenfile.size,
+							"mimetype": "application/3mf",
+							
+						})
+						
+					.then(resultUploadInit => {
+						var streamuuid = resultUploadInit.data.streamuuid;
+						var contextuuid = resultUploadInit.data.contextuuid;
+						
+						const formData = new FormData();
+						formData.append("size", chosenfile.size);					
+						formData.append("data",  new Blob([fileContent], {type: "application/3mf"} ), chosenfile.name);					
+						
+						itemstate.messages = ["Uploading..."];
+						
+						this.axiosPostFormData ("/upload/" + streamuuid, formData)
+						
+						.then(resultUploadHandle => {
+							resultUploadHandle;
+							
+							this.axiosPostRequest ("/upload/finish", {
+									"streamuuid": streamuuid,						
+									"sha256": sha256
+								})
+							.then(resultUploadFinish => {
+
+								resultUploadFinish;
+								
+								itemstate.messages = ["Preparing build..."];
+								
+								this.axiosPostRequest ("/build/prepare", {
+										"builduuid": contextuuid,						
+									})
+								.then(resultBuildPrepare => {
+									resultBuildPrepare;
+									itemstate.messages = [];
+									itemstate.chosenFile = null;
+									itemstate.uploadid = 0;
+									
+									if (successpage != "") {
+										this.changePage (successpage + ":" + contextuuid);
+										
+									}
+									
+								})
+								.catch(err => {
+									err;                    
+								});
+							})
+							.catch(err => {
+								err;                    
+							});
+					
+						})
+						.catch(err => {
+							err;                    
+						});					
+					
+					})
+					.catch(err => {
+						err;                    
+					});
+					
+				};
+		
+		}
+
+
+        changePage(page) {
+		
+			var pageString = String (page);
+			var colonIndex = pageString.search(":");
+						
+			if (colonIndex === -1) {
+				this.AppState.activePage = pageString;
+				this.AppState.activeObject = "00000000-0000-0000-0000-000000000000";
+			}
+			
+			if (colonIndex > 0) {
+				this.AppState.activePage = pageString.substring (0, colonIndex);
+				this.AppState.activeObject = pageString.substring (colonIndex + 1);
+			}
+										
+        }
+
 
 }
 

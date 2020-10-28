@@ -6,13 +6,13 @@
                 <v-list-group v-if="item.children" :key="item.caption" v-model="item.model" :prepend-icon="item.model ? item.icon : item['icon-alt']">
                     <template v-slot:activator>
                         <v-list-item-content>
-                            <v-list-item-title v-on:click.stop="uiChangePage(item.targetpage)">
+                            <v-list-item-title v-on:click.stop="Application.changePage(item.targetpage)">
                                 {{ item.caption }}
                             </v-list-item-title>
                         </v-list-item-content>
                     </template>
 
-                    <v-list-item v-for="(child, i) in item.children" :key="i" link v-on:click.stop="uiChangePage(child.targetPage)">
+                    <v-list-item v-for="(child, i) in item.children" :key="i" link v-on:click.stop="Application.changePage(child.targetPage)">
                         <v-list-item-action v-if="child.icon">
                             <v-icon>{{ child.icon }}</v-icon>
                         </v-list-item-action>
@@ -24,7 +24,7 @@
                     </v-list-item>
                 </v-list-group>
 
-                <v-list-item v-else :key="item.caption" link v-on:click.stop="uiChangePage(item.targetpage)">
+                <v-list-item v-else :key="item.caption" link v-on:click.stop="Application.changePage(item.targetpage)">
                     <v-list-item-action>
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-item-action>
@@ -40,14 +40,14 @@
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn tile large color="primary" dark v-on:click.stop="uiChangePage(Application.AppDefinition.MainPage)">
+        <v-btn tile large color="primary" dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
             {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }}
         </v-btn>
 
         <v-spacer />
 
         <template v-for="toolbaritem in Application.AppContent.ToolbarItems">
-            <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="uiChangePage(toolbaritem.targetpage)">
+            <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
         </template>
@@ -227,10 +227,8 @@
 <script>
 
 import * as Axios from "axios";
-import * as asmCrypto from "asmcrypto-lite";
 
 import LayerView from './LayerView.vue';
-
 import AMCApplication from './Application.js'
 
 
@@ -285,171 +283,6 @@ export default {
 
     methods: {
         
-		
-        
-		
-		
-		appPerformJobUpload (itemuuid, itemstate, uploadid, chosenfile, successpage) {
-					
-		
-			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!
-			var url = this.Application.API.baseURL + "/upload/";
-			var prepareurl = this.Application.API.baseURL + "/build/prepare/";
-						
-			itemstate.messages = ["Reading file..."];
-			
-			var reader = new FileReader();
-			reader.readAsArrayBuffer (chosenfile);		
-			
-			reader.onload = () => {
-				var fileContent = reader.result;						
-
-				itemstate.messages = ["Hashing file..."];
-				
-				var shaInstance = new asmCrypto.SHA256 (); 
-				shaInstance.reset ();
-				shaInstance.process (fileContent);
-				shaInstance.finish ();
-				
-				var bytesToHex = function (buffer) {
-					var hex = "";
-					var n;
-					for (n in buffer) {
-						hex += ("0" + (0xff & buffer[n]).toString(16)).slice(-2);
-					}
-					return hex;
-				}
-				
-				var sha256 = bytesToHex (shaInstance.result);
-
-				shaInstance = null;
-			
-				itemstate.messages = ["Starting Upload..."];
-				Axios({			
-						method: "POST",
-						url: url,
-						headers: {
-							"Authorization": "Bearer " + this.Application.API.authToken,
-						},
-						data: {
-							"context": "build",
-							"name": chosenfile.name,
-							"size": chosenfile.size,
-							"mimetype": "application/3mf",
-							
-						}
-					})
-					.then(resultUploadInit => {
-						var streamuuid = resultUploadInit.data.streamuuid;
-						var contextuuid = resultUploadInit.data.contextuuid;
-						
-						const formData = new FormData();
-						formData.append("size", chosenfile.size);					
-						formData.append("data",  new Blob([fileContent], {type: "application/3mf"} ), chosenfile.name);					
-						
-						itemstate.messages = ["Uploading..."];
-						
-						Axios({			
-							method: "POST",
-							url: url + streamuuid,
-							headers: {
-								"Authorization": "Bearer " + this.Application.API.authToken,
-								"Content-Type": "multipart/form-data"
-							},
-							data: formData
-							
-						})
-						.then(resultUploadHandle => {
-							resultUploadHandle;
-							
-							Axios({			
-								method: "POST",
-								url: url + "finish",
-								headers: {
-									"Authorization": "Bearer " + this.Application.API.authToken,
-								},
-								data: {
-									"streamuuid": streamuuid,						
-									"sha256": sha256
-								}
-							})
-							.then(resultUploadFinish => {
-
-								resultUploadFinish;
-								
-								itemstate.messages = ["Preparing build..."];
-								
-								Axios({			
-									method: "POST",
-									url: prepareurl,
-									headers: {
-										"Authorization": "Bearer " + this.Application.API.authToken,
-									},
-									data: {
-										"builduuid": contextuuid,						
-									}
-								})
-								.then(resultBuildPrepare => {
-									resultBuildPrepare;
-									itemstate.messages = [];
-									itemstate.chosenFile = null;
-									itemstate.uploadid = 0;
-									
-									if (successpage != "") {
-										this.uiChangePage (successpage + ":" + contextuuid);
-										
-									}
-									
-								})
-								.catch(err => {
-									err;                    
-								});
-							})
-							.catch(err => {
-								err;                    
-							});
-					
-						})
-						.catch(err => {
-							err;                    
-						});					
-					
-					})
-					.catch(err => {
-						err;                    
-					});
-					
-				};
-		
-		},
-
-		appUpdateContentItem (uuid) {
-		
-			this.Application.AppContent.ContentItems[uuid].refresh = false;
-		
-            var url = this.Application.API.baseURL + "/ui/contentitem/" + uuid;
-            Axios({
-                    method: "GET",
-                    url: url
-                })
-                .then(resultJSON => {					
-
-					var oldentrycount = this.Application.AppContent.ContentItems[uuid].entries.length;					
-					for (var i = 0; i < oldentrycount; i++) {
-						this.Application.AppContent.ContentItems[uuid].entries.pop ();
-					}
-					
-					for (var entry of resultJSON.data.content.entries) {
-						this.Application.AppContent.ContentItems[uuid].entries.push (entry);
-					}
-					this.Application.AppContent.ContentItems[uuid].refresh = true;
-                })
-                .catch(err => {
-					err;
-                    this.Application.AppContent.ContentItems[uuid].refresh = true;                    
-                });
-				
-		},
 
         uiLogInClick() {
 		
@@ -499,22 +332,6 @@ export default {
             this.ShowDrawer = !this.ShowDrawer;
         },
 
-        uiChangePage(page) {
-		
-			var pageString = String (page);
-			var colonIndex = pageString.search(":");
-						
-			if (colonIndex === -1) {
-				this.Application.AppState.activePage = pageString;
-				this.Application.AppState.activeObject = "00000000-0000-0000-0000-000000000000";
-			}
-			
-			if (colonIndex > 0) {
-				this.Application.AppState.activePage = pageString.substring (0, colonIndex);
-				this.Application.AppState.activeObject = pageString.substring (colonIndex + 1);
-			}
-										
-        },
 		
 		
 		uiTriggerUIEvent (eventname, senderuuid, contextuuid) {
@@ -550,7 +367,7 @@ export default {
 			}
 			
 			if (button.targetpage != "") {
-				this.uiChangePage (button.targetpage);
+				this.Application.changePage (button.targetpage);
 			}
 		
 		},
@@ -558,22 +375,17 @@ export default {
 		
 		uiModuleBuildListClick (item) {
 			if (item.detailpage != "") {
-				this.uiChangePage (String (item.detailpage) + ":" + String (item.buildUUID));
+				this.Application.changePage (String (item.detailpage) + ":" + String (item.buildUUID));
 			}
 		},
 			
-		
-			
+				
         uiOnTimer() {
-		
-			for (var key in this.Application.AppContent.ContentItems) {
-				var item = this.Application.AppContent.ContentItems [key];
-				if (item.refresh) {				
-					this.appUpdateContentItem (item.uuid);
-				}
-			}												
-		
+			if (this.Application) {
+				this.Application.updateContentItems ();			
+			}													
 		},
+		
 
         updateTheme() {
             // Light theme
@@ -597,8 +409,6 @@ export default {
 
         AppState: {
 		
-
-			
             uiLoginUser: "test",
             uiLoginPassword: "test",					
 			
