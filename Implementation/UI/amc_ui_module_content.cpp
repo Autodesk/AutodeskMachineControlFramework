@@ -90,11 +90,19 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 			double dLogoAspectRatio = 1.0;
 			auto aspectratioAttrib = childNode.attribute("aspectratio");
 			if (!aspectratioAttrib.empty()) {
-				dLogoAspectRatio = aspectratioAttrib.as_float();
+				dLogoAspectRatio = aspectratioAttrib.as_double();
 			}
 
+			auto pItem = std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID(), dLogoAspectRatio);
+			addItem (pItem);
 
-			addItem (std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID (), dLogoAspectRatio));
+			auto maxWidthAttrib = childNode.attribute("maxwidth");
+			if (!maxWidthAttrib.empty())
+				pItem->setMaxWidth (maxWidthAttrib.as_double ());
+			auto maxHeightAttrib = childNode.attribute("maxheight");
+			if (!maxHeightAttrib.empty())
+				pItem->setMaxHeight(maxHeightAttrib.as_double());
+
 		}
 
 		if (sChildName == "upload") {

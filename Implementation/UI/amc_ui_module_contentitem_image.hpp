@@ -48,6 +48,10 @@ namespace AMC {
 	class CUIModule_ContentImage : public CUIModule_ContentItem {
 	protected:		
 		double m_dAspectRatio;
+		double m_dMaxWidth;
+		double m_dMaxHeight;
+		bool m_bHasMaxWidth;
+		bool m_bHasMaxHeight;
 
 	public:
 
@@ -56,6 +60,11 @@ namespace AMC {
 		virtual ~CUIModule_ContentImage();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		void setMaxWidth(double dMaxWidth);
+		void clearMaxWidth();
+		void setMaxHeight(double dMaxHeight);
+		void clearMaxHeight();
 
 	};
 
