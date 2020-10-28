@@ -112,6 +112,12 @@
 											<div :key="item.uuid" v-if="(item.type=='upload')">
 																						
 												<v-file-input accept=".3mf" show-size full-width v-model="item.state.chosenFile" v-bind:label="item.uploadcaption" v-bind:messages="item.state.messages" @change="uiUploadStart (item)"></v-file-input>
+																
+											</div>
+
+											<div :key="item.uuid" v-if="(item.type=='layerview')">
+																														
+												<LayerView />
 								
 											</div>
 											
@@ -162,6 +168,8 @@
 										</template>
 											
 									</div>
+									
+																		
 								</v-card-text>
 								
 								
@@ -171,9 +179,13 @@
 
 							
 						</template>
-					
+								
+				
+
+
 					</v-row>
 				</template>
+
 								
         </v-container>
 
@@ -200,7 +212,8 @@
                 </v-col>
             </v-row>
         </v-container>
-
+		
+		
         <v-container fluid v-if="appIsReady"> </v-container>
     </v-main>
 
@@ -214,6 +227,9 @@
 <script>
 import * as Axios from "axios";
 import * as asmCrypto from "asmcrypto-lite";
+
+import LayerView from './LayerView.vue';
+
 
 export default {
     props: {
@@ -229,6 +245,7 @@ export default {
 
         this.appRetrieveConfiguration();
     },
+	
 
     beforeDestroy() {
         if (this.AppState.globalTimer != "") {
@@ -257,6 +274,10 @@ export default {
 			return (this.AppState.currentStatus === "login") || (this.AppState.currentStatus === "ready");
 		} 
     },
+	
+	components: {
+		LayerView
+	},	
 
     methods: {
         appRetrieveConfiguration() {
@@ -598,7 +619,7 @@ export default {
 		
 			var pageString = String (page);
 			var colonIndex = pageString.search(":");
-			
+						
 			if (colonIndex === -1) {
 				this.AppState.activePage = pageString;
 				this.AppState.activeObject = "00000000-0000-0000-0000-000000000000";
@@ -608,6 +629,7 @@ export default {
 				this.AppState.activePage = pageString.substring (0, colonIndex);
 				this.AppState.activeObject = pageString.substring (colonIndex + 1);
 			}
+										
         },
 		
 		
@@ -655,6 +677,23 @@ export default {
 				this.uiChangePage (String (item.detailpage) + ":" + String (item.buildUUID));
 			}
 		},
+		
+		
+		 uiMouseEnter(event) {
+            event;
+			console.log('mouseneter');
+            this.$el.addEventListener('mousemove', this.mouseMove, false);
+        },
+        uiMouseLeave(event) {
+			event;
+            // this.$el.removeEventListener('mousemove', this.mouseMove());
+        },
+        uiMouseMove(event) {
+            console.log(event.clientX, event.clientY);
+        },
+		
+	
+		
 			
         uiOnTimer() {
 		
