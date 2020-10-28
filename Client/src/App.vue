@@ -40,8 +40,8 @@
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn tile large color="primary" dark v-on:click.stop="uiChangePage(AppDefinition.MainPage)">
-            {{ uiButtonCaptionCheck(AppDefinition.TextApplicationName) }}
+        <v-btn tile large color="primary" dark v-on:click.stop="uiChangePage(Application.AppDefinition.MainPage)">
+            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }}
         </v-btn>
 
         <v-spacer />
@@ -65,10 +65,10 @@
                 <v-col cols="12" sm="8" md="4">
                     <v-card class="elevation-12">
                         <v-toolbar color="primary" dark flat>
-                            <v-toolbar-title>{{ AppDefinition.TextApplicationName }}</v-toolbar-title>
+                            <v-toolbar-title>{{ Application.AppDefinition.TextApplicationName }}</v-toolbar-title>
                         </v-toolbar>
                         <v-card-text>
-							<v-img v-if="AppDefinition.LogoUUID != ''" v-bind:src="getImageURL (AppDefinition.LogoUUID)" v-bind:aspect-ratio="AppDefinition.LogoAspectRatio" contain></v-img>
+							<v-img v-if="Application.AppDefinition.LogoUUID != ''" v-bind:src="getImageURL (Application.AppDefinition.LogoUUID)" v-bind:aspect-ratio="Application.AppDefinition.LogoAspectRatio" contain></v-img>
 						
                             <v-form>
                                 <v-text-field label="User" name="login" prepend-icon="mdi-account" type="text" v-model="AppState.uiLoginUser" autofocus clearable />
@@ -107,7 +107,7 @@
 										<template v-for="item in uiModule.items">
 											
 											<p :key="item.uuid" v-if="(item.type=='paragraph')">{{ item.text }}</p>												
-											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" v-bind:aspect-ratio="item.aspectratio" contain></v-img></p>
+											<p :key="item.uuid" v-if="(item.type=='image')"><v-img v-bind:src="getImageURL (item.uuid)" v-bind:aspect-ratio="item.aspectratio" v-bind:max-width="item.maxwidth" v-bind:max-height="item.maxheight" contain></v-img></p>
 											
 											<div :key="item.uuid" v-if="(item.type=='upload')">
 																						
@@ -219,59 +219,90 @@
 
     <v-footer color="primary" class="text-right" min-height="30" app >
         <v-spacer />
-        <span class="caption white--text" v-if="appHasInformation">&copy; {{ AppDefinition.TextCopyRight }}</span>		
+        <span class="caption white--text" v-if="appHasInformation">&copy; {{ Application.AppDefinition.TextCopyRight }}</span>		
     </v-footer>
 </v-app>
 </template>
 
 <script>
+
 import * as Axios from "axios";
 import * as asmCrypto from "asmcrypto-lite";
 
 import LayerView from './LayerView.vue';
 
 
+class AMCApplication {
+	
+	constructor (apiBaseURL)
+	{
+		this.API = {
+			baseURL : apiBaseURL,
+			authToken: "0000000000000000000000000000000000000000000000000000000000000000"			
+		}
+
+		this.AppState = {
+            currentStatus: "initial", // one of "initial" / "login" / "ready" / "error"
+            currentError: ""
+		}
+
+        this.AppDefinition = {
+            TextApplicationName: "",
+            TextCopyRight: "",
+            MainPage: "",
+			LogoUUID: "",
+			LogoAspectRatio: 1.0
+        }
+
+		
+	}
+
+}
+
+
 export default {
     props: {
-        source: String
     },
 
     created() {
-        this.AppState.globalTimer = setInterval(this.uiOnTimer, 600);
-
-        if (process.env.NODE_ENV == "development") {
-            this.API.baseURL = "http://localhost:8869/api";
+        this.GlobalTimer = setInterval(this.uiOnTimer, 600);
+		
+		var baseURL = "/api";
+        if (process.env.NODE_ENV === "development") {
+            baseURL = "http://localhost:8869/api";
         }
+		
+		this.Application = new AMCApplication (baseURL);
 
         this.appRetrieveConfiguration();
     },
 	
 
     beforeDestroy() {
-        if (this.AppState.globalTimer != "") {
-            clearInterval(this.AppState.globalTimer);
+        if (this.GlobalTimer) {
+            clearInterval(this.GlobalTimer);
         }
     },
 
     computed: {
         appIsLoading() {
-            return this.AppState.currentStatus === "initial";
+            return this.Application.AppState.currentStatus === "initial";
         },
 
         appIsLogin() {
-            return this.AppState.currentStatus === "login";
+            return this.Application.AppState.currentStatus === "login";
         },
 
         appIsReady() {
-            return this.AppState.currentStatus === "ready";
+            return this.Application.AppState.currentStatus === "ready";
         },
 
         appIsError() {
-            return this.AppState.currentStatus === "error";
+            return this.Application.AppState.currentStatus === "error";
         },
 
 		appHasInformation() {
-			return (this.AppState.currentStatus === "login") || (this.AppState.currentStatus === "ready");
+			return (this.Application.AppState.currentStatus === "login") || (this.Application.AppState.currentStatus === "ready");
 		} 
     },
 	
@@ -281,34 +312,34 @@ export default {
 
     methods: {
         appRetrieveConfiguration() {
-            var url = this.API.baseURL + "/ui/config";
+            var url = this.Application.API.baseURL + "/ui/config";
             Axios({
                     method: "GET",
                     url: url
                 })
                 .then(resultJSON => {
-                    this.AppDefinition.TextApplicationName = resultJSON.data.appname;
-                    this.AppDefinition.TextCopyRight = resultJSON.data.copyright;
-                    this.AppDefinition.MainPage = resultJSON.data.mainpage;
-                    this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
-                    this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
-					this.AppState.currentStatus = "login";
+                    this.Application.AppDefinition.TextApplicationName = resultJSON.data.appname;
+                    this.Application.AppDefinition.TextCopyRight = resultJSON.data.copyright;
+                    this.Application.AppDefinition.MainPage = resultJSON.data.mainpage;
+                    this.Application.AppDefinition.LogoUUID = resultJSON.data.logouuid;
+                    this.Application.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
+					this.Application.AppState.currentStatus = "login";
 					
-					document.title = this.AppDefinition.TextApplicationName;
+					document.title = this.Application.AppDefinition.TextApplicationName;
                 })
                 .catch(err => {
-                    this.AppState.currentStatus = "error";
-                    this.AppState.currentError = err.response.data.message;
+                    this.Application.AppState.currentStatus = "error";
+                    this.Application.AppState.currentError = err.response.data.message;
                 });
         },
 		
         appRetrieveStateUpdate () {
-            var url = this.API.baseURL + "/ui/state";
+            var url = this.Application.API.baseURL + "/ui/state";
             Axios({
                     method: "GET",
                     url: url,
 					headers: {
-						"Authorization": "Bearer " + this.API.authToken,
+						"Authorization": "Bearer " + this.Application.API.authToken,
 					},
                 })
                 .then(resultJSON => {
@@ -348,11 +379,11 @@ export default {
 					this.AppState.uiPages = resultJSON.data.pages;
 					
 					
-                    this.uiChangePage (this.AppDefinition.MainPage);
+                    this.uiChangePage (this.Application.AppDefinition.MainPage);
                 })
                 .catch(err => {
-                    this.AppState.currentStatus = "error";
-                    this.AppState.currentError = err.response.data.message;
+                    this.Application.AppState.currentStatus = "error";
+                    this.Application.AppState.currentError = err.response.data.message;
                 });
         },
 		
@@ -361,8 +392,8 @@ export default {
 					
 		
 			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!
-			var url = this.API.baseURL + "/upload/";
-			var prepareurl = this.API.baseURL + "/build/prepare/";
+			var url = this.Application.API.baseURL + "/upload/";
+			var prepareurl = this.Application.API.baseURL + "/build/prepare/";
 						
 			itemstate.messages = ["Reading file..."];
 			
@@ -397,7 +428,7 @@ export default {
 						method: "POST",
 						url: url,
 						headers: {
-							"Authorization": "Bearer " + this.API.authToken,
+							"Authorization": "Bearer " + this.Application.API.authToken,
 						},
 						data: {
 							"context": "build",
@@ -421,7 +452,7 @@ export default {
 							method: "POST",
 							url: url + streamuuid,
 							headers: {
-								"Authorization": "Bearer " + this.API.authToken,
+								"Authorization": "Bearer " + this.Application.API.authToken,
 								"Content-Type": "multipart/form-data"
 							},
 							data: formData
@@ -434,7 +465,7 @@ export default {
 								method: "POST",
 								url: url + "finish",
 								headers: {
-									"Authorization": "Bearer " + this.API.authToken,
+									"Authorization": "Bearer " + this.Application.API.authToken,
 								},
 								data: {
 									"streamuuid": streamuuid,						
@@ -451,7 +482,7 @@ export default {
 									method: "POST",
 									url: prepareurl,
 									headers: {
-										"Authorization": "Bearer " + this.API.authToken,
+										"Authorization": "Bearer " + this.Application.API.authToken,
 									},
 									data: {
 										"builduuid": contextuuid,						
@@ -495,7 +526,7 @@ export default {
 		
 			this.AppState.ContentItems[uuid].refresh = false;
 		
-            var url = this.API.baseURL + "/ui/contentitem/" + uuid;
+            var url = this.Application.API.baseURL + "/ui/contentitem/" + uuid;
             Axios({
                     method: "GET",
                     url: url
@@ -520,8 +551,8 @@ export default {
 		},
 
         uiLogInClick() {
-		
-			var url = this.API.baseURL + "/auth/";
+				
+			var url = this.Application.API.baseURL + "/auth/";
 			
             Axios({			
                     method: "POST",
@@ -552,29 +583,29 @@ export default {
 					.then(resultAuthenticate => {
 					
 						this.AppState.uiLoginPassword = "";
-						this.AppState.currentStatus = "ready";
+						this.Application.AppState.currentStatus = "ready";
 						
-						this.API.authToken = resultAuthenticate.data.token;
+						this.Application.API.authToken = resultAuthenticate.data.token;
 						
 						this.appRetrieveStateUpdate ();
 						
 					})
 					.catch(err => {
-						this.AppState.currentStatus = "error";
-						this.AppState.currentError = err.response.data.message;
+						this.Application.AppState.currentStatus = "error";
+						this.Application.AppState.currentError = err.response.data.message;
 					}); 
 									  
 					
                 })
                 .catch(err => {
-                    this.AppState.currentStatus = "error";
-                    this.AppState.currentError = err.response.data.message;
+                    this.Application.AppState.currentStatus = "error";
+                    this.Application.AppState.currentError = err.response.data.message;
                 });
 		
         },
 
         uiReloadPageClick() {
-            this.AppState.currentStatus = "initial";
+            this.Application.AppState.currentStatus = "initial";
             this.appRetrieveConfiguration();
         },
 
@@ -634,13 +665,13 @@ export default {
 		
 		
 		uiTriggerUIEvent (eventname, senderuuid, contextuuid) {
-			var url = this.API.baseURL + "/ui/event";
+			var url = this.Application.API.baseURL + "/ui/event";
 			
             Axios({			
                     method: "POST",
                     url: url,
 					headers: {
-						"Authorization": "Bearer " + this.API.authToken,
+						"Authorization": "Bearer " + this.Application.API.authToken,
 					},
 					data: {
 						"eventname": eventname,
@@ -677,22 +708,7 @@ export default {
 				this.uiChangePage (String (item.detailpage) + ":" + String (item.buildUUID));
 			}
 		},
-		
-		
-		 uiMouseEnter(event) {
-            event;
-			console.log('mouseneter');
-            this.$el.addEventListener('mousemove', this.mouseMove, false);
-        },
-        uiMouseLeave(event) {
-			event;
-            // this.$el.removeEventListener('mousemove', this.mouseMove());
-        },
-        uiMouseMove(event) {
-            console.log(event.clientX, event.clientY);
-        },
-		
-	
+			
 		
 			
         uiOnTimer() {
@@ -714,24 +730,16 @@ export default {
         },
 		
 		getImageURL (uuid) {
-			return this.API.baseURL + '/ui/image/' + uuid;
+			return this.Application.API.baseURL + '/ui/image/' + uuid;
 		}
 		
     },
 
     data: () => ({
-        API: {
-            baseURL: "/api",
-			authToken: "0000000000000000000000000000000000000000000000000000000000000000"
-        },
-
-        AppDefinition: {
-            TextApplicationName: "",
-            TextCopyRight: "",
-            MainPage: "",
-			LogoUUID: "",
-			LogoAspectRatio: 1.0
-        },
+	
+		Application: null,
+        GlobalTimer: null,
+	
 
         AppState: {
 		
@@ -739,12 +747,9 @@ export default {
             ToolbarItems: [],
 			ContentItems: [],
 					
-            currentStatus: "initial", // one of "initial" / "login" / "ready" / "error"
-            currentError: "",
             showDrawer: true,
             activePage: "",
 			activeObject: "00000000-0000-0000-0000-000000000000",
-            globalTimer: "",			
 			uiPages: [],
 			
             uiLoginUser: "test",
@@ -755,36 +760,3 @@ export default {
 };
 </script>
 
-<style lang="scss">
-.dropbox {
-    outline: 2px dashed grey;
-    /* the dash box */
-    outline-offset: -10px;
-    color: dimgray;
-    padding: auto;
-    min-height: 100px;
-    /* minimum height */
-    position: relative;
-    cursor: pointer;
-}
-
-.input-file {
-    opacity: 0;
-    /* invisible but it's there! */
-    width: 100%;
-    height: 100px;
-    position: absolute;
-    cursor: pointer;
-}
-
-.dropbox:hover {
-    background: #f0f0f0;
-    /* when mouse over to the drop zone, change color */
-}
-
-.dropbox p {
-    font-size: 1.2em;
-    text-align: center;
-    padding: 50px 0;
-}
-</style>
