@@ -378,6 +378,27 @@ export default class AMCApplication {
         }
 
 
+		getImageURL (uuid) {
+			return this.API.baseURL + '/ui/image/' + uuid;
+		}
+		
+		
+		triggerUIEvent (eventname, senderuuid, contextuuid) {
+			
+            this.axiosPostRequest("/ui/event", {
+				"eventname": eventname,
+				"senderuuid": senderuuid,
+				"contextuuid": contextuuid						
+			})
+				.then(resultHandleEvent => {
+					resultHandleEvent;
+					//alert (resultHandleEvent.data);
+				})
+                .catch(err => {
+					alert (err);
+                });				
+		}
+
 }
 
 
