@@ -8,37 +8,39 @@
 
 <script>
 
-export default {
-  props: ["Application", "moduleitem"],
+	export default {
+	  props: ["Application", "moduleitem"],
 
-  methods: {	
-  
-		uiUploadStart: function (item) {
-				item.state.idcounter = item.state.idcounter + 1;
-				if (item.state.chosenFile) {
-				
-					if (item.state.uploadid === 0) {
-						item.state.messages = ["Uploading..."];					
-				
+	  methods: {	
+	  
+			uiUploadStart: function (item) {
+					item.state.idcounter = item.state.idcounter + 1;
+					if (item.state.chosenFile) {
+					
+						if (item.state.uploadid === 0) {
+							item.state.messages = ["Uploading..."];					
+					
+						} else {
+							item.state.messages = ["Replacing upload..."];
+						}
+						item.state.uploadid = item.state.idcounter; 
+						
+						this.Application.performJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile, item.uploadsuccesspage);
+						
 					} else {
-						item.state.messages = ["Replacing upload..."];
-					}
-					item.state.uploadid = item.state.idcounter; 
 					
-					this.Application.performJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile, item.uploadsuccesspage);
+						if (!(item.state.uploadid === 0)) {
+							item.state.uploadid = 0; 
+							item.state.messages = ["Canceled upload..."];
+						}
 					
-				} else {
-				
-					if (!(item.state.uploadid === 0)) {
-						item.state.uploadid = 0; 
-						item.state.messages = ["Canceled upload..."];
 					}
+					
 				
-				}
-				
+			},	
 			
-		},	
-		
-  }
-};
+	  }
+	  
+	};
+
 </script>

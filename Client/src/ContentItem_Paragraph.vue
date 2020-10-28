@@ -8,23 +8,11 @@
 
 <script>
 
-export default {
-  props: ["Application", "moduleitem"],
-  
-  mounted() {
-	
-    },
-	
-	
-   data() {
-        return {
-        };
-    },
-	
-	
+	export default {
 
-  methods: {	
+	  props: ["Application", "moduleitem"]  
+	  	  
+	};
 	
-  }
-};
+	
 </script>

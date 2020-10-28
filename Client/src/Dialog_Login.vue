@@ -32,19 +32,14 @@
 export default {  
 
   props: ['Application'],
-
-  mounted() {
 	
-    },
-	
-	
-   data() {
+  data() {
         return {
 			uiLoginUser: "test",
 			uiLoginPassword: "test"
 			
         };
-    },
+  },
 	
 	
 

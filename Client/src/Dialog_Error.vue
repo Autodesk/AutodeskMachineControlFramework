@@ -29,20 +29,7 @@
 export default {  
 
   props: ['Application'],
-
-  mounted() {
 	
-    },
-	
-	
-   data() {
-        return {
-			
-        };
-    },
-	
-	
-
   methods: {
 
 	uiReloadPageClick: function () {

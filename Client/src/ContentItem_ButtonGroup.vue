@@ -17,23 +17,24 @@
 
 <script>
 
-export default {
-  props: ["Application", "moduleitem"],
+	export default {
+	  props: ["Application", "moduleitem"],
 
-  methods: {	
-	uiModuleButtonClick: function (button) {
-				
-		var contextuuid = this.Application.AppState.activeObject;
+	  methods: {	
+		uiModuleButtonClick: function (button) {
+					
+			var contextuuid = this.Application.AppState.activeObject;
+			
+			if (button.event != "") {		
+				this.triggerUIEvent (button.event, button.uuid, contextuuid);
+			}
+			
+			if (button.targetpage != "") {
+				this.Application.changePage (button.targetpage);
+			}
 		
-		if (button.event != "") {		
-			this.triggerUIEvent (button.event, button.uuid, contextuuid);
 		}
-		
-		if (button.targetpage != "") {
-			this.Application.changePage (button.targetpage);
-		}
+	  }
+	};
 	
-	}
-  }
-};
 </script>

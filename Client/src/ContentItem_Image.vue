@@ -8,8 +8,9 @@
 
 <script>
 
-export default {
-  props: ["Application", "moduleitem"]
-  
-};
+	export default {
+	  props: ["Application", "moduleitem"]
+	  
+	};
+	
 </script>
