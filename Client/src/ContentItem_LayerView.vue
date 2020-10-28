@@ -1,6 +1,6 @@
 <template>
 
-<div>
+<div v-if="(moduleitem.type=='layerview')">
 
   	<div>Layer View</div>
 	
@@ -32,7 +32,7 @@ import LayerViewImpl from "./LayerViewImpl.js"
 
 
 export default {
-  props: ['value'],
+  props: ["Application", "moduleitem"],
   
   mounted() {
 	

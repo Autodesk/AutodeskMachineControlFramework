@@ -13,11 +13,15 @@ class LayerViewImpl {
 		autostart: false
 	}).appendTo(domelement);
 	
-	this.gridGroup = null;
-	this.gridLineGroup1 = null;
-	this.gridLineGroup2 = null;
-	this.gridLineGroup3 = null;
+	this.gridData = {		
+		gridGroup: null,
+		gridLineGroup1: null,
+		gridLineGroup2: null,
+		gridLineGroup3: null
+	}
+	
 	this.sliceGroup = null;
+	
 	this.currentSize = {gridWidth: 0, gridHeight: 0}  
 	this.transform = { x: 0, y: 0, scaling: 1.0 } 
 		
@@ -39,7 +43,9 @@ class LayerViewImpl {
 		if ((this.currentSize.gridWidth < newWidth) || (this.currentSize.gridHeight < newHeight)) {
 			this.currentSize.gridWidth = newWidth;
 			this.currentSize.gridHeight = newHeight;
+						
 			this.createGrid (this.twoinstance, newWidth, newHeight);	    			
+			
 		}
 		
 		this.twoinstance.update ();
@@ -49,70 +55,76 @@ class LayerViewImpl {
   createGrid (twoinstance, width, height)
   {
 
-	  if (this.gridGroup) {
-		this.twoinstance.remove (this.gridGroup);
-		this.gridGroup = null;
+	  
+	  var createGridAsync = async function (twoinstance, gridData, width, height) {
+		  
+		  if (gridData.gridGroup) {
+			twoinstance.remove (gridData.gridGroup);
+			gridData.gridGroup = null;
+		  }
+		  
+		  var gridArray1 = []
+		  var gridArray2 = []
+		  var gridArray3 = []
+		  var x, y;
+		  
+		  var factor = 3;
+		  
+		  var lineCountX = width / factor + 1; 
+		  var lineCountY = height / factor + 1; 
+		  
+		  for (x = 0; x < lineCountX; x++) {
+			if (x % 4 != 0) {
+			  gridArray1.push (twoinstance.makeLine(x * factor, 0, x * factor, height));
+			}
+		  }
+
+		  for (y = 0; y < lineCountY; y++) {
+			if (y % 4 != 0) {
+			  gridArray1.push (twoinstance.makeLine(0, y * factor, width, y * factor));
+			}
+		  }
+
+		  for (x = 0; x < (lineCountX / 4); x++) {
+			if (x % 4 != 0) {
+			  gridArray2.push (twoinstance.makeLine(x * 4 * factor, 0, x * 4 * factor, height));
+			}
+		  }
+
+		  for (y = 0; y < (lineCountY / 4); y++) {
+			if (y % 4 != 0) {
+			  gridArray2.push (twoinstance.makeLine(0, y * 4 * factor, width, y * 4 * factor));
+			}
+		  }
+
+		  for (x = 0; x < (lineCountX / 16); x++) {
+			  gridArray3.push (twoinstance.makeLine(x * 16 * factor, 0, x * 16 * factor, height));
+		  }
+
+		  for (y = 0; y < (lineCountY / 16); y++) {
+			  gridArray3.push (twoinstance.makeLine(0, y * 16 * factor, width, y * 16 * factor));
+		  }
+		  
+		  var group1 = twoinstance.makeGroup(gridArray1);
+		  group1.stroke = '#f0f0f0';
+		  group1.linewidth = 0.5;
+
+		  var group2 = twoinstance.makeGroup(gridArray2);
+		  group2.stroke = '#e8e8e8';
+		  group2.linewidth = 0.6;
+
+		  var group3 = twoinstance.makeGroup(gridArray3);
+		  group3.stroke = '#e0e0e0';
+		  group3.linewidth = 0.8;
+		  
+		  gridData.gridLineGroup1 = group1;
+		  gridData.gridLineGroup2 = group2;
+		  gridData.gridLineGroup3 = group3;
+		  
+		  gridData.gridGroup = twoinstance.makeGroup(group1, group2, group3);
 	  }
 	  
-	  var gridArray1 = []
-	  var gridArray2 = []
-	  var gridArray3 = []
-	  var x, y;
-	  
-	  var factor = 3;
-	  
-	  var lineCountX = width / factor + 1; 
-	  var lineCountY = height / factor + 1; 
-	  
-	  for (x = 0; x < lineCountX; x++) {
-	    if (x % 4 != 0) {
-  		  gridArray1.push (twoinstance.makeLine(x * factor, 0, x * factor, height));
-		}
-	  }
-
-	  for (y = 0; y < lineCountY; y++) {
-	    if (y % 4 != 0) {
-		  gridArray1.push (twoinstance.makeLine(0, y * factor, width, y * factor));
-		}
-	  }
-
-	  for (x = 0; x < (lineCountX / 4); x++) {
-	    if (x % 4 != 0) {
-  		  gridArray2.push (twoinstance.makeLine(x * 4 * factor, 0, x * 4 * factor, height));
-		}
-	  }
-
-	  for (y = 0; y < (lineCountY / 4); y++) {
-	    if (y % 4 != 0) {
-		  gridArray2.push (twoinstance.makeLine(0, y * 4 * factor, width, y * 4 * factor));
-		}
-	  }
-
-	  for (x = 0; x < (lineCountX / 16); x++) {
-  		  gridArray3.push (twoinstance.makeLine(x * 16 * factor, 0, x * 16 * factor, height));
-	  }
-
-	  for (y = 0; y < (lineCountY / 16); y++) {
-		  gridArray3.push (twoinstance.makeLine(0, y * 16 * factor, width, y * 16 * factor));
-	  }
-	  
-	  var group1 = twoinstance.makeGroup(gridArray1);
-   	  group1.stroke = '#f0f0f0';
-   	  group1.linewidth = 0.5;
-
-	  var group2 = twoinstance.makeGroup(gridArray2);
-   	  group2.stroke = '#e8e8e8';
-   	  group2.linewidth = 0.6;
-
-	  var group3 = twoinstance.makeGroup(gridArray3);
-   	  group3.stroke = '#e0e0e0';
-   	  group3.linewidth = 0.8;
-	  
-	  this.gridLineGroup1 = group1;
-	  this.gridLineGroup2 = group2;
-	  this.gridLineGroup3 = group3;
-	  
-	  this.gridGroup = this.twoinstance.makeGroup(group1, group2, group3);
+	  createGridAsync (this.twoinstance, this.gridData, width, height);
 	  	
   }  
 
@@ -184,8 +196,6 @@ class LayerViewImpl {
 	
 	this.updateTransform ();
 	
-	this.twoinstance.update ();
-
   }
 
   SetAbsoluteScaling (newScaling, centerx, centery) {
@@ -220,9 +230,7 @@ class LayerViewImpl {
 	this.transform.x = this.transform.x + centerx / this.transform.scaling;	
 	this.transform.y = this.transform.y + centery / this.transform.scaling;	
 	
-	this.updateTransform ();
-	
-	this.twoinstance.update ();	  
+	this.updateTransform ();	
 	  
   }
 
