@@ -329,7 +329,13 @@
 		<error name="NOCORERESOURCEPACKAGE" code="320" description="No core resource package" />
 		<error name="INVALIDASPECTRATIO" code="321" description="Invalid aspect ratio" />
 		<error name="MISSINGLOGORESOURCE" code="322" description="Missing logo resource" />
-
+		<error name="NOUSERINTERFACEPLUGIN" code="323" description="No user interface plugin" />
+		<error name="COULDNOTLOADUILIBRARY" code="324" description="Could not load UI library" />
+		<error name="EVENTNAMENOTFOUND" code="325" description="Event name not found" />
+		<error name="INVALIDEVENTSENDER" code="326" description="Invalid event context" />
+		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
+		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
+		
 	</errors>
 	
 	

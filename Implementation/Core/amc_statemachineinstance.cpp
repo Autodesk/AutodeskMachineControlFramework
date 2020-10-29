@@ -145,16 +145,12 @@ namespace AMC {
 	void CStateMachineInstance::setCurrentStateInternal(PStateMachineState pCurrentState)
 	{
 		m_pCurrentState = pCurrentState;
-
-		m_Mutex_CurrentStateName.lock();
-		if (pCurrentState.get()) {
-			m_sCurrentStateName = std::string(pCurrentState->getName().c_str());
+		if (pCurrentState.get() != nullptr) {
+			m_ParameterHandler->setInstanceStateName(m_pCurrentState->getName());
 		}
 		else {
-			m_sCurrentStateName = "";
+			m_ParameterHandler->setInstanceStateName("");
 		}
-		m_Mutex_CurrentStateName.unlock();
-
 
 	}
 
@@ -309,12 +305,7 @@ namespace AMC {
 
 	std::string CStateMachineInstance::getCurrentStateName()
 	{
-		m_Mutex_CurrentStateName.lock();
-		//Thread safe copy of state name
-		std::string sCopiedString = std::string(m_sCurrentStateName.c_str());
-		m_Mutex_CurrentStateName.unlock();
-
-		return sCopiedString;
+		return m_ParameterHandler->getInstanceStateName();
 	}
 
 	uint32_t CStateMachineInstance::getStateCount() const

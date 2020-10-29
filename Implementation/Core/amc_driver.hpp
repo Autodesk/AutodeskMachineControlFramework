@@ -43,6 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parametergroup.hpp"
 #include "libmcdriver_dynamic.hpp" 
 
+namespace LibMCEnv {
+	namespace Impl {
+		class CDriverEnvironment;
+		typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
+	}
+}
+
 namespace AMC {
 
 	typedef void* HDriverHandle;
@@ -60,11 +67,14 @@ namespace AMC {
 		LibMCDriver::PWrapper m_pDriverWrapper;
 		LibMCDriver::PDriver m_pDriverInstance;
 
+		LibMCEnv::PWrapper m_pMCEnvWrapper;
+		LibMCEnv::Impl::PDriverEnvironment m_pDriverEnvironment;
+
 		PParameterGroup m_pParameterGroup;
 		
 	public:
 
-		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibrary, PParameterGroup pParameterGroup, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibrary, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment);
 
 		virtual ~CDriver();
 

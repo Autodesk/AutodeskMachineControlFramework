@@ -106,7 +106,7 @@ std::string CAPIJSONRequest::getNameString(const std::string& sKeyName, uint32_t
 }
 
 
-uint64_t CAPIJSONRequest::getSize(const std::string& sKeyName, const uint64_t nMinSize, const uint64_t nMaxSize, uint32_t nErrorCode)
+uint64_t CAPIJSONRequest::getUint64(const std::string& sKeyName, const uint64_t nMinValue, const uint64_t nMaxValue, uint32_t nErrorCode)
 {
 	if (!hasValue(sKeyName))
 		throw ELibMCInterfaceException(nErrorCode);
@@ -115,7 +115,7 @@ uint64_t CAPIJSONRequest::getSize(const std::string& sKeyName, const uint64_t nM
 
 	uint64_t nValue = m_pImpl->m_Document[sKeyName.c_str()].GetUint64();
 
-	if ((nValue < nMinSize) || (nValue > nMaxSize))
+	if ((nValue < nMinValue) || (nValue > nMaxValue))
 		throw ELibMCInterfaceException(nErrorCode);
 
 	return nValue;

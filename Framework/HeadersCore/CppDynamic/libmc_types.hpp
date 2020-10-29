@@ -347,6 +347,12 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_NOCORERESOURCEPACKAGE 320
 #define LIBMC_ERROR_INVALIDASPECTRATIO 321
 #define LIBMC_ERROR_MISSINGLOGORESOURCE 322
+#define LIBMC_ERROR_NOUSERINTERFACEPLUGIN 323
+#define LIBMC_ERROR_COULDNOTLOADUILIBRARY 324
+#define LIBMC_ERROR_EVENTNAMENOTFOUND 325
+#define LIBMC_ERROR_INVALIDEVENTSENDER 326
+#define LIBMC_ERROR_INVALIDEVENTCONTEXT 327
+#define LIBMC_ERROR_INVALIDLAYERINDEX 328
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -606,6 +612,12 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_NOCORERESOURCEPACKAGE: return "No core resource package";
     case LIBMC_ERROR_INVALIDASPECTRATIO: return "Invalid aspect ratio";
     case LIBMC_ERROR_MISSINGLOGORESOURCE: return "Missing logo resource";
+    case LIBMC_ERROR_NOUSERINTERFACEPLUGIN: return "No user interface plugin";
+    case LIBMC_ERROR_COULDNOTLOADUILIBRARY: return "Could not load UI library";
+    case LIBMC_ERROR_EVENTNAMENOTFOUND: return "Event name not found";
+    case LIBMC_ERROR_INVALIDEVENTSENDER: return "Invalid event context";
+    case LIBMC_ERROR_INVALIDEVENTCONTEXT: return "Invalid event sender";
+    case LIBMC_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
     default: return "unknown error";
   }
 }
