@@ -58,7 +58,7 @@ namespace AMC {
 	{
 		auto iter = m_StateMachineParameters.find(sInstanceName);
 		if(iter == m_StateMachineParameters.end ())
-			throw ELibMCInterfaceException(LIBMC_ERROR_STATEMACHINENOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
 
 		return iter->second;
 	}
