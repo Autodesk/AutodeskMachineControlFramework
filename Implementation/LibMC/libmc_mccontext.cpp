@@ -446,7 +446,7 @@ void CMCContext::loadDriverParameterGroup(const pugi::xml_node& xmlNode, AMC::PP
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGDRIVERNAME);
 
     auto driverGroup = m_pSystemState->driverHandler()->getDriverParameterGroup(driverNameAttrib.as_string ());
-    driverGroup->copyToGroup(pGroup.get());
+    pGroup->addDerivativesFromGroup(driverGroup);
 
 }
 
