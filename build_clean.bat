@@ -59,8 +59,6 @@ echo "Building Core Modules"
 call cmake ..
 call cmake --build . --config Release
 
-echo "Building Core Resources"
-go run ../Server/buildresources.go ../Plugins/Resources "%outputdir%/%GITHASH%_core.data"
 
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
