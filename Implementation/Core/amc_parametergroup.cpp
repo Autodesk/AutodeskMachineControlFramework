@@ -363,7 +363,6 @@ namespace AMC {
 		if (pParameterGroup == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		auto nCount = pParameterGroup->getParameterCount();
 
 		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
