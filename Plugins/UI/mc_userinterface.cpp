@@ -60,11 +60,14 @@ public:
 			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
 		auto sJobUUID = pUIEnvironment->GetEventContext();
-		auto pSignal = pUIEnvironment->PrepareSignal("demo", "signal_startjob");
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startjob");
 		pSignal->SetString("jobuuid", sJobUUID);
 		pSignal->SetString("jobname", "testjob");
 		pSignal->Trigger();
 
+		if (!pSignal->WaitForHandling(200))
+			throw std::runtime_error("could not start job");
+		
 	}
 
 };
