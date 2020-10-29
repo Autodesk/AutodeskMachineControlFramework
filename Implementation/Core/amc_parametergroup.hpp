@@ -115,6 +115,9 @@ namespace AMC {
 
 		void copyToGroup (CParameterGroup * pParameterGroup);
 
+		void addDerivativesFromGroup(PParameterGroup pParameterGroup);
+		void addDuplicatesFromGroup(CParameterGroup * pParameterGroup);
+
 		void setJournal(PStateJournal pStateJournal, const std::string & sInstanceName);
 
 	};

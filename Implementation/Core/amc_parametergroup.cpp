@@ -358,6 +358,36 @@ namespace AMC {
 	}
 
 
+	void CParameterGroup::addDerivativesFromGroup(PParameterGroup pParameterGroup)
+	{
+		if (pParameterGroup == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		auto nCount = pParameterGroup->getParameterCount();
+
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+			std::string sName, sDescription, sDefaultValue;
+			pParameterGroup->getParameterInfo (nIndex, sName, sDescription, sDefaultValue);
+			addNewDerivedParameter (sName, pParameterGroup, sName);
+
+		}
+
+	}
+
+	void CParameterGroup::addDuplicatesFromGroup(CParameterGroup* pParameterGroup)
+	{
+		if (pParameterGroup == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		for (auto pParameter : pParameterGroup->m_ParameterList) {
+			addParameterInternal(pParameter->duplicate());
+		}
+
+	}
+
+
 	void CParameterGroup::addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
