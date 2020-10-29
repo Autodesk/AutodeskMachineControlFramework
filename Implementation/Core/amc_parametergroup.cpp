@@ -380,10 +380,7 @@ namespace AMC {
 		if (pParameterGroup == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
-		for (auto pParameter : pParameterGroup->m_ParameterList) {
-			addParameterInternal(pParameter->duplicate());
-		}
+		pParameterGroup->copyToGroup(this);
 
 	}
 
