@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <iostream>
 
-
 using namespace AMC;
 
 CAPIHandler_Build::CAPIHandler_Build(PSystemState pSystemState)
@@ -76,7 +75,11 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 		if ((sParameterString == "/prepare") || (sParameterString == "/prepare/")) {
 			return btStartPrepareJob;
 		}
-	
+
+		if ((sParameterString == "/toolpath") || (sParameterString == "/toolpath/")) {
+			return btToolpath;
+		}
+
 	}
 
 	if (requestType == eAPIRequestType::rtGet) {
@@ -98,6 +101,8 @@ bool CAPIHandler_Build::expectsRawBody(const std::string& sURI, const eAPIReques
 
 	switch (parseRequest(sURI, requestType, jobUUID)) {
 		case btStartPrepareJob:
+			return true;
+		case btToolpath:
 			return true;
 
 		default:
@@ -142,8 +147,91 @@ void CAPIHandler_Build::handlePrepareJobRequest(CJSONWriter& writer, const uint8
 }
 
 
-void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth)
+void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
+	if (pBodyData == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
+	auto sBuildUUID = jsonRequest.getUUID(AMC_API_KEY_BUILDUUID, LIBMC_ERROR_INVALIDBUILDUUID);
+
+	auto pBuildJob = m_pSystemState->buildJobHandler()->RetrieveJob(sBuildUUID);
+	auto sStreamUUID = pBuildJob->GetStorageStreamUUID();
+
+
+	auto pToolpathHandler = m_pSystemState->toolpathHandler();
+
+	auto pToolpath = pToolpathHandler->findToolpathEntity(sStreamUUID, false);
+	if (pToolpath == nullptr) {
+		pToolpath = pToolpathHandler->loadToolpathEntity(sStreamUUID);
+	} 
+
+	auto nLayerCount = pToolpath->getLayerCount();
+
+	auto nLayerIndex = jsonRequest.getUint64(AMC_API_KEY_LAYERINDEX, 0, nLayerCount, LIBMC_ERROR_INVALIDLAYERINDEX);
+
+	auto pLayerData = pToolpath->readLayer ((uint32_t)nLayerIndex);
+	auto dUnits = pLayerData->getUnits();
+
+	CJSONWriterArray segmentArray (writer);
+
+	auto nSegmentCount = pLayerData->getSegmentCount();
+	for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
+		auto segmentType = pLayerData->getSegmentType(nSegmentIndex);
+		auto nPointCount = pLayerData->getSegmentPointCount(nSegmentIndex);
+
+		CJSONWriterObject segmentObject(writer);
+
+		if (nPointCount > 0) {
+
+			std::vector<LibMCEnv::sPosition2D> Points;
+			Points.resize(nPointCount);
+			pLayerData->storePointsToBuffer(nSegmentIndex, Points.data());
+
+			CJSONWriterArray pointArray(writer);
+
+			switch (segmentType) {
+				case LibMCEnv::eToolpathSegmentType::Hatch:
+					segmentObject.addString(AMC_API_KEY_TYPE, AMC_API_KEY_HATCH);
+					break;
+				case LibMCEnv::eToolpathSegmentType::Loop:
+					segmentObject.addString(AMC_API_KEY_TYPE, AMC_API_KEY_LOOP);
+					break;
+				case LibMCEnv::eToolpathSegmentType::Polyline:
+					segmentObject.addString(AMC_API_KEY_TYPE, AMC_API_KEY_POLYLINE);
+					break;
+			}
+
+			for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+
+				auto pPoint = &Points[nPointIndex];
+
+				CJSONWriterObject pointObject(writer);
+				pointObject.addDouble(AMC_API_KEY_X, pPoint->m_Coordinates[0] * dUnits);
+				pointObject.addDouble(AMC_API_KEY_Y, pPoint->m_Coordinates[1] * dUnits);
+
+				pointArray.addObject(pointObject);
+
+			}
+
+			segmentObject.addArray (AMC_API_KEY_POINTS, pointArray);
+
+			
+		}
+
+		segmentArray.addObject(segmentObject);
+
+	}
+
+
+	writer.addArray(AMC_API_KEY_SEGMENTS, segmentArray);
+}
+
+
+void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth)
+{	
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
@@ -183,6 +271,9 @@ PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAP
 		break;
 	case btListJobs:
 		handleListJobsRequest(writer, pAuth);
+		break;
+	case btToolpath:
+		handleToolpathRequest(writer, pBodyData, nBodyDataSize, pAuth);
 		break;
 
 	default:

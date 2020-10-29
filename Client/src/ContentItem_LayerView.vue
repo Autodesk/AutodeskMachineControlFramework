@@ -7,20 +7,22 @@
 	<v-slider
 	    dense
 		hint="Layer Index"
-		max="100"
+		max="300"
 		min="1"
+		v-model="LayerIndex"
+		@change="onLayerChanged"
 	></v-slider>
 
 	<v-slider
 	    dense
 		hint="Scaling"
-		max="1000"
+		max="100"
 		min="0"
 		v-model="ScaleFactor"
 		@change="onScalingChanged"
 	></v-slider>
 
-	<div ref="layerviewdiv" style="height:400px" v-resize="onResize" @mousedown="onStartDragging" @mousemove="onDragging"></div>  
+	<div ref="layerviewdiv" style="height:400px" v-resize="onResize" @mousedown="onStartDragging" @mousemove="onDragging" @wheel="onMouseWheel"></div>  
 
 </div>
 
@@ -53,6 +55,7 @@
 			return {
 				LayerViewerInstance: null,
 				ScaleFactor: 0,
+				LayerIndex: 1,
 				dragging: false,
 				dragcurrentx: 0,
 				dragcurrenty: 0
@@ -78,8 +81,24 @@
 			if (!this.LayerViewerInstance) 
 				return;
 				
-			this.LayerViewerInstance.SetAbsoluteScaling (1.0 + this.ScaleFactor * 0.01);
+			this.LayerViewerInstance.SetAbsoluteScaling (Math.pow (1.03, this.ScaleFactor));
 						
+		},
+		
+		
+		onLayerChanged: function () {
+			var builduuid = this.Application.AppState.activeObject;
+		
+			this.Application.axiosPostRequest ("/build/toolpath", { "builduuid": builduuid, "layerindex": this.LayerIndex })
+			  .then(layerJSON => {
+				
+				this.LayerViewerInstance.loadLayer (layerJSON.data.segments);				
+			  
+			})
+			.catch(err => {
+				err;
+				//
+			});
 		},
 		
 		onStartDragging: function (event) {
@@ -106,6 +125,33 @@
 				this.LayerViewerInstance.Drag (deltaX, deltaY);
 			}
 		  }
+		},
+		
+		onMouseWheel: function (event) {
+			event.preventDefault();
+			
+			var domelement = this.$refs.layerviewdiv;
+			if (!domelement) 
+				return;			
+			if (!this.LayerViewerInstance) 
+				return;
+
+			var deltaWheel = event.deltaY;
+			if (deltaWheel > 5)
+				deltaWheel = 5;
+			if (deltaWheel < -5)
+				deltaWheel = -5;
+				
+			var viewportX = event.clientX;
+			var viewportY = event.clientY;
+ 			var boxRectangle = domelement.getBoundingClientRect();
+ 			var localX = ( viewportX - boxRectangle.left );
+			var localY = ( viewportY - boxRectangle.top );				
+			
+			this.ScaleFactor = this.ScaleFactor - deltaWheel * 5;
+			
+			this.LayerViewerInstance.SetAbsoluteScaling (Math.pow (1.03, this.ScaleFactor), localX, localY);
+	
 		}
 		
 		

@@ -352,6 +352,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EVENTNAMENOTFOUND 325
 #define LIBMC_ERROR_INVALIDEVENTSENDER 326
 #define LIBMC_ERROR_INVALIDEVENTCONTEXT 327
+#define LIBMC_ERROR_INVALIDLAYERINDEX 328
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -616,6 +617,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EVENTNAMENOTFOUND: return "Event name not found";
     case LIBMC_ERROR_INVALIDEVENTSENDER: return "Invalid event context";
     case LIBMC_ERROR_INVALIDEVENTCONTEXT: return "Invalid event sender";
+    case LIBMC_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
     default: return "unknown error";
   }
 }

@@ -26,7 +26,7 @@
 			var contextuuid = this.Application.AppState.activeObject;
 			
 			if (button.event != "") {		
-				this.triggerUIEvent (button.event, button.uuid, contextuuid);
+				this.Application.triggerUIEvent (button.event, button.uuid, contextuuid);
 			}
 			
 			if (button.targetpage != "") {
