@@ -153,7 +153,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE 16
 
 #define AMC_API_KEY_BUILDUUID "builduuid"
-
+#define AMC_API_KEY_LAYERINDEX "layerindex"
+#define AMC_API_KEY_SEGMENTS "segments"
+#define AMC_API_KEY_POINTS "points"
+#define AMC_API_KEY_TYPE "type"
+#define AMC_API_KEY_HATCH "hatch"
+#define AMC_API_KEY_LOOP "loop"
+#define AMC_API_KEY_POLYLINE "polyline"
+#define AMC_API_KEY_X "x"
+#define AMC_API_KEY_Y "y"
 
 #define AMC_API_KEY_STATUSINSTANCE_NAME "name"
 #define AMC_API_KEY_STATUSINSTANCE_STATE "state"

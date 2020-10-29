@@ -334,8 +334,8 @@
 		<error name="EVENTNAMENOTFOUND" code="325" description="Event name not found" />
 		<error name="INVALIDEVENTSENDER" code="326" description="Invalid event context" />
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
+		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
 		
-
 	</errors>
 	
 	

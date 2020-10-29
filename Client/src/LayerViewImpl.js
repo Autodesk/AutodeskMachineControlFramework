@@ -27,8 +27,6 @@ class LayerViewImpl {
 		
 	this.updateSize (domelement.clientWidth, domelement.clientHeight);
 	
-	this.loadLayer ();
-
   }
   
   
@@ -134,7 +132,7 @@ class LayerViewImpl {
   {
   	
   
-	if (this.gridGroup) {
+	if (this.gridData.gridGroup) {
 	
 		var gridScale = this.transform.scaling;
 		if (gridScale < 1.0) {
@@ -150,12 +148,12 @@ class LayerViewImpl {
 		var gridTranslationX = this.transform.x - Math.ceil ((this.transform.x / fullGridSize)) * fullGridSize;
 		var gridTranslationY = this.transform.y - Math.ceil ((this.transform.y / fullGridSize)) * fullGridSize;
 		
-	    this.gridGroup.scale=gridScale; 
-		this.gridGroup.translation.set (gridTranslationX, gridTranslationY);
+	    this.gridData.gridGroup.scale=gridScale; 
+		this.gridData.gridGroup.translation.set (gridTranslationX, gridTranslationY);
 		
-		this.gridLineGroup1.linewidth = 0.5 / gridScale;
-		this.gridLineGroup2.linewidth = 0.6 / gridScale;
-		this.gridLineGroup3.linewidth = 0.8 / gridScale;	  
+		this.gridData.gridLineGroup1.linewidth = 0.5 / gridScale;
+		this.gridData.gridLineGroup2.linewidth = 0.6 / gridScale;
+		this.gridData.gridLineGroup3.linewidth = 0.8 / gridScale;	  
 		
 		
 		
@@ -174,25 +172,74 @@ class LayerViewImpl {
   }
 
   
-  loadLayer () {
+  loadLayer (segmentsArray) {
 
 	  if (this.sliceGroup) {
 		this.twoinstance.remove (this.sliceGroup);
 		this.sliceGroup = null;
 	  }
 	  
-      var line1 = this.twoinstance.makeLine(10, 20, 50 ,50);
-      var line2 = this.twoinstance.makeLine(50, 20, 300 ,400);
-	  this.sliceGroup = this.twoinstance.makeGroup (line1, line2);
+	  var paths=[];
+	  var segmentCount = segmentsArray.length;
+	  var segmentIndex;
+
+
+	  for (segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++) {
+		var segment = segmentsArray[segmentIndex];
+		  
+		if ((segment.type === "loop") ||(segment.type === "polyline")) {
+			
+			var pointCount = segment.points.length;
+			var pointIndex;
+			
+			var oldx = segment.points[0].x;
+			var oldy = segment.points[0].y;
+			
+			for (pointIndex = 1; pointIndex < pointCount; pointIndex ++) {
+				var x = segment.points[pointIndex].x;
+				var y = segment.points[pointIndex].y;
+				
+				paths.push (this.twoinstance.makeLine (oldx, oldy, x, y));
+				
+				oldx = x;
+				oldy = y;
+			}
+						
+						
+		} 
+
+		if (segment.type === "hatch") {
+		 	
+			var lineCount = segment.points.length / 2;
+			var lineIndex;
+			
+			for (lineIndex = 0; lineIndex < lineCount; lineIndex ++) {
+				var x1 = segment.points[lineIndex * 2].x;
+				var y1 = segment.points[lineIndex * 2].y;
+				var x2 = segment.points[lineIndex * 2 + 1].x;
+				var y2 = segment.points[lineIndex * 2 + 1].y;
+				
+				paths.push (this.twoinstance.makeLine (x1, y1, x2, y2));
+			}
+						
+							
+			//lines.push (this.twoinstance.makeLine(10, 20, 50, 50));	
+			
+		}
+		  
+	  }
 	  
-	  this.twoinstance.update ();
+	  	  
+	  this.sliceGroup = this.twoinstance.makeGroup (paths);
+	  
+	  this.updateTransform ();
 
   }
   
   Drag (deltaX, deltaY) {
   
-	this.transform.x = this.transform.x + deltaX / this.transform.scaling;	
-	this.transform.y = this.transform.y + deltaY / this.transform.scaling;	
+	this.transform.x = this.transform.x + deltaX;	
+	this.transform.y = this.transform.y + deltaY;	
 	
 	this.updateTransform ();
 	
@@ -222,13 +269,14 @@ class LayerViewImpl {
 		centery = this.twoinstance.height * 0.5;
 	}
 	 	
-	this.transform.x = this.transform.x - centerx / this.transform.scaling;	
-	this.transform.y = this.transform.y - centery / this.transform.scaling;	
+	this.transform.x = this.transform.x - centerx;	
+	this.transform.y = this.transform.y - centery;	
 	
 	this.transform.scaling = this.transform.scaling * factor;
 
-	this.transform.x = this.transform.x + centerx / this.transform.scaling;	
-	this.transform.y = this.transform.y + centery / this.transform.scaling;	
+	this.transform.x = this.transform.x * factor + centerx;	
+	this.transform.y = this.transform.y * factor + centery;	
+
 	
 	this.updateTransform ();	
 	  

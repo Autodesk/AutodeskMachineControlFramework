@@ -43,7 +43,8 @@ namespace AMC {
 	enum APIHandler_BuildType {
 		btUnknown = 0,
 		btStartPrepareJob = 1,
-		btListJobs = 2
+		btListJobs = 2,
+		btToolpath = 3
 	};
 
 	class CAPIHandler_Build : public CAPIHandler {
@@ -54,6 +55,8 @@ namespace AMC {
 		APIHandler_BuildType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& jobUUID);
 
 		void handlePrepareJobRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+		void handleToolpathRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
+
 		void handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAuth);
 
 	public:
