@@ -272,3 +272,36 @@ add_custom_command(
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
 			
 
+add_custom_target(create_core_resources ALL)
+add_custom_command(
+	TARGET create_core_resources POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "creating core resources")
+
+if(WIN32)
+add_custom_command(
+	TARGET create_core_resources POST_BUILD
+	COMMAND ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.exe
+			${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Resources/
+			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core.data)
+endif()
+
+
+if(UNIX)
+	if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*armv7.*")
+		message("armv7 detected")
+		add_custom_command(
+			TARGET create_core_resources POST_BUILD
+			COMMAND ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.arm
+					${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Resources/
+					${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core.data)
+					
+	else()
+		add_custom_command(
+			TARGET create_core_resources POST_BUILD
+			COMMAND ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.linux
+					${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Resources/
+					${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core.data)
+					
+	endif()
+endif()
+
