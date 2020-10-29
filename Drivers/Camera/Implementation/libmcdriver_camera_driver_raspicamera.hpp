@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CDriver_RaspiCamera
 #endif
 
 // Include custom headers here.
+#include "RaspiStill.hpp"
 
 
 namespace LibMCDriver_Camera {
@@ -57,6 +58,7 @@ namespace Impl {
 
 class CDriver_RaspiCamera : public virtual IDriver_RaspiCamera, public virtual CDriver_Camera {
 private:
+    RaspiStill* m_pCamera;
 
 
 protected:

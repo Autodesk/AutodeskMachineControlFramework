@@ -192,8 +192,10 @@ target_link_libraries(libmc Winmm.lib)
 target_link_libraries(libmcdata Winmm.lib)
 target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
 elseif(UNIX AND NOT APPLE)
+target_link_libraries(libmc -luuid)
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
-target_link_libraries(libmcdata SQLite3)
+target_link_libraries(libmcdata SQLite3 -luuid)
 endif()
 
 # This makes sure symbols are exported
@@ -246,11 +248,20 @@ add_custom_command(
 endif()
 
 if(UNIX)
-add_custom_command(
-	TARGET copy_distribution_libraries POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf.so
-			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
+	if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*armv7.*")
+		message("armv7 detected")
+		add_custom_command(
+			TARGET copy_distribution_libraries POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy
+				${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf_armv7.so
+				${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
+	else()
+		add_custom_command(
+			TARGET copy_distribution_libraries POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy
+				${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf.so
+				${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
+	endif()
 endif()
 
 
