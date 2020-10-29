@@ -58,16 +58,6 @@ CDriverHandler::~CDriverHandler()
 
 }
 
-template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
-{
-	if (pWrapper.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
-	pImplInstance->IncRefCount();
-	return pExternalInstance;
-}
-
 
 void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary)
 {
@@ -79,11 +69,10 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
 
 	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup);
-	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCEnv::CDriverEnvironment>(pInternalEnvironment, m_pEnvironmentWrapper);
 
 	pInternalEnvironment->setIsInitializing(true);
 
-	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibrary, pParameterGroup, pExternalEnvironment);
+	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibrary, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
 	m_DriverList.push_back(pDriver);
 	m_DriverMap.insert(std::make_pair(sName, pDriver));	
 

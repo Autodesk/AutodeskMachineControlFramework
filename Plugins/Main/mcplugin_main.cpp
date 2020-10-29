@@ -240,6 +240,9 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 
+		auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
+		pCameraDriver->Initialize("", 600, 400, LibMCDriver_Camera::eImagePixelFormat::RGB32);
+
 		pStateEnvironment->SetNextState("idle");
 	}
 
@@ -577,14 +580,15 @@ public:
 		//}
 
 		// TODO uncomment to activate camera driver pStateEnvironment->LogMessage("Getting Camera Image");
-		//auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
-		//auto pPNGImage = pCameraDriver->CapturePNGImage();
+		auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
+		auto pPNGImage = pCameraDriver->CapturePNGImage();
 		//
-		//std::vector<uint8_t> Buffer;
-		//pPNGImage->GetRawData(Buffer);
+		std::vector<uint8_t> Buffer;
+		pPNGImage->GetRawData(Buffer);
 
 		auto pBuild = pStateEnvironment->GetBuildJob(sJobUUID);
-		//TODO uncomment to activate camera driver pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
+		//TODO uncomment to activate camera driver 
+		pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
 
 		if (nCurrentLayer < (nLayerCount - 1)) {
 

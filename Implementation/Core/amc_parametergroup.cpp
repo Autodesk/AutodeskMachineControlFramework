@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter.hpp"
 #include "amc_parameter_valued.hpp"
 #include "amc_parameter_derived.hpp"
+#include "amc_parameter_instancestate.hpp"
 #include "amc_statejournal.hpp"
 
 #include "amc_jsonwriter.hpp"
@@ -357,6 +358,33 @@ namespace AMC {
 	}
 
 
+	void CParameterGroup::addDerivativesFromGroup(PParameterGroup pParameterGroup)
+	{
+		if (pParameterGroup == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		auto nCount = pParameterGroup->getParameterCount();
+
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+			std::string sName, sDescription, sDefaultValue;
+			pParameterGroup->getParameterInfo (nIndex, sName, sDescription, sDefaultValue);
+			addNewDerivedParameter (sName, pParameterGroup, sName);
+
+		}
+
+	}
+
+	void CParameterGroup::addDuplicatesFromGroup(CParameterGroup* pParameterGroup)
+	{
+		if (pParameterGroup == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		pParameterGroup->copyToGroup(this);
+
+	}
+
+
 	void CParameterGroup::addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
@@ -452,6 +480,15 @@ namespace AMC {
 		addParameterInternal(std::make_shared<CParameter_Derived>(sName, pParameterGroup, sSourceParameterName));
 
 	}
+
+	void CParameterGroup::addNewInstanceStateParameter(const std::string& sName, const std::string& sDescription)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		addParameterInternal(std::make_shared<CParameter_InstanceState>(sName, sDescription));
+
+	}
+
 
 
 	void CParameterGroup::removeValue(const std::string& sName)

@@ -97,6 +97,15 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 
 	}
 
+
+	if (requestType == eAPIRequestType::rtPost) {
+
+		if ((sParameterString == "/event/") || (sParameterString == "/event")) {
+			return APIHandler_UIType::utEvent;
+		}
+
+	}
+
 	return APIHandler_UIType::utUnknown;
 }
 
@@ -119,6 +128,14 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 	
 }
 
+bool CAPIHandler_UI::expectsRawBody(const std::string& sURI, const eAPIRequestType requestType)
+{
+	std::string sParameterUUID;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
+
+	return (uiType == APIHandler_UIType::utEvent);
+
+}
 
 void CAPIHandler_UI::handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth)
 {
@@ -188,6 +205,22 @@ void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::st
 }
 
 
+void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pBodyData == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
+	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
+	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
+	auto sContextUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTCONTEXT, LIBMC_ERROR_INVALIDEVENTCONTEXT);
+
+	m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID);
+}
+
+
 PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::string sParameterUUID;
@@ -211,6 +244,10 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 
 	case APIHandler_UIType::utImage:
 		return handleImageRequest(sParameterUUID, pAuth);
+
+	case APIHandler_UIType::utEvent:
+		handleEventRequest (writer, pBodyData, nBodyDataSize, pAuth);
+		break;
 
 	default:
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);

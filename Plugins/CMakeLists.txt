@@ -35,4 +35,5 @@ project("AMCPlugins")
 add_subdirectory(Main)
 add_subdirectory(PIDControl)
 add_subdirectory(PrinterConnection)
+add_subdirectory(UI)
 

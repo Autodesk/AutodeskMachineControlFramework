@@ -15,6 +15,7 @@ ACT/LibMCDriver_component
 ACT/LibMCPlugin_component
 ACT/LibMCEnv_component
 ACT/LibMCData_component
+ACT/LibMCUI_component
 
 Client/.DS_Store
 Client/node_modules

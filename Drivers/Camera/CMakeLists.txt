@@ -140,6 +140,9 @@ endif()
 ### Add custom code below
 ##########################################################################################
 
-
+if(UNIX)
+add_subdirectory(Libraries/raspicam)
+target_link_libraries(${DRIVERNAME} raspicam)
+endif()
 
 

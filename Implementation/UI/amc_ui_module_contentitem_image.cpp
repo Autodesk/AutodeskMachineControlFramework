@@ -46,7 +46,12 @@ using namespace AMC;
 
 
 CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID, double dAspectRatio)
-	: CUIModule_ContentItem(sUUID), m_dAspectRatio(dAspectRatio)
+	: CUIModule_ContentItem(sUUID), 
+	m_dAspectRatio(dAspectRatio),
+	m_dMaxWidth (0.0),
+	m_dMaxHeight (0.0),
+	m_bHasMaxWidth (false),
+	m_bHasMaxHeight (false)
 {
 	if ((dAspectRatio < AMC_UI_IMAGE_MINASPECTRATIO) || (dAspectRatio > AMC_UI_IMAGE_MAXASPECTRATIO))
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDASPECTRATIO, std::to_string (dAspectRatio));
@@ -64,6 +69,41 @@ void CUIModule_ContentImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWrite
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
 	object.addDouble(AMC_API_KEY_UI_ITEMASPECTRATIO, m_dAspectRatio);
+
+	if (m_bHasMaxWidth)
+		object.addDouble(AMC_API_KEY_UI_ITEMMAXWIDTH, m_dMaxWidth);
+	if (m_bHasMaxHeight)
+		object.addDouble(AMC_API_KEY_UI_ITEMMAXHEIGHT, m_dMaxHeight);
 }
 
+void CUIModule_ContentImage::setMaxWidth(double dMaxWidth)
+{
+	m_bHasMaxWidth = (dMaxWidth > 0.0);
+	if (m_bHasMaxWidth)
+		m_dMaxWidth = dMaxWidth;
+	else
+		m_dMaxWidth = 0.0;
+}
+
+void CUIModule_ContentImage::clearMaxWidth()
+{
+	m_bHasMaxWidth = false;
+	m_dMaxWidth = 0.0;
+}
+
+void CUIModule_ContentImage::setMaxHeight(double dMaxHeight)
+{
+	m_bHasMaxHeight = (dMaxHeight > 0.0);
+	if (m_bHasMaxHeight)
+		m_dMaxHeight = dMaxHeight;
+	else
+		m_dMaxHeight = 0.0;
+
+}
+
+void CUIModule_ContentImage::clearMaxHeight()
+{
+	m_bHasMaxHeight = false;
+	m_dMaxHeight = 0.0;
+}
 

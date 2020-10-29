@@ -60,7 +60,7 @@ namespace AMC {
 
 		std::string getUUID (const std::string & sKeyName, uint32_t nErrorCode);
 		std::string getNameString(const std::string& sKeyName, uint32_t nErrorCode);
-		uint64_t getSize(const std::string& sKeyName, const uint64_t nMinSize, const uint64_t nMaxSize, uint32_t nErrorCode);
+		uint64_t getUint64 (const std::string& sKeyName, const uint64_t nMinValue, const uint64_t nMaxValue, uint32_t nErrorCode);
 		std::string getSHA256(const std::string& sKeyName, uint32_t nErrorCode);
 	};
 

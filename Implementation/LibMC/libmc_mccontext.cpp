@@ -147,11 +147,16 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
 
     // Load user interface
+    auto uiLibraryAttrib = userInterfaceNode.attribute("library");
+    if (uiLibraryAttrib.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEPLUGIN);
+    auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string ());
+
     auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
     m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath  + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
     auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native> (sCoreResourcePath);
     m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
-    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, m_pSystemState->getBuildJobHandlerInstance ());
+    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance ());
 
     m_pStateJournal->startRecording();
 
@@ -441,7 +446,7 @@ void CMCContext::loadDriverParameterGroup(const pugi::xml_node& xmlNode, AMC::PP
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGDRIVERNAME);
 
     auto driverGroup = m_pSystemState->driverHandler()->getDriverParameterGroup(driverNameAttrib.as_string ());
-    driverGroup->copyToGroup(pGroup.get());
+    pGroup->addDerivativesFromGroup(driverGroup);
 
 }
 
