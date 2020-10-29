@@ -37,6 +37,9 @@ Abstract: This is a stub class definition of CDriver_RaspiCamera
 #include "libmcdriver_camera_pngimage.hpp"
 
 // Include custom headers here.
+#ifndef _WIN32
+#include "RaspiStill.hpp"
+#endif
 
 
 using namespace LibMCDriver_Camera::Impl;
@@ -64,31 +67,30 @@ IRaspiCameraDeviceIterator* CDriver_RaspiCamera::QueryDevices()
 
 void CDriver_RaspiCamera::Initialize(const std::string & sDeviceString, const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight, const LibMCDriver_Camera::eImagePixelFormat ePixelformat)
 {
-    m_pCamera = std::make_unique<RaspiStill>().release();
+#ifndef _WIN32
+    m_pCamera.reset();
+    m_pCamera = new RaspiStill ();
     m_pCamera->SetWidth(nWidth);
     m_pCamera->SetHeight(nHeight);
     m_pCamera->SetEncoding("png");
     m_pCamera->Initialize();
+#endif // _WIN32
 
 }
 
 IPNGImage* CDriver_RaspiCamera::CapturePNGImage()
 {
+#ifndef _WIN32
     auto pImage = std::make_unique<CPNGImage>(m_pCamera->GetWidth(), m_pCamera->GetHeight(), eImagePixelFormat::RGB32);
 
     std::vector <uint8_t>& pData = pImage->getBinaryData();
 
     m_pCamera->Capture(pData);
 
-    // pData.push_back('t');
-    // pData.push_back('e');
-    // pData.push_back('s');
-    // pData.push_back('t');
-    // pData.push_back('1');
-    // pData.push_back('2');
-    // pData.push_back('3');
-
     return pImage.release();
+#else
+    throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+#endif // _WIN32
 }
 
 void CDriver_RaspiCamera::QueryParameters()
