@@ -94,71 +94,79 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 void CMCContext::ParseConfiguration(const std::string & sXMLString)
 {
 
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_string (sXMLString.c_str ());
-    if (!result)
-        throw ELibMCInterfaceException (LIBMC_ERROR_COULDNOTPARSECONFIGURATION);
+    try {
 
-     
-    auto machinedefinitionNode = doc.child("machinedefinition");
-    if (machinedefinitionNode.empty ())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMACHINEDEFINITION);
-
-    auto xmlnsAttrib = machinedefinitionNode.attribute("xmlns");
-    if (xmlnsAttrib.empty ())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGXMLSCHEMA);
-
-    std::string xmlns(xmlnsAttrib.as_string ());
-    if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLSCHEMA);
-
-    auto servicesNode = machinedefinitionNode.child("services");
-    if (servicesNode.empty ())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGSERVICESNODE);
-
-    auto threadCountAttrib = servicesNode.attribute("threadcount");
-    if (threadCountAttrib.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTHREADCOUNT);
-    auto nMaxThreadCount = threadCountAttrib.as_uint();
-    if ((nMaxThreadCount < SERVICETHREADCOUNT_MIN) || (nMaxThreadCount > SERVICETHREADCOUNT_MAX))
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTHREADCOUNT);
-    m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t) nMaxThreadCount);
+        pugi::xml_document doc;
+        pugi::xml_parse_result result = doc.load_string(sXMLString.c_str());
+        if (!result)
+            throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSECONFIGURATION);
 
 
+        auto machinedefinitionNode = doc.child("machinedefinition");
+        if (machinedefinitionNode.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMACHINEDEFINITION);
 
-    m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    auto driversNodes = machinedefinitionNode.children("driver");
-    for (pugi::xml_node driversNode : driversNodes)
-    {
-        addDriver(driversNode);        
+        auto xmlnsAttrib = machinedefinitionNode.attribute("xmlns");
+        if (xmlnsAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGXMLSCHEMA);
+
+        std::string xmlns(xmlnsAttrib.as_string());
+        if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLSCHEMA);
+
+        auto servicesNode = machinedefinitionNode.child("services");
+        if (servicesNode.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGSERVICESNODE);
+
+        auto threadCountAttrib = servicesNode.attribute("threadcount");
+        if (threadCountAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTHREADCOUNT);
+        auto nMaxThreadCount = threadCountAttrib.as_uint();
+        if ((nMaxThreadCount < SERVICETHREADCOUNT_MIN) || (nMaxThreadCount > SERVICETHREADCOUNT_MAX))
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTHREADCOUNT);
+        m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t)nMaxThreadCount);
+
+
+
+        m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        auto driversNodes = machinedefinitionNode.children("driver");
+        for (pugi::xml_node driversNode : driversNodes)
+        {
+            addDriver(driversNode);
+        }
+
+
+        m_pSystemState->logger()->logMessage("Initializing state machines...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        auto statemachinesNodes = machinedefinitionNode.children("statemachine");
+        for (pugi::xml_node instanceNode : statemachinesNodes)
+        {
+            addMachineInstance(instanceNode);
+        }
+
+        // Load User Interface
+        auto userInterfaceNode = machinedefinitionNode.child("userinterface");
+        if (userInterfaceNode.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
+
+        // Load user interface
+        auto uiLibraryAttrib = userInterfaceNode.attribute("library");
+        if (uiLibraryAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEPLUGIN);
+        auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string());
+
+        auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
+        m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native>(sCoreResourcePath);
+        m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
+        m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
+
+        m_pStateJournal->startRecording();
+
     }
-
-
-    m_pSystemState->logger()->logMessage("Initializing state machines...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    auto statemachinesNodes = machinedefinitionNode.children("statemachine");
-    for (pugi::xml_node instanceNode : statemachinesNodes)
-    {
-        addMachineInstance(instanceNode);
+    catch (std::exception& E) {
+        m_pSystemState->logger()->logMessage(std::string ("initialization error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::CriticalError);
+        throw E;
     }
-
-    // Load User Interface
-    auto userInterfaceNode = machinedefinitionNode.child("userinterface");
-    if (userInterfaceNode.empty())
-        throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
-
-    // Load user interface
-    auto uiLibraryAttrib = userInterfaceNode.attribute("library");
-    if (uiLibraryAttrib.empty ())
-        throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEPLUGIN);
-    auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string ());
-
-    auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
-    m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath  + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native> (sCoreResourcePath);
-    m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
-    m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance ());
-
-    m_pStateJournal->startRecording();
 
 }
 
