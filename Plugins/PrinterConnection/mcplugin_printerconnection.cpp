@@ -136,54 +136,11 @@ private:
 
 public:
 
-	//double getExtrudeValue() const
-	//{
-	//	return m_dExtrudeValue;
-	//}
-
-	//void setExtrudeValue(double dExtrudeValue)
-	//{
-	//	m_dExtrudeValue = dExtrudeValue;
-	//}
-
 	PDriver_Marlin acquireDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		return m_DriverCast_Marlin.acquireDriver(pStateEnvironment, "marlin");
 	}
 
-
-
-	void updatePositionStateFromDriver(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-
-		if (pDriver.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
-		double dTargetX;
-		double dTargetY;
-		double dTargetZ;
-		double dCurrentX;
-		double dCurrentY;
-		double dCurrentZ;
-		double dCurrentBedTemp;
-
-		pDriver->UpdatePositionState();
-		pDriver->GetCurrentPosition(dCurrentX, dCurrentY, dCurrentZ);
-		pDriver->GetTargetPosition(dTargetX, dTargetY, dTargetZ);
-
-		pStateEnvironment->SetDoubleParameter("printerstate", "targetx", dTargetX);
-		pStateEnvironment->SetDoubleParameter("printerstate", "targety", dTargetY);
-		pStateEnvironment->SetDoubleParameter("printerstate", "targetz", dTargetZ);
-		pStateEnvironment->SetDoubleParameter("printerstate", "currentx", dCurrentX);
-		pStateEnvironment->SetDoubleParameter("printerstate", "currenty", dCurrentY);
-		pStateEnvironment->SetDoubleParameter("printerstate", "currentz", dCurrentZ);
-		pStateEnvironment->SetBoolParameter("printerstate", "ishomed", pDriver->IsHomed());
-		pStateEnvironment->SetBoolParameter("printerstate", "ismoving", pDriver->IsMoving());
-		pStateEnvironment->SetBoolParameter("printerstate", "isconnected", pDriver->IsConnected());
-		pStateEnvironment->SetBoolParameter("printerstate", "bufferavailable", pDriver->CanExecuteMovement());
-	}
 
 	void handleSignals(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment, bool bDoUpdatePIDValues, bool bDoUpdateTemperatureValues, bool bDoReportTemperatureValues, bool bDoUpdateFanValue)
 	{
@@ -339,36 +296,7 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		auto sCOMPort = pStateEnvironment->GetStringParameter ("comdata", "port");
-		auto nBaudRate = pStateEnvironment->GetIntegerParameter("comdata", "baudrate");
-		auto nConnectTimeout = pStateEnvironment->GetIntegerParameter("comdata", "connecttimeout");
-		auto dTimerInterval = pStateEnvironment->GetDoubleParameter("printerstate", "statusupdateinterval");
-
-		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
-		pDriver->Connect(sCOMPort, (uint32_t) nBaudRate, dTimerInterval, nConnectTimeout);
-
-		LibMCEnv::PSignalHandler pSignalHandler;
-		// wait until calling state machine asks for "isConnected" => report connect state, so calling state machine can proceed with next state
-		if (pStateEnvironment->WaitForSignal("signal_isconnected", 0, pSignalHandler)) {
-
-			if (pDriver->IsConnected()) {
-				pSignalHandler->SetBoolResult("success", true);
-				pSignalHandler->SignalHandled();
-
-				pStateEnvironment->SetNextState("idle");
-			}
-			else {
-				pSignalHandler->SetBoolResult("success", false);
-				pSignalHandler->SignalHandled();
-
-				pStateEnvironment->LogWarning("Printer not connected.");
-				pStateEnvironment->SetNextState("fatalerror");
-			}
-		}
-		else {
-			pStateEnvironment->LogWarning("Printer connect timeout.");
-			pStateEnvironment->SetNextState("fatalerror");
-		}
+		pStateEnvironment->SetNextState("idle");
 	}
 
 };
@@ -400,8 +328,35 @@ public:
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 
-		if (pDriver->IsConnected()) {
-			m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+		if (!pDriver->IsConnected()) {
+			LibMCEnv::PSignalHandler pSignalHandler;
+			// wait until calling state machine sends "Connect" => connect to printer
+			if (pStateEnvironment->WaitForSignal("signal_connect", 0, pSignalHandler)) {
+
+				auto sCOMPort = pStateEnvironment->GetStringParameter("comdata", "port");
+				auto nBaudRate = pStateEnvironment->GetIntegerParameter("comdata", "baudrate");
+				auto nConnectTimeout = pStateEnvironment->GetIntegerParameter("comdata", "connecttimeout");
+				auto dTimerInterval = pStateEnvironment->GetDoubleParameter("printerstate", "statusupdateinterval");
+
+				pDriver->Connect(sCOMPort, (uint32_t)nBaudRate, dTimerInterval, nConnectTimeout);
+
+				if (pDriver->IsConnected()) {
+					pSignalHandler->SetBoolResult("success", true);
+					pSignalHandler->SignalHandled();
+					pStateEnvironment->SetNextState("idle");
+				}
+				else {
+					pSignalHandler->SetBoolResult("success", false);
+					pSignalHandler->SignalHandled();
+					pStateEnvironment->SetNextState("fatalerror");
+				}
+			}
+			else {
+				pStateEnvironment->SetNextState("idle");
+			}
+		}
+		else {
+			pDriver->QueryParameters();
 			m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 			
 			if (pDriver->IsHomed() && pDriver->CanExecuteMovement()) {
@@ -422,9 +377,6 @@ public:
 			else {
 				pStateEnvironment->SetNextState("idle");
 			}
-		}
-		else {
-			pStateEnvironment->SetNextState("idle");
 		}
 	}
 
@@ -486,7 +438,7 @@ private:
 
 			pStateEnvironment->Sleep((uint32_t) dStatusUpdateInterval);
 			// call updatePositionStateFromDriver to update current planner buffer state (needed by CanExecuteMovement)
-			m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+			pDriver->QueryParameters();
 			m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 			if (timeElapsed(nLayerTimeout, tStart)) {
 				bSucces = false;
@@ -502,7 +454,7 @@ private:
 		bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 		if (bSucces) {
 			pDriver->MoveFastToZ(dZ, dSpeedFastMmPerSecond);
-			m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+			pDriver->QueryParameters();
 			m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, false, false, false);
 		}
 		return bSucces;
@@ -590,7 +542,7 @@ public:
 							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
 								pDriver->MoveFastToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
-								m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+								pDriver->QueryParameters();
 								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 
 								// move to second hatch coord with extrusion (second of a pair of coord)
@@ -601,7 +553,7 @@ public:
 										pow(PointData[i + 1].m_Coordinates[1] - PointData[i].m_Coordinates[1], 2)) * dUnit;
 									dE = dDistance * dExtrusionFactor;
 									pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + (int)1].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
-									m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+									pDriver->QueryParameters();
 									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 								}
 								else {
@@ -628,7 +580,7 @@ public:
 					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 					if (bSucces) {
 						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
-						m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+						pDriver->QueryParameters();
 						m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 
 						for (uint32_t i = 1; i < nPointCount; i++) {
@@ -640,7 +592,7 @@ public:
 									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
 								dE = dDistance * dExtrusionFactor;
 								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
-								m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+								pDriver->QueryParameters();
 								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 							}
 							else {
@@ -658,7 +610,7 @@ public:
 								pow(PointData[0].m_Coordinates[1] - PointData[nPointCount - 1].m_Coordinates[1], 2)) * dUnit;
 							dE = dDistance * dExtrusionFactor;
 							pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
-							m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+							pDriver->QueryParameters();
 							m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 						}
 						else {
@@ -675,7 +627,7 @@ public:
 					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 					if (bSucces) {
 						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
-						m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+						pDriver->QueryParameters();
 						m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 
 
@@ -688,7 +640,7 @@ public:
 									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
 								dE = dDistance * dExtrusionFactor;
 								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
-								m_pPluginData->updatePositionStateFromDriver(pDriver, pStateEnvironment);
+								pDriver->QueryParameters();
 								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 
 							}

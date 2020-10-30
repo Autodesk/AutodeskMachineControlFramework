@@ -65,7 +65,7 @@ public:
 		pSignal->SetString("jobname", "testjob");
 		pSignal->Trigger();
 
-		if (!pSignal->WaitForHandling(200))
+		if (!pSignal->WaitForHandling(2000))
 			throw std::runtime_error("could not start job");
 		
 	}

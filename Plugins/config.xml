@@ -16,7 +16,6 @@
   		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
   		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
   		<parameter name="layertimeoutgracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
-				
   	  </parametergroup>
 
   	  <parametergroup name="temperaturecontrol" description="Temperature Control">
@@ -29,7 +28,12 @@
   		<parameter name="targetbedtemperature" description="Target Bed Temperature" default="25.0" type="double" />
   	  </parametergroup>
 
-	  
+  	  <parametergroup name="comdata" description="COM Configuration">		
+  		<parameter name="port" description="COM Port" default="COM4" type="string" />
+  		<parameter name="baudrate" description="Baud rate" default="115200" type="int" />
+		  <parameter name="connecttimeout" type="int" default="2000" description="Timeout [ms] for connecting printer" />
+  	  </parametergroup>
+	  	    	     	    
   	  <signaldefinition name="signal_startjob">
   		<parameter name="jobuuid" type="string" />
    		<parameter name="jobname" type="string" />
@@ -87,10 +91,6 @@
   
     <statemachine name="printerconnection" description="Printer Connection System" initstate="init" failedstate="fatalerror" library="plugin_printerconnection">
   	  
-  	  <signaldefinition name="signal_isconnected">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
-
   	  <signaldefinition name="signal_doextrudelayer">
   		<parameter name="jobuuid" type="string" />
    		<parameter name="layerindex" type="int" />
@@ -114,6 +114,10 @@
 	  </signaldefinition>	  
 
 	  <signaldefinition name="signal_disconnect">
+		<result name="success" type="bool" />	
+	  </signaldefinition>	  
+
+	  <signaldefinition name="signal_connect">
 		<result name="success" type="bool" />	
 	  </signaldefinition>	  
 
@@ -147,15 +151,14 @@
   		<parameter name="retractextrude" description="Value for retract/restore extrusion after/before each layer" default="1" type="double" />
 	  </parametergroup>
 
+	  <parametergroup name="comdata" description="COM Configuration">
+  		<derivedparameter name="port" statemachine="main" group="comdata" parameter="port" />
+  		<derivedparameter name="baudrate" statemachine="main" group="comdata" parameter="baudrate" />
+  		<derivedparameter name="connecttimeout" statemachine="main" group="comdata" parameter="connecttimeout" />
+	  </parametergroup>
 
   	  <driverparametergroup name="printerstate" description="Printer State Data" driver="marlin" /> 
 
-  	  <parametergroup name="comdata" description="COM Configuration">		
-  		<parameter name="port" description="COM Port" default="COM4" type="string" />
-  		<parameter name="baudrate" description="Baud rate" default="115200" type="int" />
-		<parameter name="connecttimeout" type="int" default="2000" description="Timeout [ms] for connecting printer" />
-  	  </parametergroup>
-	  	    	     	    
   	  <state name="init" repeatdelay="100">
   			<outstate target="idle" />
   	  </state>
@@ -189,11 +192,6 @@
 		<parameter name="dd" description="dD Value" default="0" type="double" />
 	  </parametergroup>
 
-      <parametergroup name="printerstate" description="Printer State Data">
-  		<derivedparameter name="current_x" statemachine="printerconnection" group="printerstate" parameter="currentx" />
-	  </parametergroup>
-
-	  
 	  <signaldefinition name="signal_startcontrolling">
 		<result name="success" type="bool" />		
 	  </signaldefinition>
@@ -295,6 +293,7 @@
 				
 				<parameterlist loadingtext="Loading parameters">
 					<entry statemachine="main" group="jobinfo" />
+					<entry statemachine="printerconnection" group="printerstate" />
 				</parameterlist>	
 			</content>					
 			

@@ -75,7 +75,6 @@ namespace AMC {
 		m_dPidValueP(0),
 		m_dPidValueI(0),
 		m_dPidValueD(0)
-
 	{
 		// If we disabled homing, then we expect to be at the home position at creation
 		if (m_bDisableHoming)
@@ -747,7 +746,7 @@ namespace AMC {
 			m_dExtruderSumE += dE;
 			// E given => add E+value to command str
 			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
-			sCommand << " E" << m_dExtruderSumE;
+			//sCommand << " E" << m_dExtruderSumE;
 			//std::cout << "G1 E = " << m_dExtruderSumE << std::endl;
 		}
 		if (dSpeedInMMperSecond > 0) {
@@ -876,7 +875,7 @@ namespace AMC {
 			}
 		}
 		// TODO XXXXXXXXXXXXXXXX activate to do extrusion
-		sendCommand(sCommand.str());
+		//sendCommand(sCommand.str());
 		//std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
 	}
 

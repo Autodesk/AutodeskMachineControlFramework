@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCPlugin::Impl;
 
-#include "libmcdriver_camera_dynamic.hpp"
+// TODO uncomment to activate camera driver
+//#include "libmcdriver_camera_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
 #ifdef _MSC_VER
@@ -45,8 +46,9 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
-typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
+// TODO uncomment to activate camera driver
+//typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
+//typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
 
 /*************************************************************************************************************************
  Class definition of CMainData
@@ -54,14 +56,16 @@ typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDri
 class CMainData : public virtual CPluginData {
 protected:
 	// We need to globally store driver wrappers in the plugin
-	PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
+	// TODO uncomment to activate camera driver
+	//PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
 
 public:
 
-	PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
-	}
+	// TODO uncomment to activate camera driver
+	//PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	//{
+	//	return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
+	//}
 
 	bool deviceSetFanSpeed(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nFanId, double dFanSpeed)
 	{
@@ -240,8 +244,8 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 
-		auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
-		pCameraDriver->Initialize("", 600, 400, LibMCDriver_Camera::eImagePixelFormat::RGB32);
+		//auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
+		//pCameraDriver->Initialize("", 600, 400, LibMCDriver_Camera::eImagePixelFormat::RGB32);
 
 		pStateEnvironment->SetNextState("idle");
 	}
@@ -352,22 +356,24 @@ public:
 
 		// Find out layer count
 		auto nLayerCount = pBuildJob->GetLayerCount();
-		
-		auto pSignal = pStateEnvironment->PrepareSignal("pidcontrol_extruder", "signal_startcontrolling");
-		pSignal->Trigger();
-		pSignal->WaitForHandling(1000);
+
+		// TODO uncomment to activate PID control
+		//auto pSignal = pStateEnvironment->PrepareSignal("pidcontrol_extruder", "signal_startcontrolling");
+		//pSignal->Trigger();
+		//pSignal->WaitForHandling(1000);
 		
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
 		pStateEnvironment->SetBoolParameter("jobinfo", "autostart", false);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", true);
 
-		auto pSignalIsConnected = pStateEnvironment->PrepareSignal("printerconnection", "signal_isconnected");
-		pSignalIsConnected->Trigger();
+		// read timeout is for getting first response from printer (used in printer connection) => give main more time 
+		auto nConnectTimeout = pStateEnvironment->GetIntegerParameter("comdata", "connecttimeout");
+		auto pSignalConnected = pStateEnvironment->PrepareSignal("printerconnection", "signal_connect");
+		pSignalConnected->Trigger();
+		if (pSignalConnected->WaitForHandling((uint32_t)(nConnectTimeout * 10))) {
 
-		if (pSignalIsConnected->WaitForHandling((uint32_t)(5000))) {
-
-			if (pSignalIsConnected->GetBoolResult("success")) {
+			if (pSignalConnected->GetBoolResult("success")) {
 				pStateEnvironment->LogMessage("Printer connected. ");
 				// Printer connected
 				// 
@@ -580,15 +586,15 @@ public:
 		//}
 
 		// TODO uncomment to activate camera driver pStateEnvironment->LogMessage("Getting Camera Image");
-		auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
-		auto pPNGImage = pCameraDriver->CapturePNGImage();
+		//auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
+		//auto pPNGImage = pCameraDriver->CapturePNGImage();
 		//
-		std::vector<uint8_t> Buffer;
-		pPNGImage->GetRawData(Buffer);
+		//std::vector<uint8_t> Buffer;
+		//pPNGImage->GetRawData(Buffer);
 
 		auto pBuild = pStateEnvironment->GetBuildJob(sJobUUID);
 		//TODO uncomment to activate camera driver 
-		pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
+		//pBuild->AddBinaryData("image_layer_" + std::to_string(nCurrentLayer) + ".png", "image/png", Buffer);
 
 		if (nCurrentLayer < (nLayerCount - 1)) {
 
