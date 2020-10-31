@@ -1,13 +1,17 @@
 <template>
 
-<div v-if="(moduleitem.type=='buttongroup')">  	
+<div v-if="(moduleitem.type=='buttongroup')" class="text-right">  	
 	<v-spacer></v-spacer>
-	
+		
 	<template v-for="button in moduleitem.buttons">
 	
-		<v-btn color="primary" :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">
-			{{ button.caption }}
-		</v-btn>
+		<span :key="button.name" v-on:click.stop="uiModuleButtonClick (button);" class="pa-2">	
+			<v-btn color="primary">
+				{{ button.caption }}
+			</v-btn>			
+		</span>
+		
+		
 	
 	</template>
 	
