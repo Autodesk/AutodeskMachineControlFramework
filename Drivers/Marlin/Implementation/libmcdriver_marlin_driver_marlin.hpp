@@ -48,7 +48,7 @@ public:
 
 	CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-	void Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) override;
+	void Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) override;
 
 	void Disconnect() override;
 

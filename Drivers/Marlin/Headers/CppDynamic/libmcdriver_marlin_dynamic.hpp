@@ -361,7 +361,7 @@ public:
 	{
 	}
 	
-	inline void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout);
+	inline void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout);
 	inline void Disconnect();
 	inline void SetAbsolutePositioning(const bool bAbsolute);
 	inline void SetHeatedBedTargetTemperature(const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp);
@@ -1291,12 +1291,12 @@ public:
 	* CDriver_Marlin::Connect - Creates and initializes a new Marlin Connector.
 	* @param[in] sCOMPort - Device Port to connect to
 	* @param[in] nBaudrate - Baudrate to use
-	* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+	* @param[in] nStatusUpdateInterval - Timer interval [ms] for updating status
 	* @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 	*/
-	void CDriver_Marlin::Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
+	void CDriver_Marlin::Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_Connect(m_pHandle, sCOMPort.c_str(), nBaudrate, dStatusUpdateInterval, nConnectTimeout));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_Connect(m_pHandle, sCOMPort.c_str(), nBaudrate, nStatusUpdateInterval, nConnectTimeout));
 	}
 	
 	/**

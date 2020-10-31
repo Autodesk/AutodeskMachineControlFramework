@@ -18,7 +18,7 @@ namespace AMC {
 		uint32_t m_nConnectTimeout;
 		uint32_t m_nLineNumber;
 		bool m_bIsConnected;
-		double m_dStatusUpdateTimerInterval;
+		uint32_t m_nStatusUpdateTimerInterval;
 
 		bool m_bDebug;
 		bool m_bIsHomed;
@@ -80,7 +80,7 @@ namespace AMC {
 		CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming);
 		virtual ~CSerialController_Marlin();
 
-		void setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval);
+		void setStatusUpdateTimerInterval(const uint32_t dStatusUpdateTimerInterval);
 
 		void setConnectTimeout(const uint32_t nConnectTimeout);
 		uint32_t getConnectTimeout();

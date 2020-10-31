@@ -120,11 +120,11 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_QueryParametersPtr)
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] pCOMPort - Device Port to connect to
 * @param[in] nBaudrate - Baudrate to use
-* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+* @param[in] nStatusUpdateInterval - Timer interval [ms] for updating status
 * @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_ConnectPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_ConnectPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_uint32 nStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
 
 /**
 * Disconnects from the Marlin board.
