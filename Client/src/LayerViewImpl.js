@@ -179,6 +179,8 @@ class LayerViewImpl {
 		this.sliceGroup = null;
 	  }
 	  
+	  var height = this.twoinstance.height;
+	  
 	  var paths=[];
 	  var segmentCount = segmentsArray.length;
 	  var segmentIndex;
@@ -199,7 +201,7 @@ class LayerViewImpl {
 				var x = segment.points[pointIndex].x;
 				var y = segment.points[pointIndex].y;
 				
-				paths.push (this.twoinstance.makeLine (oldx, oldy, x, y));
+				paths.push (this.twoinstance.makeLine (oldx, height - oldy, x, height - y));
 				
 				oldx = x;
 				oldy = y;
@@ -219,7 +221,7 @@ class LayerViewImpl {
 				var x2 = segment.points[lineIndex * 2 + 1].x;
 				var y2 = segment.points[lineIndex * 2 + 1].y;
 				
-				paths.push (this.twoinstance.makeLine (x1, y1, x2, y2));
+				paths.push (this.twoinstance.makeLine (x1, height - y1, x2, height - y2));
 			}
 						
 							
