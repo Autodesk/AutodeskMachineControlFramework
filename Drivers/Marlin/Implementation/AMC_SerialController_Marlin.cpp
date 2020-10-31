@@ -48,7 +48,7 @@ namespace AMC {
 		m_bIsConnected(false),
 		m_bDoQueryFirmwareInfo(bDoQueryFirmwareInfo),
 		m_bDisableHoming(bDisableHoming),
-		m_dStatusUpdateTimerInterval(100),
+		m_nStatusUpdateTimerInterval(100),
 		m_sAckSymbol("ok"),
 		m_nLineNumber(1),
 		m_bDebug(bDebug),
@@ -82,9 +82,9 @@ namespace AMC {
 			m_bIsHomed = true;
 	}
 
-	void CSerialController_Marlin::setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval)
+	void CSerialController_Marlin::setStatusUpdateTimerInterval(const uint32_t nStatusUpdateTimerInterval)
 	{
-		m_dStatusUpdateTimerInterval = dStatusUpdateTimerInterval;
+		m_nStatusUpdateTimerInterval = nStatusUpdateTimerInterval;
 	}
 
 
