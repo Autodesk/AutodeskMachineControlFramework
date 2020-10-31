@@ -42,7 +42,7 @@ using namespace LibMCUI::Impl;
 
 
 /*************************************************************************************************************************
- Class declaration of CEventHandler
+ Class declaration of CEvent_StartBuild
 **************************************************************************************************************************/
 
 class CEvent_StartBuild : public virtual CEvent {
@@ -56,13 +56,11 @@ public:
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
-		if (pUIEnvironment.get() == nullptr)
-			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
 		auto sJobUUID = pUIEnvironment->GetEventContext();
-		auto pSignal = pUIEnvironment->PrepareSignal("demo", "signal_startjob");
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startjob");
 		pSignal->SetString("jobuuid", sJobUUID);
-		pSignal->SetString("jobname", "testjob");
+		pSignal->SetString("jobname", "Job");
 		pSignal->Trigger();
 
 	}
