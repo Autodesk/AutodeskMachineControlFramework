@@ -78,7 +78,7 @@ void CDriver_Marlin::QueryParameters()
 }
 
 
-void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
+void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	Disconnect ();
 
@@ -86,7 +86,7 @@ void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marl
 	pSerialController->setCOMPort(sCOMPort);
 	pSerialController->setBaudrate(nBaudrate);
 	pSerialController->setConnectTimeout(nConnectTimeout);
-	pSerialController->setStatusUpdateTimerInterval(dStatusUpdateInterval);
+	pSerialController->setStatusUpdateTimerInterval(nStatusUpdateInterval);
 	pSerialController->initializeController();
 	m_pSerialController = pSerialController;
 

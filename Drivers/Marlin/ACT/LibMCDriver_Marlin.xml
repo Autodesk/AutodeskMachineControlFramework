@@ -111,7 +111,7 @@ Custom implementation
 		<method name="Connect" description="Creates and initializes a new Marlin Connector.">
 			<param name="COMPort" type="string" pass="in" description="Device Port to connect to" />
 			<param name="Baudrate" type="uint32" pass="in" description="Baudrate to use" />
-			<param name="StatusUpdateInterval" type="double" pass="in" description="Timer interval [ms] for updating status" />
+			<param name="StatusUpdateInterval" type="uint32" pass="in" description="Timer interval [ms] for updating status" />
 			<param name="ConnectTimeout" type="uint32" pass="in" description="Timeout [ms] for connecting printer" />
 		</method>
 
