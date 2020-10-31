@@ -321,7 +321,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_M
 /*************************************************************************************************************************
  Class implementation for Driver_Marlin
 **************************************************************************************************************************/
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_uint32 nStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -333,7 +333,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Ma
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, dStatusUpdateInterval, nConnectTimeout);
+		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, nStatusUpdateInterval, nConnectTimeout);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
