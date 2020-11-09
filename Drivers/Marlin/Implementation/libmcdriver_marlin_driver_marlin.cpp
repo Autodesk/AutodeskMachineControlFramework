@@ -70,10 +70,23 @@ void CDriver_Marlin::QueryParameters()
 	
 	if (m_pSerialController.get() != nullptr) {
 		double dX, dY, dZ;
+		m_pSerialController->queryPositionState();
+
 		m_pSerialController->getCurrentPosition(dX, dY, dZ);
-		m_pDriverEnvironment->SetDoubleParameter("targetx", dX);
-		m_pDriverEnvironment->SetDoubleParameter("targety", dY);
-		m_pDriverEnvironment->SetDoubleParameter("targetz", dZ);
+		m_pDriverEnvironment->SetDoubleParameter("currentx", dX);
+		m_pDriverEnvironment->SetDoubleParameter("currenty", dY);
+		m_pDriverEnvironment->SetDoubleParameter("currentz", dZ);
+
+		double dTargetX, dTargetY, dTargetZ;
+		m_pSerialController->getTargetPosition(dTargetX, dTargetY, dTargetZ);
+		m_pDriverEnvironment->SetDoubleParameter("targetx", dTargetX);
+		m_pDriverEnvironment->SetDoubleParameter("targety", dTargetY);
+		m_pDriverEnvironment->SetDoubleParameter("targetz", dTargetZ);
+
+		m_pDriverEnvironment->SetBoolParameter("ishomed", m_pSerialController->isHomed());
+		m_pDriverEnvironment->SetBoolParameter("ismoving", m_pSerialController->isMoving());
+		m_pDriverEnvironment->SetBoolParameter("isconnected", m_pSerialController->isConnected());
+		m_pDriverEnvironment->SetBoolParameter("bufferavailable", m_pSerialController->canReceiveMovement());
 	}
 }
 
