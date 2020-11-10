@@ -182,18 +182,11 @@ public:
 			double dExtruderTemperature = -1;
 
 			while ((dExtruderTemperature < dExtruderTargetTemperature) || (dBedTemperature < dBedTargetTemperature)) {
-				if (pStateEnvironment->WaitForSignal("signal_gettemperature", 50, pSignalGetTemperature)) {
-					bool bBedGetValue = pSignalGetTemperature->GetDouble("bedgetvalue");
-					if (bBedGetValue) {
-						dBedTemperature = pSignalGetTemperature->GetDouble("bedtemperature");
-					}
 
-					int32_t nExtruderId = -1;
-					bool bExtruderGetValue = pSignalGetTemperature->GetDouble("extrudergetvalue");
-					if (bExtruderGetValue) {
-						nExtruderId = pSignalGetTemperature->GetDouble("extruderid");
-						dExtruderTemperature = pSignalGetTemperature->GetDouble("extrudertemperature");
-					}
+				if (pStateEnvironment->WaitForSignal("signal_gettemperature", 50, pSignalGetTemperature)) {
+					dBedTemperature = pSignalGetTemperature->GetDouble("bedtemperature");
+					dExtruderTemperature = pSignalGetTemperature->GetDouble("extrudertemperature");
+
 					pSignalGetTemperature->SetBoolResult("success", true);
 					pSignalGetTemperature->SignalHandled();
 
@@ -314,6 +307,24 @@ public:
 
 			}
 			else {
+				LibMCEnv::PSignalHandler pSignalHandler;
+				if (pStateEnvironment->WaitForSignal("signal_resetfatalerror", 0, pSignalHandler)) {
+					// in state idle nothing to do if signal resetfatalerror received
+					pSignalHandler->SetBoolResult("success", true);
+					pSignalHandler->SignalHandled();
+				}
+				if (pStateEnvironment->WaitForSignal("signal_cleartemperatureandfan", 0, pSignalHandler)) {
+					// reset bed/extruder temperature and fan speed
+					auto nFanId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "fanid");
+					m_pPluginData->deviceSetFanSpeed(pStateEnvironment, nFanId, 0);
+					// switch off heating
+					auto nExtruderId = pStateEnvironment->GetIntegerParameter("temperaturecontrol", "extruderid");
+					m_pPluginData->deviceSetTemperature(pStateEnvironment, nExtruderId, 0.0, 0.0, false);
+
+					pSignalHandler->SetBoolResult("success", true);
+					pSignalHandler->SignalHandled();
+				}
+
 				pStateEnvironment->SetNextState("idle");
 			}
 		}
@@ -368,10 +379,10 @@ public:
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", true);
 
 		// read timeout is for getting first response from printer (used in printer connection) => give main more time 
-		auto nConnectTimeout = pStateEnvironment->GetIntegerParameter("comdata", "connecttimeout");
+		auto nConnectAndInitialiseTimeout = pStateEnvironment->GetIntegerParameter("timeoutdata", "printerconnectandinitialise");
 		auto pSignalConnected = pStateEnvironment->PrepareSignal("printerconnection", "signal_connect");
 		pSignalConnected->Trigger();
-		if (pSignalConnected->WaitForHandling((uint32_t)(nConnectTimeout * 10))) {
+		if (pSignalConnected->WaitForHandling((uint32_t)nConnectAndInitialiseTimeout)) {
 
 			if (pSignalConnected->GetBoolResult("success")) {
 				pStateEnvironment->LogMessage("Printer connected. ");
@@ -510,7 +521,7 @@ public:
 
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
-		auto nLayerTimeoutGraceTime = pStateEnvironment->GetIntegerParameter("jobinfo", "layertimeoutgracetime");
+		auto nLayerTimeoutGraceTime = pStateEnvironment->GetIntegerParameter("timeoutdata", "layergracetime");
 
 		if (nLayerTimeoutGraceTime < 0)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
@@ -609,7 +620,6 @@ public:
 			pStateEnvironment->LogMessage("Finishing process...");
 			pStateEnvironment->SetNextState("finishprocess");
 		}
-
 	}
 
 };
@@ -640,10 +650,28 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		// Unload all toolpathes that might be in memory
-		pStateEnvironment->UnloadAllToolpathes();
+		LibMCEnv::PSignalHandler pHandlerInstance;
+		if (pStateEnvironment->WaitForSignal("signal_resetfatalerror", 0, pHandlerInstance)) {
 
-		pStateEnvironment->SetNextState("fatalerror");
+			pStateEnvironment->LogMessage("Reset state machine main after fatal error");
+			try {
+				pStateEnvironment->SetNextState("init");
+				pHandlerInstance->SetBoolResult("success", true);
+			}
+			catch (std::exception& E) {
+				pStateEnvironment->LogWarning(std::string("Could not reset: ") + E.what());
+				pHandlerInstance->SetBoolResult("success", false);
+				pStateEnvironment->SetNextState("fatalerror");
+			}
+			pHandlerInstance->SignalHandled();
+
+		}
+		else {
+			// Unload all toolpathes that might be in memory
+			pStateEnvironment->UnloadAllToolpathes();
+
+			pStateEnvironment->SetNextState("fatalerror");
+		}
 	}
 
 };

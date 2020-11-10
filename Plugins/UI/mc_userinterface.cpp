@@ -66,17 +66,198 @@ public:
 		pSignal->Trigger();
 
 		if (!pSignal->WaitForHandling(2000))
-			throw std::runtime_error("could not start job");
-		
+			pUIEnvironment->LogWarning("Could not start job");
+
 	}
 
 };
+
+
+class CEvent_Connect : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "connect";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_connect");
+		pSignal->Trigger();
+
+		if (!pSignal->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not connect printer");
+
+	}
+
+};
+
+
+class CEvent_Disconnect : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "disconnect";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_disconnect");
+		pSignal->Trigger();
+
+		if (!pSignal->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not disconnect printer");
+
+	}
+
+};
+
+
+class CEvent_Home : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "home";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_dohoming");
+		pSignal->Trigger();
+
+		if (!pSignal->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not home printer");
+
+	}
+
+};
+
+
+class CEvent_EmergencyStop : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "emergencystop";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_emergencystop");
+		pSignal->Trigger();
+
+		if (!pSignal->WaitForHandling(1000))
+			pUIEnvironment->LogWarning("Could not perform emergency stop");
+
+	}
+
+};
+
+class CEvent_ResetFatalError : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "resetfatalerror";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+
+		auto pSignalMain = pUIEnvironment->PrepareSignal("main", "signal_resetfatalerror");
+		pSignalMain->Trigger();
+
+		if (!pSignalMain->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not reset state machine main after fatal error");
+
+		auto pSignalPrinterconnection = pUIEnvironment->PrepareSignal("printerconnection", "signal_resetfatalerror");
+		pSignalPrinterconnection->Trigger();
+
+		if (!pSignalPrinterconnection->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Culd not reset state machine printerconnection after fatal error");
+
+	}
+
+};
+
+class CEvent_ClearTemperatureAndFan : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "cleartemperatureandfan";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+		
+		auto pSignalTemp = pUIEnvironment->PrepareSignal("main", "signal_cleartemperatureandfan");
+		pSignalTemp->Trigger();
+
+		if (pSignalTemp->WaitForHandling(10000)) {
+			if (pSignalTemp->GetBoolResult("success")) {
+				pUIEnvironment->LogMessage("Clear temperature and fan speed successful. ");
+			}
+			else {
+				pUIEnvironment->LogWarning("Clear temperature and fan speed failure. ");
+			}
+		}
+		else {
+			pUIEnvironment->LogWarning("Clear temperature and fan speed timeout!");
+		}
+	}
+
+};
+
 
 
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
 {
 	IEvent* pEventInstance = nullptr;
 	if (createEventInstanceByName<CEvent_StartBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_Connect>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_Disconnect>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_Home>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_EmergencyStop>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_ResetFatalError>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_ClearTemperatureAndFan>(sEventName, pEventInstance))
 		return pEventInstance;
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
