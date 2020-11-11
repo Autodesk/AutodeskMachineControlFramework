@@ -79,6 +79,7 @@ namespace AMCData {
 		int32_t getColumnInt (uint32_t nIdx) override;
 		int64_t getColumnInt64 (uint32_t nIdx) override;
 		eSQLColumnType getColumnType (uint32_t nIdx) override;
+		std::string getColumnUUID(uint32_t nIdx) override;
 
 		static void checkSQLiteError(int nError);
 		

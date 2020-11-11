@@ -308,8 +308,10 @@ public:
 	* IDriver_Marlin::Connect - Creates and initializes a new Marlin Connector.
 	* @param[in] sCOMPort - Device Port to connect to
 	* @param[in] nBaudrate - Baudrate to use
+	* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+	* @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 	*/
-	virtual void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate) = 0;
+	virtual void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) = 0;
 
 	/**
 	* IDriver_Marlin::Disconnect - Disconnects from the Marlin board.
@@ -321,6 +323,36 @@ public:
 	* @param[in] bAbsolute - If true, sets positioning to absolute, if false to relative
 	*/
 	virtual void SetAbsolutePositioning(const bool bAbsolute) = 0;
+
+	/**
+	* IDriver_Marlin::SetHeatedBedTargetTemperature - Sets heated bed target temperature.
+	* @param[in] dTemperatureInDegreeCelcius - Bed target temperature.
+	* @param[in] bWaitForTemp - If true, waits for the target bed temperature to be reached before proceeding
+	*/
+	virtual void SetHeatedBedTargetTemperature(const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp) = 0;
+
+	/**
+	* IDriver_Marlin::SetExtruderTargetTemperature - Sets target temperature of the given extruder.
+	* @param[in] nExtruderID - ID of extruder.
+	* @param[in] dTemperatureInDegreeCelcius - Extruder target temperature.
+	* @param[in] bWaitForTemp - If true, waits for the target extruder temperature to be reached before proceeding
+	*/
+	virtual void SetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp) = 0;
+
+	/**
+	* IDriver_Marlin::SetFanSpeed - Turns on one of the fans and set its speed.
+	* @param[in] nFanID - ID of fan.
+	* @param[in] nSpeed - Fan speed [0..255]. 0=0%...255=100%
+	*/
+	virtual void SetFanSpeed(const LibMCDriver_Marlin_uint32 nFanID, const LibMCDriver_Marlin_uint32 nSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::SetPidParameters - Sets PID parameters.
+	* @param[in] dP - New value for P parameter.
+	* @param[in] dI - New value for I parameter.
+	* @param[in] dD - New value for D parameter.
+	*/
+	virtual void SetPidParameters(const LibMCDriver_Marlin_double dP, const LibMCDriver_Marlin_double dI, const LibMCDriver_Marlin_double dD) = 0;
 
 	/**
 	* IDriver_Marlin::UpdateState - Polls a new state from the firmware.
@@ -344,12 +376,33 @@ public:
 	virtual void GetTargetPosition(LibMCDriver_Marlin_double & dX, LibMCDriver_Marlin_double & dY, LibMCDriver_Marlin_double & dZ) = 0;
 
 	/**
-	* IDriver_Marlin::GetExtruderTemperature - Returns the current temperature of an extruder.
-	* @param[in] nExtruderID - ID of Extruder
-	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
-	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
+	* IDriver_Marlin::GetExtruderTargetPosition - Returns the target extruder position.
+	* @param[out] dE - E Value in mm
 	*/
-	virtual void GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dCurrentTemperature, LibMCDriver_Marlin_double & dTargetTemperature) = 0;
+	virtual void GetExtruderTargetPosition(LibMCDriver_Marlin_double & dE) = 0;
+
+	/**
+	* IDriver_Marlin::GetHeatedBedTemperature - Returns the current and the target bed temperature.
+	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
+	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
+	*/
+	virtual void GetHeatedBedTemperature(LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature) = 0;
+
+	/**
+	* IDriver_Marlin::GetExtruderTemperature - Returns the current and the target temperature of an extruder.
+	* @param[in] nExtruderID - ID of Extruder
+	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
+	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
+	*/
+	virtual void GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature) = 0;
+
+	/**
+	* IDriver_Marlin::GetPidParameters - Returns the current PID values.
+	* @param[out] dP - Current P value.
+	* @param[out] dI - Current I value.
+	* @param[out] dD - Current D value.
+	*/
+	virtual void GetPidParameters(LibMCDriver_Marlin_double & dP, LibMCDriver_Marlin_double & dI, LibMCDriver_Marlin_double & dD) = 0;
 
 	/**
 	* IDriver_Marlin::CanExecuteMovement - Returns if the movement buffer can receive another movement command..
@@ -364,22 +417,47 @@ public:
 	virtual bool IsMoving() = 0;
 
 	/**
-	* IDriver_Marlin::MoveTo - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
-	* @param[in] dX - X Value in mm
-	* @param[in] dY - Y Value in mm
-	* @param[in] dZ - Z Value in mm
-	* @param[in] dSpeed - Movement speed in mm/s
+	* IDriver_Marlin::IsHomed - Returns if the printer is homed
+	* @return True if printer is homed.
 	*/
-	virtual void MoveTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed) = 0;
+	virtual bool IsHomed() = 0;
 
 	/**
-	* IDriver_Marlin::MoveFastTo - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* IDriver_Marlin::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
+	* @param[in] dE - E Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	virtual void MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::MoveFastToXY - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dX - X Value in mm
+	* @param[in] dY - Y Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	virtual void MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::MoveToZ - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dZ - Z Value in mm
+	* @param[in] dE - E Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	virtual void MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::MoveFastToZ - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dZ - Z Value in mm
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	virtual void MoveFastTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed) = 0;
+	virtual void MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::StartHoming - Start Homing of printer.
+	*/
+	virtual void StartHoming() = 0;
 
 };
 

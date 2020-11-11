@@ -71,6 +71,8 @@ namespace AMC {
 
 		PToolpathLayerData readLayer(uint32_t nLayerIndex);
 
+		double getUnits();
+
 	};
 
 	

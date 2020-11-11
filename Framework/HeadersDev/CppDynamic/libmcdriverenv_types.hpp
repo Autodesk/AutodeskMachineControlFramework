@@ -145,6 +145,9 @@ inline const char * LIBMCDRIVERENV_GETERRORSTRING (LibMCDriverEnvResult nErrorCo
 **************************************************************************************************************************/
 
 typedef LibMCDriverEnvHandle LibMCDriverEnv_Base;
+typedef LibMCDriverEnvHandle LibMCDriverEnv_WorkingFileExecution;
+typedef LibMCDriverEnvHandle LibMCDriverEnv_WorkingFile;
+typedef LibMCDriverEnvHandle LibMCDriverEnv_WorkingDirectory;
 typedef LibMCDriverEnvHandle LibMCDriverEnv_DriverEnvironment;
 
 namespace LibMCDriverEnv {

@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcplugin_dynamic.hpp"
 #include "libmcenv_stateenvironment.hpp"
 
+#include "amc_parameterhandler.hpp"
+
 #define AMC_MINREPEATDELAY_MS 1 // 1 milliseconds minimum repeat delay
 #define AMC_MAXREPEATDELAY_MS 10000 // 10000 milliseconds maximum repeat delay
 #define AMC_REPEATDELAYCHUNK_MS 10 // 10 milliseconds sleep if waiting for repeat

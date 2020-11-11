@@ -57,6 +57,7 @@ namespace Impl {
 class IBase;
 class IToolpathLayer;
 class IToolpathAccessor;
+class IBuild;
 class ISignalTrigger;
 class ISignalHandler;
 class IStateEnvironment;
@@ -274,6 +275,20 @@ public:
 	virtual std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
+	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* @param[in] sValueName - Value Name to query for.
+	* @return String Value.
+	*/
+	virtual std::string GetSegmentProfileValue(const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
+	* @return Double Value
+	*/
+	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
+
+	/**
 	* IToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Part UUID
@@ -285,9 +300,21 @@ public:
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[out] pPointDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPointDataBuffer - Position2D buffer of The point data array
+	* @param[out] pPointDataBuffer - Position2D buffer of The point data array. Positions are absolute in units.
 	*/
 	virtual void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetZValue - Retrieves the layers Z Value in units.
+	* @return Z Value of the layer in units.
+	*/
+	virtual LibMCEnv_int32 GetZValue() = 0;
+
+	/**
+	* IToolpathLayer::GetUnits - Retrieves the toolpath units in mm.
+	* @return Toolpath units.
+	*/
+	virtual LibMCEnv_double GetUnits() = 0;
 
 };
 
@@ -301,10 +328,10 @@ typedef IBaseSharedPtr<IToolpathLayer> PIToolpathLayer;
 class IToolpathAccessor : public virtual IBase {
 public:
 	/**
-	* IToolpathAccessor::GetUUID - Returns Toolpath data UUID.
-	* @return Returns toolpath data uuid.
+	* IToolpathAccessor::GetStorageUUID - Returns Toolpath storage UUID.
+	* @return Returns toolpath storage uuid.
 	*/
-	virtual std::string GetUUID() = 0;
+	virtual std::string GetStorageUUID() = 0;
 
 	/**
 	* IToolpathAccessor::GetLayerCount - Returns layer count.
@@ -319,9 +346,88 @@ public:
 	*/
 	virtual IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) = 0;
 
+	/**
+	* IToolpathAccessor::GetUnits - Retrieves the toolpath units in mm.
+	* @return Toolpath units.
+	*/
+	virtual LibMCEnv_double GetUnits() = 0;
+
 };
 
 typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
+
+
+/*************************************************************************************************************************
+ Class interface for Build 
+**************************************************************************************************************************/
+
+class IBuild : public virtual IBase {
+public:
+	/**
+	* IBuild::GetName - Returns name of the build.
+	* @return Name of the build.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IBuild::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	virtual std::string GetBuildUUID() = 0;
+
+	/**
+	* IBuild::GetStorageUUID - Returns storage uuid of the build.
+	* @return Storage UUID of the build.
+	*/
+	virtual std::string GetStorageUUID() = 0;
+
+	/**
+	* IBuild::GetStorageSHA256 - Returns SHA256 of the build stream.
+	* @return SHA256 of the build stream.
+	*/
+	virtual std::string GetStorageSHA256() = 0;
+
+	/**
+	* IBuild::GetLayerCount - Returns cached layer count of the toolpath.
+	* @return Returns layer count.
+	*/
+	virtual LibMCEnv_uint32 GetLayerCount() = 0;
+
+	/**
+	* IBuild::LoadToolpath - loads the a toolpath into memory
+	*/
+	virtual void LoadToolpath() = 0;
+
+	/**
+	* IBuild::UnloadToolpath - unloads the a toolpath from memory, if it has been loaded before.
+	*/
+	virtual void UnloadToolpath() = 0;
+
+	/**
+	* IBuild::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
+	* @return returns if toolpath is loaded.
+	*/
+	virtual bool ToolpathIsLoaded() = 0;
+
+	/**
+	* IBuild::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded with LoadToolpath before.
+	* @return Toolpath instance.
+	*/
+	virtual IToolpathAccessor * CreateToolpathAccessor() = 0;
+
+	/**
+	* IBuild::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sName - Name of the attache data block.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] nContentBufferSize - Number of elements in buffer
+	* @param[in] pContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuild> PIBuild;
 
 
 /*************************************************************************************************************************
@@ -368,6 +474,13 @@ public:
 	virtual void SetString(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
+	* ISignalTrigger::SetUUID - sets a uuid value
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void SetUUID(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
 	* ISignalTrigger::SetDouble - sets a double
 	* @param[in] sName - Name
 	* @param[in] dValue - Value
@@ -394,6 +507,13 @@ public:
 	* @return Value
 	*/
 	virtual std::string GetStringResult(const std::string & sName) = 0;
+
+	/**
+	* ISignalTrigger::GetUUIDResult - returns a uuid value of the result
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string GetUUIDResult(const std::string & sName) = 0;
 
 	/**
 	* ISignalTrigger::GetDoubleResult - returns a string value of the result
@@ -458,6 +578,13 @@ public:
 	virtual std::string GetString(const std::string & sName) = 0;
 
 	/**
+	* ISignalHandler::GetUUID - gets a uuid value
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string GetUUID(const std::string & sName) = 0;
+
+	/**
 	* ISignalHandler::GetDouble - gets a double
 	* @param[in] sName - Name
 	* @return Value
@@ -484,6 +611,13 @@ public:
 	* @param[in] sValue - Value
 	*/
 	virtual void SetStringResult(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* ISignalHandler::SetUUIDResult - returns a uuid value of the result
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void SetUUIDResult(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
 	* ISignalHandler::SetDoubleResult - returns a string value of the result
@@ -518,12 +652,12 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 class IStateEnvironment : public virtual IBase {
 public:
 	/**
-	* IStateEnvironment::CreateSignal - creates a signal object to trigger.
+	* IStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
 	* @return Signal trigger object.
 	*/
-	virtual ISignalTrigger * CreateSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
+	virtual ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
 
 	/**
 	* IStateEnvironment::WaitForSignal - waits for a signal.
@@ -550,35 +684,16 @@ public:
 	virtual void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle) = 0;
 
 	/**
-	* IStateEnvironment::LoadToolpath - Loads a toolpath from disk into memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
+	* IStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
 	*/
-	virtual void LoadToolpath(const std::string & sToolpathUUID) = 0;
-
-	/**
-	* IStateEnvironment::UnloadToolpath - unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	*/
-	virtual void UnloadToolpath(const std::string & sToolpathUUID) = 0;
+	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
 	* IStateEnvironment::UnloadAllToolpathes - unloads all toolpath in memory to clean up
 	*/
 	virtual void UnloadAllToolpathes() = 0;
-
-	/**
-	* IStateEnvironment::CreateToolpathAccessor - creates an accessor object for a toolpath, if loaded to memory before.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return UUID of the toolpath entity.
-	*/
-	virtual IToolpathAccessor * CreateToolpathAccessor(const std::string & sToolpathUUID) = 0;
-
-	/**
-	* IStateEnvironment::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return returns if toolpath is loaded.
-	*/
-	virtual bool ToolpathIsLoaded(const std::string & sToolpathUUID) = 0;
 
 	/**
 	* IStateEnvironment::SetNextState - sets the next state
@@ -624,6 +739,13 @@ public:
 	virtual void StoreString(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
+	* IStateEnvironment::StoreUUID - stores a uuid in the current state machine
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void StoreUUID(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
 	* IStateEnvironment::StoreInteger - stores a string in the current state machine
 	* @param[in] sName - Name
 	* @param[in] nValue - Value
@@ -657,6 +779,13 @@ public:
 	* @return Value
 	*/
 	virtual std::string RetrieveString(const std::string & sName) = 0;
+
+	/**
+	* IStateEnvironment::RetrieveUUID - retrieves a uuid from the current state machine. Fails if value has not been stored before.
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string RetrieveUUID(const std::string & sName) = 0;
 
 	/**
 	* IStateEnvironment::RetrieveInteger - retrieves a string from the current state machine. Fails if value has not been stored before.
@@ -701,6 +830,14 @@ public:
 	virtual void SetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
 
 	/**
+	* IStateEnvironment::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetUUIDParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
 	* IStateEnvironment::SetDoubleParameter - sets a double parameter
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
@@ -731,6 +868,14 @@ public:
 	* @return Value to set
 	*/
 	virtual std::string GetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IStateEnvironment::GetUUIDParameter - returns a uuid parameter
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual std::string GetUUIDParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
 	* IStateEnvironment::GetDoubleParameter - returns a double parameter

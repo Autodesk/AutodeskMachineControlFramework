@@ -24,6 +24,10 @@ THE SOFTWARE.
 
 #pragma once
 
+#ifdef _WIN32
+#define GUID_WINDOWS
+#endif
+
 #ifdef GUID_ANDROID
 #include <thread>
 #include <jni.h>

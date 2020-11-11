@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_utils.hpp"
 
 #include <string>
+#include <vector>
 
 namespace AMCCommon {
 
@@ -127,5 +128,31 @@ namespace AMCCommon {
         return nSize;
 	}
 
+
+	void CExportStream_Native::writeZeros(uint64_t bytes)
+	{
+
+		if (bytes > 0) {
+			uint32_t bufferSize = 1024 * 1024;
+			std::vector <uint64_t> Buffer;
+			Buffer.resize(bufferSize / sizeof(uint64_t));
+
+			for (auto iter = Buffer.begin(); iter != Buffer.end(); iter++)
+				*iter = 0;
+
+			while (bytes > 0) {
+				auto bytesToWrite = bytes;
+				if (bytes > bufferSize)
+					bytes = bufferSize;
+
+				writeBuffer(Buffer.data(), bytesToWrite);
+				bytes -= bytesToWrite;
+
+			}
+		}
+
+	}
+
+		
 }
 

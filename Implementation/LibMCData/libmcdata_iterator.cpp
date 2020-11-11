@@ -43,28 +43,38 @@ using namespace LibMCData::Impl;
  Class definition of CIterator 
 **************************************************************************************************************************/
 
+
+CIterator::CIterator()
+    : m_nCurrentIndex (-1)
+{
+    
+}
+
+
 bool CIterator::MoveNext()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (((size_t)m_nCurrentIndex + 1) < m_List.size()) {
+        m_nCurrentIndex++;
+        return true;
+    }
+    else
+        return false;
 }
 
 bool CIterator::MovePrevious()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    if (m_nCurrentIndex > 0) {
+        m_nCurrentIndex--;
+        return true;
+    }
+    else
+        return false;
+
 }
 
-IBase * CIterator::GetCurrent()
-{
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
-}
-
-IIterator * CIterator::Clone()
-{
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
-}
 
 LibMCData_uint64 CIterator::Count()
 {
-	throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOTIMPLEMENTED);
+    return m_List.size ();
 }
 

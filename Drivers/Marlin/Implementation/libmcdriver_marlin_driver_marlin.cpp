@@ -40,20 +40,21 @@ using namespace LibMCDriver_Marlin::Impl;
  Class definition of CDriver_Marlin 
 **************************************************************************************************************************/
 
-CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType)
-	: CDriver (sName, sType)
+CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sType, const bool doQueryFirmwareInfo, const bool bDisableHoming, const bool bDebug)
+	: CDriver (sName, sType), m_doQueryFirmwareInfo (doQueryFirmwareInfo), m_bDisableHoming (bDisableHoming), m_bDebug (bDebug)
 {
-
 }
 
 
-void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate)
+void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	Disconnect ();
 
-	auto pSerialController = std::make_shared<AMC::CSerialController_Marlin>(false);
+	auto pSerialController = std::make_shared<AMC::CSerialController_Marlin>(m_bDebug, m_doQueryFirmwareInfo, m_bDisableHoming);
 	pSerialController->setCOMPort(sCOMPort);
 	pSerialController->setBaudrate(nBaudrate);
+	pSerialController->setConnectTimeout(nConnectTimeout);
+	pSerialController->setStatusUpdateTimerInterval(dStatusUpdateInterval);
 	pSerialController->initializeController();
 	m_pSerialController = pSerialController;
 
@@ -80,7 +81,27 @@ void CDriver_Marlin::SetAbsolutePositioning(const bool bAbsolute)
 	}
 }
 
-void CDriver_Marlin::UpdateState() 
+void CDriver_Marlin::SetHeatedBedTargetTemperature(const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp)
+{
+	m_pSerialController->setHeatedBedTargetTemperature(dTemperatureInDegreeCelcius, bWaitForTemp);
+}
+
+void CDriver_Marlin::SetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp)
+{
+	m_pSerialController->setExtruderTargetTemperature(nExtruderID, dTemperatureInDegreeCelcius, bWaitForTemp);
+}
+
+void CDriver_Marlin::SetFanSpeed(const LibMCDriver_Marlin_uint32 nFanID, const LibMCDriver_Marlin_uint32 nSpeed)
+{
+	m_pSerialController->setFanSpeed(nFanID, nSpeed);
+}
+
+void CDriver_Marlin::SetPidParameters(const LibMCDriver_Marlin_double dP, const LibMCDriver_Marlin_double dI, const LibMCDriver_Marlin_double dD)
+{
+	m_pSerialController->setPidParameters(dP, dI, dD);
+}
+
+void CDriver_Marlin::UpdateState()
 {
 	if (m_pSerialController.get() == nullptr)
 		throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_NOTCONNECTED);
@@ -99,6 +120,26 @@ void CDriver_Marlin::GetTargetPosition(LibMCDriver_Marlin_double& dX, LibMCDrive
 	m_pSerialController->getTargetPosition(dX, dY, dZ);
 }
 
+void CDriver_Marlin::GetExtruderTargetPosition(LibMCDriver_Marlin_double& dE)
+{
+	m_pSerialController->getExtruderTargetPosition(dE);
+}
+
+void CDriver_Marlin::GetHeatedBedTemperature(LibMCDriver_Marlin_double& dTargetTemperature, LibMCDriver_Marlin_double& dCurrentTemperature)
+{
+	m_pSerialController->getHeatedBedTemperature(dTargetTemperature, dCurrentTemperature);
+}
+
+void CDriver_Marlin::GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double& dTargetTemperature, LibMCDriver_Marlin_double& dCurrentTemperature)
+{
+	m_pSerialController->getExtruderTemperature(nExtruderID, dTargetTemperature, dCurrentTemperature);
+}
+
+void CDriver_Marlin::GetPidParameters(LibMCDriver_Marlin_double& dP, LibMCDriver_Marlin_double& dI, LibMCDriver_Marlin_double& dD)
+{
+	m_pSerialController->getPidParameters(dP, dI, dD);
+}
+
 bool CDriver_Marlin::CanExecuteMovement()
 {
 	return m_pSerialController->canReceiveMovement();
@@ -109,17 +150,34 @@ bool CDriver_Marlin::IsMoving()
 	return m_pSerialController->isMoving();
 }
 
-void CDriver_Marlin::MoveTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+bool CDriver_Marlin::IsHomed()
 {
-	m_pSerialController->move(dX, dY, dZ, dSpeed);
+	return m_pSerialController->isHomed();
 }
 
-void CDriver_Marlin::MoveFastTo(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+void CDriver_Marlin::MoveToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed)
 {
-	m_pSerialController->moveFast(dX, dY, dZ, dSpeed);
+	m_pSerialController->moveXY(dX, dY, dE, dSpeed);
 }
 
-void CDriver_Marlin::GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double& dCurrentTemperature, LibMCDriver_Marlin_double& dTargetTemperature)
+void CDriver_Marlin::MoveFastToXY(const LibMCDriver_Marlin_double dX, const LibMCDriver_Marlin_double dY, const LibMCDriver_Marlin_double dSpeed)
 {
-	m_pSerialController->getExtruderTemperature(nExtruderID, dTargetTemperature, dCurrentTemperature);
+	m_pSerialController->moveFastXY(dX, dY, dSpeed);
+}
+
+void CDriver_Marlin::MoveToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed)
+{
+	m_pSerialController->moveZ(dZ, dE, dSpeed);
+}
+
+void CDriver_Marlin::MoveFastToZ(const LibMCDriver_Marlin_double dZ, const LibMCDriver_Marlin_double dSpeed)
+{
+	m_pSerialController->moveFastZ(dZ, dSpeed);
+}
+
+
+
+void CDriver_Marlin::StartHoming()
+{
+	m_pSerialController->startHoming();
 }

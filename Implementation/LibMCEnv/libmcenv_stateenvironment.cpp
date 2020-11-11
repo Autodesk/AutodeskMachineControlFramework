@@ -34,7 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_signalhandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
+#include "libmcenv_build.hpp"
 
+#include "amc_logger.hpp"
+#include "amc_driverhandler.hpp"
+#include "amc_parameterhandler.hpp"
 
 #include <thread> 
 
@@ -59,7 +63,7 @@ CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParam
 }
 
 
-ISignalTrigger* CStateEnvironment::CreateSignal(const std::string& sMachineInstance, const std::string& sSignalName)
+ISignalTrigger* CStateEnvironment::PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName)
 {
 	if (!m_pSystemState->stateSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
@@ -98,26 +102,19 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 }
 
 
-void CStateEnvironment::LoadToolpath(const std::string& sToolpathUUID)
+IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
-	m_pSystemState->toolpathHandler()->loadToolpathEntity(sToolpathUUID);
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+	return new CBuild(pBuildJob, m_pSystemState);
 }
 
-void CStateEnvironment::UnloadToolpath(const std::string& sToolpathUUID)
-{
-	m_pSystemState->toolpathHandler()->unloadToolpathEntity(sToolpathUUID);
-}
 
 void CStateEnvironment::UnloadAllToolpathes()
 {
 	m_pSystemState->toolpathHandler()->unloadAllEntities();
 }
 
-
-IToolpathAccessor* CStateEnvironment::CreateToolpathAccessor(const std::string& sToolpathUUID)
-{
-	return new CToolpathAccessor(sToolpathUUID, m_pSystemState->getToolpathHandlerInstance ());
-}
 
 
 void CStateEnvironment::GetDriverLibrary(const std::string& sDriverName, std::string& sDriverType, LibMCEnv_pvoid& pDriverLookup)
@@ -128,12 +125,6 @@ void CStateEnvironment::GetDriverLibrary(const std::string& sDriverName, std::st
 void CStateEnvironment::CreateDriverAccess(const std::string& sDriverName, LibMCEnv_pvoid& pDriverHandle) 
 {	
 	pDriverHandle = m_pSystemState->driverHandler()->acquireDriver(sDriverName, m_sInstanceName);
-}
-
-
-bool CStateEnvironment::ToolpathIsLoaded(const std::string& sToolpathUUID)
-{
-	return (m_pSystemState->toolpathHandler ()->findToolpathEntity(sToolpathUUID, false) != nullptr);
 }
 
 
@@ -187,6 +178,20 @@ void CStateEnvironment::StoreString(const std::string& sName, const std::string&
 	}
 
 }
+
+void CStateEnvironment::StoreUUID(const std::string& sName, const std::string& sValue)
+{
+	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+
+	if (!pGroup->hasParameter(sName)) {
+		pGroup->addNewStringParameter(sName, "", AMCCommon::CUtils::normalizeUUIDString (sValue));
+	}
+	else {
+		pGroup->setParameterValueByName(sName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+	}
+
+}
+
 
 void CStateEnvironment::StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue)
 {
@@ -249,6 +254,15 @@ std::string CStateEnvironment::RetrieveString(const std::string& sName)
 	return pGroup->getParameterValueByName(sName);
 }
 
+
+std::string CStateEnvironment::RetrieveUUID(const std::string& sName)
+{
+	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+
+	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sName));
+}
+
+
 LibMCEnv_int64 CStateEnvironment::RetrieveInteger(const std::string& sName)
 {
 	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
@@ -298,6 +312,20 @@ void CStateEnvironment::SetStringParameter(const std::string& sParameterGroup, c
 	pGroup->setParameterValueByName(sParameterName, sValue);
 }
 
+
+void CStateEnvironment::SetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (!pGroup->hasParameter(sParameterName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+
+	pGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+
+
 void CStateEnvironment::SetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue)
 {
 	if (!m_pParameterHandler->hasGroup(sParameterGroup))
@@ -344,6 +372,19 @@ std::string CStateEnvironment::GetStringParameter(const std::string& sParameterG
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
 
 	return pGroup->getParameterValueByName(sParameterName);
+}
+
+
+std::string CStateEnvironment::GetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (!pGroup->hasParameter(sParameterName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+
+	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sParameterName));
 }
 
 LibMCEnv_double CStateEnvironment::GetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName)

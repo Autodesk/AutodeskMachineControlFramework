@@ -30,6 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_statemachinestate.hpp"
+#include "amc_driverhandler.hpp"
+
+#include "common_utils.hpp"
+
 #include "libmc_interfaceexception.hpp"
 
 #include "libmcenv_stateenvironment.hpp"

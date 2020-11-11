@@ -32,16 +32,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_SYSTEMSTATE
 #define __AMC_SYSTEMSTATE
 
-#include "amc_logger.hpp"
-#include "amc_parameterhandler.hpp"
-#include "amc_statesignalhandler.hpp"
-#include "amc_driverhandler.hpp"
-#include "amc_toolpathhandler.hpp"
+#include <memory>
+#include <map>
+#include <string>
 
-#include "libmcdata_dynamic.hpp"
+namespace LibMCData {
+	class CDataModel;
+	class CStorage;
+	class CBuildJobHandler;
+
+	typedef std::shared_ptr<CDataModel> PDataModel;
+	typedef std::shared_ptr<CStorage> PStorage;
+	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
+}
+
+namespace LibMCDriverEnv {
+	class CWrapper;
+	typedef std::shared_ptr<CWrapper> PWrapper;
+}
 
 
 namespace AMC {
+
+	class CLogger;
+	class CStateSignalHandler;
+	class CDriverHandler;
+	class CToolpathHandler;
+	class CServiceHandler;
+	class CUIHandler;
+
+	typedef std::shared_ptr<CLogger> PLogger;
+	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
+	typedef std::shared_ptr<CDriverHandler> PDriverHandler;
+	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
+	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
+	typedef std::shared_ptr<CUIHandler> PUIHandler;
 
 	class CSystemState {
 	private:
@@ -49,6 +74,8 @@ namespace AMC {
 		AMC::PStateSignalHandler m_pSignalHandler;
 		AMC::PDriverHandler m_pDriverHandler;
 		AMC::PToolpathHandler m_pToolpathHandler;
+		AMC::PServiceHandler m_pServiceHandler;
+		AMC::PUIHandler m_pUIHandler;
 		
 		LibMCData::PDataModel m_pDataModel;
 		LibMCData::PStorage m_pStorage;
@@ -65,6 +92,11 @@ namespace AMC {
 		CStateSignalHandler* stateSignalHandler();
 		CDriverHandler* driverHandler();
 		CToolpathHandler* toolpathHandler();
+		CServiceHandler* serviceHandler();
+		CUIHandler* uiHandler();
+
+		LibMCData::CStorage * storage();
+		LibMCData::CBuildJobHandler * buildJobHandler();
 
 		PLogger getLoggerInstance();
 		PStateSignalHandler getStateSignalHandlerInstance();
@@ -73,6 +105,8 @@ namespace AMC {
 
 		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath);
 		std::string getLibraryPath(const std::string& sLibraryName);
+
+		std::string getSystemUserID();
 
 
 	};

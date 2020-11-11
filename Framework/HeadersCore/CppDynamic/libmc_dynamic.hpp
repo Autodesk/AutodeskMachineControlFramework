@@ -61,7 +61,7 @@ namespace LibMC {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
-class CAPIResponse;
+class CAPIRequestHandler;
 class CMCContext;
 
 /*************************************************************************************************************************
@@ -69,7 +69,7 @@ class CMCContext;
 **************************************************************************************************************************/
 typedef CWrapper CLibMCWrapper;
 typedef CBase CLibMCBase;
-typedef CAPIResponse CLibMCAPIResponse;
+typedef CAPIRequestHandler CLibMCAPIRequestHandler;
 typedef CMCContext CLibMCMCContext;
 
 /*************************************************************************************************************************
@@ -77,7 +77,7 @@ typedef CMCContext CLibMCMCContext;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
-typedef std::shared_ptr<CAPIResponse> PAPIResponse;
+typedef std::shared_ptr<CAPIRequestHandler> PAPIRequestHandler;
 typedef std::shared_ptr<CMCContext> PMCContext;
 
 /*************************************************************************************************************************
@@ -85,7 +85,7 @@ typedef std::shared_ptr<CMCContext> PMCContext;
 **************************************************************************************************************************/
 typedef PWrapper PLibMCWrapper;
 typedef PBase PLibMCBase;
-typedef PAPIResponse PLibMCAPIResponse;
+typedef PAPIRequestHandler PLibMCAPIRequestHandler;
 typedef PMCContext PLibMCMCContext;
 
 
@@ -263,7 +263,7 @@ private:
 	LibMCResult loadWrapperTableFromSymbolLookupMethod(sLibMCDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
-	friend class CAPIResponse;
+	friend class CAPIRequestHandler;
 	friend class CMCContext;
 
 };
@@ -326,22 +326,26 @@ public:
 };
 	
 /*************************************************************************************************************************
- Class CAPIResponse 
+ Class CAPIRequestHandler 
 **************************************************************************************************************************/
-class CAPIResponse : public CBase {
+class CAPIRequestHandler : public CBase {
 public:
 	
 	/**
-	* CAPIResponse::CAPIResponse - Constructor for APIResponse class.
+	* CAPIRequestHandler::CAPIRequestHandler - Constructor for APIRequestHandler class.
 	*/
-	CAPIResponse(CWrapper* pWrapper, LibMCHandle pHandle)
+	CAPIRequestHandler(CWrapper* pWrapper, LibMCHandle pHandle)
 		: CBase(pWrapper, pHandle)
 	{
 	}
 	
-	inline LibMC_uint32 GetHTTPCode();
-	inline std::string GetContentType();
-	inline void GetData(std::vector<LibMC_uint8> & DataBuffer);
+	inline bool ExpectsRawBody();
+	inline bool ExpectsFormData(LibMC_uint32 & nFieldCount);
+	inline void GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bIsFile, bool & bMandatory);
+	inline void SetFormDataField(const std::string & sName, const CInputVector<LibMC_uint8> & DataFieldBuffer);
+	inline void SetFormStringField(const std::string & sName, const std::string & sString);
+	inline void Handle(const CInputVector<LibMC_uint8> & RawBodyBuffer, std::string & sContentType, LibMC_uint32 & nHTTPCode);
+	inline void GetResultData(std::vector<LibMC_uint8> & DataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -364,8 +368,7 @@ public:
 	inline void TerminateAllThreads();
 	inline void LoadClientPackage(const CInputVector<LibMC_uint8> & ZIPStreamBuffer);
 	inline void Log(const std::string & sMessage, const eLogSubSystem eSubsystem, const eLogLevel eLogLevel);
-	inline PAPIResponse HandleAPIGetRequest(const std::string & sURI);
-	inline PAPIResponse HandleAPIPostRequest(const std::string & sURI, const CInputVector<LibMC_uint8> & BodyBuffer);
+	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod);
 };
 	
 	/**
@@ -475,17 +478,20 @@ public:
 			return LIBMC_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
-		pWrapperTable->m_APIResponse_GetHTTPCode = nullptr;
-		pWrapperTable->m_APIResponse_GetContentType = nullptr;
-		pWrapperTable->m_APIResponse_GetData = nullptr;
+		pWrapperTable->m_APIRequestHandler_ExpectsRawBody = nullptr;
+		pWrapperTable->m_APIRequestHandler_ExpectsFormData = nullptr;
+		pWrapperTable->m_APIRequestHandler_GetFormDataDetails = nullptr;
+		pWrapperTable->m_APIRequestHandler_SetFormDataField = nullptr;
+		pWrapperTable->m_APIRequestHandler_SetFormStringField = nullptr;
+		pWrapperTable->m_APIRequestHandler_Handle = nullptr;
+		pWrapperTable->m_APIRequestHandler_GetResultData = nullptr;
 		pWrapperTable->m_MCContext_RegisterLibraryPath = nullptr;
 		pWrapperTable->m_MCContext_ParseConfiguration = nullptr;
 		pWrapperTable->m_MCContext_StartAllThreads = nullptr;
 		pWrapperTable->m_MCContext_TerminateAllThreads = nullptr;
 		pWrapperTable->m_MCContext_LoadClientPackage = nullptr;
 		pWrapperTable->m_MCContext_Log = nullptr;
-		pWrapperTable->m_MCContext_HandleAPIGetRequest = nullptr;
-		pWrapperTable->m_MCContext_HandleAPIPostRequest = nullptr;
+		pWrapperTable->m_MCContext_CreateAPIRequestHandler = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -541,30 +547,66 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
-		pWrapperTable->m_APIResponse_GetHTTPCode = (PLibMCAPIResponse_GetHTTPCodePtr) GetProcAddress(hLibrary, "libmc_apiresponse_gethttpcode");
+		pWrapperTable->m_APIRequestHandler_ExpectsRawBody = (PLibMCAPIRequestHandler_ExpectsRawBodyPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_expectsrawbody");
 		#else // _WIN32
-		pWrapperTable->m_APIResponse_GetHTTPCode = (PLibMCAPIResponse_GetHTTPCodePtr) dlsym(hLibrary, "libmc_apiresponse_gethttpcode");
+		pWrapperTable->m_APIRequestHandler_ExpectsRawBody = (PLibMCAPIRequestHandler_ExpectsRawBodyPtr) dlsym(hLibrary, "libmc_apirequesthandler_expectsrawbody");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_APIResponse_GetHTTPCode == nullptr)
+		if (pWrapperTable->m_APIRequestHandler_ExpectsRawBody == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_APIResponse_GetContentType = (PLibMCAPIResponse_GetContentTypePtr) GetProcAddress(hLibrary, "libmc_apiresponse_getcontenttype");
+		pWrapperTable->m_APIRequestHandler_ExpectsFormData = (PLibMCAPIRequestHandler_ExpectsFormDataPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_expectsformdata");
 		#else // _WIN32
-		pWrapperTable->m_APIResponse_GetContentType = (PLibMCAPIResponse_GetContentTypePtr) dlsym(hLibrary, "libmc_apiresponse_getcontenttype");
+		pWrapperTable->m_APIRequestHandler_ExpectsFormData = (PLibMCAPIRequestHandler_ExpectsFormDataPtr) dlsym(hLibrary, "libmc_apirequesthandler_expectsformdata");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_APIResponse_GetContentType == nullptr)
+		if (pWrapperTable->m_APIRequestHandler_ExpectsFormData == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_APIResponse_GetData = (PLibMCAPIResponse_GetDataPtr) GetProcAddress(hLibrary, "libmc_apiresponse_getdata");
+		pWrapperTable->m_APIRequestHandler_GetFormDataDetails = (PLibMCAPIRequestHandler_GetFormDataDetailsPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_getformdatadetails");
 		#else // _WIN32
-		pWrapperTable->m_APIResponse_GetData = (PLibMCAPIResponse_GetDataPtr) dlsym(hLibrary, "libmc_apiresponse_getdata");
+		pWrapperTable->m_APIRequestHandler_GetFormDataDetails = (PLibMCAPIRequestHandler_GetFormDataDetailsPtr) dlsym(hLibrary, "libmc_apirequesthandler_getformdatadetails");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_APIResponse_GetData == nullptr)
+		if (pWrapperTable->m_APIRequestHandler_GetFormDataDetails == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_APIRequestHandler_SetFormDataField = (PLibMCAPIRequestHandler_SetFormDataFieldPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_setformdatafield");
+		#else // _WIN32
+		pWrapperTable->m_APIRequestHandler_SetFormDataField = (PLibMCAPIRequestHandler_SetFormDataFieldPtr) dlsym(hLibrary, "libmc_apirequesthandler_setformdatafield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_APIRequestHandler_SetFormDataField == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_APIRequestHandler_SetFormStringField = (PLibMCAPIRequestHandler_SetFormStringFieldPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_setformstringfield");
+		#else // _WIN32
+		pWrapperTable->m_APIRequestHandler_SetFormStringField = (PLibMCAPIRequestHandler_SetFormStringFieldPtr) dlsym(hLibrary, "libmc_apirequesthandler_setformstringfield");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_APIRequestHandler_SetFormStringField == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_APIRequestHandler_Handle = (PLibMCAPIRequestHandler_HandlePtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_handle");
+		#else // _WIN32
+		pWrapperTable->m_APIRequestHandler_Handle = (PLibMCAPIRequestHandler_HandlePtr) dlsym(hLibrary, "libmc_apirequesthandler_handle");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_APIRequestHandler_Handle == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_APIRequestHandler_GetResultData = (PLibMCAPIRequestHandler_GetResultDataPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_getresultdata");
+		#else // _WIN32
+		pWrapperTable->m_APIRequestHandler_GetResultData = (PLibMCAPIRequestHandler_GetResultDataPtr) dlsym(hLibrary, "libmc_apirequesthandler_getresultdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_APIRequestHandler_GetResultData == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -622,21 +664,12 @@ public:
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_MCContext_HandleAPIGetRequest = (PLibMCMCContext_HandleAPIGetRequestPtr) GetProcAddress(hLibrary, "libmc_mccontext_handleapigetrequest");
+		pWrapperTable->m_MCContext_CreateAPIRequestHandler = (PLibMCMCContext_CreateAPIRequestHandlerPtr) GetProcAddress(hLibrary, "libmc_mccontext_createapirequesthandler");
 		#else // _WIN32
-		pWrapperTable->m_MCContext_HandleAPIGetRequest = (PLibMCMCContext_HandleAPIGetRequestPtr) dlsym(hLibrary, "libmc_mccontext_handleapigetrequest");
+		pWrapperTable->m_MCContext_CreateAPIRequestHandler = (PLibMCMCContext_CreateAPIRequestHandlerPtr) dlsym(hLibrary, "libmc_mccontext_createapirequesthandler");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_MCContext_HandleAPIGetRequest == nullptr)
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_MCContext_HandleAPIPostRequest = (PLibMCMCContext_HandleAPIPostRequestPtr) GetProcAddress(hLibrary, "libmc_mccontext_handleapipostrequest");
-		#else // _WIN32
-		pWrapperTable->m_MCContext_HandleAPIPostRequest = (PLibMCMCContext_HandleAPIPostRequestPtr) dlsym(hLibrary, "libmc_mccontext_handleapipostrequest");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_MCContext_HandleAPIPostRequest == nullptr)
+		if (pWrapperTable->m_MCContext_CreateAPIRequestHandler == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -709,16 +742,32 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCResult eLookupError = LIBMC_SUCCESS;
-		eLookupError = (*pLookup)("libmc_apiresponse_gethttpcode", (void**)&(pWrapperTable->m_APIResponse_GetHTTPCode));
-		if ( (eLookupError != 0) || (pWrapperTable->m_APIResponse_GetHTTPCode == nullptr) )
+		eLookupError = (*pLookup)("libmc_apirequesthandler_expectsrawbody", (void**)&(pWrapperTable->m_APIRequestHandler_ExpectsRawBody));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_ExpectsRawBody == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmc_apiresponse_getcontenttype", (void**)&(pWrapperTable->m_APIResponse_GetContentType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_APIResponse_GetContentType == nullptr) )
+		eLookupError = (*pLookup)("libmc_apirequesthandler_expectsformdata", (void**)&(pWrapperTable->m_APIRequestHandler_ExpectsFormData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_ExpectsFormData == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmc_apiresponse_getdata", (void**)&(pWrapperTable->m_APIResponse_GetData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_APIResponse_GetData == nullptr) )
+		eLookupError = (*pLookup)("libmc_apirequesthandler_getformdatadetails", (void**)&(pWrapperTable->m_APIRequestHandler_GetFormDataDetails));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_GetFormDataDetails == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_apirequesthandler_setformdatafield", (void**)&(pWrapperTable->m_APIRequestHandler_SetFormDataField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_SetFormDataField == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_apirequesthandler_setformstringfield", (void**)&(pWrapperTable->m_APIRequestHandler_SetFormStringField));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_SetFormStringField == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_apirequesthandler_handle", (void**)&(pWrapperTable->m_APIRequestHandler_Handle));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_Handle == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_apirequesthandler_getresultdata", (void**)&(pWrapperTable->m_APIRequestHandler_GetResultData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_GetResultData == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_mccontext_registerlibrarypath", (void**)&(pWrapperTable->m_MCContext_RegisterLibraryPath));
@@ -745,12 +794,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_Log == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmc_mccontext_handleapigetrequest", (void**)&(pWrapperTable->m_MCContext_HandleAPIGetRequest));
-		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_HandleAPIGetRequest == nullptr) )
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmc_mccontext_handleapipostrequest", (void**)&(pWrapperTable->m_MCContext_HandleAPIPostRequest));
-		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_HandleAPIPostRequest == nullptr) )
+		eLookupError = (*pLookup)("libmc_mccontext_createapirequesthandler", (void**)&(pWrapperTable->m_MCContext_CreateAPIRequestHandler));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_CreateAPIRequestHandler == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -787,47 +832,98 @@ public:
 	 */
 	
 	/**
-	 * Method definitions for class CAPIResponse
+	 * Method definitions for class CAPIRequestHandler
 	 */
 	
 	/**
-	* CAPIResponse::GetHTTPCode - returns the HTTP Errorcode to set (200 for success).
-	* @return HTTP Code
+	* CAPIRequestHandler::ExpectsRawBody - checks if the raw body is needed to handle the request.
+	* @return Flag, if the raw body is needed in the request.
 	*/
-	LibMC_uint32 CAPIResponse::GetHTTPCode()
+	bool CAPIRequestHandler::ExpectsRawBody()
 	{
-		LibMC_uint32 resultHTTPCode = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_APIResponse_GetHTTPCode(m_pHandle, &resultHTTPCode));
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_ExpectsRawBody(m_pHandle, &resultValue));
 		
-		return resultHTTPCode;
+		return resultValue;
 	}
 	
 	/**
-	* CAPIResponse::GetContentType - returns the content type string of the data.
-	* @return Content Type.
+	* CAPIRequestHandler::ExpectsFormData - checks if the parsed form data is needed to handle the request.
+	* @param[out] nFieldCount - Number of Form Data entries that are expected.
+	* @return Flag, if the parsed form data is needed in the request.
 	*/
-	std::string CAPIResponse::GetContentType()
+	bool CAPIRequestHandler::ExpectsFormData(LibMC_uint32 & nFieldCount)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_ExpectsFormData(m_pHandle, &nFieldCount, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CAPIRequestHandler::GetFormDataDetails - returns details of expected form data.
+	* @param[in] nFieldIndex - Index of Form Data Field (0..FieldCount - 1)
+	* @param[out] sName - Name of the expected form data field.
+	* @param[out] bIsFile - Flag, if the field Is a file field.
+	* @param[out] bMandatory - Flag, if the field MUST be present.
+	*/
+	void CAPIRequestHandler::GetFormDataDetails(const LibMC_uint32 nFieldIndex, std::string & sName, bool & bIsFile, bool & bMandatory)
+	{
+		LibMC_uint32 bytesNeededName = 0;
+		LibMC_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetFormDataDetails(m_pHandle, nFieldIndex, 0, &bytesNeededName, nullptr, &bIsFile, &bMandatory));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetFormDataDetails(m_pHandle, nFieldIndex, bytesNeededName, &bytesWrittenName, &bufferName[0], &bIsFile, &bMandatory));
+		sName = std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CAPIRequestHandler::SetFormDataField - passes the a form data field to the request handler. Call only, if ExpectsFormData returns true.
+	* @param[in] sName - Name of the form data field.
+	* @param[in] DataFieldBuffer - DataField that was sent.
+	*/
+	void CAPIRequestHandler::SetFormDataField(const std::string & sName, const CInputVector<LibMC_uint8> & DataFieldBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_SetFormDataField(m_pHandle, sName.c_str(), (LibMC_uint64)DataFieldBuffer.size(), DataFieldBuffer.data()));
+	}
+	
+	/**
+	* CAPIRequestHandler::SetFormStringField - passes the a form string field to the request handler. Call only, if ExpectsFormData returns true.
+	* @param[in] sName - Name of the form data field.
+	* @param[in] sString - DataString that was sent.
+	*/
+	void CAPIRequestHandler::SetFormStringField(const std::string & sName, const std::string & sString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_SetFormStringField(m_pHandle, sName.c_str(), sString.c_str()));
+	}
+	
+	/**
+	* CAPIRequestHandler::Handle - handles the request.
+	* @param[in] RawBodyBuffer - Raw Body that was sent. Only necessary, if ExpectsRawBody returns true.
+	* @param[out] sContentType - the resulting Content Type String of the data.
+	* @param[out] nHTTPCode - the resulting HTTP Errorcode (200 for success).
+	*/
+	void CAPIRequestHandler::Handle(const CInputVector<LibMC_uint8> & RawBodyBuffer, std::string & sContentType, LibMC_uint32 & nHTTPCode)
 	{
 		LibMC_uint32 bytesNeededContentType = 0;
 		LibMC_uint32 bytesWrittenContentType = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_APIResponse_GetContentType(m_pHandle, 0, &bytesNeededContentType, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_Handle(m_pHandle, (LibMC_uint64)RawBodyBuffer.size(), RawBodyBuffer.data(), 0, &bytesNeededContentType, nullptr, &nHTTPCode));
 		std::vector<char> bufferContentType(bytesNeededContentType);
-		CheckError(m_pWrapper->m_WrapperTable.m_APIResponse_GetContentType(m_pHandle, bytesNeededContentType, &bytesWrittenContentType, &bufferContentType[0]));
-		
-		return std::string(&bufferContentType[0]);
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_Handle(m_pHandle, (LibMC_uint64)RawBodyBuffer.size(), RawBodyBuffer.data(), bytesNeededContentType, &bytesWrittenContentType, &bufferContentType[0], &nHTTPCode));
+		sContentType = std::string(&bufferContentType[0]);
 	}
 	
 	/**
-	* CAPIResponse::GetData - returns the stream content of the data.
+	* CAPIRequestHandler::GetResultData - returns the cached stream content of the resulting data. Call only after Handle().
 	* @param[out] DataBuffer - Binary stream data
 	*/
-	void CAPIResponse::GetData(std::vector<LibMC_uint8> & DataBuffer)
+	void CAPIRequestHandler::GetResultData(std::vector<LibMC_uint8> & DataBuffer)
 	{
 		LibMC_uint64 elementsNeededData = 0;
 		LibMC_uint64 elementsWrittenData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_APIResponse_GetData(m_pHandle, 0, &elementsNeededData, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetResultData(m_pHandle, 0, &elementsNeededData, nullptr));
 		DataBuffer.resize((size_t) elementsNeededData);
-		CheckError(m_pWrapper->m_WrapperTable.m_APIResponse_GetData(m_pHandle, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_APIRequestHandler_GetResultData(m_pHandle, elementsNeededData, &elementsWrittenData, DataBuffer.data()));
 	}
 	
 	/**
@@ -890,36 +986,20 @@ public:
 	}
 	
 	/**
-	* CMCContext::HandleAPIGetRequest - handle an API GET request.
+	* CMCContext::CreateAPIRequestHandler - creates an API request handler.
 	* @param[in] sURI - URI to serve
-	* @return Response instance.
+	* @param[in] sRequestMethod - Request Method
+	* @return Request Handler instance.
 	*/
-	PAPIResponse CMCContext::HandleAPIGetRequest(const std::string & sURI)
+	PAPIRequestHandler CMCContext::CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod)
 	{
-		LibMCHandle hResponse = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_HandleAPIGetRequest(m_pHandle, sURI.c_str(), &hResponse));
+		LibMCHandle hHandlerInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_CreateAPIRequestHandler(m_pHandle, sURI.c_str(), sRequestMethod.c_str(), &hHandlerInstance));
 		
-		if (!hResponse) {
+		if (!hHandlerInstance) {
 			CheckError(LIBMC_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CAPIResponse>(m_pWrapper, hResponse);
-	}
-	
-	/**
-	* CMCContext::HandleAPIPostRequest - handle an API POST request.
-	* @param[in] sURI - URI to serve
-	* @param[in] BodyBuffer - Body that was sent.
-	* @return Response instance.
-	*/
-	PAPIResponse CMCContext::HandleAPIPostRequest(const std::string & sURI, const CInputVector<LibMC_uint8> & BodyBuffer)
-	{
-		LibMCHandle hResponse = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_HandleAPIPostRequest(m_pHandle, sURI.c_str(), (LibMC_uint64)BodyBuffer.size(), BodyBuffer.data(), &hResponse));
-		
-		if (!hResponse) {
-			CheckError(LIBMC_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CAPIResponse>(m_pWrapper, hResponse);
+		return std::make_shared<CAPIRequestHandler>(m_pWrapper, hHandlerInstance);
 	}
 
 } // namespace LibMC

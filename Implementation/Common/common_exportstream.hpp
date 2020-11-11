@@ -46,6 +46,8 @@ namespace AMCCommon {
 		virtual bool seekFromEnd(uint64_t bytes, bool bHasToSucceed) = 0;
 		virtual uint64_t getPosition () = 0;
 		virtual uint64_t writeBuffer(const void * pBuffer, uint64_t cbTotalBytesToWrite) = 0;
+
+		virtual void writeZeros(uint64_t bytes) = 0;
 	};
 
 	typedef std::shared_ptr <CExportStream> PExportStream;
