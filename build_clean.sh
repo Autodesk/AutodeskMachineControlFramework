@@ -56,12 +56,27 @@ go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcs
 
 
 #echo "Building Client"
-#cd "$basepath/Client"
-# TODO: Need to implement script to build client
-# Having issues with node packages
+mkdir "$builddir/Client"
+mkdir "$builddir/Client/public"
+mkdir "$builddir/Client/src"
+mkdir "$builddir/Client/src/plugins"
+mkdir "$builddir/Client/dist"
 mkdir $builddir/Client
 mkdir $builddir/Client/dist
 cd $builddir/Client
+go run ../../Server/createDist.go ../Output $GITHASH 
+
+cp "$basepath/Client/public/"*.* "$builddir/Client/public"
+cp "$basepath/Client/src/"*.* "$builddir/Client/src"
+cp "$basepath/Client/src/plugins/"*.* "$builddir/Client/src/plugins"
+cp "$basepath/Client/"*.js "$builddir/Client"
+cp "$basepath/Client/"*.json "$builddir/Client"
+
+cd "$builddir/Client"
+
+npm install
+npm run build
+
 go run ../../Server/createDist.go ../Output $GITHASH 
 
 cd "$builddir"
