@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driver.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "libmcenv_driverenvironment.hpp"
-#include "common/common_importstream_native.hpp"
+#include "Common/common_importstream_native.hpp"
 
 using namespace AMC;
 
