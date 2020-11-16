@@ -353,6 +353,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDEVENTSENDER 326
 #define LIBMCDATA_ERROR_INVALIDEVENTCONTEXT 327
 #define LIBMCDATA_ERROR_INVALIDLAYERINDEX 328
+#define LIBMCDATA_ERROR_TEMPBASEPATHEMPTY 329
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -618,6 +619,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDEVENTSENDER: return "Invalid event context";
     case LIBMCDATA_ERROR_INVALIDEVENTCONTEXT: return "Invalid event sender";
     case LIBMCDATA_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
+    case LIBMCDATA_ERROR_TEMPBASEPATHEMPTY: return "Empty base path for temporary files";
     default: return "unknown error";
   }
 }

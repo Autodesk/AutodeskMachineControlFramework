@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include <list>
+#include <string>
 #include <thread>
 #include <mutex>
 
@@ -51,6 +52,7 @@ namespace AMC {
 	private:
 
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
+		std::string m_sTempBasePath;
 
 		// List and Map of registered drivers
 		std::list<PDriver> m_DriverList;
@@ -67,7 +69,7 @@ namespace AMC {
 
 		virtual ~CDriverHandler();
 
-		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary);
+		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath);
 
 		void GetDriverInformation (const std::string& sName, std::string& sType, HSymbolLookupHandle & pSymbolLookup);
 
@@ -76,6 +78,8 @@ namespace AMC {
 		PParameterGroup getDriverParameterGroup(const std::string& sName);
 
 		void releaseDriverLocks (const std::string& sInstanceName);
+
+		void setTempBasePath (const std::string& sTempBasePath);
 				
 	};
 	

@@ -335,6 +335,7 @@
 		<error name="INVALIDEVENTSENDER" code="326" description="Invalid event context" />
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
+		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
 		
 	</errors>
 	
@@ -414,6 +415,9 @@
 			<param name="LibraryResource" type="string" pass="in" description="Path to the library resource file." />
 		</method>
 
+		<method name="SetTempBasePath" description="sets the base path for temporary files.">
+			<param name="TempBasePath" type="string" pass="in" description="Base path for temporary files." />
+		</method>
 
 		<method name="ParseConfiguration" description="parses and initialises the state machines from a configuration XML.">
 			<param name="XMLString" type="string" pass="in" description="XML Configuration String." />

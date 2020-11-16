@@ -84,8 +84,10 @@ namespace AMC {
 
 		static PResourcePackage makeFromStream (AMCCommon::CImportStream * pStream);
 		static PResourcePackage makeFromStream (AMCCommon::PImportStream pStream);
+		static PResourcePackage makeEmpty ();
 
 		CResourcePackage(AMCCommon::CImportStream* pStream);
+		CResourcePackage();
 		virtual ~CResourcePackage();
 
 

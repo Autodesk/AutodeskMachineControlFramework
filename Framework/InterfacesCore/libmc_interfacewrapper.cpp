@@ -363,6 +363,33 @@ LibMCResult libmc_mccontext_registerlibrarypath(LibMC_MCContext pMCContext, cons
 	}
 }
 
+LibMCResult libmc_mccontext_settempbasepath(LibMC_MCContext pMCContext, const char * pTempBasePath)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pTempBasePath == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sTempBasePath(pTempBasePath);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIMCContext->SetTempBasePath(sTempBasePath);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCResult libmc_mccontext_parseconfiguration(LibMC_MCContext pMCContext, const char * pXMLString)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
@@ -560,6 +587,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_apirequesthandler_getresultdata;
 	if (sProcName == "libmc_mccontext_registerlibrarypath") 
 		*ppProcAddress = (void*) &libmc_mccontext_registerlibrarypath;
+	if (sProcName == "libmc_mccontext_settempbasepath") 
+		*ppProcAddress = (void*) &libmc_mccontext_settempbasepath;
 	if (sProcName == "libmc_mccontext_parseconfiguration") 
 		*ppProcAddress = (void*) &libmc_mccontext_parseconfiguration;
 	if (sProcName == "libmc_mccontext_startallthreads") 

@@ -353,6 +353,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDEVENTSENDER 326
 #define LIBMC_ERROR_INVALIDEVENTCONTEXT 327
 #define LIBMC_ERROR_INVALIDLAYERINDEX 328
+#define LIBMC_ERROR_TEMPBASEPATHEMPTY 329
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -618,6 +619,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDEVENTSENDER: return "Invalid event context";
     case LIBMC_ERROR_INVALIDEVENTCONTEXT: return "Invalid event sender";
     case LIBMC_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
+    case LIBMC_ERROR_TEMPBASEPATHEMPTY: return "Empty base path for temporary files";
     default: return "unknown error";
   }
 }

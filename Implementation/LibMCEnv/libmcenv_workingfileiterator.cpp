@@ -27,76 +27,67 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CWorkingDirectory
+Abstract: This is a stub class definition of CWorkingFileIterator
 
 */
 
-
-#ifndef __LIBMCENV_WORKINGDIRECTORY
-#define __LIBMCENV_WORKINGDIRECTORY
-
-#include "libmcenv_interfaces.hpp"
+#include "libmcenv_workingfileiterator.hpp"
+#include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_workingfile.hpp"
 
-// Parent classes
-#include "libmcenv_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
 // Include custom headers here.
-#include "amc_resourcepackage.hpp"
-#include "amc_logger.hpp"
 
-namespace LibMCEnv {
-namespace Impl {
 
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CWorkingDirectory 
+ Class definition of CWorkingFileIterator 
 **************************************************************************************************************************/
 
-class CWorkingDirectory : public virtual IWorkingDirectory, public virtual CBase {
-private:
+CWorkingFileIterator::CWorkingFileIterator()
+    : CIterator()
+{
+}
 
-protected:
+IBase* CWorkingFileIterator::GetCurrent()
+{
+    return GetCurrentFile();
+}
 
-    AMC::PResourcePackage m_pResourcePackage;
+IWorkingFile* CWorkingFileIterator::GetCurrentFile()
+{
+    if ((m_nCurrentIndex < 0) || (m_nCurrentIndex >= m_List.size()))
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDITERATOR);
 
-    PWorkingFileMonitor m_pWorkingFileMonitor;
+    auto pWorkingFile = std::dynamic_pointer_cast<CWorkingFile> (m_List[m_nCurrentIndex]);
+    if (pWorkingFile.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 
-public:
+    return CWorkingFile::makeFrom(pWorkingFile.get());
 
-    CWorkingDirectory(const std::string & sBasePath, AMC::PResourcePackage pResourcePackage);
-    ~CWorkingDirectory();
+}
 
-    bool IsActive() override;
 
-	std::string GetAbsoluteFilePath() override;
+IIterator* CWorkingFileIterator::Clone()
+{
+    auto pNewIterator = std::make_unique<CWorkingFileIterator>();
 
-	IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) override;
+    for (auto pBase : m_List) {
+        auto pWorkingFile = std::dynamic_pointer_cast<CWorkingFile> (pBase);
+        if (pWorkingFile.get() == nullptr)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+        pNewIterator->AddWorkingFile(CWorkingFile::makeSharedFrom (pWorkingFile.get()));
+    }
 
-	IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) override;
+    return pNewIterator.release();
+}
 
-	bool CleanUp() override;
+void CWorkingFileIterator::AddWorkingFile(std::shared_ptr<CWorkingFile> pWorkingFile)
+{
+    if (pWorkingFile.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	IWorkingFile* AddManagedFile(const std::string& sFileName) override;
+    m_List.push_back(pWorkingFile);
+}
 
-	bool HasUnmanagedFiles() override;
 
-	IWorkingFileIterator* RetrieveUnmanagedFiles() override;
-
-	IWorkingFileIterator* RetrieveManagedFiles() override;
-
-	IWorkingFileIterator* RetrieveAllFiles() override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCEnv
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCENV_WORKINGDIRECTORY
