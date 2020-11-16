@@ -81,6 +81,144 @@ LibMCEnvResult handleUnhandledException(IBase * pIBaseClass)
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class implementation for Iterator
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_iterator_movenext(LibMCEnv_Iterator pIterator, bool * pHasNext)
+{
+	IBase* pIBaseClass = (IBase *)pIterator;
+
+	try {
+		if (pHasNext == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IIterator* pIIterator = dynamic_cast<IIterator*>(pIBaseClass);
+		if (!pIIterator)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasNext = pIIterator->MoveNext();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_iterator_moveprevious(LibMCEnv_Iterator pIterator, bool * pHasPrevious)
+{
+	IBase* pIBaseClass = (IBase *)pIterator;
+
+	try {
+		if (pHasPrevious == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IIterator* pIIterator = dynamic_cast<IIterator*>(pIBaseClass);
+		if (!pIIterator)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasPrevious = pIIterator->MovePrevious();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_iterator_getcurrent(LibMCEnv_Iterator pIterator, LibMCEnv_Base * pInstance)
+{
+	IBase* pIBaseClass = (IBase *)pIterator;
+
+	try {
+		if (pInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseInstance(nullptr);
+		IIterator* pIIterator = dynamic_cast<IIterator*>(pIBaseClass);
+		if (!pIIterator)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseInstance = pIIterator->GetCurrent();
+
+		*pInstance = (IBase*)(pBaseInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_iterator_clone(LibMCEnv_Iterator pIterator, LibMCEnv_Iterator * pOutIterator)
+{
+	IBase* pIBaseClass = (IBase *)pIterator;
+
+	try {
+		if (pOutIterator == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseOutIterator(nullptr);
+		IIterator* pIIterator = dynamic_cast<IIterator*>(pIBaseClass);
+		if (!pIIterator)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseOutIterator = pIIterator->Clone();
+
+		*pOutIterator = (IBase*)(pBaseOutIterator);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_iterator_count(LibMCEnv_Iterator pIterator, LibMCEnv_uint64 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pIterator;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IIterator* pIIterator = dynamic_cast<IIterator*>(pIBaseClass);
+		if (!pIIterator)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pIIterator->Count();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for ToolpathLayer
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_toolpathlayer_getlayerdatauuid(LibMCEnv_ToolpathLayer pToolpathLayer, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer)
@@ -1150,30 +1288,6 @@ LibMCEnvResult libmcenv_workingfile_calculatesha2(LibMCEnv_WorkingFile pWorkingF
 	}
 }
 
-LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile)
-{
-	IBase* pIBaseClass = (IBase *)pWorkingFile;
-
-	try {
-		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
-		if (!pIWorkingFile)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		pIWorkingFile->DeleteFile();
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCEnvResult libmcenv_workingfile_executefile(LibMCEnv_WorkingFile pWorkingFile, LibMCEnv_WorkingFileExecution * pExecution)
 {
 	IBase* pIBaseClass = (IBase *)pWorkingFile;
@@ -1202,10 +1316,170 @@ LibMCEnvResult libmcenv_workingfile_executefile(LibMCEnv_WorkingFile pWorkingFil
 	}
 }
 
+LibMCEnvResult libmcenv_workingfile_ismanaged(LibMCEnv_WorkingFile pWorkingFile, bool * pFileIsManaged)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		if (pFileIsManaged == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pFileIsManaged = pIWorkingFile->IsManaged();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingfile_makemanaged(LibMCEnv_WorkingFile pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIWorkingFile->MakeManaged();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingfile_fileexists(LibMCEnv_WorkingFile pWorkingFile, bool * pFileDoesExist)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		if (pFileDoesExist == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pFileDoesExist = pIWorkingFile->FileExists();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFile;
+
+	try {
+		if (pSuccess == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IWorkingFile* pIWorkingFile = dynamic_cast<IWorkingFile*>(pIBaseClass);
+		if (!pIWorkingFile)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pSuccess = pIWorkingFile->DeleteFile();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for WorkingFileIterator
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_workingfileiterator_getcurrentfile(LibMCEnv_WorkingFileIterator pWorkingFileIterator, LibMCEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingFileIterator;
+
+	try {
+		if (pWorkingFile == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingFileIterator* pIWorkingFileIterator = dynamic_cast<IWorkingFileIterator*>(pIBaseClass);
+		if (!pIWorkingFileIterator)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingFileIterator->GetCurrentFile();
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for WorkingDirectory
 **************************************************************************************************************************/
+LibMCEnvResult libmcenv_workingdirectory_isactive(LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pIsActive)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pIsActive == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsActive = pIWorkingDirectory->IsActive();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_workingdirectory_getabsolutefilepath(LibMCEnv_WorkingDirectory pWorkingDirectory, const LibMCEnv_uint32 nFilePathBufferSize, LibMCEnv_uint32* pFilePathNeededChars, char * pFilePathBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
@@ -1308,6 +1582,173 @@ LibMCEnvResult libmcenv_workingdirectory_storedriverdata(LibMCEnv_WorkingDirecto
 		pBaseWorkingFile = pIWorkingDirectory->StoreDriverData(sFileName, sIdentifier);
 
 		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_cleanup(LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pSuccess)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pSuccess == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pSuccess = pIWorkingDirectory->CleanUp();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_addmanagedfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pFileName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sFileName(pFileName);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->AddManagedFile(sFileName);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_hasunmanagedfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pHasUnmanagedFiles)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pHasUnmanagedFiles == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasUnmanagedFiles = pIWorkingDirectory->HasUnmanagedFiles();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_retrieveunmanagedfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIWorkingDirectory->RetrieveUnmanagedFiles();
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_retrievemanagedfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIWorkingDirectory->RetrieveManagedFiles();
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pIteratorInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseIteratorInstance(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseIteratorInstance = pIWorkingDirectory->RetrieveAllFiles();
+
+		*pIteratorInstance = (IBase*)(pBaseIteratorInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -3955,6 +4396,16 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcenv_iterator_movenext") 
+		*ppProcAddress = (void*) &libmcenv_iterator_movenext;
+	if (sProcName == "libmcenv_iterator_moveprevious") 
+		*ppProcAddress = (void*) &libmcenv_iterator_moveprevious;
+	if (sProcName == "libmcenv_iterator_getcurrent") 
+		*ppProcAddress = (void*) &libmcenv_iterator_getcurrent;
+	if (sProcName == "libmcenv_iterator_clone") 
+		*ppProcAddress = (void*) &libmcenv_iterator_clone;
+	if (sProcName == "libmcenv_iterator_count") 
+		*ppProcAddress = (void*) &libmcenv_iterator_count;
 	if (sProcName == "libmcenv_toolpathlayer_getlayerdatauuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getlayerdatauuid;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentcount") 
@@ -4013,16 +4464,38 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingfile_getsize;
 	if (sProcName == "libmcenv_workingfile_calculatesha2") 
 		*ppProcAddress = (void*) &libmcenv_workingfile_calculatesha2;
-	if (sProcName == "libmcenv_workingfile_deletefile") 
-		*ppProcAddress = (void*) &libmcenv_workingfile_deletefile;
 	if (sProcName == "libmcenv_workingfile_executefile") 
 		*ppProcAddress = (void*) &libmcenv_workingfile_executefile;
+	if (sProcName == "libmcenv_workingfile_ismanaged") 
+		*ppProcAddress = (void*) &libmcenv_workingfile_ismanaged;
+	if (sProcName == "libmcenv_workingfile_makemanaged") 
+		*ppProcAddress = (void*) &libmcenv_workingfile_makemanaged;
+	if (sProcName == "libmcenv_workingfile_fileexists") 
+		*ppProcAddress = (void*) &libmcenv_workingfile_fileexists;
+	if (sProcName == "libmcenv_workingfile_deletefile") 
+		*ppProcAddress = (void*) &libmcenv_workingfile_deletefile;
+	if (sProcName == "libmcenv_workingfileiterator_getcurrentfile") 
+		*ppProcAddress = (void*) &libmcenv_workingfileiterator_getcurrentfile;
+	if (sProcName == "libmcenv_workingdirectory_isactive") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_isactive;
 	if (sProcName == "libmcenv_workingdirectory_getabsolutefilepath") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_getabsolutefilepath;
 	if (sProcName == "libmcenv_workingdirectory_storecustomdata") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomdata;
 	if (sProcName == "libmcenv_workingdirectory_storedriverdata") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storedriverdata;
+	if (sProcName == "libmcenv_workingdirectory_cleanup") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_cleanup;
+	if (sProcName == "libmcenv_workingdirectory_addmanagedfile") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_addmanagedfile;
+	if (sProcName == "libmcenv_workingdirectory_hasunmanagedfiles") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_hasunmanagedfiles;
+	if (sProcName == "libmcenv_workingdirectory_retrieveunmanagedfiles") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrieveunmanagedfiles;
+	if (sProcName == "libmcenv_workingdirectory_retrievemanagedfiles") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrievemanagedfiles;
+	if (sProcName == "libmcenv_workingdirectory_retrieveallfiles") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrieveallfiles;
 	if (sProcName == "libmcenv_driverenvironment_createworkingdirectory") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createworkingdirectory;
 	if (sProcName == "libmcenv_driverenvironment_retrievedriverdata") 

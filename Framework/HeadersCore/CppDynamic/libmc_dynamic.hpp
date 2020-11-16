@@ -363,6 +363,7 @@ public:
 	}
 	
 	inline void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource);
+	inline void SetTempBasePath(const std::string & sTempBasePath);
 	inline void ParseConfiguration(const std::string & sXMLString);
 	inline void StartAllThreads();
 	inline void TerminateAllThreads();
@@ -486,6 +487,7 @@ public:
 		pWrapperTable->m_APIRequestHandler_Handle = nullptr;
 		pWrapperTable->m_APIRequestHandler_GetResultData = nullptr;
 		pWrapperTable->m_MCContext_RegisterLibraryPath = nullptr;
+		pWrapperTable->m_MCContext_SetTempBasePath = nullptr;
 		pWrapperTable->m_MCContext_ParseConfiguration = nullptr;
 		pWrapperTable->m_MCContext_StartAllThreads = nullptr;
 		pWrapperTable->m_MCContext_TerminateAllThreads = nullptr;
@@ -616,6 +618,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MCContext_RegisterLibraryPath == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MCContext_SetTempBasePath = (PLibMCMCContext_SetTempBasePathPtr) GetProcAddress(hLibrary, "libmc_mccontext_settempbasepath");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_SetTempBasePath = (PLibMCMCContext_SetTempBasePathPtr) dlsym(hLibrary, "libmc_mccontext_settempbasepath");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_SetTempBasePath == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -772,6 +783,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmc_mccontext_registerlibrarypath", (void**)&(pWrapperTable->m_MCContext_RegisterLibraryPath));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_RegisterLibraryPath == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_settempbasepath", (void**)&(pWrapperTable->m_MCContext_SetTempBasePath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_SetTempBasePath == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_mccontext_parseconfiguration", (void**)&(pWrapperTable->m_MCContext_ParseConfiguration));
@@ -939,6 +954,15 @@ public:
 	void CMCContext::RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_RegisterLibraryPath(m_pHandle, sLibraryName.c_str(), sLibraryPath.c_str(), sLibraryResource.c_str()));
+	}
+	
+	/**
+	* CMCContext::SetTempBasePath - sets the base path for temporary files.
+	* @param[in] sTempBasePath - Base path for temporary files.
+	*/
+	void CMCContext::SetTempBasePath(const std::string & sTempBasePath)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_SetTempBasePath(m_pHandle, sTempBasePath.c_str()));
 	}
 	
 	/**

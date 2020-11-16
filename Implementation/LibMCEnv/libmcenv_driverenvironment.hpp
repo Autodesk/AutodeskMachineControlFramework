@@ -36,7 +36,9 @@ Abstract: This is the class declaration of CDriverEnvironment
 #define __LIBMCENV_DRIVERENVIRONMENT
 
 #include "libmcenv_interfaces.hpp"
+
 #include "amc_parametergroup.hpp"
+#include "amc_resourcepackage.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -64,11 +66,14 @@ protected:
 
 	bool m_bIsInitializing;
 
+	std::string m_sBasePath;
+
 	AMC::PParameterGroup m_pParameterGroup;
+	AMC::PResourcePackage m_pResourcePackage;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, const std::string & sBasePath);
 
 	IWorkingDirectory* CreateWorkingDirectory() override;
 

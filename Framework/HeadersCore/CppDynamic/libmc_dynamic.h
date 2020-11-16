@@ -147,6 +147,15 @@ typedef LibMCResult (*PLibMCAPIRequestHandler_GetResultDataPtr) (LibMC_APIReques
 typedef LibMCResult (*PLibMCMCContext_RegisterLibraryPathPtr) (LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResource);
 
 /**
+* sets the base path for temporary files.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pTempBasePath - Base path for temporary files.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_SetTempBasePathPtr) (LibMC_MCContext pMCContext, const char * pTempBasePath);
+
+/**
 * parses and initialises the state machines from a configuration XML.
 *
 * @param[in] pMCContext - MCContext instance.
@@ -277,6 +286,7 @@ typedef struct {
 	PLibMCAPIRequestHandler_HandlePtr m_APIRequestHandler_Handle;
 	PLibMCAPIRequestHandler_GetResultDataPtr m_APIRequestHandler_GetResultData;
 	PLibMCMCContext_RegisterLibraryPathPtr m_MCContext_RegisterLibraryPath;
+	PLibMCMCContext_SetTempBasePathPtr m_MCContext_SetTempBasePath;
 	PLibMCMCContext_ParseConfigurationPtr m_MCContext_ParseConfiguration;
 	PLibMCMCContext_StartAllThreadsPtr m_MCContext_StartAllThreads;
 	PLibMCMCContext_TerminateAllThreadsPtr m_MCContext_TerminateAllThreads;

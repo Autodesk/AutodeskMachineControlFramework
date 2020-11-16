@@ -160,6 +160,15 @@ LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_getresultdata(LibMC_APIReques
 LIBMC_DECLSPEC LibMCResult libmc_mccontext_registerlibrarypath(LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResource);
 
 /**
+* sets the base path for temporary files.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pTempBasePath - Base path for temporary files.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_settempbasepath(LibMC_MCContext pMCContext, const char * pTempBasePath);
+
+/**
 * parses and initialises the state machines from a configuration XML.
 *
 * @param[in] pMCContext - MCContext instance.
