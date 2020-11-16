@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <shlwapi.h>
 #include <iomanip>
 #else
+#include <sys/stat.h>
 #include <ctime>
 #include <unistd.h>
 #include <dirent.h> 
