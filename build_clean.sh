@@ -62,11 +62,11 @@ mkdir "$builddir/Client/src"
 mkdir "$builddir/Client/src/plugins"
 mkdir "$builddir/Client/dist"
 
-copy "$basepath/Client/public/*" "$builddir/Client/public"
-copy "$basepath/Client/src/*" "$builddir/Client/src"
-copy "$basepath/Client/src/plugins/*" "$builddir/Client/src/plugins"
-copy "$basepath/Client/*.js" "$builddir/Client"
-copy "$basepath/Client/*.json" "$builddir/Client"
+cp "$basepath/Client/public/*" "$builddir/Client/public"
+cp "$basepath/Client/src/*" "$builddir/Client/src"
+cp "$basepath/Client/src/plugins/*" "$builddir/Client/src/plugins"
+cp "$basepath/Client/*.js" "$builddir/Client"
+cp "$basepath/Client/*.json" "$builddir/Client"
 
 npm install
 npm run build
