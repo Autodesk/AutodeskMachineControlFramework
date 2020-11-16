@@ -33,9 +33,12 @@ Abstract: This is a stub class definition of CWorkingDirectory
 
 #include "libmcenv_workingdirectory.hpp"
 #include "libmcenv_interfaceexception.hpp"
+#include "libmcenv_workingfile.hpp"
+#include "libmcenv_workingfileiterator.hpp"
 
 // Include custom headers here.
-
+#include "common_utils.hpp"
+#include "common_exportstream_native.hpp"
 
 using namespace LibMCEnv::Impl;
 
@@ -43,18 +46,138 @@ using namespace LibMCEnv::Impl;
  Class definition of CWorkingDirectory 
 **************************************************************************************************************************/
 
+CWorkingDirectory::CWorkingDirectory(const std::string& sBasePath, AMC::PResourcePackage pResourcePackage)
+    : m_pResourcePackage (pResourcePackage)
+{
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (sBasePath.empty ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    auto sWorkingDirectoryPath = AMCCommon::CUtils::findTemporaryFileName(sBasePath, "amcf_", "", 1024);
+    AMCCommon::CUtils::createDirectoryOnDisk(sWorkingDirectoryPath);
+
+    m_pWorkingFileMonitor = std::make_shared<CWorkingFileMonitor> (sWorkingDirectoryPath);
+
+}
+
+
+CWorkingDirectory::~CWorkingDirectory()
+{
+    try
+    {
+        if (m_pWorkingFileMonitor.get () != nullptr)
+            m_pWorkingFileMonitor->cleanUpDirectory(nullptr);
+    }
+    catch (...)
+    {
+        // Last resort: Never let exceptions pass through destructor
+    }
+}
+
+
+bool CWorkingDirectory::IsActive()
+{
+    return m_pWorkingFileMonitor->isActive();
+}
+
 std::string CWorkingDirectory::GetAbsoluteFilePath()
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    return m_pWorkingFileMonitor->getWorkingDirectory ();
 }
 
 IWorkingFile * CWorkingDirectory::StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    if (pDataBufferBuffer == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+ 
+    std::string sAbsoluteFileName = m_pWorkingFileMonitor->getAbsoluteFileName (sFileName);
+    m_pWorkingFileMonitor->addNewMonitoredFile(sFileName);
+
+    auto pStream = std::make_unique<AMCCommon::CExportStream_Native>(sAbsoluteFileName);
+    if (nDataBufferBufferSize > 0)
+        pStream->writeBuffer(pDataBufferBuffer, nDataBufferBufferSize);
+    pStream.reset();
+
+
+    return new CWorkingFile (sFileName, m_pWorkingFileMonitor);
 }
 
 IWorkingFile * CWorkingDirectory::StoreDriverData(const std::string & sFileName, const std::string & sIdentifier)
 {
-	throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_NOTIMPLEMENTED);
+    std::string sAbsoluteFileName = m_pWorkingFileMonitor->getAbsoluteFileName(sFileName);
+    m_pWorkingFileMonitor->addNewMonitoredFile(sFileName);
+
+    std::vector<uint8_t> Buffer;
+    m_pResourcePackage->readEntry(sIdentifier, Buffer);
+
+    auto pStream = std::make_unique<AMCCommon::CExportStream_Native>(sAbsoluteFileName);
+    if (Buffer.size () > 0)
+        pStream->writeBuffer(Buffer.data(), Buffer.size ());
+    pStream.reset();
+
+    return new CWorkingFile(sFileName, m_pWorkingFileMonitor);
+
 }
+
+
+bool CWorkingDirectory::CleanUp()
+{
+    m_pWorkingFileMonitor->cleanUpDirectory (nullptr);
+
+    return !HasUnmanagedFiles();
+}
+
+IWorkingFile* CWorkingDirectory::AddManagedFile(const std::string& sFileName)
+{
+    m_pWorkingFileMonitor->addNewMonitoredFile(sFileName);
+
+    return new CWorkingFile(sFileName, m_pWorkingFileMonitor);
+}
+
+bool CWorkingDirectory::HasUnmanagedFiles()
+{
+    return false;
+}
+
+IWorkingFileIterator* CWorkingDirectory::RetrieveUnmanagedFiles()
+{
+    auto pIterator = std::make_unique<CWorkingFileIterator>();
+
+    auto fileNames = AMCCommon::CUtils::findContentOfDirectory(m_pWorkingFileMonitor->getWorkingDirectory(), true, false);
+    for (auto sFileName : fileNames) {
+        if (!m_pWorkingFileMonitor->fileIsMonitored (sFileName))
+            pIterator->AddWorkingFile(std::make_shared<CWorkingFile>(sFileName, m_pWorkingFileMonitor));
+    }
+
+    return pIterator.release();
+}
+
+IWorkingFileIterator* CWorkingDirectory::RetrieveManagedFiles()
+{
+    auto pIterator = std::make_unique<CWorkingFileIterator>();
+
+    auto fileNames = m_pWorkingFileMonitor->getFileNames ();
+    for (auto sFileName : fileNames) {
+        pIterator->AddWorkingFile(std::make_shared<CWorkingFile>(sFileName, m_pWorkingFileMonitor));
+    }
+
+    return pIterator.release();
+
+}
+
+IWorkingFileIterator* CWorkingDirectory::RetrieveAllFiles()
+{
+
+    auto pIterator = std::make_unique<CWorkingFileIterator>();
+
+    auto fileNames = AMCCommon::CUtils::findContentOfDirectory (m_pWorkingFileMonitor->getWorkingDirectory(), true, false);
+    for (auto sFileName : fileNames) {
+        pIterator->AddWorkingFile(std::make_shared<CWorkingFile>(sFileName, m_pWorkingFileMonitor));
+    }
+
+    return pIterator.release();
+}
+
+
 

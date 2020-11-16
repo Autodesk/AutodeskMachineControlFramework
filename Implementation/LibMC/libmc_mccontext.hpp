@@ -110,6 +110,8 @@ public:
 
 	void RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource) override;
 
+	void SetTempBasePath(const std::string& sTempBasePath) override;
+
 	void StartAllThreads() override;	
 
 	void TerminateAllThreads() override;

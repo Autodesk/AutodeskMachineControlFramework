@@ -56,8 +56,14 @@
 		<error name="SIGNALHASTRIGGEREDTWICE" code="15" description="signal has been triggered twice." />
 		<error name="SIGNALHASNOTBEENTRIGGERED" code="16" description="signal has not been triggered." />
 		<error name="DRIVERISNOTINITIALISING" code="17" description="driver is not in initialisation mode." />
-	
+		<error name="RESOURCEENTRYNOTFOUND" code="18" description="resource entry not found." />
+		<error name="INTERNALERROR" code="19" description="internal error." />
+		<error name="INVALIDCHARACTERINFILENAME" code="20" description="invalid character in filename." />
+		<error name="WORKINGDIRECTORYHASBEENCLEANED" code="21" description="working directory has been cleaned." />
+		<error name="INVALIDITERATOR" code="22" description="invalid iterator." />
 		
+		
+			
 	</errors>
 	
 	<enum name="ToolpathSegmentType">
@@ -85,6 +91,24 @@
 	<class name="Base">
 	</class>
 
+
+	<class name="Iterator">
+		<method name="MoveNext" description="Iterates to the next object in the list.">
+			<param name="HasNext" type="bool" pass="return" description="Iterates to the next object in the list."/>
+		</method>
+		<method name="MovePrevious" description="Iterates to the previous object in the list.">
+			<param name="HasPrevious" type="bool" pass="return" description="Iterates to the previous object in the list."/>
+		</method>
+		<method name="GetCurrent" description="Returns the object the iterator points at.">
+			<param name="Instance" type="handle" class="Base" pass="return" description="returns the object instance."/>
+		</method>
+		<method name="Clone" description="Creates a new object iterator with the same object list.">
+			<param name="OutIterator" type="handle" class="Iterator" pass="return" description="returns the cloned Iterator instance"/>
+		</method>
+		<method name="Count" description="Returns the number of resoucres the iterator captures.">
+			<param name="Count" type="uint64" pass="return" description="returns the number of objects the iterator captures."/>
+		</method>
+	</class>
 
 	<class name="ToolpathLayer" parent="Base">
 	  
@@ -235,18 +259,39 @@
 			<param name="SHA2" type="string" pass="return" description="sha256 checksum" />
 		</method>
 
-		<method name="DeleteFile" description = "Deletes the temporary file.">
-		</method>
-
 		<method name="ExecuteFile" description = "Executes the temporary file, if it is an executable.">
 			<param name="Execution" type="class" class="WorkingFileExecution" pass="return" description="execution object" />
 		</method>
 
+		<method name="IsManaged" description = "Returns if the file is managed.">
+			<param name="FileIsManaged" type="bool" pass="return" description="returns if the file is managed." />
+		</method>
+
+		<method name="MakeManaged" description = "Makes the file managed if it is not managed yet.">
+		</method>
+
+		<method name="FileExists" description = "Returns if the file exists on disk.">
+			<param name="FileDoesExist" type="bool" pass="return" description="returns if the file exists." />
+		</method>
+
+		<method name="DeleteFile" description = "Deletes the temporary file.">
+			<param name="Success" type="bool" pass="return" description="returns if deletion was successful or file did not exist in the first place." />
+		</method>
+
+	</class>
+
+	<class name="WorkingFileIterator" parent="Iterator">
+		<method name="GetCurrentFile" description="Returns the working file the iterator points at.">
+			<param name="WorkingFile" type="handle" class="WorkingFile" pass="return" description="returns the WorkingFile instance."/>
+		</method>
 	</class>
 
 
-
 	<class name="WorkingDirectory" parent="Base" description="Working Directory Access Object">
+
+		<method name="IsActive" description = "Working directory is active.">
+			<param name="IsActive" type="bool" pass="return" description="returns true if files can be read and written to the directory." />
+		</method>
 
 		<method name="GetAbsoluteFilePath" description = "Retrieves absolute file path.">
 			<param name="FilePath" type="string" pass="return" description="global path of the directory, including path delimiter." />
@@ -262,6 +307,31 @@
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="CleanUp" description = "Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.">
+			<param name="Success" type="bool" pass="return" description="returns if deletion was successful." />
+		</method>
+
+		<method name="AddManagedFile" description = "Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.">
+			<param name="FileName" type="string" pass="in" description="Filename to manage. The file does not need to exist yet." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="HasUnmanagedFiles" description = "Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.">
+			<param name="HasUnmanagedFiles" type="bool" pass="return" description="returns if there are unmanaged files." />
+		</method>
+
+		<method name="RetrieveUnmanagedFiles" description = "Returns a list of unmanaged files." >
+			<param name="IteratorInstance" type="class" class="WorkingFileIterator" pass="return" description="working file iterator instance." />
+		</method>
+
+		<method name="RetrieveManagedFiles" description = "Returns a list of managed files." >
+			<param name="IteratorInstance" type="class" class="WorkingFileIterator" pass="return" description="working file iterator instance." />
+		</method>
+
+		<method name="RetrieveAllFiles" description = "Returns a list of all files in the directory." >
+			<param name="IteratorInstance" type="class" class="WorkingFileIterator" pass="return" description="working file iterator instance." />
 		</method>
 
 	</class>

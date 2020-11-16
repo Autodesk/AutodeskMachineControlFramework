@@ -242,6 +242,16 @@ namespace AMC {
 		return std::make_shared<CResourcePackage>(pStream);
 	}
 
+	PResourcePackage CResourcePackage::makeEmpty()
+	{
+		return std::make_shared<CResourcePackage>();
+	}
+
+	CResourcePackage::CResourcePackage()
+	{
+		m_pResourcePackageZIP = nullptr;
+	}
+
 
 	CResourcePackage::CResourcePackage(AMCCommon::CImportStream* pStream)
 	{

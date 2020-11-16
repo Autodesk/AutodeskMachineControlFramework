@@ -60,11 +60,13 @@ namespace LibMCEnv {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
+class CIterator;
 class CToolpathLayer;
 class CToolpathAccessor;
 class CBuild;
 class CWorkingFileExecution;
 class CWorkingFile;
+class CWorkingFileIterator;
 class CWorkingDirectory;
 class CDriverEnvironment;
 class CSignalTrigger;
@@ -77,11 +79,13 @@ class CUIEnvironment;
 **************************************************************************************************************************/
 typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
+typedef CIterator CLibMCEnvIterator;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
 typedef CBuild CLibMCEnvBuild;
 typedef CWorkingFileExecution CLibMCEnvWorkingFileExecution;
 typedef CWorkingFile CLibMCEnvWorkingFile;
+typedef CWorkingFileIterator CLibMCEnvWorkingFileIterator;
 typedef CWorkingDirectory CLibMCEnvWorkingDirectory;
 typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
@@ -94,11 +98,13 @@ typedef CUIEnvironment CLibMCEnvUIEnvironment;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
+typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
 typedef std::shared_ptr<CBuild> PBuild;
 typedef std::shared_ptr<CWorkingFileExecution> PWorkingFileExecution;
 typedef std::shared_ptr<CWorkingFile> PWorkingFile;
+typedef std::shared_ptr<CWorkingFileIterator> PWorkingFileIterator;
 typedef std::shared_ptr<CWorkingDirectory> PWorkingDirectory;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
@@ -111,11 +117,13 @@ typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 **************************************************************************************************************************/
 typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
+typedef PIterator PLibMCEnvIterator;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
 typedef PBuild PLibMCEnvBuild;
 typedef PWorkingFileExecution PLibMCEnvWorkingFileExecution;
 typedef PWorkingFile PLibMCEnvWorkingFile;
+typedef PWorkingFileIterator PLibMCEnvWorkingFileIterator;
 typedef PWorkingDirectory PLibMCEnvWorkingDirectory;
 typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
@@ -294,11 +302,13 @@ private:
 	LibMCEnvResult loadWrapperTableFromSymbolLookupMethod(sLibMCEnvDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
+	friend class CIterator;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
 	friend class CBuild;
 	friend class CWorkingFileExecution;
 	friend class CWorkingFile;
+	friend class CWorkingFileIterator;
 	friend class CWorkingDirectory;
 	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
@@ -363,6 +373,27 @@ public:
 	}
 	
 	friend class CWrapper;
+};
+	
+/*************************************************************************************************************************
+ Class CIterator 
+**************************************************************************************************************************/
+class CIterator : public CBase {
+public:
+	
+	/**
+	* CIterator::CIterator - Constructor for Iterator class.
+	*/
+	CIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool MoveNext();
+	inline bool MovePrevious();
+	inline PBase GetCurrent();
+	inline PIterator Clone();
+	inline LibMCEnv_uint64 Count();
 };
 	
 /*************************************************************************************************************************
@@ -472,8 +503,28 @@ public:
 	inline std::string GetAbsoluteFileName();
 	inline LibMCEnv_uint64 GetSize();
 	inline std::string CalculateSHA2();
-	inline void DeleteFile();
 	inline PWorkingFileExecution ExecuteFile();
+	inline bool IsManaged();
+	inline void MakeManaged();
+	inline bool FileExists();
+	inline bool DeleteFile();
+};
+	
+/*************************************************************************************************************************
+ Class CWorkingFileIterator 
+**************************************************************************************************************************/
+class CWorkingFileIterator : public CIterator {
+public:
+	
+	/**
+	* CWorkingFileIterator::CWorkingFileIterator - Constructor for WorkingFileIterator class.
+	*/
+	CWorkingFileIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PWorkingFile GetCurrentFile();
 };
 	
 /*************************************************************************************************************************
@@ -490,9 +541,16 @@ public:
 	{
 	}
 	
+	inline bool IsActive();
 	inline std::string GetAbsoluteFilePath();
 	inline PWorkingFile StoreCustomData(const std::string & sFileName, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
 	inline PWorkingFile StoreDriverData(const std::string & sFileName, const std::string & sIdentifier);
+	inline bool CleanUp();
+	inline PWorkingFile AddManagedFile(const std::string & sFileName);
+	inline bool HasUnmanagedFiles();
+	inline PWorkingFileIterator RetrieveUnmanagedFiles();
+	inline PWorkingFileIterator RetrieveManagedFiles();
+	inline PWorkingFileIterator RetrieveAllFiles();
 };
 	
 /*************************************************************************************************************************
@@ -733,6 +791,11 @@ public:
 			return LIBMCENV_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Iterator_MoveNext = nullptr;
+		pWrapperTable->m_Iterator_MovePrevious = nullptr;
+		pWrapperTable->m_Iterator_GetCurrent = nullptr;
+		pWrapperTable->m_Iterator_Clone = nullptr;
+		pWrapperTable->m_Iterator_Count = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
@@ -762,11 +825,22 @@ public:
 		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = nullptr;
 		pWrapperTable->m_WorkingFile_GetSize = nullptr;
 		pWrapperTable->m_WorkingFile_CalculateSHA2 = nullptr;
-		pWrapperTable->m_WorkingFile_DeleteFile = nullptr;
 		pWrapperTable->m_WorkingFile_ExecuteFile = nullptr;
+		pWrapperTable->m_WorkingFile_IsManaged = nullptr;
+		pWrapperTable->m_WorkingFile_MakeManaged = nullptr;
+		pWrapperTable->m_WorkingFile_FileExists = nullptr;
+		pWrapperTable->m_WorkingFile_DeleteFile = nullptr;
+		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_IsActive = nullptr;
 		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreCustomData = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
+		pWrapperTable->m_WorkingDirectory_CleanUp = nullptr;
+		pWrapperTable->m_WorkingDirectory_AddManagedFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = nullptr;
+		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = nullptr;
+		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = nullptr;
+		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
@@ -896,6 +970,51 @@ public:
 			return LIBMCENV_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_MoveNext = (PLibMCEnvIterator_MoveNextPtr) GetProcAddress(hLibrary, "libmcenv_iterator_movenext");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_MoveNext = (PLibMCEnvIterator_MoveNextPtr) dlsym(hLibrary, "libmcenv_iterator_movenext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_MoveNext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_MovePrevious = (PLibMCEnvIterator_MovePreviousPtr) GetProcAddress(hLibrary, "libmcenv_iterator_moveprevious");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_MovePrevious = (PLibMCEnvIterator_MovePreviousPtr) dlsym(hLibrary, "libmcenv_iterator_moveprevious");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_MovePrevious == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_GetCurrent = (PLibMCEnvIterator_GetCurrentPtr) GetProcAddress(hLibrary, "libmcenv_iterator_getcurrent");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_GetCurrent = (PLibMCEnvIterator_GetCurrentPtr) dlsym(hLibrary, "libmcenv_iterator_getcurrent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_GetCurrent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_Clone = (PLibMCEnvIterator_ClonePtr) GetProcAddress(hLibrary, "libmcenv_iterator_clone");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_Clone = (PLibMCEnvIterator_ClonePtr) dlsym(hLibrary, "libmcenv_iterator_clone");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_Clone == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_Count = (PLibMCEnvIterator_CountPtr) GetProcAddress(hLibrary, "libmcenv_iterator_count");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_Count = (PLibMCEnvIterator_CountPtr) dlsym(hLibrary, "libmcenv_iterator_count");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_Count == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = (PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getlayerdatauuid");
@@ -1159,6 +1278,42 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCEnvWorkingFile_ExecuteFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_executefile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCEnvWorkingFile_ExecuteFilePtr) dlsym(hLibrary, "libmcenv_workingfile_executefile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_IsManaged = (PLibMCEnvWorkingFile_IsManagedPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_ismanaged");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_IsManaged = (PLibMCEnvWorkingFile_IsManagedPtr) dlsym(hLibrary, "libmcenv_workingfile_ismanaged");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_IsManaged == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_MakeManaged = (PLibMCEnvWorkingFile_MakeManagedPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_makemanaged");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_MakeManaged = (PLibMCEnvWorkingFile_MakeManagedPtr) dlsym(hLibrary, "libmcenv_workingfile_makemanaged");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_MakeManaged == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_FileExists = (PLibMCEnvWorkingFile_FileExistsPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_fileexists");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_FileExists = (PLibMCEnvWorkingFile_FileExistsPtr) dlsym(hLibrary, "libmcenv_workingfile_fileexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_FileExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCEnvWorkingFile_DeleteFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_deletefile");
 		#else // _WIN32
 		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCEnvWorkingFile_DeleteFilePtr) dlsym(hLibrary, "libmcenv_workingfile_deletefile");
@@ -1168,12 +1323,21 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCEnvWorkingFile_ExecuteFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_executefile");
+		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = (PLibMCEnvWorkingFileIterator_GetCurrentFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfileiterator_getcurrentfile");
 		#else // _WIN32
-		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCEnvWorkingFile_ExecuteFilePtr) dlsym(hLibrary, "libmcenv_workingfile_executefile");
+		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = (PLibMCEnvWorkingFileIterator_GetCurrentFilePtr) dlsym(hLibrary, "libmcenv_workingfileiterator_getcurrentfile");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr)
+		if (pWrapperTable->m_WorkingFileIterator_GetCurrentFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_IsActive = (PLibMCEnvWorkingDirectory_IsActivePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_isactive");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_IsActive = (PLibMCEnvWorkingDirectory_IsActivePtr) dlsym(hLibrary, "libmcenv_workingdirectory_isactive");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_IsActive == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1201,6 +1365,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_CleanUp = (PLibMCEnvWorkingDirectory_CleanUpPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_cleanup");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_CleanUp = (PLibMCEnvWorkingDirectory_CleanUpPtr) dlsym(hLibrary, "libmcenv_workingdirectory_cleanup");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_CleanUp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_AddManagedFile = (PLibMCEnvWorkingDirectory_AddManagedFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_addmanagedfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_AddManagedFile = (PLibMCEnvWorkingDirectory_AddManagedFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_addmanagedfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_AddManagedFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = (PLibMCEnvWorkingDirectory_HasUnmanagedFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_hasunmanagedfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = (PLibMCEnvWorkingDirectory_HasUnmanagedFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_hasunmanagedfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = (PLibMCEnvWorkingDirectory_RetrieveUnmanagedFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_retrieveunmanagedfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = (PLibMCEnvWorkingDirectory_RetrieveUnmanagedFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_retrieveunmanagedfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = (PLibMCEnvWorkingDirectory_RetrieveManagedFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_retrievemanagedfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = (PLibMCEnvWorkingDirectory_RetrieveManagedFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_retrievemanagedfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = (PLibMCEnvWorkingDirectory_RetrieveAllFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_retrieveallfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = (PLibMCEnvWorkingDirectory_RetrieveAllFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_retrieveallfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_RetrieveAllFiles == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1957,6 +2175,26 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCEnvResult eLookupError = LIBMCENV_SUCCESS;
+		eLookupError = (*pLookup)("libmcenv_iterator_movenext", (void**)&(pWrapperTable->m_Iterator_MoveNext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_MoveNext == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_moveprevious", (void**)&(pWrapperTable->m_Iterator_MovePrevious));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_MovePrevious == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_getcurrent", (void**)&(pWrapperTable->m_Iterator_GetCurrent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_GetCurrent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_clone", (void**)&(pWrapperTable->m_Iterator_Clone));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Clone == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_count", (void**)&(pWrapperTable->m_Iterator_Count));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Count == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getlayerdatauuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetLayerDataUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetLayerDataUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2073,12 +2311,32 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_CalculateSHA2 == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_workingfile_executefile", (void**)&(pWrapperTable->m_WorkingFile_ExecuteFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_ismanaged", (void**)&(pWrapperTable->m_WorkingFile_IsManaged));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_IsManaged == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_makemanaged", (void**)&(pWrapperTable->m_WorkingFile_MakeManaged));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_MakeManaged == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_fileexists", (void**)&(pWrapperTable->m_WorkingFile_FileExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_FileExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_workingfile_deletefile", (void**)&(pWrapperTable->m_WorkingFile_DeleteFile));
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_DeleteFile == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_workingfile_executefile", (void**)&(pWrapperTable->m_WorkingFile_ExecuteFile));
-		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_workingfileiterator_getcurrentfile", (void**)&(pWrapperTable->m_WorkingFileIterator_GetCurrentFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFileIterator_GetCurrentFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_isactive", (void**)&(pWrapperTable->m_WorkingDirectory_IsActive));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_IsActive == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingdirectory_getabsolutefilepath", (void**)&(pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath));
@@ -2091,6 +2349,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_workingdirectory_storedriverdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_cleanup", (void**)&(pWrapperTable->m_WorkingDirectory_CleanUp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_CleanUp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_addmanagedfile", (void**)&(pWrapperTable->m_WorkingDirectory_AddManagedFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_AddManagedFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_hasunmanagedfiles", (void**)&(pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_retrieveunmanagedfiles", (void**)&(pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_retrievemanagedfiles", (void**)&(pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_retrieveallfiles", (void**)&(pWrapperTable->m_WorkingDirectory_RetrieveAllFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveAllFiles == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createworkingdirectory", (void**)&(pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory));
@@ -2429,6 +2711,76 @@ public:
 	/**
 	 * Method definitions for class CBase
 	 */
+	
+	/**
+	 * Method definitions for class CIterator
+	 */
+	
+	/**
+	* CIterator::MoveNext - Iterates to the next object in the list.
+	* @return Iterates to the next object in the list.
+	*/
+	bool CIterator::MoveNext()
+	{
+		bool resultHasNext = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_MoveNext(m_pHandle, &resultHasNext));
+		
+		return resultHasNext;
+	}
+	
+	/**
+	* CIterator::MovePrevious - Iterates to the previous object in the list.
+	* @return Iterates to the previous object in the list.
+	*/
+	bool CIterator::MovePrevious()
+	{
+		bool resultHasPrevious = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_MovePrevious(m_pHandle, &resultHasPrevious));
+		
+		return resultHasPrevious;
+	}
+	
+	/**
+	* CIterator::GetCurrent - Returns the object the iterator points at.
+	* @return returns the object instance.
+	*/
+	PBase CIterator::GetCurrent()
+	{
+		LibMCEnvHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_GetCurrent(m_pHandle, &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBase>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CIterator::Clone - Creates a new object iterator with the same object list.
+	* @return returns the cloned Iterator instance
+	*/
+	PIterator CIterator::Clone()
+	{
+		LibMCEnvHandle hOutIterator = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Clone(m_pHandle, &hOutIterator));
+		
+		if (!hOutIterator) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CIterator>(m_pWrapper, hOutIterator);
+	}
+	
+	/**
+	* CIterator::Count - Returns the number of resoucres the iterator captures.
+	* @return returns the number of objects the iterator captures.
+	*/
+	LibMCEnv_uint64 CIterator::Count()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Count(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
 	
 	/**
 	 * Method definitions for class CToolpathLayer
@@ -2841,14 +3193,6 @@ public:
 	}
 	
 	/**
-	* CWorkingFile::DeleteFile - Deletes the temporary file.
-	*/
-	void CWorkingFile::DeleteFile()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFile(m_pHandle));
-	}
-	
-	/**
 	* CWorkingFile::ExecuteFile - Executes the temporary file, if it is an executable.
 	* @return execution object
 	*/
@@ -2864,8 +3208,83 @@ public:
 	}
 	
 	/**
+	* CWorkingFile::IsManaged - Returns if the file is managed.
+	* @return returns if the file is managed.
+	*/
+	bool CWorkingFile::IsManaged()
+	{
+		bool resultFileIsManaged = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_IsManaged(m_pHandle, &resultFileIsManaged));
+		
+		return resultFileIsManaged;
+	}
+	
+	/**
+	* CWorkingFile::MakeManaged - Makes the file managed if it is not managed yet.
+	*/
+	void CWorkingFile::MakeManaged()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_MakeManaged(m_pHandle));
+	}
+	
+	/**
+	* CWorkingFile::FileExists - Returns if the file exists on disk.
+	* @return returns if the file exists.
+	*/
+	bool CWorkingFile::FileExists()
+	{
+		bool resultFileDoesExist = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_FileExists(m_pHandle, &resultFileDoesExist));
+		
+		return resultFileDoesExist;
+	}
+	
+	/**
+	* CWorkingFile::DeleteFile - Deletes the temporary file.
+	* @return returns if deletion was successful or file did not exist in the first place.
+	*/
+	bool CWorkingFile::DeleteFile()
+	{
+		bool resultSuccess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFile(m_pHandle, &resultSuccess));
+		
+		return resultSuccess;
+	}
+	
+	/**
+	 * Method definitions for class CWorkingFileIterator
+	 */
+	
+	/**
+	* CWorkingFileIterator::GetCurrentFile - Returns the working file the iterator points at.
+	* @return returns the WorkingFile instance.
+	*/
+	PWorkingFile CWorkingFileIterator::GetCurrentFile()
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileIterator_GetCurrentFile(m_pHandle, &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
 	 * Method definitions for class CWorkingDirectory
 	 */
+	
+	/**
+	* CWorkingDirectory::IsActive - Working directory is active.
+	* @return returns true if files can be read and written to the directory.
+	*/
+	bool CWorkingDirectory::IsActive()
+	{
+		bool resultIsActive = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_IsActive(m_pHandle, &resultIsActive));
+		
+		return resultIsActive;
+	}
 	
 	/**
 	* CWorkingDirectory::GetAbsoluteFilePath - Retrieves absolute file path.
@@ -2914,6 +3333,91 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::CleanUp - Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
+	* @return returns if deletion was successful.
+	*/
+	bool CWorkingDirectory::CleanUp()
+	{
+		bool resultSuccess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_CleanUp(m_pHandle, &resultSuccess));
+		
+		return resultSuccess;
+	}
+	
+	/**
+	* CWorkingDirectory::AddManagedFile - Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.
+	* @param[in] sFileName - Filename to manage. The file does not need to exist yet.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::AddManagedFile(const std::string & sFileName)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_AddManagedFile(m_pHandle, sFileName.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::HasUnmanagedFiles - Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.
+	* @return returns if there are unmanaged files.
+	*/
+	bool CWorkingDirectory::HasUnmanagedFiles()
+	{
+		bool resultHasUnmanagedFiles = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_HasUnmanagedFiles(m_pHandle, &resultHasUnmanagedFiles));
+		
+		return resultHasUnmanagedFiles;
+	}
+	
+	/**
+	* CWorkingDirectory::RetrieveUnmanagedFiles - Returns a list of unmanaged files.
+	* @return working file iterator instance.
+	*/
+	PWorkingFileIterator CWorkingDirectory::RetrieveUnmanagedFiles()
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_RetrieveUnmanagedFiles(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CWorkingDirectory::RetrieveManagedFiles - Returns a list of managed files.
+	* @return working file iterator instance.
+	*/
+	PWorkingFileIterator CWorkingDirectory::RetrieveManagedFiles()
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_RetrieveManagedFiles(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CWorkingDirectory::RetrieveAllFiles - Returns a list of all files in the directory.
+	* @return working file iterator instance.
+	*/
+	PWorkingFileIterator CWorkingDirectory::RetrieveAllFiles()
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_RetrieveAllFiles(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileIterator>(m_pWrapper, hIteratorInstance);
 	}
 	
 	/**

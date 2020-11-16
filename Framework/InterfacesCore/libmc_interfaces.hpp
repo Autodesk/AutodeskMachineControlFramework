@@ -318,6 +318,12 @@ public:
 	virtual void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource) = 0;
 
 	/**
+	* IMCContext::SetTempBasePath - sets the base path for temporary files.
+	* @param[in] sTempBasePath - Base path for temporary files.
+	*/
+	virtual void SetTempBasePath(const std::string & sTempBasePath) = 0;
+
+	/**
 	* IMCContext::ParseConfiguration - parses and initialises the state machines from a configuration XML.
 	* @param[in] sXMLString - XML Configuration String.
 	*/

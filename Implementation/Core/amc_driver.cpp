@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driver.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "libmcenv_driverenvironment.hpp"
+#include "common/common_importstream_native.hpp"
 
 using namespace AMC;
 
@@ -48,8 +49,8 @@ template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_p
 }
 
 
-CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment)
-	: m_sName(sName), m_sType(sType), m_sLibrary(sLibrary), m_pParameterGroup(pParameterGroup)
+CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment)
+	: m_sName(sName), m_sType(sType), m_sLibraryPath(sLibraryPath), m_pDriverResourcePackage (pDriverResourcePackage), m_pParameterGroup(pParameterGroup)
 {
 	if (pParameterGroup.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -57,11 +58,13 @@ CDriver::CDriver(const std::string& sName, const std::string& sType, const std::
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (pMCEnvWrapper.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pDriverResourcePackage.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 	m_pDriverEnvironment = pDriverEnvironment;
 	m_pMCEnvWrapper = pMCEnvWrapper;
 
-	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibrary);
+	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibraryPath);
 	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCEnv::CDriverEnvironment>(pDriverEnvironment, m_pMCEnvWrapper);
 
 	m_pDriverWrapper->InjectComponent("LibMCEnv", m_pMCEnvWrapper->GetSymbolLookupMethod());
