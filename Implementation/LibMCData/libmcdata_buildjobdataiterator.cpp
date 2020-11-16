@@ -73,7 +73,7 @@ IIterator* CBuildJobDataIterator::Clone()
         auto pBuildJobData = std::dynamic_pointer_cast<CBuildJobData> (pBase);
         if (pBuildJobData.get() == nullptr)
             throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
-        pNewIterator->AddJobData(pBuildJobData);
+        pNewIterator->AddJobData(CBuildJobData::makeSharedFrom (pBuildJobData.get()));
     }
 
     return pNewIterator.release();

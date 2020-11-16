@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace AMCCommon {
 
@@ -70,7 +71,13 @@ namespace AMCCommon {
 		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);
 		static std::string decodeBase64ToASCIIString(const std::string& sString, eBase64Type eType);
 
+		static bool fileOrPathExistsOnDisk(const std::string& sPathName);
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
+		static void deleteDirectoryFromDisk(const std::string& sPath, bool MustSucceed);
+		static void createDirectoryOnDisk(const std::string& sPath);
+
+		static std::string findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string & sExtension, const uint32_t nMaxIterations);
+		static std::set<std::string> findContentOfDirectory(const std::string & sDirectory, bool bReturnFiles, bool bReturnDirectories);
 	};
 
 	

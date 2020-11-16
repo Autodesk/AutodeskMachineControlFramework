@@ -27,76 +27,53 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CWorkingDirectory
+Abstract: This is a stub class definition of CIterator
 
 */
 
-
-#ifndef __LIBMCENV_WORKINGDIRECTORY
-#define __LIBMCENV_WORKINGDIRECTORY
-
-#include "libmcenv_interfaces.hpp"
-#include "libmcenv_workingfile.hpp"
-
-// Parent classes
-#include "libmcenv_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcenv_iterator.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
-#include "amc_resourcepackage.hpp"
-#include "amc_logger.hpp"
 
-namespace LibMCEnv {
-namespace Impl {
 
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CWorkingDirectory 
+ Class definition of CIterator 
 **************************************************************************************************************************/
 
-class CWorkingDirectory : public virtual IWorkingDirectory, public virtual CBase {
-private:
+CIterator::CIterator()
+    : m_nCurrentIndex(-1)
+{
 
-protected:
+}
 
-    AMC::PResourcePackage m_pResourcePackage;
 
-    PWorkingFileMonitor m_pWorkingFileMonitor;
+bool CIterator::MoveNext()
+{
+    if (((size_t)m_nCurrentIndex + 1) < m_List.size()) {
+        m_nCurrentIndex++;
+        return true;
+    }
+    else
+        return false;
+}
 
-public:
+bool CIterator::MovePrevious()
+{
+    if (m_nCurrentIndex > 0) {
+        m_nCurrentIndex--;
+        return true;
+    }
+    else
+        return false;
 
-    CWorkingDirectory(const std::string & sBasePath, AMC::PResourcePackage pResourcePackage);
-    ~CWorkingDirectory();
+}
 
-    bool IsActive() override;
 
-	std::string GetAbsoluteFilePath() override;
+LibMCEnv_uint64 CIterator::Count()
+{
+    return m_List.size();
+}
 
-	IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) override;
-
-	IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) override;
-
-	bool CleanUp() override;
-
-	IWorkingFile* AddManagedFile(const std::string& sFileName) override;
-
-	bool HasUnmanagedFiles() override;
-
-	IWorkingFileIterator* RetrieveUnmanagedFiles() override;
-
-	IWorkingFileIterator* RetrieveManagedFiles() override;
-
-	IWorkingFileIterator* RetrieveAllFiles() override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCEnv
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCENV_WORKINGDIRECTORY

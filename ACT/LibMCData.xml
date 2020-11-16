@@ -323,6 +323,8 @@
 		<error name="INVALIDEVENTSENDER" code="326" description="Invalid event context" />
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
+		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
+		
 		
 						
 	</errors>

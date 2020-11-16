@@ -87,6 +87,23 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     // Create Client Dist Handler
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();
     m_pAPI->registerHandler (m_pClientDistHandler);
+
+
+    // Set Temporary Path (as default value)
+#ifdef _WIN32
+    std::vector<wchar_t> TempPathBuffer;
+    TempPathBuffer.resize(MAX_PATH + 1);
+    auto nSize = GetTempPathW(MAX_PATH, TempPathBuffer.data ());
+    if (nSize == 0)
+        throw ELibMCInterfaceException(LIBMC_ERROR_TEMPBASEPATHEMPTY);
+
+    TempPathBuffer[MAX_PATH] = 0;
+    std::string sTempPathUTF8 = AMCCommon::CUtils::UTF16toUTF8(TempPathBuffer.data());
+    m_pSystemState->driverHandler()->setTempBasePath(sTempPathUTF8);
+
+#else
+    m_pSystemState->driverHandler()->setTempBasePath("/temp");
+#endif
 }
 
 
@@ -174,8 +191,16 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
 void CMCContext::RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource)
 {
     m_pSystemState->logger()->logMessage("mapping " + sLibraryName + " to " + sLibraryPath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-    m_pSystemState->addLibraryPath(sLibraryName, sLibraryPath, sLibraryResource);
-    
+    m_pSystemState->addLibraryPath(sLibraryName, sLibraryPath, sLibraryResource);    
+}
+
+void CMCContext::SetTempBasePath(const std::string& sTempBasePath)
+{
+    if (sTempBasePath.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_TEMPBASEPATHEMPTY);
+
+    m_pSystemState->driverHandler()->setTempBasePath(sTempBasePath);
+
 }
 
 
@@ -209,7 +234,7 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
     m_pSystemState->logger()->logMessage("Initializing " + sName + " (" + sType + "@" + sLibraryName + ")", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
     try {
-        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName));
+        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName));
     } 
     catch (std::exception & E) {
         m_pSystemState->logger()->logMessage(std::string ("Driver error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);

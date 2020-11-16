@@ -48,6 +48,55 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for Iterator
+**************************************************************************************************************************/
+
+/**
+* Iterates to the next object in the list.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pHasNext - Iterates to the next object in the list.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvIterator_MoveNextPtr) (LibMCEnv_Iterator pIterator, bool * pHasNext);
+
+/**
+* Iterates to the previous object in the list.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pHasPrevious - Iterates to the previous object in the list.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvIterator_MovePreviousPtr) (LibMCEnv_Iterator pIterator, bool * pHasPrevious);
+
+/**
+* Returns the object the iterator points at.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pInstance - returns the object instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvIterator_GetCurrentPtr) (LibMCEnv_Iterator pIterator, LibMCEnv_Base * pInstance);
+
+/**
+* Creates a new object iterator with the same object list.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pOutIterator - returns the cloned Iterator instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvIterator_ClonePtr) (LibMCEnv_Iterator pIterator, LibMCEnv_Iterator * pOutIterator);
+
+/**
+* Returns the number of resoucres the iterator captures.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pCount - returns the number of objects the iterator captures.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvIterator_CountPtr) (LibMCEnv_Iterator pIterator, LibMCEnv_uint64 * pCount);
+
+/*************************************************************************************************************************
  Class definition for ToolpathLayer
 **************************************************************************************************************************/
 
@@ -366,14 +415,6 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingFile_GetSizePtr) (LibMCEnv_WorkingFile 
 typedef LibMCEnvResult (*PLibMCEnvWorkingFile_CalculateSHA2Ptr) (LibMCEnv_WorkingFile pWorkingFile, const LibMCEnv_uint32 nSHA2BufferSize, LibMCEnv_uint32* pSHA2NeededChars, char * pSHA2Buffer);
 
 /**
-* Deletes the temporary file.
-*
-* @param[in] pWorkingFile - WorkingFile instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCEnvResult (*PLibMCEnvWorkingFile_DeleteFilePtr) (LibMCEnv_WorkingFile pWorkingFile);
-
-/**
 * Executes the temporary file, if it is an executable.
 *
 * @param[in] pWorkingFile - WorkingFile instance.
@@ -382,9 +423,66 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingFile_DeleteFilePtr) (LibMCEnv_WorkingFi
 */
 typedef LibMCEnvResult (*PLibMCEnvWorkingFile_ExecuteFilePtr) (LibMCEnv_WorkingFile pWorkingFile, LibMCEnv_WorkingFileExecution * pExecution);
 
+/**
+* Returns if the file is managed.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pFileIsManaged - returns if the file is managed.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_IsManagedPtr) (LibMCEnv_WorkingFile pWorkingFile, bool * pFileIsManaged);
+
+/**
+* Makes the file managed if it is not managed yet.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_MakeManagedPtr) (LibMCEnv_WorkingFile pWorkingFile);
+
+/**
+* Returns if the file exists on disk.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pFileDoesExist - returns if the file exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_FileExistsPtr) (LibMCEnv_WorkingFile pWorkingFile, bool * pFileDoesExist);
+
+/**
+* Deletes the temporary file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pSuccess - returns if deletion was successful or file did not exist in the first place.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_DeleteFilePtr) (LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
+
+/*************************************************************************************************************************
+ Class definition for WorkingFileIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the working file the iterator points at.
+*
+* @param[in] pWorkingFileIterator - WorkingFileIterator instance.
+* @param[out] pWorkingFile - returns the WorkingFile instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingFileIterator_GetCurrentFilePtr) (LibMCEnv_WorkingFileIterator pWorkingFileIterator, LibMCEnv_WorkingFile * pWorkingFile);
+
 /*************************************************************************************************************************
  Class definition for WorkingDirectory
 **************************************************************************************************************************/
+
+/**
+* Working directory is active.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIsActive - returns true if files can be read and written to the directory.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_IsActivePtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pIsActive);
 
 /**
 * Retrieves absolute file path.
@@ -419,6 +517,61 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomDataPtr) (LibMCEnv
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreDriverDataPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pSuccess - returns if deletion was successful.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_CleanUpPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pSuccess);
+
+/**
+* Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - Filename to manage. The file does not need to exist yet.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_AddManagedFilePtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pHasUnmanagedFiles - returns if there are unmanaged files.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_HasUnmanagedFilesPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pHasUnmanagedFiles);
+
+/**
+* Returns a list of unmanaged files.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIteratorInstance - working file iterator instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_RetrieveUnmanagedFilesPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
+
+/**
+* Returns a list of managed files.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIteratorInstance - working file iterator instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_RetrieveManagedFilesPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
+
+/**
+* Returns a list of all files in the directory.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIteratorInstance - working file iterator instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_RetrieveAllFilesPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
  Class definition for DriverEnvironment
@@ -1306,6 +1459,11 @@ typedef LibMCEnvResult (*PLibMCEnvGetSymbolLookupMethodPtr) (LibMCEnv_pvoid * pS
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCEnvIterator_MoveNextPtr m_Iterator_MoveNext;
+	PLibMCEnvIterator_MovePreviousPtr m_Iterator_MovePrevious;
+	PLibMCEnvIterator_GetCurrentPtr m_Iterator_GetCurrent;
+	PLibMCEnvIterator_ClonePtr m_Iterator_Clone;
+	PLibMCEnvIterator_CountPtr m_Iterator_Count;
 	PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr m_ToolpathLayer_GetLayerDataUUID;
 	PLibMCEnvToolpathLayer_GetSegmentCountPtr m_ToolpathLayer_GetSegmentCount;
 	PLibMCEnvToolpathLayer_GetSegmentInfoPtr m_ToolpathLayer_GetSegmentInfo;
@@ -1335,11 +1493,22 @@ typedef struct {
 	PLibMCEnvWorkingFile_GetAbsoluteFileNamePtr m_WorkingFile_GetAbsoluteFileName;
 	PLibMCEnvWorkingFile_GetSizePtr m_WorkingFile_GetSize;
 	PLibMCEnvWorkingFile_CalculateSHA2Ptr m_WorkingFile_CalculateSHA2;
-	PLibMCEnvWorkingFile_DeleteFilePtr m_WorkingFile_DeleteFile;
 	PLibMCEnvWorkingFile_ExecuteFilePtr m_WorkingFile_ExecuteFile;
+	PLibMCEnvWorkingFile_IsManagedPtr m_WorkingFile_IsManaged;
+	PLibMCEnvWorkingFile_MakeManagedPtr m_WorkingFile_MakeManaged;
+	PLibMCEnvWorkingFile_FileExistsPtr m_WorkingFile_FileExists;
+	PLibMCEnvWorkingFile_DeleteFilePtr m_WorkingFile_DeleteFile;
+	PLibMCEnvWorkingFileIterator_GetCurrentFilePtr m_WorkingFileIterator_GetCurrentFile;
+	PLibMCEnvWorkingDirectory_IsActivePtr m_WorkingDirectory_IsActive;
 	PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr m_WorkingDirectory_GetAbsoluteFilePath;
 	PLibMCEnvWorkingDirectory_StoreCustomDataPtr m_WorkingDirectory_StoreCustomData;
 	PLibMCEnvWorkingDirectory_StoreDriverDataPtr m_WorkingDirectory_StoreDriverData;
+	PLibMCEnvWorkingDirectory_CleanUpPtr m_WorkingDirectory_CleanUp;
+	PLibMCEnvWorkingDirectory_AddManagedFilePtr m_WorkingDirectory_AddManagedFile;
+	PLibMCEnvWorkingDirectory_HasUnmanagedFilesPtr m_WorkingDirectory_HasUnmanagedFiles;
+	PLibMCEnvWorkingDirectory_RetrieveUnmanagedFilesPtr m_WorkingDirectory_RetrieveUnmanagedFiles;
+	PLibMCEnvWorkingDirectory_RetrieveManagedFilesPtr m_WorkingDirectory_RetrieveManagedFiles;
+	PLibMCEnvWorkingDirectory_RetrieveAllFilesPtr m_WorkingDirectory_RetrieveAllFiles;
 	PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr m_DriverEnvironment_CreateWorkingDirectory;
 	PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr m_DriverEnvironment_RetrieveDriverData;
 	PLibMCEnvDriverEnvironment_RegisterStringParameterPtr m_DriverEnvironment_RegisterStringParameter;

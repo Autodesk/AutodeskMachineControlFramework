@@ -27,102 +27,51 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CWorkingFile
+Abstract: This is the class declaration of CWorkingFileIterator
 
 */
 
 
-#ifndef __LIBMCENV_WORKINGFILE
-#define __LIBMCENV_WORKINGFILE
+#ifndef __LIBMCENV_WORKINGFILEITERATOR
+#define __LIBMCENV_WORKINGFILEITERATOR
 
 #include "libmcenv_interfaces.hpp"
+#include "libmcenv_workingfile.hpp"
 
 // Parent classes
-#include "libmcenv_base.hpp"
+#include "libmcenv_iterator.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include <set>
-#include <string>
 
-#include "amc_logger.hpp"
 
 namespace LibMCEnv {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CWorkingFile 
+ Class declaration of CWorkingFileIterator 
 **************************************************************************************************************************/
 
-class CWorkingFileMonitor {
-
-private:
-
-    bool m_bIsActive;
-
-    std::string m_sWorkingDirectory;
-    std::set<std::string> m_MonitoredFileNames;
-
-public:
-
-    CWorkingFileMonitor(const std::string & sWorkingDirectory);
-
-    std::string getWorkingDirectory();
-
-    std::string getAbsoluteFileName(const std::string& sFileName);
-
-    void addNewMonitoredFile(const std::string& sFileName);
-
-    bool fileIsMonitored(const std::string& sFileName);
-
-    void cleanUpDirectory(AMC::CLogger* pLoggerForUnmanagedFileWarnings);
-
-    bool isActive();
-
-    std::set<std::string> getFileNames();
-
-};
-
-
-typedef std::shared_ptr<CWorkingFileMonitor> PWorkingFileMonitor;
-
-
-class CWorkingFile : public virtual IWorkingFile, public virtual CBase {
+class CWorkingFileIterator : public virtual IWorkingFileIterator, public virtual CIterator {
 private:
 
 protected:
-    std::string m_sFileName;
-    std::string m_sAbsolutePath;
-
-    PWorkingFileMonitor m_pWorkingFileMonitor;
 
 public:
 
-    static CWorkingFile * makeFrom(CWorkingFile* pWorkingFile);
+    CWorkingFileIterator();
 
-    static std::shared_ptr<CWorkingFile> makeSharedFrom(CWorkingFile* pWorkingFile);
+    IIterator* Clone() override;
 
-    CWorkingFile(const std::string& sFileName, PWorkingFileMonitor pWorkingFileMonitor);
+    IBase* GetCurrent() override;
 
-	std::string GetAbsoluteFileName() override;
+	IWorkingFile * GetCurrentFile() override;
 
-	LibMCEnv_uint64 GetSize() override;
-
-	std::string CalculateSHA2() override;
-
-	IWorkingFileExecution * ExecuteFile() override;
-
-	bool IsManaged() override;
-
-	void MakeManaged() override;
-
-	bool FileExists() override;
-
-    bool DeleteFile() override;
+    void AddWorkingFile(std::shared_ptr<CWorkingFile> pWorkingFile);
 
 };
 
@@ -132,4 +81,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_WORKINGFILE
+#endif // __LIBMCENV_WORKINGFILEITERATOR
