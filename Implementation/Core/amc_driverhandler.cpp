@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driver.hpp"
 
 #include "amc_driverhandler.hpp"
+#include "amc_toolpathhandler.hpp"
 
 #include "libmcenv_driverenvironment.hpp"
 #include "libmc_interfaceexception.hpp"
@@ -46,10 +47,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper)
-	: m_pEnvironmentWrapper (pEnvironmentWrapper)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler)
+	: m_pEnvironmentWrapper (pEnvironmentWrapper), m_pToolpathHandler (pToolpathHandler)
 {
 	if (pEnvironmentWrapper.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 
@@ -81,7 +84,7 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_sTempBasePath);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_pToolpathHandler, m_sTempBasePath);
 
 	pInternalEnvironment->setIsInitializing(true);
 

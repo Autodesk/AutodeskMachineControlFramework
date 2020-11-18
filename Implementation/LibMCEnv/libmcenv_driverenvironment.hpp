@@ -39,6 +39,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 
 #include "amc_parametergroup.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_toolpathhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -66,18 +67,21 @@ protected:
 
 	bool m_bIsInitializing;
 
-	std::string m_sBasePath;
+	std::string m_sBaseTempPath;
 
 	AMC::PParameterGroup m_pParameterGroup;
 	AMC::PResourcePackage m_pResourcePackage;
+	AMC::PToolpathHandler m_pToolpathHandler;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, const std::string & sBasePath);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string & sBaseTempPath);
 
 	IWorkingDirectory* CreateWorkingDirectory() override;
 
 	void RetrieveDriverData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer) override;
+
+	IToolpathAccessor* CreateToolpathAccessor(const std::string& sBuildUUID);
 
 	void RegisterStringParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue) override;
 
