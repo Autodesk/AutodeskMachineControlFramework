@@ -469,7 +469,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_fileexists(LibMCEnv_Workin
 * @param[out] pSuccess - returns if deletion was successful or file did not exist in the first place.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_deletefromdisk(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
 
 /*************************************************************************************************************************
  Class definition for WorkingFileIterator
@@ -610,6 +610,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirecto
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pStreamUUID - UUID of the stream.
+* @param[out] pToolpathInstance - Toolpath instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance);
 
 /**
 * registers a string parameter. Must only be called during driver creation.

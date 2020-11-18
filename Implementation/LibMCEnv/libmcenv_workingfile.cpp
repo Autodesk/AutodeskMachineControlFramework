@@ -224,7 +224,7 @@ bool CWorkingFile::FileExists()
     return AMCCommon::CUtils::fileOrPathExistsOnDisk(m_sAbsolutePath);
 }
 
-bool CWorkingFile::DeleteFile()
+bool CWorkingFile::DeleteFromDisk()
 {
     if (AMCCommon::CUtils::fileOrPathExistsOnDisk(m_sAbsolutePath)) {
         AMCCommon::CUtils::deleteFileFromDisk(m_sAbsolutePath, false);

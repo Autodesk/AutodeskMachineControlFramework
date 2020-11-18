@@ -274,7 +274,7 @@
 			<param name="FileDoesExist" type="bool" pass="return" description="returns if the file exists." />
 		</method>
 
-		<method name="DeleteFile" description = "Deletes the temporary file.">
+		<method name="DeleteFromDisk" description = "Deletes the temporary file.">
 			<param name="Success" type="bool" pass="return" description="returns if deletion was successful or file did not exist in the first place." />
 		</method>
 
@@ -345,6 +345,11 @@
 		<method name="RetrieveDriverData" description = "retrieves attached driver data into a memory buffer.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
+		</method>
+		
+		<method name="CreateToolpathAccessor" description="Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the stream." />
+			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
 		</method>
 		
 		

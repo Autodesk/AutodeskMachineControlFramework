@@ -507,7 +507,7 @@ public:
 	inline bool IsManaged();
 	inline void MakeManaged();
 	inline bool FileExists();
-	inline bool DeleteFile();
+	inline bool DeleteFromDisk();
 };
 	
 /*************************************************************************************************************************
@@ -569,6 +569,7 @@ public:
 	
 	inline PWorkingDirectory CreateWorkingDirectory();
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PToolpathAccessor CreateToolpathAccessor(const std::string & sStreamUUID);
 	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue);
@@ -829,7 +830,7 @@ public:
 		pWrapperTable->m_WorkingFile_IsManaged = nullptr;
 		pWrapperTable->m_WorkingFile_MakeManaged = nullptr;
 		pWrapperTable->m_WorkingFile_FileExists = nullptr;
-		pWrapperTable->m_WorkingFile_DeleteFile = nullptr;
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = nullptr;
 		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = nullptr;
 		pWrapperTable->m_WorkingDirectory_IsActive = nullptr;
 		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = nullptr;
@@ -843,6 +844,7 @@ public:
 		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = nullptr;
@@ -1314,12 +1316,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCEnvWorkingFile_DeleteFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_deletefile");
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = (PLibMCEnvWorkingFile_DeleteFromDiskPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_deletefromdisk");
 		#else // _WIN32
-		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCEnvWorkingFile_DeleteFilePtr) dlsym(hLibrary, "libmcenv_workingfile_deletefile");
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = (PLibMCEnvWorkingFile_DeleteFromDiskPtr) dlsym(hLibrary, "libmcenv_workingfile_deletefromdisk");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_WorkingFile_DeleteFile == nullptr)
+		if (pWrapperTable->m_WorkingFile_DeleteFromDisk == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1437,6 +1439,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = (PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createtoolpathaccessor");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = (PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createtoolpathaccessor");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2327,8 +2338,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_FileExists == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_workingfile_deletefile", (void**)&(pWrapperTable->m_WorkingFile_DeleteFile));
-		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_DeleteFile == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_workingfile_deletefromdisk", (void**)&(pWrapperTable->m_WorkingFile_DeleteFromDisk));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_DeleteFromDisk == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingfileiterator_getcurrentfile", (void**)&(pWrapperTable->m_WorkingFileIterator_GetCurrentFile));
@@ -2381,6 +2392,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievedriverdata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createtoolpathaccessor", (void**)&(pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerstringparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterStringParameter));
@@ -3240,13 +3255,13 @@ public:
 	}
 	
 	/**
-	* CWorkingFile::DeleteFile - Deletes the temporary file.
+	* CWorkingFile::DeleteFromDisk - Deletes the temporary file.
 	* @return returns if deletion was successful or file did not exist in the first place.
 	*/
-	bool CWorkingFile::DeleteFile()
+	bool CWorkingFile::DeleteFromDisk()
 	{
 		bool resultSuccess = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFile(m_pHandle, &resultSuccess));
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFromDisk(m_pHandle, &resultSuccess));
 		
 		return resultSuccess;
 	}
@@ -3451,6 +3466,22 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
 		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
+	
+	/**
+	* CDriverEnvironment::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+	* @param[in] sStreamUUID - UUID of the stream.
+	* @return Toolpath instance.
+	*/
+	PToolpathAccessor CDriverEnvironment::CreateToolpathAccessor(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hToolpathInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateToolpathAccessor(m_pHandle, sStreamUUID.c_str(), &hToolpathInstance));
+		
+		if (!hToolpathInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
 	}
 	
 	/**

@@ -456,7 +456,7 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingFile_FileExistsPtr) (LibMCEnv_WorkingFi
 * @param[out] pSuccess - returns if deletion was successful or file did not exist in the first place.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvWorkingFile_DeleteFilePtr) (LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
+typedef LibMCEnvResult (*PLibMCEnvWorkingFile_DeleteFromDiskPtr) (LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
 
 /*************************************************************************************************************************
  Class definition for WorkingFileIterator
@@ -597,6 +597,16 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) (
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pStreamUUID - UUID of the stream.
+* @param[out] pToolpathInstance - Toolpath instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance);
 
 /**
 * registers a string parameter. Must only be called during driver creation.
@@ -1497,7 +1507,7 @@ typedef struct {
 	PLibMCEnvWorkingFile_IsManagedPtr m_WorkingFile_IsManaged;
 	PLibMCEnvWorkingFile_MakeManagedPtr m_WorkingFile_MakeManaged;
 	PLibMCEnvWorkingFile_FileExistsPtr m_WorkingFile_FileExists;
-	PLibMCEnvWorkingFile_DeleteFilePtr m_WorkingFile_DeleteFile;
+	PLibMCEnvWorkingFile_DeleteFromDiskPtr m_WorkingFile_DeleteFromDisk;
 	PLibMCEnvWorkingFileIterator_GetCurrentFilePtr m_WorkingFileIterator_GetCurrentFile;
 	PLibMCEnvWorkingDirectory_IsActivePtr m_WorkingDirectory_IsActive;
 	PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr m_WorkingDirectory_GetAbsoluteFilePath;
@@ -1511,6 +1521,7 @@ typedef struct {
 	PLibMCEnvWorkingDirectory_RetrieveAllFilesPtr m_WorkingDirectory_RetrieveAllFiles;
 	PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr m_DriverEnvironment_CreateWorkingDirectory;
 	PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr m_DriverEnvironment_RetrieveDriverData;
+	PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr m_DriverEnvironment_CreateToolpathAccessor;
 	PLibMCEnvDriverEnvironment_RegisterStringParameterPtr m_DriverEnvironment_RegisterStringParameter;
 	PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr m_DriverEnvironment_RegisterUUIDParameter;
 	PLibMCEnvDriverEnvironment_RegisterDoubleParameterPtr m_DriverEnvironment_RegisterDoubleParameter;
