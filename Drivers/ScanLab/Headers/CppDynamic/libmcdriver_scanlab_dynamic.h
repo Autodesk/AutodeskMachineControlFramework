@@ -115,24 +115,27 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_QueryParametersPt
 **************************************************************************************************************************/
 
 /**
-* Loads card firmware from given file path.
+* Loads card firmware from resource files.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] pPath - Path to the image files.
+* @param[in] pFirmwareResource - resource name of the firmware program file.
+* @param[in] pFPGAResource - resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryResource - resource name of the binary auxiliary file.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LoadProgramFromPathPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pPath);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
 
 /**
-* Loads card calibration file from given file.
+* Loads card calibration file from given resource file.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] pFileName - FileName to the image files.
+* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+* @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
 * @param[in] nTableNumber - Correction table index of card (1..8)
 * @param[in] nDimension - Is it a 2D or 3D correction file.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFileName, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
 
 /**
 * Selects Correction Table on card.
@@ -440,17 +443,75 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCSelector_AcquireEther
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCSelector_AcquireEthernetCardBySerialPtr) (LibMCDriver_ScanLab_RTCSelector pRTCSelector, LibMCDriver_ScanLab_uint32 nSerialNumber, LibMCDriver_ScanLab_RTCContext * pInstance);
 
 /*************************************************************************************************************************
- Class definition for Driver_ScanLab_RTC5
+ Class definition for Driver_ScanLab
 **************************************************************************************************************************/
+
+/**
+* Initializes the ScanLab SDK.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @param[in] pResourceName - Resource name of Scanlab DLL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, const char * pResourceName);
 
 /**
 * Creates and initializes a new RTC selector singleton. Should only be called once per Process.
 *
-* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
 * @param[out] pInstance - New Selector instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_CreateRTCSelectorPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_RTCSelector * pInstance);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_RTCSelector * pInstance);
+
+/*************************************************************************************************************************
+ Class definition for Driver_ScanLab_RTC5
+**************************************************************************************************************************/
+
+/**
+* Initializes the RTC5 Scanner Driver.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pIP - IP Network Address. Empty string for local card.
+* @param[in] pNetmask - IP Netmask Address. Empty string for local card.
+* @param[in] nTimeout - Time out in microseconds.
+* @param[in] nSerialNumber - Desired Serial Number of card.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_InitialisePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber);
+
+/**
+* Loads the firmware from the driver resources.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pFirmwareResource - resource name of the firmware program file.
+* @param[in] pFPGAResource - resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryResource - resource name of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_LoadFirmwarePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
+
+/**
+* Sets the correction file stream.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+* @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
+* @param[in] nTableNumber - Correction table index of card (1..8)
+* @param[in] nDimension - Is it a 2D or 3D correction file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
 
 /*************************************************************************************************************************
  Global functions
@@ -533,7 +594,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_ScanLabDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_ScanLabDriver_QueryParametersPtr m_Driver_QueryParameters;
-	PLibMCDriver_ScanLabRTCContext_LoadProgramFromPathPtr m_RTCContext_LoadProgramFromPath;
+	PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr m_RTCContext_LoadFirmware;
 	PLibMCDriver_ScanLabRTCContext_LoadCorrectionFilePtr m_RTCContext_LoadCorrectionFile;
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;
 	PLibMCDriver_ScanLabRTCContext_ConfigureListsPtr m_RTCContext_ConfigureLists;
@@ -565,7 +626,12 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCSelector_AcquireCardBySerialPtr m_RTCSelector_AcquireCardBySerial;
 	PLibMCDriver_ScanLabRTCSelector_AcquireEthernetCardPtr m_RTCSelector_AcquireEthernetCard;
 	PLibMCDriver_ScanLabRTCSelector_AcquireEthernetCardBySerialPtr m_RTCSelector_AcquireEthernetCardBySerial;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_CreateRTCSelectorPtr m_Driver_ScanLab_RTC5_CreateRTCSelector;
+	PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr m_Driver_ScanLab_LoadSDK;
+	PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr m_Driver_ScanLab_CreateRTCSelector;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_InitialisePtr m_Driver_ScanLab_RTC5_Initialise;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_LoadFirmwarePtr m_Driver_ScanLab_RTC5_LoadFirmware;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr m_Driver_ScanLab_RTC5_SetCorrectionFile;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr m_Driver_ScanLab_RTC5_DrawLayer;
 	PLibMCDriver_ScanLabGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabReleaseInstancePtr m_ReleaseInstance;

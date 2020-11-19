@@ -13,6 +13,9 @@ Abstract: This is the class declaration of CDriver_ScanLab_RTC5
 #define __LIBMCDRIVER_SCANLAB_DRIVER_SCANLAB_RTC5
 
 #include "libmcdriver_scanlab_interfaces.hpp"
+#include "libmcdriver_scanlab_driver_scanlab.hpp"
+#include "libmcdriver_scanlab_rtccontext.hpp"
+#include "libmcdriver_scanlab_rtcselector.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlab_driver.hpp"
@@ -32,29 +35,34 @@ namespace Impl {
  Class declaration of CDriver_ScanLab_RTC5 
 **************************************************************************************************************************/
 
-class CDriver_ScanLab_RTC5 : public virtual IDriver_ScanLab_RTC5, public virtual CDriver {
+class CDriver_ScanLab_RTC5 : public virtual IDriver_ScanLab_RTC5, public virtual CDriver_ScanLab {
 private:
 
 	std::string m_sName; 
 	std::string m_sType;
 
+	std::shared_ptr<IRTCSelector> m_pRTCSelector;
+	std::shared_ptr<IRTCContext> m_pRTCContext;
+
 protected:
 
 public:
 
-	CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType);
-
-	IRTCSelector * CreateRTCSelector() override;
+	CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	std::string GetName() override;
 
-	void GetVersion(LibMCDriver_ScanLab_uint32& nMajor, LibMCDriver_ScanLab_uint32& nMinor, LibMCDriver_ScanLab_uint32& nMicro, std::string& sBuild) override;
-
 	std::string GetType() override;
 
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
 	void QueryParameters() override;
+
+	void Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) override;
+
+	void LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource) override;
+
+	void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
+
+	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) override;
 
 };
 

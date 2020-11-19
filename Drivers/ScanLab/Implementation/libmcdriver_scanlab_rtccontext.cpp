@@ -40,12 +40,18 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCContext 
 **************************************************************************************************************************/
 
-CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo)
-	: m_pScanLabSDK (pScanLabSDK), m_CardNo (nCardNo), m_dCorrectionFactor(10000.0), m_LaserPort(eLaserPort::Port12BitAnalog1)
+CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_pScanLabSDK (pScanLabSDK), 
+	m_CardNo (nCardNo), 
+	m_dCorrectionFactor(10000.0), 
+	m_LaserPort(eLaserPort::Port12BitAnalog1), 
+	m_pDriverEnvironment (pDriverEnvironment),
+	m_bIsNetwork (bIsNetwork)
 {
-	if (pScanLabSDK.get() != nullptr)
+	if (pScanLabSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-
+	if (pDriverEnvironment.get () == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 	if (nCardNo == 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 }
@@ -59,23 +65,57 @@ CRTCContext::~CRTCContext()
 }
 
 
-void CRTCContext::LoadProgramFromPath(const std::string & sPath)
+
+void CRTCContext::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
 {
+
+	auto pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+
+	std::string sFirmwareName;
+	if (m_bIsNetwork) {
+		sFirmwareName = "RTC6ETH.out";
+	}
+	else {
+		sFirmwareName = "RTC6OUT.out";
+	}
+
+	auto pFirmwareFile = pWorkingDirectory->StoreDriverData (sFirmwareName, sFirmwareResource);
+	auto pFPGAFile = pWorkingDirectory->StoreDriverData ("RTC6RBF.rbf", sFPGAResource);
+	auto pAuxiliaryFile = pWorkingDirectory->StoreDriverData("RTC6DAT.dat", sAuxiliaryResource);
+
 	// TODO: Convert to ANSI
-	uint32_t nErrorCode = m_pScanLabSDK->n_load_program_file(m_CardNo, sPath.c_str());
+	uint32_t nErrorCode = m_pScanLabSDK->n_load_program_file (m_CardNo, pWorkingDirectory->GetAbsoluteFilePath().c_str ());
+
+	pFirmwareFile = nullptr;
+	pFPGAFile = nullptr;
+	pAuxiliaryFile = nullptr;
+
+	pWorkingDirectory->CleanUp();
 
 	// TODO: Detailed Error codes
 	if (nErrorCode != 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE);
+
 }
 
-void CRTCContext::LoadCorrectionFile(const std::string & sFileName, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
+void CRTCContext::LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
 {
-	uint32_t nErrorCode = m_pScanLabSDK->n_load_correction_file(m_CardNo, sFileName.c_str(), nTableNumber, nDimension);
+
+	auto pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+
+	auto pCorrectionFile = pWorkingDirectory->StoreCustomData("cor.ct5", LibMCEnv::CInputVector<uint8_t>(pCorrectionFileBuffer, nCorrectionFileBufferSize));
+
+	uint32_t nErrorCode = m_pScanLabSDK->n_load_correction_file(m_CardNo, pCorrectionFile->GetAbsoluteFileName ().c_str(), nTableNumber, nDimension);
+
+	pCorrectionFile = nullptr;
+	pWorkingDirectory->CleanUp();
+
 	// TODO: Detailed Error codes
 	if (nErrorCode != 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADCORRECTIONFILE);
+
 }
+
 
 void CRTCContext::SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB)
 {
@@ -234,7 +274,7 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	// TODO: Brennt die maschine ab?
-	float fClippedPowerFactor = fPower / 100.0f;
+	double fClippedPowerFactor = fPower / 100.0f;
 	if (fClippedPowerFactor > 1.0f)
 		fClippedPowerFactor = 1.0f;
 	if (fClippedPowerFactor < 0.0f)
@@ -242,16 +282,16 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 
 	switch (m_LaserPort) {
 	case eLaserPort::Port16bitDigital:
-		m_pScanLabSDK->n_write_io_port(m_CardNo, (int)round(fClippedPowerFactor * 65535.0f));
+		m_pScanLabSDK->n_write_io_port(m_CardNo, (int)round(fClippedPowerFactor * 65535.0));
 		break;
 	case eLaserPort::Port8bitDigital:
-		m_pScanLabSDK->n_write_8bit_port(m_CardNo, (int)round(fClippedPowerFactor * 255.0f));
+		m_pScanLabSDK->n_write_8bit_port(m_CardNo, (int)round(fClippedPowerFactor * 255.0));
 		break;
 	case eLaserPort::Port12BitAnalog1:
-		m_pScanLabSDK->n_write_da_1(m_CardNo, (int)round(fClippedPowerFactor * 4095.0f));
+		m_pScanLabSDK->n_write_da_1(m_CardNo, (int)round(fClippedPowerFactor * 4095.0));
 		break;
 	case eLaserPort::Port12BitAnalog2:
-		m_pScanLabSDK->n_write_da_2(m_CardNo, (int)round(fClippedPowerFactor * 4095.0f));
+		m_pScanLabSDK->n_write_da_2(m_CardNo, (int)round(fClippedPowerFactor * 4095.0));
 		break;
 
 	}

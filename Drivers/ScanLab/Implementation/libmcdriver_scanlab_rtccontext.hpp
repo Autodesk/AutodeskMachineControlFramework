@@ -40,18 +40,21 @@ protected:
 	uint32_t m_CardNo;
 	double m_dCorrectionFactor;
 	eLaserPort m_LaserPort;
+	bool m_bIsNetwork;
+
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	void writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower);
 
 public:
 
-	CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo);
+	CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	~CRTCContext();
 
-	void LoadProgramFromPath(const std::string & sPath) override;
+	void LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource);
 
-	void LoadCorrectionFile(const std::string & sFileName, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension) override;
+	void LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
 
 	void SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) override;
 

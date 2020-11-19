@@ -69,7 +69,7 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 IDriver* CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
 	if (sType == "scanlab-rtc5")
-		return new CDriver_ScanLab_RTC5(sName, sType);
+		return new CDriver_ScanLab_RTC5(sName, sType, pDriverEnvironment);
 
 	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DRIVERERROR);
 }
