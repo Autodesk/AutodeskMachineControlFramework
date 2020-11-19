@@ -53,14 +53,16 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_demo\" import=\"%s_plugin_demo.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_mechanics\" import=\"%s_plugin_mechanics.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_printerconnection\" import=\"%s_plugin_printerconnection.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_userinterface\" import=\"%s_plugin_userinterface.%s\" />\n", gitHash, dllExtension);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.%s\" />\n", gitHash, dllExtension);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.%s\" resources=\"%s_driver_scanlab.data\" />\n", gitHash, dllExtension);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_camera\" import=\"%s_driver_camera.%s\" />\n", gitHash, dllExtension);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.%s\" />\n", gitHash, dllExtension);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.%s\" resources=\"%s_driver_marlin.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.%s\" resources=\"%s_driver_scanlab.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_camera\" import=\"%s_driver_camera.%s\" resources=\"%s_driver_camera.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.%s\" resources=\"%s_driver_scanlaboie.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.%s\" resources=\"%s_driver_s7net.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "  </build>\n");
 	fmt.Fprintf(pkgfile, "</amcpackage>\n");
 	

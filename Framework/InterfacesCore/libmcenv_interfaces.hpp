@@ -55,11 +55,13 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
+class IIterator;
 class IToolpathLayer;
 class IToolpathAccessor;
 class IBuild;
 class IWorkingFileExecution;
 class IWorkingFile;
+class IWorkingFileIterator;
 class IWorkingDirectory;
 class IDriverEnvironment;
 class ISignalTrigger;
@@ -244,6 +246,47 @@ public:
 
 
 typedef IBaseSharedPtr<IBase> PIBase;
+
+
+/*************************************************************************************************************************
+ Class interface for Iterator 
+**************************************************************************************************************************/
+
+class IIterator : public virtual IBase {
+public:
+	/**
+	* IIterator::MoveNext - Iterates to the next object in the list.
+	* @return Iterates to the next object in the list.
+	*/
+	virtual bool MoveNext() = 0;
+
+	/**
+	* IIterator::MovePrevious - Iterates to the previous object in the list.
+	* @return Iterates to the previous object in the list.
+	*/
+	virtual bool MovePrevious() = 0;
+
+	/**
+	* IIterator::GetCurrent - Returns the object the iterator points at.
+	* @return returns the object instance.
+	*/
+	virtual IBase * GetCurrent() = 0;
+
+	/**
+	* IIterator::Clone - Creates a new object iterator with the same object list.
+	* @return returns the cloned Iterator instance
+	*/
+	virtual IIterator * Clone() = 0;
+
+	/**
+	* IIterator::Count - Returns the number of resoucres the iterator captures.
+	* @return returns the number of objects the iterator captures.
+	*/
+	virtual LibMCEnv_uint64 Count() = 0;
+
+};
+
+typedef IBaseSharedPtr<IIterator> PIIterator;
 
 
 /*************************************************************************************************************************
@@ -482,19 +525,54 @@ public:
 	virtual std::string CalculateSHA2() = 0;
 
 	/**
-	* IWorkingFile::DeleteFile - Deletes the temporary file.
-	*/
-	virtual void DeleteFile() = 0;
-
-	/**
 	* IWorkingFile::ExecuteFile - Executes the temporary file, if it is an executable.
 	* @return execution object
 	*/
 	virtual IWorkingFileExecution * ExecuteFile() = 0;
 
+	/**
+	* IWorkingFile::IsManaged - Returns if the file is managed.
+	* @return returns if the file is managed.
+	*/
+	virtual bool IsManaged() = 0;
+
+	/**
+	* IWorkingFile::MakeManaged - Makes the file managed if it is not managed yet.
+	*/
+	virtual void MakeManaged() = 0;
+
+	/**
+	* IWorkingFile::FileExists - Returns if the file exists on disk.
+	* @return returns if the file exists.
+	*/
+	virtual bool FileExists() = 0;
+
+	/**
+	* IWorkingFile::DeleteFile - Deletes the temporary file.
+	* @return returns if deletion was successful or file did not exist in the first place.
+	*/
+	virtual bool DeleteFile() = 0;
+
 };
 
 typedef IBaseSharedPtr<IWorkingFile> PIWorkingFile;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingFileIterator 
+**************************************************************************************************************************/
+
+class IWorkingFileIterator : public virtual IIterator {
+public:
+	/**
+	* IWorkingFileIterator::GetCurrentFile - Returns the working file the iterator points at.
+	* @return returns the WorkingFile instance.
+	*/
+	virtual IWorkingFile * GetCurrentFile() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFileIterator> PIWorkingFileIterator;
 
 
 /*************************************************************************************************************************
@@ -503,6 +581,12 @@ typedef IBaseSharedPtr<IWorkingFile> PIWorkingFile;
 
 class IWorkingDirectory : public virtual IBase {
 public:
+	/**
+	* IWorkingDirectory::IsActive - Working directory is active.
+	* @return returns true if files can be read and written to the directory.
+	*/
+	virtual bool IsActive() = 0;
+
 	/**
 	* IWorkingDirectory::GetAbsoluteFilePath - Retrieves absolute file path.
 	* @return global path of the directory, including path delimiter.
@@ -525,6 +609,43 @@ public:
 	* @return working file instance.
 	*/
 	virtual IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) = 0;
+
+	/**
+	* IWorkingDirectory::CleanUp - Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
+	* @return returns if deletion was successful.
+	*/
+	virtual bool CleanUp() = 0;
+
+	/**
+	* IWorkingDirectory::AddManagedFile - Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.
+	* @param[in] sFileName - Filename to manage. The file does not need to exist yet.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * AddManagedFile(const std::string & sFileName) = 0;
+
+	/**
+	* IWorkingDirectory::HasUnmanagedFiles - Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.
+	* @return returns if there are unmanaged files.
+	*/
+	virtual bool HasUnmanagedFiles() = 0;
+
+	/**
+	* IWorkingDirectory::RetrieveUnmanagedFiles - Returns a list of unmanaged files.
+	* @return working file iterator instance.
+	*/
+	virtual IWorkingFileIterator * RetrieveUnmanagedFiles() = 0;
+
+	/**
+	* IWorkingDirectory::RetrieveManagedFiles - Returns a list of managed files.
+	* @return working file iterator instance.
+	*/
+	virtual IWorkingFileIterator * RetrieveManagedFiles() = 0;
+
+	/**
+	* IWorkingDirectory::RetrieveAllFiles - Returns a list of all files in the directory.
+	* @return working file iterator instance.
+	*/
+	virtual IWorkingFileIterator * RetrieveAllFiles() = 0;
 
 };
 

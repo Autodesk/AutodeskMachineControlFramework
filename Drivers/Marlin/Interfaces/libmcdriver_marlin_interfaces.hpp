@@ -313,10 +313,10 @@ public:
 	* IDriver_Marlin::Connect - Creates and initializes a new Marlin Connector.
 	* @param[in] sCOMPort - Device Port to connect to
 	* @param[in] nBaudrate - Baudrate to use
-	* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+	* @param[in] nStatusUpdateInterval - Timer interval [ms] for updating status
 	* @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 	*/
-	virtual void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) = 0;
+	virtual void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) = 0;
 
 	/**
 	* IDriver_Marlin::Disconnect - Disconnects from the Marlin board.

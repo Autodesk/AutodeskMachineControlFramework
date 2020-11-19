@@ -42,6 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_parametergroup.hpp"
 #include "libmcdriver_dynamic.hpp" 
+#include "amc_resourcepackage.hpp"
+
+#include "Common/common_importstream_native.hpp"
+
 
 namespace LibMCEnv {
 	namespace Impl {
@@ -59,7 +63,7 @@ namespace AMC {
 	protected:
 		std::string m_sName;
 		std::string m_sType;
-		std::string m_sLibrary;	
+		std::string m_sLibraryPath;	
 
 		// If not empty, a state instance has reserved the use of this driver
 		std::string m_sReservationInstance;
@@ -70,11 +74,13 @@ namespace AMC {
 		LibMCEnv::PWrapper m_pMCEnvWrapper;
 		LibMCEnv::Impl::PDriverEnvironment m_pDriverEnvironment;
 
+		PResourcePackage m_pDriverResourcePackage;
+
 		PParameterGroup m_pParameterGroup;
 		
 	public:
 
-		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibrary, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment);
+		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibraryPath, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment);
 
 		virtual ~CDriver();
 

@@ -46,9 +46,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _WIN32
 #include <objbase.h>
+#include <shlwapi.h>
 #include <iomanip>
 #else
+#include <sys/stat.h>
 #include <ctime>
+#include <unistd.h>
+#include <dirent.h> 
 #endif
 
 
@@ -467,10 +471,98 @@ namespace AMCCommon {
 		}
 #else
 		if (std::remove(sFileName.c_str())) {
-			throw std::runtime_error("could not delete file: " + sFileName);
+			if (bMustSucceed)
+				throw std::runtime_error("could not delete file: " + sFileName);
 		}
 #endif
 	}
+
+	void CUtils::deleteDirectoryFromDisk(const std::string& sPath, bool bMustSucceed)
+	{
+#ifdef _WIN32
+		std::wstring sPathUTF16 = UTF8toUTF16(sPath);
+		if (!RemoveDirectoryW(sPathUTF16.c_str())) {
+			if (bMustSucceed)
+				throw std::runtime_error("could not delete path: " + sPath);
+		}
+#else
+		if (std::remove(sPath.c_str())) {
+			if (bMustSucceed)
+				throw std::runtime_error("could not delete path: " + sPath);
+		}
+#endif
+	}
+
+	void CUtils::createDirectoryOnDisk(const std::string& sPath)
+	{
+#ifdef _WIN32
+		std::wstring sPathUTF16 = UTF8toUTF16(sPath);
+		if (!CreateDirectoryW(sPathUTF16.c_str(), nullptr)) {
+			throw std::runtime_error("could not create path: " + sPath);
+		}
+#else
+		if (mkdir(sPath.c_str(), 0700)) {
+			throw std::runtime_error("could not create path: " + sPath);
+		}
+#endif
+	}
+
+
+	// Returns a UUID, such that sBasePath/sPrefixUUID.extension does not exist.
+	// Tries out maximum nMaxIterations different random uuids.
+	std::string CUtils::findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string& sExtension, const uint32_t nMaxIterations)
+	{
+		if (sBasePath.empty())
+			throw std::runtime_error("empty temporary file base path");
+
+		std::string sBasePathWithDelimiter = sBasePath;
+		std::string sExtensionWithPoint;
+
+		if (!sExtension.empty()) {
+			if (sExtension.at(0) != '.') {
+				sExtensionWithPoint = "." + sExtension;
+			}
+			else {
+				sExtensionWithPoint = sExtension;
+			}
+
+		}
+
+		char lastChar = sBasePathWithDelimiter.at(sBasePathWithDelimiter.length() - 1);
+		if ((lastChar != '/') && (lastChar != '\\'))
+			sBasePathWithDelimiter += "/";
+
+		for (uint32_t nIndex = 0; nIndex < nMaxIterations; nIndex++) {
+			std::string sUUID = createUUID();
+			std::string sFullPath = sBasePathWithDelimiter + sPrefix + sUUID + sExtensionWithPoint;
+
+			if (!fileOrPathExistsOnDisk(sFullPath))
+				return sFullPath;
+
+		}
+
+		throw std::runtime_error("could not create temporary file path");
+
+	}
+
+
+	bool CUtils::fileOrPathExistsOnDisk(const std::string& sPathName)
+	{
+
+#ifdef _WIN32
+		std::wstring sFileNameUTF16 = UTF8toUTF16(sPathName);
+		return PathFileExistsW(sFileNameUTF16.c_str ());
+#else
+		if (access(sPathName.c_str (), F_OK) != -1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+#endif
+
+	}
+
 
 
 	std::string CUtils::calculateSHA256FromFile(const std::string& sFileNameUTF8)
@@ -551,6 +643,65 @@ namespace AMCCommon {
 
 		byteBuffer.push_back (0);
 		return std::string((char*)byteBuffer.data());
+	}
+
+
+	std::set<std::string> CUtils::findContentOfDirectory(const std::string& sDirectory, bool bReturnFiles, bool bReturnDirectories)
+	{
+		std::set<std::string> foundItems;
+
+#ifdef _WIN32
+
+		std::wstring sSearchString = UTF8toUTF16(sDirectory + "/*");
+		WIN32_FIND_DATAW findData;
+
+		HANDLE hSearchHandle = FindFirstFileW(sSearchString.c_str(), &findData);
+		if (hSearchHandle != INVALID_HANDLE_VALUE) {
+
+			bool bFound = true;
+			while (bFound) {
+
+				std::string sFileName = UTF16toUTF8(findData.cFileName);
+				bool bIsDirectory = (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+				if ((sFileName != "..") && (sFileName != ".")) {
+					if ((bIsDirectory && bReturnDirectories) || ((!bIsDirectory) && bReturnFiles)) {
+						foundItems.insert(sFileName);
+					}
+				}
+
+				bFound = FindNextFileW (hSearchHandle, &findData);
+			}
+
+			FindClose(hSearchHandle);
+			
+
+		}
+
+
+#else
+		DIR* pDir = opendir (sDirectory.c_str ()); 
+		if (pDir != nullptr) {
+			struct dirent* pDirEnt = readdir (pDir);
+			while (pDirEnt != nullptr) {
+				std::string sFileName = pDirEnt->d_name;
+				if ((sFileName != "..") && (sFileName != ".")) {
+					bool bIsDirectory = (pDirEnt->d_type == DT_DIR);
+					if ((bIsDirectory && bReturnDirectories) || ((!bIsDirectory) && bReturnFiles)) {
+						foundItems.insert(sFileName);
+					}
+				}
+				
+				pDirEnt = readdir(pDir);
+			}
+
+			closedir(pDir);
+
+		}
+
+#endif
+
+		return foundItems;
 	}
 
 

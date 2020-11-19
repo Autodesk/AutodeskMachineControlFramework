@@ -47,21 +47,52 @@ using namespace LibMCEnv::Impl;
  Class definition of CDriverEnvironment
 **************************************************************************************************************************/
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup)
-    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, const std::string& sBasePath)
+    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBasePath(sBasePath)
 {
     if (pParameterGroup.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pParameterGroup.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (sBasePath.empty ())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
 
 IWorkingDirectory* CDriverEnvironment::CreateWorkingDirectory()
 {
-    return new CWorkingDirectory();
+    return new CWorkingDirectory(m_sBasePath, m_pResourcePackage);
 }
 
 void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer)
 {
+    auto pEntry = m_pResourcePackage->findEntryByName(sIdentifier, false);
+    if (pEntry.get () == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND);
+
+    size_t nSize = pEntry->getSize();
+    if (pDataBufferNeededCount != nullptr)
+        *pDataBufferNeededCount = nSize;
+
+    if (pDataBufferBuffer != nullptr) {
+        if (nDataBufferBufferSize < nSize)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+        std::vector <uint8_t> Buffer;
+        if (Buffer.size () != nSize)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+        m_pResourcePackage->readEntry(sIdentifier, Buffer);
+        const uint8_t* pSrc = Buffer.data();
+        uint8_t* pDst = pDataBufferBuffer;
+
+        for (size_t nIndex = 0; nIndex < nSize; nIndex++) {
+            *pDst = *pSrc;
+            pDst++;
+            pSrc++;
+        }
+
+    }
 
 }
 

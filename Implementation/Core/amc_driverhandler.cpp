@@ -37,9 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_driverenvironment.hpp"
 #include "libmc_interfaceexception.hpp"
 
+
 #include <vector>
 #include <memory>
-#include <string>
+
 #include <iostream>
 
 
@@ -59,20 +60,32 @@ CDriverHandler::~CDriverHandler()
 }
 
 
-void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary)
+void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string& sResourcePath)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	if (findDriver(sName, false) != nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_DRIVERALREADYREGISTERED);
 
+	if (m_sTempBasePath.empty ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_TEMPBASEPATHEMPTY);
+
+	PResourcePackage pResourcePackage;
+	if (!sResourcePath.empty()) {
+		auto pStream = std::make_shared <AMCCommon::CImportStream_Native> (sResourcePath);
+		pResourcePackage = CResourcePackage::makeFromStream(pStream);
+	}
+	else {
+		pResourcePackage = CResourcePackage::makeEmpty();
+	}
+
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_sTempBasePath);
 
 	pInternalEnvironment->setIsInitializing(true);
 
-	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibrary, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
+	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibraryPath, pResourcePackage, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
 	m_DriverList.push_back(pDriver);
 	m_DriverMap.insert(std::make_pair(sName, pDriver));	
 
@@ -128,4 +141,10 @@ void CDriverHandler::GetDriverInformation(const std::string& sName, std::string&
 
 	sType = pDriver->getType();
 	pSymbolLookup = pDriver->getSymbolLookup();
+}
+
+
+void CDriverHandler::setTempBasePath(const std::string& sTempBasePath)
+{
+	m_sTempBasePath = sTempBasePath;
 }
