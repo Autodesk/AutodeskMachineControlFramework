@@ -63,11 +63,20 @@ private:
 	// We need to globally store driver wrappers in the plugin
 	PDriverCast_Marlin m_DriverCast_Marlin;
 
-	// used to store id of extruder its temperature is set => the id of this extruder will be used to report currrent temperature to asking functions 
-	int32_t m_nExtruderId = -1;
-
 private:
-	void updatePIDValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+
+	void driverWaitForSignalResetFatalError(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
+		if (pStateEnvironment->WaitForSignal("signal_resetfatalerror", 0, pSignalHandler)) {
+			// in state idle nothing to do when signal resetfatalerror received
+			pSignalHandler->SetBoolResult("success", true);
+			pSignalHandler->SignalHandled();
+		}
+	}
+
+
+	void driverWaitForSignalSetPIDValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_setpidvalues", 0, pSignalHandler)) {
@@ -89,7 +98,14 @@ private:
 
 	}
 
-	void updateTemperatureValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	/// <summary>
+	/// Set target temperature of extruder and/or bed. To be used instead of (derived) parameters to set temperature by receiving  signal "signal_settemperature".
+	/// Signal can be sent by other statemachine (main for example) at any time in progress.
+	/// Temperature values could differ from default temperature values set in parameter group. Values could be (re)calculated by an algorithm to optimise print process
+	/// </summary>
+	/// <param name="pDriver"></param>
+	/// <param name="pStateEnvironment"></param>
+	void driverWaitForSignalSetTemperatureValues(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_settemperature", 0, pSignalHandler)) {
@@ -100,7 +116,7 @@ private:
 			bool bExtruderSetValue = pSignalHandler->GetDouble("extrudersetvalue");
 			// store read value => to be used in other state/function of this state machine (handleSignals)
 			// this id is used to report to ask the driver for the current temperature and report it to asking state machine (main) 
-			m_nExtruderId = pSignalHandler->GetInteger("extruderid");
+			uint32_t nExtruderId = pSignalHandler->GetInteger("extruderid");
 			double dExtruderTemperature = pSignalHandler->GetDouble("extrudertemperature");
 			bool bExtruderDoWait = pSignalHandler->GetDouble("extruderdowait");
 
@@ -110,8 +126,8 @@ private:
 			}
 
 			if (bExtruderSetValue) {
-				pStateEnvironment->LogMessage("Setting temperature value of extruder: " + std::to_string(m_nExtruderId) + " to " + std::to_string(dExtruderTemperature));
-				pDriver->SetExtruderTargetTemperature((uint32_t)m_nExtruderId, dExtruderTemperature, bExtruderDoWait);
+				pStateEnvironment->LogMessage("Setting temperature value of extruder: " + std::to_string(nExtruderId) + " to " + std::to_string(dExtruderTemperature));
+				pDriver->SetExtruderTargetTemperature((uint32_t)nExtruderId, dExtruderTemperature, bExtruderDoWait);
 			}
 
 			pSignalHandler->SetBoolResult("success", true);
@@ -120,7 +136,7 @@ private:
 
 	}
 
-	void updateFanSpeed(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	void driverWaitForSignalSetFanSpeed(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_setfanspeed", 0, pSignalHandler)) {
@@ -134,56 +150,22 @@ private:
 
 	}
 
-public:
-
-	PDriver_Marlin acquireDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	void driverGetTemperature(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		return m_DriverCast_Marlin.acquireDriver(pStateEnvironment, "marlin");
+		auto pSignal = pStateEnvironment->PrepareSignal("main", "signal_gettemperature");
+		if (pSignal->CanTrigger()) {
+			// read current temperature values from plugin member (previously set in pDriver->QueryParameters before calling handleSignals)
+			double dCurrentExtruderTemperature = pStateEnvironment->GetDoubleParameter("printerstate", "currenttemperatureextruderid0");
+			double dCurrentBedTemperature = pStateEnvironment->GetDoubleParameter("printerstate", "currenttemperaturebed");
+			// send current temperature as signal => to be interpreted by "main" 
+			pSignal->SetDouble("bedtemperature", dCurrentBedTemperature);
+			pSignal->SetDouble("extrudertemperature", dCurrentExtruderTemperature);
+			pSignal->Trigger();
+		}
 	}
 
-
-	void handleSignals(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment, bool bDoUpdatePIDValues, bool bDoUpdateTemperatureValues, bool bDoReportTemperatureValues, bool bDoUpdateFanValue)
+	void driverdriverWaitForSignalDoHoming(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-
-		if (pDriver.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
-		if (bDoUpdatePIDValues) {
-			// read signal "signal_setpidvalues" and update driver with new PID values
-			updatePIDValues(pDriver, pStateEnvironment);
-		}
-		if (bDoUpdateTemperatureValues) {
-			// read signal "signal_settemperature" and update driver with new temperature values
-			updateTemperatureValues(pDriver, pStateEnvironment);
-		}
-		if (bDoUpdateFanValue) {
-			// read signal "signal_setfanspeed" and update driver with new fan speed values
-			updateFanSpeed(pDriver, pStateEnvironment);
-		}
-		
-		if (bDoReportTemperatureValues && (m_nExtruderId > -1)) {
-			auto pSignal = pStateEnvironment->PrepareSignal("main", "signal_gettemperature");
-			if (pSignal->CanTrigger()) {
-
-				pDriver->UpdateTemperatureState(m_nExtruderId);
-				// read current temperature values from plugin member (previously set in pDriver->UpdateState in updatePositionStateFromDriver)
-				double dCurrentExtruderTemperature;
-				double dCurrentBedTemperature;
-				pDriver->GetExtruderCurrentTemperature(m_nExtruderId, dCurrentExtruderTemperature);
-				pDriver->GetHeatedBedCurrentTemperature( dCurrentBedTemperature);
-
-				// send current temperature as signal => to be interpreted by "main" 
-				pSignal->SetBool("bedgetvalue", true);
-				pSignal->SetDouble("bedtemperature", dCurrentBedTemperature);
-				pSignal->SetBool("extrudergetvalue", true);
-				pSignal->SetInteger("extruderid", m_nExtruderId);
-				pSignal->SetDouble("extrudertemperature", dCurrentExtruderTemperature);
-				pSignal->Trigger();
-			}
-		}
-
 		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_dohoming", 0, pSignalHandler)) {
 			if (!pDriver->IsHomed()) {
@@ -198,11 +180,15 @@ public:
 			}
 			pSignalHandler->SignalHandled();
 		}
-		
+	}
+
+	void driverWaitForSignalDoExtruderInit(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_doextruderinit", 0, pSignalHandler)) {
 			if (pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Initialize extruder.");
-				
+
 				double dInitialExtrude = pStateEnvironment->GetDoubleParameter("extrudedata", "initialextrude");
 				// move to a save pos
 				pDriver->MoveFastToZ(5, 50);
@@ -221,7 +207,11 @@ public:
 			}
 			pSignalHandler->SignalHandled();
 		}
-		
+	}
+
+	void driverWaitForSignalDoExtuderFinalise(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_dofinalizeextrude", 0, pSignalHandler)) {
 			if (pDriver->IsHomed()) {
 				pStateEnvironment->LogMessage("Finalize extrude.");
@@ -246,14 +236,22 @@ public:
 			}
 			pSignalHandler->SignalHandled();
 		}
+	}
 
+	void driverWaitForSignalDoEmergencyStop(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_emergencystop", 0, pSignalHandler)) {
 			pDriver->EmergencyStop();
 			pSignalHandler->SetBoolResult("success", true);
 			pSignalHandler->SignalHandled();
 			pStateEnvironment->LogWarning("EMERGENCY STOP!");
 		}
+	}
 
+	void driverWaitForSignalDoDisconnect(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_disconnect", 0, pSignalHandler)) {
 			// disconnect
 			pDriver->Disconnect();
@@ -261,7 +259,53 @@ public:
 			pSignalHandler->SignalHandled();
 			pStateEnvironment->LogMessage("Printer disconnected.");
 		}
+	}
 
+public:
+
+	PDriver_Marlin acquireDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		return m_DriverCast_Marlin.acquireDriver(pStateEnvironment, "marlin");
+	}
+
+
+	void handleSignals(PDriver_Marlin pDriver, LibMCEnv::PStateEnvironment pStateEnvironment, bool bDoUpdatePIDValues, bool bDoUpdateTemperatureValues, bool bDoReportTemperatureValues, bool bDoUpdateFanValue)
+	{
+
+		if (pDriver.get() == nullptr)
+			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+		if (pStateEnvironment.get() == nullptr)
+			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+
+		if (bDoUpdatePIDValues) {
+			// read signal "signal_setpidvalues" and update driver with new PID values
+			driverWaitForSignalSetPIDValues(pDriver, pStateEnvironment);
+		}
+		if (bDoUpdateTemperatureValues) {
+			// read signal "signal_settemperature" and update driver with new temperature values
+			driverWaitForSignalSetTemperatureValues(pDriver, pStateEnvironment);
+		}
+		if (bDoUpdateFanValue) {
+			// read signal "signal_setfanspeed" and update driver with new fan speed values
+			driverWaitForSignalSetFanSpeed(pDriver, pStateEnvironment);
+		}
+
+		// TODO remove usage of signal signal_gettemperature and bDoReportTemperatureValues when bidirectional derived parameters are possible (printerconnection.cur temp => main) 
+		if (bDoReportTemperatureValues) {
+			driverGetTemperature(pStateEnvironment);
+		}
+
+		driverdriverWaitForSignalDoHoming(pDriver, pStateEnvironment);
+		
+		driverWaitForSignalDoExtruderInit(pDriver, pStateEnvironment);
+		
+		driverWaitForSignalDoExtuderFinalise(pDriver, pStateEnvironment);
+
+		driverWaitForSignalDoEmergencyStop(pDriver, pStateEnvironment);
+
+		driverWaitForSignalDoDisconnect(pDriver, pStateEnvironment);
+
+		driverWaitForSignalResetFatalError(pDriver, pStateEnvironment);
 	}
 
 };
@@ -328,37 +372,41 @@ public:
 
 		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 
-		if (!pDriver->IsConnected()) {
-			LibMCEnv::PSignalHandler pSignalHandler;
-			// wait until calling state machine sends "Connect" => connect to printer
-			if (pStateEnvironment->WaitForSignal("signal_connect", 0, pSignalHandler)) {
+		LibMCEnv::PSignalHandler pSignalHandler;
+		// handle connect if calling state machine Main sends "Connect" => connect to printer
+		if (pStateEnvironment->WaitForSignal("signal_connect", 0, pSignalHandler)) {
 
+			if (!pDriver->IsConnected()) {
 				auto sCOMPort = pStateEnvironment->GetStringParameter("comdata", "port");
 				auto nBaudRate = pStateEnvironment->GetIntegerParameter("comdata", "baudrate");
-				auto nConnectTimeout = pStateEnvironment->GetIntegerParameter("comdata", "connecttimeout");
+				auto nConnectInitialResponseTimeout = pStateEnvironment->GetIntegerParameter("comdata", "connectinitialresponsetimeout");
 				auto dTimerInterval = pStateEnvironment->GetDoubleParameter("printerstate", "statusupdateinterval");
 
-				pDriver->Connect(sCOMPort, (uint32_t)nBaudRate, dTimerInterval, nConnectTimeout);
+				pDriver->Connect(sCOMPort, (uint32_t)nBaudRate, dTimerInterval, nConnectInitialResponseTimeout);
 
 				if (pDriver->IsConnected()) {
+					pStateEnvironment->LogMessage("Printer connected.");
 					pSignalHandler->SetBoolResult("success", true);
 					pSignalHandler->SignalHandled();
 					pStateEnvironment->SetNextState("idle");
 				}
 				else {
+					pStateEnvironment->LogWarning("Fatal error while printer connect. ");
 					pSignalHandler->SetBoolResult("success", false);
 					pSignalHandler->SignalHandled();
 					pStateEnvironment->SetNextState("fatalerror");
 				}
 			}
 			else {
-				pStateEnvironment->SetNextState("idle");
+				pSignalHandler->SetBoolResult("success", true);
+				pSignalHandler->SignalHandled();
 			}
 		}
-		else {
+
+		if (pDriver->IsConnected()) {
 			pDriver->QueryParameters();
 			m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
-			
+
 			if (pDriver->IsHomed() && pDriver->CanExecuteMovement()) {
 
 				std::string sParameterData;
@@ -377,6 +425,9 @@ public:
 			else {
 				pStateEnvironment->SetNextState("idle");
 			}
+		}
+		else {
+			pStateEnvironment->SetNextState("idle");
 		}
 	}
 
@@ -408,7 +459,28 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 		
-		pStateEnvironment->SetNextState("fatalerror");
+		LibMCEnv::PSignalHandler pHandlerInstance;
+		if (pStateEnvironment->WaitForSignal("signal_resetfatalerror", 0, pHandlerInstance)) {
+
+			pStateEnvironment->LogMessage("Reset state machine printerconnection after fatal error");
+			try {
+				pStateEnvironment->SetNextState("init");
+				pHandlerInstance->SetBoolResult("success", true);
+			}
+			catch (std::exception& E) {
+				pStateEnvironment->LogWarning(std::string("Could not reset: ") + E.what());
+				pHandlerInstance->SetBoolResult("success", false);
+				pStateEnvironment->SetNextState("fatalerror");
+			}
+			pHandlerInstance->SignalHandled();
+
+		}
+		else {
+			// Unload all toolpathes that might be in memory
+			pStateEnvironment->UnloadAllToolpathes();
+
+			pStateEnvironment->SetNextState("fatalerror");
+		}
 	}
 
 };
@@ -675,7 +747,12 @@ public:
 		pSignal->SetBoolResult("success", bSucces);
 		pSignal->SignalHandled();
 
-		pStateEnvironment->SetNextState("idle");
+		if (bSucces) {
+			pStateEnvironment->SetNextState("idle");
+		}
+		else {
+			pStateEnvironment->SetNextState("fatalerror");
+		}
 	}
 
 };

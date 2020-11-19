@@ -156,7 +156,6 @@ namespace AMC {
 
 		if (!m_pConnection->isOpen()) {
 			m_pConnection.reset();
-			throw std::runtime_error("Could not connect to serial port");
 		}
 
 		// instead of waiting a fixed time wait until "start" or "" (after timeout) received from device??
