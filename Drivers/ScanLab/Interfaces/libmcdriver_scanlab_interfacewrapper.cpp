@@ -321,19 +321,25 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_queryparameters(LibMCDriver
 /*************************************************************************************************************************
  Class implementation for RTCContext
 **************************************************************************************************************************/
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadprogramfrompath(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pPath)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadfirmware(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
 	try {
-		if (pPath == nullptr)
+		if (pFirmwareResource == nullptr)
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		std::string sPath(pPath);
+		if (pFPGAResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pAuxiliaryResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sFirmwareResource(pFirmwareResource);
+		std::string sFPGAResource(pFPGAResource);
+		std::string sAuxiliaryResource(pAuxiliaryResource);
 		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->LoadProgramFromPath(sPath);
+		pIRTCContext->LoadFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -348,19 +354,18 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadprogramfrompath(Lib
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadcorrectionfile(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFileName, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadcorrectionfile(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
 	try {
-		if (pFileName == nullptr)
+		if ( (!pCorrectionFileBuffer) && (nCorrectionFileBufferSize>0))
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		std::string sFileName(pFileName);
 		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->LoadCorrectionFile(sFileName, nTableNumber, nDimension);
+		pIRTCContext->LoadCorrectionFile(nCorrectionFileBufferSize, pCorrectionFileBuffer, nTableNumber, nDimension);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1151,23 +1156,170 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcselector_acquireethernetcardbys
 
 
 /*************************************************************************************************************************
- Class implementation for Driver_ScanLab_RTC5
+ Class implementation for Driver_ScanLab
 **************************************************************************************************************************/
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_creatertcselector(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_RTCSelector * pInstance)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_loadsdk(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, const char * pResourceName)
 {
-	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		IDriver_ScanLab* pIDriver_ScanLab = dynamic_cast<IDriver_ScanLab*>(pIBaseClass);
+		if (!pIDriver_ScanLab)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab->LoadSDK(sResourceName);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_creatertcselector(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_RTCSelector * pInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab;
 
 	try {
 		if (pInstance == nullptr)
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		IBase* pBaseInstance(nullptr);
+		IDriver_ScanLab* pIDriver_ScanLab = dynamic_cast<IDriver_ScanLab*>(pIBaseClass);
+		if (!pIDriver_ScanLab)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pBaseInstance = pIDriver_ScanLab->CreateRTCSelector();
+
+		*pInstance = (IBase*)(pBaseInstance);
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for Driver_ScanLab_RTC5
+**************************************************************************************************************************/
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_initialise(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
+
+	try {
+		if (pIP == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pNetmask == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sIP(pIP);
+		std::string sNetmask(pNetmask);
 		IDriver_ScanLab_RTC5* pIDriver_ScanLab_RTC5 = dynamic_cast<IDriver_ScanLab_RTC5*>(pIBaseClass);
 		if (!pIDriver_ScanLab_RTC5)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pBaseInstance = pIDriver_ScanLab_RTC5->CreateRTCSelector();
+		pIDriver_ScanLab_RTC5->Initialise(sIP, sNetmask, nTimeout, nSerialNumber);
 
-		*pInstance = (IBase*)(pBaseInstance);
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
+
+	try {
+		if (pFirmwareResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pFPGAResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (pAuxiliaryResource == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sFirmwareResource(pFirmwareResource);
+		std::string sFPGAResource(pFPGAResource);
+		std::string sAuxiliaryResource(pAuxiliaryResource);
+		IDriver_ScanLab_RTC5* pIDriver_ScanLab_RTC5 = dynamic_cast<IDriver_ScanLab_RTC5*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC5->LoadFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
+
+	try {
+		if ( (!pCorrectionFileBuffer) && (nCorrectionFileBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab_RTC5* pIDriver_ScanLab_RTC5 = dynamic_cast<IDriver_ScanLab_RTC5*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC5->SetCorrectionFile(nCorrectionFileBufferSize, pCorrectionFileBuffer, nTableNumber, nDimension);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IDriver_ScanLab_RTC5* pIDriver_ScanLab_RTC5 = dynamic_cast<IDriver_ScanLab_RTC5*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC5->DrawLayer(sStreamUUID, nLayerIndex);
+
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
 	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
@@ -1206,8 +1358,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_scanlab_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_queryparameters;
-	if (sProcName == "libmcdriver_scanlab_rtccontext_loadprogramfrompath") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadprogramfrompath;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_loadfirmware") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadfirmware;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_loadcorrectionfile") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_loadcorrectionfile;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_selectcorrectiontable") 
@@ -1270,8 +1422,18 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_acquireethernetcard;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_acquireethernetcardbyserial") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_acquireethernetcardbyserial;
-	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_creatertcselector") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_creatertcselector;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_loadsdk") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_loadsdk;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_creatertcselector") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_creatertcselector;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_initialise") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_initialise;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer;
 	if (sProcName == "libmcdriver_scanlab_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_getversion;
 	if (sProcName == "libmcdriver_scanlab_getlasterror") 
