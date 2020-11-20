@@ -61,6 +61,10 @@ mkdir "$builddir/Client/public"
 mkdir "$builddir/Client/src"
 mkdir "$builddir/Client/src/plugins"
 mkdir "$builddir/Client/dist"
+mkdir $builddir/Client
+mkdir $builddir/Client/dist
+cd $builddir/Client
+go run ../../Server/createDist.go ../Output $GITHASH 
 
 cp "$basepath/Client/public/"*.* "$builddir/Client/public"
 cp "$basepath/Client/src/"*.* "$builddir/Client/src"
