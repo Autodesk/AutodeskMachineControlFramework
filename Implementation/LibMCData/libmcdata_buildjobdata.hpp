@@ -70,25 +70,31 @@ private:
     std::string m_sStorageStreamUUID;
     std::string m_sUserID;
     std::string m_sJobUUID;
+    std::string m_sSHA256;
+    uint64_t m_nStreamSize;
     AMCData::PSQLHandler m_pSQLHandler;
     AMCData::PStoragePath m_pStoragePath;
 
 protected:
 
-    CBuildJobData(const std::string& sDataUUID, const std::string & sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string & sTimeStamp, std::string & sStorageStreamUUID, std::string & sUserID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    CBuildJobData(const std::string& sDataUUID, const std::string & sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string & sTimeStamp, std::string & sStorageStreamUUID, std::string & sUserID, std::string & sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
 
 public:
 
     ~CBuildJobData();
 
-    static CBuildJobData* make(const std::string& sDataUUID, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static CBuildJobData* make(const std::string& sDataUUID, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
     static CBuildJobData* makeFrom(CBuildJobData* pBuildJob);
 
-    static PBuildJobData makeShared(const std::string& sDataUUID, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static PBuildJobData makeShared(const std::string& sDataUUID, const std::string& sName, const std::string& sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string& sTimeStamp, std::string& sStorageStreamUUID, std::string& sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
     static PBuildJobData makeSharedFrom(CBuildJobData* pBuildJobData);    
 
-    static CBuildJobData* createInDatabase(const std::string sName, const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
-    static PBuildJobData createSharedInDatabase(const std::string sName, const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static CBuildJobData* createInDatabase(const std::string sName, const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+    static PBuildJobData createSharedInDatabase(const std::string sName, const std::string & sJobUUID, LibMCData::eBuildJobDataType eDataType, std::string sTimeStamp, std::string sStorageStreamUUID, std::string sUserID, std::string& sSHA2, uint64_t nStreamSize, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+
+    std::string GetDataUUID() override;
+
+    std::string GetJobUUID() override;
 
 	std::string GetName() override;
 
@@ -96,7 +102,13 @@ public:
 
 	IStorageStream * GetStorageStream() override;
 
+    std::string GetStorageStreamSHA2() override;
+    
+    LibMCData_uint64 GetStorageStreamSize() override;
+
 	LibMCData::eBuildJobDataType GetDataType() override;
+
+    std::string GetDataTypeAsString() override;
 
 	std::string GetMIMEType() override;
 

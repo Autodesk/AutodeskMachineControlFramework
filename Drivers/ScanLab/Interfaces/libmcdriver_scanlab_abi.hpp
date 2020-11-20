@@ -128,24 +128,27 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 **************************************************************************************************************************/
 
 /**
-* Loads card firmware from given file path.
+* Loads card firmware from resource files.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] pPath - Path to the image files.
+* @param[in] pFirmwareResource - resource name of the firmware program file.
+* @param[in] pFPGAResource - resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryResource - resource name of the binary auxiliary file.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadprogramfrompath(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pPath);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadfirmware(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
 
 /**
-* Loads card calibration file from given file.
+* Loads card calibration file from given resource file.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] pFileName - FileName to the image files.
+* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+* @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
 * @param[in] nTableNumber - Correction table index of card (1..8)
 * @param[in] nDimension - Is it a 2D or 3D correction file.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadcorrectionfile(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFileName, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadcorrectionfile(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
 
 /**
 * Selects Correction Table on card.
@@ -453,17 +456,75 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcse
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcselector_acquireethernetcardbyserial(LibMCDriver_ScanLab_RTCSelector pRTCSelector, LibMCDriver_ScanLab_uint32 nSerialNumber, LibMCDriver_ScanLab_RTCContext * pInstance);
 
 /*************************************************************************************************************************
- Class definition for Driver_ScanLab_RTC5
+ Class definition for Driver_ScanLab
 **************************************************************************************************************************/
+
+/**
+* Initializes the ScanLab SDK.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @param[in] pResourceName - Resource name of Scanlab DLL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_loadsdk(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, const char * pResourceName);
 
 /**
 * Creates and initializes a new RTC selector singleton. Should only be called once per Process.
 *
-* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
 * @param[out] pInstance - New Selector instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_creatertcselector(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_RTCSelector * pInstance);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_creatertcselector(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_RTCSelector * pInstance);
+
+/*************************************************************************************************************************
+ Class definition for Driver_ScanLab_RTC5
+**************************************************************************************************************************/
+
+/**
+* Initializes the RTC5 Scanner Driver.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pIP - IP Network Address. Empty string for local card.
+* @param[in] pNetmask - IP Netmask Address. Empty string for local card.
+* @param[in] nTimeout - Time out in microseconds.
+* @param[in] nSerialNumber - Desired Serial Number of card.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_initialise(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber);
+
+/**
+* Loads the firmware from the driver resources.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pFirmwareResource - resource name of the firmware program file.
+* @param[in] pFPGAResource - resource name of the firmware FPGA file.
+* @param[in] pAuxiliaryResource - resource name of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
+
+/**
+* Sets the correction file stream.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+* @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
+* @param[in] nTableNumber - Correction table index of card (1..8)
+* @param[in] nDimension - Is it a 2D or 3D correction file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
+
+/**
+* Draws a layer of a build stream. Blocks until the layer is drawn.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] pStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+* @param[in] nLayerIndex - Layer index of the build file.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
 
 /*************************************************************************************************************************
  Global functions

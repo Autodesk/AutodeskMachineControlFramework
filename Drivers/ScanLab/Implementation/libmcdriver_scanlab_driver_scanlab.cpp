@@ -27,75 +27,56 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildJobHandler
+Abstract: This is a stub class definition of CDriver_ScanLab
 
 */
 
+#include "libmcdriver_scanlab_driver_scanlab.hpp"
+#include "libmcdriver_scanlab_interfaceexception.hpp"
 
-#ifndef __LIBMCDATA_BUILDJOBHANDLER
-#define __LIBMCDATA_BUILDJOBHANDLER
-
-#include "libmcdata_interfaces.hpp"
-#include <vector>
-
-// Parent classes
-#include "libmcdata_base.hpp"
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
+#include "libmcdriver_scanlab_rtcselector.hpp"
 // Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagepath.hpp"
-
-#include <mutex>
-#include <thread>
 
 
-namespace LibMCData {
-namespace Impl {
-
+using namespace LibMCDriver_ScanLab::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CBuildJobHandler 
+ Class definition of CDriver_ScanLab 
 **************************************************************************************************************************/
 
-class CBuildJobHandler : public virtual IBuildJobHandler, public virtual CBase {
-private:
+CDriver_ScanLab::CDriver_ScanLab(LibMCEnv::PDriverEnvironment pDriverEnvironment)
+    : m_pDriverEnvironment (pDriverEnvironment)
+{
+    if (pDriverEnvironment.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-	AMCData::PSQLHandler m_pSQLHandler;
-    AMCData::PStoragePath m_pStoragePath;
-
-protected:
-
-
+}
 
 
-public:
+IRTCSelector * CDriver_ScanLab::CreateRTCSelector()
+{
+    if (m_pScanLabSDK.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKNOTLOADED);
+
+    return new CRTCSelector(m_pScanLabSDK, m_pDriverEnvironment);
+}
 
 
-    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+void CDriver_ScanLab::LoadSDK(const std::string& sResourceName)
+{
+    if (m_pScanLabSDK.get() != nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKALREADYLOADED);
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID) override;
-
-	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
-
-	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
-
-    IBuildJob* FindJobOfData(const std::string& sDataUUID) override;
-
-    std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
-
-    LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCData
-
-#ifdef _MSC_VER
-#pragma warning(pop)
+    std::string sFileName;
+#ifdef _WIN32
+    sFileName = "RTC.dll";
+#else
+    sFileName = "RTC.so";
 #endif
-#endif // __LIBMCDATA_BUILDJOBHANDLER
+
+    m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+    m_pSDKLibraryFile = m_pWorkingDirectory->StoreDriverData(sFileName, sResourceName);    
+    m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
+
+}
+

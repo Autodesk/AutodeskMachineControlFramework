@@ -324,9 +324,8 @@
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
 		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
-		
-		
-						
+		<error name="BUILDJOBDATANOTFOUND" code="330" description="Build job data not found" />
+								
 	</errors>
 	
 
@@ -509,7 +508,15 @@
 
 	<class name="BuildJobData" parent="Base" description="Build Job Data instance">
 
-		<method name="GetName" description="returns the name of a build job.">
+		<method name="GetDataUUID" description="returns the uuid of a build job data.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+
+		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+
+		<method name="GetName" description="returns the name of a build job uuid.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
@@ -521,8 +528,20 @@
 			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
 		</method>
 
+		<method name="GetStorageStreamSHA2" description="returns the checksum of the storage stream of the build.">
+			<param name="SHA2" type="string" pass="return" description="SHA256 of the storage stream." />
+		</method>
+
+		<method name="GetStorageStreamSize" description="returns the size of the storage stream of the build.">
+			<param name="Size" type="uint64" pass="return" description="size of the storage stream in bytes." />
+		</method>
+
 		<method name="GetDataType" description="returns the data type of the job data.">
 			<param name="DataType" type="enum" class="BuildJobDataType" pass="return" description="Data type of the job data" />	
+		</method>
+
+		<method name="GetDataTypeAsString" description="returns the data type of the job data as string.">
+			<param name="DataType" type="string" pass="return" description="Data type of the job data" />	
 		</method>
 
 		<method name="GetMIMEType" description="returns the mime type of a storage stream.">
@@ -607,6 +626,12 @@
 		<method name="ListJobData" description="Retrieves a list of build job data objects.">
 			<param name="IteratorInstance" type="class" class="BuildJobDataIterator" pass="return" description="Build Job Data Iterator Instance." />
 		</method>
+		
+		<method name="RetrieveJobData" description="Retrieves a build job data instance by its uuid.">
+			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
+			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
+		</method>
+		
 									
 	</class>
 
@@ -632,6 +657,11 @@
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
 		</method>
 
+		<method name="FindJobOfData" description="Finds the parent build job of a given data uuid. Fails if data does not exist.">
+			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
+			<param name="BuildJobData" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
+		</method>
+
 		<method name="ListJobsByStatus" description="Retrieves a list of build jobs, filtered by status.">
 			<param name="Status" type="enum" class="BuildJobStatus" pass="in" description="Job Status to list." />	
 			<param name="IteratorInstance" type="class" class="BuildJobIterator" pass="return" description="Build Job Iterator Instance." />
@@ -646,6 +676,7 @@
 			<param name="String" type="string" pass="in" description="String Identifier." />
 			<param name="Status" type="enum" class="BuildJobStatus" pass="return" description="Status Enum." />	
 		</method>
+
 			
 	</class>
 

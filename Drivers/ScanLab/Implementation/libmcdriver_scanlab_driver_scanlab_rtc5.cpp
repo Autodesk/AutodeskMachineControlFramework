@@ -40,29 +40,16 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CDriver_ScanLab_RTC5 
 **************************************************************************************************************************/
 
-CDriver_ScanLab_RTC5::CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType)
-	: m_sName (sName), m_sType (sType)
+CDriver_ScanLab_RTC5::CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType)
 {
 
 }
 
-
-IRTCSelector * CDriver_ScanLab_RTC5::CreateRTCSelector()
-{
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_NOTIMPLEMENTED);
-}
 
 std::string CDriver_ScanLab_RTC5::GetName()
 {
 	return m_sName;
-}
-
-void CDriver_ScanLab_RTC5::GetVersion(LibMCDriver_ScanLab_uint32& nMajor, LibMCDriver_ScanLab_uint32& nMinor, LibMCDriver_ScanLab_uint32& nMicro, std::string& sBuild)
-{
-	nMajor = 1;
-	nMinor = 0;
-	nMicro = 0;
-	sBuild = "";
 }
 
 std::string CDriver_ScanLab_RTC5::GetType()
@@ -70,14 +57,52 @@ std::string CDriver_ScanLab_RTC5::GetType()
 	return m_sType;
 }
 
-void CDriver_ScanLab_RTC5::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_ScanLab";
-	sBaseName = "libmcdriver_scanlab";
-}
 
 void CDriver_ScanLab_RTC5::QueryParameters()
 {
 
 }
 
+
+void CDriver_ScanLab_RTC5::Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber)
+{
+	if (m_pRTCSelector.get() != nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYINITIALIZED);
+
+	m_pRTCContext = nullptr;
+
+	m_pRTCSelector = std::shared_ptr<IRTCSelector> (CreateRTCSelector());
+
+	if (sIP.empty ()) {
+		m_pRTCContext = std::shared_ptr<IRTCContext> (m_pRTCSelector->AcquireCardBySerial(nSerialNumber));
+	}
+	else {
+		m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
+		m_pRTCContext = std::shared_ptr<IRTCContext>(m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber));
+	}
+
+}
+
+void CDriver_ScanLab_RTC5::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
+{
+	if (m_pRTCContext.get() != nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+	m_pRTCContext->LoadFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
+
+}
+
+
+void CDriver_ScanLab_RTC5::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
+
+{
+	if (m_pRTCContext.get() != nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+	m_pRTCContext->LoadCorrectionFile (nCorrectionFileBufferSize, pCorrectionFileBuffer, nTableNumber, nDimension);
+}
+
+void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
+{
+
+}

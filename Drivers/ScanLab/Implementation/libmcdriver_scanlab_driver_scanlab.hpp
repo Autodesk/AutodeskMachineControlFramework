@@ -27,75 +27,58 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBuildJobHandler
+Abstract: This is the class declaration of CDriver_ScanLab
 
 */
 
 
-#ifndef __LIBMCDATA_BUILDJOBHANDLER
-#define __LIBMCDATA_BUILDJOBHANDLER
+#ifndef __LIBMCDRIVER_SCANLAB_DRIVER_SCANLAB
+#define __LIBMCDRIVER_SCANLAB_DRIVER_SCANLAB
 
-#include "libmcdata_interfaces.hpp"
-#include <vector>
+#include "libmcdriver_scanlab_interfaces.hpp"
 
 // Parent classes
-#include "libmcdata_base.hpp"
-
+#include "libmcdriver_scanlab_driver.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
 #endif
 
 // Include custom headers here.
-#include "amcdata_sqlhandler.hpp"
-#include "amcdata_storagepath.hpp"
+#include "libmcdriver_scanlab_sdk.hpp"
 
-#include <mutex>
-#include <thread>
-
-
-namespace LibMCData {
+namespace LibMCDriver_ScanLab {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBuildJobHandler 
+ Class declaration of CDriver_ScanLab 
 **************************************************************************************************************************/
 
-class CBuildJobHandler : public virtual IBuildJobHandler, public virtual CBase {
+class CDriver_ScanLab : public virtual IDriver_ScanLab, public virtual CDriver {
 private:
-
-	AMCData::PSQLHandler m_pSQLHandler;
-    AMCData::PStoragePath m_pStoragePath;
 
 protected:
 
-
-
+    PScanLabSDK m_pScanLabSDK;
+    LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+    LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+    LibMCEnv::PWorkingFile m_pSDKLibraryFile;
 
 public:
 
+    CDriver_ScanLab(LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-    CBuildJobHandler(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
+	IRTCSelector * CreateRTCSelector() override;
 
-    IBuildJob* CreateJob(const std::string& sJobUUID, const std::string& sName, const std::string& sUserID, const std::string& sStorageStreamUUID) override;
-
-	IBuildJob * RetrieveJob(const std::string & sJobUUID) override;
-
-	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
-
-    IBuildJob* FindJobOfData(const std::string& sDataUUID) override;
-
-    std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
-
-    LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;
+    void LoadSDK(const std::string& sResourceName) override;
 
 };
 
 } // namespace Impl
-} // namespace LibMCData
+} // namespace LibMCDriver_ScanLab
 
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDATA_BUILDJOBHANDLER
+#endif // __LIBMCDRIVER_SCANLAB_DRIVER_SCANLAB

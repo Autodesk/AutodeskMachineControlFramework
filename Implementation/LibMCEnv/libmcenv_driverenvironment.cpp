@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_driverenvironment.hpp"
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_workingdirectory.hpp"
+#include "libmcenv_toolpathaccessor.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -47,21 +48,23 @@ using namespace LibMCEnv::Impl;
  Class definition of CDriverEnvironment
 **************************************************************************************************************************/
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, const std::string& sBasePath)
-    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBasePath(sBasePath)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath)
+    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (sBasePath.empty ())
+    if (pToolpathHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (sBaseTempPath.empty ())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
 
 IWorkingDirectory* CDriverEnvironment::CreateWorkingDirectory()
 {
-    return new CWorkingDirectory(m_sBasePath, m_pResourcePackage);
+    return new CWorkingDirectory(m_sBaseTempPath, m_pResourcePackage);
 }
 
 void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer)
@@ -95,6 +98,12 @@ void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibM
     }
 
 }
+
+IToolpathAccessor* CDriverEnvironment::CreateToolpathAccessor(const std::string& sStreamUUID)
+{
+    return new CToolpathAccessor (sStreamUUID, m_pToolpathHandler);
+}
+
 
 void CDriverEnvironment::RegisterStringParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue)
 {

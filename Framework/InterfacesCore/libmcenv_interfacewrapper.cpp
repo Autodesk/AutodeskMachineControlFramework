@@ -1392,7 +1392,7 @@ LibMCEnvResult libmcenv_workingfile_fileexists(LibMCEnv_WorkingFile pWorkingFile
 	}
 }
 
-LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess)
+LibMCEnvResult libmcenv_workingfile_deletefromdisk(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pWorkingFile;
 
@@ -1403,7 +1403,7 @@ LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile
 		if (!pIWorkingFile)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pSuccess = pIWorkingFile->DeleteFile();
+		*pSuccess = pIWorkingFile->DeleteFromDisk();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -1810,6 +1810,37 @@ LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvi
 		
 		pIDriverEnvironment->RetrieveDriverData(sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
 
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pToolpathInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IBase* pBaseToolpathInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseToolpathInstance = pIDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+
+		*pToolpathInstance = (IBase*)(pBaseToolpathInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -4472,8 +4503,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingfile_makemanaged;
 	if (sProcName == "libmcenv_workingfile_fileexists") 
 		*ppProcAddress = (void*) &libmcenv_workingfile_fileexists;
-	if (sProcName == "libmcenv_workingfile_deletefile") 
-		*ppProcAddress = (void*) &libmcenv_workingfile_deletefile;
+	if (sProcName == "libmcenv_workingfile_deletefromdisk") 
+		*ppProcAddress = (void*) &libmcenv_workingfile_deletefromdisk;
 	if (sProcName == "libmcenv_workingfileiterator_getcurrentfile") 
 		*ppProcAddress = (void*) &libmcenv_workingfileiterator_getcurrentfile;
 	if (sProcName == "libmcenv_workingdirectory_isactive") 
@@ -4500,6 +4531,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createworkingdirectory;
 	if (sProcName == "libmcenv_driverenvironment_retrievedriverdata") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_retrievedriverdata;
+	if (sProcName == "libmcenv_driverenvironment_createtoolpathaccessor") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createtoolpathaccessor;
 	if (sProcName == "libmcenv_driverenvironment_registerstringparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_registerstringparameter;
 	if (sProcName == "libmcenv_driverenvironment_registeruuidparameter") 

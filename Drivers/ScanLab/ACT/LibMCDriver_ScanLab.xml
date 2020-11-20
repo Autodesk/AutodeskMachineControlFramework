@@ -76,6 +76,11 @@
 		<error name="COULDNOTLOADPROGRAMFILE" code="1023" description="Could not load program file" />
 		<error name="COULDNOTLOADCORRECTIONFILE" code="1024" description="Could not load correction file" />
 		<error name="DELAYSMUSTBEMULTIPLEOF10" code="1025" description="Delays must be a multiple of 10 microseconds" />		
+		<error name="SCANLABSDKNOTLOADED" code="1026" description="Scanlab RTC has not been loaded" />
+		<error name="SCANLABSDKALREADYLOADED" code="1027" description="Scanlab RTC has already been loaded" />
+		<error name="CARDALREADYINITIALIZED" code="1028" description="Scanlab RTC card is already initialized" />
+		<error name="CARDNOTINITIALIZED" code="1029" description="Scanlab RTC card is not initialized" />
+		
 	</errors>
 
 
@@ -162,12 +167,14 @@ Custom implementation
 
 	<class name="RTCContext" parent="Base" description="Selector of the RTC Controller Card">
 
-		<method name="LoadProgramFromPath" description="Loads card firmware from given file path.">
-			<param name="Path" type="string" pass="in" description="Path to the image files." />
+		<method name="LoadFirmware" description="Loads card firmware from resource files.">
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
 		</method>
 
-		<method name="LoadCorrectionFile" description="Loads card calibration file from given file.">
-			<param name="FileName" type="string" pass="in" description="FileName to the image files." />
+		<method name="LoadCorrectionFile" description="Loads card calibration file from given resource file.">
+			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
 			<param name="TableNumber" type="uint32" pass="in" description="Correction table index of card (1..8)" />
 			<param name="Dimension" type="uint32" pass="in" description="Is it a 2D or 3D correction file." />
 		</method>
@@ -280,7 +287,7 @@ Custom implementation
 		<method name="GetInputPointer" description="returns current input list position">
 			<param name="Position" type="uint32" pass="return" description="Returns current position of open list" />
 		</method>
-		
+						
 	</class>
 
 	
@@ -333,15 +340,49 @@ Custom implementation
 	</class>
 
 
+	<class name="Driver_ScanLab" parent="Driver" description="A LaserScanner Driver for a ScanLAB card.">
 
-	<class name="Driver_ScanLab_RTC5" parent="Driver" description="A LaserScanner Driver for a ScanLAB RTC5 card.">
+		<method name="LoadSDK" description="Initializes the ScanLab SDK.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name of Scanlab DLL" />
+		</method>
 
 		<method name="CreateRTCSelector" description="Creates and initializes a new RTC selector singleton. Should only be called once per Process.">
 			<param name="Instance" type="class" class="RTCSelector" pass="return" description="New Selector instance" />
 		</method>
 
-	
 	</class>
+
+
+	<class name="Driver_ScanLab_RTC5" parent="Driver_ScanLab" description="A LaserScanner Driver for a single laser ScanLAB RTC5 card.">
+
+		<method name="Initialise" description="Initializes the RTC5 Scanner Driver.">
+			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
+			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
+			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
+			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
+		</method>
+
+
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+		
+		<method name="SetCorrectionFile" description="Sets the correction file stream.">
+			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
+			<param name="TableNumber" type="uint32" pass="in" description="Correction table index of card (1..8)" />
+			<param name="Dimension" type="uint32" pass="in" description="Is it a 2D or 3D correction file." />
+		</method>		
+
+		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+		
+	</class>
+
+
 
 
 

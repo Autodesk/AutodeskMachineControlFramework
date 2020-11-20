@@ -548,10 +548,10 @@ public:
 	virtual bool FileExists() = 0;
 
 	/**
-	* IWorkingFile::DeleteFile - Deletes the temporary file.
+	* IWorkingFile::DeleteFromDisk - Deletes the temporary file.
 	* @return returns if deletion was successful or file did not exist in the first place.
 	*/
-	virtual bool DeleteFile() = 0;
+	virtual bool DeleteFromDisk() = 0;
 
 };
 
@@ -672,6 +672,13 @@ public:
 	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
 	*/
 	virtual void RetrieveDriverData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IDriverEnvironment::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+	* @param[in] sStreamUUID - UUID of the stream.
+	* @return Toolpath instance.
+	*/
+	virtual IToolpathAccessor * CreateToolpathAccessor(const std::string & sStreamUUID) = 0;
 
 	/**
 	* IDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.

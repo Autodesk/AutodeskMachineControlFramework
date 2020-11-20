@@ -131,6 +131,10 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE 1023
 #define LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADCORRECTIONFILE 1024
 #define LIBMCDRIVER_SCANLAB_ERROR_DELAYSMUSTBEMULTIPLEOF10 1025
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKNOTLOADED 1026
+#define LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKALREADYLOADED 1027
+#define LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYINITIALIZED 1028
+#define LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED 1029
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -174,6 +178,10 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE: return "Could not load program file";
     case LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADCORRECTIONFILE: return "Could not load correction file";
     case LIBMCDRIVER_SCANLAB_ERROR_DELAYSMUSTBEMULTIPLEOF10: return "Delays must be a multiple of 10 microseconds";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKNOTLOADED: return "Scanlab RTC has not been loaded";
+    case LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKALREADYLOADED: return "Scanlab RTC has already been loaded";
+    case LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYINITIALIZED: return "Scanlab RTC card is already initialized";
+    case LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED: return "Scanlab RTC card is not initialized";
     default: return "unknown error";
   }
 }
@@ -186,6 +194,7 @@ typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Base;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCContext;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_RTCSelector;
+typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab;
 typedef LibMCDriver_ScanLabHandle LibMCDriver_ScanLab_Driver_ScanLab_RTC5;
 
 namespace LibMCDriver_ScanLab {
