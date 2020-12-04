@@ -141,8 +141,8 @@ endif()
 ##########################################################################################
 
 if(UNIX)
-add_subdirectory(Libraries/raspicam)
-target_link_libraries(${DRIVERNAME} raspicam)
+add_subdirectory(Libraries/raspicamera)
+target_link_libraries(${DRIVERNAME} raspicamera)
 endif()
 
 
