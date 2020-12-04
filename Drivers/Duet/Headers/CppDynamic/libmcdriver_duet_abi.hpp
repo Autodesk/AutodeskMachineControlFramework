@@ -157,23 +157,12 @@ LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_di
 LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_setabsolutepositioning(LibMCDriver_Duet_Driver_Duet pDriver_Duet, bool bAbsolute);
 
 /**
-* Polls a new state from the printer.
+* Stores the driver parameters in the driver environment.
 *
 * @param[in] pDriver_Duet - Driver_Duet instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_updatepositionstate(LibMCDriver_Duet_Driver_Duet pDriver_Duet);
-
-/**
-* Returns the current axis position.
-*
-* @param[in] pDriver_Duet - Driver_Duet instance.
-* @param[out] pX - X Value in mm
-* @param[out] pY - Y Value in mm
-* @param[out] pZ - Z Value in mm
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_getcurrentposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ);
+LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_queryparameters(LibMCDriver_Duet_Driver_Duet pDriver_Duet);
 
 /**
 * Returns the current target position.
@@ -182,9 +171,24 @@ LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_ge
 * @param[out] pX - X Value in mm
 * @param[out] pY - Y Value in mm
 * @param[out] pZ - Z Value in mm
+* @param[out] pA - A Value in mm
+* @param[out] pB - B Value in mm
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_gettargetposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ);
+LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_gettargetposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ, LibMCDriver_Duet_double * pA, LibMCDriver_Duet_double * pB);
+
+/**
+* Returns the current position.
+*
+* @param[in] pDriver_Duet - Driver_Duet instance.
+* @param[out] pX - X Value in mm
+* @param[out] pY - Y Value in mm
+* @param[out] pZ - Z Value in mm
+* @param[out] pA - A Value in mm
+* @param[out] pB - B Value in mm
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_getcurrentposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ, LibMCDriver_Duet_double * pA, LibMCDriver_Duet_double * pB);
 
 /**
 * Returns if the movement buffer can receive another movement command..
@@ -214,7 +218,7 @@ LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_is
 LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_ishomed(LibMCDriver_Duet_Driver_Duet pDriver_Duet, bool * pValue);
 
 /**
-* Returns if the printer is coneccted
+* Returns if the printer is connected
 *
 * @param[in] pDriver_Duet - Driver_Duet instance.
 * @param[out] pValue - True if printer is connected.
@@ -228,11 +232,11 @@ LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_is
 * @param[in] pDriver_Duet - Driver_Duet instance.
 * @param[in] dX - X Value in mm
 * @param[in] dY - Y Value in mm
-* @param[in] dE - E Value in mm
+* @param[in] dLaserPower - Laser power in percent of maximum power
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoxy(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dX, LibMCDriver_Duet_double dY, LibMCDriver_Duet_double dE, LibMCDriver_Duet_double dSpeed);
+LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoxy(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dX, LibMCDriver_Duet_double dY, LibMCDriver_Duet_double dLaserPower, LibMCDriver_Duet_double dSpeed);
 
 /**
 * Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -256,14 +260,24 @@ LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_mo
 LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoz(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dZ, LibMCDriver_Duet_double dSpeed);
 
 /**
-* Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+* Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 *
 * @param[in] pDriver_Duet - Driver_Duet instance.
-* @param[in] dZ - Z Value in mm
+* @param[in] dA - A Value in mm
 * @param[in] dSpeed - Movement speed in mm/s
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movefasttoz(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dZ, LibMCDriver_Duet_double dSpeed);
+LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoa(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dA, LibMCDriver_Duet_double dSpeed);
+
+/**
+* Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+*
+* @param[in] pDriver_Duet - Driver_Duet instance.
+* @param[in] dB - B Value in mm
+* @param[in] dSpeed - Movement speed in mm/s
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_DUET_DECLSPEC LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetob(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dB, LibMCDriver_Duet_double dSpeed);
 
 /**
 * Start Homing of printer.

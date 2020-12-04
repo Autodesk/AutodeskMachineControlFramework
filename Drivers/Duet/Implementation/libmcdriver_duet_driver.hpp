@@ -52,7 +52,7 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver 
+ Class declaration of CDriver
 **************************************************************************************************************************/
 
 class CDriver : public virtual IDriver, public virtual CBase {
@@ -64,20 +64,12 @@ private:
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+	std::string m_sName;
+	std::string m_sType;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+	CDriver(const std::string& sName, const std::string& sType);
 
 	std::string GetName() override;
 

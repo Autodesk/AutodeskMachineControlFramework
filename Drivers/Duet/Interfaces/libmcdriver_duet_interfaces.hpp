@@ -142,6 +142,29 @@ template <class T1, class T2, class T3, class T4> class ParameterCache_4 : publi
 		}
 };
 
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+		}
+};
+
 
 /*************************************************************************************************************************
  Class interface for Base 
@@ -330,25 +353,29 @@ public:
 	virtual void SetAbsolutePositioning(const bool bAbsolute) = 0;
 
 	/**
-	* IDriver_Duet::UpdatePositionState - Polls a new state from the printer.
+	* IDriver_Duet::QueryParameters - Stores the driver parameters in the driver environment.
 	*/
-	virtual void UpdatePositionState() = 0;
-
-	/**
-	* IDriver_Duet::GetCurrentPosition - Returns the current axis position.
-	* @param[out] dX - X Value in mm
-	* @param[out] dY - Y Value in mm
-	* @param[out] dZ - Z Value in mm
-	*/
-	virtual void GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ) = 0;
+	virtual void QueryParameters() = 0;
 
 	/**
 	* IDriver_Duet::GetTargetPosition - Returns the current target position.
 	* @param[out] dX - X Value in mm
 	* @param[out] dY - Y Value in mm
 	* @param[out] dZ - Z Value in mm
+	* @param[out] dA - A Value in mm
+	* @param[out] dB - B Value in mm
 	*/
-	virtual void GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ) = 0;
+	virtual void GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB) = 0;
+
+	/**
+	* IDriver_Duet::GetCurrentPosition - Returns the current position.
+	* @param[out] dX - X Value in mm
+	* @param[out] dY - Y Value in mm
+	* @param[out] dZ - Z Value in mm
+	* @param[out] dA - A Value in mm
+	* @param[out] dB - B Value in mm
+	*/
+	virtual void GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB) = 0;
 
 	/**
 	* IDriver_Duet::CanExecuteMovement - Returns if the movement buffer can receive another movement command..
@@ -369,7 +396,7 @@ public:
 	virtual bool IsHomed() = 0;
 
 	/**
-	* IDriver_Duet::IsConnected - Returns if the printer is coneccted
+	* IDriver_Duet::IsConnected - Returns if the printer is connected
 	* @return True if printer is connected.
 	*/
 	virtual bool IsConnected() = 0;
@@ -378,10 +405,10 @@ public:
 	* IDriver_Duet::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
-	* @param[in] dE - E Value in mm
+	* @param[in] dLaserPower - Laser power in percent of maximum power
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	virtual void MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dE, const LibMCDriver_Duet_double dSpeed) = 0;
+	virtual void MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dLaserPower, const LibMCDriver_Duet_double dSpeed) = 0;
 
 	/**
 	* IDriver_Duet::MoveFastToXY - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -399,11 +426,18 @@ public:
 	virtual void MoveToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed) = 0;
 
 	/**
-	* IDriver_Duet::MoveFastToZ - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
-	* @param[in] dZ - Z Value in mm
+	* IDriver_Duet::MoveToA - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dA - A Value in mm
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	virtual void MoveFastToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed) = 0;
+	virtual void MoveToA(const LibMCDriver_Duet_double dA, const LibMCDriver_Duet_double dSpeed) = 0;
+
+	/**
+	* IDriver_Duet::MoveToB - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dB - B Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	virtual void MoveToB(const LibMCDriver_Duet_double dB, const LibMCDriver_Duet_double dSpeed) = 0;
 
 	/**
 	* IDriver_Duet::StartHoming - Start Homing of printer.

@@ -122,19 +122,23 @@ Custom implementation
 			<param name="Absolute" type="bool" pass="in" description="If true, sets positioning to absolute, if false to relative" />
 		</method>
 		
-		<method name="UpdatePositionState" description="Polls a new state from the printer.">
-		</method>
-
-		<method name="GetCurrentPosition" description="Returns the current axis position.">
-			<param name="X" type="double" pass="out" description="X Value in mm" />
-			<param name="Y" type="double" pass="out" description="Y Value in mm" />
-			<param name="Z" type="double" pass="out" description="Z Value in mm" />
+		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
 		</method>
 	
 		<method name="GetTargetPosition" description="Returns the current target position.">
 			<param name="X" type="double" pass="out" description="X Value in mm" />
 			<param name="Y" type="double" pass="out" description="Y Value in mm" />
 			<param name="Z" type="double" pass="out" description="Z Value in mm" />
+			<param name="A" type="double" pass="out" description="A Value in mm" />
+			<param name="B" type="double" pass="out" description="B Value in mm" />
+		</method>
+
+		<method name="GetCurrentPosition" description="Returns the current position.">
+			<param name="X" type="double" pass="out" description="X Value in mm" />
+			<param name="Y" type="double" pass="out" description="Y Value in mm" />
+			<param name="Z" type="double" pass="out" description="Z Value in mm" />
+			<param name="A" type="double" pass="out" description="A Value in mm" />
+			<param name="B" type="double" pass="out" description="B Value in mm" />
 		</method>
 
 		<method name="CanExecuteMovement" description="Returns if the movement buffer can receive another movement command..">
@@ -149,14 +153,14 @@ Custom implementation
 			<param name="Value" type="bool" pass="return" description="True if printer is homed." />
 		</method>
 
-		<method name="IsConnected" description="Returns if the printer is coneccted">
+		<method name="IsConnected" description="Returns if the printer is connected">
 			<param name="Value" type="bool" pass="return" description="True if printer is connected." />
 		</method>
 
 		<method name="MoveToXY" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="X" type="double" pass="in" description="X Value in mm" />
 			<param name="Y" type="double" pass="in" description="Y Value in mm" />
-			<param name="E" type="double" pass="in" description="E Value in mm" />
+			<param name="LaserPower" type="double" pass="in" description="Laser power in percent of maximum power" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 
@@ -171,8 +175,13 @@ Custom implementation
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 
-		<method name="MoveFastToZ" description="Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
-			<param name="Z" type="double" pass="in" description="Z Value in mm" />
+		<method name="MoveToA" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+			<param name="A" type="double" pass="in" description="A Value in mm" />
+			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
+		</method>
+
+		<method name="MoveToB" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+			<param name="B" type="double" pass="in" description="B Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 	
@@ -238,5 +247,3 @@ End of Custom implementation
 	
 	
 </component>
-
-

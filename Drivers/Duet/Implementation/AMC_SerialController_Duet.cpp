@@ -32,6 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <thread>
+#include <iostream>
+
+#include "RapidJSON/document.h"
+#include "RapidJSON/error/error.h"
+#include "RapidJSON/error/en.h"
 
 #ifdef __linux__
 #include <math.h>
@@ -50,19 +55,20 @@ namespace AMC {
 		m_sAckSymbol("ok"),
 		m_nLineNumber(1),
 		m_bIsHomed(false),
+		m_bWaitForAck(false),
 		m_dTargetPosX(0),
 		m_dTargetPosY(0),
 		m_dTargetPosZ(0),
-		m_dTargetPosE(0),
+		m_dTargetPosA(0),
+		m_dTargetPosB(0),
 		m_dCurrentPosX(0),
 		m_dCurrentPosY(0),
 		m_dCurrentPosZ(0),
-		m_dAxisStepsPerUnitX(0),
-		m_dAxisStepsPerUnitY(0),
-		m_dAxisStepsPerUnitZ(0),
-		m_dAxisStepsPerUnitE(0),
+		m_dCurrentPosA(0),
+		m_dCurrentPosB(0),
 		m_dCurrentSpeedInMMperSecond(0),
-		m_sResendSymbol ("Resend:")
+		m_sResendSymbol ("Resend:"),
+		m_bDebug(false)
 	{
 	}
 
@@ -84,7 +90,7 @@ namespace AMC {
 
 		return m_sCOMPort;
 	}
-	
+
 	void CSerialController_Duet::setBaudrate(const uint32_t nBaudrate)
 	{
 		if (m_pConnection.get() != nullptr)
@@ -127,7 +133,7 @@ namespace AMC {
 			throw std::runtime_error("Serial Port already initialized");
 
 		// set timeout >1000 => 2000 (default of m_nConnectTimeout)
-		// 
+		//
 		// if printer is booting (echoing start+ Date+Memory... after switch on printer or plug in cable) and
 		// timeout would be 1000 the while loop below we be leaved "to early" (after timeout of 1sec) and
 		// the next command is sent, but printer can't respond to this command with OK,
@@ -160,13 +166,10 @@ namespace AMC {
 		// reset line number
 		std::stringstream sCommand;
 		sCommand << "M110 " << m_nLineNumber;
-		sendCommand(sCommand.str());
+		sendCommandBlocking(sCommand.str());
 
-		sendCommand("M400");
-		sendCommand("G21"); // set mm units
-		sendCommand("M149 C"); // set temperature unit to Celsius
-		sendCommand("M113 S1"); // keep alive period 0-60 possible, no decimals!
-		setPositioningAbolute();
+		sendCommandBlocking("M400");
+		setPositioningAbsolute();
 		m_bIsConnected = true;
 	}
 
@@ -224,31 +227,33 @@ namespace AMC {
 	}
 
 
-	std::stringstream CSerialController_Duet::sendCommand(const std::string& sCommand)
-	{
-		if (m_pConnection.get() == nullptr)
-			throw std::runtime_error("Serial Port not initialized");
+	bool CSerialController_Duet::checkForAck(const int nLineNumber) {
+		bool bAck = false;
+		while (m_pConnection->available()) {
+			std::string sLineRead = m_pConnection->readline();
 
-		std::string sLineToSend;
-		std::string sLineNumberCommand = "N" + std::to_string(m_nLineNumber) + " " + sCommand;
-		auto nLineNumber = m_nLineNumber;
-		m_nLineNumber++;
+			if (m_bDebug) {
+				std::cout << "RETURN: " << sLineRead << std::endl;
+			}
 
-		uint32_t nCheckSum = calculateLineChecksum(sLineNumberCommand);
-		   sLineToSend = sLineNumberCommand + "*" + std::to_string(nCheckSum) + "\n";
+			bool bResend = (sLineRead.find(m_sResendSymbol) != std::string::npos);
+			if (bResend) {
+				// For now fail, because firmware was not in reset state...
+				throw std::runtime_error("line number mismatch in firmware");
+			}
 
-		m_pConnection->write(sLineToSend);
-
-		if (m_bDebug) {
-			std::cout << "SENT: " << sLineToSend;
+			bAck = bAck || parseAckSymbol(sLineRead, nLineNumber);
 		}
+		return bAck;
+	}
 
+
+	std::stringstream CSerialController_Duet::readResponseBlocking(const int nLineNumber) {
 		std::stringstream sResultStream;
 
 		bool bAck = false;
 		while (!bAck) {
 			std::string sLineRead = m_pConnection->readline();
-			sResultStream << sLineRead;
 
 			if (m_bDebug) {
 				std::cout << "RETURN: " << sLineRead << std::endl;
@@ -261,123 +266,170 @@ namespace AMC {
 			}
 
 			bAck = parseAckSymbol(sLineRead, nLineNumber);
-				
+
+			if (!bAck) {
+				// Do not include ok etc. in result
+				sResultStream << sLineRead;
+			}
+
 		}
-		sResultStream << std::endl;
+
+		m_bWaitForAck = false;
 		return sResultStream;
 	}
 
-
-
-	void CSerialController_Duet::queryPositionState()
+	int CSerialController_Duet::sendCommand(const std::string& sCommand)
 	{
-		auto sStream = sendCommand("M114");
-		
-		auto sLine = sStream.str();
+		if (m_bWaitForAck)
+			throw std::runtime_error("Cannot send command asynchronously when waiting for an other one");
+		if (m_pConnection.get() == nullptr)
+			throw std::runtime_error("Serial Port not initialized");
 
-		auto nPosition = sLine.find("Count");
+		m_bWaitForAck = true;
 
-		if (nPosition == std::string::npos) 
-			throw std::runtime_error("could not query position state.");
+		std::string sLineToSend;
+		std::string sLineNumberCommand = "N" + std::to_string(m_nLineNumber) + " " + sCommand;
+		auto nLineNumber = m_nLineNumber;
+		m_nLineNumber++;
 
-		auto sTargetPosString = sLine.substr(0, nPosition);
-		auto sCurrentPosString = sLine.substr(nPosition + 5);
+		uint32_t nCheckSum = calculateLineChecksum(sLineNumberCommand);
+		sLineToSend = sLineNumberCommand + "*" + std::to_string(nCheckSum) + "\n";
 
-		auto nTargetXPosition = sTargetPosString.find("X:");
-		auto nTargetYPosition = sTargetPosString.find("Y:");
-		auto nTargetZPosition = sTargetPosString.find("Z:");
-		auto nTargetEPosition = sTargetPosString.find("E:");
+		m_pConnection->write(sLineToSend);
 
-		if (nTargetXPosition == std::string::npos)
-			throw std::runtime_error("could not find target X position.");
-		if (nTargetYPosition == std::string::npos)
-			throw std::runtime_error("could not find target Y position.");
-		if (nTargetZPosition == std::string::npos)
-			throw std::runtime_error("could not find target Z position.");
-		if (nTargetEPosition == std::string::npos)
-			throw std::runtime_error("could not find target E position.");
+		if (m_bDebug) {
+			std::cout << "SENT: " << sLineToSend;
+		}
 
-		if (!((nTargetXPosition < nTargetYPosition) && (nTargetYPosition < nTargetZPosition) &&
-			(nTargetZPosition < nTargetEPosition)))
-				throw std::runtime_error("invalid target position order.");
+		return nLineNumber;
+	}
 
-		auto sTargetXString = sTargetPosString.substr(nTargetXPosition + 2, nTargetYPosition - (nTargetXPosition + 2));
-		auto sTargetYString = sTargetPosString.substr(nTargetYPosition + 2, nTargetZPosition - (nTargetYPosition + 2));
-		auto sTargetZString = sTargetPosString.substr(nTargetZPosition + 2, nTargetEPosition - (nTargetZPosition + 2));
-		auto sTargetEString = sTargetPosString.substr(nTargetEPosition + 2);
+	std::stringstream CSerialController_Duet::sendCommandBlocking(const std::string& sCommand)
+	{
+		if (m_bWaitForAck) {
+			readResponseBlocking(m_nLineNumber);
+		}
 
-		m_dTargetPosX = std::stod(sTargetXString);
-		m_dTargetPosY = std::stod(sTargetYString);
-		m_dTargetPosZ = std::stod(sTargetZString);
-		m_dTargetPosE = std::stod(sTargetEString);
-
-		auto nCurrentXPosition = sCurrentPosString.find("X:");
-		auto nCurrentYPosition = sCurrentPosString.find("Y:");
-		auto nCurrentZPosition = sCurrentPosString.find("Z:");
-		auto nCurrentEolPosition = sCurrentPosString.find("\n");
+		auto nLineNumber = sendCommand(sCommand);
+		return readResponseBlocking(nLineNumber);
+	}
 
 
-		if (nCurrentXPosition == std::string::npos)
-			throw std::runtime_error("could not find current X position.");
-		if (nCurrentYPosition == std::string::npos)
-			throw std::runtime_error("could not find current Y position.");
-		if (nCurrentZPosition == std::string::npos)
-			throw std::runtime_error("could not find current Z position.");
+	void CSerialController_Duet::queryPrinterState()
+	{
+		// Response should look like
+		// {"status":"I","heaters":[0.0],"active":[0.0],"standby":[0.0],"hstat":[0],"pos":[20.000,0.000,0.000,0.000,0.000],
+		//	"machine":[20.000,0.000,0.000,0.000,0.000],"sfactor":100.0,"efactor":[],"babystep":0.000,"tool":-1,"probe":"1000",
+		//  "fanPercent":[0.0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],"fanRPM":[-1,-1],"homed":[0,0,0,0,0],"msgBox.mode":-1}
+		std::string sJsonResponse = sendCommandBlocking("M408 S0").str();
+		auto cJsonResponse = sJsonResponse.c_str();
+		rapidjson::Document jsonResponse;
+		rapidjson::ParseResult parseResult = jsonResponse.Parse(cJsonResponse);
 
-		if (!((nCurrentXPosition < nCurrentYPosition) && (nCurrentYPosition < nCurrentZPosition)))
-			throw std::runtime_error("invalid target current order.");
+		if (!parseResult) {
+			throw std::runtime_error("could not parse M408 S0 response json.");
+		}
+		assert(jsonResponse.IsObject());
 
-		auto sCurrentXString = sCurrentPosString.substr(nCurrentXPosition + 2, nCurrentYPosition - (nCurrentXPosition + 2));
-		auto sCurrentYString = sCurrentPosString.substr(nCurrentYPosition + 2, nCurrentZPosition - (nCurrentYPosition + 2));
-		auto sCurrentZString = sCurrentPosString.substr(nCurrentZPosition + 2, nCurrentEolPosition - (nCurrentZPosition + 2));
+		assert(jsonResponse["status"].IsString());
+		auto sStatus = jsonResponse["status"].GetString();
 
-		m_dCurrentPosX = std::stod(sCurrentXString) / m_dAxisStepsPerUnitX;;
-		m_dCurrentPosY = std::stod(sCurrentYString) / m_dAxisStepsPerUnitY;;
-		m_dCurrentPosZ = std::stod(sCurrentZString) / m_dAxisStepsPerUnitZ;;
+		assert(jsonResponse["pos"].IsArray());
+		auto targetPositions = jsonResponse["pos"].GetArray();
+		assert(targetPositions.Size() == 5);
 
+		assert(jsonResponse["machine"].IsArray());
+		auto currentPositions = jsonResponse["machine"].GetArray();
+		assert(currentPositions.Size() == 5);
+
+		assert(jsonResponse["homed"].IsArray());
+		auto homedFlags = jsonResponse["homed"].GetArray();
+		assert(homedFlags.Size() == 5);
+
+		assert(homedFlags[0].IsInt());
+		auto xHomed = homedFlags[0].GetInt();
+		assert(homedFlags[1].IsInt());
+		auto yHomed = homedFlags[1].GetInt();
+		assert(homedFlags[3].IsInt());
+		auto aHomed = homedFlags[3].GetInt();
+
+		auto homed = xHomed && yHomed && aHomed;
+
+		assert(targetPositions[0].IsDouble());
+		m_dTargetPosX = targetPositions[0].GetDouble();
+		assert(targetPositions[1].IsDouble());
+		m_dTargetPosY = targetPositions[1].GetDouble();
+		assert(targetPositions[2].IsDouble());
+		m_dTargetPosZ = targetPositions[2].GetDouble();
+		assert(targetPositions[3].IsDouble());
+		m_dTargetPosA = targetPositions[3].GetDouble();
+		assert(targetPositions[4].IsDouble());
+		m_dTargetPosB = targetPositions[4].GetDouble();
+
+
+		assert(currentPositions[0].IsDouble());
+		m_dCurrentPosX = currentPositions[0].GetDouble();
+		assert(currentPositions[1].IsDouble());
+		m_dCurrentPosY = currentPositions[1].GetDouble();
+		assert(currentPositions[2].IsDouble());
+		m_dCurrentPosZ = currentPositions[2].GetDouble();
+		assert(currentPositions[3].IsDouble());
+		m_dCurrentPosA = currentPositions[3].GetDouble();
+		assert(currentPositions[4].IsDouble());
+		m_dCurrentPosB = currentPositions[4].GetDouble();
+
+		// std::cout << "Homed: " << homed << std::endl;
+		// std::cout << "Current: [" << m_dCurrentPosX << ", " << m_dCurrentPosY << ", " << m_dCurrentPosZ << ", " << m_dCurrentPosA << ", " << m_dCurrentPosB << "]" << std::endl;
+		// std::cout << "Target: [" << m_dTargetPosX << ", " << m_dTargetPosY << ", " << m_dTargetPosZ << ", " << m_dTargetPosA << ", " << m_dTargetPosB << "]" << std::endl;
 	}
 
 
 
-	void CSerialController_Duet::getTargetPosition(double& dX, double& dY, double& dZ)
+	void CSerialController_Duet::getTargetPosition(double& dX, double& dY, double& dZ, double& dA, double& dB)
 	{
 		dX = m_dTargetPosX;
 		dY = m_dTargetPosY;
 		dZ = m_dTargetPosZ;
+		dA = m_dTargetPosA;
+		dB = m_dTargetPosB;
 	}
 
-	void CSerialController_Duet::getCurrentPosition(double& dX, double& dY, double& dZ)
+	void CSerialController_Duet::getCurrentPosition(double& dX, double& dY, double& dZ, double& dA, double& dB)
 	{
 		dX = m_dCurrentPosX;
 		dY = m_dCurrentPosY;
 		dZ = m_dCurrentPosZ;
+		dA = m_dCurrentPosA;
+		dB = m_dCurrentPosB;
 	}
 
-	void CSerialController_Duet::setPositioningAbolute()
+	void CSerialController_Duet::setPositioningAbsolute()
 	{
-		sendCommand("G90");
+		sendCommandBlocking("G90");
 	}
 
 	void CSerialController_Duet::setPositioningRelative()
 	{
-		sendCommand("G91");
+		sendCommandBlocking("G91");
 	}
 
-	void CSerialController_Duet::moveToEx(bool bFastMove,
-		bool bInX, const double dX, 
-		bool bInY, const double dY, 
-		bool bInZ, const double dZ,
-		bool bInE, const double dE,
+	void CSerialController_Duet::moveToEx(
+		const bool bInX,
+		const double dX,
+		const bool bInY,
+		const double dY,
+		const bool bInZ,
+		const double dZ,
+		const bool bInA,
+		const double dA,
+		const bool bInB,
+		const double dB,
+		const double dLaserPower,
 		const double dSpeedInMMperSecond)
 	{
 		std::stringstream sCommand;
 
-		if (bFastMove) {
-			sCommand << "G0";
-		}
-		else {
-			sCommand << "G1";
-		}
+		sCommand << "G1";
 
 		if (bInX) {
 			// X given => add X+value to command str
@@ -391,12 +443,18 @@ namespace AMC {
 			// Z given => add Z+value to command str
 			sCommand << " Z" << dZ;
 		}
-		if (bInE && !bFastMove) {
-			// E given => add E+value to command str
-			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
-			sCommand << " E" << dE;
-			//std::cout << "CALCULATED E = " << dE << std::endl;
+		if (bInA) {
+			// A given => add A+value to command str
+			sCommand << " A" << dA;
 		}
+		if (bInB) {
+			// B given => add B+value to command str
+			sCommand << " B" << dB;
+		}
+
+		// Add S+laserpower to command str
+		sCommand << " S" << dLaserPower;
+
 		if (dSpeedInMMperSecond > 0) {
 			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > DUETDRIVER_MINSPEED) {
 				m_dCurrentSpeedInMMperSecond = dSpeedInMMperSecond;
@@ -404,62 +462,48 @@ namespace AMC {
 			}
 		}
 		sendCommand(sCommand.str());
-
-		if (bInX) {
-			m_dTargetPosX = dX;
-		}
-		if (bInY) {
-			m_dTargetPosY = dY;
-		}
-		if (bInZ) {
-			m_dTargetPosZ = dZ;
-		}
-		if (bInE) {
-			m_dTargetPosE = dE;
-		}
 	}
 
 
-	void CSerialController_Duet::moveXY(const double dX, const double dY, const double dE, const double dSpeedInMMperSecond)
+	void CSerialController_Duet::moveXY(const double dX, const double dY, const double dLaserPower, const double dSpeedInMMperSecond)
 	{
-		bool dInE = false;
-		if (fabs(dE) > DUETDRIVER_MINSPEED) {
-			dInE = true;
-		}
-		moveToEx(false, true, dX, true, dY, false, 0.0, dInE, dE, dSpeedInMMperSecond);
+		moveToEx(true, dX, true, dY, false, 0, false, 0, false, 0, dLaserPower, dSpeedInMMperSecond);
 	}
 
 	void CSerialController_Duet::moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond)
 	{
-		moveToEx(true, true, dX, true, dY, false, 0.0, false, 0.0, dSpeedInMMperSecond);
+		moveToEx(true, dX, true, dY, false, 0, false, 0, false, 0, 0, dSpeedInMMperSecond);
 	}
 
-	void CSerialController_Duet::moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond)
+	void CSerialController_Duet::moveZ(const double dZ, const double dSpeedInMMperSecond)
 	{
-		bool dInE = false;
-		if (fabs(dE) > DUETDRIVER_MINSPEED) {
-			dInE = true;
-		}
-		moveToEx(false, false, 0.0, false, 0.0, true, dZ, dInE, dE, dSpeedInMMperSecond);
+		moveToEx(false, 0, false, 0, true, dZ, false, 0, false, 0, 0, dSpeedInMMperSecond);
 	}
 
-	void CSerialController_Duet::moveFastZ(const double dZ, const double dSpeedInMMperSecond)
+	void CSerialController_Duet::moveA(const double dA, const double dSpeedInMMperSecond)
 	{
-		moveToEx(true, false, 0.0, false, 0.0, true, dZ, false, 0.0, dSpeedInMMperSecond);
+		moveToEx(false, 0, false, 0, false, 0, true, dA, false, 0, 0, dSpeedInMMperSecond);
+	}
+
+	void CSerialController_Duet::moveB(const double dB, const double dSpeedInMMperSecond)
+	{
+		moveToEx(false, 0, false, 0, false, 0, false, 0, true, dB, 0, dSpeedInMMperSecond);
 	}
 
 	void CSerialController_Duet::waitForMovement()
 	{
-		sendCommand("M400");		
+		sendCommandBlocking("M400");
 		// Print time (M31) responses immediately with ok (+ADVANCED_OK) + print time
 		// not added to the planning buffer
-		//sendCommand("M31");
+		//sendCommandBlocking("M31");
 	}
 
 	bool CSerialController_Duet::canReceiveMovement()
 	{
-		return true;
-		//return (m_bIsConnected && (m_nCurrentBufferSpace > m_nMinBufferSpace));
+		if (m_bWaitForAck) {
+			m_bWaitForAck = !checkForAck(m_nLineNumber);
+		}
+		return m_bIsConnected && !m_bWaitForAck;
 	}
 
 	bool CSerialController_Duet::isMoving()
@@ -474,18 +518,18 @@ namespace AMC {
 
 	void CSerialController_Duet::emergencyStop()
 	{
-		sendCommand("M112");
+		sendCommandBlocking("M112");
 	}
 
 
 	void CSerialController_Duet::powerOff()
 	{
-		sendCommand("M81");
+		sendCommandBlocking("M81");
 	}
 
 	void CSerialController_Duet::setAxisPosition(const std::string& sAxis, double dValue)
 	{
-		sendCommand("G92 " + sAxis + std::to_string(dValue));		
+		sendCommandBlocking("G92 " + sAxis + std::to_string(dValue));
 	}
 
 	void CSerialController_Duet::startHoming()
