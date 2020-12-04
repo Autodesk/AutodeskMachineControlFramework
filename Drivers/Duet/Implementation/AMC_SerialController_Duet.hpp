@@ -20,33 +20,37 @@ namespace AMC {
 		bool m_bIsConnected;
 		double m_dStatusUpdateTimerInterval;
 
+		bool m_bWaitForAck;
 		bool m_bDebug;
 		bool m_bIsHomed;
 		bool m_bDoQueryFirmwareInfo;
 		bool m_bDisableHoming;
 
-		double m_dAxisStepsPerUnitX;
-		double m_dAxisStepsPerUnitY;
-		double m_dAxisStepsPerUnitZ;
-		double m_dAxisStepsPerUnitE;
 
 		double m_dTargetPosX;
 		double m_dTargetPosY;
 		double m_dTargetPosZ;
-		double m_dTargetPosE;
+		double m_dTargetPosA;
+		double m_dTargetPosB;
 
 		double m_dCurrentPosX;
 		double m_dCurrentPosY;
 		double m_dCurrentPosZ;
+		double m_dCurrentPosA;
+		double m_dCurrentPosB;
+
 		double m_dCurrentSpeedInMMperSecond;
 
 		std::string m_sAckSymbol;
 		std::string m_sResendSymbol;
 
-		std::stringstream sendCommand(const std::string& sCommand);
+		int sendCommand(const std::string& sCommand);
+		std::stringstream sendCommandBlocking(const std::string& sCommand);
+		std::stringstream readResponseBlocking(const int nLineNumber);
+		bool checkForAck(const int nLineNumber);
 		uint32_t calculateLineChecksum (const std::string& sCommand);
 		bool parseAckSymbol(const std::string& sLine, const uint32_t nLineNumber);
-		void moveToEx (bool bFastMove, bool bInX, const double dX, bool bInY, const double dY, bool bInZ, const double dZ, bool bInE, const double dE, const double dSpeedInMMperSecond);
+		void moveToEx(const bool bInX, const double dX, const bool bInY, const double dY, const bool bInZ, const double dZ, const bool bInA, const double dA, const bool bInB, const double dB, const double dLaserPower, const double dSpeedInMMperSecond);
 
 	public:
 		CSerialController_Duet();
@@ -70,26 +74,27 @@ namespace AMC {
 		void disconnectController() override;
 		void emergencyStop() override;
 
-		void setPositioningAbolute();
+		void setPositioningAbsolute();
 		void setPositioningRelative();
 
+		void queryPrinterState() override;
 
-		void queryPositionState() override;
-
-		void getTargetPosition(double& dX, double& dY, double& dZ) override;
-		void getCurrentPosition(double& dX, double& dY, double& dZ) override;
+		void getTargetPosition(double& dX, double& dY, double& dZ, double& dA, double& dB) override;
+		void getCurrentPosition(double& dX, double& dY, double& dZ, double& dA, double& dB) override;
 
 		void startHoming() override;
 
-		void moveXY(const double dX, const double dY, const double dE, const double dSpeedInMMperSecond) override;
+		void moveXY(const double dX, const double dY, const double laserPercentage, const double dSpeedInMMperSecond) override;
 		void moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond) override;
-		void moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond) override;
-		void moveFastZ(const double dZ, const double dSpeedInMMperSecond) override;
+
+		void moveZ(const double dZ, const double dSpeedInMMperSecond) override;
+		void moveA(const double dA, const double dSpeedInMMperSecond) override;
+		void moveB(const double dB, const double dSpeedInMMperSecond) override;
 
 		void setAxisPosition(const std::string& sAxis, double dValue) override;
 
 		void powerOff() override;
-		
+
 		bool isHomed() override;
 		bool isMoving() override;
 		bool canReceiveMovement() override;
