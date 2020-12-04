@@ -40,17 +40,20 @@ Interface version: 1.0.0
 #include "libmcdriver_duet_interfaces.hpp"
 #include "libmcdriver_duet_interfaceexception.hpp"
 
+#include "libmcdriver_duet_driver_duet.hpp"
+
 using namespace LibMCDriver_Duet;
 using namespace LibMCDriver_Duet::Impl;
+using namespace std;
 
 // Injected Components
 LibMCEnv::PWrapper CWrapper::sPLibMCEnvWrapper;
 
 void CWrapper::GetVersion(LibMCDriver_Duet_uint32 & nMajor, LibMCDriver_Duet_uint32 & nMinor, LibMCDriver_Duet_uint32 & nMicro)
 {
-	nMajor = LIBMCDRIVER_DUET_VERSION_MAJOR;
-	nMinor = LIBMCDRIVER_DUET_VERSION_MINOR;
-	nMicro = LIBMCDRIVER_DUET_VERSION_MICRO;
+    nMajor = LIBMCDRIVER_DUET_VERSION_MAJOR;
+    nMinor = LIBMCDRIVER_DUET_VERSION_MINOR;
+    nMicro = LIBMCDRIVER_DUET_VERSION_MICRO;
 }
 
 bool CWrapper::GetLastError(IBase* pInstance, std::string & sErrorMessage)
@@ -64,17 +67,17 @@ bool CWrapper::GetLastError(IBase* pInstance, std::string & sErrorMessage)
 
 void CWrapper::ReleaseInstance(IBase* pInstance)
 {
-	IBase::ReleaseBaseClassInterface(pInstance);
+    IBase::ReleaseBaseClassInterface(pInstance);
 }
 
 void CWrapper::AcquireInstance(IBase* pInstance)
 {
-	IBase::AcquireBaseClassInterface(pInstance);
+    IBase::AcquireBaseClassInterface(pInstance);
 }
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+    return new CDriver_Duet(sName, sType, pDriverEnvironment);
 }
 
 

@@ -84,6 +84,8 @@ public:
 
 	IBuildJobIterator * ListJobsByStatus(const LibMCData::eBuildJobStatus eStatus) override;
 
+    IBuildJob* FindJobOfData(const std::string& sDataUUID) override;
+
     std::string ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus) override;
 
     LibMCData::eBuildJobStatus ConvertStringToBuildStatus(const std::string& sString) override;

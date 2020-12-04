@@ -40,7 +40,7 @@ Abstract: This is a stub class definition of CBase
 using namespace LibMCDriver_Duet::Impl;
 
 /*************************************************************************************************************************
- Class definition of CBase 
+ Class definition of CBase
 **************************************************************************************************************************/
 
 bool CBase::GetLastErrorMessage(std::string & sErrorMessage)

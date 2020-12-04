@@ -40,27 +40,33 @@ Abstract: This is a stub class definition of CDriver
 using namespace LibMCDriver_Duet::Impl;
 
 /*************************************************************************************************************************
- Class definition of CDriver 
+ Class definition of CDriver
 **************************************************************************************************************************/
+
+CDriver::CDriver(const std::string& sName, const std::string& sType)
+	: m_sName (sName), m_sType (sType)
+{
+}
 
 std::string CDriver::GetName()
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	return m_sName;
 }
 
 std::string CDriver::GetType()
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+  return m_sType;
 }
 
 void CDriver::GetVersion(LibMCDriver_Duet_uint32 & nMajor, LibMCDriver_Duet_uint32 & nMinor, LibMCDriver_Duet_uint32 & nMicro, std::string & sBuild)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+
 }
 
 void CDriver::GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	sNameSpace = "LibMCDriver_Duet";
+	sBaseName = "libmcdriver_duet";
 }
 
 void CDriver::QueryParameters()

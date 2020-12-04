@@ -324,7 +324,29 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Sto
 **************************************************************************************************************************/
 
 /**
-* returns the name of a build job.
+* returns the uuid of a build job data.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatauuid(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the uuid of the parent build job.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getjobuuid(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the name of a build job uuid.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
 * @param[in] nNameBufferSize - size of the buffer (including trailing 0)
@@ -355,6 +377,26 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_gettimestamp(LibMCData
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestream(LibMCData_BuildJobData pBuildJobData, LibMCData_StorageStream * pStreamInstance);
 
 /**
+* returns the checksum of the storage stream of the build.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of SHA256 of the storage stream., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestreamsha2(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nSHA2BufferSize, LibMCData_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* returns the size of the storage stream of the build.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[out] pSize - size of the storage stream in bytes.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestreamsize(LibMCData_BuildJobData pBuildJobData, LibMCData_uint64 * pSize);
+
+/**
 * returns the data type of the job data.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
@@ -362,6 +404,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestream(LibMC
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatatype(LibMCData_BuildJobData pBuildJobData, LibMCData::eBuildJobDataType * pDataType);
+
+/**
+* returns the data type of the job data as string.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nDataTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataTypeBuffer -  buffer of Data type of the job data, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatatypeasstring(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nDataTypeBufferSize, LibMCData_uint32* pDataTypeNeededChars, char * pDataTypeBuffer);
 
 /**
 * returns the mime type of a storage stream.
@@ -552,6 +605,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdatabytype(LibMCDat
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdata(LibMCData_BuildJob pBuildJob, LibMCData_BuildJobDataIterator * pIteratorInstance);
 
+/**
+* Retrieves a build job data instance by its uuid.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pDataUUID - Job Data UUID.
+* @param[out] pBuildJobData - Build Job Data Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievejobdata(LibMCData_BuildJob pBuildJob, const char * pDataUUID, LibMCData_BuildJobData * pBuildJobData);
+
 /*************************************************************************************************************************
  Class definition for BuildJobIterator
 **************************************************************************************************************************/
@@ -591,6 +654,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_retrievejob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, LibMCData_BuildJob * pJobInstance);
+
+/**
+* Finds the parent build job of a given data uuid. Fails if data does not exist.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[in] pDataUUID - Job Data UUID.
+* @param[out] pBuildJobData - Build Job Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_findjobofdata(LibMCData_BuildJobHandler pBuildJobHandler, const char * pDataUUID, LibMCData_BuildJob * pBuildJobData);
 
 /**
 * Retrieves a list of build jobs, filtered by status.
