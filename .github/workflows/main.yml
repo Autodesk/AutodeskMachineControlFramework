@@ -1,4 +1,12 @@
-on: [push]
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
 
 jobs:
   build_linux_x64:
@@ -7,7 +15,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Run build in docker
+      - name: Run buildscript in docker
         uses: ./.github/build-linux-x64
         id: build
         with:
