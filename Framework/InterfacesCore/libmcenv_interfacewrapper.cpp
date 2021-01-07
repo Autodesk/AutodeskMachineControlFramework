@@ -371,7 +371,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofileuuid(LibMCEnv_ToolpathLay
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
 
@@ -388,7 +388,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLa
 		
 		bool isCacheCall = (pValueBuffer == nullptr);
 		if (isCacheCall) {
-			sValue = pIToolpathLayer->GetSegmentProfileValue(sValueName);
+			sValue = pIToolpathLayer->GetSegmentProfileValue(nIndex, sValueName);
 
 			pIToolpathLayer->_setCache (new ParameterCache_1<std::string> (sValue));
 		}
@@ -422,7 +422,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLa
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, eLibMCEnvToolpathProfileValueType eValueType, LibMCEnv_double * pValue)
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, eLibMCEnvToolpathProfileValueType eValueType, LibMCEnv_double * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
 
@@ -433,7 +433,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_Toolp
 		if (!pIToolpathLayer)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIToolpathLayer->GetSegmentProfileTypedValue(eValueType);
+		*pValue = pIToolpathLayer->GetSegmentProfileTypedValue(nIndex, eValueType);
 
 		return LIBMCENV_SUCCESS;
 	}

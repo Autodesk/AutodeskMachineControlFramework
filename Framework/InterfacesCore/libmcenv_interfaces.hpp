@@ -324,17 +324,19 @@ public:
 
 	/**
 	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	virtual std::string GetSegmentProfileValue(const std::string & sValueName) = 0;
+	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
-	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
+	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.

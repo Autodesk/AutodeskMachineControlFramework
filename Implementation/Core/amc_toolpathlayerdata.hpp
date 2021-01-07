@@ -52,6 +52,13 @@ namespace AMC {
 		uint32_t m_PartID;
 	} sToolpathLayerSegment;
 
+	typedef struct _sToolpathLayerProfile {
+		double m_dLaserSpeed;
+		double m_dLaserPower;
+		double m_dLaserFocus;
+	} sToolpathLayerProfile;
+
+
 	class CToolpathLayerData {
 	private:
 		double m_dUnits;
@@ -63,14 +70,17 @@ namespace AMC {
 
 		std::vector<std::string> m_UUIDs;
 		std::map<std::string, uint32_t> m_UUIDMap;
+		std::map<std::string, sToolpathLayerProfile> m_ProfileMap;
 
 		uint32_t registerUUID(const std::string& sUUID);
 		std::string getRegisteredUUID(const uint32_t nID);
 
+		void storeProfileData(Lib3MF::PToolpath pToolpath, const std::string& sProfileUUID);
+		sToolpathLayerProfile retrieveProfileData(const std::string& sProfileUUID);
 
 	public:
 
-		CToolpathLayerData(Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue);
+		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue);
 		virtual ~CToolpathLayerData();		
 
 		std::string getUUID ();
@@ -83,6 +93,7 @@ namespace AMC {
 
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);
+		sToolpathLayerProfile getSegmentProfile(const uint32_t nSegmentIndex);
 
 		double getUnits();
 

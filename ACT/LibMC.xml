@@ -336,6 +336,7 @@
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
 		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
+		<error name="PROFILENOTFOUND" code="330" description="Profile not found." />		
 		
 	</errors>
 	
@@ -362,6 +363,17 @@
 	<class name="Base">
 	</class>
 
+	<class name="StringClass">
+	
+		<method name="SetValue" description="Sets the value.">
+			<param name="Value" type="string" pass="in" description="String Value" />	
+		</method>
+
+		<method name="GetValue" description="Gets the value.">
+			<param name="Value" type="string" pass="return" description="String Value" />	
+		</method>
+	
+	</class>
 
 	<class name="APIRequestHandler" parent="Base" description="API Request Handler">
 

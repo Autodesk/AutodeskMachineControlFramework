@@ -62,6 +62,30 @@ extern "C" {
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for StringClass
+**************************************************************************************************************************/
+
+/**
+* Sets the value.
+*
+* @param[in] pStringClass - StringClass instance.
+* @param[in] pValue - String Value
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_stringclass_setvalue(LibMC_StringClass pStringClass, const char * pValue);
+
+/**
+* Gets the value.
+*
+* @param[in] pStringClass - StringClass instance.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of String Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_stringclass_getvalue(LibMC_StringClass pStringClass, const LibMC_uint32 nValueBufferSize, LibMC_uint32* pValueNeededChars, char * pValueBuffer);
+
+/*************************************************************************************************************************
  Class definition for APIRequestHandler
 **************************************************************************************************************************/
 
@@ -284,6 +308,15 @@ LIBMC_DECLSPEC LibMCResult libmc_injectcomponent(const char * pNameSpace, LibMC_
 * @return error code or 0 (success)
 */
 LIBMC_DECLSPEC LibMCResult libmc_createmccontext(LibMCData_DataModel pDataModel, LibMC_MCContext * pInstance);
+
+/**
+* Creates a string object.
+*
+* @param[in] pStringValue - String
+* @param[out] pInstance - New Context instance
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_createstring(const char * pStringValue, LibMC_StringClass * pInstance);
 
 #ifdef __cplusplus
 }

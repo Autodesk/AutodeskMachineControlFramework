@@ -74,14 +74,34 @@ std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nIndex)
 	return m_pToolpathLayerData->getSegmentPartUUID(nIndex);
 }
 
-std::string CToolpathLayer::GetSegmentProfileValue(const std::string& sValueName)
+std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string& sValueName)
 {
 	return "";
 }
 
-LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv::eToolpathProfileValueType eValueType)
-{
-	return 0.0;
+LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType)
+{	
+	auto sProfile = m_pToolpathLayerData->getSegmentProfile(nIndex);
+
+	switch (eValueType) {
+		case LibMCEnv::eToolpathProfileValueType::Speed:
+			return sProfile.m_dLaserSpeed;
+		case LibMCEnv::eToolpathProfileValueType::LaserPower:
+			return sProfile.m_dLaserPower;
+		case LibMCEnv::eToolpathProfileValueType::JumpSpeed:
+			return 0.0;
+		case LibMCEnv::eToolpathProfileValueType::ExtrusionFactor:
+			return 0.0;
+		case LibMCEnv::eToolpathProfileValueType::StartDelay:
+			return 0.0;
+		case LibMCEnv::eToolpathProfileValueType::EndDelay:
+			return 0.0;
+		case LibMCEnv::eToolpathProfileValueType::PolyDelay:
+			return 0.0;
+		default:
+			return 0.0;
+	}
+
 }
 
 

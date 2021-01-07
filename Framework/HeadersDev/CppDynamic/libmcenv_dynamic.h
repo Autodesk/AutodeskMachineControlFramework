@@ -147,23 +147,25 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) (LibMC
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile value of a standard type.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
 
 /**
 * Retrieves the assigned segment part uuid.
