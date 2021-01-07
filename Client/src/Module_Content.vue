@@ -25,6 +25,8 @@
 					<ContentItem_ParameterList :key="moduleitem.uuid" v-if="(moduleitem.type=='parameterlist')" :moduleitem="moduleitem" :Application="Application" />
 									
 					<ContentItem_ButtonGroup :key="moduleitem.uuid" v-if="(moduleitem.type=='buttongroup')" :moduleitem="moduleitem" :Application="Application" />
+
+					<ContentItem_Form :key="moduleitem.uuid" v-if="(moduleitem.type=='form')" :moduleitem="moduleitem" :Application="Application" />
 						
 				</template>
 					
@@ -47,6 +49,7 @@
 	import ContentItem_BuildList from './ContentItem_BuildList.vue';
 	import ContentItem_ParameterList from './ContentItem_ParameterList.vue';
 	import ContentItem_ButtonGroup from './ContentItem_ButtonGroup.vue';
+	import ContentItem_Form from './ContentItem_Form.vue';
 
 
 	export default {
@@ -59,7 +62,8 @@
 			ContentItem_Upload,
 			ContentItem_BuildList,
 			ContentItem_ParameterList,
-			ContentItem_ButtonGroup
+			ContentItem_ButtonGroup,
+			ContentItem_Form
 		}		
 		
 	};
