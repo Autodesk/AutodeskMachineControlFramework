@@ -309,15 +309,6 @@ LIBMC_DECLSPEC LibMCResult libmc_injectcomponent(const char * pNameSpace, LibMC_
 */
 LIBMC_DECLSPEC LibMCResult libmc_createmccontext(LibMCData_DataModel pDataModel, LibMC_MCContext * pInstance);
 
-/**
-* Creates a string object.
-*
-* @param[in] pStringValue - String
-* @param[out] pInstance - New Context instance
-* @return error code or 0 (success)
-*/
-LIBMC_DECLSPEC LibMCResult libmc_createstring(const char * pStringValue, LibMC_StringClass * pInstance);
-
 #ifdef __cplusplus
 }
 #endif
