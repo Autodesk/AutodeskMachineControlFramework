@@ -245,7 +245,6 @@ public:
 	inline void AcquireInstance(classParam<CBase> pInstance);
 	inline void InjectComponent(const std::string & sNameSpace, const LibMC_pvoid pSymbolAddressMethod);
 	inline PMCContext CreateMCContext(classParam<LibMCData::CDataModel> pDataModel);
-	inline PStringClass CreateString(const std::string & sStringValue);
 
 private:
 	sLibMCDynamicWrapperTable m_WrapperTable;
@@ -485,22 +484,6 @@ public:
 		return std::make_shared<CMCContext>(this, hInstance);
 	}
 	
-	/**
-	* CWrapper::CreateString - Creates a string object.
-	* @param[in] sStringValue - String
-	* @return New Context instance
-	*/
-	inline PStringClass CWrapper::CreateString(const std::string & sStringValue)
-	{
-		LibMCHandle hInstance = nullptr;
-		CheckError(nullptr,m_WrapperTable.m_CreateString(sStringValue.c_str(), &hInstance));
-		
-		if (!hInstance) {
-			CheckError(nullptr,LIBMC_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CStringClass>(this, hInstance);
-	}
-	
 	inline void CWrapper::CheckError(CBase * pBaseClass, LibMCResult nResult)
 	{
 		if (nResult != 0) {
@@ -542,7 +525,6 @@ public:
 		pWrapperTable->m_AcquireInstance = nullptr;
 		pWrapperTable->m_InjectComponent = nullptr;
 		pWrapperTable->m_CreateMCContext = nullptr;
-		pWrapperTable->m_CreateString = nullptr;
 		
 		return LIBMC_SUCCESS;
 	}
@@ -798,15 +780,6 @@ public:
 		if (pWrapperTable->m_CreateMCContext == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		#ifdef _WIN32
-		pWrapperTable->m_CreateString = (PLibMCCreateStringPtr) GetProcAddress(hLibrary, "libmc_createstring");
-		#else // _WIN32
-		pWrapperTable->m_CreateString = (PLibMCCreateStringPtr) dlsym(hLibrary, "libmc_createstring");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_CreateString == nullptr)
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		pWrapperTable->m_LibraryHandle = hLibrary;
 		return LIBMC_SUCCESS;
 	}
@@ -913,10 +886,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmc_createmccontext", (void**)&(pWrapperTable->m_CreateMCContext));
 		if ( (eLookupError != 0) || (pWrapperTable->m_CreateMCContext == nullptr) )
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmc_createstring", (void**)&(pWrapperTable->m_CreateString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_CreateString == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		return LIBMC_SUCCESS;

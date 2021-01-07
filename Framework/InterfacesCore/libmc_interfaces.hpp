@@ -434,13 +434,6 @@ public:
 	*/
 	static IMCContext * CreateMCContext(LibMCData::PDataModel pDataModel);
 
-	/**
-	* Ilibmc::CreateString - Creates a string object.
-	* @param[in] sStringValue - String
-	* @return New Context instance
-	*/
-	static IStringClass * CreateString(const std::string & sStringValue);
-
 };
 
 LibMCResult LibMC_GetProcAddress (const char * pProcName, void ** ppProcAddress);

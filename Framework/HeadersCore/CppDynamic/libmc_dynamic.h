@@ -296,15 +296,6 @@ typedef LibMCResult (*PLibMCInjectComponentPtr) (const char * pNameSpace, LibMC_
 */
 typedef LibMCResult (*PLibMCCreateMCContextPtr) (LibMCData_DataModel pDataModel, LibMC_MCContext * pInstance);
 
-/**
-* Creates a string object.
-*
-* @param[in] pStringValue - String
-* @param[out] pInstance - New Context instance
-* @return error code or 0 (success)
-*/
-typedef LibMCResult (*PLibMCCreateStringPtr) (const char * pStringValue, LibMC_StringClass * pInstance);
-
 /*************************************************************************************************************************
  Function Table Structure
 **************************************************************************************************************************/
@@ -334,7 +325,6 @@ typedef struct {
 	PLibMCAcquireInstancePtr m_AcquireInstance;
 	PLibMCInjectComponentPtr m_InjectComponent;
 	PLibMCCreateMCContextPtr m_CreateMCContext;
-	PLibMCCreateStringPtr m_CreateString;
 } sLibMCDynamicWrapperTable;
 
 #endif // __LIBMC_DYNAMICHEADER_CPPTYPES
