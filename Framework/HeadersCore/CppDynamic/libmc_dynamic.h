@@ -49,6 +49,30 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for StringClass
+**************************************************************************************************************************/
+
+/**
+* Sets the value.
+*
+* @param[in] pStringClass - StringClass instance.
+* @param[in] pValue - String Value
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCStringClass_SetValuePtr) (LibMC_StringClass pStringClass, const char * pValue);
+
+/**
+* Gets the value.
+*
+* @param[in] pStringClass - StringClass instance.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of String Value, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCStringClass_GetValuePtr) (LibMC_StringClass pStringClass, const LibMC_uint32 nValueBufferSize, LibMC_uint32* pValueNeededChars, char * pValueBuffer);
+
+/*************************************************************************************************************************
  Class definition for APIRequestHandler
 **************************************************************************************************************************/
 
@@ -272,12 +296,23 @@ typedef LibMCResult (*PLibMCInjectComponentPtr) (const char * pNameSpace, LibMC_
 */
 typedef LibMCResult (*PLibMCCreateMCContextPtr) (LibMCData_DataModel pDataModel, LibMC_MCContext * pInstance);
 
+/**
+* Creates a string object.
+*
+* @param[in] pStringValue - String
+* @param[out] pInstance - New Context instance
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCCreateStringPtr) (const char * pStringValue, LibMC_StringClass * pInstance);
+
 /*************************************************************************************************************************
  Function Table Structure
 **************************************************************************************************************************/
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCStringClass_SetValuePtr m_StringClass_SetValue;
+	PLibMCStringClass_GetValuePtr m_StringClass_GetValue;
 	PLibMCAPIRequestHandler_ExpectsRawBodyPtr m_APIRequestHandler_ExpectsRawBody;
 	PLibMCAPIRequestHandler_ExpectsFormDataPtr m_APIRequestHandler_ExpectsFormData;
 	PLibMCAPIRequestHandler_GetFormDataDetailsPtr m_APIRequestHandler_GetFormDataDetails;
@@ -299,6 +334,7 @@ typedef struct {
 	PLibMCAcquireInstancePtr m_AcquireInstance;
 	PLibMCInjectComponentPtr m_InjectComponent;
 	PLibMCCreateMCContextPtr m_CreateMCContext;
+	PLibMCCreateStringPtr m_CreateString;
 } sLibMCDynamicWrapperTable;
 
 #endif // __LIBMC_DYNAMICHEADER_CPPTYPES

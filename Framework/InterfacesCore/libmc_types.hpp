@@ -354,6 +354,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDEVENTCONTEXT 327
 #define LIBMC_ERROR_INVALIDLAYERINDEX 328
 #define LIBMC_ERROR_TEMPBASEPATHEMPTY 329
+#define LIBMC_ERROR_PROFILENOTFOUND 330
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -620,6 +621,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDEVENTCONTEXT: return "Invalid event sender";
     case LIBMC_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
     case LIBMC_ERROR_TEMPBASEPATHEMPTY: return "Empty base path for temporary files";
+    case LIBMC_ERROR_PROFILENOTFOUND: return "Profile not found.";
     default: return "unknown error";
   }
 }
@@ -629,6 +631,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCHandle LibMC_Base;
+typedef LibMCHandle LibMC_StringClass;
 typedef LibMCHandle LibMC_APIRequestHandler;
 typedef LibMCHandle LibMC_MCContext;
 

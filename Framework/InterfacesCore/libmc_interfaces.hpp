@@ -56,6 +56,7 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
+class IStringClass;
 class IAPIRequestHandler;
 class IMCContext;
 
@@ -239,6 +240,29 @@ typedef IBaseSharedPtr<IBase> PIBase;
 
 
 /*************************************************************************************************************************
+ Class interface for StringClass 
+**************************************************************************************************************************/
+
+class IStringClass : public virtual IBase {
+public:
+	/**
+	* IStringClass::SetValue - Sets the value.
+	* @param[in] sValue - String Value
+	*/
+	virtual void SetValue(const std::string & sValue) = 0;
+
+	/**
+	* IStringClass::GetValue - Gets the value.
+	* @return String Value
+	*/
+	virtual std::string GetValue() = 0;
+
+};
+
+typedef IBaseSharedPtr<IStringClass> PIStringClass;
+
+
+/*************************************************************************************************************************
  Class interface for APIRequestHandler 
 **************************************************************************************************************************/
 
@@ -409,6 +433,13 @@ public:
 	* @return New Context instance
 	*/
 	static IMCContext * CreateMCContext(LibMCData::PDataModel pDataModel);
+
+	/**
+	* Ilibmc::CreateString - Creates a string object.
+	* @param[in] sStringValue - String
+	* @return New Context instance
+	*/
+	static IStringClass * CreateString(const std::string & sStringValue);
 
 };
 

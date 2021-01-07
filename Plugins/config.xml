@@ -225,6 +225,24 @@
 
 
 		<page name="settings">
+		
+			<content name="machinesettings" title="Machine Settings" >
+
+				<form name="form1">
+					<edit caption="Machine name" text="" />
+					<switch caption="Switch 1" value="1" />
+					<switch caption="Switch 2" value="0" />
+					<switch caption="Switch 3" value="0" />
+					<memo caption="Machine description" text="" />
+					<combobox caption="Combobox" value="0" />
+				</form>
+				
+				<buttongroup>
+					<button caption="Save" />
+					<button caption="Cancel" />
+				</buttongroup>
+						
+			</content>					
 
 		</page>
 

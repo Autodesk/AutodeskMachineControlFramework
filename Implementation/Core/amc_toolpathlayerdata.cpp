@@ -34,10 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue)
+	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue)
 		: m_dUnits (dUnits), m_nZValue (nZValue)
 	{
 		if (p3MFLayer.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pToolpath.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 		m_sUUID = p3MFLayer->GetLayerDataUUID();
@@ -59,6 +61,8 @@ namespace AMC {
 			pSegment->m_Type = (LibMCEnv::eToolpathSegmentType) eType;
 			pSegment->m_ProfileID = registerUUID (sProfileUUID);
 			pSegment->m_PartID = registerUUID(sPartUUID);
+
+			storeProfileData (pToolpath, sProfileUUID);
 
 			nTotalPointCount += nPointCount;
 		}
@@ -194,6 +198,15 @@ namespace AMC {
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartID);
 	}
 
+	sToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+
+		auto sProfileUUID = getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
+		return retrieveProfileData(sProfileUUID);
+	}
+
 	double CToolpathLayerData::getUnits()
 	{
 		return m_dUnits;
@@ -204,6 +217,35 @@ namespace AMC {
 		return m_nZValue;
 	}
 
+	void CToolpathLayerData::storeProfileData(Lib3MF::PToolpath pToolpath, const std::string & sProfileUUID)
+	{
+		if (pToolpath.get () == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		auto iIter = m_ProfileMap.find(sProfileUUID);
+		if (iIter == m_ProfileMap.end()) {
+
+			auto pProfile = pToolpath->GetProfileUUID(sProfileUUID);
+			sToolpathLayerProfile sProfile;
+
+			sProfile.m_dLaserSpeed = pProfile->GetLaserSpeed();
+			sProfile.m_dLaserPower = pProfile->GetLaserPower();
+			sProfile.m_dLaserFocus = pProfile->GetLaserFocus();
+
+			m_ProfileMap.insert(std::make_pair (sProfileUUID, sProfile));
+		}
+
+	}
+
+
+	sToolpathLayerProfile CToolpathLayerData::retrieveProfileData(const std::string& sProfileUUID)
+	{
+		auto iIter = m_ProfileMap.find(sProfileUUID);
+		if (iIter == m_ProfileMap.end())
+			throw ELibMCInterfaceException(LIBMC_ERROR_PROFILENOTFOUND);
+
+		return iIter->second;
+	}
 
 }
 
