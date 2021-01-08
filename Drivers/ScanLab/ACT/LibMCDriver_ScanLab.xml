@@ -79,7 +79,9 @@
 		<error name="SCANLABSDKNOTLOADED" code="1026" description="Scanlab RTC has not been loaded" />
 		<error name="SCANLABSDKALREADYLOADED" code="1027" description="Scanlab RTC has already been loaded" />
 		<error name="CARDALREADYINITIALIZED" code="1028" description="Scanlab RTC card is already initialized" />
-		<error name="CARDNOTINITIALIZED" code="1029" description="Scanlab RTC card is not initialized" />
+		<error name="CARDNOTINITIALIZED" code="1029" description="Scanlab RTC card is not initialized" />		
+		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count" />
+		
 		
 	</errors>
 

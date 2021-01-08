@@ -65,7 +65,7 @@ void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName) {
 
 
 CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
-	: m_LibraryHandle (nullptr)
+	: m_LibraryHandle (nullptr), m_bIsInitialized (false)
 {
 
 	resetFunctionPtrs();
@@ -137,6 +137,8 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_get_input_pointer = (PScanLabPtr_n_get_input_pointer)_loadScanLabAddress(hLibrary, "n_get_input_pointer");
 	this->n_set_laser_delays = (PScanLabPtr_n_set_laser_delays)_loadScanLabAddress(hLibrary, "n_set_laser_delays");
 	this->n_set_start_list_pos = (PScanLabPtr_n_set_start_list_pos)_loadScanLabAddress(hLibrary, "n_set_start_list_pos");
+
+	m_LibraryHandle = (void*) hLibrary;
 }
 
 
@@ -158,12 +160,20 @@ CScanLabSDK::~CScanLabSDK()
 
 void CScanLabSDK::initDLL()
 {
+	if (!m_bIsInitialized) {
 
+		if (init_rtc6_dll == nullptr)
+			throw std::runtime_error("RTC DLL not loaded");
+
+		init_rtc6_dll();
+		m_bIsInitialized = true;
+	}
 }
 
 void CScanLabSDK::checkError(uint32_t nRTCError)
 {
-
+	if (nRTCError != 0)
+		throw std::runtime_error("RTC Error: " + std::to_string (nRTCError));
 }
 
 void CScanLabSDK::resetFunctionPtrs()

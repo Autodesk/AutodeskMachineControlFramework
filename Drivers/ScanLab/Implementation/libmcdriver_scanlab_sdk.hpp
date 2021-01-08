@@ -58,7 +58,7 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_rtc6_count_cards) ();
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_count_cards) ();
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_found_cards) ();
-		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_assign_card) (uint32_t nSearchNo, uint32_t nCardNo);		
+		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_assign_card) (const uint32_t nSearchNo, const uint32_t nCardNo);		
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_acquire_rtc) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_release_rtc) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_serial_number) (uint32_t nCardNo);
@@ -97,6 +97,8 @@ namespace LibMCDriver_ScanLab {
 
 		class CScanLabSDK {
 		private:
+			bool m_bIsInitialized;
+
 			void* m_LibraryHandle;
 			void resetFunctionPtrs ();
 		public:
