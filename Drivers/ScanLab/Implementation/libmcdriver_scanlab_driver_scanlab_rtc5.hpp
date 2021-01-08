@@ -44,6 +44,11 @@ private:
 	std::shared_ptr<IRTCSelector> m_pRTCSelector;
 	std::shared_ptr<IRTCContext> m_pRTCContext;
 
+	void internalBegin();
+	void internalExecute();
+	void internalJumpTo(double dXInMM, double dYInMM, double dSpeedInMM);
+	void internalMarkTo(double dXInMM, double dYInMM, double dSpeedInMM);
+
 protected:
 
 public:

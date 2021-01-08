@@ -104,5 +104,89 @@ void CDriver_ScanLab_RTC5::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nC
 
 void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
 {
+    if (m_pRTCContext.get() != nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+    auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+
+    double dUnits = pToolpathAccessor->GetUnits();
+
+    double dJumpSpeedInMMPerSecond = 100.0;
+    double dMarkSpeedInMMPerSecond = 100.0;
+
+    internalBegin();
+
+    uint32_t nSegmentCount = pLayer->GetSegmentCount();
+    for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
+
+        LibMCEnv::eToolpathSegmentType eSegmentType;
+        uint32_t nPointCount;
+        pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
+
+        if (nPointCount >= 2) {
+
+            std::vector<LibMCEnv::sPosition2D> Points;
+            pLayer->GetSegmentPointData(nSegmentIndex, Points);
+
+            if (nPointCount != Points.size())
+                throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
+
+            switch (eSegmentType) {
+            case LibMCEnv::eToolpathSegmentType::Loop:
+            case LibMCEnv::eToolpathSegmentType::Polyline:
+            {
+
+                internalJumpTo(Points[0].m_Coordinates[0] * dUnits, Points[0].m_Coordinates[1] * dUnits, dJumpSpeedInMMPerSecond);
+                for (uint32_t nPointIndex = 1; nPointIndex < nPointCount; nPointIndex++) {
+                    internalMarkTo(Points[nPointIndex].m_Coordinates[0] * dUnits, Points[nPointIndex].m_Coordinates[1] * dUnits, dMarkSpeedInMMPerSecond);
+                }
+                break;
+            }
+
+            case LibMCEnv::eToolpathSegmentType::Hatch:
+            {
+                if (nPointCount % 2 == 1)
+                    throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
+
+                uint64_t nHatchCount = nPointCount / 2;
+
+                for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+                    internalJumpTo(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits, Points[nHatchIndex * 2].m_Coordinates[1] * dUnits, dJumpSpeedInMMPerSecond);
+                    internalMarkTo(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits, Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits, dMarkSpeedInMMPerSecond);
+                }
+                break;
+            }
+
+            }
+
+        }
+
+    }
+
+    internalExecute();
+
+
+}
+
+
+void CDriver_ScanLab_RTC5::internalBegin()
+{
+
+}
+
+
+void CDriver_ScanLab_RTC5::internalExecute()
+{
+
+}
+
+void CDriver_ScanLab_RTC5::internalJumpTo(double dXInMM, double dYInMM, double dSpeedInMM)
+{
+
+}
+
+void CDriver_ScanLab_RTC5::internalMarkTo(double dXInMM, double dYInMM, double dSpeedInMM)
+{
 
 }
