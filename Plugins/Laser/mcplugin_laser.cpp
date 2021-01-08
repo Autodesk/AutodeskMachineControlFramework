@@ -40,18 +40,29 @@ using namespace LibMCPlugin::Impl;
 #endif
 
 
+#include "libmcdriver_scanlab_dynamic.hpp"
+#include "libmcenv_drivercast.hpp"
 
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
+typedef LibMCDriver_ScanLab::PDriver_ScanLab_RTC5 PDriver_ScanLab;
+typedef LibMCEnv::CDriverCast <LibMCDriver_ScanLab::CDriver_ScanLab_RTC5, LibMCDriver_ScanLab::CWrapper> PDriverCast_ScanLab;
 
 /*************************************************************************************************************************
  Class definition of CLaserData
 **************************************************************************************************************************/
 class CLaserData : public virtual CPluginData {
 protected:
+	// We need to globally store driver wrappers in the plugin
+	PDriverCast_ScanLab m_DriverCast_ScanLab;
 
 public:
+
+	PDriver_ScanLab acquireScanLabDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		return m_DriverCast_ScanLab.acquireDriver(pStateEnvironment, "scanlab");
+	}
 
 };
 
@@ -84,7 +95,23 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
+		pStateEnvironment->LogMessage("Initialising ScanLab Driver");
+
+		auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
+		pDriver->LoadSDK("rtc6dllx64");
+
+		auto sIP = pStateEnvironment->GetStringParameter ("cardconfig", "ipaddress");
+		auto sNetmask = pStateEnvironment->GetStringParameter("cardconfig", "netmask");
+		auto nTimeout = pStateEnvironment->GetIntegerParameter("cardconfig", "timeout");
+		auto nSerial = pStateEnvironment->GetIntegerParameter("cardconfig", "serial");
+
+		pStateEnvironment->LogMessage("Acquiring ethernet card #" + std::to_string(nSerial));
+		pDriver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
+		
+		pStateEnvironment->LogMessage("Initialising done..");
+
 		pStateEnvironment->SetNextState("idle");
+
 	}
 
 };

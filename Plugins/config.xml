@@ -3,8 +3,8 @@
 
   <services threadcount="32" />
 
-
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
+  <driver name="scanlab" library="driver_scanlab" type="scanlab-rtc5" />
   
   <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
   	 	  		  
@@ -66,6 +66,14 @@
 
 
     <statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
+
+  	  <parametergroup name="cardconfig" description="Card Config">
+  		<parameter name="ipaddress" description="IP Address" default="10.0.5.10" type="string" />
+  		<parameter name="netmask" description="Netmask" default="255.0.0.0" type="string" />
+  		<parameter name="timeout" description="Connection timeout" default="1000" type="int" />
+  		<parameter name="serial" description="Serial" default="332663" type="int" />
+  	  </parametergroup>
+
 
   	  <signaldefinition name="signal_exposure">
   		<parameter name="jobuuid" type="string" />
