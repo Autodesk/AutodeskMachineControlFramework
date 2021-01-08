@@ -61,7 +61,6 @@ namespace LibMC {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
-class CStringClass;
 class CAPIRequestHandler;
 class CMCContext;
 
@@ -70,7 +69,6 @@ class CMCContext;
 **************************************************************************************************************************/
 typedef CWrapper CLibMCWrapper;
 typedef CBase CLibMCBase;
-typedef CStringClass CLibMCStringClass;
 typedef CAPIRequestHandler CLibMCAPIRequestHandler;
 typedef CMCContext CLibMCMCContext;
 
@@ -79,7 +77,6 @@ typedef CMCContext CLibMCMCContext;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
-typedef std::shared_ptr<CStringClass> PStringClass;
 typedef std::shared_ptr<CAPIRequestHandler> PAPIRequestHandler;
 typedef std::shared_ptr<CMCContext> PMCContext;
 
@@ -88,7 +85,6 @@ typedef std::shared_ptr<CMCContext> PMCContext;
 **************************************************************************************************************************/
 typedef PWrapper PLibMCWrapper;
 typedef PBase PLibMCBase;
-typedef PStringClass PLibMCStringClass;
 typedef PAPIRequestHandler PLibMCAPIRequestHandler;
 typedef PMCContext PLibMCMCContext;
 
@@ -267,7 +263,6 @@ private:
 	LibMCResult loadWrapperTableFromSymbolLookupMethod(sLibMCDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
-	friend class CStringClass;
 	friend class CAPIRequestHandler;
 	friend class CMCContext;
 
@@ -328,24 +323,6 @@ public:
 	}
 	
 	friend class CWrapper;
-};
-	
-/*************************************************************************************************************************
- Class CStringClass 
-**************************************************************************************************************************/
-class CStringClass : public CBase {
-public:
-	
-	/**
-	* CStringClass::CStringClass - Constructor for StringClass class.
-	*/
-	CStringClass(CWrapper* pWrapper, LibMCHandle pHandle)
-		: CBase(pWrapper, pHandle)
-	{
-	}
-	
-	inline void SetValue(const std::string & sValue);
-	inline std::string GetValue();
 };
 	
 /*************************************************************************************************************************
@@ -502,8 +479,6 @@ public:
 			return LIBMC_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
-		pWrapperTable->m_StringClass_SetValue = nullptr;
-		pWrapperTable->m_StringClass_GetValue = nullptr;
 		pWrapperTable->m_APIRequestHandler_ExpectsRawBody = nullptr;
 		pWrapperTable->m_APIRequestHandler_ExpectsFormData = nullptr;
 		pWrapperTable->m_APIRequestHandler_GetFormDataDetails = nullptr;
@@ -572,24 +547,6 @@ public:
 			return LIBMC_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StringClass_SetValue = (PLibMCStringClass_SetValuePtr) GetProcAddress(hLibrary, "libmc_stringclass_setvalue");
-		#else // _WIN32
-		pWrapperTable->m_StringClass_SetValue = (PLibMCStringClass_SetValuePtr) dlsym(hLibrary, "libmc_stringclass_setvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StringClass_SetValue == nullptr)
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StringClass_GetValue = (PLibMCStringClass_GetValuePtr) GetProcAddress(hLibrary, "libmc_stringclass_getvalue");
-		#else // _WIN32
-		pWrapperTable->m_StringClass_GetValue = (PLibMCStringClass_GetValuePtr) dlsym(hLibrary, "libmc_stringclass_getvalue");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StringClass_GetValue == nullptr)
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_APIRequestHandler_ExpectsRawBody = (PLibMCAPIRequestHandler_ExpectsRawBodyPtr) GetProcAddress(hLibrary, "libmc_apirequesthandler_expectsrawbody");
@@ -796,14 +753,6 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCResult eLookupError = LIBMC_SUCCESS;
-		eLookupError = (*pLookup)("libmc_stringclass_setvalue", (void**)&(pWrapperTable->m_StringClass_SetValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StringClass_SetValue == nullptr) )
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmc_stringclass_getvalue", (void**)&(pWrapperTable->m_StringClass_GetValue));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StringClass_GetValue == nullptr) )
-			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmc_apirequesthandler_expectsrawbody", (void**)&(pWrapperTable->m_APIRequestHandler_ExpectsRawBody));
 		if ( (eLookupError != 0) || (pWrapperTable->m_APIRequestHandler_ExpectsRawBody == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -896,34 +845,6 @@ public:
 	/**
 	 * Method definitions for class CBase
 	 */
-	
-	/**
-	 * Method definitions for class CStringClass
-	 */
-	
-	/**
-	* CStringClass::SetValue - Sets the value.
-	* @param[in] sValue - String Value
-	*/
-	void CStringClass::SetValue(const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StringClass_SetValue(m_pHandle, sValue.c_str()));
-	}
-	
-	/**
-	* CStringClass::GetValue - Gets the value.
-	* @return String Value
-	*/
-	std::string CStringClass::GetValue()
-	{
-		LibMC_uint32 bytesNeededValue = 0;
-		LibMC_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StringClass_GetValue(m_pHandle, 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_StringClass_GetValue(m_pHandle, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
 	
 	/**
 	 * Method definitions for class CAPIRequestHandler
