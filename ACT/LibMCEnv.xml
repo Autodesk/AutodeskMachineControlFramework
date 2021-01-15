@@ -80,6 +80,11 @@
 		<option name="StartDelay" value="5" />
 		<option name="EndDelay" value="6" />
 		<option name="PolyDelay" value="7" />
+		<option name="PolyDelayAngleDependent" value="8" />
+		<option name="LaserOnDelay" value="9" />
+		<option name="LaserOffDelay" value="10" />
+		<option name="JumpDelay" value="11" />
+		<option name="MarkDelay" value="12" />
 	</enum>
 	
 	<struct name="Position2D">
