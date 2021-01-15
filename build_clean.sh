@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 builddir="$basepath/build"
@@ -73,7 +74,7 @@ cd "$builddir/Client"
 npm install
 npm run build
 
-go run ../../Server/createDist.go ../Output $GITHASH 
+go run ../../Server/createDist.go ../Output $GITHASH
 
 cd "$builddir"
 
