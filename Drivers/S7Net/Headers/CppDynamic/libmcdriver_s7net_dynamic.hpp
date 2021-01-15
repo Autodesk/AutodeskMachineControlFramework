@@ -361,7 +361,8 @@ public:
 	{
 	}
 	
-	inline void Connect();
+	inline void Initialise();
+	inline void Connect(const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot);
 	inline void Disconnect();
 };
 	
@@ -491,6 +492,7 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_Driver_S7Net_Initialise = nullptr;
 		pWrapperTable->m_Driver_S7Net_Connect = nullptr;
 		pWrapperTable->m_Driver_S7Net_Disconnect = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -591,6 +593,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_S7Net_Initialise = (PLibMCDriver_S7NetDriver_S7Net_InitialisePtr) GetProcAddress(hLibrary, "libmcdriver_s7net_driver_s7net_initialise");
+		#else // _WIN32
+		pWrapperTable->m_Driver_S7Net_Initialise = (PLibMCDriver_S7NetDriver_S7Net_InitialisePtr) dlsym(hLibrary, "libmcdriver_s7net_driver_s7net_initialise");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_S7Net_Initialise == nullptr)
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -708,6 +719,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_s7net_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_s7net_driver_s7net_initialise", (void**)&(pWrapperTable->m_Driver_S7Net_Initialise));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_S7Net_Initialise == nullptr) )
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_s7net_driver_s7net_connect", (void**)&(pWrapperTable->m_Driver_S7Net_Connect));
@@ -838,11 +853,22 @@ public:
 	 */
 	
 	/**
-	* CDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
+	* CDriver_S7Net::Initialise - Initialises the S7 PLC driver.
 	*/
-	void CDriver_S7Net::Connect()
+	void CDriver_S7Net::Initialise()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_S7Net_Connect(m_pHandle));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_S7Net_Initialise(m_pHandle));
+	}
+	
+	/**
+	* CDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
+	* @param[in] sIPAddress - PLC IP Address
+	* @param[in] nRack - Rack Number
+	* @param[in] nSlot - Slot Number
+	*/
+	void CDriver_S7Net::Connect(const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_S7Net_Connect(m_pHandle, sIPAddress.c_str(), nRack, nSlot));
 	}
 	
 	/**

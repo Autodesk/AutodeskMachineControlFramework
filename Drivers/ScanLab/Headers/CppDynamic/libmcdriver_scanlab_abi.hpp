@@ -512,9 +512,19 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 * @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
 * @param[in] nTableNumber - Correction table index of card (1..8)
 * @param[in] nDimension - Is it a 2D or 3D correction file.
+* @param[in] nTableNumberHeadA - Table number of Head A.
+* @param[in] nTableNumberHeadB - Table number of Head B.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension, LibMCDriver_ScanLab_uint32 nTableNumberHeadA, LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
+
+/**
+* Configures the laser mode.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5);
 
 /**
 * Draws a layer of a build stream. Blocks until the layer is drawn.

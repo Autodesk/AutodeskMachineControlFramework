@@ -106,6 +106,9 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_INCOMPATIBLEBINARYVERSION 8
 #define LIBMCDRIVER_S7NET_ERROR_INVALIDSTATENAME 9
 #define LIBMCDRIVER_S7NET_ERROR_DRIVERERROR 1000
+#define LIBMCDRIVER_S7NET_ERROR_DRIVERNOTINITIALISED 1001
+#define LIBMCDRIVER_S7NET_ERROR_DRIVERNOTCONNECTED 1002
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL 1003
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -124,6 +127,9 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
     case LIBMCDRIVER_S7NET_ERROR_INVALIDSTATENAME: return "invalid state name";
     case LIBMCDRIVER_S7NET_ERROR_DRIVERERROR: return "a driver error occured";
+    case LIBMCDRIVER_S7NET_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
+    case LIBMCDRIVER_S7NET_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
     default: return "unknown error";
   }
 }

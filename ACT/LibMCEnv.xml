@@ -697,6 +697,11 @@
 		</method>
 		
 
+		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
+		</method>
+
 
 	</class>
 

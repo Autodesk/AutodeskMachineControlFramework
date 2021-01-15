@@ -375,7 +375,12 @@ Custom implementation
 			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
 			<param name="TableNumber" type="uint32" pass="in" description="Correction table index of card (1..8)" />
 			<param name="Dimension" type="uint32" pass="in" description="Is it a 2D or 3D correction file." />
+			<param name="TableNumberHeadA" type="uint32" pass="in" description="Table number of Head A." />
+			<param name="TableNumberHeadB" type="uint32" pass="in" description="Table number of Head B." />
 		</method>		
+
+		<method name="ConfigureLaserMode" description="Configures the laser mode.">
+		</method>
 
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />

@@ -608,8 +608,15 @@ public:
 	* @param[in] pCorrectionFileBuffer - binary data of the correction file.
 	* @param[in] nTableNumber - Correction table index of card (1..8)
 	* @param[in] nDimension - Is it a 2D or 3D correction file.
+	* @param[in] nTableNumberHeadA - Table number of Head A.
+	* @param[in] nTableNumberHeadB - Table number of Head B.
 	*/
-	virtual void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension) = 0;
+	virtual void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC5::ConfigureLaserMode - Configures the laser mode.
+	*/
+	virtual void ConfigureLaserMode() = 0;
 
 	/**
 	* IDriver_ScanLab_RTC5::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.

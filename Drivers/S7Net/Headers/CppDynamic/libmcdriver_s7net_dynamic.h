@@ -115,12 +115,23 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_QueryParametersPtr) (
 **************************************************************************************************************************/
 
 /**
-* Creates and initializes a new S7 PLC.
+* Initialises the S7 PLC driver.
 *
 * @param[in] pDriver_S7Net - Driver_S7Net instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ConnectPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_InitialisePtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+
+/**
+* Creates and initializes a new S7 PLC.
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pIPAddress - PLC IP Address
+* @param[in] nRack - Rack Number
+* @param[in] nSlot - Slot Number
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ConnectPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot);
 
 /**
 * Disconnects from the S7 PLC.
@@ -211,6 +222,7 @@ typedef struct {
 	PLibMCDriver_S7NetDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_S7NetDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_S7NetDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_S7NetDriver_S7Net_InitialisePtr m_Driver_S7Net_Initialise;
 	PLibMCDriver_S7NetDriver_S7Net_ConnectPtr m_Driver_S7Net_Connect;
 	PLibMCDriver_S7NetDriver_S7Net_DisconnectPtr m_Driver_S7Net_Disconnect;
 	PLibMCDriver_S7NetGetVersionPtr m_GetVersion;

@@ -51,6 +51,10 @@
 		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
+		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />
+		<error name="INVALIDDRIVERPROTOCOL" code="1003" description="invalid driver protocol definition" />
+		
 	</errors>
 
 	
@@ -107,7 +111,13 @@ Custom implementation
 
 	<class name="Driver_S7Net" parent="Driver" description="A Driver for a S7 PLC.">
 
+		<method name="Initialise" description="Initialises the S7 PLC driver.">
+		</method>
+
 		<method name="Connect" description="Creates and initializes a new S7 PLC.">
+			<param name="IPAddress" type="string" pass="in" description="PLC IP Address" />
+			<param name="Rack" type="uint32" pass="in" description="Rack Number" />
+			<param name="Slot" type="uint32" pass="in" description="Slot Number" />
 		</method>
 
 		<method name="Disconnect" description="Disconnects from the S7 PLC.">

@@ -96,7 +96,11 @@ namespace AMC {
 		PResourcePackageEntry findEntryByUUID(const std::string& sUUID, const bool bHasToExist);
 		PResourcePackageEntry findEntryByName(const std::string& sName, const bool bHasToExist);
 
+		// Resizes Buffer array to right size
 		void readEntry(const std::string& sName, std::vector<uint8_t>& Buffer);
+
+		// Needs allocated memory passed
+		void readEntryEx(const std::string& sName, uint8_t * pBuffer, const uint64_t nBufferSize);
 
 	};
 

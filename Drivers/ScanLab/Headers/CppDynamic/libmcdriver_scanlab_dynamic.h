@@ -499,9 +499,19 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_Load
 * @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
 * @param[in] nTableNumber - Correction table index of card (1..8)
 * @param[in] nDimension - Is it a 2D or 3D correction file.
+* @param[in] nTableNumberHeadA - Table number of Head A.
+* @param[in] nTableNumberHeadB - Table number of Head B.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension, LibMCDriver_ScanLab_uint32 nTableNumberHeadA, LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
+
+/**
+* Configures the laser mode.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5);
 
 /**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
@@ -631,6 +641,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_InitialisePtr m_Driver_ScanLab_RTC5_Initialise;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_LoadFirmwarePtr m_Driver_ScanLab_RTC5_LoadFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr m_Driver_ScanLab_RTC5_SetCorrectionFile;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr m_Driver_ScanLab_RTC5_ConfigureLaserMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr m_Driver_ScanLab_RTC5_DrawLayer;
 	PLibMCDriver_ScanLabGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabGetLastErrorPtr m_GetLastError;

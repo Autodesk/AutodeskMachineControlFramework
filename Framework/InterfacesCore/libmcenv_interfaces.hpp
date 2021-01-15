@@ -1163,6 +1163,16 @@ public:
 	*/
 	virtual bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
+	/**
+	* IStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[in] nResourceDataBufferSize - Number of elements in buffer
+	* @param[out] pResourceDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+	*/
+	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
+
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;

@@ -1280,7 +1280,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware(L
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension, LibMCDriver_ScanLab_uint32 nTableNumberHeadA, LibMCDriver_ScanLab_uint32 nTableNumberHeadB)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
 
@@ -1291,7 +1291,31 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionf
 		if (!pIDriver_ScanLab_RTC5)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIDriver_ScanLab_RTC5->SetCorrectionFile(nCorrectionFileBufferSize, pCorrectionFileBuffer, nTableNumber, nDimension);
+		pIDriver_ScanLab_RTC5->SetCorrectionFile(nCorrectionFileBufferSize, pCorrectionFileBuffer, nTableNumber, nDimension, nTableNumberHeadA, nTableNumberHeadB);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
+
+	try {
+		IDriver_ScanLab_RTC5* pIDriver_ScanLab_RTC5 = dynamic_cast<IDriver_ScanLab_RTC5*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC5)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC5->ConfigureLaserMode();
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1432,6 +1456,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer;
 	if (sProcName == "libmcdriver_scanlab_getversion") 

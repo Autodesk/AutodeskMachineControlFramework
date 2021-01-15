@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include <math.h>
+#include <iostream>
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -105,6 +106,7 @@ void CRTCContext::LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectio
 
 	auto pCorrectionFile = pWorkingDirectory->StoreCustomData("cor.ct5", LibMCEnv::CInputVector<uint8_t>(pCorrectionFileBuffer, nCorrectionFileBufferSize));
 
+	// TODO: Convert to ANSI
 	uint32_t nErrorCode = m_pScanLabSDK->n_load_correction_file(m_CardNo, pCorrectionFile->GetAbsoluteFileName ().c_str(), nTableNumber, nDimension);
 
 	pCorrectionFile = nullptr;
@@ -112,7 +114,7 @@ void CRTCContext::LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectio
 
 	// TODO: Detailed Error codes
 	if (nErrorCode != 0)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADCORRECTIONFILE);
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADCORRECTIONFILE, "Could not load correction file #" + std::to_string (nErrorCode));
 
 }
 
@@ -319,6 +321,8 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+	std::cout << "jump: " << intX << "/" << intY << std::endl;
+
 	for (uint64_t index = 1; index < nPointsBufferSize; index++) {
 		dX = round(pPoint->m_X * m_dCorrectionFactor);
 		dY = round(pPoint->m_Y * m_dCorrectionFactor);
@@ -329,6 +333,9 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 		intY = (int)dY;
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+		std::cout << "mark: " << intX << "/" << intY << std::endl;
+
 	}
 }
 
@@ -354,6 +361,8 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 		m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
+		std::cout << "jump: " << intX << "/" << intY << std::endl;
+
 		dX = round(pHatch->m_X2 * m_dCorrectionFactor);
 		dY = round(pHatch->m_Y2 * m_dCorrectionFactor);
 		// TODO: Brennt die maschine ab?
@@ -362,6 +371,8 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 		intY = (int)dY;
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+		std::cout << "mark: " << intX << "/" << intY << std::endl;
 
 		pHatch++;
 	}

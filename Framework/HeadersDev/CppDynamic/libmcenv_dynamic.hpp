@@ -682,6 +682,7 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -909,6 +910,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -2027,6 +2029,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -2652,6 +2663,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getboolparameter", (void**)&(pWrapperTable->m_StateEnvironment_GetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
@@ -4271,6 +4286,20 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBoolParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[out] ResourceDataBuffer - Resource Data Buffer.
+	*/
+	void CStateEnvironment::LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededResourceData = 0;
+		LibMCEnv_uint64 elementsWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
+		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
 	}
 	
 	/**

@@ -460,7 +460,8 @@ public:
 	
 	inline void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber);
 	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
-	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
+	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
+	inline void ConfigureLaserMode();
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 };
 	
@@ -627,6 +628,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC5_Initialise = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC5_LoadFirmware = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -1062,6 +1064,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer");
@@ -1315,6 +1326,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer));
@@ -1870,10 +1885,20 @@ public:
 	* @param[in] CorrectionFileBuffer - binary data of the correction file.
 	* @param[in] nTableNumber - Correction table index of card (1..8)
 	* @param[in] nDimension - Is it a 2D or 3D correction file.
+	* @param[in] nTableNumberHeadA - Table number of Head A.
+	* @param[in] nTableNumberHeadB - Table number of Head B.
 	*/
-	void CDriver_ScanLab_RTC5::SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
+	void CDriver_ScanLab_RTC5::SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_SetCorrectionFile(m_pHandle, (LibMCDriver_ScanLab_uint64)CorrectionFileBuffer.size(), CorrectionFileBuffer.data(), nTableNumber, nDimension));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_SetCorrectionFile(m_pHandle, (LibMCDriver_ScanLab_uint64)CorrectionFileBuffer.size(), CorrectionFileBuffer.data(), nTableNumber, nDimension, nTableNumberHeadA, nTableNumberHeadB));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC5::ConfigureLaserMode - Configures the laser mode.
+	*/
+	void CDriver_ScanLab_RTC5::ConfigureLaserMode()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_ConfigureLaserMode(m_pHandle));
 	}
 	
 	/**

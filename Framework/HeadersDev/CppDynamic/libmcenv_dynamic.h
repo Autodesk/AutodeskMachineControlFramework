@@ -1286,6 +1286,18 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetIntegerParameterPtr) (LibM
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBoolParameterPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadResourceDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -1588,6 +1600,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetDoubleParameterPtr m_StateEnvironment_GetDoubleParameter;
 	PLibMCEnvStateEnvironment_GetIntegerParameterPtr m_StateEnvironment_GetIntegerParameter;
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
+	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvUIEnvironment_PrepareSignalPtr m_UIEnvironment_PrepareSignal;
 	PLibMCEnvUIEnvironment_GetMachineStatePtr m_UIEnvironment_GetMachineState;
 	PLibMCEnvUIEnvironment_LogMessagePtr m_UIEnvironment_LogMessage;

@@ -46,8 +46,6 @@ private:
 
 	void internalBegin();
 	void internalExecute();
-	void internalJumpTo(double dXInMM, double dYInMM, double dSpeedInMM);
-	void internalMarkTo(double dXInMM, double dYInMM, double dSpeedInMM);
 
 protected:
 
@@ -65,7 +63,9 @@ public:
 
 	void LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource) override;
 
-	void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
+	void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) override;
+
+	void ConfigureLaserMode() override;
 
 	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) override;
 

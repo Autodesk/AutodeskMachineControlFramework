@@ -310,9 +310,17 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IDriver_S7Net : public virtual IDriver {
 public:
 	/**
-	* IDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
+	* IDriver_S7Net::Initialise - Initialises the S7 PLC driver.
 	*/
-	virtual void Connect() = 0;
+	virtual void Initialise() = 0;
+
+	/**
+	* IDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
+	* @param[in] sIPAddress - PLC IP Address
+	* @param[in] nRack - Rack Number
+	* @param[in] nSlot - Slot Number
+	*/
+	virtual void Connect(const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) = 0;
 
 	/**
 	* IDriver_S7Net::Disconnect - Disconnects from the S7 PLC.

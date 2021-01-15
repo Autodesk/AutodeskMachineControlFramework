@@ -128,12 +128,23 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_quer
 **************************************************************************************************************************/
 
 /**
-* Creates and initializes a new S7 PLC.
+* Initialises the S7 PLC driver.
 *
 * @param[in] pDriver_S7Net - Driver_S7Net instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_initialise(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+
+/**
+* Creates and initializes a new S7 PLC.
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pIPAddress - PLC IP Address
+* @param[in] nRack - Rack Number
+* @param[in] nSlot - Slot Number
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot);
 
 /**
 * Disconnects from the S7 PLC.

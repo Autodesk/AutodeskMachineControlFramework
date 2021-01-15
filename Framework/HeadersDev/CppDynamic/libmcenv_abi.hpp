@@ -1299,6 +1299,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getintegerparameter(L
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/

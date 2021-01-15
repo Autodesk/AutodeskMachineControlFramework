@@ -321,7 +321,7 @@ LibMCDriver_S7NetResult libmcdriver_s7net_driver_queryparameters(LibMCDriver_S7N
 /*************************************************************************************************************************
  Class implementation for Driver_S7Net
 **************************************************************************************************************************/
-LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net)
+LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_initialise(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_S7Net;
 
@@ -330,7 +330,34 @@ LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net
 		if (!pIDriver_S7Net)
 			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
 		
-		pIDriver_S7Net->Connect();
+		pIDriver_S7Net->Initialise();
+
+		return LIBMCDRIVER_S7NET_SUCCESS;
+	}
+	catch (ELibMCDriver_S7NetInterfaceException & Exception) {
+		return handleLibMCDriver_S7NetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_S7Net;
+
+	try {
+		if (pIPAddress == nullptr)
+			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+		std::string sIPAddress(pIPAddress);
+		IDriver_S7Net* pIDriver_S7Net = dynamic_cast<IDriver_S7Net*>(pIBaseClass);
+		if (!pIDriver_S7Net)
+			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
+		
+		pIDriver_S7Net->Connect(sIPAddress, nRack, nSlot);
 
 		return LIBMCDRIVER_S7NET_SUCCESS;
 	}
@@ -394,6 +421,8 @@ LibMCDriver_S7NetResult LibMCDriver_S7Net::Impl::LibMCDriver_S7Net_GetProcAddres
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_s7net_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_queryparameters;
+	if (sProcName == "libmcdriver_s7net_driver_s7net_initialise") 
+		*ppProcAddress = (void*) &libmcdriver_s7net_driver_s7net_initialise;
 	if (sProcName == "libmcdriver_s7net_driver_s7net_connect") 
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_s7net_connect;
 	if (sProcName == "libmcdriver_s7net_driver_s7net_disconnect") 

@@ -3975,6 +3975,35 @@ LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibMCEnv_StateEnvironm
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ((!pResourceDataBuffer) && !(pResourceDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIStateEnvironment->LoadResourceData(sResourceName, nResourceDataBufferSize, pResourceDataNeededCount, pResourceDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UIEnvironment
@@ -4661,6 +4690,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getintegerparameter;
 	if (sProcName == "libmcenv_stateenvironment_getboolparameter") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getboolparameter;
+	if (sProcName == "libmcenv_stateenvironment_loadresourcedata") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcedata;
 	if (sProcName == "libmcenv_uienvironment_preparesignal") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_preparesignal;
 	if (sProcName == "libmcenv_uienvironment_getmachinestate") 

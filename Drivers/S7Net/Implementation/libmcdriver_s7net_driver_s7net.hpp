@@ -62,8 +62,10 @@ private:
 protected:
 
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+    LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 
     std::string m_sDriverType;
+    std::string m_sProtocolXML;
 
     LibS7Net::PWrapper m_pPLCWrapper;
     LibS7Net::PPLC m_pPLC;
@@ -75,7 +77,9 @@ public:
     CDriver_S7Net(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
     virtual ~CDriver_S7Net();
 
-	void Connect() override;
+    void Initialise() override;
+
+    void Connect(const std::string& sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) override;
 
 	void Disconnect() override;
 

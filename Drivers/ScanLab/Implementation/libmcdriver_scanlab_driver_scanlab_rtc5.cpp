@@ -85,26 +85,39 @@ void CDriver_ScanLab_RTC5::Initialise(const std::string& sIP, const std::string&
 
 void CDriver_ScanLab_RTC5::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
 {
-	if (m_pRTCContext.get() != nullptr)
+	if (m_pRTCContext.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
 	m_pRTCContext->LoadFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
 
 }
 
-
-void CDriver_ScanLab_RTC5::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
-
+void CDriver_ScanLab_RTC5::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) 
 {
-	if (m_pRTCContext.get() != nullptr)
+	if (m_pRTCContext.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
 	m_pRTCContext->LoadCorrectionFile (nCorrectionFileBufferSize, pCorrectionFileBuffer, nTableNumber, nDimension);
+    m_pRTCContext->SelectCorrectionTable(nTableNumberHeadA, nTableNumberHeadB);
+
+}
+
+void CDriver_ScanLab_RTC5::ConfigureLaserMode()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    m_pRTCContext->ConfigureLists(1 << 22, 1 << 22);
+    m_pRTCContext->SetLaserMode(eLaserMode::CO2, eLaserPort::Port16bitDigital);
+    m_pRTCContext->SetLaserControl(true);
+    m_pRTCContext->SetLaserPulsesInBits(64, 64);
+    m_pRTCContext->SetStandbyInBits(64, 64);
+
 }
 
 void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
 {
-    if (m_pRTCContext.get() != nullptr)
+    if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
     auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
@@ -136,11 +149,17 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
             case LibMCEnv::eToolpathSegmentType::Loop:
             case LibMCEnv::eToolpathSegmentType::Polyline:
             {
-
-                internalJumpTo(Points[0].m_Coordinates[0] * dUnits, Points[0].m_Coordinates[1] * dUnits, dJumpSpeedInMMPerSecond);
+                std::vector<sPoint2D> ContourPoints;
+                ContourPoints.resize(nPointCount);
+                
                 for (uint32_t nPointIndex = 1; nPointIndex < nPointCount; nPointIndex++) {
-                    internalMarkTo(Points[nPointIndex].m_Coordinates[0] * dUnits, Points[nPointIndex].m_Coordinates[1] * dUnits, dMarkSpeedInMMPerSecond);
+                    auto pContourPoint = &ContourPoints.at(nPointIndex);
+                    pContourPoint->m_X = (float) (Points[nPointIndex].m_Coordinates[0] * dUnits);
+                    pContourPoint->m_Y = (float) (Points[nPointIndex].m_Coordinates[1] * dUnits);
                 }
+
+                m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), 100.0f, 100.0f, 100.0f);
+
                 break;
             }
 
@@ -150,11 +169,19 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                     throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT);
 
                 uint64_t nHatchCount = nPointCount / 2;
+                std::vector<sHatch2D> Hatches;
+                Hatches.resize(nHatchCount);
 
                 for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
-                    internalJumpTo(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits, Points[nHatchIndex * 2].m_Coordinates[1] * dUnits, dJumpSpeedInMMPerSecond);
-                    internalMarkTo(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits, Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits, dMarkSpeedInMMPerSecond);
+                    auto pHatch = &Hatches.at (nHatchIndex);
+                    pHatch->m_X1 = (float)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
+                    pHatch->m_Y1 = (float)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
+                    pHatch->m_X2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
+                    pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
                 }
+
+                m_pRTCContext->DrawHatches (Hatches.size (), Hatches.data (), 100.0f, 100.0f, 100.0f);
+
                 break;
             }
 
@@ -172,21 +199,28 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
 
 void CDriver_ScanLab_RTC5::internalBegin()
 {
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    m_pRTCContext->SetStartList(1, 0);
 
 }
 
 
 void CDriver_ScanLab_RTC5::internalExecute()
 {
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-}
+    m_pRTCContext->SetEndOfList();
+    m_pRTCContext->ExecuteList(1, 0);
 
-void CDriver_ScanLab_RTC5::internalJumpTo(double dXInMM, double dYInMM, double dSpeedInMM)
-{
+    bool Busy = true;
+    uint32_t Pos = 0;
 
-}
-
-void CDriver_ScanLab_RTC5::internalMarkTo(double dXInMM, double dYInMM, double dSpeedInMM)
-{
+    while (Busy) {
+        m_pRTCContext->GetStatus (Busy, Pos);
+        Sleep (10);
+    }
 
 }
