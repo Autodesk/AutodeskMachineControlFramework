@@ -82,10 +82,13 @@ void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibM
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
 
         std::vector <uint8_t> Buffer;
-        if (Buffer.size () != nSize)
-            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
         m_pResourcePackage->readEntry(sIdentifier, Buffer);
+
+        if (Buffer.size() != nSize)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+
         const uint8_t* pSrc = Buffer.data();
         uint8_t* pDst = pDataBufferBuffer;
 

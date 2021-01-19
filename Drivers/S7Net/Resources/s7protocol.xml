@@ -1,4 +1,21 @@
-<s7protocol>
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<s7protocol xmlns="http://schemas.autodesk.com/amc/s7protocol/2021/01">
+
+	<version major="1" minor="3" patch="4" build="abcdef" />
+
+	<statusdb number="401" size="236">
+		<real name="temperature1" address="108" description="Bauplattform 1" />
+		<real name="temperature2" address="112" description="Bauplattform 2" />
+		<real name="temperature3" address="116" description="Bauplattform 3" />
+		<real name="temperature4" address="120" description="Bauplattform 4" />		
+		
+		<bool name="ready" address="234" bit="0" description="Sicherheitssteuerung ist betriebsbereit und eingeschaltet" />
+		<bool name="error" address="234" bit="1" description="Sicherheitssteuerung meldet Fehler" />
+		<bool name="door_closed" address="234" bit="2" description="Kammertüre ist geschlossen" />
+	</statusdb>
 
 
 </s7protocol>
+
+

@@ -666,8 +666,14 @@ extern "C" {
 
     }
 
+    LIBS7NET_DECLSPEC LibS7NetResult libs7net_getsymbollookupmethod(LibS7Net_pvoid* pSymbolLookupMethod)
+    {
+        return LIBS7NET_ERROR_INVALIDPARAM;
+    }
 
 }
+
+
 
 
 
