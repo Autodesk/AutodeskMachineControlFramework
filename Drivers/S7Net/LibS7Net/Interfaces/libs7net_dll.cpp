@@ -666,9 +666,64 @@ extern "C" {
 
     }
 
+    LibS7NetResult LibS7Net_GetProcAddress(const char* pProcName, void** ppProcAddress)
+    {
+        if (pProcName == nullptr)
+            return LIBS7NET_ERROR_INVALIDPARAM;
+        if (ppProcAddress == nullptr)
+            return LIBS7NET_ERROR_INVALIDPARAM;
+        *ppProcAddress = nullptr;
+        std::string sProcName(pProcName);
+
+        
+        if (sProcName == "libs7net_plcreaddata_getdata")
+            *ppProcAddress = (void*)&libs7net_plcreaddata_getdata;
+        if (sProcName == "libs7net_plc_connect")
+            *ppProcAddress = (void*)&libs7net_plc_connect;
+        if (sProcName == "libs7net_plc_isconnected")
+            *ppProcAddress = (void*)&libs7net_plc_isconnected;
+        if (sProcName == "libs7net_plc_isavailable")
+            *ppProcAddress = (void*)&libs7net_plc_isavailable;
+        if (sProcName == "libs7net_plc_getslot")
+            *ppProcAddress = (void*)&libs7net_plc_getslot;
+        if (sProcName == "libs7net_plc_getrack")
+            *ppProcAddress = (void*)&libs7net_plc_getrack;
+        if (sProcName == "libs7net_plc_getcputype")
+            *ppProcAddress = (void*)&libs7net_plc_getcputype;
+        if (sProcName == "libs7net_plc_getipaddress")
+            *ppProcAddress = (void*)&libs7net_plc_getipaddress;
+        if (sProcName == "libs7net_plc_writebytes")
+            *ppProcAddress = (void*)&libs7net_plc_writebytes;
+        if (sProcName == "libs7net_plc_readbytes")
+            *ppProcAddress = (void*)&libs7net_plc_readbytes;
+        if (sProcName == "libs7net_getversion")
+            *ppProcAddress = (void*)&libs7net_getversion;
+        if (sProcName == "libs7net_getlasterror")
+            *ppProcAddress = (void*)&libs7net_getlasterror;
+        if (sProcName == "libs7net_acquireinstance")
+            *ppProcAddress = (void*)&libs7net_acquireinstance;
+        if (sProcName == "libs7net_releaseinstance")
+            *ppProcAddress = (void*)&libs7net_releaseinstance;
+        if (sProcName == "libs7net_getsymbollookupmethod")
+            *ppProcAddress = (void*)&libs7net_getsymbollookupmethod;
+        if (sProcName == "libs7net_createplc")
+            *ppProcAddress = (void*)&libs7net_createplc;
+
+        if (*ppProcAddress == nullptr)
+            return LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+        return LIBS7NET_SUCCESS;
+    }
+
+   
+
     LIBS7NET_DECLSPEC LibS7NetResult libs7net_getsymbollookupmethod(LibS7Net_pvoid* pSymbolLookupMethod)
     {
-        return LIBS7NET_ERROR_INVALIDPARAM;
+        if (pSymbolLookupMethod == nullptr)
+            return LIBS7NET_ERROR_INVALIDPARAM;
+
+        *pSymbolLookupMethod = (void*)&LibS7Net_GetProcAddress;
+
+        return LIBS7NET_SUCCESS;
     }
 
 }

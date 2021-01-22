@@ -345,7 +345,7 @@ LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_initialise(LibMCDriver_S7
 	}
 }
 
-LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot)
+LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, eLibMCDriver_S7NetS7CPUType eCPUType, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_S7Net;
 
@@ -357,7 +357,7 @@ LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net
 		if (!pIDriver_S7Net)
 			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
 		
-		pIDriver_S7Net->Connect(sIPAddress, nRack, nSlot);
+		pIDriver_S7Net->Connect(eCPUType, sIPAddress, nRack, nSlot);
 
 		return LIBMCDRIVER_S7NET_SUCCESS;
 	}

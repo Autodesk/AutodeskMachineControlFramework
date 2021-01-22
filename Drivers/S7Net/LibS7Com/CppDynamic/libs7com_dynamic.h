@@ -56,10 +56,12 @@ Interface version: 3.1.3
 * Configures the protocol
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pProtocolConfiguration - Configuration XML as string.
+* @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
+* @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
+* @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_SetProtocolConfigurationPtr) (LibS7Com_PLCCommunication pPLCCommunication, const char * pProtocolConfiguration);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_SetProtocolConfigurationPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo);
 
 /**
 * Starts communication with the S7 PLC Instance
@@ -71,20 +73,20 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_SetProtocolConfigurationPtr) 
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_StartCommunicationPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Net_PLC pPLC);
 
 /**
+* Retrieves the status of the PLC
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_RetrieveStatusPtr) (LibS7Com_PLCCommunication pPLCCommunication);
+
+/**
 * Stops communication with the S7 PLC Instance
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
 * @return error code or 0 (success)
 */
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_StopCommunicationPtr) (LibS7Com_PLCCommunication pPLCCommunication);
-
-/**
-* Returns the status of the PLC
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @return error code or 0 (success)
-*/
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetStatusPtr) (LibS7Com_PLCCommunication pPLCCommunication);
 
 /**
 * Loads a GCode Program on the PLC
@@ -116,77 +118,68 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_ExecuteProgramPtr) (LibS7Com_
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_ClearProgramsPtr) (LibS7Com_PLCCommunication pPLCCommunication);
 
 /**
-* Returns number of reported variables.
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[out] pCount - Number of variables.
-* @return error code or 0 (success)
-*/
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetVariableCountPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 * pCount);
-
-/**
-* Returns name of variable.
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
-* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pNameBuffer -  buffer of Name of variable., may be NULL
-* @return error code or 0 (success)
-*/
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetVariableNamePtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, const LibS7Com_uint32 nNameBufferSize, LibS7Com_uint32* pNameNeededChars, char * pNameBuffer);
-
-/**
-* Returns type of variable.
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
-* @param[out] pVariableType - Type of variable.
-* @return error code or 0 (success)
-*/
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetVariableTypePtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, LibS7Com::eVariableType * pVariableType);
-
-/**
 * Returns value of string variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of String Variable.
+* @param[in] nMaxLength - Maximum length.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of Value of variable., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetVariableStringPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, const LibS7Com_uint32 nValueBufferSize, LibS7Com_uint32* pValueNeededChars, char * pValueBuffer);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableStringPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint32 nMaxLength, const LibS7Com_uint32 nValueBufferSize, LibS7Com_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Returns value of bool variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of Bit Variable.
+* @param[in] nBit - Bit of the variable (0-7)
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetVariableBoolPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, bool * pValue);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableBoolPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint32 nBit, bool * pValue);
 
 /**
-* Returns value of bool variable.
+* Returns value of byte variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of Bit Variable.
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetVariableIntegerPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, LibS7Com_int64 * pValue);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableBytePtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint8 * pValue);
+
+/**
+* Returns value of Int32 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int32 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableInt32Ptr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int32 * pValue);
+
+/**
+* Returns value of Uint32 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int32 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableUint32Ptr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int32 * pValue);
 
 /**
 * Returns value of double variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of Real Variable.
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_GetVariableDoublePtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, LibS7Com_double * pValue);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableRealPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_double * pValue);
 
 /*************************************************************************************************************************
  Global functions
@@ -263,18 +256,17 @@ typedef struct {
 	void * m_LibraryHandle;
 	PLibS7ComPLCCommunication_SetProtocolConfigurationPtr m_PLCCommunication_SetProtocolConfiguration;
 	PLibS7ComPLCCommunication_StartCommunicationPtr m_PLCCommunication_StartCommunication;
+	PLibS7ComPLCCommunication_RetrieveStatusPtr m_PLCCommunication_RetrieveStatus;
 	PLibS7ComPLCCommunication_StopCommunicationPtr m_PLCCommunication_StopCommunication;
-	PLibS7ComPLCCommunication_GetStatusPtr m_PLCCommunication_GetStatus;
 	PLibS7ComPLCCommunication_LoadProgramPtr m_PLCCommunication_LoadProgram;
 	PLibS7ComPLCCommunication_ExecuteProgramPtr m_PLCCommunication_ExecuteProgram;
 	PLibS7ComPLCCommunication_ClearProgramsPtr m_PLCCommunication_ClearPrograms;
-	PLibS7ComPLCCommunication_GetVariableCountPtr m_PLCCommunication_GetVariableCount;
-	PLibS7ComPLCCommunication_GetVariableNamePtr m_PLCCommunication_GetVariableName;
-	PLibS7ComPLCCommunication_GetVariableTypePtr m_PLCCommunication_GetVariableType;
-	PLibS7ComPLCCommunication_GetVariableStringPtr m_PLCCommunication_GetVariableString;
-	PLibS7ComPLCCommunication_GetVariableBoolPtr m_PLCCommunication_GetVariableBool;
-	PLibS7ComPLCCommunication_GetVariableIntegerPtr m_PLCCommunication_GetVariableInteger;
-	PLibS7ComPLCCommunication_GetVariableDoublePtr m_PLCCommunication_GetVariableDouble;
+	PLibS7ComPLCCommunication_ReadVariableStringPtr m_PLCCommunication_ReadVariableString;
+	PLibS7ComPLCCommunication_ReadVariableBoolPtr m_PLCCommunication_ReadVariableBool;
+	PLibS7ComPLCCommunication_ReadVariableBytePtr m_PLCCommunication_ReadVariableByte;
+	PLibS7ComPLCCommunication_ReadVariableInt32Ptr m_PLCCommunication_ReadVariableInt32;
+	PLibS7ComPLCCommunication_ReadVariableUint32Ptr m_PLCCommunication_ReadVariableUint32;
+	PLibS7ComPLCCommunication_ReadVariableRealPtr m_PLCCommunication_ReadVariableReal;
 	PLibS7ComGetVersionPtr m_GetVersion;
 	PLibS7ComGetLastErrorPtr m_GetLastError;
 	PLibS7ComAcquireInstancePtr m_AcquireInstance;

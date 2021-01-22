@@ -15,7 +15,17 @@
 		<bool name="door_closed" address="234" bit="2" description="Kammertüre ist geschlossen" />
 	</statusdb>
 
+	<controldb number="403">
+	
+		<command name="home" cmdid="20" />
+		<command name="recoat" cmdid="21" />
+		<command name="laseron" cmdid="11" />
+		<command name="laseroff" cmdid="10" />
+		
+	</controldb>
+
 
 </s7protocol>
+
 
 

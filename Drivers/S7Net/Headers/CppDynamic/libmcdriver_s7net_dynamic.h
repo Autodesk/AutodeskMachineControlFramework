@@ -126,12 +126,13 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_InitialisePtr) 
 * Creates and initializes a new S7 PLC.
 *
 * @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] eCPUType - S7 CPU Type
 * @param[in] pIPAddress - PLC IP Address
 * @param[in] nRack - Rack Number
 * @param[in] nSlot - Slot Number
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ConnectPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot);
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ConnectPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net::eS7CPUType eCPUType, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot);
 
 /**
 * Disconnects from the S7 PLC.

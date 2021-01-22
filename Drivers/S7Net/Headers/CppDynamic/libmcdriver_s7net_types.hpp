@@ -109,6 +109,24 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_DRIVERNOTINITIALISED 1001
 #define LIBMCDRIVER_S7NET_ERROR_DRIVERNOTCONNECTED 1002
 #define LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL 1003
+#define LIBMCDRIVER_S7NET_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1004
+#define LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBDEFINITION 1005
+#define LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBNUMBER 1006
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDSTATUSDBNUMBER 1007
+#define LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBSIZE 1008
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDSTATUSDBSIZE 1009
+#define LIBMCDRIVER_S7NET_ERROR_NONAMEATTRIBUTE 1010
+#define LIBMCDRIVER_S7NET_ERROR_NOADDRESSEATTRIBUTE 1011
+#define LIBMCDRIVER_S7NET_ERROR_NODESCRIPTIONATTRIBUTE 1012
+#define LIBMCDRIVER_S7NET_ERROR_NOBITATTRIBUTE 1013
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDNAMEATTRIBUTE 1014
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDADDRESSEATTRIBUTE 1015
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDDESCRIPTIONATTRIBUTE 1016
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDBITATTRIBUTE 1017
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDCPUTYPE 1018
+#define LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBDEFINITION 1019
+#define LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBNUMBER 1020
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBNUMBER 1021
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -130,6 +148,24 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
     case LIBMCDRIVER_S7NET_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
     case LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol definition";
+    case LIBMCDRIVER_S7NET_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
+    case LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBDEFINITION: return "no status db definition";
+    case LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBNUMBER: return "no status db number";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDSTATUSDBNUMBER: return "invalid status db number";
+    case LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBSIZE: return "no status db size";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDSTATUSDBSIZE: return "invalid status db size";
+    case LIBMCDRIVER_S7NET_ERROR_NONAMEATTRIBUTE: return "no name attribute";
+    case LIBMCDRIVER_S7NET_ERROR_NOADDRESSEATTRIBUTE: return "no address attribute";
+    case LIBMCDRIVER_S7NET_ERROR_NODESCRIPTIONATTRIBUTE: return "no description attribute";
+    case LIBMCDRIVER_S7NET_ERROR_NOBITATTRIBUTE: return "no bit attribute";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDNAMEATTRIBUTE: return "invalid name attribute";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDADDRESSEATTRIBUTE: return "invalid address attribute";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDDESCRIPTIONATTRIBUTE: return "invalid description attribute";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDBITATTRIBUTE: return "invalid bit attribute";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDCPUTYPE: return "invalid cpu type";
+    case LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBDEFINITION: return "no control db definition";
+    case LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBNUMBER: return "no control db number";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBNUMBER: return "invalid control db number";
     default: return "unknown error";
   }
 }
@@ -144,8 +180,21 @@ typedef LibMCDriver_S7NetHandle LibMCDriver_S7Net_Driver_S7Net;
 
 namespace LibMCDriver_S7Net {
 
+  /*************************************************************************************************************************
+   Declaration of enums
+  **************************************************************************************************************************/
+  
+  enum class eS7CPUType : LibMCDriver_S7Net_int32 {
+    S7200 = 0,
+    S7300 = 10,
+    S7400 = 20,
+    S71200 = 30,
+    S71500 = 40
+  };
+  
 } // namespace LibMCDriver_S7Net;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCDriver_S7Net::eS7CPUType eLibMCDriver_S7NetS7CPUType;
 
 #endif // __LIBMCDRIVER_S7NET_TYPES_HEADER_CPP

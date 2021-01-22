@@ -72,6 +72,10 @@ protected:
     LibS7Com::PWrapper m_pCommunicationWrapper;
     LibS7Com::PPLCCommunication m_pCommunication;
 
+    uint32_t m_nPLCtoAMC_DBNo;
+    uint32_t m_nPLCtoAMC_DBSize;
+    uint32_t m_nAMCtoPLC_DBNo;
+
 public:
 
     CDriver_S7Net(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
@@ -79,7 +83,7 @@ public:
 
     void Initialise() override;
 
-    void Connect(const std::string& sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) override;
+    void Connect(const LibMCDriver_S7Net::eS7CPUType eCPUType, const std::string& sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) override;
 
 	void Disconnect() override;
 

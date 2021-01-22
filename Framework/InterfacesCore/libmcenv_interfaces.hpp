@@ -1172,7 +1172,6 @@ public:
 	*/
 	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
 
-
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;

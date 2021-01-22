@@ -316,11 +316,12 @@ public:
 
 	/**
 	* IDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
+	* @param[in] eCPUType - S7 CPU Type
 	* @param[in] sIPAddress - PLC IP Address
 	* @param[in] nRack - Rack Number
 	* @param[in] nSlot - Slot Number
 	*/
-	virtual void Connect(const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) = 0;
+	virtual void Connect(const LibMCDriver_S7Net::eS7CPUType eCPUType, const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) = 0;
 
 	/**
 	* IDriver_S7Net::Disconnect - Disconnects from the S7 PLC.

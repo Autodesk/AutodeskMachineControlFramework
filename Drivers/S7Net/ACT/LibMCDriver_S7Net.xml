@@ -35,8 +35,7 @@
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
 	</implementations>
-	
-	
+		
 	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
 	
 	<errors>
@@ -54,8 +53,36 @@
 		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
 		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />
 		<error name="INVALIDDRIVERPROTOCOL" code="1003" description="invalid driver protocol definition" />
+		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1004" description="could not parse driver protocol" />
+		<error name="NOSTATUSDBDEFINITION" code="1005" description="no status db definition" />
+		<error name="NOSTATUSDBNUMBER" code="1006" description="no status db number" />
+		<error name="INVALIDSTATUSDBNUMBER" code="1007" description="invalid status db number" />
+		<error name="NOSTATUSDBSIZE" code="1008" description="no status db size" />
+		<error name="INVALIDSTATUSDBSIZE" code="1009" description="invalid status db size" />
+		<error name="NONAMEATTRIBUTE" code="1010" description="no name attribute" />
+		<error name="NOADDRESSEATTRIBUTE" code="1011" description="no address attribute" />
+		<error name="NODESCRIPTIONATTRIBUTE" code="1012" description="no description attribute" />
+		<error name="NOBITATTRIBUTE" code="1013" description="no bit attribute" />
+		
+		<error name="INVALIDNAMEATTRIBUTE" code="1014" description="invalid name attribute" />
+		<error name="INVALIDADDRESSEATTRIBUTE" code="1015" description="invalid address attribute" />
+		<error name="INVALIDDESCRIPTIONATTRIBUTE" code="1016" description="invalid description attribute" />
+		<error name="INVALIDBITATTRIBUTE" code="1017" description="invalid bit attribute" />
+		<error name="INVALIDCPUTYPE" code="1018" description="invalid cpu type" />
+		
+		<error name="NOCONTROLDBDEFINITION" code="1019" description="no control db definition" />
+		<error name="NOCONTROLDBNUMBER" code="1020" description="no control db number" />
+		<error name="INVALIDCONTROLDBNUMBER" code="1021" description="invalid control db number" />
 		
 	</errors>
+
+	<enum name="S7CPUType">
+		<option name="S7200" value="0" />
+		<option name="S7300" value="10" />
+		<option name="S7400" value="20" />
+		<option name="S71200" value="30" />
+		<option name="S71500" value="40" />
+	</enum>		
 
 	
 <!--
@@ -115,6 +142,7 @@ Custom implementation
 		</method>
 
 		<method name="Connect" description="Creates and initializes a new S7 PLC.">
+			<param name="CPUType" type="enum" class="S7CPUType" pass="in" description="S7 CPU Type" />
 			<param name="IPAddress" type="string" pass="in" description="PLC IP Address" />
 			<param name="Rack" type="uint32" pass="in" description="Rack Number" />
 			<param name="Slot" type="uint32" pass="in" description="Slot Number" />

@@ -362,7 +362,7 @@ public:
 	}
 	
 	inline void Initialise();
-	inline void Connect(const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot);
+	inline void Connect(const eS7CPUType eCPUType, const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot);
 	inline void Disconnect();
 };
 	
@@ -862,13 +862,14 @@ public:
 	
 	/**
 	* CDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
+	* @param[in] eCPUType - S7 CPU Type
 	* @param[in] sIPAddress - PLC IP Address
 	* @param[in] nRack - Rack Number
 	* @param[in] nSlot - Slot Number
 	*/
-	void CDriver_S7Net::Connect(const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot)
+	void CDriver_S7Net::Connect(const eS7CPUType eCPUType, const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_S7Net_Connect(m_pHandle, sIPAddress.c_str(), nRack, nSlot));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_S7Net_Connect(m_pHandle, eCPUType, sIPAddress.c_str(), nRack, nSlot));
 	}
 	
 	/**
