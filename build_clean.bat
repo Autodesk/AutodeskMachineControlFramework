@@ -86,3 +86,5 @@ echo "Build done!"
 if "%1" neq "NOPAUSE" (
 	pause
 )
+
+exit 0
