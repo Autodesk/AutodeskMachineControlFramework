@@ -74,6 +74,23 @@
 		<error name="NOCONTROLDBNUMBER" code="1020" description="no control db number" />
 		<error name="INVALIDCONTROLDBNUMBER" code="1021" description="invalid control db number" />
 		
+		<error name="UNKNOWNCOMMANDNAME" code="1022" description="unknown command name" />
+		<error name="NOCOMMANDNAME" code="1023" description="no command name" />
+		<error name="NOCOMMANDID" code="1024" description="no command id" />
+		<error name="INVALIDCOMMANDNAME" code="1025" description="invalid command name" />
+		<error name="INVALIDCOMMANDID" code="1026" description="invalid command id" />
+		
+		<error name="COMMANDHASALREADYBEENEXECUTED" code="1027" description="command has already been executed" />
+		<error name="COMMANDHASNOTBEENEXECUTED" code="1028" description="command has not been executed" />
+		<error name="INVALIDSEQUENCEID" code="1029" description="invalid sequence id" />
+		<error name="COMMANDSEQUENCEERROR" code="1030" description="command sequence communication error" />
+		<error name="COMMANDREACTIONTIMEOUT" code="1031" description="command reaction timeout" />
+		
+		
+		
+		
+					
+		
 	</errors>
 
 	<enum name="S7CPUType">
@@ -134,7 +151,8 @@ Custom implementation
 
 -->
 
-
+	<class name="PLCCommand" parent="Base">
+	</class>
 
 	<class name="Driver_S7Net" parent="Driver" description="A Driver for a S7 PLC.">
 
@@ -150,7 +168,23 @@ Custom implementation
 
 		<method name="Disconnect" description="Disconnects from the S7 PLC.">
 		</method>
+		
+		<method name="CreateCommand" description="Create Command">
+			<param name="Command" type="string" pass="in" description="Command to execute" />
+			<param name="PLCCommand" type="class" class="PLCCommand" pass="return" description="Command instance" />
+		</method>		
 
+		<method name="ExecuteCommand" description="Execute Command">
+			<param name="PLCCommand" type="class" class="PLCCommand" pass="in" description="Command instance" />
+		</method>		
+
+		<method name="WaitForCommand" description="Wait for Command to finish executing">
+			<param name="PLCCommand" type="class" class="PLCCommand" pass="in" description="Command instance" />
+			<param name="ReactionTimeInMS" type="uint32" pass="in" description="How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time." />
+			<param name="WaitForTimeInMS" type="uint32" pass="in" description="How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished." />
+			<param name="CommandSuccess" type="bool" pass="return" description="Returns true if the command was finished successfully." />
+		</method>		
+		
 	</class>
 
 

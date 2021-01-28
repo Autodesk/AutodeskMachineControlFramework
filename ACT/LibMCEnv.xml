@@ -414,6 +414,13 @@
 			<param name="Value" type="bool" pass="in" description="Value to set" />
 		</method>
 		
+		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
 
 	</class>
 	

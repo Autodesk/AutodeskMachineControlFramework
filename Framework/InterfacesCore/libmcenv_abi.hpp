@@ -728,6 +728,24 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setintegerparameter(
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setboolparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue);
 
+/**
+* Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nDelay - Milliseconds to sleeps
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_sleep(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nDelay);
+
+/**
+* Returns the global timer in milliseconds.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/

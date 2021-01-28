@@ -89,33 +89,26 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_RetrieveStatusPtr) (LibS7Com_
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_StopCommunicationPtr) (LibS7Com_PLCCommunication pPLCCommunication);
 
 /**
-* Loads a GCode Program on the PLC
+* Executes a command
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pProgram - GCode Program to send.
-* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pIdentifierBuffer -  buffer of Program identifier., may be NULL
+* @param[in] nCommandID - ID of command to be triggered.
+* @param[out] pSequenceID - Sequence ID of the executed command.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_LoadProgramPtr) (LibS7Com_PLCCommunication pPLCCommunication, const char * pProgram, const LibS7Com_uint32 nIdentifierBufferSize, LibS7Com_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ExecuteCommandPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID);
 
 /**
-* Executes a GCode Program on the PLC
+* Checks the command execution state.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pIdentifier - Program identifier.
+* @param[in] nSequenceID - Sequence ID of the executed command.
+* @param[out] pSequenceIsActive - Returns if the sequence is active.
+* @param[out] pSequenceIsFinished - Returns if the sequence is finished.
+* @param[out] pErrorCode - Current error code if sequence is active and not yet finished.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_ExecuteProgramPtr) (LibS7Com_PLCCommunication pPLCCommunication, const char * pIdentifier);
-
-/**
-* Clears loaded programs
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @return error code or 0 (success)
-*/
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_ClearProgramsPtr) (LibS7Com_PLCCommunication pPLCCommunication);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_CheckCommandExecutionPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nSequenceID, bool * pSequenceIsActive, bool * pSequenceIsFinished, LibS7Com_uint32 * pErrorCode);
 
 /**
 * Returns value of string variable.
@@ -258,9 +251,8 @@ typedef struct {
 	PLibS7ComPLCCommunication_StartCommunicationPtr m_PLCCommunication_StartCommunication;
 	PLibS7ComPLCCommunication_RetrieveStatusPtr m_PLCCommunication_RetrieveStatus;
 	PLibS7ComPLCCommunication_StopCommunicationPtr m_PLCCommunication_StopCommunication;
-	PLibS7ComPLCCommunication_LoadProgramPtr m_PLCCommunication_LoadProgram;
-	PLibS7ComPLCCommunication_ExecuteProgramPtr m_PLCCommunication_ExecuteProgram;
-	PLibS7ComPLCCommunication_ClearProgramsPtr m_PLCCommunication_ClearPrograms;
+	PLibS7ComPLCCommunication_ExecuteCommandPtr m_PLCCommunication_ExecuteCommand;
+	PLibS7ComPLCCommunication_CheckCommandExecutionPtr m_PLCCommunication_CheckCommandExecution;
 	PLibS7ComPLCCommunication_ReadVariableStringPtr m_PLCCommunication_ReadVariableString;
 	PLibS7ComPLCCommunication_ReadVariableBoolPtr m_PLCCommunication_ReadVariableBool;
 	PLibS7ComPLCCommunication_ReadVariableBytePtr m_PLCCommunication_ReadVariableByte;

@@ -124,6 +124,10 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_geth
 LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_queryparameters(LibMCDriver_S7Net_Driver pDriver);
 
 /*************************************************************************************************************************
+ Class definition for PLCCommand
+**************************************************************************************************************************/
+
+/*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/
 
@@ -154,6 +158,37 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7ne
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_disconnect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+
+/**
+* Create Command
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pCommand - Command to execute
+* @param[out] pPLCCommand - Command instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_createcommand(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pCommand, LibMCDriver_S7Net_PLCCommand * pPLCCommand);
+
+/**
+* Execute Command
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pPLCCommand - Command instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_executecommand(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net_PLCCommand pPLCCommand);
+
+/**
+* Wait for Command to finish executing
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pPLCCommand - Command instance
+* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+* @param[out] pCommandSuccess - Returns true if the command was finished successfully.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_waitforcommand(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net_PLCCommand pPLCCommand, LibMCDriver_S7Net_uint32 nReactionTimeInMS, LibMCDriver_S7Net_uint32 nWaitForTimeInMS, bool * pCommandSuccess);
 
 /*************************************************************************************************************************
  Global functions

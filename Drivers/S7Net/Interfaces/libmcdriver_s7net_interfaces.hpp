@@ -57,6 +57,7 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IPLCCommand;
 class IDriver_S7Net;
 
 
@@ -304,6 +305,17 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for PLCCommand 
+**************************************************************************************************************************/
+
+class IPLCCommand : public virtual IBase {
+public:
+};
+
+typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;
+
+
+/*************************************************************************************************************************
  Class interface for Driver_S7Net 
 **************************************************************************************************************************/
 
@@ -327,6 +339,28 @@ public:
 	* IDriver_S7Net::Disconnect - Disconnects from the S7 PLC.
 	*/
 	virtual void Disconnect() = 0;
+
+	/**
+	* IDriver_S7Net::CreateCommand - Create Command
+	* @param[in] sCommand - Command to execute
+	* @return Command instance
+	*/
+	virtual IPLCCommand * CreateCommand(const std::string & sCommand) = 0;
+
+	/**
+	* IDriver_S7Net::ExecuteCommand - Execute Command
+	* @param[in] pPLCCommand - Command instance
+	*/
+	virtual void ExecuteCommand(IPLCCommand* pPLCCommand) = 0;
+
+	/**
+	* IDriver_S7Net::WaitForCommand - Wait for Command to finish executing
+	* @param[in] pPLCCommand - Command instance
+	* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+	* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+	* @return Returns true if the command was finished successfully.
+	*/
+	virtual bool WaitForCommand(IPLCCommand* pPLCCommand, const LibMCDriver_S7Net_uint32 nReactionTimeInMS, const LibMCDriver_S7Net_uint32 nWaitForTimeInMS) = 0;
 
 };
 

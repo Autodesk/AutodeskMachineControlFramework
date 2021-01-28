@@ -178,3 +178,15 @@ void CDriverEnvironment::setIsInitializing(bool bIsInitializing)
 {
     m_bIsInitializing = bIsInitializing;
 }
+
+
+void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+{
+    m_Chrono.sleepMilliseconds(nDelay);
+}
+
+LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
+{
+    return m_Chrono.getExistenceTimeInMilliseconds();
+}
+

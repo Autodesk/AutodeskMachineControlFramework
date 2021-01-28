@@ -580,6 +580,8 @@ public:
 	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue);
 	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue);
 	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 };
 	
 /*************************************************************************************************************************
@@ -856,6 +858,8 @@ public:
 		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_Sleep = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -1540,6 +1544,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_sleep");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) dlsym(hLibrary, "libmcenv_driverenvironment_sleep");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_Sleep == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2447,6 +2469,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_setboolparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_sleep", (void**)&(pWrapperTable->m_DriverEnvironment_Sleep));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
@@ -3604,6 +3634,27 @@ public:
 	void CDriverEnvironment::SetBoolParameter(const std::string & sParameterName, const bool bValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CDriverEnvironment::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_Sleep(m_pHandle, nDelay));
+	}
+	
+	/**
+	* CDriverEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
 	}
 	
 	/**

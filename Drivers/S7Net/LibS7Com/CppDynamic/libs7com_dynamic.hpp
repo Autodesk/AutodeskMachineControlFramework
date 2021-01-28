@@ -339,9 +339,8 @@ public:
 	inline void StartCommunication(classParam<LibS7Net::CPLC> pPLC);
 	inline void RetrieveStatus();
 	inline void StopCommunication();
-	inline std::string LoadProgram(const std::string & sProgram);
-	inline void ExecuteProgram(const std::string & sIdentifier);
-	inline void ClearPrograms();
+	inline LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID);
+	inline void CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool & bSequenceIsActive, bool & bSequenceIsFinished, LibS7Com_uint32 & nErrorCode);
 	inline std::string ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength);
 	inline bool ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit);
 	inline LibS7Com_uint8 ReadVariableByte(const LibS7Com_uint32 nAddress);
@@ -471,9 +470,8 @@ public:
 		pWrapperTable->m_PLCCommunication_StartCommunication = nullptr;
 		pWrapperTable->m_PLCCommunication_RetrieveStatus = nullptr;
 		pWrapperTable->m_PLCCommunication_StopCommunication = nullptr;
-		pWrapperTable->m_PLCCommunication_LoadProgram = nullptr;
-		pWrapperTable->m_PLCCommunication_ExecuteProgram = nullptr;
-		pWrapperTable->m_PLCCommunication_ClearPrograms = nullptr;
+		pWrapperTable->m_PLCCommunication_ExecuteCommand = nullptr;
+		pWrapperTable->m_PLCCommunication_CheckCommandExecution = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableString = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableBool = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableByte = nullptr;
@@ -572,30 +570,21 @@ public:
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_LoadProgram = (PLibS7ComPLCCommunication_LoadProgramPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_loadprogram");
+		pWrapperTable->m_PLCCommunication_ExecuteCommand = (PLibS7ComPLCCommunication_ExecuteCommandPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_executecommand");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_LoadProgram = (PLibS7ComPLCCommunication_LoadProgramPtr) dlsym(hLibrary, "libs7com_plccommunication_loadprogram");
+		pWrapperTable->m_PLCCommunication_ExecuteCommand = (PLibS7ComPLCCommunication_ExecuteCommandPtr) dlsym(hLibrary, "libs7com_plccommunication_executecommand");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_LoadProgram == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ExecuteCommand == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_ExecuteProgram = (PLibS7ComPLCCommunication_ExecuteProgramPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_executeprogram");
+		pWrapperTable->m_PLCCommunication_CheckCommandExecution = (PLibS7ComPLCCommunication_CheckCommandExecutionPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_checkcommandexecution");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_ExecuteProgram = (PLibS7ComPLCCommunication_ExecuteProgramPtr) dlsym(hLibrary, "libs7com_plccommunication_executeprogram");
+		pWrapperTable->m_PLCCommunication_CheckCommandExecution = (PLibS7ComPLCCommunication_CheckCommandExecutionPtr) dlsym(hLibrary, "libs7com_plccommunication_checkcommandexecution");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_ExecuteProgram == nullptr)
-			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_ClearPrograms = (PLibS7ComPLCCommunication_ClearProgramsPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_clearprograms");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_ClearPrograms = (PLibS7ComPLCCommunication_ClearProgramsPtr) dlsym(hLibrary, "libs7com_plccommunication_clearprograms");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_ClearPrograms == nullptr)
+		if (pWrapperTable->m_PLCCommunication_CheckCommandExecution == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -747,16 +736,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_StopCommunication == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_loadprogram", (void**)&(pWrapperTable->m_PLCCommunication_LoadProgram));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_LoadProgram == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_executecommand", (void**)&(pWrapperTable->m_PLCCommunication_ExecuteCommand));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ExecuteCommand == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_executeprogram", (void**)&(pWrapperTable->m_PLCCommunication_ExecuteProgram));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ExecuteProgram == nullptr) )
-			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libs7com_plccommunication_clearprograms", (void**)&(pWrapperTable->m_PLCCommunication_ClearPrograms));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ClearPrograms == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_checkcommandexecution", (void**)&(pWrapperTable->m_PLCCommunication_CheckCommandExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_CheckCommandExecution == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablestring", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableString));
@@ -862,36 +847,28 @@ public:
 	}
 	
 	/**
-	* CPLCCommunication::LoadProgram - Loads a GCode Program on the PLC
-	* @param[in] sProgram - GCode Program to send.
-	* @return Program identifier.
+	* CPLCCommunication::ExecuteCommand - Executes a command
+	* @param[in] nCommandID - ID of command to be triggered.
+	* @return Sequence ID of the executed command.
 	*/
-	std::string CPLCCommunication::LoadProgram(const std::string & sProgram)
+	LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommandID)
 	{
-		LibS7Com_uint32 bytesNeededIdentifier = 0;
-		LibS7Com_uint32 bytesWrittenIdentifier = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_LoadProgram(m_pHandle, sProgram.c_str(), 0, &bytesNeededIdentifier, nullptr));
-		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_LoadProgram(m_pHandle, sProgram.c_str(), bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		LibS7Com_uint32 resultSequenceID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ExecuteCommand(m_pHandle, nCommandID, &resultSequenceID));
 		
-		return std::string(&bufferIdentifier[0]);
+		return resultSequenceID;
 	}
 	
 	/**
-	* CPLCCommunication::ExecuteProgram - Executes a GCode Program on the PLC
-	* @param[in] sIdentifier - Program identifier.
+	* CPLCCommunication::CheckCommandExecution - Checks the command execution state.
+	* @param[in] nSequenceID - Sequence ID of the executed command.
+	* @param[out] bSequenceIsActive - Returns if the sequence is active.
+	* @param[out] bSequenceIsFinished - Returns if the sequence is finished.
+	* @param[out] nErrorCode - Current error code if sequence is active and not yet finished.
 	*/
-	void CPLCCommunication::ExecuteProgram(const std::string & sIdentifier)
+	void CPLCCommunication::CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool & bSequenceIsActive, bool & bSequenceIsFinished, LibS7Com_uint32 & nErrorCode)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ExecuteProgram(m_pHandle, sIdentifier.c_str()));
-	}
-	
-	/**
-	* CPLCCommunication::ClearPrograms - Clears loaded programs
-	*/
-	void CPLCCommunication::ClearPrograms()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ClearPrograms(m_pHandle));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_CheckCommandExecution(m_pHandle, nSequenceID, &bSequenceIsActive, &bSequenceIsFinished, &nErrorCode));
 	}
 	
 	/**

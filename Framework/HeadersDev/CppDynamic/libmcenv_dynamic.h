@@ -715,6 +715,24 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetIntegerParameterPtr) (Lib
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetBoolParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue);
 
+/**
+* Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nDelay - Milliseconds to sleeps
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SleepPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nDelay);
+
+/**
+* Returns the global timer in milliseconds.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -1546,6 +1564,8 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_SetDoubleParameterPtr m_DriverEnvironment_SetDoubleParameter;
 	PLibMCEnvDriverEnvironment_SetIntegerParameterPtr m_DriverEnvironment_SetIntegerParameter;
 	PLibMCEnvDriverEnvironment_SetBoolParameterPtr m_DriverEnvironment_SetBoolParameter;
+	PLibMCEnvDriverEnvironment_SleepPtr m_DriverEnvironment_Sleep;
+	PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr m_DriverEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
 	PLibMCEnvSignalTrigger_TriggerPtr m_SignalTrigger_Trigger;
 	PLibMCEnvSignalTrigger_WaitForHandlingPtr m_SignalTrigger_WaitForHandling;

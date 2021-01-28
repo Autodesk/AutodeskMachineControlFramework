@@ -102,33 +102,26 @@ LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_retrievestatus(LibS7C
 LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_stopcommunication(LibS7Com_PLCCommunication pPLCCommunication);
 
 /**
-* Loads a GCode Program on the PLC
+* Executes a command
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pProgram - GCode Program to send.
-* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pIdentifierBuffer -  buffer of Program identifier., may be NULL
+* @param[in] nCommandID - ID of command to be triggered.
+* @param[out] pSequenceID - Sequence ID of the executed command.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_loadprogram(LibS7Com_PLCCommunication pPLCCommunication, const char * pProgram, const LibS7Com_uint32 nIdentifierBufferSize, LibS7Com_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_executecommand(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID);
 
 /**
-* Executes a GCode Program on the PLC
+* Checks the command execution state.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pIdentifier - Program identifier.
+* @param[in] nSequenceID - Sequence ID of the executed command.
+* @param[out] pSequenceIsActive - Returns if the sequence is active.
+* @param[out] pSequenceIsFinished - Returns if the sequence is finished.
+* @param[out] pErrorCode - Current error code if sequence is active and not yet finished.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_executeprogram(LibS7Com_PLCCommunication pPLCCommunication, const char * pIdentifier);
-
-/**
-* Clears loaded programs
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @return error code or 0 (success)
-*/
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_clearprograms(LibS7Com_PLCCommunication pPLCCommunication);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_checkcommandexecution(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nSequenceID, bool * pSequenceIsActive, bool * pSequenceIsFinished, LibS7Com_uint32 * pErrorCode);
 
 /**
 * Returns value of string variable.

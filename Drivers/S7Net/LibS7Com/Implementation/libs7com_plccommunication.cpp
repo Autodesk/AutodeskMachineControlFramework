@@ -44,7 +44,7 @@ using namespace LibS7Com::Impl;
 **************************************************************************************************************************/
 
 CPLCCommunication::CPLCCommunication()
-    : m_nPLCtoAMC_Size(0), m_nPLCtoAMC_DBNo(0), m_nAMCtoPLC_DBNo (0)
+    : m_nPLCtoAMC_Size(0), m_nPLCtoAMC_DBNo(0), m_nAMCtoPLC_DBNo (0), m_nCmdCycleCounter (1)
 {
 
 }
@@ -74,9 +74,9 @@ void CPLCCommunication::StartCommunication(LibS7Net::PPLC pPLC)
 
 void CPLCCommunication::RetrieveStatus()
 {
-    if ((m_pPLC.get() != nullptr) && (m_nPLCtoAMC_Size != 0)) {
+    m_PLCRecvBuffer.resize(0);
 
-        m_PLCRecvBuffer.resize(0);
+    if ((m_pPLC.get() != nullptr) && (m_nPLCtoAMC_Size != 0)) {
        
         auto pReadData = m_pPLC->ReadBytes(m_nPLCtoAMC_DBNo, 0, m_nPLCtoAMC_Size);
         pReadData->GetData(m_PLCRecvBuffer);
@@ -91,24 +91,51 @@ void CPLCCommunication::StopCommunication()
     m_pPLC = nullptr;
 }
 
-std::string CPLCCommunication::LoadProgram(const std::string& sProgram)
+
+LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommandID)
 {
-    return "";
+    if (m_pPLC.get() == nullptr)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTCONNECTED);
+
+    uint32_t nCycleID = m_nCmdCycleCounter;
+    m_nCmdCycleCounter++;
+
+    std::vector<uint8_t> WriteData;
+    WriteData.resize(330);
+    WriteData[262 + 3] = nCycleID;
+    WriteData[266 + 3] = nCommandID;
+    m_pPLC->WriteBytes(m_nAMCtoPLC_DBNo, 0, WriteData); 
+
+    return nCycleID;
 }
 
-void CPLCCommunication::ExecuteProgram(const std::string& sIdentifier)
+void CPLCCommunication::CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool& bSequenceIsActive, bool& bSequenceIsFinished, LibS7Com_uint32& nErrorCode)
 {
+    if (m_pPLC.get() == nullptr)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTCONNECTED);
 
-}
+    RetrieveStatus();
 
-void CPLCCommunication::ClearPrograms()
-{
+    bSequenceIsFinished = false;
+    nErrorCode = 0;
+
+    int32_t varSEQUENCE_CURRENT = ReadVariableInt32(18);
+
+    bSequenceIsActive = (varSEQUENCE_CURRENT == (int32_t) nSequenceID);
+    if (bSequenceIsActive) {
+        int32_t varSEQUENCE_STATUS = ReadVariableInt32(22);
+        int32_t varSEQUENCE_ERRORCODE = ReadVariableInt32(62);
+        bSequenceIsFinished = (varSEQUENCE_STATUS == 0);
+
+        if (!bSequenceIsFinished)
+            nErrorCode = (uint32_t)varSEQUENCE_ERRORCODE;
+    }
 
 }
 
 std::string CPLCCommunication::ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength)
 {
-    return "";
+    throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
 }
 
 bool CPLCCommunication::ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit)
@@ -135,7 +162,7 @@ LibS7Com_int32 CPLCCommunication::ReadVariableInt32(const LibS7Com_uint32 nAddre
 
     uint8_t nValue[4];
     for (int j = 0; j < 4; j++)
-        nValue[3 - j] = m_PLCRecvBuffer.at(nAddress + j);
+        nValue[3 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
 
     return *((int32_t*) &nValue[0]);
 }
@@ -147,7 +174,7 @@ LibS7Com_int32 CPLCCommunication::ReadVariableUint32(const LibS7Com_uint32 nAddr
 
     uint8_t nValue[4];
     for (int j = 0; j < 4; j++)
-        nValue[3 - j] = m_PLCRecvBuffer.at(nAddress + j);
+        nValue[3 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
 
     return *((uint32_t*)&nValue[0]);
 }
@@ -159,7 +186,7 @@ LibS7Com_double CPLCCommunication::ReadVariableReal(const LibS7Com_uint32 nAddre
 
     uint8_t nValue[4];
     for (int j = 0; j < 4; j++)
-        nValue[3 - j] = m_PLCRecvBuffer.at(nAddress + j);
+        nValue[3 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
 
     return *((float*)&nValue[0]);
 

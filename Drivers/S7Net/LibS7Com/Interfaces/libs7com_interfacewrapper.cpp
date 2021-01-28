@@ -184,70 +184,18 @@ LibS7ComResult libs7com_plccommunication_stopcommunication(LibS7Com_PLCCommunica
 	}
 }
 
-LibS7ComResult libs7com_plccommunication_loadprogram(LibS7Com_PLCCommunication pPLCCommunication, const char * pProgram, const LibS7Com_uint32 nIdentifierBufferSize, LibS7Com_uint32* pIdentifierNeededChars, char * pIdentifierBuffer)
+LibS7ComResult libs7com_plccommunication_executecommand(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID)
 {
 	IBase* pIBaseClass = (IBase *)pPLCCommunication;
 
 	try {
-		if (pProgram == nullptr)
+		if (pSequenceID == nullptr)
 			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
-		if ( (!pIdentifierBuffer) && !(pIdentifierNeededChars) )
-			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
-		std::string sProgram(pProgram);
-		std::string sIdentifier("");
 		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
 		if (!pIPLCCommunication)
 			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pIdentifierBuffer == nullptr);
-		if (isCacheCall) {
-			sIdentifier = pIPLCCommunication->LoadProgram(sProgram);
-
-			pIPLCCommunication->_setCache (new ParameterCache_1<std::string> (sIdentifier));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIPLCCommunication->_getCache ());
-			if (cache == nullptr)
-				throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
-			cache->retrieveData (sIdentifier);
-			pIPLCCommunication->_setCache (nullptr);
-		}
-		
-		if (pIdentifierNeededChars)
-			*pIdentifierNeededChars = (LibS7Com_uint32) (sIdentifier.size()+1);
-		if (pIdentifierBuffer) {
-			if (sIdentifier.size() >= nIdentifierBufferSize)
-				throw ELibS7ComInterfaceException (LIBS7COM_ERROR_BUFFERTOOSMALL);
-			for (size_t iIdentifier = 0; iIdentifier < sIdentifier.size(); iIdentifier++)
-				pIdentifierBuffer[iIdentifier] = sIdentifier[iIdentifier];
-			pIdentifierBuffer[sIdentifier.size()] = 0;
-		}
-		return LIBS7COM_SUCCESS;
-	}
-	catch (ELibS7ComInterfaceException & Exception) {
-		return handleLibS7ComException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibS7ComResult libs7com_plccommunication_executeprogram(LibS7Com_PLCCommunication pPLCCommunication, const char * pIdentifier)
-{
-	IBase* pIBaseClass = (IBase *)pPLCCommunication;
-
-	try {
-		if (pIdentifier == nullptr)
-			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
-		std::string sIdentifier(pIdentifier);
-		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
-		if (!pIPLCCommunication)
-			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
-		
-		pIPLCCommunication->ExecuteProgram(sIdentifier);
+		*pSequenceID = pIPLCCommunication->ExecuteCommand(nCommandID);
 
 		return LIBS7COM_SUCCESS;
 	}
@@ -262,16 +210,22 @@ LibS7ComResult libs7com_plccommunication_executeprogram(LibS7Com_PLCCommunicatio
 	}
 }
 
-LibS7ComResult libs7com_plccommunication_clearprograms(LibS7Com_PLCCommunication pPLCCommunication)
+LibS7ComResult libs7com_plccommunication_checkcommandexecution(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nSequenceID, bool * pSequenceIsActive, bool * pSequenceIsFinished, LibS7Com_uint32 * pErrorCode)
 {
 	IBase* pIBaseClass = (IBase *)pPLCCommunication;
 
 	try {
+		if (!pSequenceIsActive)
+			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
+		if (!pSequenceIsFinished)
+			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
+		if (!pErrorCode)
+			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
 		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
 		if (!pIPLCCommunication)
 			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
 		
-		pIPLCCommunication->ClearPrograms();
+		pIPLCCommunication->CheckCommandExecution(nSequenceID, *pSequenceIsActive, *pSequenceIsFinished, *pErrorCode);
 
 		return LIBS7COM_SUCCESS;
 	}
@@ -487,12 +441,10 @@ LibS7ComResult LibS7Com::Impl::LibS7Com_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libs7com_plccommunication_retrievestatus;
 	if (sProcName == "libs7com_plccommunication_stopcommunication") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_stopcommunication;
-	if (sProcName == "libs7com_plccommunication_loadprogram") 
-		*ppProcAddress = (void*) &libs7com_plccommunication_loadprogram;
-	if (sProcName == "libs7com_plccommunication_executeprogram") 
-		*ppProcAddress = (void*) &libs7com_plccommunication_executeprogram;
-	if (sProcName == "libs7com_plccommunication_clearprograms") 
-		*ppProcAddress = (void*) &libs7com_plccommunication_clearprograms;
+	if (sProcName == "libs7com_plccommunication_executecommand") 
+		*ppProcAddress = (void*) &libs7com_plccommunication_executecommand;
+	if (sProcName == "libs7com_plccommunication_checkcommandexecution") 
+		*ppProcAddress = (void*) &libs7com_plccommunication_checkcommandexecution;
 	if (sProcName == "libs7com_plccommunication_readvariablestring") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_readvariablestring;
 	if (sProcName == "libs7com_plccommunication_readvariablebool") 

@@ -2151,6 +2151,56 @@ LibMCEnvResult libmcenv_driverenvironment_setboolparameter(LibMCEnv_DriverEnviro
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_sleep(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nDelay)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->Sleep(nDelay);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIDriverEnvironment->GetGlobalTimerInMilliseconds();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for SignalTrigger
@@ -4582,6 +4632,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_setintegerparameter;
 	if (sProcName == "libmcenv_driverenvironment_setboolparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_setboolparameter;
+	if (sProcName == "libmcenv_driverenvironment_sleep") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_sleep;
+	if (sProcName == "libmcenv_driverenvironment_getglobaltimerinmilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_getglobaltimerinmilliseconds;
 	if (sProcName == "libmcenv_signaltrigger_cantrigger") 
 		*ppProcAddress = (void*) &libmcenv_signaltrigger_cantrigger;
 	if (sProcName == "libmcenv_signaltrigger_trigger") 

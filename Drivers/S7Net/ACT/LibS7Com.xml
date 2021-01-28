@@ -86,17 +86,18 @@
 		<method name="StopCommunication" description="Stops communication with the S7 PLC Instance">
 		</method>
 		
-		<method name="LoadProgram" description="Loads a GCode Program on the PLC">
-			<param name="Program" type="string" pass="in" description="GCode Program to send." />
-			<param name="Identifier" type="string" pass="return" description="Program identifier." />
+		<method name="ExecuteCommand" description="Executes a command">
+			<param name="CommandID" type="uint32" pass="in" description="ID of command to be triggered." />
+			<param name="SequenceID" type="uint32" pass="return" description="Sequence ID of the executed command." />
 		</method>
 
-		<method name="ExecuteProgram" description="Executes a GCode Program on the PLC">
-			<param name="Identifier" type="string" pass="in" description="Program identifier." />
+		<method name="CheckCommandExecution" description="Checks the command execution state.">
+			<param name="SequenceID" type="uint32" pass="in" description="Sequence ID of the executed command." />
+			<param name="SequenceIsActive" type="bool" pass="out" description="Returns if the sequence is active." />
+			<param name="SequenceIsFinished" type="bool" pass="out" description="Returns if the sequence is finished." />
+			<param name="ErrorCode" type="uint32" pass="out" description="Current error code if sequence is active and not yet finished." />
 		</method>
 
-		<method name="ClearPrograms" description="Clears loaded programs">
-		</method>
 
 		<method name="ReadVariableString" description="Returns value of string variable.">
 			<param name="Address" type="uint32" pass="in" description="Address of String Variable." />

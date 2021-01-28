@@ -127,6 +127,16 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBDEFINITION 1019
 #define LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBNUMBER 1020
 #define LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBNUMBER 1021
+#define LIBMCDRIVER_S7NET_ERROR_UNKNOWNCOMMANDNAME 1022
+#define LIBMCDRIVER_S7NET_ERROR_NOCOMMANDNAME 1023
+#define LIBMCDRIVER_S7NET_ERROR_NOCOMMANDID 1024
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDCOMMANDNAME 1025
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDCOMMANDID 1026
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDHASALREADYBEENEXECUTED 1027
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDHASNOTBEENEXECUTED 1028
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDSEQUENCEID 1029
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDSEQUENCEERROR 1030
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDREACTIONTIMEOUT 1031
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -166,6 +176,16 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBDEFINITION: return "no control db definition";
     case LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBNUMBER: return "no control db number";
     case LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBNUMBER: return "invalid control db number";
+    case LIBMCDRIVER_S7NET_ERROR_UNKNOWNCOMMANDNAME: return "unknown command name";
+    case LIBMCDRIVER_S7NET_ERROR_NOCOMMANDNAME: return "no command name";
+    case LIBMCDRIVER_S7NET_ERROR_NOCOMMANDID: return "no command id";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDCOMMANDNAME: return "invalid command name";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDCOMMANDID: return "invalid command id";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDHASALREADYBEENEXECUTED: return "command has already been executed";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDHASNOTBEENEXECUTED: return "command has not been executed";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDSEQUENCEID: return "invalid sequence id";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDSEQUENCEERROR: return "command sequence communication error";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDREACTIONTIMEOUT: return "command reaction timeout";
     default: return "unknown error";
   }
 }
@@ -176,6 +196,7 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
 
 typedef LibMCDriver_S7NetHandle LibMCDriver_S7Net_Base;
 typedef LibMCDriver_S7NetHandle LibMCDriver_S7Net_Driver;
+typedef LibMCDriver_S7NetHandle LibMCDriver_S7Net_PLCCommand;
 typedef LibMCDriver_S7NetHandle LibMCDriver_S7Net_Driver_S7Net;
 
 namespace LibMCDriver_S7Net {

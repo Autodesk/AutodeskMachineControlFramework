@@ -268,22 +268,20 @@ public:
 	virtual void StopCommunication() = 0;
 
 	/**
-	* IPLCCommunication::LoadProgram - Loads a GCode Program on the PLC
-	* @param[in] sProgram - GCode Program to send.
-	* @return Program identifier.
+	* IPLCCommunication::ExecuteCommand - Executes a command
+	* @param[in] nCommandID - ID of command to be triggered.
+	* @return Sequence ID of the executed command.
 	*/
-	virtual std::string LoadProgram(const std::string & sProgram) = 0;
+	virtual LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID) = 0;
 
 	/**
-	* IPLCCommunication::ExecuteProgram - Executes a GCode Program on the PLC
-	* @param[in] sIdentifier - Program identifier.
+	* IPLCCommunication::CheckCommandExecution - Checks the command execution state.
+	* @param[in] nSequenceID - Sequence ID of the executed command.
+	* @param[out] bSequenceIsActive - Returns if the sequence is active.
+	* @param[out] bSequenceIsFinished - Returns if the sequence is finished.
+	* @param[out] nErrorCode - Current error code if sequence is active and not yet finished.
 	*/
-	virtual void ExecuteProgram(const std::string & sIdentifier) = 0;
-
-	/**
-	* IPLCCommunication::ClearPrograms - Clears loaded programs
-	*/
-	virtual void ClearPrograms() = 0;
+	virtual void CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool & bSequenceIsActive, bool & bSequenceIsFinished, LibS7Com_uint32 & nErrorCode) = 0;
 
 	/**
 	* IPLCCommunication::ReadVariableString - Returns value of string variable.

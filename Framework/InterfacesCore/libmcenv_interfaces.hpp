@@ -757,6 +757,18 @@ public:
 	*/
 	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
 
+	/**
+	* IDriverEnvironment::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
+
+	/**
+	* IDriverEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;
