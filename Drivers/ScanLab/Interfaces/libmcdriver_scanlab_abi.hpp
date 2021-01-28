@@ -181,13 +181,27 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlasermode(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort);
 
 /**
-* Sets laser control of card.
+* Disables automatic laser control.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] bEnableLaser - Laser is enabled
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlasercontrol(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bEnableLaser);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableautolasercontrol(LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Sets laser control parameters of card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bDisableLaser - Laser is disabled
+* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+* @param[in] bOutputSynchronizationActive - Output synchronization active
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlasercontrolparameters(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bDisableLaser, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
 * Sets laser control pulse interval (in 1/64th microseconds)

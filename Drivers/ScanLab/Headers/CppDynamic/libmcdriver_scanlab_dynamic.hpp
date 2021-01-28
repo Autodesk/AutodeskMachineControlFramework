@@ -381,7 +381,8 @@ public:
 	inline void SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 	inline void ConfigureLists(const LibMCDriver_ScanLab_uint32 nSizeListA, const LibMCDriver_ScanLab_uint32 nSizeListB);
 	inline void SetLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort);
-	inline void SetLaserControl(const bool bEnableLaser);
+	inline void DisableAutoLaserControl();
+	inline void SetLaserControlParameters(const bool bDisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
 	inline void SetLaserPulsesInBits(const LibMCDriver_ScanLab_uint32 nHalfPeriod, const LibMCDriver_ScanLab_uint32 nPulseLength);
 	inline void SetLaserPulsesInMicroSeconds(const LibMCDriver_ScanLab_double dHalfPeriod, const LibMCDriver_ScanLab_double dPulseLength);
 	inline void SetStandbyInBits(const LibMCDriver_ScanLab_uint32 nHalfPeriod, const LibMCDriver_ScanLab_uint32 nPulseLength);
@@ -596,7 +597,8 @@ public:
 		pWrapperTable->m_RTCContext_SelectCorrectionTable = nullptr;
 		pWrapperTable->m_RTCContext_ConfigureLists = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserMode = nullptr;
-		pWrapperTable->m_RTCContext_SetLaserControl = nullptr;
+		pWrapperTable->m_RTCContext_DisableAutoLaserControl = nullptr;
+		pWrapperTable->m_RTCContext_SetLaserControlParameters = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserPulsesInBits = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserPulsesInMicroSeconds = nullptr;
 		pWrapperTable->m_RTCContext_SetStandbyInBits = nullptr;
@@ -776,12 +778,21 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_RTCContext_SetLaserControl = (PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrol");
+		pWrapperTable->m_RTCContext_DisableAutoLaserControl = (PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disableautolasercontrol");
 		#else // _WIN32
-		pWrapperTable->m_RTCContext_SetLaserControl = (PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrol");
+		pWrapperTable->m_RTCContext_DisableAutoLaserControl = (PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disableautolasercontrol");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_RTCContext_SetLaserControl == nullptr)
+		if (pWrapperTable->m_RTCContext_DisableAutoLaserControl == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetLaserControlParameters = (PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrolparameters");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetLaserControlParameters = (PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrolparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetLaserControlParameters == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1200,8 +1211,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlasercontrol", (void**)&(pWrapperTable->m_RTCContext_SetLaserControl));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserControl == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableautolasercontrol", (void**)&(pWrapperTable->m_RTCContext_DisableAutoLaserControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableAutoLaserControl == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlasercontrolparameters", (void**)&(pWrapperTable->m_RTCContext_SetLaserControlParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserControlParameters == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlaserpulsesinbits", (void**)&(pWrapperTable->m_RTCContext_SetLaserPulsesInBits));
@@ -1508,12 +1523,26 @@ public:
 	}
 	
 	/**
-	* CRTCContext::SetLaserControl - Sets laser control of card.
-	* @param[in] bEnableLaser - Laser is enabled
+	* CRTCContext::DisableAutoLaserControl - Disables automatic laser control.
 	*/
-	void CRTCContext::SetLaserControl(const bool bEnableLaser)
+	void CRTCContext::DisableAutoLaserControl()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserControl(m_pHandle, bEnableLaser));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableAutoLaserControl(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::SetLaserControlParameters - Sets laser control parameters of card.
+	* @param[in] bDisableLaser - Laser is disabled
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
+	*/
+	void CRTCContext::SetLaserControlParameters(const bool bDisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserControlParameters(m_pHandle, bDisableLaser, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive));
 	}
 	
 	/**

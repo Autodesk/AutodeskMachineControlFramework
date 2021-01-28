@@ -196,8 +196,17 @@ Custom implementation
 			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser Port Enum" />
 		</method>
 
-		<method name="SetLaserControl" description="Sets laser control of card.">
-			<param name="EnableLaser" type="bool" pass="in" description="Laser is enabled" />
+		<method name="DisableAutoLaserControl" description="Disables automatic laser control.">
+		</method>
+
+		<method name="SetLaserControlParameters" description="Sets laser control parameters of card.">
+			<param name="DisableLaser" type="bool" pass="in" description="Laser is disabled" />
+			<param name="FinishLaserPulseAfterOn" type="bool" pass="in" description="Finish laser pulse after LaserOn" />
+			<param name="PhaseShiftOfLaserSignal" type="bool" pass="in" description="180 degree phase shift of Laser signal" />
+			<param name="LaserOnSignalLowActive" type="bool" pass="in" description="Set Laser On Signal Low Active" />
+			<param name="LaserHalfSignalsLowActive" type="bool" pass="in" description="Set Laser Half Signal Low Active" />
+			<param name="SetDigitalInOneHighActive" type="bool" pass="in" description="Set Digital In 1 high Active" />
+			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
 		</method>
 
 		<method name="SetLaserPulsesInBits" description="Sets laser control pulse interval (in 1/64th microseconds)">

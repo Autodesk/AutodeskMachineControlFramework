@@ -69,7 +69,8 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_config_list) (uint32_t nCardNo, uint32_t nMem1, uint32_t nMem2);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_mode) (uint32_t nCardNo, uint32_t nMode);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_control) (uint32_t nCardNo, uint32_t nControl);
-		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pulses_ctrl) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_auto_laser_control) (uint32_t nCardNo, uint32_t nControl, uint32_t nValue, uint32_t nMode, uint32_t nMinValue, uint32_t nMaxValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pulses) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_standby) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_last_error) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_get_last_error) ();
@@ -122,7 +123,8 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_config_list n_config_list = nullptr;
 			PScanLabPtr_n_set_laser_mode n_set_laser_mode = nullptr;
 			PScanLabPtr_n_set_laser_control n_set_laser_control = nullptr;
-			PScanLabPtr_n_set_laser_pulses_ctrl n_set_laser_pulses_ctrl = nullptr;
+			PScanLabPtr_n_set_auto_laser_control n_set_auto_laser_control = nullptr;
+			PScanLabPtr_n_set_laser_pulses n_set_laser_pulses = nullptr;
 			PScanLabPtr_n_set_standby n_set_standby = nullptr;
 			PScanLabPtr_n_get_last_error n_get_last_error  = nullptr;
 			PScanLabPtr_get_last_error get_last_error = nullptr;

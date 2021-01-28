@@ -452,7 +452,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlasermode(LibMCDrive
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlasercontrol(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bEnableLaser)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_disableautolasercontrol(LibMCDriver_ScanLab_RTCContext pRTCContext)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -461,7 +461,31 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlasercontrol(LibMCDr
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->SetLaserControl(bEnableLaser);
+		pIRTCContext->DisableAutoLaserControl();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlasercontrolparameters(LibMCDriver_ScanLab_RTCContext pRTCContext, bool bDisableLaser, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->SetLaserControlParameters(bDisableLaser, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1392,8 +1416,10 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_configurelists;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setlasermode") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlasermode;
-	if (sProcName == "libmcdriver_scanlab_rtccontext_setlasercontrol") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlasercontrol;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_disableautolasercontrol") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_disableautolasercontrol;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_setlasercontrolparameters") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlasercontrolparameters;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setlaserpulsesinbits") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_setlaserpulsesinbits;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_setlaserpulsesinmicroseconds") 

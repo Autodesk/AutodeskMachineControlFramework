@@ -114,7 +114,8 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_config_list = (PScanLabPtr_n_config_list)_loadScanLabAddress(hLibrary, "n_config_list");
 	this->n_set_laser_mode = (PScanLabPtr_n_set_laser_mode)_loadScanLabAddress(hLibrary, "n_set_laser_mode");
 	this->n_set_laser_control = (PScanLabPtr_n_set_laser_control)_loadScanLabAddress(hLibrary, "n_set_laser_control");
-	this->n_set_laser_pulses_ctrl = (PScanLabPtr_n_set_laser_pulses_ctrl)_loadScanLabAddress(hLibrary, "n_set_laser_pulses_ctrl");
+	this->n_set_auto_laser_control = (PScanLabPtr_n_set_auto_laser_control)_loadScanLabAddress(hLibrary, "n_set_auto_laser_control");
+	this->n_set_laser_pulses = (PScanLabPtr_n_set_laser_pulses)_loadScanLabAddress(hLibrary, "n_set_laser_pulses");
 	this->n_set_standby = (PScanLabPtr_n_set_standby)_loadScanLabAddress(hLibrary, "n_set_standby");
 	this->n_get_last_error = (PScanLabPtr_n_get_last_error)_loadScanLabAddress(hLibrary, "n_get_last_error");
 	this->get_last_error = (PScanLabPtr_get_last_error)_loadScanLabAddress(hLibrary, "get_last_error");
@@ -197,7 +198,8 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_config_list = nullptr;
 	n_set_laser_mode = nullptr;
 	n_set_laser_control = nullptr;
-	n_set_laser_pulses_ctrl = nullptr;
+	n_set_auto_laser_control = nullptr;
+	n_set_laser_pulses = nullptr;
 	n_set_standby = nullptr;
 	n_get_last_error = nullptr;
 	get_last_error = nullptr;

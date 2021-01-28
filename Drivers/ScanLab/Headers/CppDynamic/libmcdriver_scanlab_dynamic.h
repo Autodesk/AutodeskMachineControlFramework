@@ -168,13 +168,27 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ConfigureList
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserModePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort);
 
 /**
-* Sets laser control of card.
+* Disables automatic laser control.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] bEnableLaser - Laser is enabled
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bEnableLaser);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Sets laser control parameters of card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bDisableLaser - Laser is disabled
+* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+* @param[in] bOutputSynchronizationActive - Output synchronization active
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bDisableLaser, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
 * Sets laser control pulse interval (in 1/64th microseconds)
@@ -609,7 +623,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;
 	PLibMCDriver_ScanLabRTCContext_ConfigureListsPtr m_RTCContext_ConfigureLists;
 	PLibMCDriver_ScanLabRTCContext_SetLaserModePtr m_RTCContext_SetLaserMode;
-	PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr m_RTCContext_SetLaserControl;
+	PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr m_RTCContext_DisableAutoLaserControl;
+	PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr m_RTCContext_SetLaserControlParameters;
 	PLibMCDriver_ScanLabRTCContext_SetLaserPulsesInBitsPtr m_RTCContext_SetLaserPulsesInBits;
 	PLibMCDriver_ScanLabRTCContext_SetLaserPulsesInMicroSecondsPtr m_RTCContext_SetLaserPulsesInMicroSeconds;
 	PLibMCDriver_ScanLabRTCContext_SetStandbyInBitsPtr m_RTCContext_SetStandbyInBits;

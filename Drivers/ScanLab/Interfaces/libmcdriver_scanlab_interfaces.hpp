@@ -351,10 +351,21 @@ public:
 	virtual void SetLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort) = 0;
 
 	/**
-	* IRTCContext::SetLaserControl - Sets laser control of card.
-	* @param[in] bEnableLaser - Laser is enabled
+	* IRTCContext::DisableAutoLaserControl - Disables automatic laser control.
 	*/
-	virtual void SetLaserControl(const bool bEnableLaser) = 0;
+	virtual void DisableAutoLaserControl() = 0;
+
+	/**
+	* IRTCContext::SetLaserControlParameters - Sets laser control parameters of card.
+	* @param[in] bDisableLaser - Laser is disabled
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
+	*/
+	virtual void SetLaserControlParameters(const bool bDisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
 
 	/**
 	* IRTCContext::SetLaserPulsesInBits - Sets laser control pulse interval (in 1/64th microseconds)

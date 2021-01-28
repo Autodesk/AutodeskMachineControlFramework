@@ -108,10 +108,11 @@ void CDriver_ScanLab_RTC5::ConfigureLaserMode()
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
     m_pRTCContext->ConfigureLists(1 << 22, 1 << 22);
-    m_pRTCContext->SetLaserMode(eLaserMode::CO2, eLaserPort::Port16bitDigital);
-    m_pRTCContext->SetLaserControl(true);
-    m_pRTCContext->SetLaserPulsesInBits(64, 64);
-    m_pRTCContext->SetStandbyInBits(64, 64);
+    m_pRTCContext->SetLaserMode(eLaserMode::YAG1, eLaserPort::Port12BitAnalog1);
+    m_pRTCContext->DisableAutoLaserControl ();
+    m_pRTCContext->SetLaserControlParameters (false, false, false, true, true, false, false);
+    m_pRTCContext->SetLaserPulsesInMicroSeconds(5, 5);
+    m_pRTCContext->SetStandbyInMicroSeconds(1, 1);
 
 }
 
@@ -158,7 +159,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                     pContourPoint->m_Y = (float) (Points[nPointIndex].m_Coordinates[1] * dUnits);
                 }
 
-                m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), 100.0f, 100.0f, 100.0f);
+                m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), 100.0f, 100.0f, 5.0f);
 
                 break;
             }
@@ -180,7 +181,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                     pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
                 }
 
-                m_pRTCContext->DrawHatches (Hatches.size (), Hatches.data (), 100.0f, 100.0f, 100.0f);
+                m_pRTCContext->DrawHatches (Hatches.size (), Hatches.data (), 100.0f, 100.0f, 5.0f);
 
                 break;
             }
