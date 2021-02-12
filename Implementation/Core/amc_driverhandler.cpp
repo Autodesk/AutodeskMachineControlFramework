@@ -63,7 +63,7 @@ CDriverHandler::~CDriverHandler()
 }
 
 
-void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string& sResourcePath)
+void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string& sResourcePath, const std::string& sDriverConfigurationData)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
@@ -91,6 +91,8 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibraryPath, pResourcePackage, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
 	m_DriverList.push_back(pDriver);
 	m_DriverMap.insert(std::make_pair(sName, pDriver));	
+
+	pDriver->configureDriver (sDriverConfigurationData);
 
 	pInternalEnvironment->setIsInitializing(false);
 }

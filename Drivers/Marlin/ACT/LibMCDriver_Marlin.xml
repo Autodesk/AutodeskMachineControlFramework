@@ -65,6 +65,10 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 	</class>
 	
 	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
 	
 		<method name="GetName" description = "returns the name identifier of the driver">
 			<param name="Name" type="string" pass="return" description="Name of the driver." />

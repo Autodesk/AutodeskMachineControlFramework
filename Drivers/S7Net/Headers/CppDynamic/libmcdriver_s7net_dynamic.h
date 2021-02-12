@@ -53,6 +53,15 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_ConfigurePtr) (LibMCDriver_S7Net_Driver pDriver, const char * pConfigurationString);
+
+/**
 * returns the name identifier of the driver
 *
 * @param[in] pDriver - Driver instance.
@@ -117,14 +126,6 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_QueryParametersPtr) (
 /*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/
-
-/**
-* Initialises the S7 PLC driver.
-*
-* @param[in] pDriver_S7Net - Driver_S7Net instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_InitialisePtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
 
 /**
 * Creates and initializes a new S7 PLC.
@@ -253,12 +254,12 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetCreateDriverPtr) (const char
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_S7NetDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_S7NetDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_S7NetDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_S7NetDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_S7NetDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_S7NetDriver_QueryParametersPtr m_Driver_QueryParameters;
-	PLibMCDriver_S7NetDriver_S7Net_InitialisePtr m_Driver_S7Net_Initialise;
 	PLibMCDriver_S7NetDriver_S7Net_ConnectPtr m_Driver_S7Net_Connect;
 	PLibMCDriver_S7NetDriver_S7Net_DisconnectPtr m_Driver_S7Net_Disconnect;
 	PLibMCDriver_S7NetDriver_S7Net_CreateCommandPtr m_Driver_S7Net_CreateCommand;

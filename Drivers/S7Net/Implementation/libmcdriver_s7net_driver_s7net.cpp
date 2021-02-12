@@ -295,9 +295,8 @@ CDriver_S7Net::~CDriver_S7Net()
 }
 
 
-void CDriver_S7Net::Initialise()
+void CDriver_S7Net::Configure(const std::string& sConfigurationString)
 {
-
     m_pCommunication = nullptr;
     m_pCommunicationWrapper = nullptr;
     m_pPLC = nullptr;

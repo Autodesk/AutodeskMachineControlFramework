@@ -83,6 +83,33 @@ LibMCDriver_S7NetResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_S7NetResult libmcdriver_s7net_driver_configure(LibMCDriver_S7Net_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_S7NET_SUCCESS;
+	}
+	catch (ELibMCDriver_S7NetInterfaceException & Exception) {
+		return handleLibMCDriver_S7NetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_S7NetResult libmcdriver_s7net_driver_getname(LibMCDriver_S7Net_Driver pDriver, const LibMCDriver_S7Net_uint32 nNameBufferSize, LibMCDriver_S7Net_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -325,30 +352,6 @@ LibMCDriver_S7NetResult libmcdriver_s7net_driver_queryparameters(LibMCDriver_S7N
 /*************************************************************************************************************************
  Class implementation for Driver_S7Net
 **************************************************************************************************************************/
-LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_initialise(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_S7Net;
-
-	try {
-		IDriver_S7Net* pIDriver_S7Net = dynamic_cast<IDriver_S7Net*>(pIBaseClass);
-		if (!pIDriver_S7Net)
-			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
-		
-		pIDriver_S7Net->Initialise();
-
-		return LIBMCDRIVER_S7NET_SUCCESS;
-	}
-	catch (ELibMCDriver_S7NetInterfaceException & Exception) {
-		return handleLibMCDriver_S7NetException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, eLibMCDriver_S7NetS7CPUType eCPUType, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_S7Net;
@@ -506,6 +509,8 @@ LibMCDriver_S7NetResult LibMCDriver_S7Net::Impl::LibMCDriver_S7Net_GetProcAddres
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_s7net_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_s7net_driver_configure;
 	if (sProcName == "libmcdriver_s7net_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_getname;
 	if (sProcName == "libmcdriver_s7net_driver_gettype") 
@@ -516,8 +521,6 @@ LibMCDriver_S7NetResult LibMCDriver_S7Net::Impl::LibMCDriver_S7Net_GetProcAddres
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_s7net_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_queryparameters;
-	if (sProcName == "libmcdriver_s7net_driver_s7net_initialise") 
-		*ppProcAddress = (void*) &libmcdriver_s7net_driver_s7net_initialise;
 	if (sProcName == "libmcdriver_s7net_driver_s7net_connect") 
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_s7net_connect;
 	if (sProcName == "libmcdriver_s7net_driver_s7net_disconnect") 

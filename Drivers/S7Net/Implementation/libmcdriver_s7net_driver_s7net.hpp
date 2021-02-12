@@ -164,7 +164,7 @@ public:
     CDriver_S7Net(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
     virtual ~CDriver_S7Net();
 
-    void Initialise() override;
+    void Configure(const std::string& sConfigurationString) override;
 
     void Connect(const LibMCDriver_S7Net::eS7CPUType eCPUType, const std::string& sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) override;
 

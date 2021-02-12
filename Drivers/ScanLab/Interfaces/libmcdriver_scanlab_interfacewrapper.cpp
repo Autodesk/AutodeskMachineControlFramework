@@ -83,6 +83,33 @@ LibMCDriver_ScanLabResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_configure(LibMCDriver_ScanLab_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_getname(LibMCDriver_ScanLab_Driver pDriver, const LibMCDriver_ScanLab_uint32 nNameBufferSize, LibMCDriver_ScanLab_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -1396,6 +1423,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_scanlab_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_configure;
 	if (sProcName == "libmcdriver_scanlab_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_getname;
 	if (sProcName == "libmcdriver_scanlab_driver_gettype") 

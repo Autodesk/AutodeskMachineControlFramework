@@ -32,6 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_abi.hpp"
 #include "libmcdriver_marlin_abi.hpp"
 
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_configure(LibMCDriver_Driver pDriver, const char* pConfigurationString)
+{
+	return libmcdriver_marlin_driver_configure(pDriver, pConfigurationString);
+}
+
+
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getname(LibMCDriver_Driver pDriver, const LibMCDriver_uint32 nNameBufferSize, LibMCDriver_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	return libmcdriver_marlin_driver_getname (pDriver, nNameBufferSize, pNameNeededChars, pNameBuffer);

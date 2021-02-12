@@ -66,6 +66,15 @@ extern "C" {
 **************************************************************************************************************************/
 
 /**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_configure(LibMCDriver_S7Net_Driver pDriver, const char * pConfigurationString);
+
+/**
 * returns the name identifier of the driver
 *
 * @param[in] pDriver - Driver instance.
@@ -130,14 +139,6 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_quer
 /*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/
-
-/**
-* Initialises the S7 PLC driver.
-*
-* @param[in] pDriver_S7Net - Driver_S7Net instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_initialise(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
 
 /**
 * Creates and initializes a new S7 PLC.

@@ -345,6 +345,7 @@ public:
 	{
 	}
 	
+	inline void Configure(const std::string & sConfigurationString);
 	inline std::string GetName();
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild);
@@ -382,7 +383,6 @@ public:
 	{
 	}
 	
-	inline void Initialise();
 	inline void Connect(const eS7CPUType eCPUType, const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot);
 	inline void Disconnect();
 	inline PPLCCommand CreateCommand(const std::string & sCommand);
@@ -511,12 +511,12 @@ public:
 			return LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
-		pWrapperTable->m_Driver_S7Net_Initialise = nullptr;
 		pWrapperTable->m_Driver_S7Net_Connect = nullptr;
 		pWrapperTable->m_Driver_S7Net_Disconnect = nullptr;
 		pWrapperTable->m_Driver_S7Net_CreateCommand = nullptr;
@@ -578,6 +578,15 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_S7NetDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_s7net_driver_configure");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_S7NetDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_s7net_driver_configure");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Configure == nullptr)
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_S7NetDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_s7net_driver_getname");
 		#else // _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_S7NetDriver_GetNamePtr) dlsym(hLibrary, "libmcdriver_s7net_driver_getname");
@@ -620,15 +629,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
-			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_S7Net_Initialise = (PLibMCDriver_S7NetDriver_S7Net_InitialisePtr) GetProcAddress(hLibrary, "libmcdriver_s7net_driver_s7net_initialise");
-		#else // _WIN32
-		pWrapperTable->m_Driver_S7Net_Initialise = (PLibMCDriver_S7NetDriver_S7Net_InitialisePtr) dlsym(hLibrary, "libmcdriver_s7net_driver_s7net_initialise");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_S7Net_Initialise == nullptr)
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -755,6 +755,10 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_S7NetResult eLookupError = LIBMCDRIVER_S7NET_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriver_s7net_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_s7net_driver_getname", (void**)&(pWrapperTable->m_Driver_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetName == nullptr) )
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -773,10 +777,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_s7net_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
-			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_s7net_driver_s7net_initialise", (void**)&(pWrapperTable->m_Driver_S7Net_Initialise));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_S7Net_Initialise == nullptr) )
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_s7net_driver_s7net_connect", (void**)&(pWrapperTable->m_Driver_S7Net_Connect));
@@ -839,6 +839,15 @@ public:
 	/**
 	 * Method definitions for class CDriver
 	 */
+	
+	/**
+	* CDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	void CDriver::Configure(const std::string & sConfigurationString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Configure(m_pHandle, sConfigurationString.c_str()));
+	}
 	
 	/**
 	* CDriver::GetName - returns the name identifier of the driver
@@ -921,14 +930,6 @@ public:
 	/**
 	 * Method definitions for class CDriver_S7Net
 	 */
-	
-	/**
-	* CDriver_S7Net::Initialise - Initialises the S7 PLC driver.
-	*/
-	void CDriver_S7Net::Initialise()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_S7Net_Initialise(m_pHandle));
-	}
 	
 	/**
 	* CDriver_S7Net::Connect - Creates and initializes a new S7 PLC.

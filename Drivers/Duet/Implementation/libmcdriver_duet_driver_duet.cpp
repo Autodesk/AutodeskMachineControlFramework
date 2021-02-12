@@ -63,6 +63,11 @@ CDriver_Duet::CDriver_Duet(const std::string& sName, const std::string& sType, L
 	pDriverEnvironment->RegisterBoolParameter("isconnected", "Connected", false);
 }
 
+void CDriver_Duet::Configure(const std::string& sConfigurationString)
+{
+
+}
+
 
 void CDriver_Duet::Connect(const std::string & sCOMPort, const LibMCDriver_Duet_uint32 nBaudrate, const LibMCDriver_Duet_double dStatusUpdateInterval, const LibMCDriver_Duet_uint32 nConnectTimeout)
 {

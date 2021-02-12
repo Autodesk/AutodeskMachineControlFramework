@@ -83,6 +83,33 @@ LibMCDriver_CameraResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_CameraResult libmcdriver_camera_driver_configure(LibMCDriver_Camera_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_CameraInterfaceException (LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_CAMERA_SUCCESS;
+	}
+	catch (ELibMCDriver_CameraInterfaceException & Exception) {
+		return handleLibMCDriver_CameraException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_CameraResult libmcdriver_camera_driver_getname(LibMCDriver_Camera_Driver pDriver, const LibMCDriver_Camera_uint32 nNameBufferSize, LibMCDriver_Camera_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -801,6 +828,8 @@ LibMCDriver_CameraResult LibMCDriver_Camera::Impl::LibMCDriver_Camera_GetProcAdd
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_camera_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_camera_driver_configure;
 	if (sProcName == "libmcdriver_camera_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_camera_driver_getname;
 	if (sProcName == "libmcdriver_camera_driver_gettype") 

@@ -112,6 +112,10 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 	</class>
 	
 	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
 	
 		<method name="GetName" description = "returns the name identifier of the driver">
 			<param name="Name" type="string" pass="return" description="Name of the driver." />
@@ -155,9 +159,6 @@ Custom implementation
 	</class>
 
 	<class name="Driver_S7Net" parent="Driver" description="A Driver for a S7 PLC.">
-
-		<method name="Initialise" description="Initialises the S7 PLC driver.">
-		</method>
 
 		<method name="Connect" description="Creates and initializes a new S7 PLC.">
 			<param name="CPUType" type="enum" class="S7CPUType" pass="in" description="S7 CPU Type" />

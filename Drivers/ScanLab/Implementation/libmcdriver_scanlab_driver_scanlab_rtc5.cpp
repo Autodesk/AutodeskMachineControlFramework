@@ -46,6 +46,10 @@ CDriver_ScanLab_RTC5::CDriver_ScanLab_RTC5(const std::string& sName, const std::
 
 }
 
+void CDriver_ScanLab_RTC5::Configure(const std::string& sConfigurationString)
+{
+
+}
 
 std::string CDriver_ScanLab_RTC5::GetName()
 {

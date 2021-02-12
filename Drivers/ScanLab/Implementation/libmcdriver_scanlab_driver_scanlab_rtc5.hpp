@@ -53,6 +53,8 @@ public:
 
 	CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
+	void Configure(const std::string& sConfigurationString) override;
+
 	std::string GetName() override;
 
 	std::string GetType() override;

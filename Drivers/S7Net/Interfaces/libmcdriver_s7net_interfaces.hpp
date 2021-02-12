@@ -267,6 +267,12 @@ typedef IBaseSharedPtr<IBase> PIBase;
 class IDriver : public virtual IBase {
 public:
 	/**
+	* IDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	virtual void Configure(const std::string & sConfigurationString) = 0;
+
+	/**
 	* IDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/
@@ -321,11 +327,6 @@ typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;
 
 class IDriver_S7Net : public virtual IDriver {
 public:
-	/**
-	* IDriver_S7Net::Initialise - Initialises the S7 PLC driver.
-	*/
-	virtual void Initialise() = 0;
-
 	/**
 	* IDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
 	* @param[in] eCPUType - S7 CPU Type

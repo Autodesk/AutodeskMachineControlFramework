@@ -233,8 +233,16 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
     
     m_pSystemState->logger()->logMessage("Initializing " + sName + " (" + sType + "@" + sLibraryName + ")", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
+    std::string sConfigurationData = "";
+    auto configAttrib = xmlNode.attribute("configurationresource");
+    if (!configAttrib.empty()) {
+        std::vector<uint8_t> Buffer;
+        m_pCoreResourcePackage->readEntry(configAttrib.as_string(), Buffer);
+        sConfigurationData.assign(Buffer.begin (), Buffer.end ());
+    }
+
     try {
-        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName));
+        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName), sConfigurationData);
     } 
     catch (std::exception & E) {
         m_pSystemState->logger()->logMessage(std::string ("Driver error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);

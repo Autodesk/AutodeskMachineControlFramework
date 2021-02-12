@@ -54,6 +54,11 @@ CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::st
 }
 
 
+void CDriver_RaspiCamera::Configure(const std::string& sConfigurationString)
+{
+
+}
+
 IRaspiCameraDeviceIterator* CDriver_RaspiCamera::QueryDevices() 
 {
     auto pIterator = std::make_unique <CRaspiCameraDeviceIterator> ();

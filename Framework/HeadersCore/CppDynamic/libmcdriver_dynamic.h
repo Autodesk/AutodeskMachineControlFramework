@@ -53,6 +53,15 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriverResult (*PLibMCDriverDriver_ConfigurePtr) (LibMCDriver_Driver pDriver, const char * pConfigurationString);
+
+/**
 * returns the name identifier of the driver
 *
 * @param[in] pDriver - Driver instance.
@@ -186,6 +195,7 @@ typedef LibMCDriverResult (*PLibMCDriverCreateDriverPtr) (const char * pName, co
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriverDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriverDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriverDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriverDriver_GetVersionPtr m_Driver_GetVersion;

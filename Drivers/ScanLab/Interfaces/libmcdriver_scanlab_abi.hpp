@@ -66,6 +66,15 @@ extern "C" {
 **************************************************************************************************************************/
 
 /**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_configure(LibMCDriver_ScanLab_Driver pDriver, const char * pConfigurationString);
+
+/**
 * returns the name identifier of the driver
 *
 * @param[in] pDriver - Driver instance.

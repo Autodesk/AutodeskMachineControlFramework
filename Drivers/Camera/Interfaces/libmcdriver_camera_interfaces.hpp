@@ -271,6 +271,12 @@ typedef IBaseSharedPtr<IBase> PIBase;
 class IDriver : public virtual IBase {
 public:
 	/**
+	* IDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	virtual void Configure(const std::string & sConfigurationString) = 0;
+
+	/**
 	* IDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/

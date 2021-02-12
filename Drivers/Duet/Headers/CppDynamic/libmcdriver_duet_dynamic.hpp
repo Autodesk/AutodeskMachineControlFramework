@@ -340,6 +340,7 @@ public:
 	{
 	}
 	
+	inline void Configure(const std::string & sConfigurationString);
 	inline std::string GetName();
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_Duet_uint32 & nMajor, LibMCDriver_Duet_uint32 & nMinor, LibMCDriver_Duet_uint32 & nMicro, std::string & sBuild);
@@ -503,6 +504,7 @@ public:
 			return LIBMCDRIVER_DUET_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
@@ -581,6 +583,15 @@ public:
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_DuetDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_configure");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_DuetDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_duet_driver_configure");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Configure == nullptr)
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_DuetDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_getname");
@@ -877,6 +888,10 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_DuetResult eLookupError = LIBMCDRIVER_DUET_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriver_duet_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_duet_driver_getname", (void**)&(pWrapperTable->m_Driver_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetName == nullptr) )
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1013,6 +1028,15 @@ public:
 	/**
 	 * Method definitions for class CDriver
 	 */
+	
+	/**
+	* CDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	void CDriver::Configure(const std::string & sConfigurationString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Configure(m_pHandle, sConfigurationString.c_str()));
+	}
 	
 	/**
 	* CDriver::GetName - returns the name identifier of the driver

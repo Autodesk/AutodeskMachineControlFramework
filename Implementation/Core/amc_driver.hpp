@@ -84,6 +84,8 @@ namespace AMC {
 
 		virtual ~CDriver();
 
+		void configureDriver(const std::string & sConfigurationData);
+
 		std::string getName();
 		std::string getType();
 
