@@ -74,6 +74,21 @@ double CDriver_S7RealValue::readValue(LibS7Com::CPLCCommunication* pCommunicatio
     return pCommunication->ReadVariableReal(m_nAddress);
 }
 
+CDriver_S7LRealValue::CDriver_S7LRealValue(const std::string& sName, const uint32_t nAddress)
+    : CDriver_S7Value(sName, nAddress)
+{
+
+}
+
+double CDriver_S7LRealValue::readValue(LibS7Com::CPLCCommunication* pCommunication)
+{
+    if (pCommunication == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    return pCommunication->ReadVariableLReal(m_nAddress);
+}
+
+
 CDriver_S7DIntValue::CDriver_S7DIntValue(const std::string& sName, const uint32_t nAddress)
     : CDriver_S7Value(sName, nAddress)
 {
@@ -178,7 +193,7 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
     for (pugi::xml_node childNode : statusNodes)
     {
         std::string sChildName = childNode.name();
-        if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "dint")) {
+        if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint")) {
 
             auto nameAttrib = childNode.attribute("name");
             auto addressAttrib = childNode.attribute("address");
@@ -217,6 +232,11 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
             if (sChildName == "real") {
                 pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
                 m_DriverParameters.push_back(std::make_shared<CDriver_S7RealValue>(sName, nAddress));
+            }
+
+            if (sChildName == "lreal") {
+                pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
+                m_DriverParameters.push_back(std::make_shared<CDriver_S7LRealValue>(sName, nAddress));
             }
 
             if (sChildName == "dint") {

@@ -321,11 +321,18 @@ public:
 	virtual LibS7Com_int32 ReadVariableUint32(const LibS7Com_uint32 nAddress) = 0;
 
 	/**
-	* IPLCCommunication::ReadVariableReal - Returns value of double variable.
+	* IPLCCommunication::ReadVariableReal - Returns value of single precision variable.
 	* @param[in] nAddress - Address of Real Variable.
 	* @return Value of variable.
 	*/
 	virtual LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
+	* IPLCCommunication::ReadVariableLReal - Returns value of double precision variable.
+	* @param[in] nAddress - Address of Real Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_double ReadVariableLReal(const LibS7Com_uint32 nAddress) = 0;
 
 };
 

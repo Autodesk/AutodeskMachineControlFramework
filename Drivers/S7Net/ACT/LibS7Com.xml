@@ -126,7 +126,12 @@
 			<param name="Value" type="int32" pass="return" description="Value of variable." />
 		</method>
 
-		<method name="ReadVariableReal" description="Returns value of double variable.">
+		<method name="ReadVariableReal" description="Returns value of single precision variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableLReal" description="Returns value of double precision variable.">
 			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
 			<param name="Value" type="double" pass="return" description="Value of variable." />
 		</method>

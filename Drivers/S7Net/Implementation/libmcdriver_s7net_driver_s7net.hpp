@@ -82,7 +82,15 @@ public:
 
 };
 
+class CDriver_S7LRealValue : public CDriver_S7Value {
+protected:
+public:
 
+    CDriver_S7LRealValue(const std::string& sName, const uint32_t nAddress);
+
+    double readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+};
 class CDriver_S7DIntValue : public CDriver_S7Value {
 protected:
 public:

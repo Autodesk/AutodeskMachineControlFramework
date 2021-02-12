@@ -101,6 +101,8 @@ public:
 
 	LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress) override;
 
+	LibS7Com_double ReadVariableLReal(const LibS7Com_uint32 nAddress) override;
+
 };
 
 } // namespace Impl

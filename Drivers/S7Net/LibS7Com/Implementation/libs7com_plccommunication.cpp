@@ -192,3 +192,15 @@ LibS7Com_double CPLCCommunication::ReadVariableReal(const LibS7Com_uint32 nAddre
 
 }
 
+LibS7Com_double CPLCCommunication::ReadVariableLReal(const LibS7Com_uint32 nAddress)
+{
+    if (((uint64_t)nAddress + 7) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[8];
+    for (int j = 0; j < 8; j++)
+        nValue[7 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((double*)&nValue[0]);
+
+}

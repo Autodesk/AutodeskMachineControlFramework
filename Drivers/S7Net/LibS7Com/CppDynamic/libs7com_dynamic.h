@@ -165,7 +165,7 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableInt32Ptr) (LibS7C
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableUint32Ptr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int32 * pValue);
 
 /**
-* Returns value of double variable.
+* Returns value of single precision variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
 * @param[in] nAddress - Address of Real Variable.
@@ -173,6 +173,16 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableUint32Ptr) (LibS7
 * @return error code or 0 (success)
 */
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableRealPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_double * pValue);
+
+/**
+* Returns value of double precision variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Real Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableLRealPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_double * pValue);
 
 /*************************************************************************************************************************
  Global functions
@@ -259,6 +269,7 @@ typedef struct {
 	PLibS7ComPLCCommunication_ReadVariableInt32Ptr m_PLCCommunication_ReadVariableInt32;
 	PLibS7ComPLCCommunication_ReadVariableUint32Ptr m_PLCCommunication_ReadVariableUint32;
 	PLibS7ComPLCCommunication_ReadVariableRealPtr m_PLCCommunication_ReadVariableReal;
+	PLibS7ComPLCCommunication_ReadVariableLRealPtr m_PLCCommunication_ReadVariableLReal;
 	PLibS7ComGetVersionPtr m_GetVersion;
 	PLibS7ComGetLastErrorPtr m_GetLastError;
 	PLibS7ComAcquireInstancePtr m_AcquireInstance;

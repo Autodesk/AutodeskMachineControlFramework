@@ -347,6 +347,7 @@ public:
 	inline LibS7Com_int32 ReadVariableInt32(const LibS7Com_uint32 nAddress);
 	inline LibS7Com_int32 ReadVariableUint32(const LibS7Com_uint32 nAddress);
 	inline LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_double ReadVariableLReal(const LibS7Com_uint32 nAddress);
 };
 	
 	/**
@@ -478,6 +479,7 @@ public:
 		pWrapperTable->m_PLCCommunication_ReadVariableInt32 = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableUint32 = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableReal = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableLReal = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_AcquireInstance = nullptr;
@@ -642,6 +644,15 @@ public:
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_ReadVariableLReal = (PLibS7ComPLCCommunication_ReadVariableLRealPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariablelreal");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_ReadVariableLReal = (PLibS7ComPLCCommunication_ReadVariableLRealPtr) dlsym(hLibrary, "libs7com_plccommunication_readvariablelreal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_ReadVariableLReal == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibS7ComGetVersionPtr) GetProcAddress(hLibrary, "libs7com_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibS7ComGetVersionPtr) dlsym(hLibrary, "libs7com_getversion");
@@ -766,6 +777,10 @@ public:
 		
 		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablereal", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableReal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableReal == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablelreal", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableLReal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableLReal == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libs7com_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -942,7 +957,7 @@ public:
 	}
 	
 	/**
-	* CPLCCommunication::ReadVariableReal - Returns value of double variable.
+	* CPLCCommunication::ReadVariableReal - Returns value of single precision variable.
 	* @param[in] nAddress - Address of Real Variable.
 	* @return Value of variable.
 	*/
@@ -950,6 +965,19 @@ public:
 	{
 		LibS7Com_double resultValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableReal(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CPLCCommunication::ReadVariableLReal - Returns value of double precision variable.
+	* @param[in] nAddress - Address of Real Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_double CPLCCommunication::ReadVariableLReal(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableLReal(m_pHandle, nAddress, &resultValue));
 		
 		return resultValue;
 	}

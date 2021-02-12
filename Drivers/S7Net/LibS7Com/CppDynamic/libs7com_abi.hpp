@@ -178,7 +178,7 @@ LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableint32(Lib
 LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableuint32(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int32 * pValue);
 
 /**
-* Returns value of double variable.
+* Returns value of single precision variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
 * @param[in] nAddress - Address of Real Variable.
@@ -186,6 +186,16 @@ LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableuint32(Li
 * @return error code or 0 (success)
 */
 LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablereal(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_double * pValue);
+
+/**
+* Returns value of double precision variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Real Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablelreal(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_double * pValue);
 
 /*************************************************************************************************************************
  Global functions
