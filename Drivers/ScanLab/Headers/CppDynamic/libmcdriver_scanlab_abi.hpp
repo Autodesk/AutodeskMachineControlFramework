@@ -545,9 +545,18 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 * Configures the laser mode.
 *
 * @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] eLaserMode - Laser Mode Enum
+* @param[in] eLaserPort - Laser Port Enum
+* @param[in] dMaxLaserPower - Maximum laser power.
+* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+* @param[in] bOutputSynchronizationActive - Output synchronization active
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5);
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
 * Draws a layer of a build stream. Blocks until the layer is drawn.

@@ -81,6 +81,7 @@
 		<error name="CARDALREADYINITIALIZED" code="1028" description="Scanlab RTC card is already initialized" />
 		<error name="CARDNOTINITIALIZED" code="1029" description="Scanlab RTC card is not initialized" />		
 		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count" />
+		<error name="INVALIDMAXLASERPOWER" code="1031" description="Invalid max laser power." />
 		
 		
 	</errors>
@@ -393,6 +394,15 @@ Custom implementation
 		</method>		
 
 		<method name="ConfigureLaserMode" description="Configures the laser mode.">
+			<param name="LaserMode" type="enum" class="LaserMode" pass="in" description="Laser Mode Enum" />
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser Port Enum" />
+			<param name="MaxLaserPower" type="double" pass="in" description="Maximum laser power." />
+			<param name="FinishLaserPulseAfterOn" type="bool" pass="in" description="Finish laser pulse after LaserOn" />
+			<param name="PhaseShiftOfLaserSignal" type="bool" pass="in" description="180 degree phase shift of Laser signal" />
+			<param name="LaserOnSignalLowActive" type="bool" pass="in" description="Set Laser On Signal Low Active" />
+			<param name="LaserHalfSignalsLowActive" type="bool" pass="in" description="Set Laser Half Signal Low Active" />
+			<param name="SetDigitalInOneHighActive" type="bool" pass="in" description="Set Digital In 1 high Active" />
+			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
 		</method>
 
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">

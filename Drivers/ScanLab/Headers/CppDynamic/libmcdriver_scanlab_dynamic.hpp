@@ -463,7 +463,7 @@ public:
 	inline void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber);
 	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
 	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
-	inline void ConfigureLaserMode();
+	inline void ConfigureLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 };
 	
@@ -1948,10 +1948,19 @@ public:
 	
 	/**
 	* CDriver_ScanLab_RTC5::ConfigureLaserMode - Configures the laser mode.
+	* @param[in] eLaserMode - Laser Mode Enum
+	* @param[in] eLaserPort - Laser Port Enum
+	* @param[in] dMaxLaserPower - Maximum laser power.
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
 	*/
-	void CDriver_ScanLab_RTC5::ConfigureLaserMode()
+	void CDriver_ScanLab_RTC5::ConfigureLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_ConfigureLaserMode(m_pHandle));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_ConfigureLaserMode(m_pHandle, eLaserMode, eLaserPort, dMaxLaserPower, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive));
 	}
 	
 	/**

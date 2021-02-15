@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#define RTC5_MIN_MAXLASERPOWER 10.0f
+#define RTC5_MAX_MAXLASERPOWER 10000.0f
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -106,15 +107,23 @@ void CDriver_ScanLab_RTC5::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nC
 
 }
 
-void CDriver_ScanLab_RTC5::ConfigureLaserMode()
+void CDriver_ScanLab_RTC5::ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
 {
+
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
+    if (((float)dMaxLaserPower < RTC5_MIN_MAXLASERPOWER) || ((float)dMaxLaserPower > RTC5_MAX_MAXLASERPOWER))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
+
+    m_fMaxLaserPowerInWatts = (float)dMaxLaserPower;
+
     m_pRTCContext->ConfigureLists(1 << 22, 1 << 22);
-    m_pRTCContext->SetLaserMode(eLaserMode::YAG1, eLaserPort::Port12BitAnalog1);
+    m_pRTCContext->SetLaserMode(eLaserMode, eLaserPort);
     m_pRTCContext->DisableAutoLaserControl ();
-    m_pRTCContext->SetLaserControlParameters (false, false, false, true, true, false, false);
+    m_pRTCContext->SetLaserControlParameters(false, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive);                
+    //false, false, true, true, false, false);
+
     m_pRTCContext->SetLaserPulsesInMicroSeconds(5, 5);
     m_pRTCContext->SetStandbyInMicroSeconds(1, 1);
 
@@ -124,14 +133,14 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
 {
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+    if ((m_fMaxLaserPowerInWatts < RTC5_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC5_MAX_MAXLASERPOWER))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
+    
 
     auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
     auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
 
     double dUnits = pToolpathAccessor->GetUnits();
-
-    double dJumpSpeedInMMPerSecond = 100.0;
-    double dMarkSpeedInMMPerSecond = 100.0;
 
     internalBegin();
 
@@ -144,6 +153,11 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
 
         if (nPointCount >= 2) {
 
+            float fJumpSpeedInMMPerSecond = (float) pLayer->GetSegmentProfileTypedValue (nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+            float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
+            float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
+            float fPowerInPercent = (fPowerInWatts * 100.f) / m_fMaxLaserPowerInWatts;
+
             std::vector<LibMCEnv::sPosition2D> Points;
             pLayer->GetSegmentPointData(nSegmentIndex, Points);
 
@@ -154,6 +168,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
             case LibMCEnv::eToolpathSegmentType::Loop:
             case LibMCEnv::eToolpathSegmentType::Polyline:
             {
+
                 std::vector<sPoint2D> ContourPoints;
                 ContourPoints.resize(nPointCount);
                 
@@ -163,7 +178,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                     pContourPoint->m_Y = (float) (Points[nPointIndex].m_Coordinates[1] * dUnits);
                 }
 
-                m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), 100.0f, 100.0f, 5.0f);
+                m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent);
 
                 break;
             }
@@ -185,7 +200,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                     pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
                 }
 
-                m_pRTCContext->DrawHatches (Hatches.size (), Hatches.data (), 100.0f, 100.0f, 5.0f);
+                m_pRTCContext->DrawHatches (Hatches.size (), Hatches.data (), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent);
 
                 break;
             }

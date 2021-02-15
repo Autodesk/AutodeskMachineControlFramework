@@ -632,8 +632,17 @@ public:
 
 	/**
 	* IDriver_ScanLab_RTC5::ConfigureLaserMode - Configures the laser mode.
+	* @param[in] eLaserMode - Laser Mode Enum
+	* @param[in] eLaserPort - Laser Port Enum
+	* @param[in] dMaxLaserPower - Maximum laser power.
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
 	*/
-	virtual void ConfigureLaserMode() = 0;
+	virtual void ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC5::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.

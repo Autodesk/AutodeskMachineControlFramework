@@ -151,14 +151,31 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
     if (pDriverEnvironment.get() == nullptr)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
 
-    std::vector<uint8_t> Buffer;
-    pDriverEnvironment->RetrieveDriverData("s7protocol", Buffer);
 
-    if (Buffer.size () == 0)
+}
+
+CDriver_S7Net::~CDriver_S7Net()
+{
+    m_pCommunication = nullptr;
+    m_pCommunicationWrapper = nullptr;
+    m_pPLC = nullptr;
+    m_pPLCWrapper = nullptr;
+    m_pWorkingDirectory = nullptr;
+}
+
+
+void CDriver_S7Net::Configure(const std::string& sConfigurationString)
+{
+    m_pCommunication = nullptr;
+    m_pCommunicationWrapper = nullptr;
+    m_pPLC = nullptr;
+    m_pPLCWrapper = nullptr;
+    m_pWorkingDirectory = nullptr;
+
+    if (sConfigurationString.length() == 0)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL);
 
-    std::string sProtocolXML (Buffer.begin(), Buffer.end());
-    m_sProtocolXML = sProtocolXML;
+    m_sProtocolXML = sConfigurationString;
 
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_string(m_sProtocolXML.c_str());
@@ -170,13 +187,13 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL);
 
     pugi::xml_node statusdbNode = s7protocolNode.child("statusdb");
-    if (statusdbNode.empty ())
+    if (statusdbNode.empty())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBDEFINITION);
 
     pugi::xml_attribute statusnumberAttrib = statusdbNode.attribute("number");
     if (statusnumberAttrib.empty())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBNUMBER);
-    
+
     m_nPLCtoAMC_DBNo = statusnumberAttrib.as_uint(0);
     if (m_nPLCtoAMC_DBNo == 0)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDSTATUSDBNUMBER);
@@ -199,7 +216,7 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
             auto addressAttrib = childNode.attribute("address");
             auto descriptionAttrib = childNode.attribute("description");
 
-            if (nameAttrib.empty ())
+            if (nameAttrib.empty())
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NONAMEATTRIBUTE);
             if (addressAttrib.empty())
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOADDRESSEATTRIBUTE);
@@ -207,7 +224,7 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NODESCRIPTIONATTRIBUTE);
 
             std::string sName = nameAttrib.as_string();
-            uint32_t nAddress = addressAttrib.as_uint (0);
+            uint32_t nAddress = addressAttrib.as_uint(0);
             std::string sDescription = descriptionAttrib.as_string();
 
             if (sName.empty())
@@ -225,22 +242,22 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
                 if (nBit >= 8)
                     throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDBITATTRIBUTE);
 
-                pDriverEnvironment->RegisterBoolParameter(sName, sDescription, false);
-                m_DriverParameters.push_back(std::make_shared<CDriver_S7BoolValue> (sName, nAddress, nBit));
+                m_pDriverEnvironment->RegisterBoolParameter(sName, sDescription, false);
+                m_DriverParameters.push_back(std::make_shared<CDriver_S7BoolValue>(sName, nAddress, nBit));
             }
 
             if (sChildName == "real") {
-                pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
+                m_pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
                 m_DriverParameters.push_back(std::make_shared<CDriver_S7RealValue>(sName, nAddress));
             }
 
             if (sChildName == "lreal") {
-                pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
+                m_pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
                 m_DriverParameters.push_back(std::make_shared<CDriver_S7LRealValue>(sName, nAddress));
             }
 
             if (sChildName == "dint") {
-                pDriverEnvironment->RegisterIntegerParameter(sName, sDescription, 0);
+                m_pDriverEnvironment->RegisterIntegerParameter(sName, sDescription, 0);
                 m_DriverParameters.push_back(std::make_shared<CDriver_S7DIntValue>(sName, nAddress));
             }
 
@@ -265,7 +282,7 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
         auto commandNameAttrib = commandNode.attribute("name");
         auto commandIDAttrib = commandNode.attribute("cmdid");
 
-        if (commandNameAttrib.empty ())
+        if (commandNameAttrib.empty())
             throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOCOMMANDNAME);
         if (commandIDAttrib.empty())
             throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOCOMMANDID);
@@ -273,35 +290,16 @@ CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType,
         std::string sName = commandNameAttrib.as_string();
         uint32_t nCmdID = commandIDAttrib.as_uint(0);
 
-        if (sName.empty ())
+        if (sName.empty())
             throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCOMMANDNAME);
         if (nCmdID == 0)
             throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCOMMANDID);
 
         auto pS7Command = std::make_shared<CDriver_S7Command>(sName, nCmdID);
 
-        m_CommandDefinitions.insert(std::make_pair (sName, pS7Command));
+        m_CommandDefinitions.insert(std::make_pair(sName, pS7Command));
     }
 
-}
-
-CDriver_S7Net::~CDriver_S7Net()
-{
-    m_pCommunication = nullptr;
-    m_pCommunicationWrapper = nullptr;
-    m_pPLC = nullptr;
-    m_pPLCWrapper = nullptr;
-    m_pWorkingDirectory = nullptr;
-}
-
-
-void CDriver_S7Net::Configure(const std::string& sConfigurationString)
-{
-    m_pCommunication = nullptr;
-    m_pCommunicationWrapper = nullptr;
-    m_pPLC = nullptr;
-    m_pPLCWrapper = nullptr;
-    m_pWorkingDirectory = nullptr;
 
     m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
     auto pLibS7NetDLL = m_pWorkingDirectory->StoreDriverData("libs7net.dll", "libs7net");
@@ -370,6 +368,12 @@ void CDriver_S7Net::updateParameters()
 
             auto pRealParameter = std::dynamic_pointer_cast<CDriver_S7RealValue> (pParameter);
             if (pRealParameter.get() != nullptr) {
+                double dValue = pRealParameter->readValue(m_pCommunication.get());
+                m_pDriverEnvironment->SetDoubleParameter(sName, dValue);
+            }
+
+            auto pLRealParameter = std::dynamic_pointer_cast<CDriver_S7LRealValue> (pParameter);
+            if (pLRealParameter.get() != nullptr) {
                 double dValue = pRealParameter->readValue(m_pCommunication.get());
                 m_pDriverEnvironment->SetDoubleParameter(sName, dValue);
             }

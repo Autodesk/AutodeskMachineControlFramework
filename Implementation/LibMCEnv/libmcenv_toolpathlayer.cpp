@@ -89,7 +89,7 @@ LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint3
 		case LibMCEnv::eToolpathProfileValueType::LaserPower:
 			return sProfile.m_dLaserPower;
 		case LibMCEnv::eToolpathProfileValueType::JumpSpeed:
-			return 0.0;
+			return 100.0;
 		case LibMCEnv::eToolpathProfileValueType::ExtrusionFactor:
 			return 0.0;
 		case LibMCEnv::eToolpathProfileValueType::StartDelay:

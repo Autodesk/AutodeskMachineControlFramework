@@ -1357,7 +1357,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionf
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode(LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, eLibMCDriver_ScanLabLaserMode eLaserMode, eLibMCDriver_ScanLabLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC5;
 
@@ -1366,7 +1366,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc5_configurelaser
 		if (!pIDriver_ScanLab_RTC5)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIDriver_ScanLab_RTC5->ConfigureLaserMode();
+		pIDriver_ScanLab_RTC5->ConfigureLaserMode(eLaserMode, eLaserPort, dMaxLaserPower, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}

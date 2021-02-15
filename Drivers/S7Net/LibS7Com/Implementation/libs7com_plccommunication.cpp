@@ -104,7 +104,15 @@ LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommand
     WriteData.resize(330);
     WriteData[262 + 3] = nCycleID;
     WriteData[266 + 3] = nCommandID;
-    m_pPLC->WriteBytes(m_nAMCtoPLC_DBNo, 0, WriteData); 
+
+    if (nCommandID == 21) {
+        WriteData[270 + 3] = 100; // Schichtdicke in mu
+        WriteData[274 + 3] = 1; // Anzahl Rakelhuebe
+        WriteData[278 + 2] = 7; // Recoaterspeed in mm/min
+        WriteData[278 + 3] = 208;
+        WriteData[282 + 3] = 1; // Pulverdosierungen
+    }
+    m_pPLC->WriteBytes(m_nAMCtoPLC_DBNo, 0, WriteData);
 
     return nCycleID;
 }
@@ -119,12 +127,12 @@ void CPLCCommunication::CheckCommandExecution(const LibS7Com_uint32 nSequenceID,
     bSequenceIsFinished = false;
     nErrorCode = 0;
 
-    int32_t varSEQUENCE_CURRENT = ReadVariableInt32(18);
+    int32_t varSEQUENCE_CURRENT = ReadVariableInt32(50);
 
     bSequenceIsActive = (varSEQUENCE_CURRENT == (int32_t) nSequenceID);
     if (bSequenceIsActive) {
-        int32_t varSEQUENCE_STATUS = ReadVariableInt32(22);
-        int32_t varSEQUENCE_ERRORCODE = ReadVariableInt32(62);
+        int32_t varSEQUENCE_STATUS = ReadVariableInt32(46);
+        int32_t varSEQUENCE_ERRORCODE = ReadVariableInt32(54);
         bSequenceIsFinished = (varSEQUENCE_STATUS == 0);
 
         if (!bSequenceIsFinished)
