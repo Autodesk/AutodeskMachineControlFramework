@@ -42,7 +42,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 **************************************************************************************************************************/
 
 CDriver_ScanLab_RTC5::CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType)
+	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f)
 {
 
 }
@@ -121,7 +121,7 @@ void CDriver_ScanLab_RTC5::ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserM
     m_pRTCContext->ConfigureLists(1 << 22, 1 << 22);
     m_pRTCContext->SetLaserMode(eLaserMode, eLaserPort);
     m_pRTCContext->DisableAutoLaserControl ();
-    m_pRTCContext->SetLaserControlParameters(false, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive);                
+    m_pRTCContext->SetLaserControlParameters(false, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive); 
     //false, false, true, true, false, false);
 
     m_pRTCContext->SetLaserPulsesInMicroSeconds(5, 5);

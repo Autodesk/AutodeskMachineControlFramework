@@ -283,6 +283,7 @@ void CRTCContext::SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOn
 
 void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
 {
+
 	double dBitsPerMM = m_dCorrectionFactor;
 
 	double dMarkSpeedInMMPerMilliSecond = (double)fMarkSpeed / 1000.0;
