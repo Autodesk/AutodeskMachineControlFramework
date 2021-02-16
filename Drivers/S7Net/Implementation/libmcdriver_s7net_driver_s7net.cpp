@@ -392,7 +392,7 @@ void CDriver_S7Net::updateParameters()
 
             auto pLRealParameter = std::dynamic_pointer_cast<CDriver_S7LRealValue> (pParameter);
             if (pLRealParameter.get() != nullptr) {
-                double dValue = pRealParameter->readValue(m_pCommunication.get());
+                double dValue = pLRealParameter->readValue(m_pCommunication.get());
                 m_pDriverEnvironment->SetDoubleParameter(sName, dValue);
             }
 
