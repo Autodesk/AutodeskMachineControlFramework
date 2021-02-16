@@ -145,6 +145,26 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableBoolPtr) (LibS7Co
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableBytePtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint8 * pValue);
 
 /**
+* Returns value of Int16 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int16 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableInt16Ptr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int16 * pValue);
+
+/**
+* Returns value of Uint16 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int16 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableUint16Ptr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint16 * pValue);
+
+/**
 * Returns value of Int32 variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
@@ -162,7 +182,7 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableInt32Ptr) (LibS7C
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableUint32Ptr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int32 * pValue);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ReadVariableUint32Ptr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint32 * pValue);
 
 /**
 * Returns value of single precision variable.
@@ -266,6 +286,8 @@ typedef struct {
 	PLibS7ComPLCCommunication_ReadVariableStringPtr m_PLCCommunication_ReadVariableString;
 	PLibS7ComPLCCommunication_ReadVariableBoolPtr m_PLCCommunication_ReadVariableBool;
 	PLibS7ComPLCCommunication_ReadVariableBytePtr m_PLCCommunication_ReadVariableByte;
+	PLibS7ComPLCCommunication_ReadVariableInt16Ptr m_PLCCommunication_ReadVariableInt16;
+	PLibS7ComPLCCommunication_ReadVariableUint16Ptr m_PLCCommunication_ReadVariableUint16;
 	PLibS7ComPLCCommunication_ReadVariableInt32Ptr m_PLCCommunication_ReadVariableInt32;
 	PLibS7ComPLCCommunication_ReadVariableUint32Ptr m_PLCCommunication_ReadVariableUint32;
 	PLibS7ComPLCCommunication_ReadVariableRealPtr m_PLCCommunication_ReadVariableReal;

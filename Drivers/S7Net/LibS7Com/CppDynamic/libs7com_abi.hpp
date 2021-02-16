@@ -158,6 +158,26 @@ LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablebool(LibS
 LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablebyte(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint8 * pValue);
 
 /**
+* Returns value of Int16 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int16 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableint16(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int16 * pValue);
+
+/**
+* Returns value of Uint16 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int16 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableuint16(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint16 * pValue);
+
+/**
 * Returns value of Int32 variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
@@ -175,7 +195,7 @@ LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableint32(Lib
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableuint32(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int32 * pValue);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableuint32(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint32 * pValue);
 
 /**
 * Returns value of single precision variable.

@@ -97,7 +97,11 @@ public:
 
 	LibS7Com_int32 ReadVariableInt32(const LibS7Com_uint32 nAddress) override;
 
-	LibS7Com_int32 ReadVariableUint32(const LibS7Com_uint32 nAddress) override;
+	LibS7Com_uint32 ReadVariableUint32(const LibS7Com_uint32 nAddress) override;
+
+	LibS7Com_int16 ReadVariableInt16(const LibS7Com_uint32 nAddress) override;
+
+	LibS7Com_uint16 ReadVariableUint16(const LibS7Com_uint32 nAddress) override;
 
 	LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress) override;
 

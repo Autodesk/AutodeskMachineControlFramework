@@ -307,6 +307,20 @@ public:
 	virtual LibS7Com_uint8 ReadVariableByte(const LibS7Com_uint32 nAddress) = 0;
 
 	/**
+	* IPLCCommunication::ReadVariableInt16 - Returns value of Int16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_int16 ReadVariableInt16(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
+	* IPLCCommunication::ReadVariableUint16 - Returns value of Uint16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_uint16 ReadVariableUint16(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
 	* IPLCCommunication::ReadVariableInt32 - Returns value of Int32 variable.
 	* @param[in] nAddress - Address of Int32 Variable.
 	* @return Value of variable.
@@ -318,7 +332,7 @@ public:
 	* @param[in] nAddress - Address of Int32 Variable.
 	* @return Value of variable.
 	*/
-	virtual LibS7Com_int32 ReadVariableUint32(const LibS7Com_uint32 nAddress) = 0;
+	virtual LibS7Com_uint32 ReadVariableUint32(const LibS7Com_uint32 nAddress) = 0;
 
 	/**
 	* IPLCCommunication::ReadVariableReal - Returns value of single precision variable.

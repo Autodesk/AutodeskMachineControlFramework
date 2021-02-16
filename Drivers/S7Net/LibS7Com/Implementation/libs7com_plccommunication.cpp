@@ -163,6 +163,33 @@ LibS7Com_uint8 CPLCCommunication::ReadVariableByte(const LibS7Com_uint32 nAddres
     return m_PLCRecvBuffer.at(nAddress);
 }
 
+
+LibS7Com_int16 CPLCCommunication::ReadVariableInt16(const LibS7Com_uint32 nAddress)
+{
+    if (((uint64_t)nAddress + 1) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[2];
+    for (int j = 0; j < 2; j++)
+        nValue[1 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((int16_t*)&nValue[0]);
+}
+
+
+LibS7Com_uint16 CPLCCommunication::ReadVariableUint16(const LibS7Com_uint32 nAddress)
+{
+    if (((uint64_t)nAddress + 1) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[2];
+    for (int j = 0; j < 2; j++)
+        nValue[1 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((uint16_t*)&nValue[0]);
+}
+
+
 LibS7Com_int32 CPLCCommunication::ReadVariableInt32(const LibS7Com_uint32 nAddress)
 {    
     if (((uint64_t) nAddress + 3) >= m_PLCRecvBuffer.size())
@@ -175,7 +202,7 @@ LibS7Com_int32 CPLCCommunication::ReadVariableInt32(const LibS7Com_uint32 nAddre
     return *((int32_t*) &nValue[0]);
 }
 
-LibS7Com_int32 CPLCCommunication::ReadVariableUint32(const LibS7Com_uint32 nAddress)
+LibS7Com_uint32 CPLCCommunication::ReadVariableUint32(const LibS7Com_uint32 nAddress)
 {
     if (((uint64_t)nAddress + 3) >= m_PLCRecvBuffer.size())
         throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);

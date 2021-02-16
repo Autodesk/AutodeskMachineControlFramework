@@ -344,8 +344,10 @@ public:
 	inline std::string ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength);
 	inline bool ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit);
 	inline LibS7Com_uint8 ReadVariableByte(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_int16 ReadVariableInt16(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_uint16 ReadVariableUint16(const LibS7Com_uint32 nAddress);
 	inline LibS7Com_int32 ReadVariableInt32(const LibS7Com_uint32 nAddress);
-	inline LibS7Com_int32 ReadVariableUint32(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_uint32 ReadVariableUint32(const LibS7Com_uint32 nAddress);
 	inline LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress);
 	inline LibS7Com_double ReadVariableLReal(const LibS7Com_uint32 nAddress);
 };
@@ -476,6 +478,8 @@ public:
 		pWrapperTable->m_PLCCommunication_ReadVariableString = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableBool = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableByte = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableInt16 = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableUint16 = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableInt32 = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableUint32 = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableReal = nullptr;
@@ -614,6 +618,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PLCCommunication_ReadVariableByte == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_ReadVariableInt16 = (PLibS7ComPLCCommunication_ReadVariableInt16Ptr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariableint16");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_ReadVariableInt16 = (PLibS7ComPLCCommunication_ReadVariableInt16Ptr) dlsym(hLibrary, "libs7com_plccommunication_readvariableint16");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_ReadVariableInt16 == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_ReadVariableUint16 = (PLibS7ComPLCCommunication_ReadVariableUint16Ptr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariableuint16");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_ReadVariableUint16 = (PLibS7ComPLCCommunication_ReadVariableUint16Ptr) dlsym(hLibrary, "libs7com_plccommunication_readvariableuint16");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_ReadVariableUint16 == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -765,6 +787,14 @@ public:
 		
 		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablebyte", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableByte));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableByte == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariableint16", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableInt16));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableInt16 == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariableuint16", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableUint16));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableUint16 == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libs7com_plccommunication_readvariableint32", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableInt32));
@@ -931,6 +961,32 @@ public:
 	}
 	
 	/**
+	* CPLCCommunication::ReadVariableInt16 - Returns value of Int16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_int16 CPLCCommunication::ReadVariableInt16(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_int16 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableInt16(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CPLCCommunication::ReadVariableUint16 - Returns value of Uint16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_uint16 CPLCCommunication::ReadVariableUint16(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_uint16 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableUint16(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
 	* CPLCCommunication::ReadVariableInt32 - Returns value of Int32 variable.
 	* @param[in] nAddress - Address of Int32 Variable.
 	* @return Value of variable.
@@ -948,9 +1004,9 @@ public:
 	* @param[in] nAddress - Address of Int32 Variable.
 	* @return Value of variable.
 	*/
-	LibS7Com_int32 CPLCCommunication::ReadVariableUint32(const LibS7Com_uint32 nAddress)
+	LibS7Com_uint32 CPLCCommunication::ReadVariableUint32(const LibS7Com_uint32 nAddress)
 	{
-		LibS7Com_int32 resultValue = 0;
+		LibS7Com_uint32 resultValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableUint32(m_pHandle, nAddress, &resultValue));
 		
 		return resultValue;
