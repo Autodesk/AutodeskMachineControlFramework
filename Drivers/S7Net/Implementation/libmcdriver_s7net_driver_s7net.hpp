@@ -91,6 +91,7 @@ public:
     double readValue(LibS7Com::CPLCCommunication* pCommunication);
 
 };
+
 class CDriver_S7DIntValue : public CDriver_S7Value {
 protected:
 public:
@@ -100,6 +101,18 @@ public:
     int32_t readValue(LibS7Com::CPLCCommunication* pCommunication);
 
 };
+
+
+class CDriver_S7IntValue : public CDriver_S7Value {
+protected:
+public:
+
+    CDriver_S7IntValue(const std::string& sName, const uint32_t nAddress);
+
+    int32_t readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+};
+
 
 
 class CDriver_S7BoolValue : public CDriver_S7Value {

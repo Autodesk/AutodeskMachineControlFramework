@@ -116,6 +116,16 @@
 			<param name="Value" type="uint8" pass="return" description="Value of variable." />
 		</method>
 
+		<method name="ReadVariableInt16" description="Returns value of Int16 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="int16" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableUint16" description="Returns value of Uint16 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="uint16" pass="return" description="Value of variable." />
+		</method>
+
 		<method name="ReadVariableInt32" description="Returns value of Int32 variable.">
 			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
 			<param name="Value" type="int32" pass="return" description="Value of variable." />
@@ -123,7 +133,7 @@
 
 		<method name="ReadVariableUint32" description="Returns value of Uint32 variable.">
 			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
-			<param name="Value" type="int32" pass="return" description="Value of variable." />
+			<param name="Value" type="uint32" pass="return" description="Value of variable." />
 		</method>
 
 		<method name="ReadVariableReal" description="Returns value of single precision variable.">

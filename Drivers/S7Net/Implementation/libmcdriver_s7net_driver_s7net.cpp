@@ -103,6 +103,19 @@ int32_t CDriver_S7DIntValue::readValue(LibS7Com::CPLCCommunication* pCommunicati
     return pCommunication->ReadVariableInt32(m_nAddress);
 }
 
+CDriver_S7IntValue::CDriver_S7IntValue(const std::string& sName, const uint32_t nAddress)
+    : CDriver_S7Value(sName, nAddress)
+{
+
+}
+
+int32_t CDriver_S7IntValue::readValue(LibS7Com::CPLCCommunication* pCommunication)
+{
+    if (pCommunication == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    return pCommunication->ReadVariableInt16(m_nAddress);
+}
 
 CDriver_S7BoolValue::CDriver_S7BoolValue(const std::string& sName, const uint32_t nAddress, const uint32_t nBit)
     : CDriver_S7Value (sName, nAddress), m_nBit (nBit)
@@ -210,7 +223,7 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     for (pugi::xml_node childNode : statusNodes)
     {
         std::string sChildName = childNode.name();
-        if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint")) {
+        if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint") || (sChildName == "int")) {
 
             auto nameAttrib = childNode.attribute("name");
             auto addressAttrib = childNode.attribute("address");
@@ -259,6 +272,11 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
             if (sChildName == "dint") {
                 m_pDriverEnvironment->RegisterIntegerParameter(sName, sDescription, 0);
                 m_DriverParameters.push_back(std::make_shared<CDriver_S7DIntValue>(sName, nAddress));
+            }
+
+            if (sChildName == "int") {
+                m_pDriverEnvironment->RegisterIntegerParameter(sName, sDescription, 0);
+                m_DriverParameters.push_back(std::make_shared<CDriver_S7IntValue>(sName, nAddress));
             }
 
         }
@@ -387,6 +405,12 @@ void CDriver_S7Net::updateParameters()
             auto pDintParameter = std::dynamic_pointer_cast<CDriver_S7DIntValue> (pParameter);
             if (pDintParameter.get() != nullptr) {
                 int32_t nValue = pDintParameter->readValue(m_pCommunication.get());
+                m_pDriverEnvironment->SetIntegerParameter(sName, nValue);
+            }
+
+            auto pIntParameter = std::dynamic_pointer_cast<CDriver_S7IntValue> (pParameter);
+            if (pIntParameter.get() != nullptr) {
+                int32_t nValue = pIntParameter->readValue(m_pCommunication.get());
                 m_pDriverEnvironment->SetIntegerParameter(sName, nValue);
             }
         }
