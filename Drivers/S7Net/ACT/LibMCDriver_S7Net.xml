@@ -85,6 +85,8 @@
 		<error name="INVALIDSEQUENCEID" code="1029" description="invalid sequence id" />
 		<error name="COMMANDSEQUENCEERROR" code="1030" description="command sequence communication error" />
 		<error name="COMMANDREACTIONTIMEOUT" code="1031" description="command reaction timeout" />
+		<error name="NOCOMMANDSDEFINITION" code="1032" description="no commands definition" />
+		
 		
 		
 		

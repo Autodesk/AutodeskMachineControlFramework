@@ -102,7 +102,12 @@ LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommand
 
     std::vector<uint8_t> WriteData;
     WriteData.resize(330);
-    WriteData[262 + 3] = nCycleID;
+
+    WriteData[262 + 0] = (nCycleID >> 24) & 0xff;
+    WriteData[262 + 1] = (nCycleID >> 16) & 0xff;
+    WriteData[262 + 2] = (nCycleID >> 8) & 0xff;
+    WriteData[262 + 3] = nCycleID & 0xff;
+
     WriteData[266 + 3] = nCommandID;
 
     if (nCommandID == 21) {

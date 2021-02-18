@@ -295,7 +295,11 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBNUMBER);
 
 
-    auto commandNodes = controldbNode.children("command");
+    pugi::xml_node commandsNode = s7protocolNode.child("commands");
+    if (commandsNode.empty())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOCOMMANDSDEFINITION);
+
+    auto commandNodes = commandsNode.children("command");
     for (pugi::xml_node commandNode : commandNodes) {
         auto commandNameAttrib = commandNode.attribute("name");
         auto commandIDAttrib = commandNode.attribute("cmdid");

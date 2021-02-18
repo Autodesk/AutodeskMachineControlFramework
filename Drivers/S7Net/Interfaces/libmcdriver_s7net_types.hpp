@@ -137,6 +137,7 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_INVALIDSEQUENCEID 1029
 #define LIBMCDRIVER_S7NET_ERROR_COMMANDSEQUENCEERROR 1030
 #define LIBMCDRIVER_S7NET_ERROR_COMMANDREACTIONTIMEOUT 1031
+#define LIBMCDRIVER_S7NET_ERROR_NOCOMMANDSDEFINITION 1032
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -186,6 +187,7 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_INVALIDSEQUENCEID: return "invalid sequence id";
     case LIBMCDRIVER_S7NET_ERROR_COMMANDSEQUENCEERROR: return "command sequence communication error";
     case LIBMCDRIVER_S7NET_ERROR_COMMANDREACTIONTIMEOUT: return "command reaction timeout";
+    case LIBMCDRIVER_S7NET_ERROR_NOCOMMANDSDEFINITION: return "no commands definition";
     default: return "unknown error";
   }
 }
