@@ -172,7 +172,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                 std::vector<sPoint2D> ContourPoints;
                 ContourPoints.resize(nPointCount);
                 
-                for (uint32_t nPointIndex = 1; nPointIndex < nPointCount; nPointIndex++) {
+                for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
                     auto pContourPoint = &ContourPoints.at(nPointIndex);
                     pContourPoint->m_X = (float) (Points[nPointIndex].m_Coordinates[0] * dUnits);
                     pContourPoint->m_Y = (float) (Points[nPointIndex].m_Coordinates[1] * dUnits);

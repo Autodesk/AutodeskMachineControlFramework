@@ -229,12 +229,14 @@ void CRTCContext::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, cons
 
 void CRTCContext::SetEndOfList()
 {
+	//std::cout << "setendoflist" << std::endl;
 	m_pScanLabSDK->n_set_end_of_list(m_CardNo);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
 
 void CRTCContext::ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
 {
+	//std::cout << "executelist: " << nListIndex << " - " << nPosition  << std::endl;
 	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
@@ -287,11 +289,15 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 	double dBitsPerMM = m_dCorrectionFactor;
 
 	double dMarkSpeedInMMPerMilliSecond = (double)fMarkSpeed / 1000.0;
-	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInMMPerMilliSecond * dBitsPerMM);
+	double dMarkSpeedInBits = dMarkSpeedInMMPerMilliSecond * dBitsPerMM;
+	//std::cout << "n_set_mark_speed: " << dMarkSpeedInBits << std::endl;
+	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInBits);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	double dJumpSpeedInMMPerMilliSecond = (double)fJumpSpeed / 1000.0;
-	m_pScanLabSDK->n_set_jump_speed(m_CardNo, dJumpSpeedInMMPerMilliSecond * dBitsPerMM);
+	double dJumpSpeedInBits = dJumpSpeedInMMPerMilliSecond * dBitsPerMM;
+	//std::cout << "n_set_jump_speed: " << dJumpSpeedInBits << std::endl;
+	m_pScanLabSDK->n_set_jump_speed(m_CardNo, dJumpSpeedInBits);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	// TODO: Brennt die maschine ab?
@@ -301,18 +307,28 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 	if (fClippedPowerFactor < 0.0f)
 		fClippedPowerFactor = 0.0f;
 
+	int digitalPowerValue;
+
 	switch (m_LaserPort) {
 	case eLaserPort::Port16bitDigital:
-		m_pScanLabSDK->n_write_io_port(m_CardNo, (int)round(fClippedPowerFactor * 65535.0));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+		//std::cout << "n_write_io_port: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_io_port(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port8bitDigital:
-		m_pScanLabSDK->n_write_8bit_port(m_CardNo, (int)round(fClippedPowerFactor * 255.0));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+		//std::cout << "n_write_8bit_port: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_8bit_port(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port12BitAnalog1:
-		m_pScanLabSDK->n_write_da_1(m_CardNo, (int)round(fClippedPowerFactor * 4095.0));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+		//std::cout << "n_write_da_1: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_da_1(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port12BitAnalog2:
-		m_pScanLabSDK->n_write_da_2(m_CardNo, (int)round(fClippedPowerFactor * 4095.0));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+		//std::cout << "n_write_da_2: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_da_2(m_CardNo, digitalPowerValue);
 		break;
 
 	}
@@ -337,6 +353,7 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 
 	int intX = (int)dX;
 	int intY = (int)dY;
+	//std::cout << "n_jump_abs: " << intX << "/" << intY << std::endl;
 	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -348,6 +365,7 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 
 		intX = (int)dX;
 		intY = (int)dY;
+		//std::cout << "n_mark_abs: " << intX << "/" << intY << std::endl;
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -373,6 +391,7 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 
 		int intX = (int)dX;
 		int intY = (int)dY;
+		//std::cout << "n_jump_abs: " << intX << "/" << intY << std::endl;
 		m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -382,6 +401,7 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 
 		intX = (int)dX;
 		intY = (int)dY;
+		//std::cout << "n_mark_abs: " << intX << "/" << intY << std::endl;
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
