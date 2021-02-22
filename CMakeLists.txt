@@ -112,6 +112,61 @@ set(LIBMC_SRC
   ${LIBMC_SRC_DEP_CROSSGUID}
 )
 
+add_custom_target(copy_framework ALL)
+
+file (GLOB framework_files_dev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/HeadersDev/CppDynamic/*.*")
+foreach(framework_file_dev ${framework_files_dev})
+
+	get_filename_component(framework_file_devname ${framework_file_dev} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_dev}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_dev}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/HeadersDev/CppDynamic/${framework_file_devname})
+				
+				
+endforeach()
+
+
+file (GLOB framework_files_intfdev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/InterfacesDev/*.*")
+foreach(framework_file_intfdev ${framework_files_intfdev})
+
+	get_filename_component(framework_file_intfdevname ${framework_file_intfdev} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_intfdev}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_intfdev}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/InterfacesDev/${framework_file_intfdevname})				
+				
+endforeach()
+
+
+file (GLOB framework_files_plugincpp LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/PluginCpp/*.*")
+foreach(framework_file_plugincpp ${framework_files_plugincpp})
+
+	get_filename_component(framework_file_plugincppname ${framework_file_plugincpp} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_plugincpp}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_plugincpp}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/PluginCpp/${framework_file_plugincppname})				
+				
+endforeach()
 
 add_library(libmc SHARED ${LIBMC_SRC})
 # Do not prefix the binary's name with "lib" on Unix systems:
