@@ -569,7 +569,7 @@ namespace AMCCommon {
 	{
 		std::vector<unsigned char> hash(picosha2::k_digest_size);
 
-#ifdef _WIN32
+#ifndef __GNUC__
 		auto sWidePath = AMCCommon::CUtils::UTF8toUTF16(sFileNameUTF8);
 		std::ifstream shaStream(sWidePath, std::ios::binary);
 #else

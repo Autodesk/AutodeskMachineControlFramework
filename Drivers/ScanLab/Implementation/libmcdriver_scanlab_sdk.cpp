@@ -46,7 +46,7 @@ using namespace LibMCDriver_ScanLab::Impl;
 
 #ifdef _WIN32
 void* _loadScanLabAddress (HMODULE hLibrary, const char * pSymbolName) {
-	void * pFuncPtr = GetProcAddress(hLibrary, pSymbolName);
+	void * pFuncPtr = (void*) GetProcAddress(hLibrary, pSymbolName);
 	if (pFuncPtr == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT);
 
@@ -54,7 +54,7 @@ void* _loadScanLabAddress (HMODULE hLibrary, const char * pSymbolName) {
 }
 #else
 void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName) {
-	void* pFuncPtr = dlsym(hLibrary, "libmcdriver_scanlab_driver_getname");
+	void* pFuncPtr = (void*) dlsym(hLibrary, "libmcdriver_scanlab_driver_getname");
 	dlerror();
 	if (pFuncPtr == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT);
