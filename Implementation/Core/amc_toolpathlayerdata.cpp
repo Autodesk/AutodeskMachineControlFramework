@@ -228,9 +228,17 @@ namespace AMC {
 			auto pProfile = pToolpath->GetProfileUUID(sProfileUUID);
 			sToolpathLayerProfile sProfile;
 
-			sProfile.m_dLaserSpeed = pProfile->GetLaserSpeed();
-			sProfile.m_dLaserPower = pProfile->GetLaserPower();
-			sProfile.m_dLaserFocus = pProfile->GetLaserFocus();
+			sProfile.m_dLaserSpeed = pProfile->GetParameterDoubleValue("", "laserspeed");
+			sProfile.m_dLaserPower = pProfile->GetParameterDoubleValue("", "laserpower");
+			sProfile.m_dLaserFocus = pProfile->GetParameterDoubleValueDef("", "laserfocus", 0.0);
+			sProfile.m_dJumpSpeed = pProfile->GetParameterDoubleValueDef("", "jumpspeed", sProfile.m_dLaserSpeed);
+			sProfile.m_dExtrusionFactor = pProfile->GetParameterDoubleValueDef("", "extrusionfactor", 0.0);
+			sProfile.m_dStartDelay = pProfile->GetParameterDoubleValueDef("", "startdelay", 0.0);
+			sProfile.m_dEndDelay = pProfile->GetParameterDoubleValueDef("", "enddelay", 0.0);
+			sProfile.m_dPolyDelay = pProfile->GetParameterDoubleValueDef("", "polydelay", 0.0);
+			sProfile.m_dJumpDelay = pProfile->GetParameterDoubleValueDef("", "jumpdelay", 0.0);
+			sProfile.m_dLaserOnDelay = pProfile->GetParameterDoubleValueDef("", "laserondelay", 0.0);
+			sProfile.m_dLaserOffDelay = pProfile->GetParameterDoubleValueDef("", "laseroffdelay", 0.0);
 
 			m_ProfileMap.insert(std::make_pair (sProfileUUID, sProfile));
 		}

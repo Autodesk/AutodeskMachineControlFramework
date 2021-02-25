@@ -132,12 +132,15 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_write_da_1 = (PScanLabPtr_n_write_da_1)_loadScanLabAddress(hLibrary, "n_write_da_1");
 	this->n_write_da_2 = (PScanLabPtr_n_write_da_2)_loadScanLabAddress(hLibrary, "n_write_da_2");
 	this->n_jump_abs = (PScanLabPtr_n_jump_abs)_loadScanLabAddress(hLibrary, "n_jump_abs");
+	this->n_jump_abs_3d = (PScanLabPtr_n_jump_abs_3d)_loadScanLabAddress(hLibrary, "n_jump_abs_3d");
 	this->n_mark_abs = (PScanLabPtr_n_mark_abs)_loadScanLabAddress(hLibrary, "n_mark_abs");
+	this->n_mark_abs_3d = (PScanLabPtr_n_mark_abs_3d)_loadScanLabAddress(hLibrary, "n_mark_abs_3d");
 	this->n_long_delay = (PScanLabPtr_n_long_delay)_loadScanLabAddress(hLibrary, "n_long_delay");
 	this->n_get_status = (PScanLabPtr_n_get_status)_loadScanLabAddress(hLibrary, "n_get_status");
 	this->n_get_input_pointer = (PScanLabPtr_n_get_input_pointer)_loadScanLabAddress(hLibrary, "n_get_input_pointer");
 	this->n_set_laser_delays = (PScanLabPtr_n_set_laser_delays)_loadScanLabAddress(hLibrary, "n_set_laser_delays");
 	this->n_set_start_list_pos = (PScanLabPtr_n_set_start_list_pos)_loadScanLabAddress(hLibrary, "n_set_start_list_pos");
+	this->n_set_defocus_list = (PScanLabPtr_n_set_defocus_list)_loadScanLabAddress(hLibrary, "n_set_defocus_list");
 
 	m_LibraryHandle = (void*) hLibrary;
 }

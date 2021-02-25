@@ -817,7 +817,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_setlaserdelaysinbits(Li
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawpolyline(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const sLibMCDriver_ScanLabPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawpolyline(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const sLibMCDriver_ScanLabPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -828,7 +828,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawpolyline(LibMCDrive
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->DrawPolyline(nPointsBufferSize, pPointsBuffer, fMarkSpeed, fJumpSpeed, fPower);
+		pIRTCContext->DrawPolyline(nPointsBufferSize, pPointsBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -843,7 +843,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawpolyline(LibMCDrive
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatches(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const sLibMCDriver_ScanLabHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatches(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const sLibMCDriver_ScanLabHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -854,7 +854,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_drawhatches(LibMCDriver
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->DrawHatches(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower);
+		pIRTCContext->DrawHatches(nHatchesBufferSize, pHatchesBuffer, fMarkSpeed, fJumpSpeed, fPower, fZValue);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}

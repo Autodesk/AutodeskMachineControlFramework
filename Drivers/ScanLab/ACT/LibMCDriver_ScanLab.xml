@@ -278,6 +278,7 @@ Custom implementation
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 		
 		<method name="DrawHatches" description="Writes a list of hatches into the open list">
@@ -285,6 +286,7 @@ Custom implementation
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">

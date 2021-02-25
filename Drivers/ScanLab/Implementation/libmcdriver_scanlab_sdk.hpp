@@ -89,12 +89,15 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_jump_abs) (uint32_t nCardNo, int32_t nX, int32_t nY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_mark_abs) (uint32_t nCardNo, int32_t nX, int32_t nY);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_jump_abs_3d) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nZ);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_mark_abs_3d) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nZ);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_long_delay) (uint32_t nCardNo, uint32_t nDelay);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_status) (uint32_t nCardNo, uint32_t * pnStatus, uint32_t * pnPos);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_input_pointer) (uint32_t nCardNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_delays) (uint32_t nCardNo, int32_t nLaserOnDelay, uint32_t nLaserOffDelay);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_start_list_pos) (uint32_t nCardNo, uint32_t nListNo, uint32_t nListPos);
-		
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_defocus_list) (uint32_t nCardNo, int32_t nShift);
+
 
 		class CScanLabSDK {
 		private:
@@ -142,11 +145,14 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_write_da_2 n_write_da_2 = nullptr;
 			PScanLabPtr_n_jump_abs n_jump_abs = nullptr;
 			PScanLabPtr_n_mark_abs n_mark_abs = nullptr;
+			PScanLabPtr_n_jump_abs_3d n_jump_abs_3d = nullptr;
+			PScanLabPtr_n_mark_abs_3d n_mark_abs_3d = nullptr;
 			PScanLabPtr_n_long_delay n_long_delay = nullptr;
 			PScanLabPtr_n_get_status n_get_status = nullptr;
 			PScanLabPtr_n_get_input_pointer n_get_input_pointer = nullptr;
 			PScanLabPtr_n_set_laser_delays n_set_laser_delays = nullptr;
-			PScanLabPtr_n_set_start_list_pos n_set_start_list_pos = nullptr;
+			PScanLabPtr_n_set_start_list_pos n_set_start_list_pos = nullptr;		
+			PScanLabPtr_n_set_defocus_list n_set_defocus_list = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

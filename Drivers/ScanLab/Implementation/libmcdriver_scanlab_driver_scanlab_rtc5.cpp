@@ -157,6 +157,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
             float fMarkSpeedInMMPerSecond = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
             float fPowerInWatts = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
             float fPowerInPercent = (fPowerInWatts * 100.f) / m_fMaxLaserPowerInWatts;
+            float fLaserFocus = (float)pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserFocus);
 
             std::vector<LibMCEnv::sPosition2D> Points;
             pLayer->GetSegmentPointData(nSegmentIndex, Points);
@@ -178,7 +179,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                     pContourPoint->m_Y = (float) (Points[nPointIndex].m_Coordinates[1] * dUnits);
                 }
 
-                m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent);
+                m_pRTCContext->DrawPolyline(nPointCount, ContourPoints.data(), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus);
 
                 break;
             }
@@ -200,7 +201,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
                     pHatch->m_Y2 = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
                 }
 
-                m_pRTCContext->DrawHatches (Hatches.size (), Hatches.data (), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent);
+                m_pRTCContext->DrawHatches (Hatches.size (), Hatches.data (), fMarkSpeedInMMPerSecond, fJumpSpeedInMMPerSecond, fPowerInPercent, fLaserFocus);
 
                 break;
             }

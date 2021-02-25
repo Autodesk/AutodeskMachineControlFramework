@@ -197,7 +197,8 @@ namespace LibMCEnv {
     LaserOnDelay = 9,
     LaserOffDelay = 10,
     JumpDelay = 11,
-    MarkDelay = 12
+    MarkDelay = 12,
+    LaserFocus = 13
   };
   
   /*************************************************************************************************************************

@@ -396,8 +396,8 @@ public:
 	inline void SetDelays(const LibMCDriver_ScanLab_uint32 nMarkDelay, const LibMCDriver_ScanLab_uint32 nJumpDelay, const LibMCDriver_ScanLab_uint32 nPolygonDelay);
 	inline void SetLaserDelaysInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay);
 	inline void SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOnDelay, const LibMCDriver_ScanLab_uint32 nLaserOffDelay);
-	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower);
-	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower);
+	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
@@ -1695,10 +1695,11 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	void CRTCContext::DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+	void CRTCContext::DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawPolyline(m_pHandle, (LibMCDriver_ScanLab_uint64)PointsBuffer.size(), PointsBuffer.data(), fMarkSpeed, fJumpSpeed, fPower));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawPolyline(m_pHandle, (LibMCDriver_ScanLab_uint64)PointsBuffer.size(), PointsBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
 	}
 	
 	/**
@@ -1707,10 +1708,11 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	void CRTCContext::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+	void CRTCContext::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
 	}
 	
 	/**

@@ -2217,40 +2217,38 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getuuid(Lib3MF_ToolpathProfi
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getname(Lib3MF_ToolpathProfile pToolpathProfile, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
-* Retrieves the profile's laser power
+* Checks if a parameter value exists.
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserPower - Returns the laser power.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[out] pValueExists - Returns if a value exists.
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getlaserpower(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double * pLaserPower);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_hasparametervalue(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, bool * pValueExists);
 
 /**
-* Retrieves the profile's laser speed
+* Retrieves a profile's parameter value. Fails if value does not exist.
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserSpeed - Returns the laser speed.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[out] pValue - Returns the value of the field.
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getlaserspeed(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double * pLaserSpeed);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getparameterdoublevalue(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double * pValue);
 
 /**
-* Retrieves the profile's laser focus
+* Retrieves a profile's parameter value
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserFocus - Returns the laser focus.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[in] dDefaultValue - Default value if value does not exist.
+* @param[out] pValue - Returns the value of the field.
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getlaserfocus(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double * pLaserFocus);
-
-/**
-* Retrieves the profile's laser index
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserIndex - Returns the laser index.
-* @return error code or 0 (success)
-*/
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getlaserindex(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 * pLaserIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getparameterdoublevaluedef(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dDefaultValue, Lib3MF_double * pValue);
 
 /**
 * Sets the profile's name
@@ -2262,40 +2260,15 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getlaserindex(Lib3MF_Toolpat
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setname(Lib3MF_ToolpathProfile pToolpathProfile, const char * pName);
 
 /**
-* Sets the profile's laser power
+* Sets a profile's parameter value.
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] dLaserPower - Returns the laser power.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[in] dValue - Double value of the parameter.
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setlaserpower(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double dLaserPower);
-
-/**
-* Sets the profile's laser speed
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] dLaserSpeed - Returns the laser speed.
-* @return error code or 0 (success)
-*/
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setlaserspeed(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double dLaserSpeed);
-
-/**
-* Sets the profile's laser focus
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] dLaserFocus - Returns the laser focus.
-* @return error code or 0 (success)
-*/
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setlaserfocus(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double dLaserFocus);
-
-/**
-* Sets the profile's laser index
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] nLaserIndex - Returns the laser index.
-* @return error code or 0 (success)
-*/
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setlaserindex(Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 nLaserIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setparameterdoublevalue(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dValue);
 
 /*************************************************************************************************************************
  Class definition for ToolpathLayerReader
@@ -2567,14 +2540,10 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getlayerz(Lib3MF_Toolpath pToolpath
 *
 * @param[in] pToolpath - Toolpath instance.
 * @param[in] pName - the name.
-* @param[in] dLaserPower - the laser power.
-* @param[in] dLaserSpeed - the laser speed.
-* @param[in] dLaserFocus - the laser focus.
-* @param[in] nLaserIndex - the laser index.
 * @param[out] pProfile - Returns the profile.
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_addprofile(Lib3MF_Toolpath pToolpath, const char * pName, Lib3MF_double dLaserPower, Lib3MF_double dLaserSpeed, Lib3MF_double dLaserFocus, Lib3MF_uint32 nLaserIndex, Lib3MF_ToolpathProfile * pProfile);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_addprofile(Lib3MF_Toolpath pToolpath, const char * pName, Lib3MF_ToolpathProfile * pProfile);
 
 /**
 * Returns a profile of the toolpath.

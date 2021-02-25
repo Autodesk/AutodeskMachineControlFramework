@@ -325,9 +325,10 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserDelay
 * @param[in] fMarkSpeed - Mark speed in mm/s
 * @param[in] fJumpSpeed - Mark speed in mm/s
 * @param[in] fPower - Laser power in percent
+* @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylinePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylinePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
 
 /**
 * Writes a list of hatches into the open list
@@ -338,9 +339,10 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineP
 * @param[in] fMarkSpeed - Mark speed in mm/s
 * @param[in] fJumpSpeed - Mark speed in mm/s
 * @param[in] fPower - Laser power in percent
+* @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
 
 /**
 * Adds a custom delay to the list

@@ -45,6 +45,7 @@ CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetw
 	: m_pScanLabSDK (pScanLabSDK), 
 	m_CardNo (nCardNo), 
 	m_dCorrectionFactor(10000.0), 
+	m_dZCorrectionFactor(10000.0),
 	m_LaserPort(eLaserPort::Port12BitAnalog1), 
 	m_pDriverEnvironment (pDriverEnvironment),
 	m_bIsNetwork (bIsNetwork)
@@ -125,9 +126,12 @@ void CRTCContext::SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableN
 
 	double dCorrectionFactor = m_pScanLabSDK->n_get_table_para(m_CardNo, nTableNumberHeadA, 1);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
-	if (dCorrectionFactor > 0.0)
+	if (dCorrectionFactor > 0.0) {
+		// For RTC6 both correction factors are equal, for RTC 5, there is a factor of 16
 		m_dCorrectionFactor = dCorrectionFactor;
+		m_dZCorrectionFactor = dCorrectionFactor;
+	}
+
 }
 
 void CRTCContext::ConfigureLists(const LibMCDriver_ScanLab_uint32 nSizeListA, const LibMCDriver_ScanLab_uint32 nSizeListB)
@@ -335,7 +339,7 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 
 }
 
-void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
 	if (!pPointsBuffer)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -345,11 +349,16 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower);
 
+	// Z Plane
+	double defocusZ = round(fZValue * m_dZCorrectionFactor);
+	int intDefocusZ = (int)defocusZ;
+	std::cout << "setting z defocus: " << intDefocusZ << std::endl;
+	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
+
 	const sPoint2D* pPoint = pPointsBuffer;
 	double dX = round(pPoint->m_X * m_dCorrectionFactor);
 	double dY = round(pPoint->m_Y * m_dCorrectionFactor);
 	pPoint++;
-	// TODO: Brennt die maschine ab?
 
 	int intX = (int)dX;
 	int intY = (int)dY;
@@ -372,7 +381,7 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 	}
 }
 
-void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
 	if (!pHatchesBuffer)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -381,6 +390,12 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 		return;
 
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower);
+
+	// Z Plane
+	double defocusZ = round(fZValue * m_dZCorrectionFactor);
+	int intDefocusZ = (int)defocusZ;
+	std::cout << "setting z defocus: " << intDefocusZ << std::endl;
+	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
 
 	const sHatch2D* pHatch = pHatchesBuffer;
 

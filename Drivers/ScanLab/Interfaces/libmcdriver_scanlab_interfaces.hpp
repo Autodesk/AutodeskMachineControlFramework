@@ -461,8 +461,9 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	virtual void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower) = 0;
+	virtual void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
 	* IRTCContext::DrawHatches - Writes a list of hatches into the open list
@@ -471,8 +472,9 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower) = 0;
+	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
