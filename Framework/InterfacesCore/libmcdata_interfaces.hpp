@@ -461,7 +461,19 @@ typedef IBaseSharedPtr<IStorage> PIStorage;
 class IBuildJobData : public virtual IBase {
 public:
 	/**
-	* IBuildJobData::GetName - returns the name of a build job.
+	* IBuildJobData::GetDataUUID - returns the uuid of a build job data.
+	* @return UUID String
+	*/
+	virtual std::string GetDataUUID() = 0;
+
+	/**
+	* IBuildJobData::GetJobUUID - returns the uuid of the parent build job.
+	* @return UUID String
+	*/
+	virtual std::string GetJobUUID() = 0;
+
+	/**
+	* IBuildJobData::GetName - returns the name of a build job uuid.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
@@ -479,10 +491,28 @@ public:
 	virtual IStorageStream * GetStorageStream() = 0;
 
 	/**
+	* IBuildJobData::GetStorageStreamSHA2 - returns the checksum of the storage stream of the build.
+	* @return SHA256 of the storage stream.
+	*/
+	virtual std::string GetStorageStreamSHA2() = 0;
+
+	/**
+	* IBuildJobData::GetStorageStreamSize - returns the size of the storage stream of the build.
+	* @return size of the storage stream in bytes.
+	*/
+	virtual LibMCData_uint64 GetStorageStreamSize() = 0;
+
+	/**
 	* IBuildJobData::GetDataType - returns the data type of the job data.
 	* @return Data type of the job data
 	*/
 	virtual LibMCData::eBuildJobDataType GetDataType() = 0;
+
+	/**
+	* IBuildJobData::GetDataTypeAsString - returns the data type of the job data as string.
+	* @return Data type of the job data
+	*/
+	virtual std::string GetDataTypeAsString() = 0;
 
 	/**
 	* IBuildJobData::GetMIMEType - returns the mime type of a storage stream.
@@ -620,6 +650,13 @@ public:
 	*/
 	virtual IBuildJobDataIterator * ListJobData() = 0;
 
+	/**
+	* IBuildJob::RetrieveJobData - Retrieves a build job data instance by its uuid.
+	* @param[in] sDataUUID - Job Data UUID.
+	* @return Build Job Data Instance.
+	*/
+	virtual IBuildJobData * RetrieveJobData(const std::string & sDataUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IBuildJob> PIBuildJob;
@@ -664,6 +701,13 @@ public:
 	* @return Build Job Instance.
 	*/
 	virtual IBuildJob * RetrieveJob(const std::string & sJobUUID) = 0;
+
+	/**
+	* IBuildJobHandler::FindJobOfData - Finds the parent build job of a given data uuid. Fails if data does not exist.
+	* @param[in] sDataUUID - Job Data UUID.
+	* @return Build Job Instance.
+	*/
+	virtual IBuildJob * FindJobOfData(const std::string & sDataUUID) = 0;
 
 	/**
 	* IBuildJobHandler::ListJobsByStatus - Retrieves a list of build jobs, filtered by status.

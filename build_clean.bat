@@ -8,7 +8,6 @@ set outputdir=%builddir%\Output
 if not exist "%builddir%" (mkdir "%builddir%")
 if not exist "%outputdir%" (mkdir "%outputdir%")
 if not exist "%builddir%\DevPackage" (mkdir "%builddir%\DevPackage")
-if not exist "%builddir%\DevPackage\Plugins" (mkdir "%builddir%\DevPackage\Plugins")
 if not exist "%builddir%\DevPackage\Framework" (mkdir "%builddir%\DevPackage\Framework")
 if not exist "%builddir%\DevPackage\Framework\HeadersDev" (mkdir "%builddir%\DevPackage\Framework\HeadersDev")
 if not exist "%builddir%\DevPackage\Framework\HeadersDev\CppDynamic" (mkdir "%builddir%\DevPackage\Framework\HeadersDev\CppDynamic")
@@ -57,6 +56,7 @@ cd "%builddir%"
 
 echo "Building Core Modules"
 call cmake ..
+REM call cmake -G "MinGW Makefiles" ..
 call cmake --build . --config Release
 
 
@@ -73,16 +73,18 @@ copy ..\Output\%GITHASH%_*.client Framework\Dist\
 copy ..\Output\%GITHASH%_package.xml Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\Output\lib3mf.dll Framework\Dist\%GITHASH%_core_lib3mf.dll
-copy ..\..\Templates\CMakeLists_DeveloperPackage.txt CMakeLists.txt
 copy ..\..\Templates\libmcconfig.xml .\configuration.xml
-copy ..\..\Templates\build_devpackage_clean.bat .\build_devpackage_clean.bat
 copy ..\..\Framework\HeadersDev\CppDynamic\*.* Framework\HeadersDev\CppDynamic
 copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
 copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
 copy ..\..\Framework\PluginPython\*.* Framework\PluginPython
+
+go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %GITHASH%
 
 echo "Build done!"
 
 if "%1" neq "NOPAUSE" (
 	pause
 )
+
+exit 0

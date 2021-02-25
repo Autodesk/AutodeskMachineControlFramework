@@ -115,6 +115,7 @@ typedef void * LibS7Com_pvoid;
 #define LIBS7COM_ERROR_SENDDATA 20
 #define LIBS7COM_ERROR_READDATA 30
 #define LIBS7COM_ERROR_WRITEDATA 50
+#define LIBS7COM_ERROR_INVALIDREADADDRESS 60
 
 /*************************************************************************************************************************
  Error strings for LibS7Com
@@ -142,6 +143,7 @@ inline const char * LIBS7COM_GETERRORSTRING (LibS7ComResult nErrorCode) {
     case LIBS7COM_ERROR_SENDDATA: return "Error on send data.";
     case LIBS7COM_ERROR_READDATA: return "Error on read data.";
     case LIBS7COM_ERROR_WRITEDATA: return "Error on write data.";
+    case LIBS7COM_ERROR_INVALIDREADADDRESS: return "Invalid address.";
     default: return "unknown error";
   }
 }
@@ -155,20 +157,8 @@ typedef LibS7ComHandle LibS7Com_PLCCommunication;
 
 namespace LibS7Com {
 
-  /*************************************************************************************************************************
-   Declaration of enums
-  **************************************************************************************************************************/
-  
-  enum class eVariableType : LibS7Com_int32 {
-    BooleanVariable = 1,
-    IntegerVariable = 2,
-    StringVariable = 3,
-    DoubleVariable = 4
-  };
-  
 } // namespace LibS7Com;
 
 // define legacy C-names for enums, structs and function types
-typedef LibS7Com::eVariableType eLibS7ComVariableType;
 
 #endif // __LIBS7COM_TYPES_HEADER_CPP

@@ -122,7 +122,7 @@ public:
 
 	bool FileExists() override;
 
-    bool DeleteFile() override;
+    bool DeleteFromDisk() override;
 
 };
 

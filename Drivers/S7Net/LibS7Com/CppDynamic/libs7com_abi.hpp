@@ -69,10 +69,12 @@ extern "C" {
 * Configures the protocol
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pProtocolConfiguration - Configuration XML as string.
+* @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
+* @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
+* @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, const char * pProtocolConfiguration);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo);
 
 /**
 * Starts communication with the S7 PLC Instance
@@ -84,6 +86,14 @@ LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_setprotocolconfigurat
 LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_startcommunication(LibS7Com_PLCCommunication pPLCCommunication, LibS7Net_PLC pPLC);
 
 /**
+* Retrieves the status of the PLC
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_retrievestatus(LibS7Com_PLCCommunication pPLCCommunication);
+
+/**
 * Stops communication with the S7 PLC Instance
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
@@ -92,114 +102,120 @@ LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_startcommunication(Li
 LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_stopcommunication(LibS7Com_PLCCommunication pPLCCommunication);
 
 /**
-* Returns the status of the PLC
+* Executes a command
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nCommandID - ID of command to be triggered.
+* @param[out] pSequenceID - Sequence ID of the executed command.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getstatus(LibS7Com_PLCCommunication pPLCCommunication);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_executecommand(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID);
 
 /**
-* Loads a GCode Program on the PLC
+* Checks the command execution state.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pProgram - GCode Program to send.
-* @param[in] nIdentifierBufferSize - size of the buffer (including trailing 0)
-* @param[out] pIdentifierNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pIdentifierBuffer -  buffer of Program identifier., may be NULL
+* @param[in] nSequenceID - Sequence ID of the executed command.
+* @param[out] pSequenceIsActive - Returns if the sequence is active.
+* @param[out] pSequenceIsFinished - Returns if the sequence is finished.
+* @param[out] pErrorCode - Current error code if sequence is active and not yet finished.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_loadprogram(LibS7Com_PLCCommunication pPLCCommunication, const char * pProgram, const LibS7Com_uint32 nIdentifierBufferSize, LibS7Com_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
-
-/**
-* Executes a GCode Program on the PLC
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] pIdentifier - Program identifier.
-* @return error code or 0 (success)
-*/
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_executeprogram(LibS7Com_PLCCommunication pPLCCommunication, const char * pIdentifier);
-
-/**
-* Clears loaded programs
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @return error code or 0 (success)
-*/
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_clearprograms(LibS7Com_PLCCommunication pPLCCommunication);
-
-/**
-* Returns number of reported variables.
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[out] pCount - Number of variables.
-* @return error code or 0 (success)
-*/
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getvariablecount(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 * pCount);
-
-/**
-* Returns name of variable.
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
-* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pNameBuffer -  buffer of Name of variable., may be NULL
-* @return error code or 0 (success)
-*/
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getvariablename(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, const LibS7Com_uint32 nNameBufferSize, LibS7Com_uint32* pNameNeededChars, char * pNameBuffer);
-
-/**
-* Returns type of variable.
-*
-* @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
-* @param[out] pVariableType - Type of variable.
-* @return error code or 0 (success)
-*/
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getvariabletype(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, LibS7Com::eVariableType * pVariableType);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_checkcommandexecution(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nSequenceID, bool * pSequenceIsActive, bool * pSequenceIsFinished, LibS7Com_uint32 * pErrorCode);
 
 /**
 * Returns value of string variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of String Variable.
+* @param[in] nMaxLength - Maximum length.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of Value of variable., may be NULL
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getvariablestring(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, const LibS7Com_uint32 nValueBufferSize, LibS7Com_uint32* pValueNeededChars, char * pValueBuffer);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablestring(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint32 nMaxLength, const LibS7Com_uint32 nValueBufferSize, LibS7Com_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Returns value of bool variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of Bit Variable.
+* @param[in] nBit - Bit of the variable (0-7)
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getvariablebool(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, bool * pValue);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablebool(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint32 nBit, bool * pValue);
 
 /**
-* Returns value of bool variable.
+* Returns value of byte variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of Bit Variable.
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getvariableinteger(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, LibS7Com_int64 * pValue);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablebyte(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint8 * pValue);
 
 /**
-* Returns value of double variable.
+* Returns value of Int16 variable.
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
-* @param[in] nIndex - Index of variable (0-based).
+* @param[in] nAddress - Address of Int16 Variable.
 * @param[out] pValue - Value of variable.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_getvariabledouble(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nIndex, LibS7Com_double * pValue);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableint16(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int16 * pValue);
+
+/**
+* Returns value of Uint16 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int16 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableuint16(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint16 * pValue);
+
+/**
+* Returns value of Int32 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int32 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableint32(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_int32 * pValue);
+
+/**
+* Returns value of Uint32 variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Int32 Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariableuint32(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_uint32 * pValue);
+
+/**
+* Returns value of single precision variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Real Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablereal(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_double * pValue);
+
+/**
+* Returns value of double precision variable.
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nAddress - Address of Real Variable.
+* @param[out] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_readvariablelreal(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nAddress, LibS7Com_double * pValue);
 
 /*************************************************************************************************************************
  Global functions

@@ -64,11 +64,11 @@ std::string CAPIHandler_Build::getBaseURI ()
 	return "api/build";
 }
 
-APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& jobUUID)
+APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& paramUUID)
 {
 	// Leave away base URI
  	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(9));
-	jobUUID = "";
+	paramUUID = "";
 
 	if (requestType == eAPIRequestType::rtPost) {
 
@@ -86,6 +86,16 @@ APIHandler_BuildType CAPIHandler_Build::parseRequest(const std::string& sURI, co
 
 		if ((sParameterString == "/") || (sParameterString == "")) {
 			return btListJobs;
+		}
+
+		if (sParameterString.substr(0, 15) == "/listbuilddata/") {
+			paramUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(15));
+			return btListBuildData;
+		}
+
+		if (sParameterString.substr (0, 6) == "/data/") {
+			paramUUID = AMCCommon::CUtils::normalizeUUIDString (sParameterString.substr(6));
+			return btGetBuildData;
 		}
 
 	}
@@ -245,6 +255,8 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 		auto pBuildJob = pBuildJobIterator->GetCurrentJob();
 
 		CJSONWriterObject jobJSON(writer);
+		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBUUID, pBuildJob->GetUUID());
+		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBSTORAGESTREAM, pBuildJob->GetStorageStreamUUID());
 		jobJSON.addString(AMC_API_KEY_UPLOAD_BUILDJOBNAME, pBuildJob->GetName ());
 		jobJSON.addInteger(AMC_API_KEY_UPLOAD_BUILDJOBLAYERCOUNT, pBuildJob->GetLayerCount());
 
@@ -254,13 +266,69 @@ void CAPIHandler_Build::handleListJobsRequest(CJSONWriter& writer, PAPIAuth pAut
 	writer.addArray(AMC_API_KEY_UPLOAD_BUILDJOBARRAY, jobJSONArray);
 }
 
+void CAPIHandler_Build::handleListBuildDataRequest(CJSONWriter& writer, PAPIAuth pAuth, std::string& buildUUID)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(buildUUID);
+
+	CJSONWriterArray dataJSONArray(writer);
+
+	auto pJobDataIterator = pBuildJob->ListJobData();
+	while (pJobDataIterator->MoveNext()) {
+		auto pJobData = pJobDataIterator->GetCurrentJobData();
+		auto sUUID = pJobData->GetDataUUID();
+		auto sDataType = pJobData->GetDataTypeAsString();
+		auto sMimeType = pJobData->GetMIMEType();
+		auto sName = pJobData->GetName();
+		auto sTimeStamp = pJobData->GetTimeStamp();
+		auto nSize = pJobData->GetStorageStreamSize();
+		auto sSHA2 = pJobData->GetStorageStreamSHA2();
+
+		CJSONWriterObject dataObject (writer);
+		dataObject.addString(AMC_API_KEY_UPLOAD_UUID, sUUID);
+		dataObject.addString(AMC_API_KEY_UPLOAD_DATATYPE, sDataType);
+		dataObject.addString(AMC_API_KEY_UPLOAD_MIMETYPE, sMimeType);
+		dataObject.addString(AMC_API_KEY_UPLOAD_NAME, sName);
+		dataObject.addString(AMC_API_KEY_UPLOAD_TIMESTAMP, sTimeStamp);
+		dataObject.addInteger(AMC_API_KEY_UPLOAD_SIZE, nSize);
+		dataObject.addString(AMC_API_KEY_UPLOAD_SHA256, sSHA2);
+
+		dataJSONArray.addObject(dataObject);
+	}
+
+	writer.addArray(AMC_API_KEY_UPLOAD_BUILDDATAARRAY, dataJSONArray);
+
+}
+
+
+PAPIResponse CAPIHandler_Build::handleGetBuildDataRequest(PAPIAuth pAuth, std::string& buildDataUUID)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pBuildJob = pBuildJobHandler->FindJobOfData(buildDataUUID);
+	auto pBuildJobData = pBuildJob->RetrieveJobData(buildDataUUID);
+
+	auto pStorageStream = pBuildJobData->GetStorageStream();
+
+	auto pResponse = std::make_shared<CAPIFixedBufferResponse>(pBuildJobData->GetMIMEType());
+	pStorageStream->GetContent (pResponse->getBuffer());
+
+	return pResponse;
+	
+
+}
 
 
 PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
-	std::string jobUUID;
+	std::string paramUUID;
 
-	auto buildType = parseRequest(sURI, requestType, jobUUID);
+	auto buildType = parseRequest(sURI, requestType, paramUUID);
 
 	CJSONWriter writer;
 	writeJSONHeader(writer, AMC_API_PROTOCOL_BUILD);
@@ -274,6 +342,14 @@ PAPIResponse CAPIHandler_Build::handleRequest(const std::string& sURI, const eAP
 		break;
 	case btToolpath:
 		handleToolpathRequest(writer, pBodyData, nBodyDataSize, pAuth);
+		break;
+
+	case btListBuildData:
+		handleListBuildDataRequest(writer, pAuth, paramUUID);
+		break;
+
+	case btGetBuildData:
+		return handleGetBuildDataRequest(pAuth, paramUUID);
 		break;
 
 	default:

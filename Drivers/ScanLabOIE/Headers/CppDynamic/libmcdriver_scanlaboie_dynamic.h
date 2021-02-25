@@ -53,6 +53,15 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ConfigurePtr) (LibMCDriver_ScanLabOIE_Driver pDriver, const char * pConfigurationString);
+
+/**
 * returns the name identifier of the driver
 *
 * @param[in] pDriver - Driver instance.
@@ -190,6 +199,7 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIECreateDriverPtr) (
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_ScanLabOIEDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_ScanLabOIEDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_ScanLabOIEDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_ScanLabOIEDriver_GetVersionPtr m_Driver_GetVersion;

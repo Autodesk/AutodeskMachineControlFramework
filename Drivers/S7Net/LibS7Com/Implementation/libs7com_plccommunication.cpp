@@ -43,68 +43,204 @@ using namespace LibS7Com::Impl;
  Class definition of CPLCCommunication 
 **************************************************************************************************************************/
 
+CPLCCommunication::CPLCCommunication()
+    : m_nPLCtoAMC_Size(0), m_nPLCtoAMC_DBNo(0), m_nAMCtoPLC_DBNo (0), m_nCmdCycleCounter (1)
+{
+
+}
+
+
+void CPLCCommunication::SetProtocolConfiguration(const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo)
+{
+    if (nPLCtoAMC_DBNo == 0)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
+    if (nPLCtoAMC_Size == 0)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
+    if (nAMCtoPLC_DBNo == 0)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
+
+    m_nPLCtoAMC_DBNo = nPLCtoAMC_DBNo;
+    m_nPLCtoAMC_Size = nPLCtoAMC_Size;
+    m_nAMCtoPLC_DBNo = nAMCtoPLC_DBNo;
+}
+
 void CPLCCommunication::StartCommunication(LibS7Net::PPLC pPLC)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (pPLC.get() == nullptr)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
+
+    m_pPLC = pPLC;
+}
+
+void CPLCCommunication::RetrieveStatus()
+{
+    m_PLCRecvBuffer.resize(0);
+
+    if ((m_pPLC.get() != nullptr) && (m_nPLCtoAMC_Size != 0)) {
+       
+        auto pReadData = m_pPLC->ReadBytes(m_nPLCtoAMC_DBNo, 0, m_nPLCtoAMC_Size);
+        pReadData->GetData(m_PLCRecvBuffer);
+
+
+    }
+
 }
 
 void CPLCCommunication::StopCommunication()
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    m_pPLC = nullptr;
 }
 
-void CPLCCommunication::GetStatus()
+
+LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommandID)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (m_pPLC.get() == nullptr)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTCONNECTED);
+
+    uint32_t nCycleID = m_nCmdCycleCounter;
+    m_nCmdCycleCounter++;
+
+    std::vector<uint8_t> WriteData;
+    WriteData.resize(330);
+
+    WriteData[262 + 0] = (nCycleID >> 24) & 0xff;
+    WriteData[262 + 1] = (nCycleID >> 16) & 0xff;
+    WriteData[262 + 2] = (nCycleID >> 8) & 0xff;
+    WriteData[262 + 3] = nCycleID & 0xff;
+
+    WriteData[266 + 3] = nCommandID;
+
+    if (nCommandID == 21) {
+        WriteData[270 + 3] = 100; // Schichtdicke in mu
+        WriteData[274 + 3] = 1; // Anzahl Rakelhuebe
+        WriteData[278 + 2] = 7; // Recoaterspeed in mm/min
+        WriteData[278 + 3] = 208;
+        WriteData[282 + 3] = 1; // Pulverdosierungen
+    }
+    m_pPLC->WriteBytes(m_nAMCtoPLC_DBNo, 0, WriteData);
+
+    return nCycleID;
 }
 
-std::string CPLCCommunication::LoadProgram(const std::string & sProgram)
+void CPLCCommunication::CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool& bSequenceIsActive, bool& bSequenceIsFinished, LibS7Com_uint32& nErrorCode)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (m_pPLC.get() == nullptr)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTCONNECTED);
+
+    RetrieveStatus();
+
+    bSequenceIsFinished = false;
+    nErrorCode = 0;
+
+    int32_t varSEQUENCE_CURRENT = ReadVariableInt32(50);
+
+    bSequenceIsActive = (varSEQUENCE_CURRENT == (int32_t) nSequenceID);
+    if (bSequenceIsActive) {
+        int32_t varSEQUENCE_STATUS = ReadVariableInt32(46);
+        int32_t varSEQUENCE_ERRORCODE = ReadVariableInt32(54);
+        bSequenceIsFinished = (varSEQUENCE_STATUS == 0);
+
+        if (!bSequenceIsFinished)
+            nErrorCode = (uint32_t)varSEQUENCE_ERRORCODE;
+    }
+
 }
 
-void CPLCCommunication::ExecuteProgram(const std::string & sIdentifier)
+std::string CPLCCommunication::ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
 }
 
-void CPLCCommunication::ClearPrograms()
+bool CPLCCommunication::ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (nBit >= 8)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
+
+    auto nValue = ReadVariableByte(nAddress);
+    return ((nValue & (1UL << nBit)) != 0);
 }
 
-LibS7Com_uint32 CPLCCommunication::GetVariableCount()
+LibS7Com_uint8 CPLCCommunication::ReadVariableByte(const LibS7Com_uint32 nAddress)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (nAddress >= m_PLCRecvBuffer.size ())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    return m_PLCRecvBuffer.at(nAddress);
 }
 
-std::string CPLCCommunication::GetVariableName(const LibS7Com_uint32 nIndex)
+
+LibS7Com_int16 CPLCCommunication::ReadVariableInt16(const LibS7Com_uint32 nAddress)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (((uint64_t)nAddress + 1) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[2];
+    for (int j = 0; j < 2; j++)
+        nValue[1 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((int16_t*)&nValue[0]);
 }
 
-LibS7Com::eVariableType CPLCCommunication::GetVariableType(const LibS7Com_uint32 nIndex)
+
+LibS7Com_uint16 CPLCCommunication::ReadVariableUint16(const LibS7Com_uint32 nAddress)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (((uint64_t)nAddress + 1) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[2];
+    for (int j = 0; j < 2; j++)
+        nValue[1 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((uint16_t*)&nValue[0]);
 }
 
-std::string CPLCCommunication::GetVariableString(const LibS7Com_uint32 nIndex)
+
+LibS7Com_int32 CPLCCommunication::ReadVariableInt32(const LibS7Com_uint32 nAddress)
+{    
+    if (((uint64_t) nAddress + 3) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[4];
+    for (int j = 0; j < 4; j++)
+        nValue[3 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((int32_t*) &nValue[0]);
+}
+
+LibS7Com_uint32 CPLCCommunication::ReadVariableUint32(const LibS7Com_uint32 nAddress)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (((uint64_t)nAddress + 3) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[4];
+    for (int j = 0; j < 4; j++)
+        nValue[3 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((uint32_t*)&nValue[0]);
 }
 
-bool CPLCCommunication::GetVariableBool(const LibS7Com_uint32 nIndex)
+LibS7Com_double CPLCCommunication::ReadVariableReal(const LibS7Com_uint32 nAddress)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (((uint64_t)nAddress + 3) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    uint8_t nValue[4];
+    for (int j = 0; j < 4; j++)
+        nValue[3 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
+
+    return *((float*)&nValue[0]);
+
 }
 
-LibS7Com_int64 CPLCCommunication::GetVariableInteger(const LibS7Com_uint32 nIndex)
+LibS7Com_double CPLCCommunication::ReadVariableLReal(const LibS7Com_uint32 nAddress)
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
-}
+    if (((uint64_t)nAddress + 7) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
 
-LibS7Com_double CPLCCommunication::GetVariableDouble(const LibS7Com_uint32 nIndex)
-{
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
-}
+    uint8_t nValue[8];
+    for (int j = 0; j < 8; j++)
+        nValue[7 - j] = m_PLCRecvBuffer.at((uint64_t)nAddress + j);
 
+    return *((double*)&nValue[0]);
+
+}

@@ -64,6 +64,7 @@ class CBase;
 class CDriver;
 class CRTCContext;
 class CRTCSelector;
+class CDriver_ScanLab;
 class CDriver_ScanLab_RTC5;
 
 /*************************************************************************************************************************
@@ -74,6 +75,7 @@ typedef CBase CLibMCDriver_ScanLabBase;
 typedef CDriver CLibMCDriver_ScanLabDriver;
 typedef CRTCContext CLibMCDriver_ScanLabRTCContext;
 typedef CRTCSelector CLibMCDriver_ScanLabRTCSelector;
+typedef CDriver_ScanLab CLibMCDriver_ScanLabDriver_ScanLab;
 typedef CDriver_ScanLab_RTC5 CLibMCDriver_ScanLabDriver_ScanLab_RTC5;
 
 /*************************************************************************************************************************
@@ -84,6 +86,7 @@ typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CRTCContext> PRTCContext;
 typedef std::shared_ptr<CRTCSelector> PRTCSelector;
+typedef std::shared_ptr<CDriver_ScanLab> PDriver_ScanLab;
 typedef std::shared_ptr<CDriver_ScanLab_RTC5> PDriver_ScanLab_RTC5;
 
 /*************************************************************************************************************************
@@ -94,6 +97,7 @@ typedef PBase PLibMCDriver_ScanLabBase;
 typedef PDriver PLibMCDriver_ScanLabDriver;
 typedef PRTCContext PLibMCDriver_ScanLabRTCContext;
 typedef PRTCSelector PLibMCDriver_ScanLabRTCSelector;
+typedef PDriver_ScanLab PLibMCDriver_ScanLabDriver_ScanLab;
 typedef PDriver_ScanLab_RTC5 PLibMCDriver_ScanLabDriver_ScanLab_RTC5;
 
 
@@ -275,6 +279,7 @@ private:
 	friend class CDriver;
 	friend class CRTCContext;
 	friend class CRTCSelector;
+	friend class CDriver_ScanLab;
 	friend class CDriver_ScanLab_RTC5;
 
 };
@@ -350,6 +355,7 @@ public:
 	{
 	}
 	
+	inline void Configure(const std::string & sConfigurationString);
 	inline std::string GetName();
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_ScanLab_uint32 & nMajor, LibMCDriver_ScanLab_uint32 & nMinor, LibMCDriver_ScanLab_uint32 & nMicro, std::string & sBuild);
@@ -371,12 +377,13 @@ public:
 	{
 	}
 	
-	inline void LoadProgramFromPath(const std::string & sPath);
-	inline void LoadCorrectionFile(const std::string & sFileName, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
+	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
+	inline void LoadCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
 	inline void SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 	inline void ConfigureLists(const LibMCDriver_ScanLab_uint32 nSizeListA, const LibMCDriver_ScanLab_uint32 nSizeListB);
 	inline void SetLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort);
-	inline void SetLaserControl(const bool bEnableLaser);
+	inline void DisableAutoLaserControl();
+	inline void SetLaserControlParameters(const bool bDisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
 	inline void SetLaserPulsesInBits(const LibMCDriver_ScanLab_uint32 nHalfPeriod, const LibMCDriver_ScanLab_uint32 nPulseLength);
 	inline void SetLaserPulsesInMicroSeconds(const LibMCDriver_ScanLab_double dHalfPeriod, const LibMCDriver_ScanLab_double dPulseLength);
 	inline void SetStandbyInBits(const LibMCDriver_ScanLab_uint32 nHalfPeriod, const LibMCDriver_ScanLab_uint32 nPulseLength);
@@ -389,8 +396,8 @@ public:
 	inline void SetDelays(const LibMCDriver_ScanLab_uint32 nMarkDelay, const LibMCDriver_ScanLab_uint32 nJumpDelay, const LibMCDriver_ScanLab_uint32 nPolygonDelay);
 	inline void SetLaserDelaysInMicroseconds(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay);
 	inline void SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOnDelay, const LibMCDriver_ScanLab_uint32 nLaserOffDelay);
-	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower);
-	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower);
+	inline void DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
+	inline void DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue);
 	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
@@ -422,20 +429,42 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDriver_ScanLab 
+**************************************************************************************************************************/
+class CDriver_ScanLab : public CDriver {
+public:
+	
+	/**
+	* CDriver_ScanLab::CDriver_ScanLab - Constructor for Driver_ScanLab class.
+	*/
+	CDriver_ScanLab(CWrapper* pWrapper, LibMCDriver_ScanLabHandle pHandle)
+		: CDriver(pWrapper, pHandle)
+	{
+	}
+	
+	inline void LoadSDK(const std::string & sResourceName);
+	inline PRTCSelector CreateRTCSelector();
+};
+	
+/*************************************************************************************************************************
  Class CDriver_ScanLab_RTC5 
 **************************************************************************************************************************/
-class CDriver_ScanLab_RTC5 : public CDriver {
+class CDriver_ScanLab_RTC5 : public CDriver_ScanLab {
 public:
 	
 	/**
 	* CDriver_ScanLab_RTC5::CDriver_ScanLab_RTC5 - Constructor for Driver_ScanLab_RTC5 class.
 	*/
 	CDriver_ScanLab_RTC5(CWrapper* pWrapper, LibMCDriver_ScanLabHandle pHandle)
-		: CDriver(pWrapper, pHandle)
+		: CDriver_ScanLab(pWrapper, pHandle)
 	{
 	}
 	
-	inline PRTCSelector CreateRTCSelector();
+	inline void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber);
+	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
+	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
+	inline void ConfigureLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
+	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 };
 	
 	/**
@@ -559,17 +588,19 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
-		pWrapperTable->m_RTCContext_LoadProgramFromPath = nullptr;
+		pWrapperTable->m_RTCContext_LoadFirmware = nullptr;
 		pWrapperTable->m_RTCContext_LoadCorrectionFile = nullptr;
 		pWrapperTable->m_RTCContext_SelectCorrectionTable = nullptr;
 		pWrapperTable->m_RTCContext_ConfigureLists = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserMode = nullptr;
-		pWrapperTable->m_RTCContext_SetLaserControl = nullptr;
+		pWrapperTable->m_RTCContext_DisableAutoLaserControl = nullptr;
+		pWrapperTable->m_RTCContext_SetLaserControlParameters = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserPulsesInBits = nullptr;
 		pWrapperTable->m_RTCContext_SetLaserPulsesInMicroSeconds = nullptr;
 		pWrapperTable->m_RTCContext_SetStandbyInBits = nullptr;
@@ -596,7 +627,13 @@ public:
 		pWrapperTable->m_RTCSelector_AcquireCardBySerial = nullptr;
 		pWrapperTable->m_RTCSelector_AcquireEthernetCard = nullptr;
 		pWrapperTable->m_RTCSelector_AcquireEthernetCardBySerial = nullptr;
-		pWrapperTable->m_Driver_ScanLab_RTC5_CreateRTCSelector = nullptr;
+		pWrapperTable->m_Driver_ScanLab_LoadSDK = nullptr;
+		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC5_Initialise = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC5_LoadFirmware = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -653,6 +690,15 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_ScanLabDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_configure");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_ScanLabDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_configure");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Configure == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_ScanLabDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_getname");
 		#else // _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_ScanLabDriver_GetNamePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_getname");
@@ -698,12 +744,12 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_RTCContext_LoadProgramFromPath = (PLibMCDriver_ScanLabRTCContext_LoadProgramFromPathPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_loadprogramfrompath");
+		pWrapperTable->m_RTCContext_LoadFirmware = (PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_loadfirmware");
 		#else // _WIN32
-		pWrapperTable->m_RTCContext_LoadProgramFromPath = (PLibMCDriver_ScanLabRTCContext_LoadProgramFromPathPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_loadprogramfrompath");
+		pWrapperTable->m_RTCContext_LoadFirmware = (PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_loadfirmware");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_RTCContext_LoadProgramFromPath == nullptr)
+		if (pWrapperTable->m_RTCContext_LoadFirmware == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -743,12 +789,21 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_RTCContext_SetLaserControl = (PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrol");
+		pWrapperTable->m_RTCContext_DisableAutoLaserControl = (PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disableautolasercontrol");
 		#else // _WIN32
-		pWrapperTable->m_RTCContext_SetLaserControl = (PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrol");
+		pWrapperTable->m_RTCContext_DisableAutoLaserControl = (PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disableautolasercontrol");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_RTCContext_SetLaserControl == nullptr)
+		if (pWrapperTable->m_RTCContext_DisableAutoLaserControl == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetLaserControlParameters = (PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrolparameters");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetLaserControlParameters = (PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setlasercontrolparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetLaserControlParameters == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -986,12 +1041,66 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC5_CreateRTCSelector = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_CreateRTCSelectorPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_creatertcselector");
+		pWrapperTable->m_Driver_ScanLab_LoadSDK = (PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_loadsdk");
 		#else // _WIN32
-		pWrapperTable->m_Driver_ScanLab_RTC5_CreateRTCSelector = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_CreateRTCSelectorPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_creatertcselector");
+		pWrapperTable->m_Driver_ScanLab_LoadSDK = (PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_loadsdk");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_ScanLab_RTC5_CreateRTCSelector == nullptr)
+		if (pWrapperTable->m_Driver_ScanLab_LoadSDK == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = (PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_creatertcselector");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = (PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_creatertcselector");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_CreateRTCSelector == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_Initialise = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_InitialisePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_initialise");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_Initialise = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_InitialisePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_initialise");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC5_Initialise == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_LoadFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_LoadFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_LoadFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_LoadFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC5_LoadFirmware == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer = (PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1073,6 +1182,10 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_ScanLabResult eLookupError = LIBMCDRIVER_SCANLAB_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_getname", (void**)&(pWrapperTable->m_Driver_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetName == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1093,8 +1206,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_loadprogramfrompath", (void**)&(pWrapperTable->m_RTCContext_LoadProgramFromPath));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_LoadProgramFromPath == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_loadfirmware", (void**)&(pWrapperTable->m_RTCContext_LoadFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_LoadFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_loadcorrectionfile", (void**)&(pWrapperTable->m_RTCContext_LoadCorrectionFile));
@@ -1113,8 +1226,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlasercontrol", (void**)&(pWrapperTable->m_RTCContext_SetLaserControl));
-		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserControl == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableautolasercontrol", (void**)&(pWrapperTable->m_RTCContext_DisableAutoLaserControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableAutoLaserControl == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlasercontrolparameters", (void**)&(pWrapperTable->m_RTCContext_SetLaserControlParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetLaserControlParameters == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setlaserpulsesinbits", (void**)&(pWrapperTable->m_RTCContext_SetLaserPulsesInBits));
@@ -1221,8 +1338,32 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCSelector_AcquireEthernetCardBySerial == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_creatertcselector", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_CreateRTCSelector));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_CreateRTCSelector == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_loadsdk", (void**)&(pWrapperTable->m_Driver_ScanLab_LoadSDK));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_LoadSDK == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_creatertcselector", (void**)&(pWrapperTable->m_Driver_ScanLab_CreateRTCSelector));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_CreateRTCSelector == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_initialise", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_Initialise));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_Initialise == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_loadfirmware", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_LoadFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_LoadFirmware == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_setcorrectionfile", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_SetCorrectionFile == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_configurelasermode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_ConfigureLaserMode == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc5_drawlayer", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC5_DrawLayer == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1265,6 +1406,15 @@ public:
 	/**
 	 * Method definitions for class CDriver
 	 */
+	
+	/**
+	* CDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	void CDriver::Configure(const std::string & sConfigurationString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Configure(m_pHandle, sConfigurationString.c_str()));
+	}
 	
 	/**
 	* CDriver::GetName - returns the name identifier of the driver
@@ -1345,23 +1495,25 @@ public:
 	 */
 	
 	/**
-	* CRTCContext::LoadProgramFromPath - Loads card firmware from given file path.
-	* @param[in] sPath - Path to the image files.
+	* CRTCContext::LoadFirmware - Loads card firmware from resource files.
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
 	*/
-	void CRTCContext::LoadProgramFromPath(const std::string & sPath)
+	void CRTCContext::LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_LoadProgramFromPath(m_pHandle, sPath.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_LoadFirmware(m_pHandle, sFirmwareResource.c_str(), sFPGAResource.c_str(), sAuxiliaryResource.c_str()));
 	}
 	
 	/**
-	* CRTCContext::LoadCorrectionFile - Loads card calibration file from given file.
-	* @param[in] sFileName - FileName to the image files.
+	* CRTCContext::LoadCorrectionFile - Loads card calibration file from given resource file.
+	* @param[in] CorrectionFileBuffer - binary data of the correction file.
 	* @param[in] nTableNumber - Correction table index of card (1..8)
 	* @param[in] nDimension - Is it a 2D or 3D correction file.
 	*/
-	void CRTCContext::LoadCorrectionFile(const std::string & sFileName, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
+	void CRTCContext::LoadCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_LoadCorrectionFile(m_pHandle, sFileName.c_str(), nTableNumber, nDimension));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_LoadCorrectionFile(m_pHandle, (LibMCDriver_ScanLab_uint64)CorrectionFileBuffer.size(), CorrectionFileBuffer.data(), nTableNumber, nDimension));
 	}
 	
 	/**
@@ -1395,12 +1547,26 @@ public:
 	}
 	
 	/**
-	* CRTCContext::SetLaserControl - Sets laser control of card.
-	* @param[in] bEnableLaser - Laser is enabled
+	* CRTCContext::DisableAutoLaserControl - Disables automatic laser control.
 	*/
-	void CRTCContext::SetLaserControl(const bool bEnableLaser)
+	void CRTCContext::DisableAutoLaserControl()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserControl(m_pHandle, bEnableLaser));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableAutoLaserControl(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::SetLaserControlParameters - Sets laser control parameters of card.
+	* @param[in] bDisableLaser - Laser is disabled
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
+	*/
+	void CRTCContext::SetLaserControlParameters(const bool bDisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetLaserControlParameters(m_pHandle, bDisableLaser, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive));
 	}
 	
 	/**
@@ -1529,10 +1695,11 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	void CRTCContext::DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+	void CRTCContext::DrawPolyline(const CInputVector<sPoint2D> & PointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawPolyline(m_pHandle, (LibMCDriver_ScanLab_uint64)PointsBuffer.size(), PointsBuffer.data(), fMarkSpeed, fJumpSpeed, fPower));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawPolyline(m_pHandle, (LibMCDriver_ScanLab_uint64)PointsBuffer.size(), PointsBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
 	}
 	
 	/**
@@ -1541,10 +1708,11 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	void CRTCContext::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+	void CRTCContext::DrawHatches(const CInputVector<sHatch2D> & HatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DrawHatches(m_pHandle, (LibMCDriver_ScanLab_uint64)HatchesBuffer.size(), HatchesBuffer.data(), fMarkSpeed, fJumpSpeed, fPower, fZValue));
 	}
 	
 	/**
@@ -1713,22 +1881,98 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CDriver_ScanLab_RTC5
+	 * Method definitions for class CDriver_ScanLab
 	 */
 	
 	/**
-	* CDriver_ScanLab_RTC5::CreateRTCSelector - Creates and initializes a new RTC selector singleton. Should only be called once per Process.
+	* CDriver_ScanLab::LoadSDK - Initializes the ScanLab SDK.
+	* @param[in] sResourceName - Resource name of Scanlab DLL
+	*/
+	void CDriver_ScanLab::LoadSDK(const std::string & sResourceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_LoadSDK(m_pHandle, sResourceName.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab::CreateRTCSelector - Creates and initializes a new RTC selector singleton. Should only be called once per Process.
 	* @return New Selector instance
 	*/
-	PRTCSelector CDriver_ScanLab_RTC5::CreateRTCSelector()
+	PRTCSelector CDriver_ScanLab::CreateRTCSelector()
 	{
 		LibMCDriver_ScanLabHandle hInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_CreateRTCSelector(m_pHandle, &hInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_CreateRTCSelector(m_pHandle, &hInstance));
 		
 		if (!hInstance) {
 			CheckError(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CRTCSelector>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	 * Method definitions for class CDriver_ScanLab_RTC5
+	 */
+	
+	/**
+	* CDriver_ScanLab_RTC5::Initialise - Initializes the RTC5 Scanner Driver.
+	* @param[in] sIP - IP Network Address. Empty string for local card.
+	* @param[in] sNetmask - IP Netmask Address. Empty string for local card.
+	* @param[in] nTimeout - Time out in microseconds.
+	* @param[in] nSerialNumber - Desired Serial Number of card.
+	*/
+	void CDriver_ScanLab_RTC5::Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_Initialise(m_pHandle, sIP.c_str(), sNetmask.c_str(), nTimeout, nSerialNumber));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC5::LoadFirmware - Loads the firmware from the driver resources.
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	*/
+	void CDriver_ScanLab_RTC5::LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_LoadFirmware(m_pHandle, sFirmwareResource.c_str(), sFPGAResource.c_str(), sAuxiliaryResource.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC5::SetCorrectionFile - Sets the correction file stream.
+	* @param[in] CorrectionFileBuffer - binary data of the correction file.
+	* @param[in] nTableNumber - Correction table index of card (1..8)
+	* @param[in] nDimension - Is it a 2D or 3D correction file.
+	* @param[in] nTableNumberHeadA - Table number of Head A.
+	* @param[in] nTableNumberHeadB - Table number of Head B.
+	*/
+	void CDriver_ScanLab_RTC5::SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_SetCorrectionFile(m_pHandle, (LibMCDriver_ScanLab_uint64)CorrectionFileBuffer.size(), CorrectionFileBuffer.data(), nTableNumber, nDimension, nTableNumberHeadA, nTableNumberHeadB));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC5::ConfigureLaserMode - Configures the laser mode.
+	* @param[in] eLaserMode - Laser Mode Enum
+	* @param[in] eLaserPort - Laser Port Enum
+	* @param[in] dMaxLaserPower - Maximum laser power.
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
+	*/
+	void CDriver_ScanLab_RTC5::ConfigureLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_ConfigureLaserMode(m_pHandle, eLaserMode, eLaserPort, dMaxLaserPower, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC5::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	*/
+	void CDriver_ScanLab_RTC5::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC5_DrawLayer(m_pHandle, sStreamUUID.c_str(), nLayerIndex));
 	}
 
 } // namespace LibMCDriver_ScanLab

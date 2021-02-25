@@ -100,7 +100,7 @@ namespace AMC {
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
 		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
-		return std::make_shared<CToolpathLayerData> (p3MFLayerData, dUnits, nZValue);
+		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue);
 	}
 
 

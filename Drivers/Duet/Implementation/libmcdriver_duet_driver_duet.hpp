@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CDriver_Duet
 #endif
 
 // Include custom headers here.
+#include "AMC_SerialController_Duet.hpp"
 
 
 namespace LibMCDriver_Duet {
@@ -52,7 +53,7 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver_Duet 
+ Class declaration of CDriver_Duet
 **************************************************************************************************************************/
 
 class CDriver_Duet : public virtual IDriver_Duet, public virtual CDriver {
@@ -64,11 +65,12 @@ private:
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+	AMC::PSerialController m_pSerialController;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 public:
+
+	CDriver_Duet(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	/**
 	* Put additional public members here. They will not be visible in the external API.
@@ -79,17 +81,19 @@ public:
 	* Public member functions to implement.
 	*/
 
+	void Configure(const std::string& sConfigurationString) override;
+
 	void Connect(const std::string & sCOMPort, const LibMCDriver_Duet_uint32 nBaudrate, const LibMCDriver_Duet_double dStatusUpdateInterval, const LibMCDriver_Duet_uint32 nConnectTimeout) override;
 
 	void Disconnect() override;
 
 	void SetAbsolutePositioning(const bool bAbsolute) override;
 
-	void UpdatePositionState() override;
+	void QueryParameters() override;
 
-	void GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ) override;
+	void GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB) override;
 
-	void GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ) override;
+	void GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB) override;
 
 	bool CanExecuteMovement() override;
 
@@ -99,13 +103,15 @@ public:
 
 	bool IsConnected() override;
 
-	void MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dE, const LibMCDriver_Duet_double dSpeed) override;
+	void MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dLaserPower, const LibMCDriver_Duet_double dSpeed) override;
 
 	void MoveFastToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dSpeed) override;
 
 	void MoveToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed) override;
 
-	void MoveFastToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed) override;
+	void MoveToA(const LibMCDriver_Duet_double dA, const LibMCDriver_Duet_double dSpeed) override;
+
+	void MoveToB(const LibMCDriver_Duet_double dB, const LibMCDriver_Duet_double dSpeed) override;
 
 	void StartHoming() override;
 

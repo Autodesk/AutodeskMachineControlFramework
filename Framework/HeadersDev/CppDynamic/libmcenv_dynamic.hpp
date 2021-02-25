@@ -414,8 +414,8 @@ public:
 	inline LibMCEnv_uint32 GetSegmentCount();
 	inline void GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
-	inline std::string GetSegmentProfileValue(const std::string & sValueName);
-	inline LibMCEnv_double GetSegmentProfileTypedValue(const eToolpathProfileValueType eValueType);
+	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName);
+	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline LibMCEnv_int32 GetZValue();
@@ -507,7 +507,7 @@ public:
 	inline bool IsManaged();
 	inline void MakeManaged();
 	inline bool FileExists();
-	inline bool DeleteFile();
+	inline bool DeleteFromDisk();
 };
 	
 /*************************************************************************************************************************
@@ -569,6 +569,7 @@ public:
 	
 	inline PWorkingDirectory CreateWorkingDirectory();
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PToolpathAccessor CreateToolpathAccessor(const std::string & sStreamUUID);
 	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue);
@@ -579,6 +580,8 @@ public:
 	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue);
 	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue);
 	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 };
 	
 /*************************************************************************************************************************
@@ -681,6 +684,7 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -829,7 +833,7 @@ public:
 		pWrapperTable->m_WorkingFile_IsManaged = nullptr;
 		pWrapperTable->m_WorkingFile_MakeManaged = nullptr;
 		pWrapperTable->m_WorkingFile_FileExists = nullptr;
-		pWrapperTable->m_WorkingFile_DeleteFile = nullptr;
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = nullptr;
 		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = nullptr;
 		pWrapperTable->m_WorkingDirectory_IsActive = nullptr;
 		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = nullptr;
@@ -843,6 +847,7 @@ public:
 		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = nullptr;
@@ -853,6 +858,8 @@ public:
 		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_Sleep = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -907,6 +914,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -1314,12 +1322,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCEnvWorkingFile_DeleteFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_deletefile");
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = (PLibMCEnvWorkingFile_DeleteFromDiskPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_deletefromdisk");
 		#else // _WIN32
-		pWrapperTable->m_WorkingFile_DeleteFile = (PLibMCEnvWorkingFile_DeleteFilePtr) dlsym(hLibrary, "libmcenv_workingfile_deletefile");
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = (PLibMCEnvWorkingFile_DeleteFromDiskPtr) dlsym(hLibrary, "libmcenv_workingfile_deletefromdisk");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_WorkingFile_DeleteFile == nullptr)
+		if (pWrapperTable->m_WorkingFile_DeleteFromDisk == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1440,6 +1448,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = (PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createtoolpathaccessor");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = (PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createtoolpathaccessor");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = (PLibMCEnvDriverEnvironment_RegisterStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registerstringparameter");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = (PLibMCEnvDriverEnvironment_RegisterStringParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registerstringparameter");
@@ -1527,6 +1544,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_sleep");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) dlsym(hLibrary, "libmcenv_driverenvironment_sleep");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_Sleep == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2016,6 +2051,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -2327,8 +2371,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_FileExists == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_workingfile_deletefile", (void**)&(pWrapperTable->m_WorkingFile_DeleteFile));
-		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_DeleteFile == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_workingfile_deletefromdisk", (void**)&(pWrapperTable->m_WorkingFile_DeleteFromDisk));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_DeleteFromDisk == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingfileiterator_getcurrentfile", (void**)&(pWrapperTable->m_WorkingFileIterator_GetCurrentFile));
@@ -2383,6 +2427,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createtoolpathaccessor", (void**)&(pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerstringparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterStringParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterStringParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2421,6 +2469,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_setboolparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_sleep", (void**)&(pWrapperTable->m_DriverEnvironment_Sleep));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
@@ -2639,6 +2695,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_PrepareSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2842,29 +2902,31 @@ public:
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	std::string CToolpathLayer::GetSegmentProfileValue(const std::string & sValueName)
+	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, sValueName.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sValueName.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const eToolpathProfileValueType eValueType)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, eValueType, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, nIndex, eValueType, &resultValue));
 		
 		return resultValue;
 	}
@@ -3240,13 +3302,13 @@ public:
 	}
 	
 	/**
-	* CWorkingFile::DeleteFile - Deletes the temporary file.
+	* CWorkingFile::DeleteFromDisk - Deletes the temporary file.
 	* @return returns if deletion was successful or file did not exist in the first place.
 	*/
-	bool CWorkingFile::DeleteFile()
+	bool CWorkingFile::DeleteFromDisk()
 	{
 		bool resultSuccess = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFile(m_pHandle, &resultSuccess));
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFromDisk(m_pHandle, &resultSuccess));
 		
 		return resultSuccess;
 	}
@@ -3454,6 +3516,22 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+	* @param[in] sStreamUUID - UUID of the stream.
+	* @return Toolpath instance.
+	*/
+	PToolpathAccessor CDriverEnvironment::CreateToolpathAccessor(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hToolpathInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateToolpathAccessor(m_pHandle, sStreamUUID.c_str(), &hToolpathInstance));
+		
+		if (!hToolpathInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
+	}
+	
+	/**
 	* CDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.
 	* @param[in] sParameterName - Parameter Name
 	* @param[in] sDescription - Parameter Description
@@ -3556,6 +3634,27 @@ public:
 	void CDriverEnvironment::SetBoolParameter(const std::string & sParameterName, const bool bValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CDriverEnvironment::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_Sleep(m_pHandle, nDelay));
+	}
+	
+	/**
+	* CDriverEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
 	}
 	
 	/**
@@ -4238,6 +4337,20 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBoolParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[out] ResourceDataBuffer - Resource Data Buffer.
+	*/
+	void CStateEnvironment::LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededResourceData = 0;
+		LibMCEnv_uint64 elementsWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
+		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
 	}
 	
 	/**

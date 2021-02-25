@@ -61,8 +61,6 @@
 		<error name="INVALIDCHARACTERINFILENAME" code="20" description="invalid character in filename." />
 		<error name="WORKINGDIRECTORYHASBEENCLEANED" code="21" description="working directory has been cleaned." />
 		<error name="INVALIDITERATOR" code="22" description="invalid iterator." />
-		
-		
 			
 	</errors>
 	
@@ -82,6 +80,12 @@
 		<option name="StartDelay" value="5" />
 		<option name="EndDelay" value="6" />
 		<option name="PolyDelay" value="7" />
+		<option name="PolyDelayAngleDependent" value="8" />
+		<option name="LaserOnDelay" value="9" />
+		<option name="LaserOffDelay" value="10" />
+		<option name="JumpDelay" value="11" />
+		<option name="MarkDelay" value="12" />
+		<option name="LaserFocus" value="13" />
 	</enum>
 	
 	<struct name="Position2D">
@@ -132,11 +136,13 @@
 		</method>
 
 		<method name="GetSegmentProfileValue" description="Retrieves an assigned profile custom value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="Value" type="string" pass="return" description="String Value." />
 		</method>
 
 		<method name="GetSegmentProfileTypedValue" description="Retrieves an assigned profile value of a standard type.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
 			<param name="Value" type="double" pass="return" description="Double Value" />
 		</method>
@@ -274,7 +280,7 @@
 			<param name="FileDoesExist" type="bool" pass="return" description="returns if the file exists." />
 		</method>
 
-		<method name="DeleteFile" description = "Deletes the temporary file.">
+		<method name="DeleteFromDisk" description = "Deletes the temporary file.">
 			<param name="Success" type="bool" pass="return" description="returns if deletion was successful or file did not exist in the first place." />
 		</method>
 
@@ -347,6 +353,11 @@
 			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
 		</method>
 		
+		<method name="CreateToolpathAccessor" description="Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the stream." />
+			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
+		</method>
+		
 		
 		<method name="RegisterStringParameter" description="registers a string parameter. Must only be called during driver creation.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
@@ -404,6 +415,13 @@
 			<param name="Value" type="bool" pass="in" description="Value to set" />
 		</method>
 		
+		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
 
 	</class>
 	
@@ -691,6 +709,11 @@
 			<param name="Value" type="bool" pass="return" description="Value to set" />
 		</method>
 		
+
+		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
+		</method>
 
 
 	</class>

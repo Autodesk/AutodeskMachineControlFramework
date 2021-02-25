@@ -40,9 +40,13 @@ protected:
 
 	PScanLabSDK m_pScanLabSDK;
 
+	IRTCContext* acquireCardEx(const LibMCDriver_ScanLab_uint32 nNumber, bool bIsNetworkCard);
+
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
 public:
 
-	CRTCSelector(PScanLabSDK pScanLabSDK);
+	CRTCSelector(PScanLabSDK pScanLabSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CRTCSelector();
 

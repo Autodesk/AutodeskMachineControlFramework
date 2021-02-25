@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_ui_handler.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -325,4 +326,30 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+
+void CStateEnvironment::LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get () == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+	auto nResourceSize = pResourceEntry->getSize();
+
+	if (pResourceDataNeededCount != nullptr)
+		*pResourceDataNeededCount = nResourceSize;
+
+	if (pResourceDataBuffer != nullptr) {
+		if (nResourceDataBufferSize < nResourceSize)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+		pResourcePackage->readEntryEx(sResourceName, pResourceDataBuffer, nResourceDataBufferSize);
+	}
+
+
+}
 

@@ -58,82 +58,91 @@
 		<error name="SENDDATA" code="20" description="Error on send data." />
 		<error name="READDATA" code="30" description="Error on read data." />
 		<error name="WRITEDATA" code="50" description="Error on write data." />
+		<error name="INVALIDREADADDRESS" code="60" description="Invalid address." />
 				
 	</errors>
 	
-	<importcomponent uri="LibS7Net.xml" namespace="LibS7Net"/>	
-	  
-	<enum name="VariableType">
-		<option name="BooleanVariable" value="1" />
-		<option name="IntegerVariable" value="2" />
-		<option name="StringVariable" value="3" />
-		<option name="DoubleVariable" value="4" />
-	</enum>		  
 	
-		
+	<importcomponent uri="LibS7Net.xml" namespace="LibS7Net"/>	
+	  		
 	<class name="Base">
 	</class>
 	
-
 	<class name="PLCCommunication" parent="Base">
 
 		<method name="SetProtocolConfiguration" description="Configures the protocol">
-			<param name="ProtocolConfiguration" type="string" pass="in" description="Configuration XML as string." />
+			<param name="PLCtoAMC_DBNo" type="uint32" pass="in" description="DB Number of PLC to AMC connection" />
+			<param name="PLCtoAMC_Size" type="uint32" pass="in" description="Size of PLC to AMC protocol buffer." />
+			<param name="AMCtoPLC_DBNo" type="uint32" pass="in" description="DB Number of AMC to PLC connection" />
 		</method>
 						
 		<method name="StartCommunication" description="Starts communication with the S7 PLC Instance">
 			<param name="PLC" type="class" class="LibS7Net:PLC" pass="in" description="PLC Instance" />
 		</method>
 		
+		<method name="RetrieveStatus" description="Retrieves the status of the PLC">
+		</method>
+		
 		<method name="StopCommunication" description="Stops communication with the S7 PLC Instance">
 		</method>
 		
-		<method name="GetStatus" description="Returns the status of the PLC">
+		<method name="ExecuteCommand" description="Executes a command">
+			<param name="CommandID" type="uint32" pass="in" description="ID of command to be triggered." />
+			<param name="SequenceID" type="uint32" pass="return" description="Sequence ID of the executed command." />
 		</method>
 
-		<method name="LoadProgram" description="Loads a GCode Program on the PLC">
-			<param name="Program" type="string" pass="in" description="GCode Program to send." />
-			<param name="Identifier" type="string" pass="return" description="Program identifier." />
+		<method name="CheckCommandExecution" description="Checks the command execution state.">
+			<param name="SequenceID" type="uint32" pass="in" description="Sequence ID of the executed command." />
+			<param name="SequenceIsActive" type="bool" pass="out" description="Returns if the sequence is active." />
+			<param name="SequenceIsFinished" type="bool" pass="out" description="Returns if the sequence is finished." />
+			<param name="ErrorCode" type="uint32" pass="out" description="Current error code if sequence is active and not yet finished." />
 		</method>
 
-		<method name="ExecuteProgram" description="Executes a GCode Program on the PLC">
-			<param name="Identifier" type="string" pass="in" description="Program identifier." />
-		</method>
 
-		<method name="ClearPrograms" description="Clears loaded programs">
-		</method>
-
-		<method name="GetVariableCount" description="Returns number of reported variables.">
-			<param name="Count" type="uint32" pass="return" description="Number of variables." />
-		</method>
-
-		<method name="GetVariableName" description="Returns name of variable.">
-			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
-			<param name="Name" type="string" pass="return" description="Name of variable." />
-		</method>
-
-		<method name="GetVariableType" description="Returns type of variable.">
-			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
-			<param name="VariableType" type="enum" class="VariableType" pass="return" description="Type of variable." />
-		</method>
-
-		<method name="GetVariableString" description="Returns value of string variable.">
-			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
+		<method name="ReadVariableString" description="Returns value of string variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of String Variable." />
+			<param name="MaxLength" type="uint32" pass="in" description="Maximum length." />
 			<param name="Value" type="string" pass="return" description="Value of variable." />
 		</method>
 						
-		<method name="GetVariableBool" description="Returns value of bool variable.">
-			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
+		<method name="ReadVariableBool" description="Returns value of bool variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Bit" type="uint32" pass="in" description="Bit of the variable (0-7)" />
 			<param name="Value" type="bool" pass="return" description="Value of variable." />
 		</method>
 
-		<method name="GetVariableInteger" description="Returns value of bool variable.">
-			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
-			<param name="Value" type="int64" pass="return" description="Value of variable." />
+		<method name="ReadVariableByte" description="Returns value of byte variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Value" type="uint8" pass="return" description="Value of variable." />
 		</method>
-		
-		<method name="GetVariableDouble" description="Returns value of double variable.">
-			<param name="Index" type="uint32" pass="in" description="Index of variable (0-based)." />
+
+		<method name="ReadVariableInt16" description="Returns value of Int16 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="int16" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableUint16" description="Returns value of Uint16 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="uint16" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableInt32" description="Returns value of Int32 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="int32" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableUint32" description="Returns value of Uint32 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="uint32" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableReal" description="Returns value of single precision variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableLReal" description="Returns value of double precision variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
 			<param name="Value" type="double" pass="return" description="Value of variable." />
 		</method>
 		

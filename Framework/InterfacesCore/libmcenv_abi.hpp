@@ -160,23 +160,25 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofileuuid(Li
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile value of a standard type.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
 
 /**
 * Retrieves the assigned segment part uuid.
@@ -469,7 +471,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_fileexists(LibMCEnv_Workin
 * @param[out] pSuccess - returns if deletion was successful or file did not exist in the first place.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_deletefromdisk(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
 
 /*************************************************************************************************************************
  Class definition for WorkingFileIterator
@@ -612,6 +614,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirecto
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
 
 /**
+* Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pStreamUUID - UUID of the stream.
+* @param[out] pToolpathInstance - Toolpath instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
 * registers a string parameter. Must only be called during driver creation.
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
@@ -715,6 +727,24 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setintegerparameter(
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setboolparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue);
+
+/**
+* Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nDelay - Milliseconds to sleeps
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_sleep(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nDelay);
+
+/**
+* Returns the global timer in milliseconds.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /*************************************************************************************************************************
  Class definition for SignalTrigger
@@ -1286,6 +1316,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getintegerparameter(L
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
 
 /*************************************************************************************************************************
  Class definition for UIEnvironment

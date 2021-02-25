@@ -36,6 +36,8 @@ Abstract: This is the class declaration of CDriver_S7Net
 #define __LIBMCDRIVER_S7NET_DRIVER_S7NET
 
 #include "libmcdriver_s7net_interfaces.hpp"
+#include <string>
+#include <map>
 
 // Parent classes
 #include "libmcdriver_s7net_driver.hpp"
@@ -56,30 +58,138 @@ namespace Impl {
  Class declaration of CDriver_S7Net 
 **************************************************************************************************************************/
 
+class CDriver_S7Value {
+protected:
+    std::string m_sName;
+    uint32_t m_nAddress;
+public:
+
+    CDriver_S7Value(const std::string& sName, const uint32_t nAddress);
+    virtual ~CDriver_S7Value();
+
+    std::string getName ();
+
+};
+
+
+class CDriver_S7RealValue : public CDriver_S7Value {
+protected:
+public:
+
+    CDriver_S7RealValue(const std::string& sName, const uint32_t nAddress);
+
+    double readValue(LibS7Com::CPLCCommunication * pCommunication);
+
+};
+
+class CDriver_S7LRealValue : public CDriver_S7Value {
+protected:
+public:
+
+    CDriver_S7LRealValue(const std::string& sName, const uint32_t nAddress);
+
+    double readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+};
+
+class CDriver_S7DIntValue : public CDriver_S7Value {
+protected:
+public:
+
+    CDriver_S7DIntValue(const std::string& sName, const uint32_t nAddress);
+
+    int32_t readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+};
+
+
+class CDriver_S7IntValue : public CDriver_S7Value {
+protected:
+public:
+
+    CDriver_S7IntValue(const std::string& sName, const uint32_t nAddress);
+
+    int32_t readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+};
+
+
+
+class CDriver_S7BoolValue : public CDriver_S7Value {
+protected:
+
+    uint32_t m_nBit;
+
+public:
+
+    CDriver_S7BoolValue(const std::string& sName, const uint32_t nAddress, const uint32_t nBit);
+
+    bool readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+};
+
+typedef std::shared_ptr<CDriver_S7Value> PDriver_S7Value;
+
+
+class CDriver_S7Command {
+protected:
+    std::string m_sName;
+    uint32_t m_nCommandID;
+public:
+
+    CDriver_S7Command(const std::string& sName, const uint32_t nCommandID);
+    virtual ~CDriver_S7Command();
+
+    std::string getName();
+    uint32_t getCommandID();
+};
+
+typedef std::shared_ptr<CDriver_S7Command> PDriver_S7Command;
+
+
 class CDriver_S7Net : public virtual IDriver_S7Net, public virtual CDriver {
 private:
 
 protected:
 
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+    LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
 
     std::string m_sDriverType;
+    std::string m_sProtocolXML;
 
     LibS7Net::PWrapper m_pPLCWrapper;
     LibS7Net::PPLC m_pPLC;
     LibS7Com::PWrapper m_pCommunicationWrapper;
     LibS7Com::PPLCCommunication m_pCommunication;
 
+    uint32_t m_nPLCtoAMC_DBNo;
+    uint32_t m_nPLCtoAMC_DBSize;
+    uint32_t m_nAMCtoPLC_DBNo;
+
+    std::list<PDriver_S7Value> m_DriverParameters;
+    std::map<std::string, PDriver_S7Command> m_CommandDefinitions;
+
+    void updateParameters ();
+
 public:
 
     CDriver_S7Net(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
     virtual ~CDriver_S7Net();
 
-	void Connect() override;
+    void Configure(const std::string& sConfigurationString) override;
+
+    void Connect(const LibMCDriver_S7Net::eS7CPUType eCPUType, const std::string& sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) override;
 
 	void Disconnect() override;
 
 	void QueryParameters() override;
+
+    IPLCCommand* CreateCommand(const std::string& sCommand) override;
+
+    void ExecuteCommand(IPLCCommand* pPLCCommand) override;
+
+    bool WaitForCommand(IPLCCommand* pPLCCommand, const LibMCDriver_S7Net_uint32 nReactionTimeInMS, const LibMCDriver_S7Net_uint32 nWaitForTimeInMS) override;
 
 };
 

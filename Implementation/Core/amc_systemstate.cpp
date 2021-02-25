@@ -73,9 +73,9 @@ namespace AMC {
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
 
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper);
-		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler);
+		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pParameterInstances = std::make_shared<CParameterInstances>();
 		m_pUIHandler = std::make_shared<CUIHandler>(m_pParameterInstances, m_pSignalHandler,  pEnvWrapper, m_pLogger);
