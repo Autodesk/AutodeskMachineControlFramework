@@ -40,6 +40,7 @@ Abstract: This is a stub class definition of CBuildJob
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 using namespace LibMCData::Impl;
 
@@ -277,13 +278,35 @@ void CBuildJob::AddJobData(const std::string& sName, IStorageStream* pStream, co
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
     auto sStreamUUID = pStream->GetUUID();
+    auto sStreamSHA2 = pStream->GetSHA2();
+    auto nStreamSize = pStream->GetSize();
 
-    auto sTimeStamp = AMCCommon::CUtils::getCurrentISO8601TimeUTC();
-    std::unique_ptr<CBuildJobData> buildJobData (CBuildJobData::createInDatabase (sName, m_sUUID, eDataType, sTimeStamp, sStreamUUID, sUserID, m_pSQLHandler, m_pStoragePath));
+    AMCCommon::CChrono chrono;
+    auto sTimeStamp = chrono.getStartTimeISO8601TimeUTC();
+    std::unique_ptr<CBuildJobData> buildJobData (CBuildJobData::createInDatabase (sName, m_sUUID, eDataType, sTimeStamp, sStreamUUID, sUserID, sStreamSHA2, nStreamSize, m_pSQLHandler, m_pStoragePath));
 }
 
 
-IBuildJobDataIterator* CBuildJob::ListJobDataEx(AMCData::CSQLStatement* pStatement)
+CBuildJobData * CBuildJob::makeJobDataEx(AMCData::CSQLStatement* pStatement)
+{
+    if (pStatement == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
+
+    std::string sDataUUID = pStatement->getColumnUUID(1);
+    std::string sJobUUID = pStatement->getColumnString(2);
+    std::string sName = pStatement->getColumnString(3);
+    LibMCData::eBuildJobDataType eDataType = CBuildJobData::convertStringToBuildJobDataType(pStatement->getColumnString(4));
+    std::string sTimeStamp = pStatement->getColumnString(5);
+    std::string sStorageStreamUUID = pStatement->getColumnUUID(6);
+    std::string sUserID = pStatement->getColumnString(7);
+    std::string sSHA2 = pStatement->getColumnString(8);
+    uint64_t nStreamSize = pStatement->getColumnInt64(9);
+
+    return CBuildJobData::make(sDataUUID, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, sSHA2, nStreamSize, m_pSQLHandler, m_pStoragePath);
+}
+
+
+IBuildJobDataIterator* CBuildJob::listJobDataEx(AMCData::CSQLStatement* pStatement)
 {
     if (pStatement == nullptr)
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
@@ -291,16 +314,7 @@ IBuildJobDataIterator* CBuildJob::ListJobDataEx(AMCData::CSQLStatement* pStateme
     std::unique_ptr<CBuildJobDataIterator> buildJobIterator(new CBuildJobDataIterator());
 
     while (pStatement->nextRow()) {
-        std::string sDataUUID = pStatement->getColumnUUID(1);
-        std::string sJobUUID = pStatement->getColumnString(2);
-        std::string sName = pStatement->getColumnString(3);
-        LibMCData::eBuildJobDataType eDataType = CBuildJobData::convertStringToBuildJobDataType(pStatement->getColumnString(4));
-        std::string sTimeStamp = pStatement->getColumnString(5);
-        std::string sStorageStreamUUID = pStatement->getColumnUUID(6);
-        std::string sUserID = pStatement->getColumnString(7);
-
-
-        buildJobIterator->AddJobData(CBuildJobData::makeShared(sDataUUID, sName, sJobUUID, eDataType, sTimeStamp, sStorageStreamUUID, sUserID, m_pSQLHandler, m_pStoragePath));
+        buildJobIterator->AddJobData(std::shared_ptr<CBuildJobData> (makeJobDataEx (pStatement)));
     }
 
     return buildJobIterator.release();
@@ -310,25 +324,41 @@ IBuildJobDataIterator* CBuildJob::ListJobDataEx(AMCData::CSQLStatement* pStateme
 IBuildJobDataIterator* CBuildJob::ListJobDataByType(const LibMCData::eBuildJobDataType eDataType)
 {
 
-    std::string sQuery = "SELECT uuid, jobuuid, name, datatype, timestamp, storagestreamuuid, userid FROM buildjobdata WHERE jobuuid=? AND active=? AND datatype=? ORDER BY timestamp";
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? AND datatype=? ORDER BY buildjobdata.timestamp";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString (1, m_sUUID);
     pStatement->setInt(2, 1);
     pStatement->setString(3, CBuildJobData::convertBuildJobDataTypeToString(eDataType));
 
-    return ListJobDataEx (pStatement.get());
+    return listJobDataEx (pStatement.get());
 }
 
 IBuildJobDataIterator* CBuildJob::ListJobData()
 {
     std::unique_ptr<CBuildJobDataIterator> buildJobIterator (new CBuildJobDataIterator ());
 
-    std::string sQuery = "SELECT uuid, jobuuid, name, datatype, timestamp, storagestreamuuid, userid FROM buildjobdata WHERE jobuuid=? AND active=? ORDER BY timestamp";
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND active=? ORDER BY buildjobdata.timestamp";
     auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
     pStatement->setString(1, m_sUUID);
     pStatement->setInt(2, 1);
 
-    return ListJobDataEx(pStatement.get());
+    return listJobDataEx(pStatement.get());
+}
+
+IBuildJobData* CBuildJob::RetrieveJobData(const std::string& sDataUUID)
+{
+    std::unique_ptr<CBuildJobDataIterator> buildJobIterator(new CBuildJobDataIterator());
+
+    std::string sQuery = "SELECT buildjobdata.uuid, buildjobdata.jobuuid, buildjobdata.name, buildjobdata.datatype, buildjobdata.timestamp, buildjobdata.storagestreamuuid, buildjobdata.userid, storage_streams.sha2, storage_streams.size FROM buildjobdata LEFT JOIN storage_streams ON storage_streams.uuid=storagestreamuuid WHERE jobuuid=? AND buildjobdata.uuid=? AND active=?";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, m_sUUID);
+    pStatement->setString(2, sDataUUID);
+    pStatement->setInt(3, 1);
+
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBDATANOTFOUND);
+    
+    return makeJobDataEx(pStatement.get());
 }
 
 

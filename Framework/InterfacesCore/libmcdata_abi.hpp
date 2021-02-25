@@ -263,11 +263,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storenewstream(LibMCData_St
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nSize - Final size of the stream. MUST NOT be 0.
-* @param[in] pSHA2 - SHA256 of the uploaded data.
 * @param[in] pUserID - Currently authenticated user
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pSHA2, const char * pUserID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_beginpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID);
 
 /**
 * stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -286,9 +285,10 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storepartialstream(LibMCDat
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @param[in] pSHA2 - SHA256 of the uploaded data. If given initially, MUST be identical.
 * @return error code or 0 (success)
 */
-LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage, const char * pUUID);
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2);
 
 /**
 * Returns the maximum stream size that the data model allows.
@@ -309,12 +309,44 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_getmaxstreamsize(LibMCData_
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_contenttypeisaccepted(LibMCData_Storage pStorage, const char * pContentType, bool * pAccepted);
 
+/**
+* checks if a stream is an image.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream.
+* @param[out] pIsImage - Returns if the stream is an image.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_streamisimage(LibMCData_Storage pStorage, const char * pUUID, bool * pIsImage);
+
 /*************************************************************************************************************************
  Class definition for BuildJobData
 **************************************************************************************************************************/
 
 /**
-* returns the name of a build job.
+* returns the uuid of a build job data.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatauuid(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the uuid of the parent build job.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getjobuuid(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the name of a build job uuid.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
 * @param[in] nNameBufferSize - size of the buffer (including trailing 0)
@@ -345,6 +377,26 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_gettimestamp(LibMCData
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestream(LibMCData_BuildJobData pBuildJobData, LibMCData_StorageStream * pStreamInstance);
 
 /**
+* returns the checksum of the storage stream of the build.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of SHA256 of the storage stream., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestreamsha2(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nSHA2BufferSize, LibMCData_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* returns the size of the storage stream of the build.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[out] pSize - size of the storage stream in bytes.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestreamsize(LibMCData_BuildJobData pBuildJobData, LibMCData_uint64 * pSize);
+
+/**
 * returns the data type of the job data.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
@@ -352,6 +404,17 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getstoragestream(LibMC
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatatype(LibMCData_BuildJobData pBuildJobData, LibMCData::eBuildJobDataType * pDataType);
+
+/**
+* returns the data type of the job data as string.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nDataTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataTypeBuffer -  buffer of Data type of the job data, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobdata_getdatatypeasstring(LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nDataTypeBufferSize, LibMCData_uint32* pDataTypeNeededChars, char * pDataTypeBuffer);
 
 /**
 * returns the mime type of a storage stream.
@@ -542,6 +605,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdatabytype(LibMCDat
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_listjobdata(LibMCData_BuildJob pBuildJob, LibMCData_BuildJobDataIterator * pIteratorInstance);
 
+/**
+* Retrieves a build job data instance by its uuid.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pDataUUID - Job Data UUID.
+* @param[out] pBuildJobData - Build Job Data Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjob_retrievejobdata(LibMCData_BuildJob pBuildJob, const char * pDataUUID, LibMCData_BuildJobData * pBuildJobData);
+
 /*************************************************************************************************************************
  Class definition for BuildJobIterator
 **************************************************************************************************************************/
@@ -583,6 +656,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_createjob(LibMCData
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_retrievejob(LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, LibMCData_BuildJob * pJobInstance);
 
 /**
+* Finds the parent build job of a given data uuid. Fails if data does not exist.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[in] pDataUUID - Job Data UUID.
+* @param[out] pBuildJobData - Build Job Instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_findjobofdata(LibMCData_BuildJobHandler pBuildJobHandler, const char * pDataUUID, LibMCData_BuildJob * pBuildJobData);
+
+/**
 * Retrieves a list of build jobs, filtered by status.
 *
 * @param[in] pBuildJobHandler - BuildJobHandler instance.
@@ -615,6 +698,35 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertbuildstatust
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_buildjobhandler_convertstringtobuildstatus(LibMCData_BuildJobHandler pBuildJobHandler, const char * pString, LibMCData::eBuildJobStatus * pStatus);
 
 /*************************************************************************************************************************
+ Class definition for LoginHandler
+**************************************************************************************************************************/
+
+/**
+* Checks if a user exist.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[out] pUserExists - Flag if users exists
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_LoginHandler pLoginHandler, const char * pUsername, bool * pUserExists);
+
+/**
+* Retrieves a users data.
+*
+* @param[in] pLoginHandler - LoginHandler instance.
+* @param[in] pUsername - User name
+* @param[in] nSaltBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSaltNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSaltBuffer -  buffer of Salt of the user., may be NULL
+* @param[in] nHashedPasswordBufferSize - size of the buffer (including trailing 0)
+* @param[out] pHashedPasswordNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pHashedPasswordBuffer -  buffer of Hashed Password., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nSaltBufferSize, LibMCData_uint32* pSaltNeededChars, char * pSaltBuffer, const LibMCData_uint32 nHashedPasswordBufferSize, LibMCData_uint32* pHashedPasswordNeededChars, char * pHashedPasswordBuffer);
+
+/*************************************************************************************************************************
  Class definition for DataModel
 **************************************************************************************************************************/
 
@@ -637,6 +749,20 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_initialisedatabase(LibMCD
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getdatamodelversion(LibMCData_DataModel pDataModel, LibMCData_uint32 * pVersion);
+
+/**
+* returns unique identifiers for the current installation.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] nInstallationUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pInstallationUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pInstallationUUIDBuffer -  buffer of Installation UUID. Public value to document which installation was used for something., may be NULL
+* @param[in] nInstallationSecretBufferSize - size of the buffer (including trailing 0)
+* @param[out] pInstallationSecretNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pInstallationSecretBuffer -  buffer of Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getinstallationinformation(LibMCData_DataModel pDataModel, const LibMCData_uint32 nInstallationUUIDBufferSize, LibMCData_uint32* pInstallationUUIDNeededChars, char * pInstallationUUIDBuffer, const LibMCData_uint32 nInstallationSecretBufferSize, LibMCData_uint32* pInstallationSecretNeededChars, char * pInstallationSecretBuffer);
 
 /**
 * creates a storage access class.
@@ -664,6 +790,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createbuildjobhandler(Lib
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createnewlogsession(LibMCData_DataModel pDataModel, LibMCData_LogSession * pLogSession);
+
+/**
+* creates a login handler instance.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pLoginHandler - LoginHandler instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createloginhandler(LibMCData_DataModel pDataModel, LibMCData_LoginHandler * pLoginHandler);
 
 /*************************************************************************************************************************
  Global functions

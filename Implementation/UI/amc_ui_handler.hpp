@@ -34,10 +34,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include <memory>
 #include <vector>
 #include <string>
+#include <mutex>
+
+namespace LibMCUI {
+	amcDeclareDependingClass(CWrapper, PWrapper);
+	amcDeclareDependingClass(CEventHandler, PEventHandler);
+}
+
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
+
+namespace LibMCEnv {
+	amcDeclareDependingClass(CWrapper, PWrapper);
+
+	namespace Impl {
+		amcDeclareDependingClass(CUIEnvironment, PUIEnvironment);
+	}
+}
 
 namespace AMC {
 
@@ -45,34 +65,63 @@ namespace AMC {
 	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
 	amcDeclareDependingClass(CUIPage, PUIPage);
+	amcDeclareDependingClass(CLogger, PLogger);
+	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);	
+	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 
 	class CUIHandler {
 	protected:
+
+		std::mutex m_Mutex;
+
 		std::string m_sAppName;
 		std::string m_sCopyrightString;
+		std::string m_sLogoUUID;
+		double m_dLogoAspectRatio;
+
+		PParameterInstances m_pParameterInstances;
+		PStateSignalHandler m_pSignalHandler;
+		PResourcePackage m_pCoreResourcePackage;
+		PLogger m_pLogger;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
 
-		std::map <std::pair<std::string, std::string>, PUIPage> m_Pages;
+		std::map <std::string, PUIPage> m_Pages;
+		PUIPage m_pMainPage;
+
+		LibMCUI::PWrapper m_pUIPluginWrapper;
+		LibMCUI::PEventHandler m_pUIEventHandler;
+		LibMCEnv::PWrapper m_pEnvironmentWrapper;
+
+		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+		PUIPage addPage_Unsafe (const std::string& sName);
+
+		PUIPage findPage(const std::string& sName);
 
 	public:
 
-		CUIHandler();
+		CUIHandler(PParameterInstances pParameterInstances, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
 		
 		virtual ~CUIHandler();
 		
 		std::string getAppName();
 		std::string getCopyrightString();
 
-		void addMenuItem (const std::string & sID, const std::string & sIcon, const std::string & sCaption, const std::string & sTargetPage);
-		void addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+		void writeConfigurationToJSON (CJSONWriter & writer);
+		void writeStateToJSON(CJSONWriter& writer);
 
-		PUIPage addPage(const std::string& sInstanceName, const std::string& sName);
+		void loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pCoreResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
 
-		void writeToJSON (CJSONWriter & writer);
+		PResourcePackage getCoreResourcePackage ();
 
-		void loadFromXML (pugi::xml_node & xmlNode);
+		PUIModuleItem findModuleItem(const std::string & sUUID);
+
+		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

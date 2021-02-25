@@ -362,13 +362,14 @@ public:
 	{
 	}
 	
-	inline void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath);
+	inline void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource);
+	inline void SetTempBasePath(const std::string & sTempBasePath);
 	inline void ParseConfiguration(const std::string & sXMLString);
 	inline void StartAllThreads();
 	inline void TerminateAllThreads();
-	inline void LoadClientPackage(const CInputVector<LibMC_uint8> & ZIPStreamBuffer);
+	inline void LoadClientPackage(const std::string & sResourcePath);
 	inline void Log(const std::string & sMessage, const eLogSubSystem eSubsystem, const eLogLevel eLogLevel);
-	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod);
+	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization);
 };
 	
 	/**
@@ -486,6 +487,7 @@ public:
 		pWrapperTable->m_APIRequestHandler_Handle = nullptr;
 		pWrapperTable->m_APIRequestHandler_GetResultData = nullptr;
 		pWrapperTable->m_MCContext_RegisterLibraryPath = nullptr;
+		pWrapperTable->m_MCContext_SetTempBasePath = nullptr;
 		pWrapperTable->m_MCContext_ParseConfiguration = nullptr;
 		pWrapperTable->m_MCContext_StartAllThreads = nullptr;
 		pWrapperTable->m_MCContext_TerminateAllThreads = nullptr;
@@ -616,6 +618,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MCContext_RegisterLibraryPath == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MCContext_SetTempBasePath = (PLibMCMCContext_SetTempBasePathPtr) GetProcAddress(hLibrary, "libmc_mccontext_settempbasepath");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_SetTempBasePath = (PLibMCMCContext_SetTempBasePathPtr) dlsym(hLibrary, "libmc_mccontext_settempbasepath");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_SetTempBasePath == nullptr)
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -772,6 +783,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmc_mccontext_registerlibrarypath", (void**)&(pWrapperTable->m_MCContext_RegisterLibraryPath));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_RegisterLibraryPath == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_settempbasepath", (void**)&(pWrapperTable->m_MCContext_SetTempBasePath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_SetTempBasePath == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_mccontext_parseconfiguration", (void**)&(pWrapperTable->m_MCContext_ParseConfiguration));
@@ -934,10 +949,20 @@ public:
 	* CMCContext::RegisterLibraryPath - registers a library for a given name.
 	* @param[in] sLibraryName - Library Name.
 	* @param[in] sLibraryPath - Path to the shared library.
+	* @param[in] sLibraryResource - Path to the library resource file.
 	*/
-	void CMCContext::RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath)
+	void CMCContext::RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_RegisterLibraryPath(m_pHandle, sLibraryName.c_str(), sLibraryPath.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_RegisterLibraryPath(m_pHandle, sLibraryName.c_str(), sLibraryPath.c_str(), sLibraryResource.c_str()));
+	}
+	
+	/**
+	* CMCContext::SetTempBasePath - sets the base path for temporary files.
+	* @param[in] sTempBasePath - Base path for temporary files.
+	*/
+	void CMCContext::SetTempBasePath(const std::string & sTempBasePath)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_SetTempBasePath(m_pHandle, sTempBasePath.c_str()));
 	}
 	
 	/**
@@ -967,11 +992,11 @@ public:
 	
 	/**
 	* CMCContext::LoadClientPackage - load a client package to serve the client website.
-	* @param[in] ZIPStreamBuffer - client package ZIP stream.
+	* @param[in] sResourcePath - Path to the resource package.
 	*/
-	void CMCContext::LoadClientPackage(const CInputVector<LibMC_uint8> & ZIPStreamBuffer)
+	void CMCContext::LoadClientPackage(const std::string & sResourcePath)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_LoadClientPackage(m_pHandle, (LibMC_uint64)ZIPStreamBuffer.size(), ZIPStreamBuffer.data()));
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_LoadClientPackage(m_pHandle, sResourcePath.c_str()));
 	}
 	
 	/**
@@ -989,12 +1014,13 @@ public:
 	* CMCContext::CreateAPIRequestHandler - creates an API request handler.
 	* @param[in] sURI - URI to serve
 	* @param[in] sRequestMethod - Request Method
+	* @param[in] sAuthorization - Authorization Header String
 	* @return Request Handler instance.
 	*/
-	PAPIRequestHandler CMCContext::CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod)
+	PAPIRequestHandler CMCContext::CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization)
 	{
 		LibMCHandle hHandlerInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_CreateAPIRequestHandler(m_pHandle, sURI.c_str(), sRequestMethod.c_str(), &hHandlerInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_CreateAPIRequestHandler(m_pHandle, sURI.c_str(), sRequestMethod.c_str(), sAuthorization.c_str(), &hHandlerInstance));
 		
 		if (!hHandlerInstance) {
 			CheckError(LIBMC_ERROR_INVALIDPARAM);

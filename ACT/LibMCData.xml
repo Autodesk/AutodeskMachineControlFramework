@@ -192,15 +192,15 @@
 		<error name="COULDNOTREADZIPSTREAM" code="206" description="Could not read ZIP stream" />		
 		<error name="COULDNOTREADFULLZIPDATA" code="207" description="Could not read full zip data" />		
 		
-		<error name="COULDNOTFINDDISTRIBUTIONINDEX" code="208" description="Could not find distribution index." />		
-		<error name="COULDNOTPARSEDISTRIBUTIONINDEX" code="209" description="Could not parse distribution index." />
-		<error name="EMPTYDISTRIBUTIONINDEX" code="210" description="Empty distribution index." />
-		<error name="MISSINGDISTRIBUTIONINDEX" code="211" description="Missing distribution index." />
+		<error name="COULDNOTFINDRESOURCEINDEX" code="208" description="Could not find resource index." />		
+		<error name="COULDNOTPARSERESOURCEINDEX" code="209" description="Could not parse resource index." />
+		<error name="EMPTYRESOURCEINDEX" code="210" description="Empty resource index." />
+		<error name="MISSINGRESOURCEINDEX" code="211" description="Missing resource index." />
 		
-		<error name="MISSINGDISTRIBUTIONURL" code="212" description="Missing distribution url." />
-		<error name="MISSINGDISTRIBUTIONFILENAME" code="213" description="Missing distribution filename." />
-		<error name="MISSINGDISTRIBUTIONSIZE" code="214" description="Missing distribution size." />
-		<error name="MISSINGDISTRIBUTIONCONTENTTYPE" code="215" description="Missing distribution content type." />
+		<error name="MISSINGRESOURCENAME" code="212" description="Missing resource name." />
+		<error name="MISSINGRESOURCEFILENAME" code="213" description="Missing resource filename." />
+		<error name="MISSINGRESOURCESIZE" code="214" description="Missing resource size." />
+		<error name="MISSINGRESOURCECONTENTTYPE" code="215" description="Missing resource content type." />
 		
 		<error name="DRIVERALREADYREGISTERED" code="216" description="Driver already registered." />
 		<error name="DRIVERNOTFOUND" code="217" description="Driver not found." />
@@ -276,6 +276,56 @@
 		<error name="MISSINGTOOLBARITEMCAPTION" code="280" description="Missing toolbar item caption" />
 		<error name="MISSINGSERVICESNODE" code="281" description="Missing services node" />		
 
+		<error name="INVALIDSESSIONUUID" code="282" description="Invalid session UUID" />
+		<error name="INVALIDSESSIONKEY" code="283" description="Invalid session Key" />
+		<error name="SESSIONNOTAUTHORIZED" code="284" description="Session not authorized" />
+		<error name="INVALIDUSERNAME" code="285" description="Invalid user name" />
+		<error name="INVALIDPASSWORD" code="286" description="Invalid password" />
+		<error name="INVALIDAUTHORIZATION" code="287" description="Invalid Authorization" />
+		<error name="USERALREADYAUTHORIZED" code="288" description="User already authorized" />
+		<error name="INVALIDSESSIONTOKEN" code="289" description="Invalid session token" />	
+		<error name="INVALIDCLIENTKEY" code="290" description="Invalid client key" />		
+		<error name="INVALIDLOGIN" code="291" description="Invalid login credentials" />
+		<error name="DUPLICATEPAGE" code="292" description="Duplicate page" />
+		<error name="PAGENOTFOUND" code="293" description="Page not found" />
+		<error name="MISSINGPAGENAME" code="294" description="Missing page name" />
+		<error name="INVALIDPAGENAME" code="295" description="Invalid page name" />
+		<error name="MODULENOTFOUND" code="296" description="Module not found" />
+		<error name="DUPLICATEMODULE" code="297" description="Duplicate module" />
+		<error name="INVALIDMODULENAME" code="298" description="Invalid module name" />
+		<error name="INVALIDMODULETYPE" code="299" description="Invalid module type" />	
+		<error name="INVALIDHEADLINE" code="300" description="Invalid headline" />
+		<error name="USERNOTFOUND" code="301" description="User not found" />
+		<error name="STREAMISNOTIMAGE" code="302" description="Stream is not image" />		
+		<error name="TOOMANYCONTENTPARAMETERS" code="303" description="Too many content parameters" />
+		<error name="MISSINGCONTENTSTATEMACHINENAME" code="304" description="Missing content state machine name" />
+		<error name="MISSINGCONTENTGROUPNAME" code="305" description="Missing content group name" />
+		<error name="INVALIDENTRIESPERPAGE" code="306" description="Invalid entries per page" />
+		<error name="MODULEITEMNOTFOUND" code="307" description="Module item not found" />
+		<error name="DERIVEDPARAMETERSREADONLY" code="308" description="Derived parameters are read only." />
+		<error name="TOOMANYJOURNALVARIABLES" code="309" description="Too many journal variables" />
+		<error name="JOURNALISNOTINITIALISING" code="310" description="Too many journal variables" />
+		<error name="JOURNALISNOTRECORDING" code="311" description="Too many journal variables" />
+		<error name="INVALIDVARIABLETYPE" code="312" description="Invalid variable type" />
+		<error name="INVALIDVARIABLEUNITS" code="313" description="Invalid variable units" />
+		<error name="UNITSHAVEALREADYBEENSET" code="314" description="Units have already been set" />
+		<error name="UNITSHAVENOTBEENSET" code="315" description="Units have not been set" />
+		<error name="INVALIDTIMESTAMP" code="316" description="Invalid time stamp" />
+		<error name="NOCURRENTJOURNALCHUNK" code="317" description="No current journal chunk" />
+		<error name="DUPLICATEJOURNALID" code="318" description="Duplicate journal id" />		
+		<error name="RESOURCEENTRYNOTFOUND" code="319" description="Resource entry not found" />
+		<error name="NOCORERESOURCEPACKAGE" code="320" description="No core resource package" />
+		<error name="INVALIDASPECTRATIO" code="321" description="Invalid aspect ratio" />
+		<error name="MISSINGLOGORESOURCE" code="322" description="Missing logo resource" />
+		<error name="NOUSERINTERFACEPLUGIN" code="323" description="No user interface plugin" />
+		<error name="COULDNOTLOADUILIBRARY" code="324" description="Could not load UI library" />
+		<error name="EVENTNAMENOTFOUND" code="325" description="Event name not found" />
+		<error name="INVALIDEVENTSENDER" code="326" description="Invalid event context" />
+		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
+		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
+		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
+		<error name="BUILDJOBDATANOTFOUND" code="330" description="Build job data not found" />
+								
 	</errors>
 	
 
@@ -406,12 +456,10 @@
 			<param name="IsReady" type="bool" pass="return" description="Stream is ready." />
 		</method>	
 
-
 		<method name="RetrieveStream" description="retrieves an existing stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream." />	
 			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
 		</method>	
-
 
 		<method name="StoreNewStream" description="stores a new stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. Must be unique and newly generated." />	
@@ -428,7 +476,6 @@
 			<param name="Name" type="string" pass="in" description="Name of the stream." />	
 			<param name="MimeType" type="string" pass="in" description="Mime type of the content. MUST NOT be empty." />	
 			<param name="Size" type="uint64" pass="in" description="Final size of the stream. MUST NOT be 0." />	
-			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data." />	
 			<param name="UserID" type="string" pass="in" description="Currently authenticated user" />
 		</method>	
 
@@ -440,6 +487,7 @@
 	
 		<method name="FinishPartialStream" description="Finishes storing a stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
+			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data. If given initially, MUST be identical." />
 		</method>	
 		
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
@@ -451,12 +499,24 @@
 			<param name="Accepted" type="bool" pass="return" description="Content type is accepted." />	
 		</method>	
 	
+		<method name="StreamIsImage" description="checks if a stream is an image.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream." />	
+			<param name="IsImage" type="bool" pass="return" description="Returns if the stream is an image." />
+		</method>	
 	</class>
 
 
 	<class name="BuildJobData" parent="Base" description="Build Job Data instance">
 
-		<method name="GetName" description="returns the name of a build job.">
+		<method name="GetDataUUID" description="returns the uuid of a build job data.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+
+		<method name="GetJobUUID" description="returns the uuid of the parent build job.">
+			<param name="UUID" type="string" pass="return" description="UUID String" />	
+		</method>
+
+		<method name="GetName" description="returns the name of a build job uuid.">
 			<param name="Name" type="string" pass="return" description="Name String" />	
 		</method>
 
@@ -468,8 +528,20 @@
 			<param name="StreamInstance" type="class" class="StorageStream" pass="return" description="Stream Instance." />
 		</method>
 
+		<method name="GetStorageStreamSHA2" description="returns the checksum of the storage stream of the build.">
+			<param name="SHA2" type="string" pass="return" description="SHA256 of the storage stream." />
+		</method>
+
+		<method name="GetStorageStreamSize" description="returns the size of the storage stream of the build.">
+			<param name="Size" type="uint64" pass="return" description="size of the storage stream in bytes." />
+		</method>
+
 		<method name="GetDataType" description="returns the data type of the job data.">
 			<param name="DataType" type="enum" class="BuildJobDataType" pass="return" description="Data type of the job data" />	
+		</method>
+
+		<method name="GetDataTypeAsString" description="returns the data type of the job data as string.">
+			<param name="DataType" type="string" pass="return" description="Data type of the job data" />	
 		</method>
 
 		<method name="GetMIMEType" description="returns the mime type of a storage stream.">
@@ -554,6 +626,12 @@
 		<method name="ListJobData" description="Retrieves a list of build job data objects.">
 			<param name="IteratorInstance" type="class" class="BuildJobDataIterator" pass="return" description="Build Job Data Iterator Instance." />
 		</method>
+		
+		<method name="RetrieveJobData" description="Retrieves a build job data instance by its uuid.">
+			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
+			<param name="BuildJobData" type="class" class="BuildJobData" pass="return" description="Build Job Data Instance." />
+		</method>
+		
 									
 	</class>
 
@@ -579,6 +657,11 @@
 			<param name="JobInstance" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
 		</method>
 
+		<method name="FindJobOfData" description="Finds the parent build job of a given data uuid. Fails if data does not exist.">
+			<param name="DataUUID" type="string" pass="in" description="Job Data UUID." />	
+			<param name="BuildJobData" type="class" class="BuildJob" pass="return" description="Build Job Instance." />
+		</method>
+
 		<method name="ListJobsByStatus" description="Retrieves a list of build jobs, filtered by status.">
 			<param name="Status" type="enum" class="BuildJobStatus" pass="in" description="Job Status to list." />	
 			<param name="IteratorInstance" type="class" class="BuildJobIterator" pass="return" description="Build Job Iterator Instance." />
@@ -593,9 +676,27 @@
 			<param name="String" type="string" pass="in" description="String Identifier." />
 			<param name="Status" type="enum" class="BuildJobStatus" pass="return" description="Status Enum." />	
 		</method>
+
 			
 	</class>
 
+
+
+
+	<class name="LoginHandler" parent="Base" description="Login handler instance">
+	
+		<method name="UserExists" description="Checks if a user exist.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="UserExists" type="bool" pass="return" description="Flag if users exists" />
+		</method>
+	
+		<method name="GetUserDetails" description="Retrieves a users data.">
+			<param name="Username" type="string" pass="in" description="User name" />
+			<param name="Salt" type="string" pass="out" description="Salt of the user." />
+			<param name="HashedPassword" type="string" pass="out" description="Hashed Password." />
+		</method>
+	
+	</class>
 
 
 
@@ -611,6 +712,11 @@
 			<param name="Version" type="uint32" pass="return" description="Data model version." />	
 		</method>
 
+		<method name="GetInstallationInformation" description="returns unique identifiers for the current installation.">
+			<param name="InstallationUUID" type="string" pass="out" description="Installation UUID. Public value to document which installation was used for something." />	
+			<param name="InstallationSecret" type="string" pass="out" description="Secret SHA256 key for seeding external-facing pseudo-randomness. MUST NOT be given outside of the application." />	
+		</method>
+
 		<method name="CreateStorage" description="creates a storage access class.">
 			<param name="Storage" type="class" class="Storage" pass="return" description="Storage class instance." />	
 		</method>
@@ -623,6 +729,9 @@
 			<param name="LogSession" type="class" class="LogSession" pass="return" description="LogSession class instance." />	
 		</method>
 		
+		<method name="CreateLoginHandler" description="creates a login handler instance.">
+			<param name="LoginHandler" type="class" class="LoginHandler" pass="return" description="LoginHandler instance." />	
+		</method>
 				
 	</class>
 

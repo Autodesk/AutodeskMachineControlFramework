@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of CConnectionIterator
 */
 
 #include "liboie_connectioniterator.hpp"
+#include "liboie_connection.hpp"
 #include "liboie_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -43,8 +44,15 @@ using namespace LibOIE::Impl;
  Class definition of CConnectionIterator 
 **************************************************************************************************************************/
 
+CConnectionIterator::CConnectionIterator()
+    : CIterator ()
+{
+
+}
+
+
 IConnection * CConnectionIterator::GetCurrentConnection()
 {
-	throw ELibOIEInterfaceException(LIBOIE_ERROR_NOTIMPLEMENTED);
+    return new CConnection();
 }
 

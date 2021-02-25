@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_handler_ui.hpp"
 #include "amc_api_jsonrequest.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_ui_module_item.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -63,15 +64,44 @@ std::string CAPIHandler_UI::getBaseURI ()
 	return "api/ui";
 }
 
-APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eAPIRequestType requestType)
+APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& sParameterUUID)
 {
 	// Leave away base URI
 	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(getBaseURI ().length ()));
+	sParameterUUID = "";
 
 	if (requestType == eAPIRequestType::rtGet) {
 
 		if ((sParameterString == "/config/") || (sParameterString == "/config")) {
 			return APIHandler_UIType::utConfiguration;
+		}
+
+		if ((sParameterString == "/state/") || (sParameterString == "/state")) {
+			return APIHandler_UIType::utState;
+		}
+
+		if (sParameterString.length() == 43) {
+			if (sParameterString.substr(0, 7) == "/image/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr (7, 36));
+				return APIHandler_UIType::utImage;
+			}
+		}
+
+		if (sParameterString.length() == 49) {
+			if (sParameterString.substr(0, 13) == "/contentitem/") {
+				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(13, 36));
+				return APIHandler_UIType::utContentItem;
+			}
+		}
+
+
+	}
+
+
+	if (requestType == eAPIRequestType::rtPost) {
+
+		if ((sParameterString == "/event/") || (sParameterString == "/event")) {
+			return APIHandler_UIType::utEvent;
 		}
 
 	}
@@ -80,31 +110,143 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 }
 
 
+void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) 
+{
+	std::string sParameterUUID;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
 
+	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage) || (uiType == APIHandler_UIType::utContentItem)) {
+
+		bNeedsToBeAuthorized = false;
+		bCreateNewSession = false;
+
+	}
+	else {
+		bNeedsToBeAuthorized = true;
+		bCreateNewSession = false;
+	}
+	
+}
+
+bool CAPIHandler_UI::expectsRawBody(const std::string& sURI, const eAPIRequestType requestType)
+{
+	std::string sParameterUUID;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
+
+	return (uiType == APIHandler_UIType::utEvent);
+
+}
 
 void CAPIHandler_UI::handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth)
 {
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	writer.addString(AMC_API_KEY_UI_SESSIONID, pAuth->getSessionUUID());
-	m_pSystemState->uiHandler()->writeToJSON(writer);
+	m_pSystemState->uiHandler()->writeConfigurationToJSON(writer);
+}
+
+void CAPIHandler_UI::handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	m_pSystemState->uiHandler()->writeStateToJSON(writer);
+}
+
+
+PAPIResponse CAPIHandler_UI::handleImageRequest(const std::string& sParameterUUID, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	// First look in resources for UUID
+	auto pCoreResourcePackage = m_pSystemState->uiHandler()->getCoreResourcePackage();
+	auto pResourceEntry = pCoreResourcePackage->findEntryByUUID(sParameterUUID, false);
+
+	if (pResourceEntry != nullptr) {
+		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(pResourceEntry->getContentType ());
+		pCoreResourcePackage->readEntry(pResourceEntry->getName(), apiResponse->getBuffer());
+
+		return apiResponse;
+	}
+
+	// Then look in storage for uuid
+	auto pStorage = m_pSystemState->storage();
+	if (pStorage->StreamIsImage(sParameterUUID)) {
+
+		auto pStream = pStorage->RetrieveStream(sParameterUUID);
+		auto sContentType = pStream->GetMIMEType();
+
+		auto apiResponse = std::make_shared<CAPIFixedBufferResponse>(sContentType);
+		pStream->GetContent(apiResponse->getBuffer());
+
+		return apiResponse;		
+	}
+
+	// if not found, return 404
+	return nullptr;
 
 }
 
 
+void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	auto pModuleItem = m_pSystemState->uiHandler()->findModuleItem (sParameterUUID);
+	if (pModuleItem.get () == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND);
+
+	CJSONWriterObject object(writer);
+	pModuleItem->addContentToJSON(writer, object);
+	writer.addString(AMC_API_KEY_UI_ITEMUUID, sParameterUUID);
+	writer.addObject(AMC_API_KEY_UI_CONTENT, object);
+}
+
+
+void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
+{
+	if (pAuth.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pBodyData == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
+	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
+	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
+	auto sContextUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTCONTEXT, LIBMC_ERROR_INVALIDEVENTCONTEXT);
+
+	m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID);
+}
+
 
 PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
-
-	auto uiType = parseRequest(sURI, requestType);
+	std::string sParameterUUID;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
 
 	CJSONWriter writer;
-	writeJSONHeader(writer, AMC_API_PROTOCOL_BUILD);
+	writeJSONHeader(writer, AMC_API_PROTOCOL_UI);
 
 	switch (uiType) {
 	case APIHandler_UIType::utConfiguration:
 		handleConfigurationRequest(writer, pAuth);
+		break;
+
+	case APIHandler_UIType::utState:
+		handleStateRequest(writer, pAuth);
+		break;
+
+	case APIHandler_UIType::utContentItem:
+		handleContentItemRequest(writer, sParameterUUID, pAuth);
+		break;
+
+	case APIHandler_UIType::utImage:
+		return handleImageRequest(sParameterUUID, pAuth);
+
+	case APIHandler_UIType::utEvent:
+		handleEventRequest (writer, pBodyData, nBodyDataSize, pAuth);
 		break;
 
 	default:
@@ -113,8 +255,6 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 	}
 
 	return std::make_shared<CAPIStringResponse>(AMC_API_HTTP_SUCCESS, AMC_API_CONTENTTYPE, writer.saveToString());
-
-	return nullptr;
 }
 
 

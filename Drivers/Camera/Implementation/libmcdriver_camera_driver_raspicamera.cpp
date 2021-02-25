@@ -45,7 +45,7 @@ using namespace LibMCDriver_Camera::Impl;
  Class definition of CDriver_RaspiCamera 
 **************************************************************************************************************************/
 
-CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
     : CDriver_Camera (sName, sType), m_pDriverEnvironment (pDriverEnvironment)
 {
     if (pDriverEnvironment.get() == nullptr)
@@ -53,6 +53,11 @@ CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::st
 
 }
 
+
+void CDriver_RaspiCamera::Configure(const std::string& sConfigurationString)
+{
+
+}
 
 IRaspiCameraDeviceIterator* CDriver_RaspiCamera::QueryDevices() 
 {
@@ -83,5 +88,10 @@ IPNGImage* CDriver_RaspiCamera::CapturePNGImage()
     pData.push_back('3');
 
     return pImage.release();
+}
+
+void CDriver_RaspiCamera::QueryParameters()
+{
+
 }
 

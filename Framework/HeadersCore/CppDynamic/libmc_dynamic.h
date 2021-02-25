@@ -141,9 +141,19 @@ typedef LibMCResult (*PLibMCAPIRequestHandler_GetResultDataPtr) (LibMC_APIReques
 * @param[in] pMCContext - MCContext instance.
 * @param[in] pLibraryName - Library Name.
 * @param[in] pLibraryPath - Path to the shared library.
+* @param[in] pLibraryResource - Path to the library resource file.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_RegisterLibraryPathPtr) (LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath);
+typedef LibMCResult (*PLibMCMCContext_RegisterLibraryPathPtr) (LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResource);
+
+/**
+* sets the base path for temporary files.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pTempBasePath - Base path for temporary files.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_SetTempBasePathPtr) (LibMC_MCContext pMCContext, const char * pTempBasePath);
 
 /**
 * parses and initialises the state machines from a configuration XML.
@@ -174,11 +184,10 @@ typedef LibMCResult (*PLibMCMCContext_TerminateAllThreadsPtr) (LibMC_MCContext p
 * load a client package to serve the client website.
 *
 * @param[in] pMCContext - MCContext instance.
-* @param[in] nZIPStreamBufferSize - Number of elements in buffer
-* @param[in] pZIPStreamBuffer - uint8 buffer of client package ZIP stream.
+* @param[in] pResourcePath - Path to the resource package.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_LoadClientPackagePtr) (LibMC_MCContext pMCContext, LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8 * pZIPStreamBuffer);
+typedef LibMCResult (*PLibMCMCContext_LoadClientPackagePtr) (LibMC_MCContext pMCContext, const char * pResourcePath);
 
 /**
 * log message with a certain log level.
@@ -197,10 +206,11 @@ typedef LibMCResult (*PLibMCMCContext_LogPtr) (LibMC_MCContext pMCContext, const
 * @param[in] pMCContext - MCContext instance.
 * @param[in] pURI - URI to serve
 * @param[in] pRequestMethod - Request Method
+* @param[in] pAuthorization - Authorization Header String
 * @param[out] pHandlerInstance - Request Handler instance.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_CreateAPIRequestHandlerPtr) (LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance);
+typedef LibMCResult (*PLibMCMCContext_CreateAPIRequestHandlerPtr) (LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorization, LibMC_APIRequestHandler * pHandlerInstance);
 
 /*************************************************************************************************************************
  Global functions
@@ -276,6 +286,7 @@ typedef struct {
 	PLibMCAPIRequestHandler_HandlePtr m_APIRequestHandler_Handle;
 	PLibMCAPIRequestHandler_GetResultDataPtr m_APIRequestHandler_GetResultData;
 	PLibMCMCContext_RegisterLibraryPathPtr m_MCContext_RegisterLibraryPath;
+	PLibMCMCContext_SetTempBasePathPtr m_MCContext_SetTempBasePath;
 	PLibMCMCContext_ParseConfigurationPtr m_MCContext_ParseConfiguration;
 	PLibMCMCContext_StartAllThreadsPtr m_MCContext_StartAllThreads;
 	PLibMCMCContext_TerminateAllThreadsPtr m_MCContext_TerminateAllThreads;

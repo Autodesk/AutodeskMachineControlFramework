@@ -146,12 +146,12 @@ LibMCResult CCall_libmc_apirequesthandler_getresultdata(LibMCHandle libraryHandl
 }
 
 
-LibMCResult CCall_libmc_mccontext_registerlibrarypath(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath)
+LibMCResult CCall_libmc_mccontext_registerlibrarypath(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResourcePath)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_RegisterLibraryPath (pMCContext, pLibraryName, pLibraryPath);
+	return wrapperTable->m_MCContext_RegisterLibraryPath (pMCContext, pLibraryName, pLibraryPath, pLibraryResourcePath);
 }
 
 
@@ -182,12 +182,12 @@ LibMCResult CCall_libmc_mccontext_terminateallthreads(LibMCHandle libraryHandle,
 }
 
 
-LibMCResult CCall_libmc_mccontext_loadclientpackage(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8 * pZIPStreamBuffer)
+LibMCResult CCall_libmc_mccontext_loadclientpackage(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pPackagePath)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_LoadClientPackage (pMCContext, nZIPStreamBufferSize, pZIPStreamBuffer);
+	return wrapperTable->m_MCContext_LoadClientPackage (pMCContext, pPackagePath);
 }
 
 
@@ -200,12 +200,12 @@ LibMCResult CCall_libmc_mccontext_log(LibMCHandle libraryHandle, LibMC_MCContext
 }
 
 
-LibMCResult CCall_libmc_mccontext_createapirequesthandler(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance)
+LibMCResult CCall_libmc_mccontext_createapirequesthandler(LibMCHandle libraryHandle, LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorizationString, LibMC_APIRequestHandler * pHandlerInstance)
 {
 	if (libraryHandle == 0) 
 		return LIBMC_ERROR_INVALIDCAST;
 	sLibMCDynamicWrapperTable * wrapperTable = (sLibMCDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_MCContext_CreateAPIRequestHandler (pMCContext, pURI, pRequestMethod, pHandlerInstance);
+	return wrapperTable->m_MCContext_CreateAPIRequestHandler (pMCContext, pURI, pRequestMethod, pAuthorizationString, pHandlerInstance);
 }
 
 
@@ -297,7 +297,6 @@ const (
 	LogSubSystem_System = 1
 	LogSubSystem_Network = 2
 )
-
 // Error constants for LibMC.
 const LIBMC_ERROR_NOTIMPLEMENTED = 1;
 const LIBMC_ERROR_INVALIDPARAM = 2;
@@ -435,14 +434,14 @@ const LIBMC_ERROR_COULDNOTSTATZIPENTRY = 204;
 const LIBMC_ERROR_COULDNOTOPENZIPENTRY = 205;
 const LIBMC_ERROR_COULDNOTREADZIPSTREAM = 206;
 const LIBMC_ERROR_COULDNOTREADFULLZIPDATA = 207;
-const LIBMC_ERROR_COULDNOTFINDDISTRIBUTIONINDEX = 208;
-const LIBMC_ERROR_COULDNOTPARSEDISTRIBUTIONINDEX = 209;
-const LIBMC_ERROR_EMPTYDISTRIBUTIONINDEX = 210;
-const LIBMC_ERROR_MISSINGDISTRIBUTIONINDEX = 211;
-const LIBMC_ERROR_MISSINGDISTRIBUTIONURL = 212;
-const LIBMC_ERROR_MISSINGDISTRIBUTIONFILENAME = 213;
-const LIBMC_ERROR_MISSINGDISTRIBUTIONSIZE = 214;
-const LIBMC_ERROR_MISSINGDISTRIBUTIONCONTENTTYPE = 215;
+const LIBMC_ERROR_COULDNOTFINDRESOURCEINDEX = 208;
+const LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX = 209;
+const LIBMC_ERROR_EMPTYRESOURCEINDEX = 210;
+const LIBMC_ERROR_MISSINGRESOURCEINDEX = 211;
+const LIBMC_ERROR_MISSINGRESOURCENAME = 212;
+const LIBMC_ERROR_MISSINGRESOURCEFILENAME = 213;
+const LIBMC_ERROR_MISSINGRESOURCESIZE = 214;
+const LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE = 215;
 const LIBMC_ERROR_DRIVERALREADYREGISTERED = 216;
 const LIBMC_ERROR_DRIVERNOTFOUND = 217;
 const LIBMC_ERROR_MISSINGDRIVERNAME = 218;
@@ -483,6 +482,70 @@ const LIBMC_ERROR_INVALIDSTREAMUUID = 252;
 const LIBMC_ERROR_INVALIDFIELDNAME = 253;
 const LIBMC_ERROR_UPLOADSIZEMISMATCH = 254;
 const LIBMC_ERROR_CONTENTTYPENOTACCEPTED = 255;
+const LIBMC_ERROR_NOCURRENTUPLOAD = 256;
+const LIBMC_ERROR_UPLOADCHECKSUMMISMATCH = 257;
+const LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS = 258;
+const LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED = 259;
+const LIBMC_ERROR_INVALIDBUILDUUID = 260;
+const LIBMC_ERROR_MISSINGTHREADCOUNT = 261;
+const LIBMC_ERROR_INVALIDTHREADCOUNT = 262;
+const LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS = 263;
+const LIBMC_ERROR_INVALIDITERATOR = 264;
+const LIBMC_ERROR_INVALIDDATATYPE = 265;
+const LIBMC_ERROR_COULDNOTSENDSIGNAL = 266;
+const LIBMC_ERROR_MISSINGSIGNALPARAMETER = 267;
+const LIBMC_ERROR_NOUSERINTERFACEDEFINITION = 268;
+const LIBMC_ERROR_MISSINGAPPNAME = 269;
+const LIBMC_ERROR_MISSINGCOPYRIGHT = 270;
+const LIBMC_ERROR_MISSINGMAINPAGE = 271;
+const LIBMC_ERROR_MISSINGMENUITEMID = 272;
+const LIBMC_ERROR_MISSINGMENUITEMICON = 273;
+const LIBMC_ERROR_MISSINGMENUITEMCAPTION = 274;
+const LIBMC_ERROR_MISSINGTARGETPAGE = 275;
+const LIBMC_ERROR_MISSINGMENUNODE = 276;
+const LIBMC_ERROR_MISSINGTOOLBARNODE = 277;
+const LIBMC_ERROR_MISSINGTOOLBARITEMID = 278;
+const LIBMC_ERROR_MISSINGTOOLBARITEMICON = 279;
+const LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION = 280;
+const LIBMC_ERROR_MISSINGSERVICESNODE = 281;
+const LIBMC_ERROR_INVALIDSESSIONUUID = 282;
+const LIBMC_ERROR_INVALIDSESSIONKEY = 283;
+const LIBMC_ERROR_SESSIONNOTAUTHORIZED = 284;
+const LIBMC_ERROR_INVALIDUSERNAME = 285;
+const LIBMC_ERROR_INVALIDPASSWORD = 286;
+const LIBMC_ERROR_INVALIDAUTHORIZATION = 287;
+const LIBMC_ERROR_USERALREADYAUTHORIZED = 288;
+const LIBMC_ERROR_INVALIDSESSIONTOKEN = 289;
+const LIBMC_ERROR_INVALIDCLIENTKEY = 290;
+const LIBMC_ERROR_INVALIDLOGIN = 291;
+const LIBMC_ERROR_DUPLICATEPAGE = 292;
+const LIBMC_ERROR_PAGENOTFOUND = 293;
+const LIBMC_ERROR_MISSINGPAGENAME = 294;
+const LIBMC_ERROR_INVALIDPAGENAME = 295;
+const LIBMC_ERROR_MODULENOTFOUND = 296;
+const LIBMC_ERROR_DUPLICATEMODULE = 297;
+const LIBMC_ERROR_INVALIDMODULENAME = 298;
+const LIBMC_ERROR_INVALIDMODULETYPE = 299;
+const LIBMC_ERROR_INVALIDHEADLINE = 300;
+const LIBMC_ERROR_USERNOTFOUND = 301;
+const LIBMC_ERROR_STREAMISNOTIMAGE = 302;
+const LIBMC_ERROR_TOOMANYCONTENTPARAMETERS = 303;
+const LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME = 304;
+const LIBMC_ERROR_MISSINGCONTENTGROUPNAME = 305;
+const LIBMC_ERROR_INVALIDENTRIESPERPAGE = 306;
+const LIBMC_ERROR_MODULEITEMNOTFOUND = 307;
+const LIBMC_ERROR_DERIVEDPARAMETERSREADONLY = 308;
+const LIBMC_ERROR_TOOMANYJOURNALVARIABLES = 309;
+const LIBMC_ERROR_JOURNALISNOTINITIALISING = 310;
+const LIBMC_ERROR_JOURNALISNOTRECORDING = 311;
+const LIBMC_ERROR_INVALIDVARIABLETYPE = 312;
+const LIBMC_ERROR_INVALIDVARIABLEUNITS = 313;
+const LIBMC_ERROR_UNITSHAVEALREADYBEENSET = 314;
+const LIBMC_ERROR_UNITSHAVENOTBEENSET = 315;
+const LIBMC_ERROR_INVALIDTIMESTAMP = 316;
+const LIBMC_ERROR_NOCURRENTJOURNALCHUNK = 317;
+const LIBMC_ERROR_DUPLICATEJOURNALID = 318;
+const LIBMC_ERROR_RESOURCEENTRYNOTFOUND = 319;
 
 // WrappedError is an error that wraps a LibMC error.
 type WrappedError struct {
@@ -768,22 +831,22 @@ func errorMessage(errorcode uint32) string {
 		return "Could not read ZIP stream";
 	case LIBMC_ERROR_COULDNOTREADFULLZIPDATA:
 		return "Could not read full zip data";
-	case LIBMC_ERROR_COULDNOTFINDDISTRIBUTIONINDEX:
-		return "Could not find distribution index.";
-	case LIBMC_ERROR_COULDNOTPARSEDISTRIBUTIONINDEX:
-		return "Could not parse distribution index.";
-	case LIBMC_ERROR_EMPTYDISTRIBUTIONINDEX:
-		return "Empty distribution index.";
-	case LIBMC_ERROR_MISSINGDISTRIBUTIONINDEX:
-		return "Missing distribution index.";
-	case LIBMC_ERROR_MISSINGDISTRIBUTIONURL:
-		return "Missing distribution url.";
-	case LIBMC_ERROR_MISSINGDISTRIBUTIONFILENAME:
-		return "Missing distribution filename.";
-	case LIBMC_ERROR_MISSINGDISTRIBUTIONSIZE:
-		return "Missing distribution size.";
-	case LIBMC_ERROR_MISSINGDISTRIBUTIONCONTENTTYPE:
-		return "Missing distribution content type.";
+	case LIBMC_ERROR_COULDNOTFINDRESOURCEINDEX:
+		return "Could not find resource index.";
+	case LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX:
+		return "Could not parse resource index.";
+	case LIBMC_ERROR_EMPTYRESOURCEINDEX:
+		return "Empty resource index.";
+	case LIBMC_ERROR_MISSINGRESOURCEINDEX:
+		return "Missing resource index.";
+	case LIBMC_ERROR_MISSINGRESOURCENAME:
+		return "Missing resource name.";
+	case LIBMC_ERROR_MISSINGRESOURCEFILENAME:
+		return "Missing resource filename.";
+	case LIBMC_ERROR_MISSINGRESOURCESIZE:
+		return "Missing resource size.";
+	case LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE:
+		return "Missing resource content type.";
 	case LIBMC_ERROR_DRIVERALREADYREGISTERED:
 		return "Driver already registered.";
 	case LIBMC_ERROR_DRIVERNOTFOUND:
@@ -811,7 +874,7 @@ func errorMessage(errorcode uint32) string {
 	case LIBMC_ERROR_DUPLICATEJOBUUID:
 		return "Duplicate job uuid";
 	case LIBMC_ERROR_INVALIDJOBSTATUS:
-		return "Invalid Job status";
+		return "Invalid job status";
 	case LIBMC_ERROR_INVALIDSTREAMCONTEXT:
 		return "Invalid stream context";
 	case LIBMC_ERROR_JOBUUIDNOTFOUND:
@@ -864,6 +927,134 @@ func errorMessage(errorcode uint32) string {
 		return "Upload size mismatch";
 	case LIBMC_ERROR_CONTENTTYPENOTACCEPTED:
 		return "Content type not accepted";
+	case LIBMC_ERROR_NOCURRENTUPLOAD:
+		return "No current upload";
+	case LIBMC_ERROR_UPLOADCHECKSUMMISMATCH:
+		return "Upload checksum mismatch";
+	case LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS:
+		return "Invalid storage stream status";
+	case LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED:
+		return "Context uuid not accepted";
+	case LIBMC_ERROR_INVALIDBUILDUUID:
+		return "Invalid build uuid";
+	case LIBMC_ERROR_MISSINGTHREADCOUNT:
+		return "Missing thread count";
+	case LIBMC_ERROR_INVALIDTHREADCOUNT:
+		return "Invalid thread count";
+	case LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS:
+		return "Could not update build status";
+	case LIBMC_ERROR_INVALIDITERATOR:
+		return "Invalid iterator";
+	case LIBMC_ERROR_INVALIDDATATYPE:
+		return "Invalid data type";
+	case LIBMC_ERROR_COULDNOTSENDSIGNAL:
+		return "Could not send signal";
+	case LIBMC_ERROR_MISSINGSIGNALPARAMETER:
+		return "Missing signal parameter";
+	case LIBMC_ERROR_NOUSERINTERFACEDEFINITION:
+		return "No user interface definition";
+	case LIBMC_ERROR_MISSINGAPPNAME:
+		return "Missing app name";
+	case LIBMC_ERROR_MISSINGCOPYRIGHT:
+		return "Missing copyright";
+	case LIBMC_ERROR_MISSINGMAINPAGE:
+		return "Missing main page";
+	case LIBMC_ERROR_MISSINGMENUITEMID:
+		return "Missing menu item id";
+	case LIBMC_ERROR_MISSINGMENUITEMICON:
+		return "Missing menu item icon";
+	case LIBMC_ERROR_MISSINGMENUITEMCAPTION:
+		return "Missing menu item caption";
+	case LIBMC_ERROR_MISSINGTARGETPAGE:
+		return "Missing menu item target page";
+	case LIBMC_ERROR_MISSINGMENUNODE:
+		return "Missing menu node";
+	case LIBMC_ERROR_MISSINGTOOLBARNODE:
+		return "Missing toolbar node";
+	case LIBMC_ERROR_MISSINGTOOLBARITEMID:
+		return "Missing toolbar item id";
+	case LIBMC_ERROR_MISSINGTOOLBARITEMICON:
+		return "Missing toolbar item icon";
+	case LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION:
+		return "Missing toolbar item caption";
+	case LIBMC_ERROR_MISSINGSERVICESNODE:
+		return "Missing services node";
+	case LIBMC_ERROR_INVALIDSESSIONUUID:
+		return "Invalid session UUID";
+	case LIBMC_ERROR_INVALIDSESSIONKEY:
+		return "Invalid session Key";
+	case LIBMC_ERROR_SESSIONNOTAUTHORIZED:
+		return "Session not authorized";
+	case LIBMC_ERROR_INVALIDUSERNAME:
+		return "Invalid user name";
+	case LIBMC_ERROR_INVALIDPASSWORD:
+		return "Invalid password";
+	case LIBMC_ERROR_INVALIDAUTHORIZATION:
+		return "Invalid Authorization";
+	case LIBMC_ERROR_USERALREADYAUTHORIZED:
+		return "User already authorized";
+	case LIBMC_ERROR_INVALIDSESSIONTOKEN:
+		return "Invalid session token";
+	case LIBMC_ERROR_INVALIDCLIENTKEY:
+		return "Invalid client key";
+	case LIBMC_ERROR_INVALIDLOGIN:
+		return "Invalid login credentials";
+	case LIBMC_ERROR_DUPLICATEPAGE:
+		return "Duplicate page";
+	case LIBMC_ERROR_PAGENOTFOUND:
+		return "Page not found";
+	case LIBMC_ERROR_MISSINGPAGENAME:
+		return "Missing page name";
+	case LIBMC_ERROR_INVALIDPAGENAME:
+		return "Invalid page name";
+	case LIBMC_ERROR_MODULENOTFOUND:
+		return "Module not found";
+	case LIBMC_ERROR_DUPLICATEMODULE:
+		return "Duplicate module";
+	case LIBMC_ERROR_INVALIDMODULENAME:
+		return "Invalid module name";
+	case LIBMC_ERROR_INVALIDMODULETYPE:
+		return "Invalid module type";
+	case LIBMC_ERROR_INVALIDHEADLINE:
+		return "Invalid headline";
+	case LIBMC_ERROR_USERNOTFOUND:
+		return "User not found";
+	case LIBMC_ERROR_STREAMISNOTIMAGE:
+		return "Stream is not image";
+	case LIBMC_ERROR_TOOMANYCONTENTPARAMETERS:
+		return "Too many content parameters";
+	case LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME:
+		return "Missing content state machine name";
+	case LIBMC_ERROR_MISSINGCONTENTGROUPNAME:
+		return "Missing content group name";
+	case LIBMC_ERROR_INVALIDENTRIESPERPAGE:
+		return "Invalid entries per page";
+	case LIBMC_ERROR_MODULEITEMNOTFOUND:
+		return "Module item not found";
+	case LIBMC_ERROR_DERIVEDPARAMETERSREADONLY:
+		return "Derived parameters are read only.";
+	case LIBMC_ERROR_TOOMANYJOURNALVARIABLES:
+		return "Too many journal variables";
+	case LIBMC_ERROR_JOURNALISNOTINITIALISING:
+		return "Too many journal variables";
+	case LIBMC_ERROR_JOURNALISNOTRECORDING:
+		return "Too many journal variables";
+	case LIBMC_ERROR_INVALIDVARIABLETYPE:
+		return "Invalid variable type";
+	case LIBMC_ERROR_INVALIDVARIABLEUNITS:
+		return "Invalid variable units";
+	case LIBMC_ERROR_UNITSHAVEALREADYBEENSET:
+		return "Units have already been set";
+	case LIBMC_ERROR_UNITSHAVENOTBEENSET:
+		return "Units have not been set";
+	case LIBMC_ERROR_INVALIDTIMESTAMP:
+		return "Invalid time stamp";
+	case LIBMC_ERROR_NOCURRENTJOURNALCHUNK:
+		return "No current journal chunk";
+	case LIBMC_ERROR_DUPLICATEJOURNALID:
+		return "Duplicate journal id";
+	case LIBMC_ERROR_RESOURCEENTRYNOTFOUND:
+		return "Resource entry not found";
 	default:
 		return "unknown";
 	}
@@ -1022,8 +1213,8 @@ func (wrapper Wrapper) NewMCContext(r ref) MCContext {
 }
 
 // RegisterLibraryPath registers a library for a given name.
-func (inst MCContext) RegisterLibraryPath(libraryName string, libraryPath string) error {
-	returnValue := C.CCall_libmc_mccontext_registerlibrarypath(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(libraryName), C.CString(libraryPath))
+func (inst MCContext) RegisterLibraryPath(libraryName string, libraryPath string, libraryResourcePath string) error {
+	returnValue := C.CCall_libmc_mccontext_registerlibrarypath(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(libraryName), C.CString(libraryPath), C.CString(libraryResourcePath))
 	if returnValue != 0 {
 		return makeError(uint32(returnValue))
 	}
@@ -1058,8 +1249,8 @@ func (inst MCContext) TerminateAllThreads() error {
 }
 
 // LoadClientPackage load a client package to serve the client website.
-func (inst MCContext) LoadClientPackage(zIPStream []uint8) error {
-	returnValue := C.CCall_libmc_mccontext_loadclientpackage(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(len(zIPStream)), (*C.uint8_t)(unsafe.Pointer(&zIPStream[0])))
+func (inst MCContext) LoadClientPackage(packagePath string) error {
+	returnValue := C.CCall_libmc_mccontext_loadclientpackage(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString (packagePath))
 	if returnValue != 0 {
 		return makeError(uint32(returnValue))
 	}
@@ -1076,9 +1267,9 @@ func (inst MCContext) Log(message string, subsystem LogSubSystem, logLevel LogLe
 }
 
 // CreateAPIRequestHandler creates an API request handler.
-func (inst MCContext) CreateAPIRequestHandler(uRI string, requestMethod string) (APIRequestHandler, error) {
+func (inst MCContext) CreateAPIRequestHandler(uRI string, requestMethod string, authorizationString string) (APIRequestHandler, error) {
 	var handlerInstance ref
-	returnValue := C.CCall_libmc_mccontext_createapirequesthandler(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(uRI), C.CString(requestMethod), &handlerInstance)
+	returnValue := C.CCall_libmc_mccontext_createapirequesthandler(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(uRI), C.CString(requestMethod), C.CString(authorizationString), &handlerInstance)
 	if returnValue != 0 {
 		return APIRequestHandler{}, makeError(uint32(returnValue))
 	}

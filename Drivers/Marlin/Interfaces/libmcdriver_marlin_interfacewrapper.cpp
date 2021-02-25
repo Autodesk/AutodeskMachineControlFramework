@@ -83,6 +83,33 @@ LibMCDriver_MarlinResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_configure(LibMCDriver_Marlin_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_MarlinResult libmcdriver_marlin_driver_getname(LibMCDriver_Marlin_Driver pDriver, const LibMCDriver_Marlin_uint32 nNameBufferSize, LibMCDriver_Marlin_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -293,11 +320,35 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_getheaderinformation(LibMCDri
 	}
 }
 
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_Marlin_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_Marlin
 **************************************************************************************************************************/
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_uint32 nStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -309,7 +360,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Ma
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, dStatusUpdateInterval, nConnectTimeout);
+		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, nStatusUpdateInterval, nConnectTimeout);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -468,7 +519,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setpidparameters(LibMC
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_updatestate(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_updatepositionstate(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -477,7 +528,31 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_updatestate(LibMCDrive
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->UpdateState();
+		pIDriver_Marlin->UpdatePositionState();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_updatetemperaturestate(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->UpdateTemperatureState(nExtruderID);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -578,20 +653,18 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextrudertargetposit
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getheatedbedtemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pTargetTemperature, LibMCDriver_Marlin_double * pCurrentTemperature)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getheatedbedtargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pTargetTemperature)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
 	try {
 		if (!pTargetTemperature)
 			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
-		if (!pCurrentTemperature)
-			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
 		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->GetHeatedBedTemperature(*pTargetTemperature, *pCurrentTemperature);
+		pIDriver_Marlin->GetHeatedBedTargetTemperature(*pTargetTemperature);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -606,20 +679,70 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getheatedbedtemperatur
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextrudertemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double * pTargetTemperature, LibMCDriver_Marlin_double * pCurrentTemperature)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getheatedbedcurrenttemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double * pCurrentTemperature)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
 	try {
-		if (!pTargetTemperature)
-			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
 		if (!pCurrentTemperature)
 			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
 		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->GetExtruderTemperature(nExtruderID, *pTargetTemperature, *pCurrentTemperature);
+		pIDriver_Marlin->GetHeatedBedCurrentTemperature(*pCurrentTemperature);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextrudercurrenttemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double * pCurrentTemperature)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		if (!pCurrentTemperature)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->GetExtruderCurrentTemperature(nExtruderID, *pCurrentTemperature);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_getextrudertargettemperature(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double * pTargetTemperature)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		if (!pTargetTemperature)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->GetExtruderTargetTemperature(nExtruderID, *pTargetTemperature);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -728,6 +851,32 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_ishomed(LibMCDriver_Ma
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
 		*pValue = pIDriver_Marlin->IsHomed();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_isconnected(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		*pValue = pIDriver_Marlin->IsConnected();
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -862,6 +1011,153 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_starthoming(LibMCDrive
 	}
 }
 
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_emergencystop(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->EmergencyStop();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setaxisposition(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pAxis, LibMCDriver_Marlin_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		if (pAxis == nullptr)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		std::string sAxis(pAxis);
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->SetAxisPosition(sAxis, dValue);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_extruderdoextrude(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, LibMCDriver_Marlin_double dE, LibMCDriver_Marlin_double dSpeed)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->ExtruderDoExtrude(dE, dSpeed);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_setabsoluteextrusion(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, bool bAbsolute)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->SetAbsoluteExtrusion(bAbsolute);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_stopidlehold(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->StopIdleHold();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_poweroff(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
+
+	try {
+		IDriver_Marlin* pIDriver_Marlin = dynamic_cast<IDriver_Marlin*>(pIBaseClass);
+		if (!pIDriver_Marlin)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver_Marlin->PowerOff();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -877,6 +1173,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_marlin_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_configure;
 	if (sProcName == "libmcdriver_marlin_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getname;
 	if (sProcName == "libmcdriver_marlin_driver_gettype") 
@@ -885,6 +1183,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getversion;
 	if (sProcName == "libmcdriver_marlin_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_marlin_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_queryparameters;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_connect") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_connect;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_disconnect") 
@@ -899,18 +1199,24 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setfanspeed;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_setpidparameters") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setpidparameters;
-	if (sProcName == "libmcdriver_marlin_driver_marlin_updatestate") 
-		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_updatestate;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_updatepositionstate") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_updatepositionstate;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_updatetemperaturestate") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_updatetemperaturestate;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_getcurrentposition") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getcurrentposition;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_gettargetposition") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_gettargetposition;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_getextrudertargetposition") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getextrudertargetposition;
-	if (sProcName == "libmcdriver_marlin_driver_marlin_getheatedbedtemperature") 
-		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getheatedbedtemperature;
-	if (sProcName == "libmcdriver_marlin_driver_marlin_getextrudertemperature") 
-		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getextrudertemperature;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_getheatedbedtargettemperature") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getheatedbedtargettemperature;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_getheatedbedcurrenttemperature") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getheatedbedcurrenttemperature;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_getextrudercurrenttemperature") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getextrudercurrenttemperature;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_getextrudertargettemperature") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getextrudertargettemperature;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_getpidparameters") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_getpidparameters;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_canexecutemovement") 
@@ -919,6 +1225,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_ismoving;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_ishomed") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_ishomed;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_isconnected") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_isconnected;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_movetoxy") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movetoxy;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_movefasttoxy") 
@@ -929,6 +1237,18 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_movefasttoz;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_starthoming") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_starthoming;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_emergencystop") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_emergencystop;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_setaxisposition") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setaxisposition;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_extruderdoextrude") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_extruderdoextrude;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_setabsoluteextrusion") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_setabsoluteextrusion;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_stopidlehold") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_stopidlehold;
+	if (sProcName == "libmcdriver_marlin_driver_marlin_poweroff") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_poweroff;
 	if (sProcName == "libmcdriver_marlin_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_getversion;
 	if (sProcName == "libmcdriver_marlin_getlasterror") 
@@ -1078,11 +1398,11 @@ LibMCDriver_MarlinResult libmcdriver_marlin_injectcomponent(const char * pNameSp
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -1123,7 +1443,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_getsymbollookupmethod(LibMCDriver_Ma
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance)
+LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -1136,8 +1456,8 @@ LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, con
 			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		

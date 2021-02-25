@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <list>
 #include <map>
+#include <vector>
 
 // Macros for forward declaration of classes
 #define amcDeclareDependingClass(CLASSNAME, SHAREDPTRNAME) class CLASSNAME; typedef std::shared_ptr<CLASSNAME> SHAREDPTRNAME;

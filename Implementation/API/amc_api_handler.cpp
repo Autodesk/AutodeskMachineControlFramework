@@ -111,6 +111,12 @@ namespace AMC {
 		
 	}
 				
+	void CAPIHandler::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession)
+	{
+		bNeedsToBeAuthorized = true;
+		bCreateNewSession = false;
+	}
+
 
 	bool CAPIHandler::expectsRawBody(const std::string& sURI, const eAPIRequestType requestType)
 	{

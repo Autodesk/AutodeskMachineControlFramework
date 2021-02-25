@@ -31,22 +31,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_MENUITEM
 #define __AMCIMPL_UI_TOOLBARITEM
 #define __AMCIMPL_API_CONSTANTS
+#define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
 
 #include "amc_ui_handler.hpp"
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_toolbaritem.hpp"
+#include "amc_ui_page.hpp"
+#include "amc_ui_modulefactory.hpp"
+#include "amc_parameterinstances.hpp"
 #include "amc_jsonwriter.hpp"
+#include "amc_ui_module_item.hpp"
+#include "amc_logger.hpp"
+#include "amc_statesignalhandler.hpp"
 
 #include "amc_api_constants.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "libmcenv_uienvironment.hpp"
+
+#include "libmcui_dynamic.hpp"
 
 #include "PugiXML/pugixml.hpp"
 
 using namespace AMC;
 
-CUIHandler::CUIHandler()
+CUIHandler::CUIHandler(PParameterInstances pParameterInstances, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
+    : m_dLogoAspectRatio (1.0), 
+    m_pParameterInstances (pParameterInstances),
+    m_pEnvironmentWrapper (pEnvironmentWrapper),
+    m_pSignalHandler (pSignalHandler),
+    m_pLogger(pLogger)
 {
+    if (pParameterInstances.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pEnvironmentWrapper.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pSignalHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pLogger.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
 
@@ -57,31 +81,57 @@ CUIHandler::~CUIHandler()
 
 std::string CUIHandler::getAppName()
 {
+    std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
 	return m_sAppName;
 }
 
 std::string CUIHandler::getCopyrightString()
 {
-	return m_sCopyrightString;
+    std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+    return m_sCopyrightString;
 }
 
-void CUIHandler::addMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
+void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
 {
-	m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption));
+    std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+    auto pPage = findPage (sTargetPage);    
+    m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption, pPage));
 }
 
-void CUIHandler::addToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
+void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
 {
-	m_ToolbarItems.push_back(std::make_shared<CUIToolbarItem> (sID, sIcon, sCaption));
+    std::lock_guard<std::mutex> lockGuard(m_Mutex);
+    
+    auto pPage = findPage(sTargetPage);
+    m_ToolbarItems.push_back(std::make_shared<CUIToolbarItem> (sID, sIcon, sCaption, pPage));
+}
+
+PUIPage CUIHandler::findPage(const std::string& sName)
+{
+    auto iter = m_Pages.find(sName);
+
+    if (iter == m_Pages.end())
+        throw ELibMCInterfaceException(LIBMC_ERROR_PAGENOTFOUND);
+
+    return iter->second;
 }
 
 
-void CUIHandler::writeToJSON(CJSONWriter& writer)
+void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
 {
-	writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
-	writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
-	//writer.addString(AMC_API_KEY_UI_MAINPAGE, m_);
+    writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
+    writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
+    writer.addString(AMC_API_KEY_UI_MAINPAGE, m_pMainPage->getName());
+    writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
+    writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
 
+}
+
+void CUIHandler::writeStateToJSON(CJSONWriter& writer)
+{
 	CJSONWriterArray menuItems(writer);
 
 	for (auto iter : m_MenuItems) {
@@ -89,7 +139,7 @@ void CUIHandler::writeToJSON(CJSONWriter& writer)
 		menuItem.addString(AMC_API_KEY_UI_ID, iter->getID ());
 		menuItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon ());
 		menuItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption ());
-		//menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, "main");
+		menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPage()->getName ());
 		menuItems.addObject(menuItem);
 	}
 
@@ -102,25 +152,64 @@ void CUIHandler::writeToJSON(CJSONWriter& writer)
 		toolbarItem.addString(AMC_API_KEY_UI_ID, iter->getID());
 		toolbarItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon());
 		toolbarItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption());
-		//menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, "main");
-		toolbarItems.addObject(toolbarItem);
+        toolbarItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPage()->getName());
+        toolbarItems.addObject(toolbarItem);
 	}
 	writer.addArray(AMC_API_KEY_UI_TOOLBARITEMS, toolbarItems);
 
+    CJSONWriterArray pages(writer);
+    for (auto iter : m_Pages) {
+        CJSONWriterObject page(writer);
+        page.addString(AMC_API_KEY_UI_PAGENAME, iter.second->getName());
+
+        CJSONWriterArray modules(writer);
+        iter.second->writeModulesToJSON (writer, modules);
+
+        page.addArray(AMC_API_KEY_UI_MODULES, modules);
+
+        pages.addObject(page);
+    }
+    writer.addArray(AMC_API_KEY_UI_PAGES, pages);
 }
 
-PUIPage CUIHandler::addPage(const std::string& sInstanceName, const std::string& sName)    
+PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
 {
-    //auto pPage = std::make_shared<CUIPage> ();
+    if (sName.empty ())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPAGENAME);
 
-    return nullptr;
+    auto iIterator = m_Pages.find (sName);
+    if (iIterator != m_Pages.end())
+        throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPAGE);
+
+    auto pPage = std::make_shared<CUIPage> (sName);
+    m_Pages.insert (std::make_pair (sName, pPage));
+
+    return pPage;
 }
 
 
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
 {
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
     m_sAppName = "";
     m_sCopyrightString = "";
+    m_pCoreResourcePackage = pResourcePackage;
+
+    try {
+        auto pUIPluginWrapper = LibMCUI::CWrapper::loadLibrary(sUILibraryPath);
+        auto pUIEventHandler = pUIPluginWrapper->CreateEventHandler();
+
+        pUIPluginWrapper->InjectComponent ("LibMCEnv", m_pEnvironmentWrapper->GetSymbolLookupMethod ());
+
+        m_pUIPluginWrapper = pUIPluginWrapper;
+        m_pUIEventHandler = pUIEventHandler;
+    }
+    catch (std::exception& E) {
+        throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTLOADUILIBRARY, E.what ());
+    }
+
     m_ToolbarItems.clear();
     m_MenuItems.clear();
 
@@ -138,6 +227,49 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
     if (mainpageAttrib.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
     std::string sMainPage(mainpageAttrib.as_string());
+
+    auto logoNode = xmlNode.child("logo");
+    if (!logoNode.empty()) {
+
+        auto resourceAttrib = logoNode.attribute("resource");
+        if (resourceAttrib.empty ())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGLOGORESOURCE);
+
+        auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+        m_sLogoUUID = pResourceEntry->getUUID ();
+
+        auto aspectratioAttrib = logoNode.attribute("aspectratio");
+        if (!aspectratioAttrib.empty()) {
+            m_dLogoAspectRatio = aspectratioAttrib.as_float();
+        }
+        else {
+            m_dLogoAspectRatio = 1.0;
+        }
+
+        if ((m_dLogoAspectRatio < AMC_UI_IMAGE_MINASPECTRATIO) || (m_dLogoAspectRatio > AMC_UI_IMAGE_MAXASPECTRATIO))
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDASPECTRATIO, std::to_string(m_dLogoAspectRatio));
+    }
+
+    auto pageNodes = xmlNode.children("page");
+    for (pugi::xml_node pageNode : pageNodes) {
+
+        auto pageNameAttrib = pageNode.attribute("name");
+        if (pageNameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPAGENAME);
+        std::string sPageName(pageNameAttrib.as_string());
+
+        auto pPage = addPage_Unsafe(sPageName);
+
+        auto pageChildren = pageNode.children();
+        for (pugi::xml_node pageChild : pageChildren) {
+            
+            auto pModule = CUIModuleFactory::createModule(pageChild, m_pParameterInstances, m_pCoreResourcePackage, pBuildJobHandler);
+            pPage->addModule(pModule);
+
+        }
+
+    }
+
 
     auto menuNode = xmlNode.child("menu");
     if (menuNode.empty())
@@ -161,7 +293,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
         if (targetPageAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
 
-        addMenuItem(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
+        addMenuItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
     }
 
     auto toolbarNode = xmlNode.child("toolbar");
@@ -186,6 +318,53 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
         if (targetPageAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
 
-        addToolbarItem(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
+        addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
     }
+
+    m_pMainPage = findPage (sMainPage);
 }
+
+PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
+{
+    for (auto pPage : m_Pages) {
+        auto pModuleItem = pPage.second->findModuleItem(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pModuleItem;
+    }
+
+    return nullptr;
+}
+
+
+PResourcePackage CUIHandler::getCoreResourcePackage()
+{
+    if (m_pCoreResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
+
+    return m_pCoreResourcePackage;
+
+}
+
+template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
+{
+    if (pWrapper.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+    auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
+    pImplInstance->IncRefCount();
+    return pExternalInstance;
+}
+
+
+void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID)
+{    
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pParameterInstances, m_pSignalHandler, sSenderUUID, sContextUUID);
+    auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
+
+    auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+
+    pEvent->Handle(pExternalEnvironment);
+
+}
+
+

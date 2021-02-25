@@ -34,10 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue)
+	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue)
 		: m_dUnits (dUnits), m_nZValue (nZValue)
 	{
 		if (p3MFLayer.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		if (pToolpath.get() == nullptr)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 		m_sUUID = p3MFLayer->GetLayerDataUUID();
@@ -59,6 +61,8 @@ namespace AMC {
 			pSegment->m_Type = (LibMCEnv::eToolpathSegmentType) eType;
 			pSegment->m_ProfileID = registerUUID (sProfileUUID);
 			pSegment->m_PartID = registerUUID(sPartUUID);
+
+			storeProfileData (pToolpath, sProfileUUID);
 
 			nTotalPointCount += nPointCount;
 		}
@@ -194,6 +198,15 @@ namespace AMC {
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartID);
 	}
 
+	sToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
+	{
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+
+		auto sProfileUUID = getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
+		return retrieveProfileData(sProfileUUID);
+	}
+
 	double CToolpathLayerData::getUnits()
 	{
 		return m_dUnits;
@@ -204,6 +217,43 @@ namespace AMC {
 		return m_nZValue;
 	}
 
+	void CToolpathLayerData::storeProfileData(Lib3MF::PToolpath pToolpath, const std::string & sProfileUUID)
+	{
+		if (pToolpath.get () == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		auto iIter = m_ProfileMap.find(sProfileUUID);
+		if (iIter == m_ProfileMap.end()) {
+
+			auto pProfile = pToolpath->GetProfileUUID(sProfileUUID);
+			sToolpathLayerProfile sProfile;
+
+			sProfile.m_dLaserSpeed = pProfile->GetParameterDoubleValue("", "laserspeed");
+			sProfile.m_dLaserPower = pProfile->GetParameterDoubleValue("", "laserpower");
+			sProfile.m_dLaserFocus = pProfile->GetParameterDoubleValueDef("", "laserfocus", 0.0);
+			sProfile.m_dJumpSpeed = pProfile->GetParameterDoubleValueDef("", "jumpspeed", sProfile.m_dLaserSpeed);
+			sProfile.m_dExtrusionFactor = pProfile->GetParameterDoubleValueDef("", "extrusionfactor", 0.0);
+			sProfile.m_dStartDelay = pProfile->GetParameterDoubleValueDef("", "startdelay", 0.0);
+			sProfile.m_dEndDelay = pProfile->GetParameterDoubleValueDef("", "enddelay", 0.0);
+			sProfile.m_dPolyDelay = pProfile->GetParameterDoubleValueDef("", "polydelay", 0.0);
+			sProfile.m_dJumpDelay = pProfile->GetParameterDoubleValueDef("", "jumpdelay", 0.0);
+			sProfile.m_dLaserOnDelay = pProfile->GetParameterDoubleValueDef("", "laserondelay", 0.0);
+			sProfile.m_dLaserOffDelay = pProfile->GetParameterDoubleValueDef("", "laseroffdelay", 0.0);
+
+			m_ProfileMap.insert(std::make_pair (sProfileUUID, sProfile));
+		}
+
+	}
+
+
+	sToolpathLayerProfile CToolpathLayerData::retrieveProfileData(const std::string& sProfileUUID)
+	{
+		auto iIter = m_ProfileMap.find(sProfileUUID);
+		if (iIter == m_ProfileMap.end())
+			throw ELibMCInterfaceException(LIBMC_ERROR_PROFILENOTFOUND);
+
+		return iIter->second;
+	}
 
 }
 

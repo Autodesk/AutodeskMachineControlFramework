@@ -47,6 +47,9 @@ namespace AMC {
 	class CParameterGroup;
 	typedef std::shared_ptr<CParameterGroup> PParameterGroup;
 
+	class CStateJournal;
+	typedef std::shared_ptr<CStateJournal> PStateJournal;
+
 	class CParameterGroup {
 	private:
 		
@@ -54,6 +57,9 @@ namespace AMC {
 		std::string m_sDescription;
 		std::map<std::string, PParameter> m_Parameters;
 		std::vector<PParameter> m_ParameterList;
+
+		PStateJournal m_pStateJournal;
+		std::string m_sInstanceName;
 
 		std::mutex m_GroupMutex;
 
@@ -72,14 +78,18 @@ namespace AMC {
 		bool hasParameter (const std::string & sName);
 
 		void addNewStringParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue);
-		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue);
+		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits);
 		void addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue);
 		void addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue);
 
-		void addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue);
+		void addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue, const std::string& sUnits);
+		void addNewDerivedParameter(const std::string& sName, AMC::PParameterGroup pParameterGroup, const std::string& sSourceParameterName);
+		void addNewInstanceStateParameter(const std::string& sName, const std::string& m_sDescription);
 
 		uint32_t getParameterCount();
 		void getParameterInfo(const uint32_t nIndex, std::string & sName, std::string & sDescription, std::string & sDefaultValue);		
+		void getParameterInfoByName(const std::string& sName, std::string& sDescription, std::string& sDefaultValue);
+
 		std::string getParameterValueByIndex(const uint32_t nIndex);
 		std::string getParameterValueByName(const std::string & sName);
 		double getDoubleParameterValueByIndex(const uint32_t nIndex);
@@ -102,6 +112,13 @@ namespace AMC {
 
 		std::string serializeToJSON();
 		void deserializeJSON(const std::string & sJSON);
+
+		void copyToGroup (CParameterGroup * pParameterGroup);
+
+		void addDerivativesFromGroup(PParameterGroup pParameterGroup);
+		void addDuplicatesFromGroup(CParameterGroup * pParameterGroup);
+
+		void setJournal(PStateJournal pStateJournal, const std::string & sInstanceName);
 
 	};
 

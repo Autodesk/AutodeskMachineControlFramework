@@ -559,8 +559,8 @@ public:
 	inline void UnAcceptDevice(const LibOIE_uint32 nRuleID);
 	inline void ClearAcceptedDevices();
 	inline PConnectionIterator ListConnections();
-	inline void SetConnectionAcceptedCallback(const ConnectionAcceptedCallback pCallback);
-	inline void SetConnectionRejectedCallback(const ConnectionRejectedCallback pCallback);
+	inline void SetConnectionAcceptedCallback(const ConnectionAcceptedCallback pCallback, const LibOIE_pvoid pUserData);
+	inline void SetConnectionRejectedCallback(const ConnectionRejectedCallback pCallback, const LibOIE_pvoid pUserData);
 };
 	
 	/**
@@ -1937,19 +1937,21 @@ public:
 	/**
 	* CServer::SetConnectionAcceptedCallback - sets a callback that triggers when a new connection was established.
 	* @param[in] pCallback - callback pointer.
+	* @param[in] pUserData - Userdata that is passed to the callback function
 	*/
-	void CServer::SetConnectionAcceptedCallback(const ConnectionAcceptedCallback pCallback)
+	void CServer::SetConnectionAcceptedCallback(const ConnectionAcceptedCallback pCallback, const LibOIE_pvoid pUserData)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Server_SetConnectionAcceptedCallback(m_pHandle, pCallback));
+		CheckError(m_pWrapper->m_WrapperTable.m_Server_SetConnectionAcceptedCallback(m_pHandle, pCallback, pUserData));
 	}
 	
 	/**
 	* CServer::SetConnectionRejectedCallback - sets a callback that triggers when a new connection was rejected.
 	* @param[in] pCallback - callback pointer.
+	* @param[in] pUserData - Userdata that is passed to the callback function
 	*/
-	void CServer::SetConnectionRejectedCallback(const ConnectionRejectedCallback pCallback)
+	void CServer::SetConnectionRejectedCallback(const ConnectionRejectedCallback pCallback, const LibOIE_pvoid pUserData)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Server_SetConnectionRejectedCallback(m_pHandle, pCallback));
+		CheckError(m_pWrapper->m_WrapperTable.m_Server_SetConnectionRejectedCallback(m_pHandle, pCallback, pUserData));
 	}
 
 } // namespace LibOIE

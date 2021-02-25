@@ -112,6 +112,12 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_TERMINATED 14
 #define LIBMCENV_ERROR_SIGNALHASTRIGGEREDTWICE 15
 #define LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED 16
+#define LIBMCENV_ERROR_DRIVERISNOTINITIALISING 17
+#define LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND 18
+#define LIBMCENV_ERROR_INTERNALERROR 19
+#define LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME 20
+#define LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED 21
+#define LIBMCENV_ERROR_INVALIDITERATOR 22
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -136,6 +142,12 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_TERMINATED: return "operation has been terminated.";
     case LIBMCENV_ERROR_SIGNALHASTRIGGEREDTWICE: return "signal has been triggered twice.";
     case LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED: return "signal has not been triggered.";
+    case LIBMCENV_ERROR_DRIVERISNOTINITIALISING: return "driver is not in initialisation mode.";
+    case LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND: return "resource entry not found.";
+    case LIBMCENV_ERROR_INTERNALERROR: return "internal error.";
+    case LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME: return "invalid character in filename.";
+    case LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED: return "working directory has been cleaned.";
+    case LIBMCENV_ERROR_INVALIDITERATOR: return "invalid iterator.";
     default: return "unknown error";
   }
 }
@@ -145,12 +157,19 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCEnvHandle LibMCEnv_Base;
+typedef LibMCEnvHandle LibMCEnv_Iterator;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
 typedef LibMCEnvHandle LibMCEnv_Build;
+typedef LibMCEnvHandle LibMCEnv_WorkingFileExecution;
+typedef LibMCEnvHandle LibMCEnv_WorkingFile;
+typedef LibMCEnvHandle LibMCEnv_WorkingFileIterator;
+typedef LibMCEnvHandle LibMCEnv_WorkingDirectory;
+typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;
 typedef LibMCEnvHandle LibMCEnv_StateEnvironment;
+typedef LibMCEnvHandle LibMCEnv_UIEnvironment;
 
 namespace LibMCEnv {
 
@@ -173,7 +192,13 @@ namespace LibMCEnv {
     LaserPower = 4,
     StartDelay = 5,
     EndDelay = 6,
-    PolyDelay = 7
+    PolyDelay = 7,
+    PolyDelayAngleDependent = 8,
+    LaserOnDelay = 9,
+    LaserOffDelay = 10,
+    JumpDelay = 11,
+    MarkDelay = 12,
+    LaserFocus = 13
   };
   
   /*************************************************************************************************************************

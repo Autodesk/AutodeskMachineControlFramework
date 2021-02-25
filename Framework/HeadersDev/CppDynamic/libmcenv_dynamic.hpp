@@ -60,48 +60,76 @@ namespace LibMCEnv {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
+class CIterator;
 class CToolpathLayer;
 class CToolpathAccessor;
 class CBuild;
+class CWorkingFileExecution;
+class CWorkingFile;
+class CWorkingFileIterator;
+class CWorkingDirectory;
+class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
 class CStateEnvironment;
+class CUIEnvironment;
 
 /*************************************************************************************************************************
  Declaration of deprecated class types
 **************************************************************************************************************************/
 typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
+typedef CIterator CLibMCEnvIterator;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
 typedef CBuild CLibMCEnvBuild;
+typedef CWorkingFileExecution CLibMCEnvWorkingFileExecution;
+typedef CWorkingFile CLibMCEnvWorkingFile;
+typedef CWorkingFileIterator CLibMCEnvWorkingFileIterator;
+typedef CWorkingDirectory CLibMCEnvWorkingDirectory;
+typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
 typedef CStateEnvironment CLibMCEnvStateEnvironment;
+typedef CUIEnvironment CLibMCEnvUIEnvironment;
 
 /*************************************************************************************************************************
  Declaration of shared pointer types
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
+typedef std::shared_ptr<CIterator> PIterator;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
 typedef std::shared_ptr<CBuild> PBuild;
+typedef std::shared_ptr<CWorkingFileExecution> PWorkingFileExecution;
+typedef std::shared_ptr<CWorkingFile> PWorkingFile;
+typedef std::shared_ptr<CWorkingFileIterator> PWorkingFileIterator;
+typedef std::shared_ptr<CWorkingDirectory> PWorkingDirectory;
+typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
 typedef std::shared_ptr<CStateEnvironment> PStateEnvironment;
+typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 
 /*************************************************************************************************************************
  Declaration of deprecated shared pointer types
 **************************************************************************************************************************/
 typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
+typedef PIterator PLibMCEnvIterator;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
 typedef PBuild PLibMCEnvBuild;
+typedef PWorkingFileExecution PLibMCEnvWorkingFileExecution;
+typedef PWorkingFile PLibMCEnvWorkingFile;
+typedef PWorkingFileIterator PLibMCEnvWorkingFileIterator;
+typedef PWorkingDirectory PLibMCEnvWorkingDirectory;
+typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
 typedef PStateEnvironment PLibMCEnvStateEnvironment;
+typedef PUIEnvironment PLibMCEnvUIEnvironment;
 
 
 /*************************************************************************************************************************
@@ -274,12 +302,19 @@ private:
 	LibMCEnvResult loadWrapperTableFromSymbolLookupMethod(sLibMCEnvDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
+	friend class CIterator;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
 	friend class CBuild;
+	friend class CWorkingFileExecution;
+	friend class CWorkingFile;
+	friend class CWorkingFileIterator;
+	friend class CWorkingDirectory;
+	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
 	friend class CStateEnvironment;
+	friend class CUIEnvironment;
 
 };
 
@@ -341,6 +376,27 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CIterator 
+**************************************************************************************************************************/
+class CIterator : public CBase {
+public:
+	
+	/**
+	* CIterator::CIterator - Constructor for Iterator class.
+	*/
+	CIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool MoveNext();
+	inline bool MovePrevious();
+	inline PBase GetCurrent();
+	inline PIterator Clone();
+	inline LibMCEnv_uint64 Count();
+};
+	
+/*************************************************************************************************************************
  Class CToolpathLayer 
 **************************************************************************************************************************/
 class CToolpathLayer : public CBase {
@@ -358,8 +414,8 @@ public:
 	inline LibMCEnv_uint32 GetSegmentCount();
 	inline void GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
-	inline std::string GetSegmentProfileValue(const std::string & sValueName);
-	inline LibMCEnv_double GetSegmentProfileTypedValue(const eToolpathProfileValueType eValueType);
+	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName);
+	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline LibMCEnv_int32 GetZValue();
@@ -410,6 +466,122 @@ public:
 	inline bool ToolpathIsLoaded();
 	inline PToolpathAccessor CreateToolpathAccessor();
 	inline std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const CInputVector<LibMCEnv_uint8> & ContentBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CWorkingFileExecution 
+**************************************************************************************************************************/
+class CWorkingFileExecution : public CBase {
+public:
+	
+	/**
+	* CWorkingFileExecution::CWorkingFileExecution - Constructor for WorkingFileExecution class.
+	*/
+	CWorkingFileExecution(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void GetStatus();
+	inline std::string ReturnStdOut();
+};
+	
+/*************************************************************************************************************************
+ Class CWorkingFile 
+**************************************************************************************************************************/
+class CWorkingFile : public CBase {
+public:
+	
+	/**
+	* CWorkingFile::CWorkingFile - Constructor for WorkingFile class.
+	*/
+	CWorkingFile(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetAbsoluteFileName();
+	inline LibMCEnv_uint64 GetSize();
+	inline std::string CalculateSHA2();
+	inline PWorkingFileExecution ExecuteFile();
+	inline bool IsManaged();
+	inline void MakeManaged();
+	inline bool FileExists();
+	inline bool DeleteFromDisk();
+};
+	
+/*************************************************************************************************************************
+ Class CWorkingFileIterator 
+**************************************************************************************************************************/
+class CWorkingFileIterator : public CIterator {
+public:
+	
+	/**
+	* CWorkingFileIterator::CWorkingFileIterator - Constructor for WorkingFileIterator class.
+	*/
+	CWorkingFileIterator(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CIterator(pWrapper, pHandle)
+	{
+	}
+	
+	inline PWorkingFile GetCurrentFile();
+};
+	
+/*************************************************************************************************************************
+ Class CWorkingDirectory 
+**************************************************************************************************************************/
+class CWorkingDirectory : public CBase {
+public:
+	
+	/**
+	* CWorkingDirectory::CWorkingDirectory - Constructor for WorkingDirectory class.
+	*/
+	CWorkingDirectory(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool IsActive();
+	inline std::string GetAbsoluteFilePath();
+	inline PWorkingFile StoreCustomData(const std::string & sFileName, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PWorkingFile StoreDriverData(const std::string & sFileName, const std::string & sIdentifier);
+	inline bool CleanUp();
+	inline PWorkingFile AddManagedFile(const std::string & sFileName);
+	inline bool HasUnmanagedFiles();
+	inline PWorkingFileIterator RetrieveUnmanagedFiles();
+	inline PWorkingFileIterator RetrieveManagedFiles();
+	inline PWorkingFileIterator RetrieveAllFiles();
+};
+	
+/*************************************************************************************************************************
+ Class CDriverEnvironment 
+**************************************************************************************************************************/
+class CDriverEnvironment : public CBase {
+public:
+	
+	/**
+	* CDriverEnvironment::CDriverEnvironment - Constructor for DriverEnvironment class.
+	*/
+	CDriverEnvironment(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PWorkingDirectory CreateWorkingDirectory();
+	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PToolpathAccessor CreateToolpathAccessor(const std::string & sStreamUUID);
+	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
+	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
+	inline void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue);
+	inline void RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_int64 nDefaultValue);
+	inline void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue);
+	inline void SetStringParameter(const std::string & sParameterName, const std::string & sValue);
+	inline void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue);
+	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue);
+	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue);
+	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 };
 	
 /*************************************************************************************************************************
@@ -499,17 +671,7 @@ public:
 	inline void LogInfo(const std::string & sLogString);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
 	inline bool CheckForTermination();
-	inline void StoreString(const std::string & sName, const std::string & sValue);
-	inline void StoreUUID(const std::string & sName, const std::string & sValue);
-	inline void StoreInteger(const std::string & sName, const LibMCEnv_int64 nValue);
-	inline void StoreDouble(const std::string & sName, const LibMCEnv_double dValue);
-	inline void StoreBool(const std::string & sName, const bool bValue);
 	inline void StoreSignal(const std::string & sName, classParam<CSignalHandler> pHandler);
-	inline std::string RetrieveString(const std::string & sName);
-	inline std::string RetrieveUUID(const std::string & sName);
-	inline LibMCEnv_int64 RetrieveInteger(const std::string & sName);
-	inline LibMCEnv_double RetrieveDouble(const std::string & sName);
-	inline bool RetrieveBool(const std::string & sName);
 	inline PSignalHandler RetrieveSignal(const std::string & sName);
 	inline void ClearStoredValue(const std::string & sName);
 	inline void SetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue);
@@ -522,6 +684,34 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CUIEnvironment 
+**************************************************************************************************************************/
+class CUIEnvironment : public CBase {
+public:
+	
+	/**
+	* CUIEnvironment::CUIEnvironment - Constructor for UIEnvironment class.
+	*/
+	CUIEnvironment(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
+	inline std::string GetMachineState(const std::string & sMachineInstance);
+	inline void LogMessage(const std::string & sLogString);
+	inline void LogWarning(const std::string & sLogString);
+	inline void LogInfo(const std::string & sLogString);
+	inline std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline std::string GetEventContext();
 };
 	
 	/**
@@ -605,6 +795,11 @@ public:
 			return LIBMCENV_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Iterator_MoveNext = nullptr;
+		pWrapperTable->m_Iterator_MovePrevious = nullptr;
+		pWrapperTable->m_Iterator_GetCurrent = nullptr;
+		pWrapperTable->m_Iterator_Clone = nullptr;
+		pWrapperTable->m_Iterator_Count = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
@@ -629,6 +824,42 @@ public:
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
 		pWrapperTable->m_Build_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_Build_AddBinaryData = nullptr;
+		pWrapperTable->m_WorkingFileExecution_GetStatus = nullptr;
+		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = nullptr;
+		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = nullptr;
+		pWrapperTable->m_WorkingFile_GetSize = nullptr;
+		pWrapperTable->m_WorkingFile_CalculateSHA2 = nullptr;
+		pWrapperTable->m_WorkingFile_ExecuteFile = nullptr;
+		pWrapperTable->m_WorkingFile_IsManaged = nullptr;
+		pWrapperTable->m_WorkingFile_MakeManaged = nullptr;
+		pWrapperTable->m_WorkingFile_FileExists = nullptr;
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = nullptr;
+		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_IsActive = nullptr;
+		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomData = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
+		pWrapperTable->m_WorkingDirectory_CleanUp = nullptr;
+		pWrapperTable->m_WorkingDirectory_AddManagedFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = nullptr;
+		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = nullptr;
+		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = nullptr;
+		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetStringParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetUUIDParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_Sleep = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -670,17 +901,7 @@ public:
 		pWrapperTable->m_StateEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_StateEnvironment_Sleep = nullptr;
 		pWrapperTable->m_StateEnvironment_CheckForTermination = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreString = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreUUID = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreInteger = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreDouble = nullptr;
-		pWrapperTable->m_StateEnvironment_StoreBool = nullptr;
 		pWrapperTable->m_StateEnvironment_StoreSignal = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveString = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveUUID = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveInteger = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveDouble = nullptr;
-		pWrapperTable->m_StateEnvironment_RetrieveBool = nullptr;
 		pWrapperTable->m_StateEnvironment_RetrieveSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_ClearStoredValue = nullptr;
 		pWrapperTable->m_StateEnvironment_SetStringParameter = nullptr;
@@ -693,6 +914,18 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
+		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
+		pWrapperTable->m_UIEnvironment_LogWarning = nullptr;
+		pWrapperTable->m_UIEnvironment_LogInfo = nullptr;
+		pWrapperTable->m_UIEnvironment_GetStringParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetUUIDParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetDoubleParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetIntegerParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetEventContext = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -745,6 +978,51 @@ public:
 			return LIBMCENV_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_MoveNext = (PLibMCEnvIterator_MoveNextPtr) GetProcAddress(hLibrary, "libmcenv_iterator_movenext");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_MoveNext = (PLibMCEnvIterator_MoveNextPtr) dlsym(hLibrary, "libmcenv_iterator_movenext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_MoveNext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_MovePrevious = (PLibMCEnvIterator_MovePreviousPtr) GetProcAddress(hLibrary, "libmcenv_iterator_moveprevious");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_MovePrevious = (PLibMCEnvIterator_MovePreviousPtr) dlsym(hLibrary, "libmcenv_iterator_moveprevious");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_MovePrevious == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_GetCurrent = (PLibMCEnvIterator_GetCurrentPtr) GetProcAddress(hLibrary, "libmcenv_iterator_getcurrent");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_GetCurrent = (PLibMCEnvIterator_GetCurrentPtr) dlsym(hLibrary, "libmcenv_iterator_getcurrent");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_GetCurrent == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_Clone = (PLibMCEnvIterator_ClonePtr) GetProcAddress(hLibrary, "libmcenv_iterator_clone");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_Clone = (PLibMCEnvIterator_ClonePtr) dlsym(hLibrary, "libmcenv_iterator_clone");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_Clone == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Iterator_Count = (PLibMCEnvIterator_CountPtr) GetProcAddress(hLibrary, "libmcenv_iterator_count");
+		#else // _WIN32
+		pWrapperTable->m_Iterator_Count = (PLibMCEnvIterator_CountPtr) dlsym(hLibrary, "libmcenv_iterator_count");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Iterator_Count == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = (PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getlayerdatauuid");
@@ -960,6 +1238,330 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_AddBinaryData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFileExecution_GetStatus = (PLibMCEnvWorkingFileExecution_GetStatusPtr) GetProcAddress(hLibrary, "libmcenv_workingfileexecution_getstatus");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFileExecution_GetStatus = (PLibMCEnvWorkingFileExecution_GetStatusPtr) dlsym(hLibrary, "libmcenv_workingfileexecution_getstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFileExecution_GetStatus == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = (PLibMCEnvWorkingFileExecution_ReturnStdOutPtr) GetProcAddress(hLibrary, "libmcenv_workingfileexecution_returnstdout");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFileExecution_ReturnStdOut = (PLibMCEnvWorkingFileExecution_ReturnStdOutPtr) dlsym(hLibrary, "libmcenv_workingfileexecution_returnstdout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFileExecution_ReturnStdOut == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = (PLibMCEnvWorkingFile_GetAbsoluteFileNamePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_getabsolutefilename");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_GetAbsoluteFileName = (PLibMCEnvWorkingFile_GetAbsoluteFileNamePtr) dlsym(hLibrary, "libmcenv_workingfile_getabsolutefilename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_GetAbsoluteFileName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_GetSize = (PLibMCEnvWorkingFile_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_getsize");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_GetSize = (PLibMCEnvWorkingFile_GetSizePtr) dlsym(hLibrary, "libmcenv_workingfile_getsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_GetSize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_CalculateSHA2 = (PLibMCEnvWorkingFile_CalculateSHA2Ptr) GetProcAddress(hLibrary, "libmcenv_workingfile_calculatesha2");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_CalculateSHA2 = (PLibMCEnvWorkingFile_CalculateSHA2Ptr) dlsym(hLibrary, "libmcenv_workingfile_calculatesha2");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_CalculateSHA2 == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCEnvWorkingFile_ExecuteFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfile_executefile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_ExecuteFile = (PLibMCEnvWorkingFile_ExecuteFilePtr) dlsym(hLibrary, "libmcenv_workingfile_executefile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_IsManaged = (PLibMCEnvWorkingFile_IsManagedPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_ismanaged");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_IsManaged = (PLibMCEnvWorkingFile_IsManagedPtr) dlsym(hLibrary, "libmcenv_workingfile_ismanaged");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_IsManaged == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_MakeManaged = (PLibMCEnvWorkingFile_MakeManagedPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_makemanaged");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_MakeManaged = (PLibMCEnvWorkingFile_MakeManagedPtr) dlsym(hLibrary, "libmcenv_workingfile_makemanaged");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_MakeManaged == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_FileExists = (PLibMCEnvWorkingFile_FileExistsPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_fileexists");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_FileExists = (PLibMCEnvWorkingFile_FileExistsPtr) dlsym(hLibrary, "libmcenv_workingfile_fileexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_FileExists == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = (PLibMCEnvWorkingFile_DeleteFromDiskPtr) GetProcAddress(hLibrary, "libmcenv_workingfile_deletefromdisk");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFile_DeleteFromDisk = (PLibMCEnvWorkingFile_DeleteFromDiskPtr) dlsym(hLibrary, "libmcenv_workingfile_deletefromdisk");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFile_DeleteFromDisk == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = (PLibMCEnvWorkingFileIterator_GetCurrentFilePtr) GetProcAddress(hLibrary, "libmcenv_workingfileiterator_getcurrentfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingFileIterator_GetCurrentFile = (PLibMCEnvWorkingFileIterator_GetCurrentFilePtr) dlsym(hLibrary, "libmcenv_workingfileiterator_getcurrentfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingFileIterator_GetCurrentFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_IsActive = (PLibMCEnvWorkingDirectory_IsActivePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_isactive");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_IsActive = (PLibMCEnvWorkingDirectory_IsActivePtr) dlsym(hLibrary, "libmcenv_workingdirectory_isactive");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_IsActive == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = (PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_getabsolutefilepath");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = (PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr) dlsym(hLibrary, "libmcenv_workingdirectory_getabsolutefilepath");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomData = (PLibMCEnvWorkingDirectory_StoreCustomDataPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storecustomdata");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomData = (PLibMCEnvWorkingDirectory_StoreCustomDataPtr) dlsym(hLibrary, "libmcenv_workingdirectory_storecustomdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverData = (PLibMCEnvWorkingDirectory_StoreDriverDataPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storedriverdata");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverData = (PLibMCEnvWorkingDirectory_StoreDriverDataPtr) dlsym(hLibrary, "libmcenv_workingdirectory_storedriverdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_CleanUp = (PLibMCEnvWorkingDirectory_CleanUpPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_cleanup");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_CleanUp = (PLibMCEnvWorkingDirectory_CleanUpPtr) dlsym(hLibrary, "libmcenv_workingdirectory_cleanup");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_CleanUp == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_AddManagedFile = (PLibMCEnvWorkingDirectory_AddManagedFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_addmanagedfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_AddManagedFile = (PLibMCEnvWorkingDirectory_AddManagedFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_addmanagedfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_AddManagedFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = (PLibMCEnvWorkingDirectory_HasUnmanagedFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_hasunmanagedfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = (PLibMCEnvWorkingDirectory_HasUnmanagedFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_hasunmanagedfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = (PLibMCEnvWorkingDirectory_RetrieveUnmanagedFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_retrieveunmanagedfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = (PLibMCEnvWorkingDirectory_RetrieveUnmanagedFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_retrieveunmanagedfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = (PLibMCEnvWorkingDirectory_RetrieveManagedFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_retrievemanagedfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = (PLibMCEnvWorkingDirectory_RetrieveManagedFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_retrievemanagedfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = (PLibMCEnvWorkingDirectory_RetrieveAllFilesPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_retrieveallfiles");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = (PLibMCEnvWorkingDirectory_RetrieveAllFilesPtr) dlsym(hLibrary, "libmcenv_workingdirectory_retrieveallfiles");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_RetrieveAllFiles == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createworkingdirectory");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createworkingdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_retrievedriverdata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_retrievedriverdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = (PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createtoolpathaccessor");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = (PLibMCEnvDriverEnvironment_CreateToolpathAccessorPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createtoolpathaccessor");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = (PLibMCEnvDriverEnvironment_RegisterStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registerstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = (PLibMCEnvDriverEnvironment_RegisterStringParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registerstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = (PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registeruuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = (PLibMCEnvDriverEnvironment_RegisterUUIDParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registeruuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = (PLibMCEnvDriverEnvironment_RegisterDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registerdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = (PLibMCEnvDriverEnvironment_RegisterDoubleParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registerdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = (PLibMCEnvDriverEnvironment_RegisterIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registerintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter = (PLibMCEnvDriverEnvironment_RegisterIntegerParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registerintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = (PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_registerboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RegisterBoolParameter = (PLibMCEnvDriverEnvironment_RegisterBoolParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_registerboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RegisterBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetStringParameter = (PLibMCEnvDriverEnvironment_SetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_setstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetStringParameter = (PLibMCEnvDriverEnvironment_SetStringParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_setstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetUUIDParameter = (PLibMCEnvDriverEnvironment_SetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_setuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetUUIDParameter = (PLibMCEnvDriverEnvironment_SetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_setuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = (PLibMCEnvDriverEnvironment_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = (PLibMCEnvDriverEnvironment_SetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = (PLibMCEnvDriverEnvironment_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = (PLibMCEnvDriverEnvironment_SetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_SetBoolParameter = (PLibMCEnvDriverEnvironment_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_SetBoolParameter = (PLibMCEnvDriverEnvironment_SetBoolParameterPtr) dlsym(hLibrary, "libmcenv_driverenvironment_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_sleep");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) dlsym(hLibrary, "libmcenv_driverenvironment_sleep");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_Sleep == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1332,102 +1934,12 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreString = (PLibMCEnvStateEnvironment_StoreStringPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storestring");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreString = (PLibMCEnvStateEnvironment_StoreStringPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storestring");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreString == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreUUID = (PLibMCEnvStateEnvironment_StoreUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storeuuid");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreUUID = (PLibMCEnvStateEnvironment_StoreUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storeuuid");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreUUID == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreInteger = (PLibMCEnvStateEnvironment_StoreIntegerPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storeinteger");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreInteger = (PLibMCEnvStateEnvironment_StoreIntegerPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storeinteger");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreInteger == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreDouble = (PLibMCEnvStateEnvironment_StoreDoublePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storedouble");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreDouble = (PLibMCEnvStateEnvironment_StoreDoublePtr) dlsym(hLibrary, "libmcenv_stateenvironment_storedouble");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreDouble == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_StoreBool = (PLibMCEnvStateEnvironment_StoreBoolPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storebool");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_StoreBool = (PLibMCEnvStateEnvironment_StoreBoolPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storebool");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_StoreBool == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_storesignal");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_StoreSignal = (PLibMCEnvStateEnvironment_StoreSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_storesignal");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveString = (PLibMCEnvStateEnvironment_RetrieveStringPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievestring");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveString = (PLibMCEnvStateEnvironment_RetrieveStringPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievestring");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveString == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveUUID = (PLibMCEnvStateEnvironment_RetrieveUUIDPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrieveuuid");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveUUID = (PLibMCEnvStateEnvironment_RetrieveUUIDPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrieveuuid");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveUUID == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveInteger = (PLibMCEnvStateEnvironment_RetrieveIntegerPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrieveinteger");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveInteger = (PLibMCEnvStateEnvironment_RetrieveIntegerPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrieveinteger");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveInteger == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveDouble = (PLibMCEnvStateEnvironment_RetrieveDoublePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievedouble");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveDouble = (PLibMCEnvStateEnvironment_RetrieveDoublePtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievedouble");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveDouble == nullptr)
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveBool = (PLibMCEnvStateEnvironment_RetrieveBoolPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_retrievebool");
-		#else // _WIN32
-		pWrapperTable->m_StateEnvironment_RetrieveBool = (PLibMCEnvStateEnvironment_RetrieveBoolPtr) dlsym(hLibrary, "libmcenv_stateenvironment_retrievebool");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StateEnvironment_RetrieveBool == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1539,6 +2051,114 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_PrepareSignal == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineState = (PLibMCEnvUIEnvironment_GetMachineStatePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachinestate");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetMachineState = (PLibMCEnvUIEnvironment_GetMachineStatePtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachinestate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetMachineState == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LogMessage = (PLibMCEnvUIEnvironment_LogMessagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_logmessage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LogMessage = (PLibMCEnvUIEnvironment_LogMessagePtr) dlsym(hLibrary, "libmcenv_uienvironment_logmessage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LogMessage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LogWarning = (PLibMCEnvUIEnvironment_LogWarningPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_logwarning");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LogWarning = (PLibMCEnvUIEnvironment_LogWarningPtr) dlsym(hLibrary, "libmcenv_uienvironment_logwarning");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LogWarning == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LogInfo = (PLibMCEnvUIEnvironment_LogInfoPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loginfo");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LogInfo = (PLibMCEnvUIEnvironment_LogInfoPtr) dlsym(hLibrary, "libmcenv_uienvironment_loginfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LogInfo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetStringParameter = (PLibMCEnvUIEnvironment_GetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetStringParameter = (PLibMCEnvUIEnvironment_GetStringParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetUUIDParameter = (PLibMCEnvUIEnvironment_GetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetUUIDParameter = (PLibMCEnvUIEnvironment_GetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetDoubleParameter = (PLibMCEnvUIEnvironment_GetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetDoubleParameter = (PLibMCEnvUIEnvironment_GetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetIntegerParameter = (PLibMCEnvUIEnvironment_GetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetIntegerParameter = (PLibMCEnvUIEnvironment_GetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetBoolParameter = (PLibMCEnvUIEnvironment_GetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetBoolParameter = (PLibMCEnvUIEnvironment_GetBoolParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_geteventcontext");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) dlsym(hLibrary, "libmcenv_uienvironment_geteventcontext");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetEventContext == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -1599,6 +2219,26 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCEnvResult eLookupError = LIBMCENV_SUCCESS;
+		eLookupError = (*pLookup)("libmcenv_iterator_movenext", (void**)&(pWrapperTable->m_Iterator_MoveNext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_MoveNext == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_moveprevious", (void**)&(pWrapperTable->m_Iterator_MovePrevious));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_MovePrevious == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_getcurrent", (void**)&(pWrapperTable->m_Iterator_GetCurrent));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_GetCurrent == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_clone", (void**)&(pWrapperTable->m_Iterator_Clone));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Clone == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_iterator_count", (void**)&(pWrapperTable->m_Iterator_Count));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Count == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getlayerdatauuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetLayerDataUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetLayerDataUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1693,6 +2333,150 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_addbinarydata", (void**)&(pWrapperTable->m_Build_AddBinaryData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_AddBinaryData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfileexecution_getstatus", (void**)&(pWrapperTable->m_WorkingFileExecution_GetStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFileExecution_GetStatus == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfileexecution_returnstdout", (void**)&(pWrapperTable->m_WorkingFileExecution_ReturnStdOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFileExecution_ReturnStdOut == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_getabsolutefilename", (void**)&(pWrapperTable->m_WorkingFile_GetAbsoluteFileName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_GetAbsoluteFileName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_getsize", (void**)&(pWrapperTable->m_WorkingFile_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_GetSize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_calculatesha2", (void**)&(pWrapperTable->m_WorkingFile_CalculateSHA2));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_CalculateSHA2 == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_executefile", (void**)&(pWrapperTable->m_WorkingFile_ExecuteFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_ExecuteFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_ismanaged", (void**)&(pWrapperTable->m_WorkingFile_IsManaged));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_IsManaged == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_makemanaged", (void**)&(pWrapperTable->m_WorkingFile_MakeManaged));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_MakeManaged == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_fileexists", (void**)&(pWrapperTable->m_WorkingFile_FileExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_FileExists == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfile_deletefromdisk", (void**)&(pWrapperTable->m_WorkingFile_DeleteFromDisk));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFile_DeleteFromDisk == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingfileiterator_getcurrentfile", (void**)&(pWrapperTable->m_WorkingFileIterator_GetCurrentFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingFileIterator_GetCurrentFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_isactive", (void**)&(pWrapperTable->m_WorkingDirectory_IsActive));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_IsActive == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_getabsolutefilepath", (void**)&(pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storecustomdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storedriverdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_cleanup", (void**)&(pWrapperTable->m_WorkingDirectory_CleanUp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_CleanUp == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_addmanagedfile", (void**)&(pWrapperTable->m_WorkingDirectory_AddManagedFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_AddManagedFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_hasunmanagedfiles", (void**)&(pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_retrieveunmanagedfiles", (void**)&(pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_retrievemanagedfiles", (void**)&(pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_retrieveallfiles", (void**)&(pWrapperTable->m_WorkingDirectory_RetrieveAllFiles));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveAllFiles == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createworkingdirectory", (void**)&(pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievedriverdata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createtoolpathaccessor", (void**)&(pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerstringparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registeruuidparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerdoubleparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerintegerparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerboolparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RegisterBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_setstringparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_setuuidparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_setdoubleparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_setintegerparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_setboolparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_sleep", (void**)&(pWrapperTable->m_DriverEnvironment_Sleep));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
@@ -1859,48 +2643,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CheckForTermination == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storestring", (void**)&(pWrapperTable->m_StateEnvironment_StoreString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreString == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storeuuid", (void**)&(pWrapperTable->m_StateEnvironment_StoreUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreUUID == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storeinteger", (void**)&(pWrapperTable->m_StateEnvironment_StoreInteger));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreInteger == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storedouble", (void**)&(pWrapperTable->m_StateEnvironment_StoreDouble));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreDouble == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_storebool", (void**)&(pWrapperTable->m_StateEnvironment_StoreBool));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreBool == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_storesignal", (void**)&(pWrapperTable->m_StateEnvironment_StoreSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_StoreSignal == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievestring", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveString == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrieveuuid", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveUUID == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrieveinteger", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveInteger));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveInteger == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievedouble", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveDouble));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveDouble == nullptr) )
-			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievebool", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveBool));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_RetrieveBool == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_retrievesignal", (void**)&(pWrapperTable->m_StateEnvironment_RetrieveSignal));
@@ -1951,6 +2695,54 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_PrepareSignal == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachinestate", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineState == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_logmessage", (void**)&(pWrapperTable->m_UIEnvironment_LogMessage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogMessage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_logwarning", (void**)&(pWrapperTable->m_UIEnvironment_LogWarning));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogWarning == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loginfo", (void**)&(pWrapperTable->m_UIEnvironment_LogInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getstringparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getuuidparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getdoubleparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getintegerparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getboolparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_geteventcontext", (void**)&(pWrapperTable->m_UIEnvironment_GetEventContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetEventContext == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GetVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1979,6 +2771,76 @@ public:
 	/**
 	 * Method definitions for class CBase
 	 */
+	
+	/**
+	 * Method definitions for class CIterator
+	 */
+	
+	/**
+	* CIterator::MoveNext - Iterates to the next object in the list.
+	* @return Iterates to the next object in the list.
+	*/
+	bool CIterator::MoveNext()
+	{
+		bool resultHasNext = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_MoveNext(m_pHandle, &resultHasNext));
+		
+		return resultHasNext;
+	}
+	
+	/**
+	* CIterator::MovePrevious - Iterates to the previous object in the list.
+	* @return Iterates to the previous object in the list.
+	*/
+	bool CIterator::MovePrevious()
+	{
+		bool resultHasPrevious = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_MovePrevious(m_pHandle, &resultHasPrevious));
+		
+		return resultHasPrevious;
+	}
+	
+	/**
+	* CIterator::GetCurrent - Returns the object the iterator points at.
+	* @return returns the object instance.
+	*/
+	PBase CIterator::GetCurrent()
+	{
+		LibMCEnvHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_GetCurrent(m_pHandle, &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CBase>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CIterator::Clone - Creates a new object iterator with the same object list.
+	* @return returns the cloned Iterator instance
+	*/
+	PIterator CIterator::Clone()
+	{
+		LibMCEnvHandle hOutIterator = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Clone(m_pHandle, &hOutIterator));
+		
+		if (!hOutIterator) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CIterator>(m_pWrapper, hOutIterator);
+	}
+	
+	/**
+	* CIterator::Count - Returns the number of resoucres the iterator captures.
+	* @return returns the number of objects the iterator captures.
+	*/
+	LibMCEnv_uint64 CIterator::Count()
+	{
+		LibMCEnv_uint64 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Count(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
 	
 	/**
 	 * Method definitions for class CToolpathLayer
@@ -2040,29 +2902,31 @@ public:
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	std::string CToolpathLayer::GetSegmentProfileValue(const std::string & sValueName)
+	std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, sValueName.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sValueName.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileValue(m_pHandle, nIndex, sValueName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
-	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const eToolpathProfileValueType eValueType)
+	LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, eValueType, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentProfileTypedValue(m_pHandle, nIndex, eValueType, &resultValue));
 		
 		return resultValue;
 	}
@@ -2315,6 +3179,482 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_AddBinaryData(m_pHandle, sName.c_str(), sMIMEType.c_str(), (LibMCEnv_uint64)ContentBuffer.size(), ContentBuffer.data(), bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
 		
 		return std::string(&bufferDataUUID[0]);
+	}
+	
+	/**
+	 * Method definitions for class CWorkingFileExecution
+	 */
+	
+	/**
+	* CWorkingFileExecution::GetStatus - Returns the execution status
+	*/
+	void CWorkingFileExecution::GetStatus()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileExecution_GetStatus(m_pHandle));
+	}
+	
+	/**
+	* CWorkingFileExecution::ReturnStdOut - Returns the output of the executable as string buffer
+	* @return stdout buffer
+	*/
+	std::string CWorkingFileExecution::ReturnStdOut()
+	{
+		LibMCEnv_uint32 bytesNeededStringBuffer = 0;
+		LibMCEnv_uint32 bytesWrittenStringBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileExecution_ReturnStdOut(m_pHandle, 0, &bytesNeededStringBuffer, nullptr));
+		std::vector<char> bufferStringBuffer(bytesNeededStringBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileExecution_ReturnStdOut(m_pHandle, bytesNeededStringBuffer, &bytesWrittenStringBuffer, &bufferStringBuffer[0]));
+		
+		return std::string(&bufferStringBuffer[0]);
+	}
+	
+	/**
+	 * Method definitions for class CWorkingFile
+	 */
+	
+	/**
+	* CWorkingFile::GetAbsoluteFileName - Retrieves absolute file name of the working file
+	* @return global path of the file
+	*/
+	std::string CWorkingFile::GetAbsoluteFileName()
+	{
+		LibMCEnv_uint32 bytesNeededFileName = 0;
+		LibMCEnv_uint32 bytesWrittenFileName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_GetAbsoluteFileName(m_pHandle, 0, &bytesNeededFileName, nullptr));
+		std::vector<char> bufferFileName(bytesNeededFileName);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_GetAbsoluteFileName(m_pHandle, bytesNeededFileName, &bytesWrittenFileName, &bufferFileName[0]));
+		
+		return std::string(&bufferFileName[0]);
+	}
+	
+	/**
+	* CWorkingFile::GetSize - Returns the size of temporary file.
+	* @return file size
+	*/
+	LibMCEnv_uint64 CWorkingFile::GetSize()
+	{
+		LibMCEnv_uint64 resultFileSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_GetSize(m_pHandle, &resultFileSize));
+		
+		return resultFileSize;
+	}
+	
+	/**
+	* CWorkingFile::CalculateSHA2 - Calculates the SHA256 checksum of the file.
+	* @return sha256 checksum
+	*/
+	std::string CWorkingFile::CalculateSHA2()
+	{
+		LibMCEnv_uint32 bytesNeededSHA2 = 0;
+		LibMCEnv_uint32 bytesWrittenSHA2 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_CalculateSHA2(m_pHandle, 0, &bytesNeededSHA2, nullptr));
+		std::vector<char> bufferSHA2(bytesNeededSHA2);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_CalculateSHA2(m_pHandle, bytesNeededSHA2, &bytesWrittenSHA2, &bufferSHA2[0]));
+		
+		return std::string(&bufferSHA2[0]);
+	}
+	
+	/**
+	* CWorkingFile::ExecuteFile - Executes the temporary file, if it is an executable.
+	* @return execution object
+	*/
+	PWorkingFileExecution CWorkingFile::ExecuteFile()
+	{
+		LibMCEnvHandle hExecution = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_ExecuteFile(m_pHandle, &hExecution));
+		
+		if (!hExecution) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileExecution>(m_pWrapper, hExecution);
+	}
+	
+	/**
+	* CWorkingFile::IsManaged - Returns if the file is managed.
+	* @return returns if the file is managed.
+	*/
+	bool CWorkingFile::IsManaged()
+	{
+		bool resultFileIsManaged = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_IsManaged(m_pHandle, &resultFileIsManaged));
+		
+		return resultFileIsManaged;
+	}
+	
+	/**
+	* CWorkingFile::MakeManaged - Makes the file managed if it is not managed yet.
+	*/
+	void CWorkingFile::MakeManaged()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_MakeManaged(m_pHandle));
+	}
+	
+	/**
+	* CWorkingFile::FileExists - Returns if the file exists on disk.
+	* @return returns if the file exists.
+	*/
+	bool CWorkingFile::FileExists()
+	{
+		bool resultFileDoesExist = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_FileExists(m_pHandle, &resultFileDoesExist));
+		
+		return resultFileDoesExist;
+	}
+	
+	/**
+	* CWorkingFile::DeleteFromDisk - Deletes the temporary file.
+	* @return returns if deletion was successful or file did not exist in the first place.
+	*/
+	bool CWorkingFile::DeleteFromDisk()
+	{
+		bool resultSuccess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFile_DeleteFromDisk(m_pHandle, &resultSuccess));
+		
+		return resultSuccess;
+	}
+	
+	/**
+	 * Method definitions for class CWorkingFileIterator
+	 */
+	
+	/**
+	* CWorkingFileIterator::GetCurrentFile - Returns the working file the iterator points at.
+	* @return returns the WorkingFile instance.
+	*/
+	PWorkingFile CWorkingFileIterator::GetCurrentFile()
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingFileIterator_GetCurrentFile(m_pHandle, &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	 * Method definitions for class CWorkingDirectory
+	 */
+	
+	/**
+	* CWorkingDirectory::IsActive - Working directory is active.
+	* @return returns true if files can be read and written to the directory.
+	*/
+	bool CWorkingDirectory::IsActive()
+	{
+		bool resultIsActive = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_IsActive(m_pHandle, &resultIsActive));
+		
+		return resultIsActive;
+	}
+	
+	/**
+	* CWorkingDirectory::GetAbsoluteFilePath - Retrieves absolute file path.
+	* @return global path of the directory, including path delimiter.
+	*/
+	std::string CWorkingDirectory::GetAbsoluteFilePath()
+	{
+		LibMCEnv_uint32 bytesNeededFilePath = 0;
+		LibMCEnv_uint32 bytesWrittenFilePath = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_GetAbsoluteFilePath(m_pHandle, 0, &bytesNeededFilePath, nullptr));
+		std::vector<char> bufferFilePath(bytesNeededFilePath);
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_GetAbsoluteFilePath(m_pHandle, bytesNeededFilePath, &bytesWrittenFilePath, &bufferFilePath[0]));
+		
+		return std::string(&bufferFilePath[0]);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] DataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomData(const std::string & sFileName, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomData(m_pHandle, sFileName.c_str(), (LibMCEnv_uint64)DataBufferBuffer.size(), DataBufferBuffer.data(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreDriverData(const std::string & sFileName, const std::string & sIdentifier)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreDriverData(m_pHandle, sFileName.c_str(), sIdentifier.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::CleanUp - Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
+	* @return returns if deletion was successful.
+	*/
+	bool CWorkingDirectory::CleanUp()
+	{
+		bool resultSuccess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_CleanUp(m_pHandle, &resultSuccess));
+		
+		return resultSuccess;
+	}
+	
+	/**
+	* CWorkingDirectory::AddManagedFile - Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.
+	* @param[in] sFileName - Filename to manage. The file does not need to exist yet.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::AddManagedFile(const std::string & sFileName)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_AddManagedFile(m_pHandle, sFileName.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::HasUnmanagedFiles - Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.
+	* @return returns if there are unmanaged files.
+	*/
+	bool CWorkingDirectory::HasUnmanagedFiles()
+	{
+		bool resultHasUnmanagedFiles = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_HasUnmanagedFiles(m_pHandle, &resultHasUnmanagedFiles));
+		
+		return resultHasUnmanagedFiles;
+	}
+	
+	/**
+	* CWorkingDirectory::RetrieveUnmanagedFiles - Returns a list of unmanaged files.
+	* @return working file iterator instance.
+	*/
+	PWorkingFileIterator CWorkingDirectory::RetrieveUnmanagedFiles()
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_RetrieveUnmanagedFiles(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CWorkingDirectory::RetrieveManagedFiles - Returns a list of managed files.
+	* @return working file iterator instance.
+	*/
+	PWorkingFileIterator CWorkingDirectory::RetrieveManagedFiles()
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_RetrieveManagedFiles(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	* CWorkingDirectory::RetrieveAllFiles - Returns a list of all files in the directory.
+	* @return working file iterator instance.
+	*/
+	PWorkingFileIterator CWorkingDirectory::RetrieveAllFiles()
+	{
+		LibMCEnvHandle hIteratorInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_RetrieveAllFiles(m_pHandle, &hIteratorInstance));
+		
+		if (!hIteratorInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFileIterator>(m_pWrapper, hIteratorInstance);
+	}
+	
+	/**
+	 * Method definitions for class CDriverEnvironment
+	 */
+	
+	/**
+	* CDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
+	* @return creates a working directory
+	*/
+	PWorkingDirectory CDriverEnvironment::CreateWorkingDirectory()
+	{
+		LibMCEnvHandle hWorkingDirectory = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateWorkingDirectory(m_pHandle, &hWorkingDirectory));
+		
+		if (!hWorkingDirectory) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingDirectory>(m_pWrapper, hWorkingDirectory);
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[out] DataBufferBuffer - buffer data.
+	*/
+	void CDriverEnvironment::RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededDataBuffer = 0;
+		LibMCEnv_uint64 elementsWrittenDataBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
+		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
+	
+	/**
+	* CDriverEnvironment::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+	* @param[in] sStreamUUID - UUID of the stream.
+	* @return Toolpath instance.
+	*/
+	PToolpathAccessor CDriverEnvironment::CreateToolpathAccessor(const std::string & sStreamUUID)
+	{
+		LibMCEnvHandle hToolpathInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateToolpathAccessor(m_pHandle, sStreamUUID.c_str(), &hToolpathInstance));
+		
+		if (!hToolpathInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterStringParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), sDefaultValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterUUIDParameter - registers a uuid parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterUUIDParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), sDefaultValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterDoubleParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), dDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterIntegerParameter - registers an int parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] nDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_int64 nDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterIntegerParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), nDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::RegisterBoolParameter - registers a bool parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] bDefaultValue - default value to set
+	*/
+	void CDriverEnvironment::RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RegisterBoolParameter(m_pHandle, sParameterName.c_str(), sDescription.c_str(), bDefaultValue));
+	}
+	
+	/**
+	* CDriverEnvironment::SetStringParameter - sets a string parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CDriverEnvironment::SetStringParameter(const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetStringParameter(m_pHandle, sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CDriverEnvironment::SetUUIDParameter(const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetUUIDParameter(m_pHandle, sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	void CDriverEnvironment::SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
+	}
+	
+	/**
+	* CDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	void CDriverEnvironment::SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
+	}
+	
+	/**
+	* CDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	void CDriverEnvironment::SetBoolParameter(const std::string & sParameterName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CDriverEnvironment::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_Sleep(m_pHandle, nDelay));
+	}
+	
+	/**
+	* CDriverEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
 	}
 	
 	/**
@@ -2833,56 +4173,6 @@ public:
 	}
 	
 	/**
-	* CStateEnvironment::StoreString - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	void CStateEnvironment::StoreString(const std::string & sName, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreString(m_pHandle, sName.c_str(), sValue.c_str()));
-	}
-	
-	/**
-	* CStateEnvironment::StoreUUID - stores a uuid in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	void CStateEnvironment::StoreUUID(const std::string & sName, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreUUID(m_pHandle, sName.c_str(), sValue.c_str()));
-	}
-	
-	/**
-	* CStateEnvironment::StoreInteger - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] nValue - Value
-	*/
-	void CStateEnvironment::StoreInteger(const std::string & sName, const LibMCEnv_int64 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreInteger(m_pHandle, sName.c_str(), nValue));
-	}
-	
-	/**
-	* CStateEnvironment::StoreDouble - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] dValue - Value
-	*/
-	void CStateEnvironment::StoreDouble(const std::string & sName, const LibMCEnv_double dValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreDouble(m_pHandle, sName.c_str(), dValue));
-	}
-	
-	/**
-	* CStateEnvironment::StoreBool - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] bValue - Value
-	*/
-	void CStateEnvironment::StoreBool(const std::string & sName, const bool bValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreBool(m_pHandle, sName.c_str(), bValue));
-	}
-	
-	/**
 	* CStateEnvironment::StoreSignal - stores a signal handler in the current state machine
 	* @param[in] sName - Name
 	* @param[in] pHandler - Signal handler to store.
@@ -2891,77 +4181,6 @@ public:
 	{
 		LibMCEnvHandle hHandler = pHandler.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_StoreSignal(m_pHandle, sName.c_str(), hHandler));
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveString - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	std::string CStateEnvironment::RetrieveString(const std::string & sName)
-	{
-		LibMCEnv_uint32 bytesNeededValue = 0;
-		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveString(m_pHandle, sName.c_str(), 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveString(m_pHandle, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveUUID - retrieves a uuid from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	std::string CStateEnvironment::RetrieveUUID(const std::string & sName)
-	{
-		LibMCEnv_uint32 bytesNeededValue = 0;
-		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveUUID(m_pHandle, sName.c_str(), 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveUUID(m_pHandle, sName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveInteger - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	LibMCEnv_int64 CStateEnvironment::RetrieveInteger(const std::string & sName)
-	{
-		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveInteger(m_pHandle, sName.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveDouble - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	LibMCEnv_double CStateEnvironment::RetrieveDouble(const std::string & sName)
-	{
-		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveDouble(m_pHandle, sName.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CStateEnvironment::RetrieveBool - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	bool CStateEnvironment::RetrieveBool(const std::string & sName)
-	{
-		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_RetrieveBool(m_pHandle, sName.c_str(), &resultValue));
-		
-		return resultValue;
 	}
 	
 	/**
@@ -3118,6 +4337,180 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBoolParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[out] ResourceDataBuffer - Resource Data Buffer.
+	*/
+	void CStateEnvironment::LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededResourceData = 0;
+		LibMCEnv_uint64 elementsWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
+		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CUIEnvironment
+	 */
+	
+	/**
+	* CUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sSignalName - Name Of signal channel.
+	* @return Signal trigger object.
+	*/
+	PSignalTrigger CUIEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
+	{
+		LibMCEnvHandle hSignalInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_PrepareSignal(m_pHandle, sMachineInstance.c_str(), sSignalName.c_str(), &hSignalInstance));
+		
+		if (!hSignalInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CSignalTrigger>(m_pWrapper, hSignalInstance);
+	}
+	
+	/**
+	* CUIEnvironment::GetMachineState - Retrieves the machine state
+	* @param[in] sMachineInstance - State machine instance name
+	* @return Name of current state
+	*/
+	std::string CUIEnvironment::GetMachineState(const std::string & sMachineInstance)
+	{
+		LibMCEnv_uint32 bytesNeededStateName = 0;
+		LibMCEnv_uint32 bytesWrittenStateName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineState(m_pHandle, sMachineInstance.c_str(), 0, &bytesNeededStateName, nullptr));
+		std::vector<char> bufferStateName(bytesNeededStateName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineState(m_pHandle, sMachineInstance.c_str(), bytesNeededStateName, &bytesWrittenStateName, &bufferStateName[0]));
+		
+		return std::string(&bufferStateName[0]);
+	}
+	
+	/**
+	* CUIEnvironment::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	void CUIEnvironment::LogMessage(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LogMessage(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	void CUIEnvironment::LogWarning(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LogWarning(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	void CUIEnvironment::LogInfo(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LogInfo(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::GetStringParameter - returns a string parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	std::string CUIEnvironment::GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetStringParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetStringParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetUUIDParameter - returns a uuid parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	std::string CUIEnvironment::GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUUIDParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUUIDParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetDoubleParameter - returns a double parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	LibMCEnv_double CUIEnvironment::GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetDoubleParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetIntegerParameter - returns an int parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	LibMCEnv_int64 CUIEnvironment::GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetIntegerParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetBoolParameter - returns a bool parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	bool CUIEnvironment::GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetBoolParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetEventContext - returns the event context uuid as string
+	* @return Context UUID
+	*/
+	std::string CUIEnvironment::GetEventContext()
+	{
+		LibMCEnv_uint32 bytesNeededContextUUID = 0;
+		LibMCEnv_uint32 bytesWrittenContextUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetEventContext(m_pHandle, 0, &bytesNeededContextUUID, nullptr));
+		std::vector<char> bufferContextUUID(bytesNeededContextUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetEventContext(m_pHandle, bytesNeededContextUUID, &bytesWrittenContextUUID, &bufferContextUUID[0]));
+		
+		return std::string(&bufferContextUUID[0]);
 	}
 
 } // namespace LibMCEnv

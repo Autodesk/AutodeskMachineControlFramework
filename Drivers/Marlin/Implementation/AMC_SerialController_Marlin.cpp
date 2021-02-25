@@ -33,9 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <thread>
 
-#ifdef __linux__
-#include <math.h>
-#endif
+#include <cmath>
 
 #define MARLINDRIVER_MINSPEED 0.0001
 
@@ -45,9 +43,10 @@ namespace AMC {
 		: m_sCOMPort("COM1"),
 		m_nBaudRate(115200),
 		m_nConnectTimeout(2000),
+		m_bIsConnected(false),
 		m_bDoQueryFirmwareInfo(bDoQueryFirmwareInfo),
 		m_bDisableHoming(bDisableHoming),
-		m_dStatusUpdateTimerInterval(100),
+		m_nStatusUpdateTimerInterval(100),
 		m_sAckSymbol("ok"),
 		m_nLineNumber(1),
 		m_bDebug(bDebug),
@@ -81,9 +80,9 @@ namespace AMC {
 			m_bIsHomed = true;
 	}
 
-	void CSerialController_Marlin::setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval)
+	void CSerialController_Marlin::setStatusUpdateTimerInterval(const uint32_t nStatusUpdateTimerInterval)
 	{
-		m_dStatusUpdateTimerInterval = dStatusUpdateTimerInterval;
+		m_nStatusUpdateTimerInterval = nStatusUpdateTimerInterval;
 	}
 
 
@@ -113,6 +112,11 @@ namespace AMC {
 		return m_nBaudRate;
 	}
 
+	bool CSerialController_Marlin::isConnected()
+	{
+		return m_bIsConnected;
+	}
+
 	void CSerialController_Marlin::setConnectTimeout(const uint32_t nConnectTimeout)
 	{
 		if (m_pConnection.get() != nullptr)
@@ -132,6 +136,7 @@ namespace AMC {
 
 	void CSerialController_Marlin::initializeController()
 	{
+		m_bIsConnected = false;
 		if (m_pConnection.get() != nullptr)
 			throw std::runtime_error("Serial Port already initialized");
 
@@ -178,7 +183,8 @@ namespace AMC {
 		sendCommand("M149 C"); // set temperature unit to Celsius
 		sendCommand("M113 S1"); // keep alive period 0-60 possible, no decimals!
 		setPositioningAbolute();
-
+		setAbsoluteExtrusion(true);
+		
 		if (m_nCurrentBufferSpace > 0) {
 			m_nMaxBufferSpace = m_nCurrentBufferSpace;
 		}
@@ -198,12 +204,12 @@ namespace AMC {
 		}
 
 		checkIsHomed();
-
-
+		m_bIsConnected = true;
 	}
 
 	void CSerialController_Marlin::disconnectController()
 	{
+		m_bIsConnected = false;
 		m_pConnection.reset();
 	}
 
@@ -381,9 +387,10 @@ namespace AMC {
 	
 	void CSerialController_Marlin::queryTemperatureState(uint32_t nExtruderIndex)
 	{
-		if (nExtruderIndex < m_iExtruderCount)
+		if ((nExtruderIndex >= 0) && (nExtruderIndex < m_iExtruderCount))
 		{
 			auto sStream = sendCommand("M105 T" + std::to_string(nExtruderIndex));
+			
 			auto sLine = sStream.str();
 			auto nPosition = sLine.find("T:");
 
@@ -564,6 +571,7 @@ namespace AMC {
 	void CSerialController_Marlin::queryPositionState()
 	{
 		auto sStream = sendCommand("M114");
+		
 		auto sLine = sStream.str();
 
 		auto nPosition = sLine.find("Count");
@@ -628,16 +636,26 @@ namespace AMC {
 
 	}
 
-	void CSerialController_Marlin::getHeatedBedTemperature(double& dTargetTemperature, double& dCurrentTemperature)
+	void CSerialController_Marlin::getHeatedBedTargetTemperature(double& dTargetTemperature)
 	{
 		dTargetTemperature = m_dTargetBedTemp;
+	}
+
+	void CSerialController_Marlin::getHeatedBedCurrentTemperature(double& dCurrentTemperature)
+	{
 		dCurrentTemperature = m_dCurrentBedTemp;
 	}
 
-	void CSerialController_Marlin::getExtruderTemperature(uint32_t nExtruderIndex, double& dTargetTemperature, double& dCurrentTemperature)
+	void CSerialController_Marlin::getExtruderTargetTemperature(uint32_t nExtruderIndex, double& dTargetTemperature)
 	{
 		if (nExtruderIndex < m_iExtruderCount) {
 			dTargetTemperature = m_dTargetExtruderTemp[nExtruderIndex];
+		}
+	}
+
+	void CSerialController_Marlin::getExtruderCurrentTemperature(uint32_t nExtruderIndex, double& dCurrentTemperature)
+	{
+		if (nExtruderIndex < m_iExtruderCount) {
 			dCurrentTemperature = m_dCurrentExtruderTemp[nExtruderIndex];
 		}
 	}
@@ -724,8 +742,9 @@ namespace AMC {
 		}
 		if (bInE && !bFastMove) {
 			// E given => add E+value to command str
-			// TODO remove to activate Extrusion
-			//sCommand << " E" << dE;
+			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
+			sCommand << " E" << dE;
+			//std::cout << "CALCULATED E = " << dE << std::endl;
 		}
 		if (dSpeedInMMperSecond > 0) {
 			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
@@ -788,17 +807,67 @@ namespace AMC {
 
 	bool CSerialController_Marlin::canReceiveMovement()
 	{
-		return (m_nCurrentBufferSpace > m_nMinBufferSpace);
+		return (m_bIsConnected && (m_nCurrentBufferSpace > m_nMinBufferSpace));
 	}
 
 	bool CSerialController_Marlin::isMoving()
 	{
-		return (m_nCurrentBufferSpace != m_nMaxBufferSpace);
+		return (m_bIsConnected && m_nCurrentBufferSpace != m_nMaxBufferSpace);
 	}
 
 	bool CSerialController_Marlin::isHomed()
 	{
-		return (m_bIsHomed);
+		return (m_bIsConnected && m_bIsHomed);
+	}
+
+	void CSerialController_Marlin::emergencyStop()
+	{
+		sendCommand("M112");
+	}
+
+
+	void CSerialController_Marlin::powerOff()
+	{
+		sendCommand("M81");
+	}
+
+	void CSerialController_Marlin::stopIdleHold()
+	{
+		sendCommand("M84");
+	}
+
+	void CSerialController_Marlin::setAbsoluteExtrusion(bool bAbsolute)
+	{
+		std::string sCommand;
+		if (bAbsolute) {
+			// absolute mode
+			sCommand  = "M82";
+		}
+		else {
+			// relative mode
+			sCommand = "M83";
+		}
+		sendCommand(sCommand);
+	}
+
+
+	void CSerialController_Marlin::setAxisPosition(const std::string& sAxis, double dValue)
+	{
+		sendCommand("G92 " + sAxis + std::to_string(dValue));		
+	}
+
+	void CSerialController_Marlin::extruderDoExtrude(double dE, double dSpeedInMMperSecond)
+	{
+		std::stringstream sCommand;
+
+		sCommand << "G1 E" << dE;
+
+		if (dSpeedInMMperSecond > 0) {
+			sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
+		}
+		// TODO XXXXXXXXXXXXXXXX activate to do extrusion
+		sendCommand(sCommand.str());
+		//std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
 	}
 
 

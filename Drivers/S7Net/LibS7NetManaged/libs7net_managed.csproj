@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+
+    <!-- Indicate the assembly is providing a COM server -->
+    <EnableComHosting>True</EnableComHosting>
+
+    <!-- Generate a RegFree COM manifest -->
+    <Platforms>x64</Platforms>
+    <Nullable>enable</Nullable>
+    <AssemblyName>libs7net_managed</AssemblyName>
+  </PropertyGroup>
+
+</Project>

@@ -39,11 +39,13 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCSelector 
 **************************************************************************************************************************/
 
-CRTCSelector::CRTCSelector(PScanLabSDK pScanLabSDK) :
-	m_pScanLabSDK(pScanLabSDK)
+CRTCSelector::CRTCSelector(PScanLabSDK pScanLabSDK, LibMCEnv::PDriverEnvironment pDriverEnvironment) :
+	m_pScanLabSDK(pScanLabSDK), m_pDriverEnvironment (pDriverEnvironment)
 
 {
-	if (pScanLabSDK.get() != nullptr)
+	if (pScanLabSDK.get() == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+	if (pDriverEnvironment.get () == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 }
 
@@ -103,7 +105,7 @@ LibMCDriver_ScanLab_uint32 CRTCSelector::GetEthernetCardCount()
 	return m_pScanLabSDK->eth_found_cards();
 }
 
-IRTCContext * CRTCSelector::AcquireCard(const LibMCDriver_ScanLab_uint32 nNumber)
+IRTCContext* CRTCSelector::acquireCardEx(const LibMCDriver_ScanLab_uint32 nNumber, bool bIsNetworkCard)
 {
 	m_pScanLabSDK->initDLL();
 
@@ -114,8 +116,14 @@ IRTCContext * CRTCSelector::AcquireCard(const LibMCDriver_ScanLab_uint32 nNumber
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYACQUIRED);
 	}
 
-	return new CRTCContext(m_pScanLabSDK, cardNo);
+	return new CRTCContext(m_pScanLabSDK, cardNo, bIsNetworkCard, m_pDriverEnvironment);
 }
+
+IRTCContext* CRTCSelector::AcquireCard(const LibMCDriver_ScanLab_uint32 nNumber)
+{
+	return acquireCardEx(nNumber, false);
+}
+
 
 IRTCContext * CRTCSelector::AcquireCardBySerial(const LibMCDriver_ScanLab_uint32 nSerialNumber)
 {
@@ -144,7 +152,7 @@ IRTCContext * CRTCSelector::AcquireEthernetCard(const LibMCDriver_ScanLab_uint32
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTFOUND);
 	}
 
-	return AcquireCard(nNewCardNo);
+	return acquireCardEx(nNewCardNo, true);
 }
 
 IRTCContext * CRTCSelector::AcquireEthernetCardBySerial(const LibMCDriver_ScanLab_uint32 nSerialNumber)

@@ -47,7 +47,7 @@ Interface version: 1.0.0
 #include "libmcdriver_marlin_types.hpp"
 
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 namespace LibMCDriver_Marlin {
 namespace Impl {
@@ -266,6 +266,12 @@ typedef IBaseSharedPtr<IBase> PIBase;
 class IDriver : public virtual IBase {
 public:
 	/**
+	* IDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	virtual void Configure(const std::string & sConfigurationString) = 0;
+
+	/**
 	* IDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/
@@ -293,6 +299,11 @@ public:
 	*/
 	virtual void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) = 0;
 
+	/**
+	* IDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	virtual void QueryParameters() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver> PIDriver;
@@ -308,10 +319,10 @@ public:
 	* IDriver_Marlin::Connect - Creates and initializes a new Marlin Connector.
 	* @param[in] sCOMPort - Device Port to connect to
 	* @param[in] nBaudrate - Baudrate to use
-	* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+	* @param[in] nStatusUpdateInterval - Timer interval [ms] for updating status
 	* @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 	*/
-	virtual void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) = 0;
+	virtual void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout) = 0;
 
 	/**
 	* IDriver_Marlin::Disconnect - Disconnects from the Marlin board.
@@ -355,9 +366,15 @@ public:
 	virtual void SetPidParameters(const LibMCDriver_Marlin_double dP, const LibMCDriver_Marlin_double dI, const LibMCDriver_Marlin_double dD) = 0;
 
 	/**
-	* IDriver_Marlin::UpdateState - Polls a new state from the firmware.
+	* IDriver_Marlin::UpdatePositionState - Polls a new state from the printer.
 	*/
-	virtual void UpdateState() = 0;
+	virtual void UpdatePositionState() = 0;
+
+	/**
+	* IDriver_Marlin::UpdateTemperatureState - Polls a new temperature state from the printer.
+	* @param[in] nExtruderID - ID of extruder.
+	*/
+	virtual void UpdateTemperatureState(const LibMCDriver_Marlin_uint32 nExtruderID) = 0;
 
 	/**
 	* IDriver_Marlin::GetCurrentPosition - Returns the current axis position.
@@ -382,19 +399,30 @@ public:
 	virtual void GetExtruderTargetPosition(LibMCDriver_Marlin_double & dE) = 0;
 
 	/**
-	* IDriver_Marlin::GetHeatedBedTemperature - Returns the current and the target bed temperature.
+	* IDriver_Marlin::GetHeatedBedTargetTemperature - Returns the the target bed temperature.
 	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
-	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
 	*/
-	virtual void GetHeatedBedTemperature(LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature) = 0;
+	virtual void GetHeatedBedTargetTemperature(LibMCDriver_Marlin_double & dTargetTemperature) = 0;
 
 	/**
-	* IDriver_Marlin::GetExtruderTemperature - Returns the current and the target temperature of an extruder.
-	* @param[in] nExtruderID - ID of Extruder
-	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
+	* IDriver_Marlin::GetHeatedBedCurrentTemperature - Returns the current bed temperature.
 	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
 	*/
-	virtual void GetExtruderTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dTargetTemperature, LibMCDriver_Marlin_double & dCurrentTemperature) = 0;
+	virtual void GetHeatedBedCurrentTemperature(LibMCDriver_Marlin_double & dCurrentTemperature) = 0;
+
+	/**
+	* IDriver_Marlin::GetExtruderCurrentTemperature - Returns the current temperature of an extruder.
+	* @param[in] nExtruderID - ID of Extruder
+	* @param[out] dCurrentTemperature - Current Temperature in degree celsius.
+	*/
+	virtual void GetExtruderCurrentTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dCurrentTemperature) = 0;
+
+	/**
+	* IDriver_Marlin::GetExtruderTargetTemperature - Returns the target temperature of an extruder.
+	* @param[in] nExtruderID - ID of Extruder
+	* @param[out] dTargetTemperature - Target Temperature in degree celsius.
+	*/
+	virtual void GetExtruderTargetTemperature(const LibMCDriver_Marlin_uint32 nExtruderID, LibMCDriver_Marlin_double & dTargetTemperature) = 0;
 
 	/**
 	* IDriver_Marlin::GetPidParameters - Returns the current PID values.
@@ -421,6 +449,12 @@ public:
 	* @return True if printer is homed.
 	*/
 	virtual bool IsHomed() = 0;
+
+	/**
+	* IDriver_Marlin::IsConnected - Returns if the printer is coneccted
+	* @return True if printer is connected.
+	*/
+	virtual bool IsConnected() = 0;
 
 	/**
 	* IDriver_Marlin::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
@@ -459,6 +493,41 @@ public:
 	*/
 	virtual void StartHoming() = 0;
 
+	/**
+	* IDriver_Marlin::EmergencyStop - Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.
+	*/
+	virtual void EmergencyStop() = 0;
+
+	/**
+	* IDriver_Marlin::SetAxisPosition - Set the current position of given axis to the specified value.
+	* @param[in] sAxis - Axis whose value is to be set.
+	* @param[in] dValue - New value for given Axis.
+	*/
+	virtual void SetAxisPosition(const std::string & sAxis, const LibMCDriver_Marlin_double dValue) = 0;
+
+	/**
+	* IDriver_Marlin::ExtruderDoExtrude - Extrudes the specified value with given Feedrate.
+	* @param[in] dE - E value in mm
+	* @param[in] dSpeed - Extrusion speed in mm/s
+	*/
+	virtual void ExtruderDoExtrude(const LibMCDriver_Marlin_double dE, const LibMCDriver_Marlin_double dSpeed) = 0;
+
+	/**
+	* IDriver_Marlin::SetAbsoluteExtrusion - Sets the extrusion (E axis) to absolute mode.
+	* @param[in] bAbsolute - If true, sets mode to absolute, if false to relative
+	*/
+	virtual void SetAbsoluteExtrusion(const bool bAbsolute) = 0;
+
+	/**
+	* IDriver_Marlin::StopIdleHold - Stop the idle hold on all axis and extruder.
+	*/
+	virtual void StopIdleHold() = 0;
+
+	/**
+	* IDriver_Marlin::PowerOff - Turn off the high-voltage power supply.
+	*/
+	virtual void PowerOff() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver_Marlin> PIDriver_Marlin;
@@ -470,7 +539,7 @@ typedef IBaseSharedPtr<IDriver_Marlin> PIDriver_Marlin;
 class CWrapper {
 public:
 	// Injected Components
-	static LibMCDriverEnv::PWrapper sPLibMCDriverEnvWrapper;
+	static LibMCEnv::PWrapper sPLibMCEnvWrapper;
 
 	/**
 	* Ilibmcdriver_marlin::GetVersion - retrieves the binary version of this library.
@@ -507,7 +576,7 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 };
 

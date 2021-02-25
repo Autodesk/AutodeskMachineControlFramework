@@ -44,39 +44,29 @@ namespace AMC {
 	class CParameter;
 	typedef std::shared_ptr<CParameter> PParameter;
 
+	class CParameterGroup;
+	typedef std::shared_ptr<CParameterGroup> PParameterGroup;
+
 	class CParameter {
-	private:
-		std::string m_sName;
-		std::string m_sDescription;
-		std::string m_sDefaultValue;
-		std::string m_sValue;
 	public:
 
-		CParameter(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue);
-		CParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue);
-		CParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue);
-		CParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue);
+		virtual std::string getName() const = 0;
+		virtual std::string getDescription() const = 0;
+		virtual std::string getDefaultValue() const = 0;
 
-		virtual ~CParameter();		
+		virtual std::string getStringValue() const = 0;
+		virtual void setStringValue(const std::string& sValue) = 0;
 
-		// The following calls are not thread-safe and need to be mutexed in ParameterGroup!
+		virtual double getDoubleValue() const = 0;
+		virtual void setDoubleValue(const double dValue) = 0;
 
-		std::string getName() const;
-		std::string getDescription() const;
-		std::string getDefaultValue() const;
+		virtual int64_t getIntValue() const = 0;
+		virtual void setIntValue(const int64_t nValue) = 0;
 
-		std::string getStringValue() const;
-		void setStringValue(const std::string& sValue);
+		virtual bool getBoolValue() const = 0;
+		virtual void setBoolValue(const bool bValue) = 0;
 
-		double getDoubleValue() const;
-		void setDoubleValue(const double dValue);
-
-		int64_t getIntValue() const;
-		void setIntValue(const int64_t nValue);
-
-		bool getBoolValue() const;
-		void setBoolValue(const bool bValue);
-
+		virtual PParameter duplicate() = 0;
 	};
 
 	

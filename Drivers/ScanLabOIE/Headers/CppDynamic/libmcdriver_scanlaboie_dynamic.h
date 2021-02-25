@@ -41,7 +41,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_scanlaboie_types.hpp"
 
-#include "libmcdriverenv_types.hpp"
+#include "libmcenv_types.hpp"
 
 
 /*************************************************************************************************************************
@@ -51,6 +51,15 @@ Interface version: 1.0.0
 /*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
+
+/**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ConfigurePtr) (LibMCDriver_ScanLabOIE_Driver pDriver, const char * pConfigurationString);
 
 /**
 * returns the name identifier of the driver
@@ -101,6 +110,14 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_GetVersionP
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_GetHeaderInformationPtr) (LibMCDriver_ScanLabOIE_Driver pDriver, const LibMCDriver_ScanLabOIE_uint32 nNameSpaceBufferSize, LibMCDriver_ScanLabOIE_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_ScanLabOIE_uint32 nBaseNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
+
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_QueryParametersPtr) (LibMCDriver_ScanLabOIE_Driver pDriver);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_OIE
@@ -174,7 +191,7 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEGetSymbolLookupMet
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIECreateDriverPtr) (const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance);
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIECreateDriverPtr) (const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance);
 
 /*************************************************************************************************************************
  Function Table Structure
@@ -182,10 +199,12 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIECreateDriverPtr) (
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_ScanLabOIEDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_ScanLabOIEDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_ScanLabOIEDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_ScanLabOIEDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_ScanLabOIEDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
+	PLibMCDriver_ScanLabOIEDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_ScanLabOIEGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabOIEGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabOIEReleaseInstancePtr m_ReleaseInstance;

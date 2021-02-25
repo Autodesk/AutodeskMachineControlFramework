@@ -41,7 +41,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_camera_types.hpp"
 
-#include "libmcdriverenv_types.hpp"
+#include "libmcenv_types.hpp"
 
 
 /*************************************************************************************************************************
@@ -51,6 +51,15 @@ Interface version: 1.0.0
 /*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
+
+/**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDriver_ConfigurePtr) (LibMCDriver_Camera_Driver pDriver, const char * pConfigurationString);
 
 /**
 * returns the name identifier of the driver
@@ -101,6 +110,14 @@ typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDriver_GetVersionPtr) (Lib
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDriver_GetHeaderInformationPtr) (LibMCDriver_Camera_Driver pDriver, const LibMCDriver_Camera_uint32 nNameSpaceBufferSize, LibMCDriver_Camera_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_Camera_uint32 nBaseNameBufferSize, LibMCDriver_Camera_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
+
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraDriver_QueryParametersPtr) (LibMCDriver_Camera_Driver pDriver);
 
 /*************************************************************************************************************************
  Class definition for Iterator
@@ -338,7 +355,7 @@ typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraGetSymbolLookupMethodPtr) 
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraCreateDriverPtr) (const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance);
+typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraCreateDriverPtr) (const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Camera_Driver * pInstance);
 
 /*************************************************************************************************************************
  Function Table Structure
@@ -346,10 +363,12 @@ typedef LibMCDriver_CameraResult (*PLibMCDriver_CameraCreateDriverPtr) (const ch
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_CameraDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_CameraDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_CameraDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_CameraDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_CameraDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
+	PLibMCDriver_CameraDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_CameraIterator_MoveNextPtr m_Iterator_MoveNext;
 	PLibMCDriver_CameraIterator_MovePreviousPtr m_Iterator_MovePrevious;
 	PLibMCDriver_CameraIterator_GetCurrentPtr m_Iterator_GetCurrent;

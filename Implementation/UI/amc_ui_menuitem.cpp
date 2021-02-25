@@ -29,16 +29,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #define __AMCIMPL_UI_MENUITEM
+#define __AMCIMPL_UI_PAGE
 
 #include "amc_ui_menuitem.hpp"
+#include "amc_ui_page.hpp"
 #include "libmc_interfaceexception.hpp"
 
 
 using namespace AMC;
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption)
+CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
+	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
 {
+	if (pPage.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
 
@@ -60,4 +64,9 @@ std::string CUIMenuItem::getIcon()
 std::string CUIMenuItem::getCaption()
 {
 	return m_sCaption;
+}
+
+PUIPage CUIMenuItem::getPage()
+{
+	return m_pPage;
 }

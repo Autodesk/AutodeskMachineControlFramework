@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 builddir="$basepath/build"
@@ -34,21 +35,59 @@ echo "git hash: $GITHASH"
 
 cd "$basepath"
 
+echo "Building Resource builder (Win32)..."
+set GOARCH=amd64
+set GOOS=windows
+go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+
+echo "Building Resource builder (Linux64)..."
+set GOARCH=amd64
+set GOOS=linux
+go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+
+echo "Building Resource builder (LinuxARM)..."
+set GOARCH=arm
+set GOOS=linux
+set GOARM=5
+go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+
 echo "Building Go Server..."
 go get "github.com/gorilla/handlers"
 go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
 
 #echo "Building Client"
-#cd "$basepath/Client"
-# TODO: Need to implement script to build client
-# Having issues with node packages
+mkdir "$builddir/Client"
+mkdir "$builddir/Client/public"
+mkdir "$builddir/Client/src"
+mkdir "$builddir/Client/src/plugins"
+mkdir "$builddir/Client/dist"
+mkdir $builddir/Client
+mkdir $builddir/Client/dist
+cd $builddir/Client
+go run ../../Server/createDist.go ../Output $GITHASH 
+
+cp "$basepath/Client/public/"*.* "$builddir/Client/public"
+cp "$basepath/Client/src/"*.* "$builddir/Client/src"
+cp "$basepath/Client/src/plugins/"*.* "$builddir/Client/src/plugins"
+cp "$basepath/Client/"*.js "$builddir/Client"
+cp "$basepath/Client/"*.json "$builddir/Client"
+
+cd "$builddir/Client"
+
+npm install
+npm run build
+
+go run ../../Server/createDist.go ../Output $GITHASH
 
 cd "$builddir"
 
 echo "Building Core Modules"
 cmake ..
 cmake --build . --config Release
+
+echo "Building Core Resources"
+go run ../Server/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
 
 #echo "Building Developer Package"
 # TODO: Copy files to builddir

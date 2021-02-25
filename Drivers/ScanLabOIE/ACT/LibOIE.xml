@@ -47,6 +47,33 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		<error name="INTERNALERROR" code="9" description="Internal error" />
+		
+		
+		
+		<error name="UNKNOWNPACKETTYPE" code="1000" description="received unknown packet type." />
+		<error name="UNSUPPORTEDPACKETVERSION" code="1001" description="received unsupported packet version." />
+		<error name="STRINGEXCEEDSCHARACTERLIMIT" code="1002" description="string exceeds maximum character size." />
+		<error name="READINGPACKETHEADERALREADY" code="1003" description="packed header is already being read." />
+		<error name="VARIABLEDATANOTFULLYREAD" code="1004" description="variable data has not been fully read." />
+		<error name="VARIABLEDATAINVALIDBOOLEANVALUE" code="1005" description="invalid boolean value in variable data." />
+		<error name="VARIABLEVALUEEXCEEDSMINIMUM" code="1006" description="variable data exceeds minimum." />
+		<error name="VARIABLEVALUEEXCEEDSMAXIMUM" code="1007" description="variable data exceeds maximum." />
+		<error name="PACKETSHOULDNOTHAVEPAYLOAD" code="1008" description="packet should not have payload." />
+		<error name="INVALIDVARIABLEHEADERSIZE" code="1009" description="invalid variable header size." />
+		<error name="VARIABLEHEADERREADERROR" code="1010" description="variable header read error." />
+		<error name="INSUFFICIENTPACKETDATA" code="1011" description="insufficient packet data." />
+		<error name="INVALIDPACKETVERSION" code="1012" description="invalid packet version." />
+		<error name="PACKETVERSIONALREADYWRITTEN" code="1013" description="packet version already written." />
+		<error name="VARIABLEHEADERALREADYWRITTEN" code="1014" description="variable header already written." />
+		<error name="NOVARIABLEHEADERCONTENT" code="1015" description="no variable header content." />
+		<error name="RULEIDOVERFLOW" code="1016" description="rule id overflow." />
+		<error name="CONNECTIONNOTFOUND" code="1017" description="connection not found." />
+		<error name="SERVICEALREADYRUNNING" code="1018" description="service already running." />
+		<error name="INVALIDPACKETSIZE" code="1019" description="invalid packet size." />
+		<error name="INVALIDPAYLOADSIZE" code="1020" description="invalid payload size." />
+		
+				
 	</errors>
 
 
@@ -280,10 +307,12 @@
 
 		<method name="SetConnectionAcceptedCallback" description = "sets a callback that triggers when a new connection was established.">			
 			<param name="Callback" type="functiontype" class="ConnectionAcceptedCallback" pass="in" description="callback pointer." />
+			<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
 		</method>
 
 		<method name="SetConnectionRejectedCallback" description = "sets a callback that triggers when a new connection was rejected.">			
 			<param name="Callback" type="functiontype" class="ConnectionRejectedCallback" pass="in" description="callback pointer." />
+			<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
 		</method>
 
 	</class>

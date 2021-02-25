@@ -55,8 +55,13 @@
 		<error name="TERMINATED" code="14" description="operation has been terminated." />
 		<error name="SIGNALHASTRIGGEREDTWICE" code="15" description="signal has been triggered twice." />
 		<error name="SIGNALHASNOTBEENTRIGGERED" code="16" description="signal has not been triggered." />
-	
-		
+		<error name="DRIVERISNOTINITIALISING" code="17" description="driver is not in initialisation mode." />
+		<error name="RESOURCEENTRYNOTFOUND" code="18" description="resource entry not found." />
+		<error name="INTERNALERROR" code="19" description="internal error." />
+		<error name="INVALIDCHARACTERINFILENAME" code="20" description="invalid character in filename." />
+		<error name="WORKINGDIRECTORYHASBEENCLEANED" code="21" description="working directory has been cleaned." />
+		<error name="INVALIDITERATOR" code="22" description="invalid iterator." />
+			
 	</errors>
 	
 	<enum name="ToolpathSegmentType">
@@ -75,6 +80,12 @@
 		<option name="StartDelay" value="5" />
 		<option name="EndDelay" value="6" />
 		<option name="PolyDelay" value="7" />
+		<option name="PolyDelayAngleDependent" value="8" />
+		<option name="LaserOnDelay" value="9" />
+		<option name="LaserOffDelay" value="10" />
+		<option name="JumpDelay" value="11" />
+		<option name="MarkDelay" value="12" />
+		<option name="LaserFocus" value="13" />
 	</enum>
 	
 	<struct name="Position2D">
@@ -84,6 +95,24 @@
 	<class name="Base">
 	</class>
 
+
+	<class name="Iterator">
+		<method name="MoveNext" description="Iterates to the next object in the list.">
+			<param name="HasNext" type="bool" pass="return" description="Iterates to the next object in the list."/>
+		</method>
+		<method name="MovePrevious" description="Iterates to the previous object in the list.">
+			<param name="HasPrevious" type="bool" pass="return" description="Iterates to the previous object in the list."/>
+		</method>
+		<method name="GetCurrent" description="Returns the object the iterator points at.">
+			<param name="Instance" type="handle" class="Base" pass="return" description="returns the object instance."/>
+		</method>
+		<method name="Clone" description="Creates a new object iterator with the same object list.">
+			<param name="OutIterator" type="handle" class="Iterator" pass="return" description="returns the cloned Iterator instance"/>
+		</method>
+		<method name="Count" description="Returns the number of resoucres the iterator captures.">
+			<param name="Count" type="uint64" pass="return" description="returns the number of objects the iterator captures."/>
+		</method>
+	</class>
 
 	<class name="ToolpathLayer" parent="Base">
 	  
@@ -107,11 +136,13 @@
 		</method>
 
 		<method name="GetSegmentProfileValue" description="Retrieves an assigned profile custom value.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ValueName" type="string" pass="in" description="Value Name to query for." />
 			<param name="Value" type="string" pass="return" description="String Value." />
 		</method>
 
 		<method name="GetSegmentProfileTypedValue" description="Retrieves an assigned profile value of a standard type.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ValueType" type="enum" class="ToolpathProfileValueType" pass="in" description="Enum to query for. MUST NOT be custom." />
 			<param name="Value" type="double" pass="return" description="Double Value" />
 		</method>
@@ -205,6 +236,195 @@
 
 				
 	</class>
+	
+	
+	<class name="WorkingFileExecution" parent="Base" description="Working File Execution Object">
+
+		<method name="GetStatus" description = "Returns the execution status">
+		</method>
+
+		<method name="ReturnStdOut" description = "Returns the output of the executable as string buffer">
+			<param name="StringBuffer" type="string" pass="return" description="stdout buffer" />
+		</method>
+
+
+	</class>
+
+
+	<class name="WorkingFile" parent="Base" description="Working File Access Object">
+
+		<method name="GetAbsoluteFileName" description = "Retrieves absolute file name of the working file">
+			<param name="FileName" type="string" pass="return" description="global path of the file" />
+		</method>
+
+		<method name="GetSize" description = "Returns the size of temporary file.">
+			<param name="FileSize" type="uint64" pass="return" description="file size" />
+		</method>
+
+		<method name="CalculateSHA2" description = "Calculates the SHA256 checksum of the file.">
+			<param name="SHA2" type="string" pass="return" description="sha256 checksum" />
+		</method>
+
+		<method name="ExecuteFile" description = "Executes the temporary file, if it is an executable.">
+			<param name="Execution" type="class" class="WorkingFileExecution" pass="return" description="execution object" />
+		</method>
+
+		<method name="IsManaged" description = "Returns if the file is managed.">
+			<param name="FileIsManaged" type="bool" pass="return" description="returns if the file is managed." />
+		</method>
+
+		<method name="MakeManaged" description = "Makes the file managed if it is not managed yet.">
+		</method>
+
+		<method name="FileExists" description = "Returns if the file exists on disk.">
+			<param name="FileDoesExist" type="bool" pass="return" description="returns if the file exists." />
+		</method>
+
+		<method name="DeleteFromDisk" description = "Deletes the temporary file.">
+			<param name="Success" type="bool" pass="return" description="returns if deletion was successful or file did not exist in the first place." />
+		</method>
+
+	</class>
+
+	<class name="WorkingFileIterator" parent="Iterator">
+		<method name="GetCurrentFile" description="Returns the working file the iterator points at.">
+			<param name="WorkingFile" type="handle" class="WorkingFile" pass="return" description="returns the WorkingFile instance."/>
+		</method>
+	</class>
+
+
+	<class name="WorkingDirectory" parent="Base" description="Working Directory Access Object">
+
+		<method name="IsActive" description = "Working directory is active.">
+			<param name="IsActive" type="bool" pass="return" description="returns true if files can be read and written to the directory." />
+		</method>
+
+		<method name="GetAbsoluteFilePath" description = "Retrieves absolute file path.">
+			<param name="FilePath" type="string" pass="return" description="global path of the directory, including path delimiter." />
+		</method>
+
+		<method name="StoreCustomData" description = "Stores a data buffer in a temporary file.">
+			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreDriverData" description = "Stores attached driver data in a temporary file.">
+			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="CleanUp" description = "Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.">
+			<param name="Success" type="bool" pass="return" description="returns if deletion was successful." />
+		</method>
+
+		<method name="AddManagedFile" description = "Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.">
+			<param name="FileName" type="string" pass="in" description="Filename to manage. The file does not need to exist yet." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="HasUnmanagedFiles" description = "Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.">
+			<param name="HasUnmanagedFiles" type="bool" pass="return" description="returns if there are unmanaged files." />
+		</method>
+
+		<method name="RetrieveUnmanagedFiles" description = "Returns a list of unmanaged files." >
+			<param name="IteratorInstance" type="class" class="WorkingFileIterator" pass="return" description="working file iterator instance." />
+		</method>
+
+		<method name="RetrieveManagedFiles" description = "Returns a list of managed files." >
+			<param name="IteratorInstance" type="class" class="WorkingFileIterator" pass="return" description="working file iterator instance." />
+		</method>
+
+		<method name="RetrieveAllFiles" description = "Returns a list of all files in the directory." >
+			<param name="IteratorInstance" type="class" class="WorkingFileIterator" pass="return" description="working file iterator instance." />
+		</method>
+
+	</class>
+
+	<class name="DriverEnvironment" parent="Base" description="Environment of the driver">
+	  
+		<method name="CreateWorkingDirectory" description = "creates a temporary working directory.">
+			<param name="WorkingDirectory" type="class" class="WorkingDirectory" pass="return" description="creates a working directory" />
+		</method>
+
+		<method name="RetrieveDriverData" description = "retrieves attached driver data into a memory buffer.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
+		</method>
+		
+		<method name="CreateToolpathAccessor" description="Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the stream." />
+			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
+		</method>
+		
+		
+		<method name="RegisterStringParameter" description="registers a string parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterUUIDParameter" description="registers a uuid parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="string" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterDoubleParameter" description="registers a double parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="double" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterIntegerParameter" description="registers an int parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="int64" pass="in" description="default value to set" />
+		</method>
+
+		<method name="RegisterBoolParameter" description="registers a bool parameter. Must only be called during driver creation.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Description" type="string" pass="in" description="Parameter Description" />
+			<param name="DefaultValue" type="bool" pass="in" description="default value to set" />
+		</method>
+		
+		
+		<method name="SetStringParameter" description="sets a string parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetUUIDParameter" description="sets a uuid parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetDoubleParameter" description="sets a double parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetIntegerParameter" description="sets an int parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetBoolParameter" description="sets a bool parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="in" description="Value to set" />
+		</method>
+		
+		<method name="Sleep" description="Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleeps" />
+		</method>
+
+		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+	</class>
+	
 	
 
 	<class name="SignalTrigger" parent="Base" description="Class for signal triggering">
@@ -414,60 +634,9 @@
 		</method>
 
 
-
-		<method name="StoreString" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreUUID" description="stores a uuid in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreInteger" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="int64" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreDouble" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="double" pass="in" description="Value" />
-		</method>
-
-		<method name="StoreBool" description="stores a string in the current state machine">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="bool" pass="in" description="Value" />
-		</method>
-
 		<method name="StoreSignal" description="stores a signal handler in the current state machine">
 			<param name="Name" type="string" pass="in" description="Name" />
 			<param name="Handler" type="class" class="SignalHandler" pass="in" description="Signal handler to store." />
-		</method>
-
-		<method name="RetrieveString" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveUUID" description="retrieves a uuid from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="string" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveInteger" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="int64" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveDouble" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="double" pass="return" description="Value" />
-		</method>
-
-		<method name="RetrieveBool" description="retrieves a string from the current state machine. Fails if value has not been stored before.">
-			<param name="Name" type="string" pass="in" description="Name" />
-			<param name="Value" type="bool" pass="return" description="Value" />
 		</method>
 
 		<method name="RetrieveSignal" description="retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.">
@@ -541,8 +710,85 @@
 		</method>
 		
 
+		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
+		</method>
+
 
 	</class>
+
+
+
+
+	<class name="UIEnvironment" parent="Base" description="Environment of the UI">
+	  
+		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="SignalName" type="string" pass="in" description="Name Of signal channel." />
+			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />
+		</method>
+	  
+		
+		<method name="GetMachineState" description="Retrieves the machine state">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="StateName" type="string" pass="return" description="Name of current state" />
+		</method>
+
+		<method name="LogMessage" description="logs a string as message">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogWarning" description="logs a string as warning">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogInfo" description="logs a string as info">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+				
+		<method name="GetStringParameter" description="returns a string parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetUUIDParameter" description="returns a uuid parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetDoubleParameter" description="returns a double parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetIntegerParameter" description="returns an int parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="return" description="Value to set" />
+		</method>
+
+		<method name="GetBoolParameter" description="returns a bool parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="return" description="Value to set" />
+		</method>
+		
+		<method name="GetEventContext" description="returns the event context uuid as string">
+			<param name="ContextUUID" type="string" pass="return" description="Context UUID" />
+		</method>
+		
+
+	</class>
+
 
 
 		

@@ -35,14 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <memory>
 #include <string>
-#include <chrono>
 #include <sstream>
 #include <iomanip>
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
+
 #include "amc_loggerentry.hpp"
 
 #define LOG_SUBSYSTEM_SYSTEM "system"
+#define LOG_SUBSYSTEM_WORKINGDIRECTORIES "workdir"
 #define LOG_SUBSYSTEM_NETWORK "network"
 #define LOG_SUBSYSTEM_UNKNOWN "unknown"
 
@@ -73,7 +75,8 @@ namespace AMC {
 		
 		void logMessage(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel)
 		{
-			logMessageEx(sMessage, sSubSystem, logLevel, AMCCommon::CUtils::getCurrentISO8601TimeUTC());
+			AMCCommon::CChrono chrono;
+			logMessageEx(sMessage, sSubSystem, logLevel, chrono.getStartTimeISO8601TimeUTC());
 		}
 
 

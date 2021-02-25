@@ -35,27 +35,13 @@ namespace Impl {
 class CDriver : public virtual IDriver, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
-
 protected:
-
-	/**
-	* Put protected members here.
-	*/
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	void GetVersion(LibMCDriver_ScanLab_uint32& nMajor, LibMCDriver_ScanLab_uint32& nMinor, LibMCDriver_ScanLab_uint32& nMicro, std::string& sBuild) override;
 
-
-	/**
-	* Public member functions to implement.
-	*/
-
+	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
 
 };
 

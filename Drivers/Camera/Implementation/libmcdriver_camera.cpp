@@ -45,7 +45,7 @@ using namespace LibMCDriver_Camera;
 using namespace LibMCDriver_Camera::Impl;
 
 // Injected Components
-LibMCDriverEnv::PWrapper CWrapper::sPLibMCDriverEnvWrapper;
+LibMCEnv::PWrapper CWrapper::sPLibMCEnvWrapper;
 
 void CWrapper::GetVersion(LibMCDriver_Camera_uint32 & nMajor, LibMCDriver_Camera_uint32 & nMinor, LibMCDriver_Camera_uint32 & nMicro)
 {
@@ -73,7 +73,7 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 	IBase::AcquireBaseClassInterface(pInstance);
 }
 
-IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
 	if (sType == "raspi-camera-1.0") {
 

@@ -33,22 +33,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driver.hpp"
 
 #include "amc_driverhandler.hpp"
+#include "amc_toolpathhandler.hpp"
 
-#include "libmcdriverenv_driverenvironment.hpp"
+#include "libmcenv_driverenvironment.hpp"
 #include "libmc_interfaceexception.hpp"
+
 
 #include <vector>
 #include <memory>
-#include <string>
+
 #include <iostream>
 
 
 using namespace AMC;
 
-CDriverHandler::CDriverHandler(LibMCDriverEnv::PWrapper pEnvironmentWrapper)
-	: m_pEnvironmentWrapper (pEnvironmentWrapper)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler)
+	: m_pEnvironmentWrapper (pEnvironmentWrapper), m_pToolpathHandler (pToolpathHandler)
 {
 	if (pEnvironmentWrapper.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pToolpathHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 }
 
@@ -58,30 +62,39 @@ CDriverHandler::~CDriverHandler()
 
 }
 
-template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCDriverEnv::Impl::IBase> pImplInstance, LibMCDriverEnv::PWrapper pWrapper)
-{
-	if (pWrapper.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCDriverEnv::Impl::IBase*) (pImplInstance.get()));
-	pImplInstance->IncRefCount();
-	return pExternalInstance;
-}
-
-
-void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary)
+void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string& sResourcePath, const std::string& sDriverConfigurationData)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	if (findDriver(sName, false) != nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_DRIVERALREADYREGISTERED);
 
-	auto pInternalEnvironment = std::make_shared<LibMCDriverEnv::Impl::CDriverEnvironment>();
-	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCDriverEnv::CDriverEnvironment>(pInternalEnvironment, m_pEnvironmentWrapper);
+	if (m_sTempBasePath.empty ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_TEMPBASEPATHEMPTY);
 
-	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibrary, pExternalEnvironment);
+	PResourcePackage pResourcePackage;
+	if (!sResourcePath.empty()) {
+		auto pStream = std::make_shared <AMCCommon::CImportStream_Native> (sResourcePath);
+		pResourcePackage = CResourcePackage::makeFromStream(pStream);
+	}
+	else {
+		pResourcePackage = CResourcePackage::makeEmpty();
+	}
+
+	auto pParameterGroup = std::make_shared<CParameterGroup>();
+
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_pToolpathHandler, m_sTempBasePath);
+
+	pInternalEnvironment->setIsInitializing(true);
+
+	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibraryPath, pResourcePackage, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
 	m_DriverList.push_back(pDriver);
 	m_DriverMap.insert(std::make_pair(sName, pDriver));	
+
+	pDriver->configureDriver (sDriverConfigurationData);
+
+	pInternalEnvironment->setIsInitializing(false);
 }
 
 CDriver* CDriverHandler::findDriver(const std::string& sName, bool bFailIfNotExisting)
@@ -107,6 +120,15 @@ HDriverHandle CDriverHandler::acquireDriver(const std::string& sName, const std:
 
 }
 
+PParameterGroup CDriverHandler::getDriverParameterGroup(const std::string& sName)
+{
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	auto pDriver = findDriver(sName, true);
+	return pDriver->getParameterGroup();
+
+}
+
 
 void CDriverHandler::releaseDriverLocks(const std::string& sInstanceName)
 {
@@ -124,4 +146,10 @@ void CDriverHandler::GetDriverInformation(const std::string& sName, std::string&
 
 	sType = pDriver->getType();
 	pSymbolLookup = pDriver->getSymbolLookup();
+}
+
+
+void CDriverHandler::setTempBasePath(const std::string& sTempBasePath)
+{
+	m_sTempBasePath = sTempBasePath;
 }

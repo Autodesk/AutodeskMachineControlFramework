@@ -143,7 +143,7 @@ typedef LibMCResult (*PLibMCAPIRequestHandler_GetResultDataPtr) (LibMC_APIReques
 * @param[in] pLibraryPath - Path to the shared library.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_RegisterLibraryPathPtr) (LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath);
+typedef LibMCResult (*PLibMCMCContext_RegisterLibraryPathPtr) (LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResourcePath);
 
 /**
 * parses and initialises the state machines from a configuration XML.
@@ -178,7 +178,7 @@ typedef LibMCResult (*PLibMCMCContext_TerminateAllThreadsPtr) (LibMC_MCContext p
 * @param[in] pZIPStreamBuffer - uint8 buffer of client package ZIP stream.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_LoadClientPackagePtr) (LibMC_MCContext pMCContext, LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8 * pZIPStreamBuffer);
+typedef LibMCResult (*PLibMCMCContext_LoadClientPackagePtr) (LibMC_MCContext pMCContext, const char * pPackagePath);
 
 /**
 * log message with a certain log level.
@@ -197,10 +197,11 @@ typedef LibMCResult (*PLibMCMCContext_LogPtr) (LibMC_MCContext pMCContext, const
 * @param[in] pMCContext - MCContext instance.
 * @param[in] pURI - URI to serve
 * @param[in] pRequestMethod - Request Method
+* @param[in] pAuthorization - Authorization JSON String
 * @param[out] pHandlerInstance - Request Handler instance.
 * @return error code or 0 (success)
 */
-typedef LibMCResult (*PLibMCMCContext_CreateAPIRequestHandlerPtr) (LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, LibMC_APIRequestHandler * pHandlerInstance);
+typedef LibMCResult (*PLibMCMCContext_CreateAPIRequestHandlerPtr) (LibMC_MCContext pMCContext, const char * pURI, const char * pRequestMethod, const char * pAuthorization, LibMC_APIRequestHandler * pHandlerInstance);
 
 /*************************************************************************************************************************
  Global functions

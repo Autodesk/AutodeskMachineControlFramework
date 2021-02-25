@@ -17,7 +17,8 @@ namespace AMC {
 		uint32_t m_nBaudRate;
 		uint32_t m_nConnectTimeout;
 		uint32_t m_nLineNumber;
-		double m_dStatusUpdateTimerInterval;
+		bool m_bIsConnected;
+		uint32_t m_nStatusUpdateTimerInterval;
 
 		bool m_bDebug;
 		bool m_bIsHomed;
@@ -77,7 +78,7 @@ namespace AMC {
 		CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming);
 		virtual ~CSerialController_Marlin();
 
-		void setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval);
+		void setStatusUpdateTimerInterval(const uint32_t dStatusUpdateTimerInterval);
 
 		void setConnectTimeout(const uint32_t nConnectTimeout);
 		uint32_t getConnectTimeout();
@@ -88,9 +89,12 @@ namespace AMC {
 		void setBaudrate(const uint32_t nBaudrate);
 		uint32_t getBaudrate();
 
+		bool isConnected();
+
 		void initializeController() override;
 		void resetController() override;
 		void disconnectController() override;
+		void emergencyStop() override;
 
 		void setPositioningAbolute();
 		void setPositioningRelative();
@@ -103,8 +107,10 @@ namespace AMC {
 		void queryTemperatureState(uint32_t nExtruderIndex) override;
 		void queryPositionState() override;
 
-		void getHeatedBedTemperature(double& dTargetTemperature, double& dCurrentTemperature) override;
-		void getExtruderTemperature(uint32_t nExtruderIndex, double& dTargetTemperature, double& dCurrentTemperature) override;
+		void getHeatedBedCurrentTemperature(double& dCurrentTemperature) override;
+		void getHeatedBedTargetTemperature(double& dTargetTemperature) override;
+		void getExtruderCurrentTemperature(uint32_t nExtruderIndex, double& dCurrentTemperature) override;
+		void getExtruderTargetTemperature(uint32_t nExtruderIndex, double& dTargetTemperature) override;
 
 		void getTargetPosition(double& dX, double& dY, double& dZ) override;
 		void getCurrentPosition(double& dX, double& dY, double& dZ) override;
@@ -119,6 +125,13 @@ namespace AMC {
 		void moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond) override;
 		void moveFastZ(const double dZ, const double dSpeedInMMperSecond) override;
 
+		void setAxisPosition(const std::string& sAxis, double dValue) override;
+		void extruderDoExtrude(double dE, double dSpeedInMMperSecond) override;
+		void setAbsoluteExtrusion(bool bAbsolute) override;
+
+		void stopIdleHold() override;
+		void powerOff() override;
+		
 		bool isHomed() override;
 		bool isMoving() override;
 		bool canReceiveMovement() override;
