@@ -335,7 +335,9 @@ public:
 	{
 	}
 	
-	inline void SetProtocolConfiguration(const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo);
+	inline void SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size);
+	inline void SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress);
+	inline void SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress);
 	inline void StartCommunication(classParam<LibS7Net::CPLC> pPLC);
 	inline void RetrieveStatus();
 	inline void StopCommunication();
@@ -470,6 +472,8 @@ public:
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
 		pWrapperTable->m_PLCCommunication_SetProtocolConfiguration = nullptr;
+		pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets = nullptr;
+		pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets = nullptr;
 		pWrapperTable->m_PLCCommunication_StartCommunication = nullptr;
 		pWrapperTable->m_PLCCommunication_RetrieveStatus = nullptr;
 		pWrapperTable->m_PLCCommunication_StopCommunication = nullptr;
@@ -546,6 +550,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PLCCommunication_SetProtocolConfiguration == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets = (PLibS7ComPLCCommunication_SetAMCTOPLCOffsetsPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_setamctoplcoffsets");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets = (PLibS7ComPLCCommunication_SetAMCTOPLCOffsetsPtr) dlsym(hLibrary, "libs7com_plccommunication_setamctoplcoffsets");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets = (PLibS7ComPLCCommunication_SetPLCToAMCOffsetsPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_setplctoamcoffsets");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets = (PLibS7ComPLCCommunication_SetPLCToAMCOffsetsPtr) dlsym(hLibrary, "libs7com_plccommunication_setplctoamcoffsets");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -757,6 +779,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_SetProtocolConfiguration == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libs7com_plccommunication_setamctoplcoffsets", (void**)&(pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_plccommunication_setplctoamcoffsets", (void**)&(pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libs7com_plccommunication_startcommunication", (void**)&(pWrapperTable->m_PLCCommunication_StartCommunication));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_StartCommunication == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -856,13 +886,48 @@ public:
 	
 	/**
 	* CPLCCommunication::SetProtocolConfiguration - Configures the protocol
+	* @param[in] nMajorVersion - Major Protocol Version
+	* @param[in] nMinorVersion - Minor Protocol Version
+	* @param[in] nPatchVersion - Patch Protocol Version
 	* @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
 	* @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
 	* @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
+	* @param[in] nAMCtoPLC_Size - Size of AMC to PLC protocol buffer.
 	*/
-	void CPLCCommunication::SetProtocolConfiguration(const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo)
+	void CPLCCommunication::SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetProtocolConfiguration(m_pHandle, nPLCtoAMC_DBNo, nPLCtoAMC_Size, nAMCtoPLC_DBNo));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetProtocolConfiguration(m_pHandle, nMajorVersion, nMinorVersion, nPatchVersion, nPLCtoAMC_DBNo, nPLCtoAMC_Size, nAMCtoPLC_DBNo, nAMCtoPLC_Size));
+	}
+	
+	/**
+	* CPLCCommunication::SetAMCTOPLCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nCommandSequenceAddress - Command Sequence Address
+	* @param[in] nCommandIDAddress - Command ID Address
+	* @param[in] nCommandChecksumAddress - Command Checksum Address
+	*/
+	void CPLCCommunication::SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetAMCTOPLCOffsets(m_pHandle, nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nCommandSequenceAddress, nCommandIDAddress, nCommandChecksumAddress));
+	}
+	
+	/**
+	* CPLCCommunication::SetPLCToAMCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nSequenceRunningAddress - Sequence Running Address
+	* @param[in] nSequenceFinishedAddress - Sequence Finished Address
+	* @param[in] nSequenceStatusAddress - Sequence Status Address
+	* @param[in] nSequenceErrorAddress - Sequence Error Address
+	*/
+	void CPLCCommunication::SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetPLCToAMCOffsets(m_pHandle, nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nSequenceRunningAddress, nSequenceFinishedAddress, nSequenceStatusAddress, nSequenceErrorAddress));
 	}
 	
 	/**

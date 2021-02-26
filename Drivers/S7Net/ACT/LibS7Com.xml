@@ -71,11 +71,36 @@
 	<class name="PLCCommunication" parent="Base">
 
 		<method name="SetProtocolConfiguration" description="Configures the protocol">
+			<param name="MajorVersion" type="uint32" pass="in" description="Major Protocol Version" />
+			<param name="MinorVersion" type="uint32" pass="in" description="Minor Protocol Version" />
+			<param name="PatchVersion" type="uint32" pass="in" description="Patch Protocol Version" />
 			<param name="PLCtoAMC_DBNo" type="uint32" pass="in" description="DB Number of PLC to AMC connection" />
 			<param name="PLCtoAMC_Size" type="uint32" pass="in" description="Size of PLC to AMC protocol buffer." />
 			<param name="AMCtoPLC_DBNo" type="uint32" pass="in" description="DB Number of AMC to PLC connection" />
+			<param name="AMCtoPLC_Size" type="uint32" pass="in" description="Size of AMC to PLC protocol buffer." />
 		</method>
-						
+
+		<method name="SetAMCTOPLCOffsets" description="Configures the command offsets">
+			<param name="MajorVersionAddress" type="uint32" pass="in" description="Major Protocol Version Address" />
+			<param name="MinorVersionAddress" type="uint32" pass="in" description="Minor Protocol Version Address" />
+			<param name="PatchVersionAddress" type="uint32" pass="in" description="Patch Protocol Version Address" />
+			<param name="BuildVersionAddress" type="uint32" pass="in" description="Build Protocol Version Address" />
+			<param name="CommandSequenceAddress" type="uint32" pass="in" description="Command Sequence Address" />
+			<param name="CommandIDAddress" type="uint32" pass="in" description="Command ID Address" />
+			<param name="CommandChecksumAddress" type="uint32" pass="in" description="Command Checksum Address" />
+		</method>
+		
+		<method name="SetPLCToAMCOffsets" description="Configures the command offsets">
+			<param name="MajorVersionAddress" type="uint32" pass="in" description="Major Protocol Version Address" />
+			<param name="MinorVersionAddress" type="uint32" pass="in" description="Minor Protocol Version Address" />
+			<param name="PatchVersionAddress" type="uint32" pass="in" description="Patch Protocol Version Address" />
+			<param name="BuildVersionAddress" type="uint32" pass="in" description="Build Protocol Version Address" />
+			<param name="SequenceRunningAddress" type="uint32" pass="in" description="Sequence Running Address" />
+			<param name="SequenceFinishedAddress" type="uint32" pass="in" description="Sequence Finished Address" />
+			<param name="SequenceStatusAddress" type="uint32" pass="in" description="Sequence Status Address" />
+			<param name="SequenceErrorAddress" type="uint32" pass="in" description="Sequence Error Address" />
+		</method>
+
 		<method name="StartCommunication" description="Starts communication with the S7 PLC Instance">
 			<param name="PLC" type="class" class="LibS7Net:PLC" pass="in" description="PLC Instance" />
 		</method>

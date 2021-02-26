@@ -138,6 +138,12 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_COMMANDSEQUENCEERROR 1030
 #define LIBMCDRIVER_S7NET_ERROR_COMMANDREACTIONTIMEOUT 1031
 #define LIBMCDRIVER_S7NET_ERROR_NOCOMMANDSDEFINITION 1032
+#define LIBMCDRIVER_S7NET_ERROR_NOVERSIONDEFINITION 1033
+#define LIBMCDRIVER_S7NET_ERROR_NOMAJORVERSION 1034
+#define LIBMCDRIVER_S7NET_ERROR_NOMINORVERSION 1035
+#define LIBMCDRIVER_S7NET_ERROR_NOPATCHVERSION 1036
+#define LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBSIZE 1037
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBSIZE 1038
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -188,6 +194,12 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_COMMANDSEQUENCEERROR: return "command sequence communication error";
     case LIBMCDRIVER_S7NET_ERROR_COMMANDREACTIONTIMEOUT: return "command reaction timeout";
     case LIBMCDRIVER_S7NET_ERROR_NOCOMMANDSDEFINITION: return "no commands definition";
+    case LIBMCDRIVER_S7NET_ERROR_NOVERSIONDEFINITION: return "no version definition";
+    case LIBMCDRIVER_S7NET_ERROR_NOMAJORVERSION: return "no major version";
+    case LIBMCDRIVER_S7NET_ERROR_NOMINORVERSION: return "no minor version";
+    case LIBMCDRIVER_S7NET_ERROR_NOPATCHVERSION: return "no patch version";
+    case LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBSIZE: return "no control db size";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBSIZE: return "invalid control db size";
     default: return "unknown error";
   }
 }

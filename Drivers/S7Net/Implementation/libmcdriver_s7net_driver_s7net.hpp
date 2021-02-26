@@ -165,7 +165,6 @@ protected:
 
     uint32_t m_nPLCtoAMC_DBNo;
     uint32_t m_nPLCtoAMC_DBSize;
-    uint32_t m_nAMCtoPLC_DBNo;
 
     std::list<PDriver_S7Value> m_DriverParameters;
     std::map<std::string, PDriver_S7Command> m_CommandDefinitions;

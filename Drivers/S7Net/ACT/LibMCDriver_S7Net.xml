@@ -87,11 +87,12 @@
 		<error name="COMMANDREACTIONTIMEOUT" code="1031" description="command reaction timeout" />
 		<error name="NOCOMMANDSDEFINITION" code="1032" description="no commands definition" />
 		
-		
-		
-		
-		
-					
+		<error name="NOVERSIONDEFINITION" code="1033" description="no version definition" />
+		<error name="NOMAJORVERSION" code="1034" description="no major version" />
+		<error name="NOMINORVERSION" code="1035" description="no minor version" />
+		<error name="NOPATCHVERSION" code="1036" description="no patch version" />
+		<error name="NOCONTROLDBSIZE" code="1037" description="no control db size" />
+		<error name="INVALIDCONTROLDBSIZE" code="1038" description="invalid control db size" />
 		
 	</errors>
 

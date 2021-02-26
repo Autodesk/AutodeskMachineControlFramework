@@ -65,11 +65,32 @@ private:
 protected:
 
 	uint32_t m_nPLCtoAMC_Size;
+	uint32_t m_nAMCtoPLC_Size;
 	uint32_t m_nPLCtoAMC_DBNo;
 	uint32_t m_nAMCtoPLC_DBNo;
+	uint32_t m_nMajorVersion;
+	uint32_t m_nMinorVersion;
+	uint32_t m_nPatchVersion;
 	LibS7Net::PPLC m_pPLC;
 
 	uint32_t m_nCmdCycleCounter;
+
+	LibS7Com_uint32 m_nAMCtoPLC_MajorVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_MinorVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_PatchVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_BuildVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_CommandSequenceAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_CommandIDAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_CommandChecksumAddress;
+
+	LibS7Com_uint32 m_nPLCtoAMC_MajorVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_MinorVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_PatchVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_BuildVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceRunningAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceFinishedAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceStatusAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceErrorAddress;
 
 	std::vector<uint8_t> m_PLCRecvBuffer;
 
@@ -77,7 +98,11 @@ public:
 
 	CPLCCommunication ();
 
-	void SetProtocolConfiguration(const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo) override;
+	void SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size) override;
+
+	void SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress) override;
+
+	void SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress) override;
 
 	void StartCommunication(LibS7Net::PPLC pPLC) override;
 

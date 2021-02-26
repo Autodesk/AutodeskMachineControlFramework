@@ -69,12 +69,47 @@ extern "C" {
 * Configures the protocol
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nMajorVersion - Major Protocol Version
+* @param[in] nMinorVersion - Minor Protocol Version
+* @param[in] nPatchVersion - Patch Protocol Version
 * @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
 * @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
 * @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
+* @param[in] nAMCtoPLC_Size - Size of AMC to PLC protocol buffer.
 * @return error code or 0 (success)
 */
-LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo);
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersion, LibS7Com_uint32 nMinorVersion, LibS7Com_uint32 nPatchVersion, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo, LibS7Com_uint32 nAMCtoPLC_Size);
+
+/**
+* Configures the command offsets
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nMajorVersionAddress - Major Protocol Version Address
+* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+* @param[in] nBuildVersionAddress - Build Protocol Version Address
+* @param[in] nCommandSequenceAddress - Command Sequence Address
+* @param[in] nCommandIDAddress - Command ID Address
+* @param[in] nCommandChecksumAddress - Command Checksum Address
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_setamctoplcoffsets(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nCommandSequenceAddress, LibS7Com_uint32 nCommandIDAddress, LibS7Com_uint32 nCommandChecksumAddress);
+
+/**
+* Configures the command offsets
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nMajorVersionAddress - Major Protocol Version Address
+* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+* @param[in] nBuildVersionAddress - Build Protocol Version Address
+* @param[in] nSequenceRunningAddress - Sequence Running Address
+* @param[in] nSequenceFinishedAddress - Sequence Finished Address
+* @param[in] nSequenceStatusAddress - Sequence Status Address
+* @param[in] nSequenceErrorAddress - Sequence Error Address
+* @return error code or 0 (success)
+*/
+LIBS7COM_DECLSPEC LibS7ComResult libs7com_plccommunication_setplctoamcoffsets(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nSequenceRunningAddress, LibS7Com_uint32 nSequenceFinishedAddress, LibS7Com_uint32 nSequenceStatusAddress, LibS7Com_uint32 nSequenceErrorAddress);
 
 /**
 * Starts communication with the S7 PLC Instance
