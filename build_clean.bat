@@ -17,13 +17,16 @@ if not exist "%builddir%\DevPackage\Framework\InterfacesDev" (mkdir "%builddir%\
 if not exist "%builddir%\DevPackage\Framework\PluginCpp" (mkdir "%builddir%\DevPackage\Framework\PluginCpp")
 if not exist "%builddir%\DevPackage\Framework\PluginPython" (mkdir "%builddir%\DevPackage\Framework\PluginPython")
 if not exist "%builddir%\DevPackage\Framework\Dist" (mkdir "%builddir%\DevPackage\Framework\Dist")
-if not exist "%builddir%\Framework" (mkdir "%builddir%\DevPackage\Framework")
-if not exist "%builddir%\Framework\HeadersDev" (mkdir "%builddir%\DevPackage\Framework\HeadersDev")
+if not exist "%builddir%\Framework" (mkdir "%builddir%\Framework")
+if not exist "%builddir%\Framework\HeadersDev" (mkdir "%builddir%\Framework\HeadersDev")
 if not exist "%builddir%\Framework\HeadersDev\CppDynamic" (mkdir "%builddir%\Framework\HeadersDev\CppDynamic")
 if not exist "%builddir%\Framework\HeadersDriver" (mkdir "%builddir%\Framework\HeadersDriver")
 if not exist "%builddir%\Framework\HeadersDriver\CppDynamic" (mkdir "%builddir%\Framework\HeadersDriver\CppDynamic")
 if not exist "%builddir%\Framework\InterfacesDev" (mkdir "%builddir%\Framework\InterfacesDev")
 if not exist "%builddir%\Framework\PluginCpp" (mkdir "%builddir%\Framework\PluginCpp")
+
+copy "%basepath%\Framework\PluginCpp\*.*" "%builddir%\Framework\PluginCpp"
+copy "%basepath%\Framework\InterfacesDev\*.*" "%builddir%\Framework\InterfacesDev"
 
 git rev-parse --verify --short HEAD >"%builddir%\githash.txt"
 SET /p GITHASH=<"%builddir%\githash.txt"
