@@ -131,6 +131,10 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_write_8bit_port = (PScanLabPtr_n_write_8bit_port)_loadScanLabAddress(hLibrary, "n_write_8bit_port");
 	this->n_write_da_1 = (PScanLabPtr_n_write_da_1)_loadScanLabAddress(hLibrary, "n_write_da_1");
 	this->n_write_da_2 = (PScanLabPtr_n_write_da_2)_loadScanLabAddress(hLibrary, "n_write_da_2");
+	this->n_write_io_port_list = (PScanLabPtr_n_write_io_port)_loadScanLabAddress(hLibrary, "n_write_io_port_list");
+	this->n_write_8bit_port_list = (PScanLabPtr_n_write_8bit_port)_loadScanLabAddress(hLibrary, "n_write_8bit_port_list");
+	this->n_write_da_1_list = (PScanLabPtr_n_write_da_1)_loadScanLabAddress(hLibrary, "n_write_da_1_list");
+	this->n_write_da_2_list = (PScanLabPtr_n_write_da_2)_loadScanLabAddress(hLibrary, "n_write_da_2_list");
 	this->n_jump_abs = (PScanLabPtr_n_jump_abs)_loadScanLabAddress(hLibrary, "n_jump_abs");
 	this->n_jump_abs_3d = (PScanLabPtr_n_jump_abs_3d)_loadScanLabAddress(hLibrary, "n_jump_abs_3d");
 	this->n_mark_abs = (PScanLabPtr_n_mark_abs)_loadScanLabAddress(hLibrary, "n_mark_abs");
@@ -218,12 +222,19 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_write_8bit_port = nullptr;
 	n_write_da_1 = nullptr;
 	n_write_da_2 = nullptr;
+	n_write_io_port_list = nullptr;
+	n_write_8bit_port_list = nullptr;
+	n_write_da_1_list = nullptr;
+	n_write_da_2_list = nullptr;
 	n_jump_abs = nullptr;
 	n_mark_abs = nullptr;
+	n_jump_abs_3d = nullptr;
+	n_mark_abs_3d = nullptr;
 	n_long_delay = nullptr;
 	n_get_status = nullptr;
 	n_get_input_pointer = nullptr;
 	n_set_laser_delays = nullptr;
 	n_set_start_list_pos = nullptr;
+	n_set_defocus_list = nullptr;
 }
 

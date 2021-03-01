@@ -87,6 +87,10 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_8bit_port) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_io_port_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_8bit_port_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2_list) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_jump_abs) (uint32_t nCardNo, int32_t nX, int32_t nY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_mark_abs) (uint32_t nCardNo, int32_t nX, int32_t nY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_jump_abs_3d) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nZ);
@@ -143,6 +147,10 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_write_8bit_port n_write_8bit_port = nullptr;
 			PScanLabPtr_n_write_da_1 n_write_da_1 = nullptr;
 			PScanLabPtr_n_write_da_2 n_write_da_2 = nullptr;
+			PScanLabPtr_n_write_io_port n_write_io_port_list = nullptr;
+			PScanLabPtr_n_write_8bit_port n_write_8bit_port_list = nullptr;
+			PScanLabPtr_n_write_da_1 n_write_da_1_list = nullptr;
+			PScanLabPtr_n_write_da_2 n_write_da_2_list = nullptr;
 			PScanLabPtr_n_jump_abs n_jump_abs = nullptr;
 			PScanLabPtr_n_mark_abs n_mark_abs = nullptr;
 			PScanLabPtr_n_jump_abs_3d n_jump_abs_3d = nullptr;
