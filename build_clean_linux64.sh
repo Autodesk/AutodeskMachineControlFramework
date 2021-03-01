@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# disable go modules
+export GO111MODULE="off" 
+
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 builddir="$basepath/build"
 outputdir="$builddir/Output"
@@ -25,6 +28,12 @@ dirs_to_make[16]="$builddir/Framework/HeadersDriver"
 dirs_to_make[17]="$builddir/Framework/HeadersDriver/CppDynamic"
 dirs_to_make[18]="$builddir/Framework/InterfacesDev"
 dirs_to_make[19]="$builddir/Framework/PluginCpp"
+dirs_to_make[20]="$builddir/Client"
+dirs_to_make[21]="$builddir/Client/public"
+dirs_to_make[22]="$builddir/Client/src"
+dirs_to_make[23]="$builddir/Client/src/plugins"
+dirs_to_make[24]="$builddir/Client/dist"
+
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -65,13 +74,6 @@ echo "Building Go Server..."
 go get "github.com/gorilla/handlers"
 go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
-
-#echo "Building Client"
-mkdir "$builddir/Client"
-mkdir "$builddir/Client/public"
-mkdir "$builddir/Client/src"
-mkdir "$builddir/Client/src/plugins"
-mkdir "$builddir/Client/dist"
 
 cp "$basepath/Client/public/"*.* "$builddir/Client/public"
 cp "$basepath/Client/src/"*.* "$builddir/Client/src"
