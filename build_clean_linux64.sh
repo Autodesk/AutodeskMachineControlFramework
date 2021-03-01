@@ -35,8 +35,8 @@ do
 	fi
 done
 
-copy "$basepath/Framework/PluginCpp/*.*" "$builddir/Framework/PluginCpp"
-copy "$basepath/Framework/InterfacesDev/*.*" "$builddir/Framework/InterfacesDev"
+cp "$basepath/Framework/PluginCpp/*.*" "$builddir/Framework/PluginCpp"
+cp "$basepath/Framework/InterfacesDev/*.*" "$builddir/Framework/InterfacesDev"
 
 git rev-parse --verify --short HEAD > "$builddir/githash.txt"
 GITHASH=$(<"$builddir/githash.txt")
@@ -96,22 +96,22 @@ go run ../Server/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_c
 
 echo "Building Developer Package"
 cd "$builddir/DevPackage"
-copy ../githash.txt Framework/Dist/disthash.txt
-copy ../Output/amc_server Framework/Dist/
-copy ../Output/amc_server.xml Framework/Dist/
-copy ../Output/${GITHASH}_core_libmc.so Framework/Dist/
-copy ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
-copy ../Output/${GITHASH}_core_libmcdata.so Framework/Dist/
-copy ../Output/${GITHASH}_*.data Framework/Dist/
-copy ../Output/${GITHASH}_*.client Framework/Dist/
-copy ../Output/${GITHASH}_package.xml Framework/Dist/
-copy ../Output/${GITHASH}_driver_*.so Framework/Dist/
-copy ../Output/lib3mf.so Framework/Dist/${GITHASH}_core_lib3mf.so
-copy ../../Templates/libmcconfig.xml ./configuration.xml
-copy ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
-copy ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
-copy ../../Framework/PluginCpp/*.* Framework/PluginCpp
-copy ../../Framework/PluginPython/*.* Framework/PluginPython
+cp ../githash.txt Framework/Dist/disthash.txt
+cp ../Output/amc_server Framework/Dist/
+cp ../Output/amc_server.xml Framework/Dist/
+cp ../Output/${GITHASH}_core_libmc.so Framework/Dist/
+cp ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
+cp ../Output/${GITHASH}_core_libmcdata.so Framework/Dist/
+cp ../Output/${GITHASH}_*.data Framework/Dist/
+cp ../Output/${GITHASH}_*.client Framework/Dist/
+cp ../Output/${GITHASH}_package.xml Framework/Dist/
+cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
+cp ../Output/lib3mf.so Framework/Dist/${GITHASH}_core_lib3mf.so
+cp ../../Templates/libmcconfig.xml ./configuration.xml
+cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
+cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
+cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
+cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
 go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
 
