@@ -241,7 +241,7 @@ void CDriver_ScanLab_RTC5::internalExecute()
 
     while (Busy) {
         m_pRTCContext->GetStatus (Busy, Pos);
-        Sleep (10);
+        m_pDriverEnvironment->Sleep(10);
     }
 
 }

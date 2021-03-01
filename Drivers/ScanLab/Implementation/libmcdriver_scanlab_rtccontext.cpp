@@ -317,22 +317,22 @@ void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const
 	case eLaserPort::Port16bitDigital:
 		digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
 		//std::cout << "n_write_io_port: " << digitalPowerValue << std::endl;
-		m_pScanLabSDK->n_write_io_port(m_CardNo, digitalPowerValue);
+		m_pScanLabSDK->n_write_io_port_list(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port8bitDigital:
 		digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
 		//std::cout << "n_write_8bit_port: " << digitalPowerValue << std::endl;
-		m_pScanLabSDK->n_write_8bit_port(m_CardNo, digitalPowerValue);
+		m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port12BitAnalog1:
 		digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
 		//std::cout << "n_write_da_1: " << digitalPowerValue << std::endl;
-		m_pScanLabSDK->n_write_da_1(m_CardNo, digitalPowerValue);
+		m_pScanLabSDK->n_write_da_1_list(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port12BitAnalog2:
 		digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
 		//std::cout << "n_write_da_2: " << digitalPowerValue << std::endl;
-		m_pScanLabSDK->n_write_da_2(m_CardNo, digitalPowerValue);
+		m_pScanLabSDK->n_write_da_2_list(m_CardNo, digitalPowerValue);
 		break;
 
 	}
@@ -352,7 +352,7 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 	// Z Plane
 	double defocusZ = round(fZValue * m_dZCorrectionFactor);
 	int intDefocusZ = (int)defocusZ;
-	std::cout << "setting z defocus: " << intDefocusZ << std::endl;
+	//std::cout << "setting z defocus: " << intDefocusZ << std::endl;
 	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
 
 	const sPoint2D* pPoint = pPointsBuffer;
@@ -394,7 +394,7 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 	// Z Plane
 	double defocusZ = round(fZValue * m_dZCorrectionFactor);
 	int intDefocusZ = (int)defocusZ;
-	std::cout << "setting z defocus: " << intDefocusZ << std::endl;
+	//std::cout << "setting z defocus: " << intDefocusZ << std::endl;
 	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
 
 	const sHatch2D* pHatch = pHatchesBuffer;

@@ -83,7 +83,7 @@ LibS7ComResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for PLCCommunication
 **************************************************************************************************************************/
-LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo)
+LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersion, LibS7Com_uint32 nMinorVersion, LibS7Com_uint32 nPatchVersion, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo, LibS7Com_uint32 nAMCtoPLC_Size)
 {
 	IBase* pIBaseClass = (IBase *)pPLCCommunication;
 
@@ -92,7 +92,55 @@ LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCo
 		if (!pIPLCCommunication)
 			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
 		
-		pIPLCCommunication->SetProtocolConfiguration(nPLCtoAMC_DBNo, nPLCtoAMC_Size, nAMCtoPLC_DBNo);
+		pIPLCCommunication->SetProtocolConfiguration(nMajorVersion, nMinorVersion, nPatchVersion, nPLCtoAMC_DBNo, nPLCtoAMC_Size, nAMCtoPLC_DBNo, nAMCtoPLC_Size);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_plccommunication_setamctoplcoffsets(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nCommandSequenceAddress, LibS7Com_uint32 nCommandIDAddress, LibS7Com_uint32 nCommandChecksumAddress)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommunication;
+
+	try {
+		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
+		if (!pIPLCCommunication)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pIPLCCommunication->SetAMCTOPLCOffsets(nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nCommandSequenceAddress, nCommandIDAddress, nCommandChecksumAddress);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_plccommunication_setplctoamcoffsets(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nSequenceRunningAddress, LibS7Com_uint32 nSequenceFinishedAddress, LibS7Com_uint32 nSequenceStatusAddress, LibS7Com_uint32 nSequenceErrorAddress)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommunication;
+
+	try {
+		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
+		if (!pIPLCCommunication)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pIPLCCommunication->SetPLCToAMCOffsets(nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nSequenceRunningAddress, nSequenceFinishedAddress, nSequenceStatusAddress, nSequenceErrorAddress);
 
 		return LIBS7COM_SUCCESS;
 	}
@@ -513,6 +561,10 @@ LibS7ComResult LibS7Com::Impl::LibS7Com_GetProcAddress (const char * pProcName, 
 	
 	if (sProcName == "libs7com_plccommunication_setprotocolconfiguration") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_setprotocolconfiguration;
+	if (sProcName == "libs7com_plccommunication_setamctoplcoffsets") 
+		*ppProcAddress = (void*) &libs7com_plccommunication_setamctoplcoffsets;
+	if (sProcName == "libs7com_plccommunication_setplctoamcoffsets") 
+		*ppProcAddress = (void*) &libs7com_plccommunication_setplctoamcoffsets;
 	if (sProcName == "libs7com_plccommunication_startcommunication") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_startcommunication;
 	if (sProcName == "libs7com_plccommunication_retrievestatus") 

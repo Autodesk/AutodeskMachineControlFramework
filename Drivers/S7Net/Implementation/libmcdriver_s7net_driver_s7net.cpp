@@ -159,7 +159,7 @@ uint32_t CDriver_S7Command::getCommandID()
 **************************************************************************************************************************/
 
 CDriver_S7Net::CDriver_S7Net(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : CDriver (sName, sType), m_pDriverEnvironment (pDriverEnvironment), m_nAMCtoPLC_DBNo (0), m_nPLCtoAMC_DBNo (0),  m_nPLCtoAMC_DBSize (0)
+    : CDriver (sName, sType), m_pDriverEnvironment (pDriverEnvironment), m_nPLCtoAMC_DBNo (0),  m_nPLCtoAMC_DBSize (0)
 {
     if (pDriverEnvironment.get() == nullptr)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
@@ -199,6 +199,25 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     if (s7protocolNode.empty())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL);
 
+    pugi::xml_node versionNode = s7protocolNode.child("version");
+    if (versionNode.empty())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOVERSIONDEFINITION);
+
+    pugi::xml_attribute majorversionAttrib = versionNode.attribute("major");
+    if (majorversionAttrib.empty())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOMAJORVERSION);
+    uint32_t nMajorVersion = majorversionAttrib.as_uint(0);
+
+    pugi::xml_attribute minorversionAttrib = versionNode.attribute("minor");
+    if (minorversionAttrib.empty())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOMINORVERSION);
+    uint32_t nMinorVersion = minorversionAttrib.as_uint(0);
+
+    pugi::xml_attribute patchversionAttrib = versionNode.attribute("patch");
+    if (patchversionAttrib.empty())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOPATCHVERSION);
+    uint32_t nPatchVersion = patchversionAttrib.as_uint(0);
+
     pugi::xml_node statusdbNode = s7protocolNode.child("statusdb");
     if (statusdbNode.empty())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBDEFINITION);
@@ -206,7 +225,6 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     pugi::xml_attribute statusnumberAttrib = statusdbNode.attribute("number");
     if (statusnumberAttrib.empty())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOSTATUSDBNUMBER);
-
     m_nPLCtoAMC_DBNo = statusnumberAttrib.as_uint(0);
     if (m_nPLCtoAMC_DBNo == 0)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDSTATUSDBNUMBER);
@@ -289,11 +307,16 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     pugi::xml_attribute controlnumberAttrib = controldbNode.attribute("number");
     if (controlnumberAttrib.empty())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBNUMBER);
-
-    m_nAMCtoPLC_DBNo = controlnumberAttrib.as_uint(0);
-    if (m_nAMCtoPLC_DBNo == 0)
+    uint32_t nAMCtoPLC_DBNo = controlnumberAttrib.as_uint(0);
+    if (nAMCtoPLC_DBNo == 0)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBNUMBER);
 
+    pugi::xml_attribute controlsizeAttrib = controldbNode.attribute("size");
+    if (controlsizeAttrib.empty())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBSIZE);
+    uint32_t nAMCtoPLC_Size = controlsizeAttrib.as_uint(0);
+    if (nAMCtoPLC_Size == 0)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBSIZE);
 
     pugi::xml_node commandsNode = s7protocolNode.child("commands");
     if (commandsNode.empty())
@@ -337,7 +360,10 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     m_pCommunicationWrapper = LibS7Com::CWrapper::loadLibraryFromSymbolLookupMethod((void*) &LibS7Com::Impl::LibS7Com_GetProcAddress);
     m_pCommunicationWrapper->InjectComponent("LibS7Net", m_pPLCWrapper->GetSymbolLookupMethod());
     m_pCommunication = m_pCommunicationWrapper->CreatePLCCommunication();
-    m_pCommunication->SetProtocolConfiguration(m_nPLCtoAMC_DBNo, m_nPLCtoAMC_DBSize, m_nAMCtoPLC_DBNo);
+    m_pCommunication->SetProtocolConfiguration (nMajorVersion, nMinorVersion, nPatchVersion, m_nPLCtoAMC_DBNo, m_nPLCtoAMC_DBSize, nAMCtoPLC_DBNo, nAMCtoPLC_Size);
+
+    m_pCommunication->SetPLCToAMCOffsets (2, 4, 6, 8, 50, 42, 46, 54);
+    m_pCommunication->SetAMCTOPLCOffsets(0, 2, 4, 6, 40, 44, 106);
     
 }
 

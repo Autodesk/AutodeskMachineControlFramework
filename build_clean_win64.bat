@@ -17,6 +17,16 @@ if not exist "%builddir%\DevPackage\Framework\InterfacesDev" (mkdir "%builddir%\
 if not exist "%builddir%\DevPackage\Framework\PluginCpp" (mkdir "%builddir%\DevPackage\Framework\PluginCpp")
 if not exist "%builddir%\DevPackage\Framework\PluginPython" (mkdir "%builddir%\DevPackage\Framework\PluginPython")
 if not exist "%builddir%\DevPackage\Framework\Dist" (mkdir "%builddir%\DevPackage\Framework\Dist")
+if not exist "%builddir%\Framework" (mkdir "%builddir%\Framework")
+if not exist "%builddir%\Framework\HeadersDev" (mkdir "%builddir%\Framework\HeadersDev")
+if not exist "%builddir%\Framework\HeadersDev\CppDynamic" (mkdir "%builddir%\Framework\HeadersDev\CppDynamic")
+if not exist "%builddir%\Framework\HeadersDriver" (mkdir "%builddir%\Framework\HeadersDriver")
+if not exist "%builddir%\Framework\HeadersDriver\CppDynamic" (mkdir "%builddir%\Framework\HeadersDriver\CppDynamic")
+if not exist "%builddir%\Framework\InterfacesDev" (mkdir "%builddir%\Framework\InterfacesDev")
+if not exist "%builddir%\Framework\PluginCpp" (mkdir "%builddir%\Framework\PluginCpp")
+
+copy "%basepath%\Framework\PluginCpp\*.*" "%builddir%\Framework\PluginCpp"
+copy "%basepath%\Framework\InterfacesDev\*.*" "%builddir%\Framework\InterfacesDev"
 
 git rev-parse --verify --short HEAD >"%builddir%\githash.txt"
 SET /p GITHASH=<"%builddir%\githash.txt"
@@ -24,7 +34,7 @@ echo git hash: %GITHASH%
 
 cd /d "%basepath%"
 
-echo "Building Resource builder (Win32)..."
+echo "Building Resource builder (Win64)..."
 set GOARCH=amd64
 set GOOS=windows
 go build -o "%builddir%/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
@@ -73,7 +83,6 @@ copy ..\Output\%GITHASH%_*.client Framework\Dist\
 copy ..\Output\%GITHASH%_package.xml Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\Output\lib3mf.dll Framework\Dist\%GITHASH%_core_lib3mf.dll
-copy ..\..\Templates\libmcconfig.xml .\configuration.xml
 copy ..\..\Framework\HeadersDev\CppDynamic\*.* Framework\HeadersDev\CppDynamic
 copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
 copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp

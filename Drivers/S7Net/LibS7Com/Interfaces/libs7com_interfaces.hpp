@@ -245,11 +245,40 @@ class IPLCCommunication : public virtual IBase {
 public:
 	/**
 	* IPLCCommunication::SetProtocolConfiguration - Configures the protocol
+	* @param[in] nMajorVersion - Major Protocol Version
+	* @param[in] nMinorVersion - Minor Protocol Version
+	* @param[in] nPatchVersion - Patch Protocol Version
 	* @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
 	* @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
 	* @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
+	* @param[in] nAMCtoPLC_Size - Size of AMC to PLC protocol buffer.
 	*/
-	virtual void SetProtocolConfiguration(const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo) = 0;
+	virtual void SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size) = 0;
+
+	/**
+	* IPLCCommunication::SetAMCTOPLCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nCommandSequenceAddress - Command Sequence Address
+	* @param[in] nCommandIDAddress - Command ID Address
+	* @param[in] nCommandChecksumAddress - Command Checksum Address
+	*/
+	virtual void SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress) = 0;
+
+	/**
+	* IPLCCommunication::SetPLCToAMCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nSequenceRunningAddress - Sequence Running Address
+	* @param[in] nSequenceFinishedAddress - Sequence Finished Address
+	* @param[in] nSequenceStatusAddress - Sequence Status Address
+	* @param[in] nSequenceErrorAddress - Sequence Error Address
+	*/
+	virtual void SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress) = 0;
 
 	/**
 	* IPLCCommunication::StartCommunication - Starts communication with the S7 PLC Instance

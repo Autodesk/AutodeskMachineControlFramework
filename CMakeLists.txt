@@ -169,6 +169,8 @@ foreach(framework_file_plugincpp ${framework_files_plugincpp})
 endforeach()
 
 add_library(libmc SHARED ${LIBMC_SRC})
+add_dependencies(libmc copy_framework)
+
 # Do not prefix the binary's name with "lib" on Unix systems:
 set_target_properties(libmc PROPERTIES PREFIX "" IMPORT_PREFIX "" )
 # The following two properties are crucial to reduce the number of undesirably exported symbols
@@ -235,6 +237,8 @@ source_group("libmcdata" FILES ${LIBMCDATA_SRC_LIBMCDATA})
 source_group("dependencies\\crossguid" FILES ${LIBMCDATA_SRC_DEP_CROSSGUID})
 
 add_library(libmcdata SHARED ${LIBMCDATA_SRC})
+add_dependencies(libmcdata copy_framework)
+
 # Do not prefix the binary's name with "lib" on Unix systems:
 set_target_properties(libmcdata PROPERTIES PREFIX "" IMPORT_PREFIX "" )
 # The following two properties are crucial to reduce the number of undesirably exported symbols
@@ -295,6 +299,7 @@ set_target_properties(libmcdata
 
 
 add_custom_target(copy_distribution_libraries ALL)
+add_dependencies(copy_distribution_libraries copy_framework)
 
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
