@@ -24,6 +24,7 @@ dirs_to_make[15]="$builddir/Framework/HeadersDev/CppDynamic"
 dirs_to_make[16]="$builddir/Framework/HeadersDriver"
 dirs_to_make[17]="$builddir/Framework/HeadersDriver/CppDynamic"
 dirs_to_make[18]="$builddir/Framework/InterfacesDev"
+dirs_to_make[19]="$builddir/Framework/PluginCpp"
 
 for dir in "${dirs_to_make[@]}"
 do
