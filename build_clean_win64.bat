@@ -34,7 +34,7 @@ echo git hash: %GITHASH%
 
 cd /d "%basepath%"
 
-echo "Building Resource builder (Win32)..."
+echo "Building Resource builder (Win64)..."
 set GOARCH=amd64
 set GOOS=windows
 go build -o "%builddir%/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
@@ -83,7 +83,6 @@ copy ..\Output\%GITHASH%_*.client Framework\Dist\
 copy ..\Output\%GITHASH%_package.xml Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\Output\lib3mf.dll Framework\Dist\%GITHASH%_core_lib3mf.dll
-copy ..\..\Templates\libmcconfig.xml .\configuration.xml
 copy ..\..\Framework\HeadersDev\CppDynamic\*.* Framework\HeadersDev\CppDynamic
 copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
 copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp

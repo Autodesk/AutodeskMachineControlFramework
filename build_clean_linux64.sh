@@ -18,6 +18,12 @@ dirs_to_make[9]="$builddir/DevPackage/Framework/InterfacesDev"
 dirs_to_make[10]="$builddir/DevPackage/Framework/PluginCpp"
 dirs_to_make[11]="$builddir/DevPackage/Framework/PluginPython"
 dirs_to_make[12]="$builddir/DevPackage/Framework/Dist"
+dirs_to_make[13]="$builddir/Framework"
+dirs_to_make[14]="$builddir/Framework/HeadersDev"
+dirs_to_make[15]="$builddir/Framework/HeadersDev/CppDynamic"
+dirs_to_make[16]="$builddir/Framework/HeadersDriver"
+dirs_to_make[17]="$builddir/Framework/HeadersDriver/CppDynamic"
+dirs_to_make[18]="$builddir/Framework/InterfacesDev"
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -29,13 +35,16 @@ do
 	fi
 done
 
+copy "$basepath/Framework/PluginCpp/*.*" "$builddir/Framework/PluginCpp"
+copy "$basepath/Framework/InterfacesDev/*.*" "$builddir/Framework/InterfacesDev"
+
 git rev-parse --verify --short HEAD > "$builddir/githash.txt"
 GITHASH=$(<"$builddir/githash.txt")
 echo "git hash: $GITHASH"
 
 cd "$basepath"
 
-echo "Building Resource builder (Win32)..."
+echo "Building Resource builder (Win64)..."
 set GOARCH=amd64
 set GOOS=windows
 go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/Server/buildResources.go"
@@ -85,6 +94,25 @@ cmake --build . --config Release
 echo "Building Core Resources"
 go run ../Server/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
 
-#echo "Building Developer Package"
-# TODO: Copy files to builddir
+echo "Building Developer Package"
+cd "$builddir/DevPackage"
+copy ../githash.txt Framework/Dist/disthash.txt
+copy ../Output/amc_server Framework/Dist/
+copy ../Output/amc_server.xml Framework/Dist/
+copy ../Output/${GITHASH}_core_libmc.so Framework/Dist/
+copy ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
+copy ../Output/${GITHASH}_core_libmcdata.so Framework/Dist/
+copy ../Output/${GITHASH}_*.data Framework/Dist/
+copy ../Output/${GITHASH}_*.client Framework/Dist/
+copy ../Output/${GITHASH}_package.xml Framework/Dist/
+copy ../Output/${GITHASH}_driver_*.so Framework/Dist/
+copy ../Output/lib3mf.so Framework/Dist/${GITHASH}_core_lib3mf.so
+copy ../../Templates/libmcconfig.xml ./configuration.xml
+copy ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
+copy ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
+copy ../../Framework/PluginCpp/*.* Framework/PluginCpp
+copy ../../Framework/PluginPython/*.* Framework/PluginPython
 
+go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
+
+echo "Build done!"
