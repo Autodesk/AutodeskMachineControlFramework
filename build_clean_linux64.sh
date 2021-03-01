@@ -35,8 +35,8 @@ do
 	fi
 done
 
-cp "$basepath/Framework/PluginCpp/*.*" "$builddir/Framework/PluginCpp"
-cp "$basepath/Framework/InterfacesDev/*.*" "$builddir/Framework/InterfacesDev"
+cp "$basepath/Framework/PluginCpp/"* "$builddir/Framework/PluginCpp"
+cp "$basepath/Framework/InterfacesDev/"* "$builddir/Framework/InterfacesDev"
 
 git rev-parse --verify --short HEAD > "$builddir/githash.txt"
 GITHASH=$(<"$builddir/githash.txt")
