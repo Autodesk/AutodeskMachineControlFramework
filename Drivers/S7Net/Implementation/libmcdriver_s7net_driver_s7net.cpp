@@ -255,12 +255,12 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NODESCRIPTIONATTRIBUTE);
 
             std::string sName = nameAttrib.as_string();
-            uint32_t nAddress = addressAttrib.as_uint(0);
+            uint32_t nAddress = addressAttrib.as_uint(1UL << 30);
             std::string sDescription = descriptionAttrib.as_string();
 
             if (sName.empty())
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDNAMEATTRIBUTE);
-            if (nAddress == 0)
+            if (nAddress >= m_nPLCtoAMC_DBSize)
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDADDRESSEATTRIBUTE);
             if (sDescription.empty())
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDDESCRIPTIONATTRIBUTE);
@@ -362,8 +362,8 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     m_pCommunication = m_pCommunicationWrapper->CreatePLCCommunication();
     m_pCommunication->SetProtocolConfiguration (nMajorVersion, nMinorVersion, nPatchVersion, m_nPLCtoAMC_DBNo, m_nPLCtoAMC_DBSize, nAMCtoPLC_DBNo, nAMCtoPLC_Size);
 
-    m_pCommunication->SetPLCToAMCOffsets (2, 4, 6, 8, 50, 42, 46, 54);
-    m_pCommunication->SetAMCTOPLCOffsets(0, 2, 4, 6, 40, 44, 106);
+    m_pCommunication->SetPLCToAMCOffsets (0, 2, 4, 6, 24, 28, 16, 20);
+    m_pCommunication->SetAMCTOPLCOffsets (0, 2, 4, 6, 16, 20, 40);
     
 }
 
