@@ -59,6 +59,10 @@ std::string CDriver_S7Value::getName()
     return m_sName;
 }
 
+uint32_t CDriver_S7Value::getAddress()
+{
+    return m_nAddress;
+}
 
 CDriver_S7RealValue::CDriver_S7RealValue(const std::string& sName, const uint32_t nAddress)
     : CDriver_S7Value (sName, nAddress)
@@ -129,6 +133,17 @@ bool CDriver_S7BoolValue::readValue(LibS7Com::CPLCCommunication* pCommunication)
 
     return pCommunication->ReadVariableBool(m_nAddress, m_nBit);
 
+}
+
+
+CDriver_S7StringValue::CDriver_S7StringValue(const std::string& sName, const uint32_t nAddress, const uint32_t nLength)
+    : CDriver_S7Value(sName, nAddress), m_nLength(nLength)
+{
+}
+
+std::string CDriver_S7StringValue::readValue(LibS7Com::CPLCCommunication* pCommunication)
+{
+    return pCommunication->ReadVariableString(m_nAddress, m_nLength);;
 }
 
 
@@ -241,7 +256,7 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     for (pugi::xml_node childNode : statusNodes)
     {
         std::string sChildName = childNode.name();
-        if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint") || (sChildName == "int")) {
+        if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint") || (sChildName == "int") || (sChildName == "string")) {
 
             auto nameAttrib = childNode.attribute("name");
             auto addressAttrib = childNode.attribute("address");
@@ -274,27 +289,51 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
                     throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDBITATTRIBUTE);
 
                 m_pDriverEnvironment->RegisterBoolParameter(sName, sDescription, false);
-                m_DriverParameters.push_back(std::make_shared<CDriver_S7BoolValue>(sName, nAddress, nBit));
+                auto pValue = std::make_shared<CDriver_S7BoolValue>(sName, nAddress, nBit);
+                m_DriverParameters.push_back(pValue);
+                m_DriverParameterMap.insert(std::make_pair (sName, pValue));
+            }
+
+            if (sChildName == "string") {
+                auto lengthAttrib = childNode.attribute("length");
+                if (lengthAttrib.empty())
+                    throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOLENGTHATTRIBUTE);
+                uint32_t nLength = lengthAttrib.as_uint(0xffff);
+                if (nLength >= 256)
+                    throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDLENGTHATTRIBUTE);
+
+                m_pDriverEnvironment->RegisterStringParameter(sName, sDescription, "");
+                auto pValue = std::make_shared<CDriver_S7StringValue>(sName, nAddress, nLength);
+                m_DriverParameters.push_back(pValue);
+                m_DriverParameterMap.insert(std::make_pair(sName, pValue));
             }
 
             if (sChildName == "real") {
                 m_pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
-                m_DriverParameters.push_back(std::make_shared<CDriver_S7RealValue>(sName, nAddress));
+                auto pValue = std::make_shared<CDriver_S7RealValue>(sName, nAddress);
+                m_DriverParameters.push_back(pValue);
+                m_DriverParameterMap.insert(std::make_pair(sName, pValue));
             }
 
             if (sChildName == "lreal") {
                 m_pDriverEnvironment->RegisterDoubleParameter(sName, sDescription, 0.0);
-                m_DriverParameters.push_back(std::make_shared<CDriver_S7LRealValue>(sName, nAddress));
+                auto pValue = std::make_shared<CDriver_S7LRealValue>(sName, nAddress);
+                m_DriverParameters.push_back(pValue);
+                m_DriverParameterMap.insert(std::make_pair(sName, pValue));
             }
 
             if (sChildName == "dint") {
                 m_pDriverEnvironment->RegisterIntegerParameter(sName, sDescription, 0);
-                m_DriverParameters.push_back(std::make_shared<CDriver_S7DIntValue>(sName, nAddress));
+                auto pValue = std::make_shared<CDriver_S7DIntValue>(sName, nAddress);
+                m_DriverParameters.push_back(pValue);
+                m_DriverParameterMap.insert(std::make_pair(sName, pValue));
             }
 
             if (sChildName == "int") {
                 m_pDriverEnvironment->RegisterIntegerParameter(sName, sDescription, 0);
-                m_DriverParameters.push_back(std::make_shared<CDriver_S7IntValue>(sName, nAddress));
+                auto pValue = std::make_shared<CDriver_S7IntValue>(sName, nAddress);
+                m_DriverParameters.push_back(pValue);
+                m_DriverParameterMap.insert(std::make_pair(sName, pValue));
             }
 
         }
@@ -317,6 +356,77 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     uint32_t nAMCtoPLC_Size = controlsizeAttrib.as_uint(0);
     if (nAMCtoPLC_Size == 0)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBSIZE);
+
+    auto controlNodes = controldbNode.children();
+    for (pugi::xml_node controlNode : controlNodes)
+    {
+        std::string sChildName = controlNode.name();
+        if ((sChildName == "bool") || (sChildName == "real") || (sChildName == "lreal") || (sChildName == "dint") || (sChildName == "int") || (sChildName == "string")) {
+
+            auto nameAttrib = controlNode.attribute("name");
+            auto addressAttrib = controlNode.attribute("address");
+            auto descriptionAttrib = controlNode.attribute("description");
+
+            if (nameAttrib.empty())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NONAMEATTRIBUTE);
+            if (addressAttrib.empty())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOADDRESSEATTRIBUTE);
+            if (descriptionAttrib.empty())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NODESCRIPTIONATTRIBUTE);
+
+            std::string sName = nameAttrib.as_string();
+            uint32_t nAddress = addressAttrib.as_uint(1UL << 30);
+            std::string sDescription = descriptionAttrib.as_string();
+
+            if (sName.empty())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDNAMEATTRIBUTE);
+            if (nAddress >= nAMCtoPLC_Size)
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDADDRESSEATTRIBUTE);
+            if (sDescription.empty())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDDESCRIPTIONATTRIBUTE);
+
+            if (sChildName == "bool") {
+                auto bitAttrib = controlNode.attribute("bit");
+                if (bitAttrib.empty())
+                    throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOBITATTRIBUTE);
+                uint32_t nBit = bitAttrib.as_uint(0xffff);
+                if (nBit >= 8)
+                    throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDBITATTRIBUTE);
+
+                m_ControlParameterMap.insert (std::make_pair (sName, std::make_shared<CDriver_S7BoolValue>(sName, nAddress, nBit)));
+            }
+
+            if (sChildName == "real") {
+                m_ControlParameterMap.insert(std::make_pair(sName, std::make_shared<CDriver_S7RealValue>(sName, nAddress)));
+            }
+
+            if (sChildName == "lreal") {
+                m_ControlParameterMap.insert(std::make_pair(sName, std::make_shared<CDriver_S7LRealValue>(sName, nAddress)));
+            }
+
+            if (sChildName == "dint") {
+                m_ControlParameterMap.insert(std::make_pair(sName, std::make_shared<CDriver_S7DIntValue>(sName, nAddress)));
+            }
+
+            if (sChildName == "int") {
+                m_ControlParameterMap.insert(std::make_pair(sName, std::make_shared<CDriver_S7IntValue>(sName, nAddress)));
+            }
+
+            if (sChildName == "string") {
+                auto lengthAttrib = controlNode.attribute("length");
+                if (lengthAttrib.empty())
+                    throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_NOLENGTHATTRIBUTE);
+                uint32_t nLength = lengthAttrib.as_uint(0xffff);
+                if (nLength >= 256)
+                    throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDLENGTHATTRIBUTE);
+
+                m_ControlParameterMap.insert(std::make_pair(sName, std::make_shared<CDriver_S7StringValue>(sName, nAddress, nLength)));
+            }
+
+        }
+    }
+
+
 
     pugi::xml_node commandsNode = s7protocolNode.child("commands");
     if (commandsNode.empty())
@@ -362,8 +472,24 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     m_pCommunication = m_pCommunicationWrapper->CreatePLCCommunication();
     m_pCommunication->SetProtocolConfiguration (nMajorVersion, nMinorVersion, nPatchVersion, m_nPLCtoAMC_DBNo, m_nPLCtoAMC_DBSize, nAMCtoPLC_DBNo, nAMCtoPLC_Size);
 
-    m_pCommunication->SetPLCToAMCOffsets (0, 2, 4, 6, 24, 28, 16, 20);
-    m_pCommunication->SetAMCTOPLCOffsets (0, 2, 4, 6, 16, 20, 40);
+    m_pCommunication->SetPLCToAMCOffsets(
+        findPLCToAMCIntOffset("version_major"),
+        findPLCToAMCIntOffset("version_minor"),
+        findPLCToAMCIntOffset("version_patch"),
+        findPLCToAMCStringOffset("version_build"),
+        findPLCToAMCDIntOffset("sequence_running"),
+        findPLCToAMCDIntOffset("sequence_finished"),
+        findPLCToAMCDIntOffset("sequence_status"),
+        findPLCToAMCDIntOffset("sequence_error"));
+
+    m_pCommunication->SetAMCTOPLCOffsets(
+        findAMCToPLCIntOffset("version_major"),
+        findAMCToPLCIntOffset("version_minor"),
+        findAMCToPLCIntOffset("version_patch"),
+        findAMCToPLCStringOffset("version_build"),
+        findAMCToPLCDIntOffset("cmd_sequence"),
+        findAMCToPLCDIntOffset("cmd_id"),
+        findAMCToPLCDIntOffset("cmd_checksum"));
     
 }
 
@@ -430,6 +556,12 @@ void CDriver_S7Net::updateParameters()
             if (pBoolParameter.get() != nullptr) {
                 bool bValue = pBoolParameter->readValue(m_pCommunication.get());
                 m_pDriverEnvironment->SetBoolParameter(sName, bValue);
+            }
+
+            auto pStringParameter = std::dynamic_pointer_cast<CDriver_S7StringValue> (pParameter);
+            if (pStringParameter.get() != nullptr) {
+                std::string sValue = pStringParameter->readValue(m_pCommunication.get());
+                m_pDriverEnvironment->SetStringParameter(sName, sValue);
             }
 
             auto pDintParameter = std::dynamic_pointer_cast<CDriver_S7DIntValue> (pParameter);
@@ -499,6 +631,87 @@ void CDriver_S7Net::ExecuteCommand(IPLCCommand* pPLCCommand)
     pPLCCommandInstance->setSequenceID(nSequenceID);
 
     this->QueryParameters(); 
+}
+
+
+uint32_t CDriver_S7Net::findPLCToAMCIntOffset(const std::string& sName)
+{
+    auto iIter = m_DriverParameterMap.find(sName);
+    if (iIter == m_DriverParameterMap.end())
+        throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS, "could not find address: " + sName);
+
+    auto pIntParam = dynamic_cast<CDriver_S7IntValue*> (iIter->second.get());
+    if (pIntParam == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_FIELDISNOINTPARAM, "field is no int parameter: " + sName);
+
+    return pIntParam->getAddress();
+}
+
+uint32_t CDriver_S7Net::findPLCToAMCDIntOffset(const std::string& sName)
+{
+    auto iIter = m_DriverParameterMap.find(sName);
+    if (iIter == m_DriverParameterMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS, "could not find address: " + sName);
+
+    auto pDIntParam = dynamic_cast<CDriver_S7DIntValue*> (iIter->second.get());
+    if (pDIntParam == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_FIELDISNODINTPARAM, "field is no dint parameter: " + sName);
+
+    return pDIntParam->getAddress();
+}
+
+uint32_t CDriver_S7Net::findPLCToAMCStringOffset(const std::string& sName)
+{
+    auto iIter = m_DriverParameterMap.find(sName);
+    if (iIter == m_DriverParameterMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS, "could not find address: " + sName);
+
+    auto pStringParam = dynamic_cast<CDriver_S7StringValue*> (iIter->second.get());
+    if (pStringParam == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_FIELDISNOSTRINGPARAM, "field is no string parameter: " + sName);
+
+    return pStringParam->getAddress();
+}
+
+
+uint32_t CDriver_S7Net::findAMCToPLCIntOffset(const std::string& sName)
+{
+    auto iIter = m_ControlParameterMap.find(sName);
+    if (iIter == m_ControlParameterMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS, "could not find address: " + sName);
+
+    auto pIntParam = dynamic_cast<CDriver_S7IntValue*> (iIter->second.get());
+    if (pIntParam == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_FIELDISNOINTPARAM, "field is no int parameter: " + sName);
+
+    return pIntParam->getAddress();
+}
+
+uint32_t CDriver_S7Net::findAMCToPLCDIntOffset(const std::string& sName)
+{
+    auto iIter = m_ControlParameterMap.find(sName);
+    if (iIter == m_ControlParameterMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS, "could not find address: " + sName);
+
+    auto pDIntParam = dynamic_cast<CDriver_S7DIntValue*> (iIter->second.get());
+    if (pDIntParam == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_FIELDISNODINTPARAM, "field is no dint parameter: " + sName);
+
+    return pDIntParam->getAddress();
+
+}
+
+uint32_t CDriver_S7Net::findAMCToPLCStringOffset(const std::string& sName)
+{
+    auto iIter = m_ControlParameterMap.find(sName);
+    if (iIter == m_ControlParameterMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS, "could not find address: " + sName);
+
+    auto pStringParam = dynamic_cast<CDriver_S7StringValue*> (iIter->second.get());
+    if (pStringParam == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_FIELDISNODINTPARAM, "field is no string parameter: " + sName);
+
+    return pStringParam->getAddress();
 }
 
 bool CDriver_S7Net::WaitForCommand(IPLCCommand* pPLCCommand, const LibMCDriver_S7Net_uint32 nReactionTimeInMS, const LibMCDriver_S7Net_uint32 nWaitForTimeInMS)

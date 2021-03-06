@@ -94,6 +94,15 @@
 		<error name="NOCONTROLDBSIZE" code="1037" description="no control db size" />
 		<error name="INVALIDCONTROLDBSIZE" code="1038" description="invalid control db size" />
 		
+		<error name="COULDNOTFINDADDRESS" code="1039" description="could not find address" />
+		<error name="FIELDISNOINTPARAM" code="1040" description="field is no int parameter" />
+		<error name="FIELDISNODINTPARAM" code="1041" description="field is no dint parameter" />
+		<error name="FIELDISNOSTRINGPARAM" code="1042" description="field is no string parameter" />
+		<error name="NOLENGTHATTRIBUTE" code="1043" description="no length attribute" />
+		<error name="INVALIDLENGTHATTRIBUTE" code="1044" description="invalid length attribute" />
+		
+		
+		
 	</errors>
 
 	<enum name="S7CPUType">

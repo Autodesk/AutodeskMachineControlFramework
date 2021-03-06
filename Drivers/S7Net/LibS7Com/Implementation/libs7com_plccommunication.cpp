@@ -252,7 +252,25 @@ void CPLCCommunication::CheckCommandExecution(const LibS7Com_uint32 nSequenceID,
 
 std::string CPLCCommunication::ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength)
 {
-    throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (nMaxLength >= 256)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
+
+    if (((uint64_t)nAddress + nMaxLength + 2) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    auto nLength = ReadVariableByte(nAddress);
+    if (nLength > nMaxLength)
+        nLength = nMaxLength;
+
+    std::vector<uint8_t> Bytes;
+    Bytes.resize((uint64_t) nMaxLength + 1);
+
+    for (uint32_t j = 0; j < nLength; j++) {
+        Bytes[j] = ReadVariableByte(nAddress + 2 + j);
+    }
+    Bytes[nMaxLength] = 0;
+
+    return std::string ((char*) Bytes.data());
 }
 
 bool CPLCCommunication::ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit)

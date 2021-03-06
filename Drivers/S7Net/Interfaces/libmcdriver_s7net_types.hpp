@@ -144,6 +144,12 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_NOPATCHVERSION 1036
 #define LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBSIZE 1037
 #define LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBSIZE 1038
+#define LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS 1039
+#define LIBMCDRIVER_S7NET_ERROR_FIELDISNOINTPARAM 1040
+#define LIBMCDRIVER_S7NET_ERROR_FIELDISNODINTPARAM 1041
+#define LIBMCDRIVER_S7NET_ERROR_FIELDISNOSTRINGPARAM 1042
+#define LIBMCDRIVER_S7NET_ERROR_NOLENGTHATTRIBUTE 1043
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDLENGTHATTRIBUTE 1044
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -200,6 +206,12 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_NOPATCHVERSION: return "no patch version";
     case LIBMCDRIVER_S7NET_ERROR_NOCONTROLDBSIZE: return "no control db size";
     case LIBMCDRIVER_S7NET_ERROR_INVALIDCONTROLDBSIZE: return "invalid control db size";
+    case LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDADDRESS: return "could not find address";
+    case LIBMCDRIVER_S7NET_ERROR_FIELDISNOINTPARAM: return "field is no int parameter";
+    case LIBMCDRIVER_S7NET_ERROR_FIELDISNODINTPARAM: return "field is no dint parameter";
+    case LIBMCDRIVER_S7NET_ERROR_FIELDISNOSTRINGPARAM: return "field is no string parameter";
+    case LIBMCDRIVER_S7NET_ERROR_NOLENGTHATTRIBUTE: return "no length attribute";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDLENGTHATTRIBUTE: return "invalid length attribute";
     default: return "unknown error";
   }
 }

@@ -67,7 +67,8 @@ public:
     CDriver_S7Value(const std::string& sName, const uint32_t nAddress);
     virtual ~CDriver_S7Value();
 
-    std::string getName ();
+    std::string getName(); 
+    uint32_t getAddress();
 
 };
 
@@ -128,6 +129,20 @@ public:
 
 };
 
+class CDriver_S7StringValue : public CDriver_S7Value {
+protected:
+
+    uint32_t m_nLength;
+
+public:
+
+    CDriver_S7StringValue(const std::string& sName, const uint32_t nAddress, const uint32_t nLength);
+
+    std::string readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+};
+
+
 typedef std::shared_ptr<CDriver_S7Value> PDriver_S7Value;
 
 
@@ -167,9 +182,19 @@ protected:
     uint32_t m_nPLCtoAMC_DBSize;
 
     std::list<PDriver_S7Value> m_DriverParameters;
+    std::map<std::string, PDriver_S7Value> m_DriverParameterMap;
+
     std::map<std::string, PDriver_S7Command> m_CommandDefinitions;
+    std::map<std::string, PDriver_S7Value> m_ControlParameterMap;
 
     void updateParameters ();
+
+    uint32_t findPLCToAMCIntOffset (const std::string & sName);
+    uint32_t findPLCToAMCDIntOffset(const std::string& sName);
+    uint32_t findPLCToAMCStringOffset(const std::string& sName);
+    uint32_t findAMCToPLCIntOffset(const std::string& sName);
+    uint32_t findAMCToPLCDIntOffset(const std::string& sName);
+    uint32_t findAMCToPLCStringOffset(const std::string& sName);
 
 public:
 
