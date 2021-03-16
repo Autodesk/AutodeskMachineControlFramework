@@ -302,8 +302,25 @@ Custom implementation
 			<param name="Position" type="uint32" pass="out" description="Returns current executed position" />
 		</method>
 
+		<method name="GetHeadStatus" description="Returns status of scan head">
+			<param name="HeadNo" type="uint32" pass="in" description="Head Number" />
+			<param name="PositionXisOK" type="bool" pass="out" description="Position X is ok" />
+			<param name="PositionYisOK" type="bool" pass="out" description="Position Y is ok" />
+			<param name="TemperatureisOK" type="bool" pass="out" description="Temperature is ok" />
+			<param name="PowerisOK" type="bool" pass="out" description="Power is ok" />
+		</method>
+
+
 		<method name="GetInputPointer" description="returns current input list position">
 			<param name="Position" type="uint32" pass="return" description="Returns current position of open list" />
+		</method>
+
+		<method name="GetRTCVersion" description="Returns version information of the RTC Card">
+			<param name="RTCVersion" type="uint32" pass="out" description="RTC Card Version" />
+			<param name="RTCType" type="uint32" pass="out" description="RTC Card Type" />
+			<param name="DLLVersion" type="uint32" pass="out" description="RTC DLL Version" />
+			<param name="HEXVersion" type="uint32" pass="out" description="RTC HEX Version" />
+			<param name="BIOSVersion" type="uint32" pass="out" description="RTC BIOS Version" />
 		</method>
 						
 	</class>
