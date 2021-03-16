@@ -44,12 +44,30 @@ using namespace LibMCDriver_ScanLab::Impl;
 CDriver_ScanLab_RTC5::CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f)
 {
-
 }
 
 void CDriver_ScanLab_RTC5::Configure(const std::string& sConfigurationString)
 {
-
+    m_pDriverEnvironment->RegisterBoolParameter("position_x_ok", "Scan Position X is ok", false);
+    m_pDriverEnvironment->RegisterBoolParameter("position_y_ok", "Scan Position Y is ok", false);
+    m_pDriverEnvironment->RegisterBoolParameter("temperature_ok", "Scan Head Temperature is ok", false);
+    m_pDriverEnvironment->RegisterBoolParameter("power_ok", "Scan Head Power is ok", false);
+    m_pDriverEnvironment->RegisterBoolParameter("laser_on", "Laser is On", false);
+    m_pDriverEnvironment->RegisterIntegerParameter("position_x", "Laser Position X", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("position_y", "Laser Position Y", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("position_z", "Laser Position Z", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("position_x_corrected", "corrected Laser Position X", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("position_y_corrected", "corrected Laser Position Y", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("position_z_corrected", "corrected Laser Position Z", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("focus_shift", "current Focus Shift", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("mark_speed", "current Mark Speed", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("list_position", "current List Position", 0);
+    m_pDriverEnvironment->RegisterBoolParameter("card_busy", "Card is busy", false);
+    m_pDriverEnvironment->RegisterIntegerParameter("rtc_version", "Scanlab RTC Version", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("card_type", "Scanlab RTC Type", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("dll_version", "Scanlab DLL Version", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("hex_version", "Scanlab HEX Version", 0);
+    m_pDriverEnvironment->RegisterIntegerParameter("bios_version", "Scanlab BIOS Version", 0);
 }
 
 std::string CDriver_ScanLab_RTC5::GetName()
@@ -65,7 +83,7 @@ std::string CDriver_ScanLab_RTC5::GetType()
 
 void CDriver_ScanLab_RTC5::QueryParameters()
 {
-
+    updateCardStatus();
 }
 
 
@@ -85,6 +103,18 @@ void CDriver_ScanLab_RTC5::Initialise(const std::string& sIP, const std::string&
 		m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
 		m_pRTCContext = std::shared_ptr<IRTCContext>(m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber));
 	}
+
+    uint32_t nRTCVersion = 0;
+    uint32_t nRTCType = 0;
+    uint32_t nDLLVersion = 0;
+    uint32_t nHEXVersion = 0;
+    uint32_t nBIOSVersion = 0;
+    m_pRTCContext->GetRTCVersion(nRTCVersion, nRTCType, nDLLVersion, nHEXVersion, nBIOSVersion);
+    m_pDriverEnvironment->SetIntegerParameter("rtc_version", nRTCVersion);
+    m_pDriverEnvironment->SetIntegerParameter("card_type", nRTCType);
+    m_pDriverEnvironment->SetIntegerParameter("dll_version", nDLLVersion);
+    m_pDriverEnvironment->SetIntegerParameter("hex_version", nHEXVersion);
+    m_pDriverEnvironment->SetIntegerParameter("bios_version", nBIOSVersion);
 
 }
 
@@ -242,6 +272,29 @@ void CDriver_ScanLab_RTC5::internalExecute()
     while (Busy) {
         m_pRTCContext->GetStatus (Busy, Pos);
         m_pDriverEnvironment->Sleep(10);
+
+        updateCardStatus();
     }
 
 }
+
+void CDriver_ScanLab_RTC5::updateCardStatus()
+{
+    bool Busy = true;
+    uint32_t ListPosition = 0;
+    bool bPositionXisOK, bPositionYisOK, bTemperatureisOK, bPowerisOK;
+
+    m_pRTCContext->GetStatus(Busy, ListPosition);
+    m_pRTCContext->GetHeadStatus(1, bPositionXisOK, bPositionYisOK, bTemperatureisOK, bPowerisOK);
+
+    m_pDriverEnvironment->SetBoolParameter("position_x_ok", bPositionXisOK);
+    m_pDriverEnvironment->SetBoolParameter("position_y_ok", bPositionYisOK);
+    m_pDriverEnvironment->SetBoolParameter("temperature_ok", bTemperatureisOK);
+    m_pDriverEnvironment->SetBoolParameter("power_ok", bPowerisOK);
+
+    m_pDriverEnvironment->SetIntegerParameter("list_position", ListPosition);
+    m_pDriverEnvironment->SetBoolParameter("card_busy", Busy);
+
+
+}
+

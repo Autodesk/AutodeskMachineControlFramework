@@ -386,6 +386,19 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getstatus(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pBusy, LibMCDriver_ScanLab_uint32 * pPosition);
 
 /**
+* Returns status of scan head
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nHeadNo - Head Number
+* @param[out] pPositionXisOK - Position X is ok
+* @param[out] pPositionYisOK - Position Y is ok
+* @param[out] pTemperatureisOK - Temperature is ok
+* @param[out] pPowerisOK - Power is ok
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getheadstatus(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nHeadNo, bool * pPositionXisOK, bool * pPositionYisOK, bool * pTemperatureisOK, bool * pPowerisOK);
+
+/**
 * returns current input list position
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -393,6 +406,19 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getinputpointer(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pPosition);
+
+/**
+* Returns version information of the RTC Card
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pRTCVersion - RTC Card Version
+* @param[out] pRTCType - RTC Card Type
+* @param[out] pDLLVersion - RTC DLL Version
+* @param[out] pHEXVersion - RTC HEX Version
+* @param[out] pBIOSVersion - RTC BIOS Version
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getrtcversion(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pRTCVersion, LibMCDriver_ScanLab_uint32 * pRTCType, LibMCDriver_ScanLab_uint32 * pDLLVersion, LibMCDriver_ScanLab_uint32 * pHEXVersion, LibMCDriver_ScanLab_uint32 * pBIOSVersion);
 
 /*************************************************************************************************************************
  Class definition for RTCSelector

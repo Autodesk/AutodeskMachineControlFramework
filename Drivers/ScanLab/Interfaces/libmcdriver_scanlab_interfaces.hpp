@@ -145,6 +145,29 @@ template <class T1, class T2, class T3, class T4> class ParameterCache_4 : publi
 		}
 };
 
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+		}
+};
+
 
 /*************************************************************************************************************************
  Class interface for Base 
@@ -496,10 +519,30 @@ public:
 	virtual void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition) = 0;
 
 	/**
+	* IRTCContext::GetHeadStatus - Returns status of scan head
+	* @param[in] nHeadNo - Head Number
+	* @param[out] bPositionXisOK - Position X is ok
+	* @param[out] bPositionYisOK - Position Y is ok
+	* @param[out] bTemperatureisOK - Temperature is ok
+	* @param[out] bPowerisOK - Power is ok
+	*/
+	virtual void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK) = 0;
+
+	/**
 	* IRTCContext::GetInputPointer - returns current input list position
 	* @return Returns current position of open list
 	*/
 	virtual LibMCDriver_ScanLab_uint32 GetInputPointer() = 0;
+
+	/**
+	* IRTCContext::GetRTCVersion - Returns version information of the RTC Card
+	* @param[out] nRTCVersion - RTC Card Version
+	* @param[out] nRTCType - RTC Card Type
+	* @param[out] nDLLVersion - RTC DLL Version
+	* @param[out] nHEXVersion - RTC HEX Version
+	* @param[out] nBIOSVersion - RTC BIOS Version
+	*/
+	virtual void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion) = 0;
 
 };
 

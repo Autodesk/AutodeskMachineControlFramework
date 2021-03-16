@@ -947,6 +947,38 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getstatus(LibMCDriver_S
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getheadstatus(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nHeadNo, bool * pPositionXisOK, bool * pPositionYisOK, bool * pTemperatureisOK, bool * pPowerisOK)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (!pPositionXisOK)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pPositionYisOK)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pTemperatureisOK)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pPowerisOK)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->GetHeadStatus(nHeadNo, *pPositionXisOK, *pPositionYisOK, *pTemperatureisOK, *pPowerisOK);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getinputpointer(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pPosition)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
@@ -959,6 +991,40 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getinputpointer(LibMCDr
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		*pPosition = pIRTCContext->GetInputPointer();
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getrtcversion(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pRTCVersion, LibMCDriver_ScanLab_uint32 * pRTCType, LibMCDriver_ScanLab_uint32 * pDLLVersion, LibMCDriver_ScanLab_uint32 * pHEXVersion, LibMCDriver_ScanLab_uint32 * pBIOSVersion)
+{
+	IBase* pIBaseClass = (IBase *)pRTCContext;
+
+	try {
+		if (!pRTCVersion)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pRTCType)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pDLLVersion)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pHEXVersion)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if (!pBIOSVersion)
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
+		if (!pIRTCContext)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIRTCContext->GetRTCVersion(*pRTCVersion, *pRTCType, *pDLLVersion, *pHEXVersion, *pBIOSVersion);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1483,8 +1549,12 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getcorrectionfactor;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_getstatus") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getstatus;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getheadstatus") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getheadstatus;
 	if (sProcName == "libmcdriver_scanlab_rtccontext_getinputpointer") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getinputpointer;
+	if (sProcName == "libmcdriver_scanlab_rtccontext_getrtcversion") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_rtccontext_getrtcversion;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcards") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_searchcards;
 	if (sProcName == "libmcdriver_scanlab_rtcselector_searchcardsbyrange") 

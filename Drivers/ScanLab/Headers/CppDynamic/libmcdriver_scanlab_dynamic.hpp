@@ -401,7 +401,9 @@ public:
 	inline void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay);
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
+	inline void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK);
 	inline LibMCDriver_ScanLab_uint32 GetInputPointer();
+	inline void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion);
 };
 	
 /*************************************************************************************************************************
@@ -618,7 +620,9 @@ public:
 		pWrapperTable->m_RTCContext_AddCustomDelay = nullptr;
 		pWrapperTable->m_RTCContext_GetCorrectionFactor = nullptr;
 		pWrapperTable->m_RTCContext_GetStatus = nullptr;
+		pWrapperTable->m_RTCContext_GetHeadStatus = nullptr;
 		pWrapperTable->m_RTCContext_GetInputPointer = nullptr;
+		pWrapperTable->m_RTCContext_GetRTCVersion = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -960,12 +964,30 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetHeadStatus = (PLibMCDriver_ScanLabRTCContext_GetHeadStatusPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getheadstatus");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetHeadStatus = (PLibMCDriver_ScanLabRTCContext_GetHeadStatusPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getheadstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetHeadStatus == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCContext_GetInputPointer = (PLibMCDriver_ScanLabRTCContext_GetInputPointerPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getinputpointer");
 		#else // _WIN32
 		pWrapperTable->m_RTCContext_GetInputPointer = (PLibMCDriver_ScanLabRTCContext_GetInputPointerPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getinputpointer");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_GetInputPointer == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetRTCVersion = (PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getrtcversion");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetRTCVersion = (PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getrtcversion");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetRTCVersion == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1302,8 +1324,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetStatus == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getheadstatus", (void**)&(pWrapperTable->m_RTCContext_GetHeadStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetHeadStatus == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getinputpointer", (void**)&(pWrapperTable->m_RTCContext_GetInputPointer));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetInputPointer == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getrtcversion", (void**)&(pWrapperTable->m_RTCContext_GetRTCVersion));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetRTCVersion == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
@@ -1747,6 +1777,19 @@ public:
 	}
 	
 	/**
+	* CRTCContext::GetHeadStatus - Returns status of scan head
+	* @param[in] nHeadNo - Head Number
+	* @param[out] bPositionXisOK - Position X is ok
+	* @param[out] bPositionYisOK - Position Y is ok
+	* @param[out] bTemperatureisOK - Temperature is ok
+	* @param[out] bPowerisOK - Power is ok
+	*/
+	void CRTCContext::GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetHeadStatus(m_pHandle, nHeadNo, &bPositionXisOK, &bPositionYisOK, &bTemperatureisOK, &bPowerisOK));
+	}
+	
+	/**
 	* CRTCContext::GetInputPointer - returns current input list position
 	* @return Returns current position of open list
 	*/
@@ -1756,6 +1799,19 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetInputPointer(m_pHandle, &resultPosition));
 		
 		return resultPosition;
+	}
+	
+	/**
+	* CRTCContext::GetRTCVersion - Returns version information of the RTC Card
+	* @param[out] nRTCVersion - RTC Card Version
+	* @param[out] nRTCType - RTC Card Type
+	* @param[out] nDLLVersion - RTC DLL Version
+	* @param[out] nHEXVersion - RTC HEX Version
+	* @param[out] nBIOSVersion - RTC BIOS Version
+	*/
+	void CRTCContext::GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetRTCVersion(m_pHandle, &nRTCVersion, &nRTCType, &nDLLVersion, &nHEXVersion, &nBIOSVersion));
 	}
 	
 	/**

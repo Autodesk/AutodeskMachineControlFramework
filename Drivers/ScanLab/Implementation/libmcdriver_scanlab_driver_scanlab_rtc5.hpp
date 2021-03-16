@@ -49,6 +49,8 @@ private:
 	void internalBegin();
 	void internalExecute();
 
+	void updateCardStatus();
+
 protected:
 
 public:

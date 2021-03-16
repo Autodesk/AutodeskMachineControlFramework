@@ -373,6 +373,19 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCorrection
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetStatusPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pBusy, LibMCDriver_ScanLab_uint32 * pPosition);
 
 /**
+* Returns status of scan head
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nHeadNo - Head Number
+* @param[out] pPositionXisOK - Position X is ok
+* @param[out] pPositionYisOK - Position Y is ok
+* @param[out] pTemperatureisOK - Temperature is ok
+* @param[out] pPowerisOK - Power is ok
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetHeadStatusPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nHeadNo, bool * pPositionXisOK, bool * pPositionYisOK, bool * pTemperatureisOK, bool * pPowerisOK);
+
+/**
 * returns current input list position
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -380,6 +393,19 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetStatusPtr)
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetInputPointerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pPosition);
+
+/**
+* Returns version information of the RTC Card
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pRTCVersion - RTC Card Version
+* @param[out] pRTCType - RTC Card Type
+* @param[out] pDLLVersion - RTC DLL Version
+* @param[out] pHEXVersion - RTC HEX Version
+* @param[out] pBIOSVersion - RTC BIOS Version
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pRTCVersion, LibMCDriver_ScanLab_uint32 * pRTCType, LibMCDriver_ScanLab_uint32 * pDLLVersion, LibMCDriver_ScanLab_uint32 * pHEXVersion, LibMCDriver_ScanLab_uint32 * pBIOSVersion);
 
 /*************************************************************************************************************************
  Class definition for RTCSelector
@@ -663,7 +689,9 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddCustomDelayPtr m_RTCContext_AddCustomDelay;
 	PLibMCDriver_ScanLabRTCContext_GetCorrectionFactorPtr m_RTCContext_GetCorrectionFactor;
 	PLibMCDriver_ScanLabRTCContext_GetStatusPtr m_RTCContext_GetStatus;
+	PLibMCDriver_ScanLabRTCContext_GetHeadStatusPtr m_RTCContext_GetHeadStatus;
 	PLibMCDriver_ScanLabRTCContext_GetInputPointerPtr m_RTCContext_GetInputPointer;
+	PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr m_RTCContext_GetRTCVersion;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;
