@@ -272,7 +272,7 @@ LibMQTTResult libmqtt_mqttcontext_disconnect(LibMQTT_MQTTContext pMQTTContext)
 	}
 }
 
-LibMQTTResult libmqtt_mqttcontext_sendmessage(LibMQTT_MQTTContext pMQTTContext, const char * pMessageJSON)
+LibMQTTResult libmqtt_mqttcontext_sendmqttmessage(LibMQTT_MQTTContext pMQTTContext, const char * pMessageJSON)
 {
 	IBase* pIBaseClass = (IBase *)pMQTTContext;
 
@@ -284,7 +284,7 @@ LibMQTTResult libmqtt_mqttcontext_sendmessage(LibMQTT_MQTTContext pMQTTContext, 
 		if (!pIMQTTContext)
 			throw ELibMQTTInterfaceException(LIBMQTT_ERROR_INVALIDCAST);
 		
-		pIMQTTContext->SendMessage(sMessageJSON);
+		pIMQTTContext->SendMQTTMessage(sMessageJSON);
 
 		return LIBMQTT_SUCCESS;
 	}
@@ -328,8 +328,8 @@ LibMQTTResult LibMQTT::Impl::LibMQTT_GetProcAddress (const char * pProcName, voi
 		*ppProcAddress = (void*) &libmqtt_mqttcontext_connect;
 	if (sProcName == "libmqtt_mqttcontext_disconnect") 
 		*ppProcAddress = (void*) &libmqtt_mqttcontext_disconnect;
-	if (sProcName == "libmqtt_mqttcontext_sendmessage") 
-		*ppProcAddress = (void*) &libmqtt_mqttcontext_sendmessage;
+	if (sProcName == "libmqtt_mqttcontext_sendmqttmessage") 
+		*ppProcAddress = (void*) &libmqtt_mqttcontext_sendmqttmessage;
 	if (sProcName == "libmqtt_getversion") 
 		*ppProcAddress = (void*) &libmqtt_getversion;
 	if (sProcName == "libmqtt_getlasterror") 

@@ -337,7 +337,7 @@ public:
 	inline void SetMqttMessage(const std::string & sMqttMessage);
 	inline void Connect();
 	inline void Disconnect();
-	inline void SendMessage(const std::string & sMessageJSON);
+	inline void SendMQTTMessage(const std::string & sMessageJSON);
 };
 	
 	/**
@@ -446,7 +446,7 @@ public:
 		pWrapperTable->m_MQTTContext_SetMqttMessage = nullptr;
 		pWrapperTable->m_MQTTContext_Connect = nullptr;
 		pWrapperTable->m_MQTTContext_Disconnect = nullptr;
-		pWrapperTable->m_MQTTContext_SendMessage = nullptr;
+		pWrapperTable->m_MQTTContext_SendMQTTMessage = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -565,12 +565,12 @@ public:
 			return LIBMQTT_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_MQTTContext_SendMessage = (PLibMQTTMQTTContext_SendMessagePtr) GetProcAddress(hLibrary, "libmqtt_mqttcontext_sendmessage");
+		pWrapperTable->m_MQTTContext_SendMQTTMessage = (PLibMQTTMQTTContext_SendMQTTMessagePtr) GetProcAddress(hLibrary, "libmqtt_mqttcontext_sendmqttmessage");
 		#else // _WIN32
-		pWrapperTable->m_MQTTContext_SendMessage = (PLibMQTTMQTTContext_SendMessagePtr) dlsym(hLibrary, "libmqtt_mqttcontext_sendmessage");
+		pWrapperTable->m_MQTTContext_SendMQTTMessage = (PLibMQTTMQTTContext_SendMQTTMessagePtr) dlsym(hLibrary, "libmqtt_mqttcontext_sendmqttmessage");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_MQTTContext_SendMessage == nullptr)
+		if (pWrapperTable->m_MQTTContext_SendMQTTMessage == nullptr)
 			return LIBMQTT_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -671,8 +671,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MQTTContext_Disconnect == nullptr) )
 			return LIBMQTT_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmqtt_mqttcontext_sendmessage", (void**)&(pWrapperTable->m_MQTTContext_SendMessage));
-		if ( (eLookupError != 0) || (pWrapperTable->m_MQTTContext_SendMessage == nullptr) )
+		eLookupError = (*pLookup)("libmqtt_mqttcontext_sendmqttmessage", (void**)&(pWrapperTable->m_MQTTContext_SendMQTTMessage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MQTTContext_SendMQTTMessage == nullptr) )
 			return LIBMQTT_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmqtt_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -777,12 +777,12 @@ public:
 	}
 	
 	/**
-	* CMQTTContext::SendMessage - Sends an MQTT Message.
+	* CMQTTContext::SendMQTTMessage - Sends an MQTT Message.
 	* @param[in] sMessageJSON - Message in JSON format.
 	*/
-	void CMQTTContext::SendMessage(const std::string & sMessageJSON)
+	void CMQTTContext::SendMQTTMessage(const std::string & sMessageJSON)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_MQTTContext_SendMessage(m_pHandle, sMessageJSON.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_MQTTContext_SendMQTTMessage(m_pHandle, sMessageJSON.c_str()));
 	}
 
 } // namespace LibMQTT

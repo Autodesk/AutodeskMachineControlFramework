@@ -135,7 +135,7 @@ LIBMQTT_DECLSPEC LibMQTTResult libmqtt_mqttcontext_disconnect(LibMQTT_MQTTContex
 * @param[in] pMessageJSON - Message in JSON format.
 * @return error code or 0 (success)
 */
-LIBMQTT_DECLSPEC LibMQTTResult libmqtt_mqttcontext_sendmessage(LibMQTT_MQTTContext pMQTTContext, const char * pMessageJSON);
+LIBMQTT_DECLSPEC LibMQTTResult libmqtt_mqttcontext_sendmqttmessage(LibMQTT_MQTTContext pMQTTContext, const char * pMessageJSON);
 
 /*************************************************************************************************************************
  Global functions

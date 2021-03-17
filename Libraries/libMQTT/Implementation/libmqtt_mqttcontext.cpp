@@ -358,15 +358,15 @@ static int initializeMqtt(MQTTContext_t* pMqttContext,
 
 
 CMQTTContext::CMQTTContext()
-    : m_mqttContext (new MQTTContext_t),
-    m_networkContext (new NetworkContext_t),
-    m_opensslParams (new OpensslParams_t)
+    : m_mqttContext(new MQTTContext_t),
+    m_networkContext(new NetworkContext_t),
+    m_opensslParams(new OpensslParams_t),
+    m_pClientSessionPresent(false),
+    m_mqttSessionEstablished(false)
 {
     *m_networkContext = { 0 };
     *m_mqttContext = { 0 };
     *m_opensslParams = { 0 };
-    bool m_pClientSessionPresent;
-    bool m_mqttSessionEstablished;
 }
 
 
@@ -474,7 +474,7 @@ void CMQTTContext::Disconnect()
 
 }
 
-void CMQTTContext::SendMessage(const std::string & sMessageJSON)
+void CMQTTContext::SendMQTTMessage(const std::string & sMessageJSON)
 {
     if (m_mqttSessionEstablished == false)
     {

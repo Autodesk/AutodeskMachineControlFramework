@@ -122,7 +122,7 @@ typedef LibMQTTResult (*PLibMQTTMQTTContext_DisconnectPtr) (LibMQTT_MQTTContext 
 * @param[in] pMessageJSON - Message in JSON format.
 * @return error code or 0 (success)
 */
-typedef LibMQTTResult (*PLibMQTTMQTTContext_SendMessagePtr) (LibMQTT_MQTTContext pMQTTContext, const char * pMessageJSON);
+typedef LibMQTTResult (*PLibMQTTMQTTContext_SendMQTTMessagePtr) (LibMQTT_MQTTContext pMQTTContext, const char * pMessageJSON);
 
 /*************************************************************************************************************************
  Global functions
@@ -197,7 +197,7 @@ typedef struct {
 	PLibMQTTMQTTContext_SetMqttMessagePtr m_MQTTContext_SetMqttMessage;
 	PLibMQTTMQTTContext_ConnectPtr m_MQTTContext_Connect;
 	PLibMQTTMQTTContext_DisconnectPtr m_MQTTContext_Disconnect;
-	PLibMQTTMQTTContext_SendMessagePtr m_MQTTContext_SendMessage;
+	PLibMQTTMQTTContext_SendMQTTMessagePtr m_MQTTContext_SendMQTTMessage;
 	PLibMQTTGetVersionPtr m_GetVersion;
 	PLibMQTTGetLastErrorPtr m_GetLastError;
 	PLibMQTTReleaseInstancePtr m_ReleaseInstance;

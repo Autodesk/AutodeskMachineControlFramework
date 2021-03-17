@@ -131,6 +131,6 @@ void CDriver_MQTT::SendMQTTMessage(const std::string & sMessageJSON)
     if (m_pMQTTContext.get() == nullptr)
         throw ELibMCDriver_MQTTInterfaceException(LIBMCDRIVER_MQTT_ERROR_NOTINITIZALIZED);
 
-    m_pMQTTContext->SendMessage(sMessageJSON);
+    m_pMQTTContext->SendMQTTMessage(sMessageJSON);
 }
 

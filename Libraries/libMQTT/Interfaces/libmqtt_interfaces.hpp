@@ -286,10 +286,10 @@ public:
 	virtual void Disconnect() = 0;
 
 	/**
-	* IMQTTContext::SendMessage - Sends an MQTT Message.
+	* IMQTTContext::SendMQTTMessage - Sends an MQTT Message.
 	* @param[in] sMessageJSON - Message in JSON format.
 	*/
-	virtual void SendMessage(const std::string & sMessageJSON) = 0;
+	virtual void SendMQTTMessage(const std::string & sMessageJSON) = 0;
 
 };
 

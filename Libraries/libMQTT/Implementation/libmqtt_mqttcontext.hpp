@@ -145,8 +145,7 @@ public:
 
 	void Disconnect() override;
 
-#undef SendMessage
-	void SendMessage(const std::string & sMessageJSON) override;
+	void SendMQTTMessage(const std::string & sMessageJSON) override;
 
 };
 
