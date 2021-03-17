@@ -76,7 +76,7 @@ void CDriver_MQTT::Configure(const std::string& sConfigurationString)
     m_pLibMQTTWrapper = LibMQTT::CWrapper::loadLibrary(m_pLibMQTTDLL->GetAbsoluteFileName ());
     m_pMQTTContext = m_pLibMQTTWrapper->CreateContext("");
 
-    std::string sIotEndPoint = "a149utcxzuxuzf-ats.iot.eu-west-1.amazonaws.com";
+    std::string sIotEndPoint = "";
     uint32_t nIotPort = 8883;
     std::string sClientName = "client";
     std::string sTopicName = "topic";
