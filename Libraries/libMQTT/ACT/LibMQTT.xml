@@ -88,7 +88,7 @@
 		<method name="Disconnect" description = "Disconnect a running MQTT connection">
 		</method>
 
-		<method name="SendMessage" description = "Sends an MQTT Message.">
+		<method name="SendMQTTMessage" description = "Sends an MQTT Message.">
 			<param name="MessageJSON" type="string" pass="in" description="Message in JSON format." />		
 		</method>
 
