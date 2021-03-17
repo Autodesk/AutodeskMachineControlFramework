@@ -1561,6 +1561,40 @@ LibMCEnvResult libmcenv_workingdirectory_storecustomdata(LibMCEnv_WorkingDirecto
 	}
 }
 
+LibMCEnvResult libmcenv_workingdirectory_storecustomstring(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pFileName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sFileName(pFileName);
+		std::string sDataString(pDataString);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->StoreCustomString(sFileName, sDataString);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_workingdirectory_storedriverdata(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile)
 {
 	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
@@ -4592,6 +4626,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_getabsolutefilepath;
 	if (sProcName == "libmcenv_workingdirectory_storecustomdata") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomdata;
+	if (sProcName == "libmcenv_workingdirectory_storecustomstring") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomstring;
 	if (sProcName == "libmcenv_workingdirectory_storedriverdata") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storedriverdata;
 	if (sProcName == "libmcenv_workingdirectory_cleanup") 

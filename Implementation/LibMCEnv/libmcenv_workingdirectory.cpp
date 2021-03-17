@@ -99,9 +99,22 @@ IWorkingFile * CWorkingDirectory::StoreCustomData(const std::string & sFileName,
         pStream->writeBuffer(pDataBufferBuffer, nDataBufferBufferSize);
     pStream.reset();
 
-
     return new CWorkingFile (sFileName, m_pWorkingFileMonitor);
 }
+
+
+IWorkingFile* CWorkingDirectory::StoreCustomString(const std::string& sFileName, const std::string& sDataString)
+{
+    std::string sAbsoluteFileName = m_pWorkingFileMonitor->getAbsoluteFileName(sFileName);
+    m_pWorkingFileMonitor->addNewMonitoredFile(sFileName);
+
+    auto pStream = std::make_unique<AMCCommon::CExportStream_Native>(sAbsoluteFileName);
+    if (sDataString.length () > 0)
+        pStream->writeBuffer(sDataString.c_str (), sDataString.length ());
+    pStream.reset();
+
+}
+
 
 IWorkingFile * CWorkingDirectory::StoreDriverData(const std::string & sFileName, const std::string & sIdentifier)
 {

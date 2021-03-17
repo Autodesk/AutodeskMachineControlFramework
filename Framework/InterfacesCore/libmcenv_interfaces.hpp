@@ -605,6 +605,14 @@ public:
 	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
 
 	/**
+	* IWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomString(const std::string & sFileName, const std::string & sDataString) = 0;
+
+	/**
 	* IWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.

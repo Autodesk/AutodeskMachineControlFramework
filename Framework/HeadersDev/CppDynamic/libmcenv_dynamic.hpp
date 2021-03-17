@@ -544,6 +544,7 @@ public:
 	inline bool IsActive();
 	inline std::string GetAbsoluteFilePath();
 	inline PWorkingFile StoreCustomData(const std::string & sFileName, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PWorkingFile StoreCustomString(const std::string & sFileName, const std::string & sDataString);
 	inline PWorkingFile StoreDriverData(const std::string & sFileName, const std::string & sIdentifier);
 	inline bool CleanUp();
 	inline PWorkingFile AddManagedFile(const std::string & sFileName);
@@ -838,6 +839,7 @@ public:
 		pWrapperTable->m_WorkingDirectory_IsActive = nullptr;
 		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreCustomData = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomString = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
 		pWrapperTable->m_WorkingDirectory_CleanUp = nullptr;
 		pWrapperTable->m_WorkingDirectory_AddManagedFile = nullptr;
@@ -1364,6 +1366,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_WorkingDirectory_StoreCustomData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomString = (PLibMCEnvWorkingDirectory_StoreCustomStringPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storecustomstring");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomString = (PLibMCEnvWorkingDirectory_StoreCustomStringPtr) dlsym(hLibrary, "libmcenv_workingdirectory_storecustomstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomString == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2391,6 +2402,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storecustomstring", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_workingdirectory_storedriverdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3373,6 +3388,23 @@ public:
 	{
 		LibMCEnvHandle hWorkingFile = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomData(m_pHandle, sFileName.c_str(), (LibMCEnv_uint64)DataBufferBuffer.size(), DataBufferBuffer.data(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomString(const std::string & sFileName, const std::string & sDataString)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomString(m_pHandle, sFileName.c_str(), sDataString.c_str(), &hWorkingFile));
 		
 		if (!hWorkingFile) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

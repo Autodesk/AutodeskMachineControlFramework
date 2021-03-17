@@ -523,6 +523,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_getabsolutefilepath(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomdata(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
 
 /**
+* Stores a string in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] pDataString - file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomstring(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
 * Stores attached driver data in a temporary file.
 *
 * @param[in] pWorkingDirectory - WorkingDirectory instance.

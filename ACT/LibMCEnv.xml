@@ -309,6 +309,12 @@
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
 		</method>
 
+		<method name="StoreCustomString" description = "Stores a string in a temporary file.">
+			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="DataString" type="string" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
 		<method name="StoreDriverData" description = "Stores attached driver data in a temporary file.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
