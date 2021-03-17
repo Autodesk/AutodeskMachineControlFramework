@@ -402,6 +402,7 @@ public:
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
 	inline void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK);
+	inline void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed);
 	inline LibMCDriver_ScanLab_uint32 GetInputPointer();
 	inline void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion);
 };
@@ -621,6 +622,7 @@ public:
 		pWrapperTable->m_RTCContext_GetCorrectionFactor = nullptr;
 		pWrapperTable->m_RTCContext_GetStatus = nullptr;
 		pWrapperTable->m_RTCContext_GetHeadStatus = nullptr;
+		pWrapperTable->m_RTCContext_GetStateValues = nullptr;
 		pWrapperTable->m_RTCContext_GetInputPointer = nullptr;
 		pWrapperTable->m_RTCContext_GetRTCVersion = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
@@ -970,6 +972,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RTCContext_GetHeadStatus == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetStateValues = (PLibMCDriver_ScanLabRTCContext_GetStateValuesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getstatevalues");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetStateValues = (PLibMCDriver_ScanLabRTCContext_GetStateValuesPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getstatevalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetStateValues == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1326,6 +1337,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getheadstatus", (void**)&(pWrapperTable->m_RTCContext_GetHeadStatus));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetHeadStatus == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getstatevalues", (void**)&(pWrapperTable->m_RTCContext_GetStateValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetStateValues == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getinputpointer", (void**)&(pWrapperTable->m_RTCContext_GetInputPointer));
@@ -1787,6 +1802,23 @@ public:
 	void CRTCContext::GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetHeadStatus(m_pHandle, nHeadNo, &bPositionXisOK, &bPositionYisOK, &bTemperatureisOK, &bPowerisOK));
+	}
+	
+	/**
+	* CRTCContext::GetStateValues - Returns status values of scan head
+	* @param[out] bLaserIsOn - Laser is on
+	* @param[out] nPositionX - Current Position X in Units
+	* @param[out] nPositionY - Current Position Y in Units
+	* @param[out] nPositionZ - Current Position Z in Units
+	* @param[out] nCorrectedPositionX - Current Position X in Units
+	* @param[out] nCorrectedPositionY - Current Position Y in Units
+	* @param[out] nCorrectedPositionZ - Current Position Z in Units
+	* @param[out] nFocusShift - Current Focus Shift in Units
+	* @param[out] nMarkSpeed - Current Mark Speed in Units
+	*/
+	void CRTCContext::GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetStateValues(m_pHandle, &bLaserIsOn, &nPositionX, &nPositionY, &nPositionZ, &nCorrectedPositionX, &nCorrectedPositionY, &nCorrectedPositionZ, &nFocusShift, &nMarkSpeed));
 	}
 	
 	/**

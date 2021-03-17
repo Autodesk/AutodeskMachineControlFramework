@@ -168,6 +168,118 @@ template <class T1, class T2, class T3, class T4, class T5> class ParameterCache
 		}
 };
 
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7> class ParameterCache_7 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+	public:
+		ParameterCache_7 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8> class ParameterCache_8 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+		T8 m_param8;
+	public:
+		ParameterCache_8 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7, const T8 & param8)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7), m_param8 (param8)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7, T8 & param8)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
+			param8 = m_param8;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9> class ParameterCache_9 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+		T8 m_param8;
+		T9 m_param9;
+	public:
+		ParameterCache_9 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7, const T8 & param8, const T9 & param9)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7), m_param8 (param8), m_param9 (param9)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7, T8 & param8, T9 & param9)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
+			param8 = m_param8;
+			param9 = m_param9;
+		}
+};
+
 
 /*************************************************************************************************************************
  Class interface for Base 
@@ -527,6 +639,20 @@ public:
 	* @param[out] bPowerisOK - Power is ok
 	*/
 	virtual void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK) = 0;
+
+	/**
+	* IRTCContext::GetStateValues - Returns status values of scan head
+	* @param[out] bLaserIsOn - Laser is on
+	* @param[out] nPositionX - Current Position X in Units
+	* @param[out] nPositionY - Current Position Y in Units
+	* @param[out] nPositionZ - Current Position Z in Units
+	* @param[out] nCorrectedPositionX - Current Position X in Units
+	* @param[out] nCorrectedPositionY - Current Position Y in Units
+	* @param[out] nCorrectedPositionZ - Current Position Z in Units
+	* @param[out] nFocusShift - Current Focus Shift in Units
+	* @param[out] nMarkSpeed - Current Mark Speed in Units
+	*/
+	virtual void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed) = 0;
 
 	/**
 	* IRTCContext::GetInputPointer - returns current input list position

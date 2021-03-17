@@ -478,3 +478,15 @@ void CRTCContext::GetRTCVersion(LibMCDriver_ScanLab_uint32& nRTCVersion, LibMCDr
 	nHEXVersion = m_pScanLabSDK->n_get_hex_version(m_CardNo);
 }
 
+void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_uint32& nPositionX, LibMCDriver_ScanLab_uint32& nPositionY, LibMCDriver_ScanLab_uint32& nPositionZ, LibMCDriver_ScanLab_uint32& nCorrectedPositionX, LibMCDriver_ScanLab_uint32& nCorrectedPositionY, LibMCDriver_ScanLab_uint32& nCorrectedPositionZ, LibMCDriver_ScanLab_uint32& nFocusShift, LibMCDriver_ScanLab_uint32& nMarkSpeed)
+{
+	bLaserIsOn = m_pScanLabSDK->n_get_value(m_CardNo, 0); // LASERON
+	nPositionX = m_pScanLabSDK->n_get_value(m_CardNo, 7); // SampleX
+	nPositionY = m_pScanLabSDK->n_get_value(m_CardNo, 8); // SampleY
+	nPositionZ = m_pScanLabSDK->n_get_value(m_CardNo, 9); // SampleZ
+	nCorrectedPositionX = m_pScanLabSDK->n_get_value(m_CardNo, 10); // SampleXCorr
+	nCorrectedPositionY = m_pScanLabSDK->n_get_value(m_CardNo, 11); // SampleYCorr
+	nCorrectedPositionZ = m_pScanLabSDK->n_get_value(m_CardNo, 12); // SampleZCorr
+	nFocusShift = m_pScanLabSDK->n_get_value(m_CardNo, 32); // Focus shift
+	nMarkSpeed = m_pScanLabSDK->n_get_value(m_CardNo, 45); // Mark Speed
+}

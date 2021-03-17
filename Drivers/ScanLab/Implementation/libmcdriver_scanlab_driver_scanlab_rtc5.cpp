@@ -295,6 +295,22 @@ void CDriver_ScanLab_RTC5::updateCardStatus()
     m_pDriverEnvironment->SetIntegerParameter("list_position", ListPosition);
     m_pDriverEnvironment->SetBoolParameter("card_busy", Busy);
 
+    bool bLaserIsOn;
+    uint32_t nPositionX, nPositionY, nPositionZ;
+    uint32_t nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ;
+    uint32_t nFocusShift, nMarkSpeed;
+
+    m_pRTCContext->GetStateValues(bLaserIsOn, nPositionX, nPositionY, nPositionZ, nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ, nFocusShift, nMarkSpeed);
+    m_pDriverEnvironment->SetBoolParameter("laser_on", bLaserIsOn);
+    m_pDriverEnvironment->SetIntegerParameter("position_x", nPositionX);
+    m_pDriverEnvironment->SetIntegerParameter("position_y", nPositionY);
+    m_pDriverEnvironment->SetIntegerParameter("position_z", nPositionZ);
+    m_pDriverEnvironment->SetIntegerParameter("position_x_corrected", nCorrectedPositionX);
+    m_pDriverEnvironment->SetIntegerParameter("position_y_corrected", nCorrectedPositionY);
+    m_pDriverEnvironment->SetIntegerParameter("position_z_corrected", nCorrectedPositionZ);
+    m_pDriverEnvironment->SetIntegerParameter("focus_shift", nFocusShift);
+    m_pDriverEnvironment->SetIntegerParameter("mark_speed", nMarkSpeed);
+
 
 }
 

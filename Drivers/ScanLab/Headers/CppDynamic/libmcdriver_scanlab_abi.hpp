@@ -399,6 +399,23 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getheadstatus(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nHeadNo, bool * pPositionXisOK, bool * pPositionYisOK, bool * pTemperatureisOK, bool * pPowerisOK);
 
 /**
+* Returns status values of scan head
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pLaserIsOn - Laser is on
+* @param[out] pPositionX - Current Position X in Units
+* @param[out] pPositionY - Current Position Y in Units
+* @param[out] pPositionZ - Current Position Z in Units
+* @param[out] pCorrectedPositionX - Current Position X in Units
+* @param[out] pCorrectedPositionY - Current Position Y in Units
+* @param[out] pCorrectedPositionZ - Current Position Z in Units
+* @param[out] pFocusShift - Current Focus Shift in Units
+* @param[out] pMarkSpeed - Current Mark Speed in Units
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getstatevalues(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserIsOn, LibMCDriver_ScanLab_uint32 * pPositionX, LibMCDriver_ScanLab_uint32 * pPositionY, LibMCDriver_ScanLab_uint32 * pPositionZ, LibMCDriver_ScanLab_uint32 * pCorrectedPositionX, LibMCDriver_ScanLab_uint32 * pCorrectedPositionY, LibMCDriver_ScanLab_uint32 * pCorrectedPositionZ, LibMCDriver_ScanLab_uint32 * pFocusShift, LibMCDriver_ScanLab_uint32 * pMarkSpeed);
+
+/**
 * returns current input list position
 *
 * @param[in] pRTCContext - RTCContext instance.

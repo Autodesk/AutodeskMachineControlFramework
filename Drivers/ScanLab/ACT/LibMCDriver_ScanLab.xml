@@ -310,6 +310,17 @@ Custom implementation
 			<param name="PowerisOK" type="bool" pass="out" description="Power is ok" />
 		</method>
 
+		<method name="GetStateValues" description="Returns status values of scan head">
+			<param name="LaserIsOn" type="bool" pass="out" description="Laser is on" />
+			<param name="PositionX" type="uint32" pass="out" description="Current Position X in Units" />
+			<param name="PositionY" type="uint32" pass="out" description="Current Position Y in Units" />
+			<param name="PositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
+			<param name="CorrectedPositionX" type="uint32" pass="out" description="Current Position X in Units" />
+			<param name="CorrectedPositionY" type="uint32" pass="out" description="Current Position Y in Units" />
+			<param name="CorrectedPositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
+			<param name="FocusShift" type="uint32" pass="out" description="Current Focus Shift in Units" />
+			<param name="MarkSpeed" type="uint32" pass="out" description="Current Mark Speed in Units" />
+		</method>
 
 		<method name="GetInputPointer" description="returns current input list position">
 			<param name="Position" type="uint32" pass="return" description="Returns current position of open list" />
