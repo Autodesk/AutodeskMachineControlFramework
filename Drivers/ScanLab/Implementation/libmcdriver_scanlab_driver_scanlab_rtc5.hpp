@@ -41,19 +41,23 @@ private:
 	std::string m_sName; 
 	std::string m_sType;
 
+	float m_fMaxLaserPowerInWatts;
+
 	std::shared_ptr<IRTCSelector> m_pRTCSelector;
 	std::shared_ptr<IRTCContext> m_pRTCContext;
 
 	void internalBegin();
 	void internalExecute();
-	void internalJumpTo(double dXInMM, double dYInMM, double dSpeedInMM);
-	void internalMarkTo(double dXInMM, double dYInMM, double dSpeedInMM);
+
+	void updateCardStatus();
 
 protected:
 
 public:
 
 	CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+	void Configure(const std::string& sConfigurationString) override;
 
 	std::string GetName() override;
 
@@ -65,8 +69,10 @@ public:
 
 	void LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource) override;
 
-	void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
+	void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) override;
 
+	void ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) override;
+	
 	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) override;
 
 };

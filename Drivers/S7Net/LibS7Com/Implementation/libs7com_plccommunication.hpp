@@ -64,48 +64,73 @@ private:
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+	uint32_t m_nPLCtoAMC_Size;
+	uint32_t m_nAMCtoPLC_Size;
+	uint32_t m_nPLCtoAMC_DBNo;
+	uint32_t m_nAMCtoPLC_DBNo;
+	uint32_t m_nMajorVersion;
+	uint32_t m_nMinorVersion;
+	uint32_t m_nPatchVersion;
+	LibS7Net::PPLC m_pPLC;
+
+	uint32_t m_nCmdCycleCounter;
+
+	LibS7Com_uint32 m_nAMCtoPLC_MajorVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_MinorVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_PatchVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_BuildVersionAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_CommandSequenceAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_CommandIDAddress;
+	LibS7Com_uint32 m_nAMCtoPLC_CommandChecksumAddress;
+
+	LibS7Com_uint32 m_nPLCtoAMC_MajorVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_MinorVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_PatchVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_BuildVersionAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceRunningAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceFinishedAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceStatusAddress;
+	LibS7Com_uint32 m_nPLCtoAMC_SequenceErrorAddress;
+
+	std::vector<uint8_t> m_PLCRecvBuffer;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CPLCCommunication ();
 
+	void SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size) override;
 
-	/**
-	* Public member functions to implement.
-	*/
+	void SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress) override;
 
-	void SetProtocolConfiguration(const std::string& sProtocolConfiguration) override;
+	void SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress) override;
 
 	void StartCommunication(LibS7Net::PPLC pPLC) override;
 
+	void RetrieveStatus() override;
+
 	void StopCommunication() override;
 
-	void GetStatus() override;
+	LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID) override;
 
-	std::string LoadProgram(const std::string & sProgram) override;
+	void CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool& bSequenceIsActive, bool& bSequenceIsFinished, LibS7Com_uint32& nErrorCode) override;
 
-	void ExecuteProgram(const std::string & sIdentifier) override;
+	std::string ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength) override;
 
-	void ClearPrograms() override;
+	bool ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit) override;
 
-	LibS7Com_uint32 GetVariableCount() override;
+	LibS7Com_uint8 ReadVariableByte(const LibS7Com_uint32 nAddress) override;
 
-	std::string GetVariableName(const LibS7Com_uint32 nIndex) override;
+	LibS7Com_int32 ReadVariableInt32(const LibS7Com_uint32 nAddress) override;
 
-	LibS7Com::eVariableType GetVariableType(const LibS7Com_uint32 nIndex) override;
+	LibS7Com_uint32 ReadVariableUint32(const LibS7Com_uint32 nAddress) override;
 
-	std::string GetVariableString(const LibS7Com_uint32 nIndex) override;
+	LibS7Com_int16 ReadVariableInt16(const LibS7Com_uint32 nAddress) override;
 
-	bool GetVariableBool(const LibS7Com_uint32 nIndex) override;
+	LibS7Com_uint16 ReadVariableUint16(const LibS7Com_uint32 nAddress) override;
 
-	LibS7Com_int64 GetVariableInteger(const LibS7Com_uint32 nIndex) override;
+	LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress) override;
 
-	LibS7Com_double GetVariableDouble(const LibS7Com_uint32 nIndex) override;
+	LibS7Com_double ReadVariableLReal(const LibS7Com_uint32 nAddress) override;
 
 };
 

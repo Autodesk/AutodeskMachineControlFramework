@@ -83,6 +83,33 @@ LibMCDriver_DuetResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_DuetResult libmcdriver_duet_driver_configure(LibMCDriver_Duet_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_DUET_SUCCESS;
+	}
+	catch (ELibMCDriver_DuetInterfaceException & Exception) {
+		return handleLibMCDriver_DuetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_DuetResult libmcdriver_duet_driver_getname(LibMCDriver_Duet_Driver pDriver, const LibMCDriver_Duet_uint32 nNameBufferSize, LibMCDriver_Duet_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -826,6 +853,8 @@ LibMCDriver_DuetResult LibMCDriver_Duet::Impl::LibMCDriver_Duet_GetProcAddress (
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_duet_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_duet_driver_configure;
 	if (sProcName == "libmcdriver_duet_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_getname;
 	if (sProcName == "libmcdriver_duet_driver_gettype") 

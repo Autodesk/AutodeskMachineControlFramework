@@ -83,6 +83,33 @@ LibMCDriver_MarlinResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_configure(LibMCDriver_Marlin_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_MarlinResult libmcdriver_marlin_driver_getname(LibMCDriver_Marlin_Driver pDriver, const LibMCDriver_Marlin_uint32 nNameBufferSize, LibMCDriver_Marlin_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -1146,6 +1173,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_marlin_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_configure;
 	if (sProcName == "libmcdriver_marlin_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getname;
 	if (sProcName == "libmcdriver_marlin_driver_gettype") 

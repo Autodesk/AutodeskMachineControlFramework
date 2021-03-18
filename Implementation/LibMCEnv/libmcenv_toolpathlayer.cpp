@@ -88,16 +88,24 @@ LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint3
 			return sProfile.m_dLaserSpeed;
 		case LibMCEnv::eToolpathProfileValueType::LaserPower:
 			return sProfile.m_dLaserPower;
+		case LibMCEnv::eToolpathProfileValueType::LaserFocus:
+			return sProfile.m_dLaserFocus;
 		case LibMCEnv::eToolpathProfileValueType::JumpSpeed:
-			return 0.0;
+			return sProfile.m_dJumpSpeed;
 		case LibMCEnv::eToolpathProfileValueType::ExtrusionFactor:
-			return 0.0;
+			return sProfile.m_dExtrusionFactor;
 		case LibMCEnv::eToolpathProfileValueType::StartDelay:
-			return 0.0;
+			return sProfile.m_dStartDelay;
 		case LibMCEnv::eToolpathProfileValueType::EndDelay:
-			return 0.0;
+			return sProfile.m_dEndDelay;
 		case LibMCEnv::eToolpathProfileValueType::PolyDelay:
-			return 0.0;
+			return sProfile.m_dPolyDelay;
+		case LibMCEnv::eToolpathProfileValueType::JumpDelay:
+			return sProfile.m_dJumpDelay;
+		case LibMCEnv::eToolpathProfileValueType::LaserOnDelay:
+			return sProfile.m_dLaserOnDelay;
+		case LibMCEnv::eToolpathProfileValueType::LaserOffDelay:
+			return sProfile.m_dLaserOffDelay;
 		default:
 			return 0.0;
 	}

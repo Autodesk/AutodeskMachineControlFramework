@@ -39,6 +39,7 @@ Interface version: 3.1.3
 #include "libs7com_abi.hpp"
 #include "libs7com_interfaces.hpp"
 #include "libs7com_interfaceexception.hpp"
+#include "libs7com_plccommunication.hpp"
 
 using namespace LibS7Com;
 using namespace LibS7Com::Impl;
@@ -74,7 +75,7 @@ void CWrapper::ReleaseInstance(IBase* pInstance)
 
 IPLCCommunication * CWrapper::CreatePLCCommunication()
 {
-	throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+	return new CPLCCommunication();
 }
 
 

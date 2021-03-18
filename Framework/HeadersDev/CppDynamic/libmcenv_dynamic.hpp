@@ -544,6 +544,7 @@ public:
 	inline bool IsActive();
 	inline std::string GetAbsoluteFilePath();
 	inline PWorkingFile StoreCustomData(const std::string & sFileName, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PWorkingFile StoreCustomString(const std::string & sFileName, const std::string & sDataString);
 	inline PWorkingFile StoreDriverData(const std::string & sFileName, const std::string & sIdentifier);
 	inline bool CleanUp();
 	inline PWorkingFile AddManagedFile(const std::string & sFileName);
@@ -580,6 +581,8 @@ public:
 	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue);
 	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue);
 	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void Sleep(const LibMCEnv_uint32 nDelay);
+	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 };
 	
 /*************************************************************************************************************************
@@ -682,6 +685,7 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
+	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -835,6 +839,7 @@ public:
 		pWrapperTable->m_WorkingDirectory_IsActive = nullptr;
 		pWrapperTable->m_WorkingDirectory_GetAbsoluteFilePath = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreCustomData = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomString = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
 		pWrapperTable->m_WorkingDirectory_CleanUp = nullptr;
 		pWrapperTable->m_WorkingDirectory_AddManagedFile = nullptr;
@@ -855,6 +860,8 @@ public:
 		pWrapperTable->m_DriverEnvironment_SetDoubleParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetIntegerParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
+		pWrapperTable->m_DriverEnvironment_Sleep = nullptr;
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -909,6 +916,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -1361,6 +1369,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomString = (PLibMCEnvWorkingDirectory_StoreCustomStringPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storecustomstring");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomString = (PLibMCEnvWorkingDirectory_StoreCustomStringPtr) dlsym(hLibrary, "libmcenv_workingdirectory_storecustomstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = (PLibMCEnvWorkingDirectory_StoreDriverDataPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storedriverdata");
 		#else // _WIN32
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = (PLibMCEnvWorkingDirectory_StoreDriverDataPtr) dlsym(hLibrary, "libmcenv_workingdirectory_storedriverdata");
@@ -1538,6 +1555,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_sleep");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_Sleep = (PLibMCEnvDriverEnvironment_SleepPtr) dlsym(hLibrary, "libmcenv_driverenvironment_sleep");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_Sleep == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_driverenvironment_getglobaltimerinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2027,6 +2062,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceData = (PLibMCEnvStateEnvironment_LoadResourceDataPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -2358,6 +2402,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storecustomstring", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomString == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_workingdirectory_storedriverdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2436,6 +2484,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_setboolparameter", (void**)&(pWrapperTable->m_DriverEnvironment_SetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_sleep", (void**)&(pWrapperTable->m_DriverEnvironment_Sleep));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
@@ -2652,6 +2708,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_getboolparameter", (void**)&(pWrapperTable->m_StateEnvironment_GetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
@@ -3336,6 +3396,23 @@ public:
 	}
 	
 	/**
+	* CWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomString(const std::string & sFileName, const std::string & sDataString)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomString(m_pHandle, sFileName.c_str(), sDataString.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
 	* CWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
@@ -3589,6 +3666,27 @@ public:
 	void CDriverEnvironment::SetBoolParameter(const std::string & sParameterName, const bool bValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CDriverEnvironment::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_Sleep(m_pHandle, nDelay));
+	}
+	
+	/**
+	* CDriverEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
 	}
 	
 	/**
@@ -4271,6 +4369,20 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetBoolParameter(m_pHandle, sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
+	}
+	
+	/**
+	* CStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[out] ResourceDataBuffer - Resource Data Buffer.
+	*/
+	void CStateEnvironment::LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededResourceData = 0;
+		LibMCEnv_uint64 elementsWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
+		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
 	}
 	
 	/**

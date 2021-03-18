@@ -53,6 +53,15 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_ConfigurePtr) (LibMCDriver_S7Net_Driver pDriver, const char * pConfigurationString);
+
+/**
 * returns the name identifier of the driver
 *
 * @param[in] pDriver - Driver instance.
@@ -111,6 +120,10 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_GetHeaderInformationP
 typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_QueryParametersPtr) (LibMCDriver_S7Net_Driver pDriver);
 
 /*************************************************************************************************************************
+ Class definition for PLCCommand
+**************************************************************************************************************************/
+
+/*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/
 
@@ -118,9 +131,13 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_QueryParametersPtr) (
 * Creates and initializes a new S7 PLC.
 *
 * @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] eCPUType - S7 CPU Type
+* @param[in] pIPAddress - PLC IP Address
+* @param[in] nRack - Rack Number
+* @param[in] nSlot - Slot Number
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ConnectPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ConnectPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net::eS7CPUType eCPUType, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot);
 
 /**
 * Disconnects from the S7 PLC.
@@ -129,6 +146,37 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ConnectPtr) (Li
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_DisconnectPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+
+/**
+* Create Command
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pCommand - Command to execute
+* @param[out] pPLCCommand - Command instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_CreateCommandPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pCommand, LibMCDriver_S7Net_PLCCommand * pPLCCommand);
+
+/**
+* Execute Command
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pPLCCommand - Command instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_ExecuteCommandPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net_PLCCommand pPLCCommand);
+
+/**
+* Wait for Command to finish executing
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pPLCCommand - Command instance
+* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+* @param[out] pCommandSuccess - Returns true if the command was finished successfully.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_S7Net_WaitForCommandPtr) (LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net_PLCCommand pPLCCommand, LibMCDriver_S7Net_uint32 nReactionTimeInMS, LibMCDriver_S7Net_uint32 nWaitForTimeInMS, bool * pCommandSuccess);
 
 /*************************************************************************************************************************
  Global functions
@@ -206,6 +254,7 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetCreateDriverPtr) (const char
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_S7NetDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_S7NetDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_S7NetDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_S7NetDriver_GetVersionPtr m_Driver_GetVersion;
@@ -213,6 +262,9 @@ typedef struct {
 	PLibMCDriver_S7NetDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_S7NetDriver_S7Net_ConnectPtr m_Driver_S7Net_Connect;
 	PLibMCDriver_S7NetDriver_S7Net_DisconnectPtr m_Driver_S7Net_Disconnect;
+	PLibMCDriver_S7NetDriver_S7Net_CreateCommandPtr m_Driver_S7Net_CreateCommand;
+	PLibMCDriver_S7NetDriver_S7Net_ExecuteCommandPtr m_Driver_S7Net_ExecuteCommand;
+	PLibMCDriver_S7NetDriver_S7Net_WaitForCommandPtr m_Driver_S7Net_WaitForCommand;
 	PLibMCDriver_S7NetGetVersionPtr m_GetVersion;
 	PLibMCDriver_S7NetGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_S7NetReleaseInstancePtr m_ReleaseInstance;

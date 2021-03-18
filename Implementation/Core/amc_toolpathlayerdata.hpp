@@ -56,6 +56,14 @@ namespace AMC {
 		double m_dLaserSpeed;
 		double m_dLaserPower;
 		double m_dLaserFocus;
+		double m_dJumpSpeed;
+		double m_dExtrusionFactor;
+		double m_dStartDelay;
+		double m_dEndDelay;
+		double m_dPolyDelay;
+		double m_dJumpDelay;
+		double m_dLaserOnDelay;
+		double m_dLaserOffDelay;
 	} sToolpathLayerProfile;
 
 

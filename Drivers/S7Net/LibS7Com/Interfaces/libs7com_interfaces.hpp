@@ -245,9 +245,40 @@ class IPLCCommunication : public virtual IBase {
 public:
 	/**
 	* IPLCCommunication::SetProtocolConfiguration - Configures the protocol
-	* @param[in] sProtocolConfiguration - Configuration XML as string.
+	* @param[in] nMajorVersion - Major Protocol Version
+	* @param[in] nMinorVersion - Minor Protocol Version
+	* @param[in] nPatchVersion - Patch Protocol Version
+	* @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
+	* @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
+	* @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
+	* @param[in] nAMCtoPLC_Size - Size of AMC to PLC protocol buffer.
 	*/
-	virtual void SetProtocolConfiguration(const std::string & sProtocolConfiguration) = 0;
+	virtual void SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size) = 0;
+
+	/**
+	* IPLCCommunication::SetAMCTOPLCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nCommandSequenceAddress - Command Sequence Address
+	* @param[in] nCommandIDAddress - Command ID Address
+	* @param[in] nCommandChecksumAddress - Command Checksum Address
+	*/
+	virtual void SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress) = 0;
+
+	/**
+	* IPLCCommunication::SetPLCToAMCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nSequenceRunningAddress - Sequence Running Address
+	* @param[in] nSequenceFinishedAddress - Sequence Finished Address
+	* @param[in] nSequenceStatusAddress - Sequence Status Address
+	* @param[in] nSequenceErrorAddress - Sequence Error Address
+	*/
+	virtual void SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress) = 0;
 
 	/**
 	* IPLCCommunication::StartCommunication - Starts communication with the S7 PLC Instance
@@ -256,80 +287,95 @@ public:
 	virtual void StartCommunication(LibS7Net::PPLC pPLC) = 0;
 
 	/**
+	* IPLCCommunication::RetrieveStatus - Retrieves the status of the PLC
+	*/
+	virtual void RetrieveStatus() = 0;
+
+	/**
 	* IPLCCommunication::StopCommunication - Stops communication with the S7 PLC Instance
 	*/
 	virtual void StopCommunication() = 0;
 
 	/**
-	* IPLCCommunication::GetStatus - Returns the status of the PLC
+	* IPLCCommunication::ExecuteCommand - Executes a command
+	* @param[in] nCommandID - ID of command to be triggered.
+	* @return Sequence ID of the executed command.
 	*/
-	virtual void GetStatus() = 0;
+	virtual LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID) = 0;
 
 	/**
-	* IPLCCommunication::LoadProgram - Loads a GCode Program on the PLC
-	* @param[in] sProgram - GCode Program to send.
-	* @return Program identifier.
+	* IPLCCommunication::CheckCommandExecution - Checks the command execution state.
+	* @param[in] nSequenceID - Sequence ID of the executed command.
+	* @param[out] bSequenceIsActive - Returns if the sequence is active.
+	* @param[out] bSequenceIsFinished - Returns if the sequence is finished.
+	* @param[out] nErrorCode - Current error code if sequence is active and not yet finished.
 	*/
-	virtual std::string LoadProgram(const std::string & sProgram) = 0;
+	virtual void CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool & bSequenceIsActive, bool & bSequenceIsFinished, LibS7Com_uint32 & nErrorCode) = 0;
 
 	/**
-	* IPLCCommunication::ExecuteProgram - Executes a GCode Program on the PLC
-	* @param[in] sIdentifier - Program identifier.
-	*/
-	virtual void ExecuteProgram(const std::string & sIdentifier) = 0;
-
-	/**
-	* IPLCCommunication::ClearPrograms - Clears loaded programs
-	*/
-	virtual void ClearPrograms() = 0;
-
-	/**
-	* IPLCCommunication::GetVariableCount - Returns number of reported variables.
-	* @return Number of variables.
-	*/
-	virtual LibS7Com_uint32 GetVariableCount() = 0;
-
-	/**
-	* IPLCCommunication::GetVariableName - Returns name of variable.
-	* @param[in] nIndex - Index of variable (0-based).
-	* @return Name of variable.
-	*/
-	virtual std::string GetVariableName(const LibS7Com_uint32 nIndex) = 0;
-
-	/**
-	* IPLCCommunication::GetVariableType - Returns type of variable.
-	* @param[in] nIndex - Index of variable (0-based).
-	* @return Type of variable.
-	*/
-	virtual LibS7Com::eVariableType GetVariableType(const LibS7Com_uint32 nIndex) = 0;
-
-	/**
-	* IPLCCommunication::GetVariableString - Returns value of string variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* IPLCCommunication::ReadVariableString - Returns value of string variable.
+	* @param[in] nAddress - Address of String Variable.
+	* @param[in] nMaxLength - Maximum length.
 	* @return Value of variable.
 	*/
-	virtual std::string GetVariableString(const LibS7Com_uint32 nIndex) = 0;
+	virtual std::string ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength) = 0;
 
 	/**
-	* IPLCCommunication::GetVariableBool - Returns value of bool variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* IPLCCommunication::ReadVariableBool - Returns value of bool variable.
+	* @param[in] nAddress - Address of Bit Variable.
+	* @param[in] nBit - Bit of the variable (0-7)
 	* @return Value of variable.
 	*/
-	virtual bool GetVariableBool(const LibS7Com_uint32 nIndex) = 0;
+	virtual bool ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit) = 0;
 
 	/**
-	* IPLCCommunication::GetVariableInteger - Returns value of bool variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* IPLCCommunication::ReadVariableByte - Returns value of byte variable.
+	* @param[in] nAddress - Address of Bit Variable.
 	* @return Value of variable.
 	*/
-	virtual LibS7Com_int64 GetVariableInteger(const LibS7Com_uint32 nIndex) = 0;
+	virtual LibS7Com_uint8 ReadVariableByte(const LibS7Com_uint32 nAddress) = 0;
 
 	/**
-	* IPLCCommunication::GetVariableDouble - Returns value of double variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* IPLCCommunication::ReadVariableInt16 - Returns value of Int16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
 	* @return Value of variable.
 	*/
-	virtual LibS7Com_double GetVariableDouble(const LibS7Com_uint32 nIndex) = 0;
+	virtual LibS7Com_int16 ReadVariableInt16(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
+	* IPLCCommunication::ReadVariableUint16 - Returns value of Uint16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_uint16 ReadVariableUint16(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
+	* IPLCCommunication::ReadVariableInt32 - Returns value of Int32 variable.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_int32 ReadVariableInt32(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
+	* IPLCCommunication::ReadVariableUint32 - Returns value of Uint32 variable.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_uint32 ReadVariableUint32(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
+	* IPLCCommunication::ReadVariableReal - Returns value of single precision variable.
+	* @param[in] nAddress - Address of Real Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress) = 0;
+
+	/**
+	* IPLCCommunication::ReadVariableLReal - Returns value of double precision variable.
+	* @param[in] nAddress - Address of Real Variable.
+	* @return Value of variable.
+	*/
+	virtual LibS7Com_double ReadVariableLReal(const LibS7Com_uint32 nAddress) = 0;
 
 };
 

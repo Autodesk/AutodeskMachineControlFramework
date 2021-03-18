@@ -143,6 +143,10 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDTHREADCOUNT);
         m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t)nMaxThreadCount);
 
+        auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
+        m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native>(sCoreResourcePath);
+        m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
 
 
         m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -171,10 +175,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEPLUGIN);
         auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string());
 
-        auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
-        m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-        auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native>(sCoreResourcePath);
-        m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
+        m_pSystemState->logger()->logMessage("Loading UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
         m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
 
         m_pStateJournal->startRecording();
@@ -233,8 +234,16 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
     
     m_pSystemState->logger()->logMessage("Initializing " + sName + " (" + sType + "@" + sLibraryName + ")", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
+    std::string sConfigurationData = "";
+    auto configAttrib = xmlNode.attribute("configurationresource");
+    if (!configAttrib.empty()) {
+        std::vector<uint8_t> Buffer;
+        m_pCoreResourcePackage->readEntry(configAttrib.as_string(), Buffer);
+        sConfigurationData.assign(Buffer.begin (), Buffer.end ());
+    }
+
     try {
-        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName));
+        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName), sConfigurationData);
     } 
     catch (std::exception & E) {
         m_pSystemState->logger()->logMessage(std::string ("Driver error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);

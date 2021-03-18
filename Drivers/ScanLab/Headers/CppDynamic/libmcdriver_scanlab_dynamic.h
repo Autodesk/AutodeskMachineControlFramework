@@ -53,6 +53,15 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ConfigurePtr) (LibMCDriver_ScanLab_Driver pDriver, const char * pConfigurationString);
+
+/**
 * returns the name identifier of the driver
 *
 * @param[in] pDriver - Driver instance.
@@ -168,13 +177,27 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_ConfigureList
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserModePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort);
 
 /**
-* Sets laser control of card.
+* Disables automatic laser control.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] bEnableLaser - Laser is enabled
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bEnableLaser);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Sets laser control parameters of card.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] bDisableLaser - Laser is disabled
+* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+* @param[in] bOutputSynchronizationActive - Output synchronization active
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool bDisableLaser, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
 * Sets laser control pulse interval (in 1/64th microseconds)
@@ -302,9 +325,10 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetLaserDelay
 * @param[in] fMarkSpeed - Mark speed in mm/s
 * @param[in] fJumpSpeed - Mark speed in mm/s
 * @param[in] fPower - Laser power in percent
+* @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylinePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylinePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
 
 /**
 * Writes a list of hatches into the open list
@@ -315,9 +339,10 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawPolylineP
 * @param[in] fMarkSpeed - Mark speed in mm/s
 * @param[in] fJumpSpeed - Mark speed in mm/s
 * @param[in] fPower - Laser power in percent
+* @param[in] fZValue - Focus Z Value
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DrawHatchesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, LibMCDriver_ScanLab_single fMarkSpeed, LibMCDriver_ScanLab_single fJumpSpeed, LibMCDriver_ScanLab_single fPower, LibMCDriver_ScanLab_single fZValue);
 
 /**
 * Adds a custom delay to the list
@@ -348,6 +373,36 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCorrection
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetStatusPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pBusy, LibMCDriver_ScanLab_uint32 * pPosition);
 
 /**
+* Returns status of scan head
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nHeadNo - Head Number
+* @param[out] pPositionXisOK - Position X is ok
+* @param[out] pPositionYisOK - Position Y is ok
+* @param[out] pTemperatureisOK - Temperature is ok
+* @param[out] pPowerisOK - Power is ok
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetHeadStatusPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 nHeadNo, bool * pPositionXisOK, bool * pPositionYisOK, bool * pTemperatureisOK, bool * pPowerisOK);
+
+/**
+* Returns status values of scan head
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pLaserIsOn - Laser is on
+* @param[out] pPositionX - Current Position X in Units
+* @param[out] pPositionY - Current Position Y in Units
+* @param[out] pPositionZ - Current Position Z in Units
+* @param[out] pCorrectedPositionX - Current Position X in Units
+* @param[out] pCorrectedPositionY - Current Position Y in Units
+* @param[out] pCorrectedPositionZ - Current Position Z in Units
+* @param[out] pFocusShift - Current Focus Shift in Units
+* @param[out] pMarkSpeed - Current Mark Speed in Units
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetStateValuesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserIsOn, LibMCDriver_ScanLab_uint32 * pPositionX, LibMCDriver_ScanLab_uint32 * pPositionY, LibMCDriver_ScanLab_uint32 * pPositionZ, LibMCDriver_ScanLab_uint32 * pCorrectedPositionX, LibMCDriver_ScanLab_uint32 * pCorrectedPositionY, LibMCDriver_ScanLab_uint32 * pCorrectedPositionZ, LibMCDriver_ScanLab_uint32 * pFocusShift, LibMCDriver_ScanLab_uint32 * pMarkSpeed);
+
+/**
 * returns current input list position
 *
 * @param[in] pRTCContext - RTCContext instance.
@@ -355,6 +410,19 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetStatusPtr)
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetInputPointerPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pPosition);
+
+/**
+* Returns version information of the RTC Card
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pRTCVersion - RTC Card Version
+* @param[out] pRTCType - RTC Card Type
+* @param[out] pDLLVersion - RTC DLL Version
+* @param[out] pHEXVersion - RTC HEX Version
+* @param[out] pBIOSVersion - RTC BIOS Version
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pRTCVersion, LibMCDriver_ScanLab_uint32 * pRTCType, LibMCDriver_ScanLab_uint32 * pDLLVersion, LibMCDriver_ScanLab_uint32 * pHEXVersion, LibMCDriver_ScanLab_uint32 * pBIOSVersion);
 
 /*************************************************************************************************************************
  Class definition for RTCSelector
@@ -499,9 +567,28 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_Load
 * @param[in] pCorrectionFileBuffer - uint8 buffer of binary data of the correction file.
 * @param[in] nTableNumber - Correction table index of card (1..8)
 * @param[in] nDimension - Is it a 2D or 3D correction file.
+* @param[in] nTableNumberHeadA - Table number of Head A.
+* @param[in] nTableNumberHeadB - Table number of Head B.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, LibMCDriver_ScanLab_uint32 nTableNumber, LibMCDriver_ScanLab_uint32 nDimension, LibMCDriver_ScanLab_uint32 nTableNumberHeadA, LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
+
+/**
+* Configures the laser mode.
+*
+* @param[in] pDriver_ScanLab_RTC5 - Driver_ScanLab_RTC5 instance.
+* @param[in] eLaserMode - Laser Mode Enum
+* @param[in] eLaserPort - Laser Port Enum
+* @param[in] dMaxLaserPower - Maximum laser power.
+* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+* @param[in] bOutputSynchronizationActive - Output synchronization active
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC5 pDriver_ScanLab_RTC5, LibMCDriver_ScanLab::eLaserMode eLaserMode, LibMCDriver_ScanLab::eLaserPort eLaserPort, LibMCDriver_ScanLab_double dMaxLaserPower, bool bFinishLaserPulseAfterOn, bool bPhaseShiftOfLaserSignal, bool bLaserOnSignalLowActive, bool bLaserHalfSignalsLowActive, bool bSetDigitalInOneHighActive, bool bOutputSynchronizationActive);
 
 /**
 * Draws a layer of a build stream. Blocks until the layer is drawn.
@@ -589,6 +676,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabCreateDriverPtr) (const 
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_ScanLabDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_ScanLabDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_ScanLabDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_ScanLabDriver_GetVersionPtr m_Driver_GetVersion;
@@ -599,7 +687,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_SelectCorrectionTablePtr m_RTCContext_SelectCorrectionTable;
 	PLibMCDriver_ScanLabRTCContext_ConfigureListsPtr m_RTCContext_ConfigureLists;
 	PLibMCDriver_ScanLabRTCContext_SetLaserModePtr m_RTCContext_SetLaserMode;
-	PLibMCDriver_ScanLabRTCContext_SetLaserControlPtr m_RTCContext_SetLaserControl;
+	PLibMCDriver_ScanLabRTCContext_DisableAutoLaserControlPtr m_RTCContext_DisableAutoLaserControl;
+	PLibMCDriver_ScanLabRTCContext_SetLaserControlParametersPtr m_RTCContext_SetLaserControlParameters;
 	PLibMCDriver_ScanLabRTCContext_SetLaserPulsesInBitsPtr m_RTCContext_SetLaserPulsesInBits;
 	PLibMCDriver_ScanLabRTCContext_SetLaserPulsesInMicroSecondsPtr m_RTCContext_SetLaserPulsesInMicroSeconds;
 	PLibMCDriver_ScanLabRTCContext_SetStandbyInBitsPtr m_RTCContext_SetStandbyInBits;
@@ -617,7 +706,10 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_AddCustomDelayPtr m_RTCContext_AddCustomDelay;
 	PLibMCDriver_ScanLabRTCContext_GetCorrectionFactorPtr m_RTCContext_GetCorrectionFactor;
 	PLibMCDriver_ScanLabRTCContext_GetStatusPtr m_RTCContext_GetStatus;
+	PLibMCDriver_ScanLabRTCContext_GetHeadStatusPtr m_RTCContext_GetHeadStatus;
+	PLibMCDriver_ScanLabRTCContext_GetStateValuesPtr m_RTCContext_GetStateValues;
 	PLibMCDriver_ScanLabRTCContext_GetInputPointerPtr m_RTCContext_GetInputPointer;
+	PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr m_RTCContext_GetRTCVersion;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;
@@ -631,6 +723,7 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_InitialisePtr m_Driver_ScanLab_RTC5_Initialise;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_LoadFirmwarePtr m_Driver_ScanLab_RTC5_LoadFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_SetCorrectionFilePtr m_Driver_ScanLab_RTC5_SetCorrectionFile;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_ConfigureLaserModePtr m_Driver_ScanLab_RTC5_ConfigureLaserMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC5_DrawLayerPtr m_Driver_ScanLab_RTC5_DrawLayer;
 	PLibMCDriver_ScanLabGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabGetLastErrorPtr m_GetLastError;

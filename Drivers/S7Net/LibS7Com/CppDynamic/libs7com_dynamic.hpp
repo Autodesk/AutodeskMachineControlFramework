@@ -335,20 +335,23 @@ public:
 	{
 	}
 	
-	inline void SetProtocolConfiguration(const std::string & sProtocolConfiguration);
+	inline void SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size);
+	inline void SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress);
+	inline void SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress);
 	inline void StartCommunication(classParam<LibS7Net::CPLC> pPLC);
+	inline void RetrieveStatus();
 	inline void StopCommunication();
-	inline void GetStatus();
-	inline std::string LoadProgram(const std::string & sProgram);
-	inline void ExecuteProgram(const std::string & sIdentifier);
-	inline void ClearPrograms();
-	inline LibS7Com_uint32 GetVariableCount();
-	inline std::string GetVariableName(const LibS7Com_uint32 nIndex);
-	inline eVariableType GetVariableType(const LibS7Com_uint32 nIndex);
-	inline std::string GetVariableString(const LibS7Com_uint32 nIndex);
-	inline bool GetVariableBool(const LibS7Com_uint32 nIndex);
-	inline LibS7Com_int64 GetVariableInteger(const LibS7Com_uint32 nIndex);
-	inline LibS7Com_double GetVariableDouble(const LibS7Com_uint32 nIndex);
+	inline LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID);
+	inline void CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool & bSequenceIsActive, bool & bSequenceIsFinished, LibS7Com_uint32 & nErrorCode);
+	inline std::string ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength);
+	inline bool ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit);
+	inline LibS7Com_uint8 ReadVariableByte(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_int16 ReadVariableInt16(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_uint16 ReadVariableUint16(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_int32 ReadVariableInt32(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_uint32 ReadVariableUint32(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_double ReadVariableReal(const LibS7Com_uint32 nAddress);
+	inline LibS7Com_double ReadVariableLReal(const LibS7Com_uint32 nAddress);
 };
 	
 	/**
@@ -469,19 +472,22 @@ public:
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
 		pWrapperTable->m_PLCCommunication_SetProtocolConfiguration = nullptr;
+		pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets = nullptr;
+		pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets = nullptr;
 		pWrapperTable->m_PLCCommunication_StartCommunication = nullptr;
+		pWrapperTable->m_PLCCommunication_RetrieveStatus = nullptr;
 		pWrapperTable->m_PLCCommunication_StopCommunication = nullptr;
-		pWrapperTable->m_PLCCommunication_GetStatus = nullptr;
-		pWrapperTable->m_PLCCommunication_LoadProgram = nullptr;
-		pWrapperTable->m_PLCCommunication_ExecuteProgram = nullptr;
-		pWrapperTable->m_PLCCommunication_ClearPrograms = nullptr;
-		pWrapperTable->m_PLCCommunication_GetVariableCount = nullptr;
-		pWrapperTable->m_PLCCommunication_GetVariableName = nullptr;
-		pWrapperTable->m_PLCCommunication_GetVariableType = nullptr;
-		pWrapperTable->m_PLCCommunication_GetVariableString = nullptr;
-		pWrapperTable->m_PLCCommunication_GetVariableBool = nullptr;
-		pWrapperTable->m_PLCCommunication_GetVariableInteger = nullptr;
-		pWrapperTable->m_PLCCommunication_GetVariableDouble = nullptr;
+		pWrapperTable->m_PLCCommunication_ExecuteCommand = nullptr;
+		pWrapperTable->m_PLCCommunication_CheckCommandExecution = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableString = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableBool = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableByte = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableInt16 = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableUint16 = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableInt32 = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableUint32 = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableReal = nullptr;
+		pWrapperTable->m_PLCCommunication_ReadVariableLReal = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_AcquireInstance = nullptr;
@@ -547,12 +553,39 @@ public:
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets = (PLibS7ComPLCCommunication_SetAMCTOPLCOffsetsPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_setamctoplcoffsets");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets = (PLibS7ComPLCCommunication_SetAMCTOPLCOffsetsPtr) dlsym(hLibrary, "libs7com_plccommunication_setamctoplcoffsets");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets = (PLibS7ComPLCCommunication_SetPLCToAMCOffsetsPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_setplctoamcoffsets");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets = (PLibS7ComPLCCommunication_SetPLCToAMCOffsetsPtr) dlsym(hLibrary, "libs7com_plccommunication_setplctoamcoffsets");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_PLCCommunication_StartCommunication = (PLibS7ComPLCCommunication_StartCommunicationPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_startcommunication");
 		#else // _WIN32
 		pWrapperTable->m_PLCCommunication_StartCommunication = (PLibS7ComPLCCommunication_StartCommunicationPtr) dlsym(hLibrary, "libs7com_plccommunication_startcommunication");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PLCCommunication_StartCommunication == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_RetrieveStatus = (PLibS7ComPLCCommunication_RetrieveStatusPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_retrievestatus");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_RetrieveStatus = (PLibS7ComPLCCommunication_RetrieveStatusPtr) dlsym(hLibrary, "libs7com_plccommunication_retrievestatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_RetrieveStatus == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -565,102 +598,102 @@ public:
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetStatus = (PLibS7ComPLCCommunication_GetStatusPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getstatus");
+		pWrapperTable->m_PLCCommunication_ExecuteCommand = (PLibS7ComPLCCommunication_ExecuteCommandPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_executecommand");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetStatus = (PLibS7ComPLCCommunication_GetStatusPtr) dlsym(hLibrary, "libs7com_plccommunication_getstatus");
+		pWrapperTable->m_PLCCommunication_ExecuteCommand = (PLibS7ComPLCCommunication_ExecuteCommandPtr) dlsym(hLibrary, "libs7com_plccommunication_executecommand");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetStatus == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ExecuteCommand == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_LoadProgram = (PLibS7ComPLCCommunication_LoadProgramPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_loadprogram");
+		pWrapperTable->m_PLCCommunication_CheckCommandExecution = (PLibS7ComPLCCommunication_CheckCommandExecutionPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_checkcommandexecution");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_LoadProgram = (PLibS7ComPLCCommunication_LoadProgramPtr) dlsym(hLibrary, "libs7com_plccommunication_loadprogram");
+		pWrapperTable->m_PLCCommunication_CheckCommandExecution = (PLibS7ComPLCCommunication_CheckCommandExecutionPtr) dlsym(hLibrary, "libs7com_plccommunication_checkcommandexecution");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_LoadProgram == nullptr)
+		if (pWrapperTable->m_PLCCommunication_CheckCommandExecution == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_ExecuteProgram = (PLibS7ComPLCCommunication_ExecuteProgramPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_executeprogram");
+		pWrapperTable->m_PLCCommunication_ReadVariableString = (PLibS7ComPLCCommunication_ReadVariableStringPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariablestring");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_ExecuteProgram = (PLibS7ComPLCCommunication_ExecuteProgramPtr) dlsym(hLibrary, "libs7com_plccommunication_executeprogram");
+		pWrapperTable->m_PLCCommunication_ReadVariableString = (PLibS7ComPLCCommunication_ReadVariableStringPtr) dlsym(hLibrary, "libs7com_plccommunication_readvariablestring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_ExecuteProgram == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableString == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_ClearPrograms = (PLibS7ComPLCCommunication_ClearProgramsPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_clearprograms");
+		pWrapperTable->m_PLCCommunication_ReadVariableBool = (PLibS7ComPLCCommunication_ReadVariableBoolPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariablebool");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_ClearPrograms = (PLibS7ComPLCCommunication_ClearProgramsPtr) dlsym(hLibrary, "libs7com_plccommunication_clearprograms");
+		pWrapperTable->m_PLCCommunication_ReadVariableBool = (PLibS7ComPLCCommunication_ReadVariableBoolPtr) dlsym(hLibrary, "libs7com_plccommunication_readvariablebool");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_ClearPrograms == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableBool == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableCount = (PLibS7ComPLCCommunication_GetVariableCountPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getvariablecount");
+		pWrapperTable->m_PLCCommunication_ReadVariableByte = (PLibS7ComPLCCommunication_ReadVariableBytePtr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariablebyte");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableCount = (PLibS7ComPLCCommunication_GetVariableCountPtr) dlsym(hLibrary, "libs7com_plccommunication_getvariablecount");
+		pWrapperTable->m_PLCCommunication_ReadVariableByte = (PLibS7ComPLCCommunication_ReadVariableBytePtr) dlsym(hLibrary, "libs7com_plccommunication_readvariablebyte");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetVariableCount == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableByte == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableName = (PLibS7ComPLCCommunication_GetVariableNamePtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getvariablename");
+		pWrapperTable->m_PLCCommunication_ReadVariableInt16 = (PLibS7ComPLCCommunication_ReadVariableInt16Ptr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariableint16");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableName = (PLibS7ComPLCCommunication_GetVariableNamePtr) dlsym(hLibrary, "libs7com_plccommunication_getvariablename");
+		pWrapperTable->m_PLCCommunication_ReadVariableInt16 = (PLibS7ComPLCCommunication_ReadVariableInt16Ptr) dlsym(hLibrary, "libs7com_plccommunication_readvariableint16");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetVariableName == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableInt16 == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableType = (PLibS7ComPLCCommunication_GetVariableTypePtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getvariabletype");
+		pWrapperTable->m_PLCCommunication_ReadVariableUint16 = (PLibS7ComPLCCommunication_ReadVariableUint16Ptr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariableuint16");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableType = (PLibS7ComPLCCommunication_GetVariableTypePtr) dlsym(hLibrary, "libs7com_plccommunication_getvariabletype");
+		pWrapperTable->m_PLCCommunication_ReadVariableUint16 = (PLibS7ComPLCCommunication_ReadVariableUint16Ptr) dlsym(hLibrary, "libs7com_plccommunication_readvariableuint16");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetVariableType == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableUint16 == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableString = (PLibS7ComPLCCommunication_GetVariableStringPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getvariablestring");
+		pWrapperTable->m_PLCCommunication_ReadVariableInt32 = (PLibS7ComPLCCommunication_ReadVariableInt32Ptr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariableint32");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableString = (PLibS7ComPLCCommunication_GetVariableStringPtr) dlsym(hLibrary, "libs7com_plccommunication_getvariablestring");
+		pWrapperTable->m_PLCCommunication_ReadVariableInt32 = (PLibS7ComPLCCommunication_ReadVariableInt32Ptr) dlsym(hLibrary, "libs7com_plccommunication_readvariableint32");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetVariableString == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableInt32 == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableBool = (PLibS7ComPLCCommunication_GetVariableBoolPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getvariablebool");
+		pWrapperTable->m_PLCCommunication_ReadVariableUint32 = (PLibS7ComPLCCommunication_ReadVariableUint32Ptr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariableuint32");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableBool = (PLibS7ComPLCCommunication_GetVariableBoolPtr) dlsym(hLibrary, "libs7com_plccommunication_getvariablebool");
+		pWrapperTable->m_PLCCommunication_ReadVariableUint32 = (PLibS7ComPLCCommunication_ReadVariableUint32Ptr) dlsym(hLibrary, "libs7com_plccommunication_readvariableuint32");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetVariableBool == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableUint32 == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableInteger = (PLibS7ComPLCCommunication_GetVariableIntegerPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getvariableinteger");
+		pWrapperTable->m_PLCCommunication_ReadVariableReal = (PLibS7ComPLCCommunication_ReadVariableRealPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariablereal");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableInteger = (PLibS7ComPLCCommunication_GetVariableIntegerPtr) dlsym(hLibrary, "libs7com_plccommunication_getvariableinteger");
+		pWrapperTable->m_PLCCommunication_ReadVariableReal = (PLibS7ComPLCCommunication_ReadVariableRealPtr) dlsym(hLibrary, "libs7com_plccommunication_readvariablereal");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetVariableInteger == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableReal == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableDouble = (PLibS7ComPLCCommunication_GetVariableDoublePtr) GetProcAddress(hLibrary, "libs7com_plccommunication_getvariabledouble");
+		pWrapperTable->m_PLCCommunication_ReadVariableLReal = (PLibS7ComPLCCommunication_ReadVariableLRealPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_readvariablelreal");
 		#else // _WIN32
-		pWrapperTable->m_PLCCommunication_GetVariableDouble = (PLibS7ComPLCCommunication_GetVariableDoublePtr) dlsym(hLibrary, "libs7com_plccommunication_getvariabledouble");
+		pWrapperTable->m_PLCCommunication_ReadVariableLReal = (PLibS7ComPLCCommunication_ReadVariableLRealPtr) dlsym(hLibrary, "libs7com_plccommunication_readvariablelreal");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommunication_GetVariableDouble == nullptr)
+		if (pWrapperTable->m_PLCCommunication_ReadVariableLReal == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -746,56 +779,68 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_SetProtocolConfiguration == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libs7com_plccommunication_setamctoplcoffsets", (void**)&(pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_plccommunication_setplctoamcoffsets", (void**)&(pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libs7com_plccommunication_startcommunication", (void**)&(pWrapperTable->m_PLCCommunication_StartCommunication));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_StartCommunication == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_plccommunication_retrievestatus", (void**)&(pWrapperTable->m_PLCCommunication_RetrieveStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_RetrieveStatus == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libs7com_plccommunication_stopcommunication", (void**)&(pWrapperTable->m_PLCCommunication_StopCommunication));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_StopCommunication == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getstatus", (void**)&(pWrapperTable->m_PLCCommunication_GetStatus));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetStatus == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_executecommand", (void**)&(pWrapperTable->m_PLCCommunication_ExecuteCommand));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ExecuteCommand == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_loadprogram", (void**)&(pWrapperTable->m_PLCCommunication_LoadProgram));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_LoadProgram == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_checkcommandexecution", (void**)&(pWrapperTable->m_PLCCommunication_CheckCommandExecution));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_CheckCommandExecution == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_executeprogram", (void**)&(pWrapperTable->m_PLCCommunication_ExecuteProgram));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ExecuteProgram == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablestring", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableString == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_clearprograms", (void**)&(pWrapperTable->m_PLCCommunication_ClearPrograms));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ClearPrograms == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablebool", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableBool));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableBool == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getvariablecount", (void**)&(pWrapperTable->m_PLCCommunication_GetVariableCount));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetVariableCount == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablebyte", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableByte));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableByte == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getvariablename", (void**)&(pWrapperTable->m_PLCCommunication_GetVariableName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetVariableName == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariableint16", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableInt16));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableInt16 == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getvariabletype", (void**)&(pWrapperTable->m_PLCCommunication_GetVariableType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetVariableType == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariableuint16", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableUint16));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableUint16 == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getvariablestring", (void**)&(pWrapperTable->m_PLCCommunication_GetVariableString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetVariableString == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariableint32", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableInt32));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableInt32 == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getvariablebool", (void**)&(pWrapperTable->m_PLCCommunication_GetVariableBool));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetVariableBool == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariableuint32", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableUint32));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableUint32 == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getvariableinteger", (void**)&(pWrapperTable->m_PLCCommunication_GetVariableInteger));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetVariableInteger == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablereal", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableReal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableReal == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libs7com_plccommunication_getvariabledouble", (void**)&(pWrapperTable->m_PLCCommunication_GetVariableDouble));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_GetVariableDouble == nullptr) )
+		eLookupError = (*pLookup)("libs7com_plccommunication_readvariablelreal", (void**)&(pWrapperTable->m_PLCCommunication_ReadVariableLReal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_ReadVariableLReal == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libs7com_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -841,11 +886,48 @@ public:
 	
 	/**
 	* CPLCCommunication::SetProtocolConfiguration - Configures the protocol
-	* @param[in] sProtocolConfiguration - Configuration XML as string.
+	* @param[in] nMajorVersion - Major Protocol Version
+	* @param[in] nMinorVersion - Minor Protocol Version
+	* @param[in] nPatchVersion - Patch Protocol Version
+	* @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
+	* @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
+	* @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
+	* @param[in] nAMCtoPLC_Size - Size of AMC to PLC protocol buffer.
 	*/
-	void CPLCCommunication::SetProtocolConfiguration(const std::string & sProtocolConfiguration)
+	void CPLCCommunication::SetProtocolConfiguration(const LibS7Com_uint32 nMajorVersion, const LibS7Com_uint32 nMinorVersion, const LibS7Com_uint32 nPatchVersion, const LibS7Com_uint32 nPLCtoAMC_DBNo, const LibS7Com_uint32 nPLCtoAMC_Size, const LibS7Com_uint32 nAMCtoPLC_DBNo, const LibS7Com_uint32 nAMCtoPLC_Size)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetProtocolConfiguration(m_pHandle, sProtocolConfiguration.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetProtocolConfiguration(m_pHandle, nMajorVersion, nMinorVersion, nPatchVersion, nPLCtoAMC_DBNo, nPLCtoAMC_Size, nAMCtoPLC_DBNo, nAMCtoPLC_Size));
+	}
+	
+	/**
+	* CPLCCommunication::SetAMCTOPLCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nCommandSequenceAddress - Command Sequence Address
+	* @param[in] nCommandIDAddress - Command ID Address
+	* @param[in] nCommandChecksumAddress - Command Checksum Address
+	*/
+	void CPLCCommunication::SetAMCTOPLCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nCommandSequenceAddress, const LibS7Com_uint32 nCommandIDAddress, const LibS7Com_uint32 nCommandChecksumAddress)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetAMCTOPLCOffsets(m_pHandle, nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nCommandSequenceAddress, nCommandIDAddress, nCommandChecksumAddress));
+	}
+	
+	/**
+	* CPLCCommunication::SetPLCToAMCOffsets - Configures the command offsets
+	* @param[in] nMajorVersionAddress - Major Protocol Version Address
+	* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+	* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+	* @param[in] nBuildVersionAddress - Build Protocol Version Address
+	* @param[in] nSequenceRunningAddress - Sequence Running Address
+	* @param[in] nSequenceFinishedAddress - Sequence Finished Address
+	* @param[in] nSequenceStatusAddress - Sequence Status Address
+	* @param[in] nSequenceErrorAddress - Sequence Error Address
+	*/
+	void CPLCCommunication::SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_SetPLCToAMCOffsets(m_pHandle, nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nSequenceRunningAddress, nSequenceFinishedAddress, nSequenceStatusAddress, nSequenceErrorAddress));
 	}
 	
 	/**
@@ -859,6 +941,14 @@ public:
 	}
 	
 	/**
+	* CPLCCommunication::RetrieveStatus - Retrieves the status of the PLC
+	*/
+	void CPLCCommunication::RetrieveStatus()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_RetrieveStatus(m_pHandle));
+	}
+	
+	/**
 	* CPLCCommunication::StopCommunication - Stops communication with the S7 PLC Instance
 	*/
 	void CPLCCommunication::StopCommunication()
@@ -867,138 +957,148 @@ public:
 	}
 	
 	/**
-	* CPLCCommunication::GetStatus - Returns the status of the PLC
+	* CPLCCommunication::ExecuteCommand - Executes a command
+	* @param[in] nCommandID - ID of command to be triggered.
+	* @return Sequence ID of the executed command.
 	*/
-	void CPLCCommunication::GetStatus()
+	LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommandID)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetStatus(m_pHandle));
-	}
-	
-	/**
-	* CPLCCommunication::LoadProgram - Loads a GCode Program on the PLC
-	* @param[in] sProgram - GCode Program to send.
-	* @return Program identifier.
-	*/
-	std::string CPLCCommunication::LoadProgram(const std::string & sProgram)
-	{
-		LibS7Com_uint32 bytesNeededIdentifier = 0;
-		LibS7Com_uint32 bytesWrittenIdentifier = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_LoadProgram(m_pHandle, sProgram.c_str(), 0, &bytesNeededIdentifier, nullptr));
-		std::vector<char> bufferIdentifier(bytesNeededIdentifier);
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_LoadProgram(m_pHandle, sProgram.c_str(), bytesNeededIdentifier, &bytesWrittenIdentifier, &bufferIdentifier[0]));
+		LibS7Com_uint32 resultSequenceID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ExecuteCommand(m_pHandle, nCommandID, &resultSequenceID));
 		
-		return std::string(&bufferIdentifier[0]);
+		return resultSequenceID;
 	}
 	
 	/**
-	* CPLCCommunication::ExecuteProgram - Executes a GCode Program on the PLC
-	* @param[in] sIdentifier - Program identifier.
+	* CPLCCommunication::CheckCommandExecution - Checks the command execution state.
+	* @param[in] nSequenceID - Sequence ID of the executed command.
+	* @param[out] bSequenceIsActive - Returns if the sequence is active.
+	* @param[out] bSequenceIsFinished - Returns if the sequence is finished.
+	* @param[out] nErrorCode - Current error code if sequence is active and not yet finished.
 	*/
-	void CPLCCommunication::ExecuteProgram(const std::string & sIdentifier)
+	void CPLCCommunication::CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool & bSequenceIsActive, bool & bSequenceIsFinished, LibS7Com_uint32 & nErrorCode)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ExecuteProgram(m_pHandle, sIdentifier.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_CheckCommandExecution(m_pHandle, nSequenceID, &bSequenceIsActive, &bSequenceIsFinished, &nErrorCode));
 	}
 	
 	/**
-	* CPLCCommunication::ClearPrograms - Clears loaded programs
-	*/
-	void CPLCCommunication::ClearPrograms()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ClearPrograms(m_pHandle));
-	}
-	
-	/**
-	* CPLCCommunication::GetVariableCount - Returns number of reported variables.
-	* @return Number of variables.
-	*/
-	LibS7Com_uint32 CPLCCommunication::GetVariableCount()
-	{
-		LibS7Com_uint32 resultCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableCount(m_pHandle, &resultCount));
-		
-		return resultCount;
-	}
-	
-	/**
-	* CPLCCommunication::GetVariableName - Returns name of variable.
-	* @param[in] nIndex - Index of variable (0-based).
-	* @return Name of variable.
-	*/
-	std::string CPLCCommunication::GetVariableName(const LibS7Com_uint32 nIndex)
-	{
-		LibS7Com_uint32 bytesNeededName = 0;
-		LibS7Com_uint32 bytesWrittenName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableName(m_pHandle, nIndex, 0, &bytesNeededName, nullptr));
-		std::vector<char> bufferName(bytesNeededName);
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableName(m_pHandle, nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0]));
-		
-		return std::string(&bufferName[0]);
-	}
-	
-	/**
-	* CPLCCommunication::GetVariableType - Returns type of variable.
-	* @param[in] nIndex - Index of variable (0-based).
-	* @return Type of variable.
-	*/
-	eVariableType CPLCCommunication::GetVariableType(const LibS7Com_uint32 nIndex)
-	{
-		eVariableType resultVariableType = (eVariableType) 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableType(m_pHandle, nIndex, &resultVariableType));
-		
-		return resultVariableType;
-	}
-	
-	/**
-	* CPLCCommunication::GetVariableString - Returns value of string variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* CPLCCommunication::ReadVariableString - Returns value of string variable.
+	* @param[in] nAddress - Address of String Variable.
+	* @param[in] nMaxLength - Maximum length.
 	* @return Value of variable.
 	*/
-	std::string CPLCCommunication::GetVariableString(const LibS7Com_uint32 nIndex)
+	std::string CPLCCommunication::ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength)
 	{
 		LibS7Com_uint32 bytesNeededValue = 0;
 		LibS7Com_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableString(m_pHandle, nIndex, 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableString(m_pHandle, nAddress, nMaxLength, 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableString(m_pHandle, nIndex, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableString(m_pHandle, nAddress, nMaxLength, bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
-	* CPLCCommunication::GetVariableBool - Returns value of bool variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* CPLCCommunication::ReadVariableBool - Returns value of bool variable.
+	* @param[in] nAddress - Address of Bit Variable.
+	* @param[in] nBit - Bit of the variable (0-7)
 	* @return Value of variable.
 	*/
-	bool CPLCCommunication::GetVariableBool(const LibS7Com_uint32 nIndex)
+	bool CPLCCommunication::ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit)
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableBool(m_pHandle, nIndex, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableBool(m_pHandle, nAddress, nBit, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
-	* CPLCCommunication::GetVariableInteger - Returns value of bool variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* CPLCCommunication::ReadVariableByte - Returns value of byte variable.
+	* @param[in] nAddress - Address of Bit Variable.
 	* @return Value of variable.
 	*/
-	LibS7Com_int64 CPLCCommunication::GetVariableInteger(const LibS7Com_uint32 nIndex)
+	LibS7Com_uint8 CPLCCommunication::ReadVariableByte(const LibS7Com_uint32 nAddress)
 	{
-		LibS7Com_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableInteger(m_pHandle, nIndex, &resultValue));
+		LibS7Com_uint8 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableByte(m_pHandle, nAddress, &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
-	* CPLCCommunication::GetVariableDouble - Returns value of double variable.
-	* @param[in] nIndex - Index of variable (0-based).
+	* CPLCCommunication::ReadVariableInt16 - Returns value of Int16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
 	* @return Value of variable.
 	*/
-	LibS7Com_double CPLCCommunication::GetVariableDouble(const LibS7Com_uint32 nIndex)
+	LibS7Com_int16 CPLCCommunication::ReadVariableInt16(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_int16 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableInt16(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CPLCCommunication::ReadVariableUint16 - Returns value of Uint16 variable.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_uint16 CPLCCommunication::ReadVariableUint16(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_uint16 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableUint16(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CPLCCommunication::ReadVariableInt32 - Returns value of Int32 variable.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_int32 CPLCCommunication::ReadVariableInt32(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_int32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableInt32(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CPLCCommunication::ReadVariableUint32 - Returns value of Uint32 variable.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_uint32 CPLCCommunication::ReadVariableUint32(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_uint32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableUint32(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CPLCCommunication::ReadVariableReal - Returns value of single precision variable.
+	* @param[in] nAddress - Address of Real Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_double CPLCCommunication::ReadVariableReal(const LibS7Com_uint32 nAddress)
 	{
 		LibS7Com_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_GetVariableDouble(m_pHandle, nIndex, &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableReal(m_pHandle, nAddress, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CPLCCommunication::ReadVariableLReal - Returns value of double precision variable.
+	* @param[in] nAddress - Address of Real Variable.
+	* @return Value of variable.
+	*/
+	LibS7Com_double CPLCCommunication::ReadVariableLReal(const LibS7Com_uint32 nAddress)
+	{
+		LibS7Com_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ReadVariableLReal(m_pHandle, nAddress, &resultValue));
 		
 		return resultValue;
 	}

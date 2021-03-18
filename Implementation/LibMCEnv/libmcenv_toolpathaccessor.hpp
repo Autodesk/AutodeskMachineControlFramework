@@ -60,6 +60,7 @@ protected:
 
 	std::string m_sStorageUUID;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	double m_dDefaultJumpSpeed;
 
 
 public:

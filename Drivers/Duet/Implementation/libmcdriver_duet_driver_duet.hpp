@@ -81,6 +81,8 @@ public:
 	* Public member functions to implement.
 	*/
 
+	void Configure(const std::string& sConfigurationString) override;
+
 	void Connect(const std::string & sCOMPort, const LibMCDriver_Duet_uint32 nBaudrate, const LibMCDriver_Duet_double dStatusUpdateInterval, const LibMCDriver_Duet_uint32 nConnectTimeout) override;
 
 	void Disconnect() override;
