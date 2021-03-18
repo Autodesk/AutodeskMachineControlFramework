@@ -113,6 +113,7 @@ IWorkingFile* CWorkingDirectory::StoreCustomString(const std::string& sFileName,
         pStream->writeBuffer(sDataString.c_str (), sDataString.length ());
     pStream.reset();
 
+    return new CWorkingFile(sFileName, m_pWorkingFileMonitor);
 }
 
 
