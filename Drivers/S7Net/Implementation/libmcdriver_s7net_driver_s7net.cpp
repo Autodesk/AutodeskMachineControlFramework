@@ -452,6 +452,26 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
 
         auto pS7Command = std::make_shared<CDriver_S7Command>(sName, nCmdID);
 
+        auto commandParamNodes = commandNode.children("parameter");
+        for (pugi::xml_node commandParamNode : commandParamNodes) {
+            auto paramNameAttrib = commandParamNode.attribute("name");
+            auto paramDescriptionAttrib = commandParamNode.attribute("description");
+            auto paramFieldAttrib = commandParamNode.attribute("field");
+
+            std::string sParamName = paramNameAttrib.as_string();
+            std::string sParamDescription = paramDescriptionAttrib.as_string();
+            std::string sParamField = paramFieldAttrib.as_string();
+
+            if (sParamName.empty ())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNAMEMISSING);
+            if (sParamDescription.empty())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERDESCRIPTIONMISSING);
+            if (sParamField.empty())
+                throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERFIELDMISSING);
+
+        }
+
+
         m_CommandDefinitions.insert(std::make_pair(sName, pS7Command));
     }
 

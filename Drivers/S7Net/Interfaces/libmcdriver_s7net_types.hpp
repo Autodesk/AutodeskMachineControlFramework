@@ -150,6 +150,9 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_FIELDISNOSTRINGPARAM 1042
 #define LIBMCDRIVER_S7NET_ERROR_NOLENGTHATTRIBUTE 1043
 #define LIBMCDRIVER_S7NET_ERROR_INVALIDLENGTHATTRIBUTE 1044
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNAMEMISSING 1045
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERDESCRIPTIONMISSING 1046
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERFIELDMISSING 1047
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -212,6 +215,9 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_FIELDISNOSTRINGPARAM: return "field is no string parameter";
     case LIBMCDRIVER_S7NET_ERROR_NOLENGTHATTRIBUTE: return "no length attribute";
     case LIBMCDRIVER_S7NET_ERROR_INVALIDLENGTHATTRIBUTE: return "invalid length attribute";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNAMEMISSING: return "command parameter name missing";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERDESCRIPTIONMISSING: return "command parameter description missing";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERFIELDMISSING: return "command parameter field missing";
     default: return "unknown error";
   }
 }

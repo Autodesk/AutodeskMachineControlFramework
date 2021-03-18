@@ -101,7 +101,9 @@
 		<error name="NOLENGTHATTRIBUTE" code="1043" description="no length attribute" />
 		<error name="INVALIDLENGTHATTRIBUTE" code="1044" description="invalid length attribute" />
 		
-		
+		<error name="COMMANDPARAMETERNAMEMISSING" code="1045" description="command parameter name missing" />
+		<error name="COMMANDPARAMETERDESCRIPTIONMISSING" code="1046" description="command parameter description missing" />
+		<error name="COMMANDPARAMETERFIELDMISSING" code="1047" description="command parameter field missing" />
 		
 	</errors>
 
