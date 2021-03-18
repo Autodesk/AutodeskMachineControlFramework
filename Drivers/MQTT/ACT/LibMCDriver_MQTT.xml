@@ -51,8 +51,22 @@
 		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />	
-		<error name="NOTINITIZALIZED" code="1001" description="mqtt driver not initialized" />	
-
+		<error name="NOTINITIALIZED" code="1001" description="mqtt driver not initialized" />	
+		<error name="INVALIDMQTTCONFIG" code="1002" description="invalid mqtt config" />	
+		<error name="IOTENDPOINTMISSING" code="1003" description="iot end point missing" />	
+		<error name="IOTENDPOINTURLMISSING" code="1004" description="iot end point url missing" />	
+		<error name="IOTENDPOINTPORTMISSING" code="1005" description="iot end point port missing" />	
+		<error name="INVALIDIOTENDPOINT" code="1006" description="invalid iot end point" />	
+		<error name="IOTENDPOINTCERTIFICATEMISSING" code="1007" description="iot endpoint certificate missing" />	
+		<error name="CLIENTMISSING" code="1008" description="client missing" />	
+		<error name="CLIENTNAMEMISSING" code="1009" description="client name missing" />	
+		<error name="CLIENTTOPICMISSING" code="1010" description="client topic missing" />	
+		<error name="INVALIDCLIENTNAME" code="1011" description="invalid client name" />	
+		<error name="INVALIDCLIENTTOPIC" code="1012" description="invalid client topic" />	
+		<error name="CLIENTCERTIFICATEMISSING" code="1013" description="client certificate missing" />	
+		<error name="CLIENTPRIVATEKEYMISSING" code="1014" description="client private key missing" />	
+		<error name="COULDNOTPARSEMQTTCONFIG" code="1015" description="could not parse mqtt config" />	
+				
 	</errors>
 
 
