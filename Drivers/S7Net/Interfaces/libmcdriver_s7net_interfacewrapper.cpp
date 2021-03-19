@@ -348,6 +348,117 @@ LibMCDriver_S7NetResult libmcdriver_s7net_driver_queryparameters(LibMCDriver_S7N
 /*************************************************************************************************************************
  Class implementation for PLCCommand
 **************************************************************************************************************************/
+LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setintegerparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_S7Net_int32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetIntegerParameter(sParameterName, nValue);
+
+		return LIBMCDRIVER_S7NET_SUCCESS;
+	}
+	catch (ELibMCDriver_S7NetInterfaceException & Exception) {
+		return handleLibMCDriver_S7NetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setstringparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sValue(pValue);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetStringParameter(sParameterName, sValue);
+
+		return LIBMCDRIVER_S7NET_SUCCESS;
+	}
+	catch (ELibMCDriver_S7NetInterfaceException & Exception) {
+		return handleLibMCDriver_S7NetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setboolparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetBoolParameter(sParameterName, bValue);
+
+		return LIBMCDRIVER_S7NET_SUCCESS;
+	}
+	catch (ELibMCDriver_S7NetInterfaceException & Exception) {
+		return handleLibMCDriver_S7NetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setdoubleparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_S7Net_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetDoubleParameter(sParameterName, dValue);
+
+		return LIBMCDRIVER_S7NET_SUCCESS;
+	}
+	catch (ELibMCDriver_S7NetInterfaceException & Exception) {
+		return handleLibMCDriver_S7NetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_S7Net
@@ -521,6 +632,14 @@ LibMCDriver_S7NetResult LibMCDriver_S7Net::Impl::LibMCDriver_S7Net_GetProcAddres
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_s7net_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_queryparameters;
+	if (sProcName == "libmcdriver_s7net_plccommand_setintegerparameter") 
+		*ppProcAddress = (void*) &libmcdriver_s7net_plccommand_setintegerparameter;
+	if (sProcName == "libmcdriver_s7net_plccommand_setstringparameter") 
+		*ppProcAddress = (void*) &libmcdriver_s7net_plccommand_setstringparameter;
+	if (sProcName == "libmcdriver_s7net_plccommand_setboolparameter") 
+		*ppProcAddress = (void*) &libmcdriver_s7net_plccommand_setboolparameter;
+	if (sProcName == "libmcdriver_s7net_plccommand_setdoubleparameter") 
+		*ppProcAddress = (void*) &libmcdriver_s7net_plccommand_setdoubleparameter;
 	if (sProcName == "libmcdriver_s7net_driver_s7net_connect") 
 		*ppProcAddress = (void*) &libmcdriver_s7net_driver_s7net_connect;
 	if (sProcName == "libmcdriver_s7net_driver_s7net_disconnect") 

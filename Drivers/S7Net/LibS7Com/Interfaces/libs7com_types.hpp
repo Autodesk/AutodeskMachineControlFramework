@@ -153,6 +153,7 @@ inline const char * LIBS7COM_GETERRORSTRING (LibS7ComResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibS7ComHandle LibS7Com_Base;
+typedef LibS7ComHandle LibS7Com_CommandParameters;
 typedef LibS7ComHandle LibS7Com_PLCCommunication;
 
 namespace LibS7Com {

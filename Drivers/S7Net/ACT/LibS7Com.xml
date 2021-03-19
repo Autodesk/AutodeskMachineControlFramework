@@ -68,6 +68,57 @@
 	<class name="Base">
 	</class>
 	
+	<class name="CommandParameters" parent="Base">
+	
+		<method name="WriteString" description="Writes string value.">
+			<param name="Address" type="uint32" pass="in" description="Address of String Variable." />
+			<param name="MaxLength" type="uint32" pass="in" description="Maximum length." />
+			<param name="Value" type="string" pass="in" description="Value of variable." />
+		</method>
+						
+		<method name="WriteBool" description="Writes bool value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Bit" type="uint32" pass="in" description="Bit of the variable (0-7)" />
+			<param name="Value" type="bool" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteByte" description="Writes byte value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Value" type="uint8" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteInt16" description="Writes Int16 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="int16" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteUint16" description="Writes Uint16 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="uint16" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteInt32" description="Writes Int32 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="int32" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteUint32" description="Writes Uint32 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="uint32" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteReal" description="Writes Real value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteLReal" description="Writes LReal value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="in" description="Value of variable." />
+		</method>
+	</class>
+	
+	
 	<class name="PLCCommunication" parent="Base">
 
 		<method name="SetProtocolConfiguration" description="Configures the protocol">
@@ -110,8 +161,13 @@
 		
 		<method name="StopCommunication" description="Stops communication with the S7 PLC Instance">
 		</method>
+
+		<method name="PrepareParameters" description="Prepares Command Parameters">
+			<param name="Instance" type="class" class="CommandParameters" pass="return" description="Instance of the parameters class." />
+		</method>
 		
 		<method name="ExecuteCommand" description="Executes a command">
+			<param name="ParametersInstance" type="class" class="CommandParameters" pass="in" description="Instance of the parameters class." />
 			<param name="CommandID" type="uint32" pass="in" description="ID of command to be triggered." />
 			<param name="SequenceID" type="uint32" pass="return" description="Sequence ID of the executed command." />
 		</method>

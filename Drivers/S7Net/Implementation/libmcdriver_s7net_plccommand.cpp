@@ -63,3 +63,77 @@ void CPLCCommand::setSequenceID(const uint32_t nSequenceID)
 {
     m_nSequenceID = nSequenceID;
 }
+
+void CPLCCommand::addParameterDefinition(const std::string& sName, const ePLCFieldType fieldType)
+{
+    if (sName.empty())
+        throw ELibMCDriver_S7NetInterfaceException (LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    m_ParameterTypeMap.insert(std::make_pair (sName, fieldType));
+}
+
+
+
+void CPLCCommand::SetIntegerParameter(const std::string& sParameterName, const LibMCDriver_S7Net_int32 nValue)
+{
+    auto iParameterType = m_ParameterTypeMap.find(sParameterName);
+    if (iParameterType == m_ParameterTypeMap.end ())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNOTFOUND, "command parameter not found: " + sParameterName);
+
+    if ((iParameterType->second != ePLCFieldType::ftDInt) && (iParameterType->second != ePLCFieldType::ftInt))
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAMETERTYPE, "command parameter is not of type integer: " + sParameterName);
+
+    if (iParameterType->second == ePLCFieldType::ftInt) {
+        if ((nValue < INT16_MIN) || (nValue > INT16_MAX))
+            throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETEROUTOFBOUNDS, "command field parameter is out of bounds: " + sParameterName);        
+    }
+        
+
+    m_ParameterValues.insert(std::make_pair(sParameterName, std::to_string (nValue)));
+}
+
+void CPLCCommand::SetStringParameter(const std::string& sParameterName, const std::string& sValue)
+{
+    auto iParameterType = m_ParameterTypeMap.find(sParameterName);
+    if (iParameterType == m_ParameterTypeMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNOTFOUND, "command parameter not found: " + sParameterName);
+
+    if (iParameterType->second != ePLCFieldType::ftString)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAMETERTYPE, "command parameter is not of type string: " + sParameterName);
+
+    m_ParameterValues.insert(std::make_pair(sParameterName, sValue));
+}
+
+void CPLCCommand::SetBoolParameter(const std::string& sParameterName, const bool bValue)
+{
+    auto iParameterType = m_ParameterTypeMap.find(sParameterName);
+    if (iParameterType == m_ParameterTypeMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNOTFOUND, "command parameter not found: " + sParameterName);
+
+    if (iParameterType->second != ePLCFieldType::ftBool)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAMETERTYPE, "command parameter is not of type bool: " + sParameterName);
+
+    m_ParameterValues.insert(std::make_pair(sParameterName, bValue ? "1" : "0" ));
+}
+
+void CPLCCommand::SetDoubleParameter(const std::string& sParameterName, const LibMCDriver_S7Net_double dValue)
+{
+    auto iParameterType = m_ParameterTypeMap.find(sParameterName);
+    if (iParameterType == m_ParameterTypeMap.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNOTFOUND, "command parameter not found: " + sParameterName);
+
+    if (iParameterType->second != ePLCFieldType::ftReal)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAMETERTYPE, "command parameter is not of type double: " + sParameterName);
+
+    m_ParameterValues.insert(std::make_pair(sParameterName, std::to_string(dValue)));
+}
+
+
+std::string CPLCCommand::getParameterValue(const std::string& sParameterName)
+{
+    auto iParameterValue = m_ParameterValues.find(sParameterName);
+    if (iParameterValue != m_ParameterValues.end())
+        return iParameterValue->second;
+
+    return "";
+}

@@ -61,6 +61,7 @@ namespace LibS7Com {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
+class CCommandParameters;
 class CPLCCommunication;
 
 /*************************************************************************************************************************
@@ -68,6 +69,7 @@ class CPLCCommunication;
 **************************************************************************************************************************/
 typedef CWrapper CLibS7ComWrapper;
 typedef CBase CLibS7ComBase;
+typedef CCommandParameters CLibS7ComCommandParameters;
 typedef CPLCCommunication CLibS7ComPLCCommunication;
 
 /*************************************************************************************************************************
@@ -75,6 +77,7 @@ typedef CPLCCommunication CLibS7ComPLCCommunication;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
+typedef std::shared_ptr<CCommandParameters> PCommandParameters;
 typedef std::shared_ptr<CPLCCommunication> PPLCCommunication;
 
 /*************************************************************************************************************************
@@ -82,6 +85,7 @@ typedef std::shared_ptr<CPLCCommunication> PPLCCommunication;
 **************************************************************************************************************************/
 typedef PWrapper PLibS7ComWrapper;
 typedef PBase PLibS7ComBase;
+typedef PCommandParameters PLibS7ComCommandParameters;
 typedef PPLCCommunication PLibS7ComPLCCommunication;
 
 
@@ -260,6 +264,7 @@ private:
 	LibS7ComResult loadWrapperTableFromSymbolLookupMethod(sLibS7ComDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
+	friend class CCommandParameters;
 	friend class CPLCCommunication;
 
 };
@@ -322,6 +327,31 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CCommandParameters 
+**************************************************************************************************************************/
+class CCommandParameters : public CBase {
+public:
+	
+	/**
+	* CCommandParameters::CCommandParameters - Constructor for CommandParameters class.
+	*/
+	CCommandParameters(CWrapper* pWrapper, LibS7ComHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void WriteString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength, const std::string & sValue);
+	inline void WriteBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit, const bool bValue);
+	inline void WriteByte(const LibS7Com_uint32 nAddress, const LibS7Com_uint8 nValue);
+	inline void WriteInt16(const LibS7Com_uint32 nAddress, const LibS7Com_int16 nValue);
+	inline void WriteUint16(const LibS7Com_uint32 nAddress, const LibS7Com_uint16 nValue);
+	inline void WriteInt32(const LibS7Com_uint32 nAddress, const LibS7Com_int32 nValue);
+	inline void WriteUint32(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nValue);
+	inline void WriteReal(const LibS7Com_uint32 nAddress, const LibS7Com_double dValue);
+	inline void WriteLReal(const LibS7Com_uint32 nAddress, const LibS7Com_double dValue);
+};
+	
+/*************************************************************************************************************************
  Class CPLCCommunication 
 **************************************************************************************************************************/
 class CPLCCommunication : public CBase {
@@ -341,7 +371,8 @@ public:
 	inline void StartCommunication(classParam<LibS7Net::CPLC> pPLC);
 	inline void RetrieveStatus();
 	inline void StopCommunication();
-	inline LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID);
+	inline PCommandParameters PrepareParameters();
+	inline LibS7Com_uint32 ExecuteCommand(classParam<CCommandParameters> pParametersInstance, const LibS7Com_uint32 nCommandID);
 	inline void CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool & bSequenceIsActive, bool & bSequenceIsFinished, LibS7Com_uint32 & nErrorCode);
 	inline std::string ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength);
 	inline bool ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit);
@@ -471,12 +502,22 @@ public:
 			return LIBS7COM_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_CommandParameters_WriteString = nullptr;
+		pWrapperTable->m_CommandParameters_WriteBool = nullptr;
+		pWrapperTable->m_CommandParameters_WriteByte = nullptr;
+		pWrapperTable->m_CommandParameters_WriteInt16 = nullptr;
+		pWrapperTable->m_CommandParameters_WriteUint16 = nullptr;
+		pWrapperTable->m_CommandParameters_WriteInt32 = nullptr;
+		pWrapperTable->m_CommandParameters_WriteUint32 = nullptr;
+		pWrapperTable->m_CommandParameters_WriteReal = nullptr;
+		pWrapperTable->m_CommandParameters_WriteLReal = nullptr;
 		pWrapperTable->m_PLCCommunication_SetProtocolConfiguration = nullptr;
 		pWrapperTable->m_PLCCommunication_SetAMCTOPLCOffsets = nullptr;
 		pWrapperTable->m_PLCCommunication_SetPLCToAMCOffsets = nullptr;
 		pWrapperTable->m_PLCCommunication_StartCommunication = nullptr;
 		pWrapperTable->m_PLCCommunication_RetrieveStatus = nullptr;
 		pWrapperTable->m_PLCCommunication_StopCommunication = nullptr;
+		pWrapperTable->m_PLCCommunication_PrepareParameters = nullptr;
 		pWrapperTable->m_PLCCommunication_ExecuteCommand = nullptr;
 		pWrapperTable->m_PLCCommunication_CheckCommandExecution = nullptr;
 		pWrapperTable->m_PLCCommunication_ReadVariableString = nullptr;
@@ -544,6 +585,87 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteString = (PLibS7ComCommandParameters_WriteStringPtr) GetProcAddress(hLibrary, "libs7com_commandparameters_writestring");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteString = (PLibS7ComCommandParameters_WriteStringPtr) dlsym(hLibrary, "libs7com_commandparameters_writestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteString == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteBool = (PLibS7ComCommandParameters_WriteBoolPtr) GetProcAddress(hLibrary, "libs7com_commandparameters_writebool");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteBool = (PLibS7ComCommandParameters_WriteBoolPtr) dlsym(hLibrary, "libs7com_commandparameters_writebool");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteBool == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteByte = (PLibS7ComCommandParameters_WriteBytePtr) GetProcAddress(hLibrary, "libs7com_commandparameters_writebyte");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteByte = (PLibS7ComCommandParameters_WriteBytePtr) dlsym(hLibrary, "libs7com_commandparameters_writebyte");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteByte == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteInt16 = (PLibS7ComCommandParameters_WriteInt16Ptr) GetProcAddress(hLibrary, "libs7com_commandparameters_writeint16");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteInt16 = (PLibS7ComCommandParameters_WriteInt16Ptr) dlsym(hLibrary, "libs7com_commandparameters_writeint16");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteInt16 == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteUint16 = (PLibS7ComCommandParameters_WriteUint16Ptr) GetProcAddress(hLibrary, "libs7com_commandparameters_writeuint16");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteUint16 = (PLibS7ComCommandParameters_WriteUint16Ptr) dlsym(hLibrary, "libs7com_commandparameters_writeuint16");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteUint16 == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteInt32 = (PLibS7ComCommandParameters_WriteInt32Ptr) GetProcAddress(hLibrary, "libs7com_commandparameters_writeint32");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteInt32 = (PLibS7ComCommandParameters_WriteInt32Ptr) dlsym(hLibrary, "libs7com_commandparameters_writeint32");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteInt32 == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteUint32 = (PLibS7ComCommandParameters_WriteUint32Ptr) GetProcAddress(hLibrary, "libs7com_commandparameters_writeuint32");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteUint32 = (PLibS7ComCommandParameters_WriteUint32Ptr) dlsym(hLibrary, "libs7com_commandparameters_writeuint32");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteUint32 == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteReal = (PLibS7ComCommandParameters_WriteRealPtr) GetProcAddress(hLibrary, "libs7com_commandparameters_writereal");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteReal = (PLibS7ComCommandParameters_WriteRealPtr) dlsym(hLibrary, "libs7com_commandparameters_writereal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteReal == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_CommandParameters_WriteLReal = (PLibS7ComCommandParameters_WriteLRealPtr) GetProcAddress(hLibrary, "libs7com_commandparameters_writelreal");
+		#else // _WIN32
+		pWrapperTable->m_CommandParameters_WriteLReal = (PLibS7ComCommandParameters_WriteLRealPtr) dlsym(hLibrary, "libs7com_commandparameters_writelreal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_CommandParameters_WriteLReal == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_PLCCommunication_SetProtocolConfiguration = (PLibS7ComPLCCommunication_SetProtocolConfigurationPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_setprotocolconfiguration");
 		#else // _WIN32
 		pWrapperTable->m_PLCCommunication_SetProtocolConfiguration = (PLibS7ComPLCCommunication_SetProtocolConfigurationPtr) dlsym(hLibrary, "libs7com_plccommunication_setprotocolconfiguration");
@@ -595,6 +717,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PLCCommunication_StopCommunication == nullptr)
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommunication_PrepareParameters = (PLibS7ComPLCCommunication_PrepareParametersPtr) GetProcAddress(hLibrary, "libs7com_plccommunication_prepareparameters");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommunication_PrepareParameters = (PLibS7ComPLCCommunication_PrepareParametersPtr) dlsym(hLibrary, "libs7com_plccommunication_prepareparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommunication_PrepareParameters == nullptr)
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -775,6 +906,42 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibS7ComResult eLookupError = LIBS7COM_SUCCESS;
+		eLookupError = (*pLookup)("libs7com_commandparameters_writestring", (void**)&(pWrapperTable->m_CommandParameters_WriteString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteString == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writebool", (void**)&(pWrapperTable->m_CommandParameters_WriteBool));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteBool == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writebyte", (void**)&(pWrapperTable->m_CommandParameters_WriteByte));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteByte == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writeint16", (void**)&(pWrapperTable->m_CommandParameters_WriteInt16));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteInt16 == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writeuint16", (void**)&(pWrapperTable->m_CommandParameters_WriteUint16));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteUint16 == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writeint32", (void**)&(pWrapperTable->m_CommandParameters_WriteInt32));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteInt32 == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writeuint32", (void**)&(pWrapperTable->m_CommandParameters_WriteUint32));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteUint32 == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writereal", (void**)&(pWrapperTable->m_CommandParameters_WriteReal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteReal == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_commandparameters_writelreal", (void**)&(pWrapperTable->m_CommandParameters_WriteLReal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_CommandParameters_WriteLReal == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libs7com_plccommunication_setprotocolconfiguration", (void**)&(pWrapperTable->m_PLCCommunication_SetProtocolConfiguration));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_SetProtocolConfiguration == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -797,6 +964,10 @@ public:
 		
 		eLookupError = (*pLookup)("libs7com_plccommunication_stopcommunication", (void**)&(pWrapperTable->m_PLCCommunication_StopCommunication));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_StopCommunication == nullptr) )
+			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libs7com_plccommunication_prepareparameters", (void**)&(pWrapperTable->m_PLCCommunication_PrepareParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommunication_PrepareParameters == nullptr) )
 			return LIBS7COM_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libs7com_plccommunication_executecommand", (void**)&(pWrapperTable->m_PLCCommunication_ExecuteCommand));
@@ -881,6 +1052,102 @@ public:
 	 */
 	
 	/**
+	 * Method definitions for class CCommandParameters
+	 */
+	
+	/**
+	* CCommandParameters::WriteString - Writes string value.
+	* @param[in] nAddress - Address of String Variable.
+	* @param[in] nMaxLength - Maximum length.
+	* @param[in] sValue - Value of variable.
+	*/
+	void CCommandParameters::WriteString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteString(m_pHandle, nAddress, nMaxLength, sValue.c_str()));
+	}
+	
+	/**
+	* CCommandParameters::WriteBool - Writes bool value.
+	* @param[in] nAddress - Address of Bit Variable.
+	* @param[in] nBit - Bit of the variable (0-7)
+	* @param[in] bValue - Value of variable.
+	*/
+	void CCommandParameters::WriteBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteBool(m_pHandle, nAddress, nBit, bValue));
+	}
+	
+	/**
+	* CCommandParameters::WriteByte - Writes byte value.
+	* @param[in] nAddress - Address of Bit Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	void CCommandParameters::WriteByte(const LibS7Com_uint32 nAddress, const LibS7Com_uint8 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteByte(m_pHandle, nAddress, nValue));
+	}
+	
+	/**
+	* CCommandParameters::WriteInt16 - Writes Int16 value.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	void CCommandParameters::WriteInt16(const LibS7Com_uint32 nAddress, const LibS7Com_int16 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteInt16(m_pHandle, nAddress, nValue));
+	}
+	
+	/**
+	* CCommandParameters::WriteUint16 - Writes Uint16 value.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	void CCommandParameters::WriteUint16(const LibS7Com_uint32 nAddress, const LibS7Com_uint16 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteUint16(m_pHandle, nAddress, nValue));
+	}
+	
+	/**
+	* CCommandParameters::WriteInt32 - Writes Int32 value.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	void CCommandParameters::WriteInt32(const LibS7Com_uint32 nAddress, const LibS7Com_int32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteInt32(m_pHandle, nAddress, nValue));
+	}
+	
+	/**
+	* CCommandParameters::WriteUint32 - Writes Uint32 value.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	void CCommandParameters::WriteUint32(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteUint32(m_pHandle, nAddress, nValue));
+	}
+	
+	/**
+	* CCommandParameters::WriteReal - Writes Real value.
+	* @param[in] nAddress - Address of Real Variable.
+	* @param[in] dValue - Value of variable.
+	*/
+	void CCommandParameters::WriteReal(const LibS7Com_uint32 nAddress, const LibS7Com_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteReal(m_pHandle, nAddress, dValue));
+	}
+	
+	/**
+	* CCommandParameters::WriteLReal - Writes LReal value.
+	* @param[in] nAddress - Address of Real Variable.
+	* @param[in] dValue - Value of variable.
+	*/
+	void CCommandParameters::WriteLReal(const LibS7Com_uint32 nAddress, const LibS7Com_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_CommandParameters_WriteLReal(m_pHandle, nAddress, dValue));
+	}
+	
+	/**
 	 * Method definitions for class CPLCCommunication
 	 */
 	
@@ -957,14 +1224,31 @@ public:
 	}
 	
 	/**
+	* CPLCCommunication::PrepareParameters - Prepares Command Parameters
+	* @return Instance of the parameters class.
+	*/
+	PCommandParameters CPLCCommunication::PrepareParameters()
+	{
+		LibS7ComHandle hInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_PrepareParameters(m_pHandle, &hInstance));
+		
+		if (!hInstance) {
+			CheckError(LIBS7COM_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CCommandParameters>(m_pWrapper, hInstance);
+	}
+	
+	/**
 	* CPLCCommunication::ExecuteCommand - Executes a command
+	* @param[in] pParametersInstance - Instance of the parameters class.
 	* @param[in] nCommandID - ID of command to be triggered.
 	* @return Sequence ID of the executed command.
 	*/
-	LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommandID)
+	LibS7Com_uint32 CPLCCommunication::ExecuteCommand(classParam<CCommandParameters> pParametersInstance, const LibS7Com_uint32 nCommandID)
 	{
+		LibS7ComHandle hParametersInstance = pParametersInstance.GetHandle();
 		LibS7Com_uint32 resultSequenceID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ExecuteCommand(m_pHandle, nCommandID, &resultSequenceID));
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommunication_ExecuteCommand(m_pHandle, hParametersInstance, nCommandID, &resultSequenceID));
 		
 		return resultSequenceID;
 	}
