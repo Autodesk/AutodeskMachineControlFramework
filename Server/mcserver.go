@@ -50,6 +50,7 @@ import (
 // Global Handles
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 var GlobalContext libmc.MCContext;
+var DevMode bool;
 
 const XMLNS_SERVERCONFIG = "http://schemas.autodesk.com/amc/2020/06"
 const XMLNS_PACKAGECONFIG = "http://schemas.autodesk.com/amcpackage/2020/06"
@@ -378,8 +379,11 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 	var dataBytes []byte;
 	bodyBytes := make ([]byte, 1);
 	
-	w.Header().Set("Access-Control-Allow-Headers", "*");	
-	w.Header().Set("Access-Control-Allow-Origin", "*");	
+	if (DevMode) {
+		w.Header().Set("Access-Control-Allow-Headers", "*");	
+		w.Header().Set("Access-Control-Allow-Origin", "*");	
+	}
+	
 	w.Header().Set("Cache-Control", "no-cache");
 	
 	if (r.Method == "OPTIONS") { // CORS handler	
@@ -516,6 +520,25 @@ func startAppServer (host string, port uint32, context libmc.MCContext) (error) 
 func main() {
 
 	var err error;
+	
+	// Check command line parameters
+	DevMode = false;
+	argsWithProg := os.Args;
+	if (len (argsWithProg) >= 2) {
+		argsWithoutProg := argsWithProg[1:];
+		
+		for _, arg := range argsWithoutProg {
+			if arg == "--develop" {
+				DevMode = true;
+			}
+		}	
+	
+	}
+	
+	if (DevMode) {
+		fmt.Println("Starting in Development mode!");
+	}
+	
 	
 	serverConfigFileName, err := filepath.Abs ("amc_server.xml");
 	if (err != nil) {

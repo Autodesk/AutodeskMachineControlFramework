@@ -83,6 +83,33 @@ LibMCDriverResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriverResult libmcdriver_driver_configure(LibMCDriver_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriverInterfaceException (LIBMCDRIVER_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriverInterfaceException(LIBMCDRIVER_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_SUCCESS;
+	}
+	catch (ELibMCDriverInterfaceException & Exception) {
+		return handleLibMCDriverException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriverResult libmcdriver_driver_getname(LibMCDriver_Driver pDriver, const LibMCDriver_uint32 nNameBufferSize, LibMCDriver_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -332,6 +359,8 @@ LibMCDriverResult LibMCDriver::Impl::LibMCDriver_GetProcAddress (const char * pP
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_driver_configure;
 	if (sProcName == "libmcdriver_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_driver_getname;
 	if (sProcName == "libmcdriver_driver_gettype") 

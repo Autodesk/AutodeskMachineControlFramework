@@ -73,7 +73,7 @@ namespace AMC {
 
 		virtual ~CDriverHandler();
 
-		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath);
+		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath, const std::string & sDriverConfigurationData);
 
 		void GetDriverInformation (const std::string& sName, std::string& sType, HSymbolLookupHandle & pSymbolLookup);
 

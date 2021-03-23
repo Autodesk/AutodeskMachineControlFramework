@@ -74,9 +74,9 @@ public:
 
 	std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex) override;
 
-	std::string GetSegmentProfileValue(const std::string& sValueName) override;
+	std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string& sValueName) override;
 
-	LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv::eToolpathProfileValueType eValueType) override;
+	LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) override;
 
 	void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) override;
 

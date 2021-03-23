@@ -66,6 +66,10 @@ CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sTyp
 
 }
 
+void CDriver_Marlin::Configure(const std::string& sConfigurationString)
+{
+
+}
 
 void CDriver_Marlin::QueryParameters()
 {

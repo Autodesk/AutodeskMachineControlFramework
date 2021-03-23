@@ -135,6 +135,8 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKALREADYLOADED 1027
 #define LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYINITIALIZED 1028
 #define LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED 1029
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT 1030
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER 1031
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -182,6 +184,8 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKALREADYLOADED: return "Scanlab RTC has already been loaded";
     case LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYINITIALIZED: return "Scanlab RTC card is already initialized";
     case LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED: return "Scanlab RTC card is not initialized";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER: return "Invalid max laser power.";
     default: return "unknown error";
   }
 }

@@ -324,17 +324,19 @@ public:
 
 	/**
 	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] sValueName - Value Name to query for.
 	* @return String Value.
 	*/
-	virtual std::string GetSegmentProfileValue(const std::string & sValueName) = 0;
+	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
 	* @return Double Value
 	*/
-	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
+	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.
@@ -603,6 +605,14 @@ public:
 	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
 
 	/**
+	* IWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomString(const std::string & sFileName, const std::string & sDataString) = 0;
+
+	/**
 	* IWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
@@ -754,6 +764,18 @@ public:
 	* @param[in] bValue - Value to set
 	*/
 	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IDriverEnvironment::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
+
+	/**
+	* IDriverEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
 };
 
@@ -1160,6 +1182,15 @@ public:
 	* @return Value to set
 	*/
 	virtual bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[in] nResourceDataBufferSize - Number of elements in buffer
+	* @param[out] pResourceDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+	*/
+	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
 
 };
 

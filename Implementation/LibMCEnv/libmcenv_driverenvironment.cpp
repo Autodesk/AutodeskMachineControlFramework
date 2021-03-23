@@ -82,10 +82,13 @@ void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibM
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
 
         std::vector <uint8_t> Buffer;
-        if (Buffer.size () != nSize)
-            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
         m_pResourcePackage->readEntry(sIdentifier, Buffer);
+
+        if (Buffer.size() != nSize)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+
         const uint8_t* pSrc = Buffer.data();
         uint8_t* pDst = pDataBufferBuffer;
 
@@ -175,3 +178,15 @@ void CDriverEnvironment::setIsInitializing(bool bIsInitializing)
 {
     m_bIsInitializing = bIsInitializing;
 }
+
+
+void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
+{
+    m_Chrono.sleepMilliseconds(nDelay);
+}
+
+LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
+{
+    return m_Chrono.getExistenceTimeInMilliseconds();
+}
+

@@ -40,6 +40,7 @@ Abstract: This is the class declaration of CDriverEnvironment
 #include "amc_parametergroup.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_toolpathhandler.hpp"
+#include "common_chrono.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -73,6 +74,8 @@ protected:
 	AMC::PResourcePackage m_pResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
 
+	AMCCommon::CChrono m_Chrono;
+
 public:
 
 	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string & sBaseTempPath);
@@ -104,6 +107,11 @@ public:
 	void SetBoolParameter(const std::string& sParameterName, const bool bValue) override;
 
 	void setIsInitializing(bool bIsInitializing);
+
+	void Sleep(const LibMCEnv_uint32 nDelay) override;
+
+	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
+
 
 };
 

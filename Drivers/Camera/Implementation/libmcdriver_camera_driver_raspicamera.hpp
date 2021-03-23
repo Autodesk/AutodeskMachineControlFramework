@@ -66,6 +66,8 @@ public:
 
     CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
+    void Configure(const std::string& sConfigurationString) override;
+
     IRaspiCameraDeviceIterator* QueryDevices() override;
 
 	void Initialize(const std::string & sDeviceString, const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight, const LibMCDriver_Camera::eImagePixelFormat ePixelformat) override;

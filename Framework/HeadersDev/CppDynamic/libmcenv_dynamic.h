@@ -147,23 +147,25 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) (LibMC
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile value of a standard type.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
 
 /**
 * Retrieves the assigned segment part uuid.
@@ -508,6 +510,17 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomDataPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
 
 /**
+* Stores a string in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] pDataString - file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomStringPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
 * Stores attached driver data in a temporary file.
 *
 * @param[in] pWorkingDirectory - WorkingDirectory instance.
@@ -712,6 +725,24 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetIntegerParameterPtr) (Lib
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SetBoolParameterPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue);
+
+/**
+* Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nDelay - Milliseconds to sleeps
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SleepPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nDelay);
+
+/**
+* Returns the global timer in milliseconds.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /*************************************************************************************************************************
  Class definition for SignalTrigger
@@ -1284,6 +1315,18 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetIntegerParameterPtr) (LibM
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBoolParameterPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
 
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadResourceDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -1512,6 +1555,7 @@ typedef struct {
 	PLibMCEnvWorkingDirectory_IsActivePtr m_WorkingDirectory_IsActive;
 	PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr m_WorkingDirectory_GetAbsoluteFilePath;
 	PLibMCEnvWorkingDirectory_StoreCustomDataPtr m_WorkingDirectory_StoreCustomData;
+	PLibMCEnvWorkingDirectory_StoreCustomStringPtr m_WorkingDirectory_StoreCustomString;
 	PLibMCEnvWorkingDirectory_StoreDriverDataPtr m_WorkingDirectory_StoreDriverData;
 	PLibMCEnvWorkingDirectory_CleanUpPtr m_WorkingDirectory_CleanUp;
 	PLibMCEnvWorkingDirectory_AddManagedFilePtr m_WorkingDirectory_AddManagedFile;
@@ -1532,6 +1576,8 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_SetDoubleParameterPtr m_DriverEnvironment_SetDoubleParameter;
 	PLibMCEnvDriverEnvironment_SetIntegerParameterPtr m_DriverEnvironment_SetIntegerParameter;
 	PLibMCEnvDriverEnvironment_SetBoolParameterPtr m_DriverEnvironment_SetBoolParameter;
+	PLibMCEnvDriverEnvironment_SleepPtr m_DriverEnvironment_Sleep;
+	PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr m_DriverEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
 	PLibMCEnvSignalTrigger_TriggerPtr m_SignalTrigger_Trigger;
 	PLibMCEnvSignalTrigger_WaitForHandlingPtr m_SignalTrigger_WaitForHandling;
@@ -1586,6 +1632,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetDoubleParameterPtr m_StateEnvironment_GetDoubleParameter;
 	PLibMCEnvStateEnvironment_GetIntegerParameterPtr m_StateEnvironment_GetIntegerParameter;
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
+	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvUIEnvironment_PrepareSignalPtr m_UIEnvironment_PrepareSignal;
 	PLibMCEnvUIEnvironment_GetMachineStatePtr m_UIEnvironment_GetMachineState;
 	PLibMCEnvUIEnvironment_LogMessagePtr m_UIEnvironment_LogMessage;

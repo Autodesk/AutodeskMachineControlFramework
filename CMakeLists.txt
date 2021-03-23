@@ -112,8 +112,65 @@ set(LIBMC_SRC
   ${LIBMC_SRC_DEP_CROSSGUID}
 )
 
+add_custom_target(copy_framework ALL)
+
+file (GLOB framework_files_dev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/HeadersDev/CppDynamic/*.*")
+foreach(framework_file_dev ${framework_files_dev})
+
+	get_filename_component(framework_file_devname ${framework_file_dev} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_dev}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_dev}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/HeadersDev/CppDynamic/${framework_file_devname})
+				
+				
+endforeach()
+
+
+file (GLOB framework_files_intfdev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/InterfacesDev/*.*")
+foreach(framework_file_intfdev ${framework_files_intfdev})
+
+	get_filename_component(framework_file_intfdevname ${framework_file_intfdev} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_intfdev}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_intfdev}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/InterfacesDev/${framework_file_intfdevname})				
+				
+endforeach()
+
+
+file (GLOB framework_files_plugincpp LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/PluginCpp/*.*")
+foreach(framework_file_plugincpp ${framework_files_plugincpp})
+
+	get_filename_component(framework_file_plugincppname ${framework_file_plugincpp} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_plugincpp}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_plugincpp}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/PluginCpp/${framework_file_plugincppname})				
+				
+endforeach()
 
 add_library(libmc SHARED ${LIBMC_SRC})
+add_dependencies(libmc copy_framework)
+
 # Do not prefix the binary's name with "lib" on Unix systems:
 set_target_properties(libmc PROPERTIES PREFIX "" IMPORT_PREFIX "" )
 # The following two properties are crucial to reduce the number of undesirably exported symbols
@@ -180,6 +237,8 @@ source_group("libmcdata" FILES ${LIBMCDATA_SRC_LIBMCDATA})
 source_group("dependencies\\crossguid" FILES ${LIBMCDATA_SRC_DEP_CROSSGUID})
 
 add_library(libmcdata SHARED ${LIBMCDATA_SRC})
+add_dependencies(libmcdata copy_framework)
+
 # Do not prefix the binary's name with "lib" on Unix systems:
 set_target_properties(libmcdata PROPERTIES PREFIX "" IMPORT_PREFIX "" )
 # The following two properties are crucial to reduce the number of undesirably exported symbols
@@ -187,12 +246,18 @@ set_target_properties(libmcdata PROPERTIES CXX_VISIBILITY_PRESET hidden)
 set_target_properties(libmcdata PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
 
 if(WIN32)
-target_link_libraries(libmc Winmm.lib)
-target_link_libraries(libmc Shlwapi.lib)
 
-target_link_libraries(libmcdata Winmm.lib)
-target_link_libraries(libmcdata Shlwapi.lib)
-target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
+if (MSVC)
+	target_link_libraries(libmc Winmm.lib)
+	target_link_libraries(libmc Shlwapi.lib)
+	target_link_libraries(libmcdata Winmm.lib)
+	target_link_libraries(libmcdata Shlwapi.lib)
+	target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
+else()
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
+	target_link_libraries(libmcdata SQLite3)
+endif (MSVC)
+
 elseif(UNIX AND NOT APPLE)
 target_link_libraries(libmc -luuid)
 
@@ -236,6 +301,7 @@ set_target_properties(libmcdata
 
 
 add_custom_target(copy_distribution_libraries ALL)
+add_dependencies(copy_distribution_libraries copy_framework)
 
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD

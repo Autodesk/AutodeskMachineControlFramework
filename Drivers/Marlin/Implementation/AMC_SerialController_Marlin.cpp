@@ -33,9 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <thread>
 
-#ifdef __linux__
-#include <math.h>
-#endif
+#include <cmath>
 
 #define MARLINDRIVER_MINSPEED 0.0001
 
