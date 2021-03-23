@@ -36,6 +36,7 @@ using namespace LibMCPlugin::Impl;
 
 // TODO uncomment to activate camera driver
 //#include "libmcdriver_camera_dynamic.hpp"
+#include "libmcdriver_mqtt_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
 #ifdef _MSC_VER
@@ -50,6 +51,9 @@ using namespace LibMCPlugin::Impl;
 //typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
 //typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
 
+typedef LibMCDriver_MQTT::PDriver_MQTT PDriver_MQTT;
+typedef LibMCEnv::CDriverCast <LibMCDriver_MQTT::CDriver_MQTT, LibMCDriver_MQTT::CWrapper> PDriverCast_MQTT;
+
 /*************************************************************************************************************************
  Class definition of CMainData
 **************************************************************************************************************************/
@@ -58,6 +62,7 @@ protected:
 	// We need to globally store driver wrappers in the plugin
 	// TODO uncomment to activate camera driver
 	//PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
+	PDriverCast_MQTT m_DriverCast_MQTT;
 
 public:
 
@@ -66,6 +71,11 @@ public:
 	//{
 	//	return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
 	//}
+
+	PDriver_MQTT acquireMQTTDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		return m_DriverCast_MQTT.acquireDriver(pStateEnvironment, "mqtt");
+	}
 
 	bool deviceSetFanSpeed(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nFanId, double dFanSpeed)
 	{
@@ -237,6 +247,10 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 
+		pStateEnvironment->LogMessage("Establishing MQTT Connection...");
+		auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
+		pMQTTDriver->Connect();
+
 		//auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
 		//pCameraDriver->Initialize("", 600, 400, LibMCDriver_Camera::eImagePixelFormat::RGB32);
 
@@ -268,6 +282,9 @@ public:
 	{
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+
+		auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
+		pMQTTDriver->SendMQTTMessage ("TestMessage");
 
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
