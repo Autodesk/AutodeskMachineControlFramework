@@ -229,7 +229,7 @@ namespace AMC {
 			sToolpathLayerProfile sProfile;
 
 			sProfile.m_dLaserSpeed = pProfile->GetParameterDoubleValue("", "laserspeed");
-			sProfile.m_dLaserPower = pProfile->GetParameterDoubleValue("", "laserpower");
+			sProfile.m_dLaserPower = pProfile->GetParameterDoubleValueDef("", "laserpower", 0.0);
 			sProfile.m_dLaserFocus = pProfile->GetParameterDoubleValueDef("", "laserfocus", 0.0);
 			sProfile.m_dJumpSpeed = pProfile->GetParameterDoubleValueDef("", "jumpspeed", sProfile.m_dLaserSpeed);
 			sProfile.m_dExtrusionFactor = pProfile->GetParameterDoubleValueDef("", "extrusionfactor", 0.0);
