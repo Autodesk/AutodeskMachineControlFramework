@@ -78,6 +78,11 @@ CDriver::~CDriver()
 }
 
 
+void CDriver::configureDriver(const std::string& sConfigurationData)
+{
+	m_pDriverInstance->Configure(sConfigurationData);
+}
+
 HDriverHandle CDriver::acquireDriverHandle(const std::string& sInstanceName)
 {		
 	if (!m_sReservationInstance.empty())

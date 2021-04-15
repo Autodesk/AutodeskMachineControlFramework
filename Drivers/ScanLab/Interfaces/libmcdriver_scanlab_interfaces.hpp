@@ -59,6 +59,7 @@ class IBase;
 class IDriver;
 class IRTCContext;
 class IRTCSelector;
+class IDriver_ScanLab;
 class IDriver_ScanLab_RTC5;
 
 
@@ -141,6 +142,141 @@ template <class T1, class T2, class T3, class T4> class ParameterCache_4 : publi
 			param2 = m_param2;
 			param3 = m_param3;
 			param4 = m_param4;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7> class ParameterCache_7 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+	public:
+		ParameterCache_7 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8> class ParameterCache_8 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+		T8 m_param8;
+	public:
+		ParameterCache_8 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7, const T8 & param8)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7), m_param8 (param8)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7, T8 & param8)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
+			param8 = m_param8;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9> class ParameterCache_9 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+		T7 m_param7;
+		T8 m_param8;
+		T9 m_param9;
+	public:
+		ParameterCache_9 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6, const T7 & param7, const T8 & param8, const T9 & param9)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6), m_param7 (param7), m_param8 (param8), m_param9 (param9)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6, T7 & param7, T8 & param8, T9 & param9)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
+			param7 = m_param7;
+			param8 = m_param8;
+			param9 = m_param9;
 		}
 };
 
@@ -268,6 +404,12 @@ typedef IBaseSharedPtr<IBase> PIBase;
 class IDriver : public virtual IBase {
 public:
 	/**
+	* IDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	virtual void Configure(const std::string & sConfigurationString) = 0;
+
+	/**
 	* IDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/
@@ -312,18 +454,21 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IRTCContext : public virtual IBase {
 public:
 	/**
-	* IRTCContext::LoadProgramFromPath - Loads card firmware from given file path.
-	* @param[in] sPath - Path to the image files.
+	* IRTCContext::LoadFirmware - Loads card firmware from resource files.
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
 	*/
-	virtual void LoadProgramFromPath(const std::string & sPath) = 0;
+	virtual void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
 
 	/**
-	* IRTCContext::LoadCorrectionFile - Loads card calibration file from given file.
-	* @param[in] sFileName - FileName to the image files.
+	* IRTCContext::LoadCorrectionFile - Loads card calibration file from given resource file.
+	* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+	* @param[in] pCorrectionFileBuffer - binary data of the correction file.
 	* @param[in] nTableNumber - Correction table index of card (1..8)
 	* @param[in] nDimension - Is it a 2D or 3D correction file.
 	*/
-	virtual void LoadCorrectionFile(const std::string & sFileName, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension) = 0;
+	virtual void LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension) = 0;
 
 	/**
 	* IRTCContext::SelectCorrectionTable - Selects Correction Table on card.
@@ -347,10 +492,21 @@ public:
 	virtual void SetLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort) = 0;
 
 	/**
-	* IRTCContext::SetLaserControl - Sets laser control of card.
-	* @param[in] bEnableLaser - Laser is enabled
+	* IRTCContext::DisableAutoLaserControl - Disables automatic laser control.
 	*/
-	virtual void SetLaserControl(const bool bEnableLaser) = 0;
+	virtual void DisableAutoLaserControl() = 0;
+
+	/**
+	* IRTCContext::SetLaserControlParameters - Sets laser control parameters of card.
+	* @param[in] bDisableLaser - Laser is disabled
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
+	*/
+	virtual void SetLaserControlParameters(const bool bDisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
 
 	/**
 	* IRTCContext::SetLaserPulsesInBits - Sets laser control pulse interval (in 1/64th microseconds)
@@ -440,8 +596,9 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	virtual void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower) = 0;
+	virtual void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
 	* IRTCContext::DrawHatches - Writes a list of hatches into the open list
@@ -450,8 +607,9 @@ public:
 	* @param[in] fMarkSpeed - Mark speed in mm/s
 	* @param[in] fJumpSpeed - Mark speed in mm/s
 	* @param[in] fPower - Laser power in percent
+	* @param[in] fZValue - Focus Z Value
 	*/
-	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower) = 0;
+	virtual void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) = 0;
 
 	/**
 	* IRTCContext::AddCustomDelay - Adds a custom delay to the list
@@ -473,10 +631,44 @@ public:
 	virtual void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition) = 0;
 
 	/**
+	* IRTCContext::GetHeadStatus - Returns status of scan head
+	* @param[in] nHeadNo - Head Number
+	* @param[out] bPositionXisOK - Position X is ok
+	* @param[out] bPositionYisOK - Position Y is ok
+	* @param[out] bTemperatureisOK - Temperature is ok
+	* @param[out] bPowerisOK - Power is ok
+	*/
+	virtual void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK) = 0;
+
+	/**
+	* IRTCContext::GetStateValues - Returns status values of scan head
+	* @param[out] bLaserIsOn - Laser is on
+	* @param[out] nPositionX - Current Position X in Units
+	* @param[out] nPositionY - Current Position Y in Units
+	* @param[out] nPositionZ - Current Position Z in Units
+	* @param[out] nCorrectedPositionX - Current Position X in Units
+	* @param[out] nCorrectedPositionY - Current Position Y in Units
+	* @param[out] nCorrectedPositionZ - Current Position Z in Units
+	* @param[out] nFocusShift - Current Focus Shift in Units
+	* @param[out] nMarkSpeed - Current Mark Speed in Units
+	*/
+	virtual void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed) = 0;
+
+	/**
 	* IRTCContext::GetInputPointer - returns current input list position
 	* @return Returns current position of open list
 	*/
 	virtual LibMCDriver_ScanLab_uint32 GetInputPointer() = 0;
+
+	/**
+	* IRTCContext::GetRTCVersion - Returns version information of the RTC Card
+	* @param[out] nRTCVersion - RTC Card Version
+	* @param[out] nRTCType - RTC Card Type
+	* @param[out] nDLLVersion - RTC DLL Version
+	* @param[out] nHEXVersion - RTC HEX Version
+	* @param[out] nBIOSVersion - RTC BIOS Version
+	*/
+	virtual void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion) = 0;
 
 };
 
@@ -553,16 +745,82 @@ typedef IBaseSharedPtr<IRTCSelector> PIRTCSelector;
 
 
 /*************************************************************************************************************************
- Class interface for Driver_ScanLab_RTC5 
+ Class interface for Driver_ScanLab 
 **************************************************************************************************************************/
 
-class IDriver_ScanLab_RTC5 : public virtual IDriver {
+class IDriver_ScanLab : public virtual IDriver {
 public:
 	/**
-	* IDriver_ScanLab_RTC5::CreateRTCSelector - Creates and initializes a new RTC selector singleton. Should only be called once per Process.
+	* IDriver_ScanLab::LoadSDK - Initializes the ScanLab SDK.
+	* @param[in] sResourceName - Resource name of Scanlab DLL
+	*/
+	virtual void LoadSDK(const std::string & sResourceName) = 0;
+
+	/**
+	* IDriver_ScanLab::CreateRTCSelector - Creates and initializes a new RTC selector singleton. Should only be called once per Process.
 	* @return New Selector instance
 	*/
 	virtual IRTCSelector * CreateRTCSelector() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriver_ScanLab> PIDriver_ScanLab;
+
+
+/*************************************************************************************************************************
+ Class interface for Driver_ScanLab_RTC5 
+**************************************************************************************************************************/
+
+class IDriver_ScanLab_RTC5 : public virtual IDriver_ScanLab {
+public:
+	/**
+	* IDriver_ScanLab_RTC5::Initialise - Initializes the RTC5 Scanner Driver.
+	* @param[in] sIP - IP Network Address. Empty string for local card.
+	* @param[in] sNetmask - IP Netmask Address. Empty string for local card.
+	* @param[in] nTimeout - Time out in microseconds.
+	* @param[in] nSerialNumber - Desired Serial Number of card.
+	*/
+	virtual void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC5::LoadFirmware - Loads the firmware from the driver resources.
+	* @param[in] sFirmwareResource - resource name of the firmware program file.
+	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
+	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	*/
+	virtual void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC5::SetCorrectionFile - Sets the correction file stream.
+	* @param[in] nCorrectionFileBufferSize - Number of elements in buffer
+	* @param[in] pCorrectionFileBuffer - binary data of the correction file.
+	* @param[in] nTableNumber - Correction table index of card (1..8)
+	* @param[in] nDimension - Is it a 2D or 3D correction file.
+	* @param[in] nTableNumberHeadA - Table number of Head A.
+	* @param[in] nTableNumberHeadB - Table number of Head B.
+	*/
+	virtual void SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8 * pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC5::ConfigureLaserMode - Configures the laser mode.
+	* @param[in] eLaserMode - Laser Mode Enum
+	* @param[in] eLaserPort - Laser Port Enum
+	* @param[in] dMaxLaserPower - Maximum laser power.
+	* @param[in] bFinishLaserPulseAfterOn - Finish laser pulse after LaserOn
+	* @param[in] bPhaseShiftOfLaserSignal - 180 degree phase shift of Laser signal
+	* @param[in] bLaserOnSignalLowActive - Set Laser On Signal Low Active
+	* @param[in] bLaserHalfSignalsLowActive - Set Laser Half Signal Low Active
+	* @param[in] bSetDigitalInOneHighActive - Set Digital In 1 high Active
+	* @param[in] bOutputSynchronizationActive - Output synchronization active
+	*/
+	virtual void ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC5::DrawLayer - Draws a layer of a build stream. Blocks until the layer is drawn.
+	* @param[in] sStreamUUID - UUID of the build stream. Must have been loaded in memory by the system.
+	* @param[in] nLayerIndex - Layer index of the build file.
+	*/
+	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
 
 };
 

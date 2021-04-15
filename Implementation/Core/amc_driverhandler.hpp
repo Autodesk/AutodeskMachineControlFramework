@@ -48,11 +48,15 @@ namespace AMC {
 	class CDriver;
 	typedef std::shared_ptr<CDriver> PDriver;
 
+	class CToolpathHandler;
+	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
+
 	class CDriverHandler {
 	private:
 
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 		std::string m_sTempBasePath;
+		PToolpathHandler m_pToolpathHandler;
 
 		// List and Map of registered drivers
 		std::list<PDriver> m_DriverList;
@@ -65,11 +69,11 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler);
 
 		virtual ~CDriverHandler();
 
-		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath);
+		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath, const std::string & sDriverConfigurationData);
 
 		void GetDriverInformation (const std::string& sName, std::string& sType, HSymbolLookupHandle & pSymbolLookup);
 

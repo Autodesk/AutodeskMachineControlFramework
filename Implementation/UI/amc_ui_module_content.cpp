@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem_parameterlist.hpp"
 #include "amc_ui_module_contentitem_upload.hpp"
 #include "amc_ui_module_contentitem_layerview.hpp"
-
+#include "amc_ui_module_contentitem_form.hpp"
 
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
@@ -150,6 +150,37 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				auto targetpageAttrib = buttonNode.attribute("targetpage");
 				auto eventAttrib = buttonNode.attribute("event");
 				pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string());
+			}
+
+		}
+
+
+		if (sChildName == "form") {
+
+			auto pForm = std::make_shared <CUIModule_ContentForm>();
+			addItem(pForm);
+
+			auto formNodes = childNode.children();
+			for (auto formNode : formNodes) {
+
+				std::string sNodeName = formNode.name();
+				auto captionAttrib = formNode.attribute("caption");
+
+				if (sNodeName == "edit") {
+					pForm->addEdit(captionAttrib.as_string());
+				}
+
+				if (sNodeName == "switch") {
+					pForm->addSwitch(captionAttrib.as_string());
+				}
+
+				if (sNodeName == "memo") {
+					pForm->addMemo(captionAttrib.as_string());
+				}
+
+				if (sNodeName == "combobox") {
+					pForm->addCombobox(captionAttrib.as_string());
+				}
 			}
 
 		}

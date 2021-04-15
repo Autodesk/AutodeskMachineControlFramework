@@ -336,6 +336,7 @@
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
 		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
+		<error name="PROFILENOTFOUND" code="330" description="Profile not found." />		
 		
 	</errors>
 	
@@ -361,8 +362,7 @@
 		
 	<class name="Base">
 	</class>
-
-
+	
 	<class name="APIRequestHandler" parent="Base" description="API Request Handler">
 
 		<method name="ExpectsRawBody" description="checks if the raw body is needed to handle the request.">
@@ -451,7 +451,17 @@
 	</class>
 
 		
-	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent">
+	<global 
+	   baseclassname="Base" 
+	   stringoutclassname="Base" 
+	   releasemethod="ReleaseInstance" 
+	   acquiremethod="AcquireInstance" 
+	   versionmethod="GetVersion" 
+	   errormethod="GetLastError" 
+	   injectionmethod="InjectComponent"
+	   simpletypewrapperclass="CreateString"
+	   
+	   >
 		
 		<method name="GetVersion" description = "retrieves the binary version of this library.">
 			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
@@ -478,6 +488,8 @@
 			<param name="DataModel" type="class" class="LibMCData:DataModel" pass="in" description="DataModel Object" />
 			<param name="Instance" type="class" class="MCContext" pass="return" description="New Context instance" />
 		</method>
+		
+		
 	</global>
 	
 	

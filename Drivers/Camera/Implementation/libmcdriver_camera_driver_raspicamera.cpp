@@ -38,7 +38,7 @@ Abstract: This is a stub class definition of CDriver_RaspiCamera
 
 // Include custom headers here.
 #ifndef _WIN32
-#include "RaspiStill.hpp"
+#include "raspicamera.h"
 #endif
 
 
@@ -57,6 +57,11 @@ CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::st
 }
 
 
+void CDriver_RaspiCamera::Configure(const std::string& sConfigurationString)
+{
+
+}
+
 IRaspiCameraDeviceIterator* CDriver_RaspiCamera::QueryDevices() 
 {
     auto pIterator = std::make_unique <CRaspiCameraDeviceIterator> ();
@@ -68,11 +73,10 @@ IRaspiCameraDeviceIterator* CDriver_RaspiCamera::QueryDevices()
 void CDriver_RaspiCamera::Initialize(const std::string & sDeviceString, const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight, const LibMCDriver_Camera::eImagePixelFormat ePixelformat)
 {
 #ifndef _WIN32
-    m_pCamera.reset();
-    m_pCamera = new RaspiStill ();
-    m_pCamera->SetWidth(nWidth);
-    m_pCamera->SetHeight(nHeight);
-    m_pCamera->SetEncoding("png");
+    // m_pCamera.reset();
+    m_pCamera = new RaspiCamera ();
+    m_pCamera->Settings.Width = 640;
+    m_pCamera->Settings.Height = 480;
     m_pCamera->Initialize();
 #endif // _WIN32
 
@@ -81,11 +85,11 @@ void CDriver_RaspiCamera::Initialize(const std::string & sDeviceString, const Li
 IPNGImage* CDriver_RaspiCamera::CapturePNGImage()
 {
 #ifndef _WIN32
-    auto pImage = std::make_unique<CPNGImage>(m_pCamera->GetWidth(), m_pCamera->GetHeight(), eImagePixelFormat::RGB32);
+    auto pImage = std::make_unique<CPNGImage>(m_pCamera->Settings.Width, m_pCamera->Settings.Height, eImagePixelFormat::RGB32);
 
-    std::vector <uint8_t>& pData = pImage->getBinaryData();
+    std::vector<uint8_t>& pData = pImage->getBinaryData();
 
-    m_pCamera->Capture(pData);
+    m_pCamera->Capture(&pData);
 
     return pImage.release();
 #else

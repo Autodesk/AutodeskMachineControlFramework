@@ -74,14 +74,42 @@ std::string CToolpathLayer::GetSegmentPartUUID(const LibMCEnv_uint32 nIndex)
 	return m_pToolpathLayerData->getSegmentPartUUID(nIndex);
 }
 
-std::string CToolpathLayer::GetSegmentProfileValue(const std::string& sValueName)
+std::string CToolpathLayer::GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string& sValueName)
 {
 	return "";
 }
 
-LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv::eToolpathProfileValueType eValueType)
-{
-	return 0.0;
+LibMCEnv_double CToolpathLayer::GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType)
+{	
+	auto sProfile = m_pToolpathLayerData->getSegmentProfile(nIndex);
+
+	switch (eValueType) {
+		case LibMCEnv::eToolpathProfileValueType::Speed:
+			return sProfile.m_dLaserSpeed;
+		case LibMCEnv::eToolpathProfileValueType::LaserPower:
+			return sProfile.m_dLaserPower;
+		case LibMCEnv::eToolpathProfileValueType::LaserFocus:
+			return sProfile.m_dLaserFocus;
+		case LibMCEnv::eToolpathProfileValueType::JumpSpeed:
+			return sProfile.m_dJumpSpeed;
+		case LibMCEnv::eToolpathProfileValueType::ExtrusionFactor:
+			return sProfile.m_dExtrusionFactor;
+		case LibMCEnv::eToolpathProfileValueType::StartDelay:
+			return sProfile.m_dStartDelay;
+		case LibMCEnv::eToolpathProfileValueType::EndDelay:
+			return sProfile.m_dEndDelay;
+		case LibMCEnv::eToolpathProfileValueType::PolyDelay:
+			return sProfile.m_dPolyDelay;
+		case LibMCEnv::eToolpathProfileValueType::JumpDelay:
+			return sProfile.m_dJumpDelay;
+		case LibMCEnv::eToolpathProfileValueType::LaserOnDelay:
+			return sProfile.m_dLaserOnDelay;
+		case LibMCEnv::eToolpathProfileValueType::LaserOffDelay:
+			return sProfile.m_dLaserOffDelay;
+		default:
+			return 0.0;
+	}
+
 }
 
 

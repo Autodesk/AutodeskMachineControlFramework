@@ -138,6 +138,65 @@ namespace AMC {
 		}
 
 
+		void unzipFileEx(const std::string& sName, uint8_t* pBuffer, const uint64_t nBufferSize)
+		{
+			auto iIter = m_ZIPEntries.find(sName);
+			if (iIter == m_ZIPEntries.end())
+				throw ELibMCInterfaceException(LIBMC_ERROR_ZIPENTRYNOTFOUND);
+
+			zip_stat_t Stat;
+			int32_t nResult = zip_stat_index(m_ZIParchive, iIter->second, ZIP_FL_UNCHANGED, &Stat);
+			if (nResult != 0)
+				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTSTATZIPENTRY);
+
+			uint64_t nSize = Stat.size;
+
+			zip_file_t* pFile = zip_fopen_index(m_ZIParchive, iIter->second, ZIP_FL_UNCHANGED);
+			if (pFile == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTOPENZIPENTRY);
+
+			CResourcePackage_ZIPFilePtr pZIPFilePtr(pFile);
+			
+			if (nSize > 0) {
+
+				if (pBuffer == nullptr)
+					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+				if (nBufferSize < nSize)
+					throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+
+				uint64_t cbBytesLeft = nSize;
+				uint64_t cbBytesRead = 0;
+
+				uint8_t* pData = pBuffer;
+				while (cbBytesLeft > 0) {
+					uint32_t cbBytesToRead;
+					if (cbBytesLeft > ROOT_ZIP_READCHUNKSIZE)
+						cbBytesToRead = ROOT_ZIP_READCHUNKSIZE;
+					else
+						cbBytesToRead = (uint32_t)cbBytesLeft;
+					cbBytesLeft -= cbBytesToRead;
+
+					uint64_t readSize = zip_fread(pFile, pData, cbBytesToRead);
+					if (readSize < 0)
+						throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTREADZIPSTREAM);
+					cbBytesRead += readSize;
+
+					if (readSize != (uint64_t)cbBytesToRead)
+						break;
+
+					pData += readSize;
+				}
+
+
+				if ((uint64_t)cbBytesRead != nSize) {
+					throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTREADFULLZIPDATA);
+				}
+
+			}
+
+		}
+
+
 		void unzipFile(const std::string& sName, std::vector<uint8_t>& Buffer)
 		{
 
@@ -386,6 +445,20 @@ namespace AMC {
 
 		auto sFileName = iIter->second->getFileName ();
 		m_pResourcePackageZIP->unzipFile(sFileName, Buffer);
+
+	}
+
+
+	void CResourcePackage::readEntryEx(const std::string& sName, uint8_t* pBuffer, const uint64_t nBufferSize)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto iIter = m_NameMap.find(sName);
+		if (iIter == m_NameMap.end())
+			throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
+
+		auto sFileName = iIter->second->getFileName();
+		m_pResourcePackageZIP->unzipFileEx(sFileName, pBuffer, nBufferSize);
 
 	}
 

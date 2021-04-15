@@ -371,7 +371,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofileuuid(LibMCEnv_ToolpathLay
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
 
@@ -388,7 +388,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLa
 		
 		bool isCacheCall = (pValueBuffer == nullptr);
 		if (isCacheCall) {
-			sValue = pIToolpathLayer->GetSegmentProfileValue(sValueName);
+			sValue = pIToolpathLayer->GetSegmentProfileValue(nIndex, sValueName);
 
 			pIToolpathLayer->_setCache (new ParameterCache_1<std::string> (sValue));
 		}
@@ -422,7 +422,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLa
 	}
 }
 
-LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, eLibMCEnvToolpathProfileValueType eValueType, LibMCEnv_double * pValue)
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, eLibMCEnvToolpathProfileValueType eValueType, LibMCEnv_double * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
 
@@ -433,7 +433,7 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_Toolp
 		if (!pIToolpathLayer)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIToolpathLayer->GetSegmentProfileTypedValue(eValueType);
+		*pValue = pIToolpathLayer->GetSegmentProfileTypedValue(nIndex, eValueType);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -1392,7 +1392,7 @@ LibMCEnvResult libmcenv_workingfile_fileexists(LibMCEnv_WorkingFile pWorkingFile
 	}
 }
 
-LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess)
+LibMCEnvResult libmcenv_workingfile_deletefromdisk(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pWorkingFile;
 
@@ -1403,7 +1403,7 @@ LibMCEnvResult libmcenv_workingfile_deletefile(LibMCEnv_WorkingFile pWorkingFile
 		if (!pIWorkingFile)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pSuccess = pIWorkingFile->DeleteFile();
+		*pSuccess = pIWorkingFile->DeleteFromDisk();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -1546,6 +1546,40 @@ LibMCEnvResult libmcenv_workingdirectory_storecustomdata(LibMCEnv_WorkingDirecto
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pBaseWorkingFile = pIWorkingDirectory->StoreCustomData(sFileName, nDataBufferBufferSize, pDataBufferBuffer);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_storecustomstring(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pFileName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sFileName(pFileName);
+		std::string sDataString(pDataString);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->StoreCustomString(sFileName, sDataString);
 
 		*pWorkingFile = (IBase*)(pBaseWorkingFile);
 		return LIBMCENV_SUCCESS;
@@ -1810,6 +1844,37 @@ LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvi
 		
 		pIDriverEnvironment->RetrieveDriverData(sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
 
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pStreamUUID == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pToolpathInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sStreamUUID(pStreamUUID);
+		IBase* pBaseToolpathInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseToolpathInstance = pIDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+
+		*pToolpathInstance = (IBase*)(pBaseToolpathInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -2106,6 +2171,56 @@ LibMCEnvResult libmcenv_driverenvironment_setboolparameter(LibMCEnv_DriverEnviro
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIDriverEnvironment->SetBoolParameter(sParameterName, bValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_sleep(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nDelay)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->Sleep(nDelay);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pTimerValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimerValue = pIDriverEnvironment->GetGlobalTimerInMilliseconds();
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -3944,6 +4059,35 @@ LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibMCEnv_StateEnvironm
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ((!pResourceDataBuffer) && !(pResourceDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIStateEnvironment->LoadResourceData(sResourceName, nResourceDataBufferSize, pResourceDataNeededCount, pResourceDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UIEnvironment
@@ -4472,8 +4616,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingfile_makemanaged;
 	if (sProcName == "libmcenv_workingfile_fileexists") 
 		*ppProcAddress = (void*) &libmcenv_workingfile_fileexists;
-	if (sProcName == "libmcenv_workingfile_deletefile") 
-		*ppProcAddress = (void*) &libmcenv_workingfile_deletefile;
+	if (sProcName == "libmcenv_workingfile_deletefromdisk") 
+		*ppProcAddress = (void*) &libmcenv_workingfile_deletefromdisk;
 	if (sProcName == "libmcenv_workingfileiterator_getcurrentfile") 
 		*ppProcAddress = (void*) &libmcenv_workingfileiterator_getcurrentfile;
 	if (sProcName == "libmcenv_workingdirectory_isactive") 
@@ -4482,6 +4626,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_getabsolutefilepath;
 	if (sProcName == "libmcenv_workingdirectory_storecustomdata") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomdata;
+	if (sProcName == "libmcenv_workingdirectory_storecustomstring") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomstring;
 	if (sProcName == "libmcenv_workingdirectory_storedriverdata") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storedriverdata;
 	if (sProcName == "libmcenv_workingdirectory_cleanup") 
@@ -4500,6 +4646,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createworkingdirectory;
 	if (sProcName == "libmcenv_driverenvironment_retrievedriverdata") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_retrievedriverdata;
+	if (sProcName == "libmcenv_driverenvironment_createtoolpathaccessor") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createtoolpathaccessor;
 	if (sProcName == "libmcenv_driverenvironment_registerstringparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_registerstringparameter;
 	if (sProcName == "libmcenv_driverenvironment_registeruuidparameter") 
@@ -4520,6 +4668,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_setintegerparameter;
 	if (sProcName == "libmcenv_driverenvironment_setboolparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_setboolparameter;
+	if (sProcName == "libmcenv_driverenvironment_sleep") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_sleep;
+	if (sProcName == "libmcenv_driverenvironment_getglobaltimerinmilliseconds") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_getglobaltimerinmilliseconds;
 	if (sProcName == "libmcenv_signaltrigger_cantrigger") 
 		*ppProcAddress = (void*) &libmcenv_signaltrigger_cantrigger;
 	if (sProcName == "libmcenv_signaltrigger_trigger") 
@@ -4628,6 +4780,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getintegerparameter;
 	if (sProcName == "libmcenv_stateenvironment_getboolparameter") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getboolparameter;
+	if (sProcName == "libmcenv_stateenvironment_loadresourcedata") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcedata;
 	if (sProcName == "libmcenv_uienvironment_preparesignal") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_preparesignal;
 	if (sProcName == "libmcenv_uienvironment_getmachinestate") 

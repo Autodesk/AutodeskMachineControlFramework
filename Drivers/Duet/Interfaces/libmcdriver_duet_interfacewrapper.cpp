@@ -83,6 +83,33 @@ LibMCDriver_DuetResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_DuetResult libmcdriver_duet_driver_configure(LibMCDriver_Duet_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_DUET_SUCCESS;
+	}
+	catch (ELibMCDriver_DuetInterfaceException & Exception) {
+		return handleLibMCDriver_DuetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_DuetResult libmcdriver_duet_driver_getname(LibMCDriver_Duet_Driver pDriver, const LibMCDriver_Duet_uint32 nNameBufferSize, LibMCDriver_Duet_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -396,7 +423,7 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_setabsolutepositioning(LibMC
 	}
 }
 
-LibMCDriver_DuetResult libmcdriver_duet_driver_duet_updatepositionstate(LibMCDriver_Duet_Driver_Duet pDriver_Duet)
+LibMCDriver_DuetResult libmcdriver_duet_driver_duet_queryparameters(LibMCDriver_Duet_Driver_Duet pDriver_Duet)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Duet;
 
@@ -405,7 +432,7 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_updatepositionstate(LibMCDri
 		if (!pIDriver_Duet)
 			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
 		
-		pIDriver_Duet->UpdatePositionState();
+		pIDriver_Duet->QueryParameters();
 
 		return LIBMCDRIVER_DUET_SUCCESS;
 	}
@@ -420,7 +447,7 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_updatepositionstate(LibMCDri
 	}
 }
 
-LibMCDriver_DuetResult libmcdriver_duet_driver_duet_getcurrentposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ)
+LibMCDriver_DuetResult libmcdriver_duet_driver_duet_gettargetposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ, LibMCDriver_Duet_double * pA, LibMCDriver_Duet_double * pB)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Duet;
 
@@ -431,11 +458,15 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_getcurrentposition(LibMCDriv
 			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
 		if (!pZ)
 			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
+		if (!pA)
+			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
+		if (!pB)
+			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
 		IDriver_Duet* pIDriver_Duet = dynamic_cast<IDriver_Duet*>(pIBaseClass);
 		if (!pIDriver_Duet)
 			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
 		
-		pIDriver_Duet->GetCurrentPosition(*pX, *pY, *pZ);
+		pIDriver_Duet->GetTargetPosition(*pX, *pY, *pZ, *pA, *pB);
 
 		return LIBMCDRIVER_DUET_SUCCESS;
 	}
@@ -450,7 +481,7 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_getcurrentposition(LibMCDriv
 	}
 }
 
-LibMCDriver_DuetResult libmcdriver_duet_driver_duet_gettargetposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ)
+LibMCDriver_DuetResult libmcdriver_duet_driver_duet_getcurrentposition(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double * pX, LibMCDriver_Duet_double * pY, LibMCDriver_Duet_double * pZ, LibMCDriver_Duet_double * pA, LibMCDriver_Duet_double * pB)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Duet;
 
@@ -461,11 +492,15 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_gettargetposition(LibMCDrive
 			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
 		if (!pZ)
 			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
+		if (!pA)
+			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
+		if (!pB)
+			throw ELibMCDriver_DuetInterfaceException (LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
 		IDriver_Duet* pIDriver_Duet = dynamic_cast<IDriver_Duet*>(pIBaseClass);
 		if (!pIDriver_Duet)
 			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
 		
-		pIDriver_Duet->GetTargetPosition(*pX, *pY, *pZ);
+		pIDriver_Duet->GetCurrentPosition(*pX, *pY, *pZ, *pA, *pB);
 
 		return LIBMCDRIVER_DUET_SUCCESS;
 	}
@@ -584,7 +619,7 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_isconnected(LibMCDriver_Duet
 	}
 }
 
-LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoxy(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dX, LibMCDriver_Duet_double dY, LibMCDriver_Duet_double dE, LibMCDriver_Duet_double dSpeed)
+LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoxy(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dX, LibMCDriver_Duet_double dY, LibMCDriver_Duet_double dLaserPower, LibMCDriver_Duet_double dSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Duet;
 
@@ -593,7 +628,7 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoxy(LibMCDriver_Duet_Dr
 		if (!pIDriver_Duet)
 			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
 		
-		pIDriver_Duet->MoveToXY(dX, dY, dE, dSpeed);
+		pIDriver_Duet->MoveToXY(dX, dY, dLaserPower, dSpeed);
 
 		return LIBMCDRIVER_DUET_SUCCESS;
 	}
@@ -656,7 +691,7 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoz(LibMCDriver_Duet_Dri
 	}
 }
 
-LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movefasttoz(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dZ, LibMCDriver_Duet_double dSpeed)
+LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetoa(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dA, LibMCDriver_Duet_double dSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Duet;
 
@@ -665,7 +700,31 @@ LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movefasttoz(LibMCDriver_Duet
 		if (!pIDriver_Duet)
 			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
 		
-		pIDriver_Duet->MoveFastToZ(dZ, dSpeed);
+		pIDriver_Duet->MoveToA(dA, dSpeed);
+
+		return LIBMCDRIVER_DUET_SUCCESS;
+	}
+	catch (ELibMCDriver_DuetInterfaceException & Exception) {
+		return handleLibMCDriver_DuetException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_DuetResult libmcdriver_duet_driver_duet_movetob(LibMCDriver_Duet_Driver_Duet pDriver_Duet, LibMCDriver_Duet_double dB, LibMCDriver_Duet_double dSpeed)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Duet;
+
+	try {
+		IDriver_Duet* pIDriver_Duet = dynamic_cast<IDriver_Duet*>(pIBaseClass);
+		if (!pIDriver_Duet)
+			throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDCAST);
+		
+		pIDriver_Duet->MoveToB(dB, dSpeed);
 
 		return LIBMCDRIVER_DUET_SUCCESS;
 	}
@@ -794,6 +853,8 @@ LibMCDriver_DuetResult LibMCDriver_Duet::Impl::LibMCDriver_Duet_GetProcAddress (
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_duet_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_duet_driver_configure;
 	if (sProcName == "libmcdriver_duet_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_getname;
 	if (sProcName == "libmcdriver_duet_driver_gettype") 
@@ -810,12 +871,12 @@ LibMCDriver_DuetResult LibMCDriver_Duet::Impl::LibMCDriver_Duet_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_disconnect;
 	if (sProcName == "libmcdriver_duet_driver_duet_setabsolutepositioning") 
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_setabsolutepositioning;
-	if (sProcName == "libmcdriver_duet_driver_duet_updatepositionstate") 
-		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_updatepositionstate;
-	if (sProcName == "libmcdriver_duet_driver_duet_getcurrentposition") 
-		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_getcurrentposition;
+	if (sProcName == "libmcdriver_duet_driver_duet_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_queryparameters;
 	if (sProcName == "libmcdriver_duet_driver_duet_gettargetposition") 
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_gettargetposition;
+	if (sProcName == "libmcdriver_duet_driver_duet_getcurrentposition") 
+		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_getcurrentposition;
 	if (sProcName == "libmcdriver_duet_driver_duet_canexecutemovement") 
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_canexecutemovement;
 	if (sProcName == "libmcdriver_duet_driver_duet_ismoving") 
@@ -830,8 +891,10 @@ LibMCDriver_DuetResult LibMCDriver_Duet::Impl::LibMCDriver_Duet_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_movefasttoxy;
 	if (sProcName == "libmcdriver_duet_driver_duet_movetoz") 
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_movetoz;
-	if (sProcName == "libmcdriver_duet_driver_duet_movefasttoz") 
-		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_movefasttoz;
+	if (sProcName == "libmcdriver_duet_driver_duet_movetoa") 
+		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_movetoa;
+	if (sProcName == "libmcdriver_duet_driver_duet_movetob") 
+		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_movetob;
 	if (sProcName == "libmcdriver_duet_driver_duet_starthoming") 
 		*ppProcAddress = (void*) &libmcdriver_duet_driver_duet_starthoming;
 	if (sProcName == "libmcdriver_duet_driver_duet_emergencystop") 

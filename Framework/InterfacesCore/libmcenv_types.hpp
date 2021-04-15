@@ -192,7 +192,13 @@ namespace LibMCEnv {
     LaserPower = 4,
     StartDelay = 5,
     EndDelay = 6,
-    PolyDelay = 7
+    PolyDelay = 7,
+    PolyDelayAngleDependent = 8,
+    LaserOnDelay = 9,
+    LaserOffDelay = 10,
+    JumpDelay = 11,
+    MarkDelay = 12,
+    LaserFocus = 13
   };
   
   /*************************************************************************************************************************

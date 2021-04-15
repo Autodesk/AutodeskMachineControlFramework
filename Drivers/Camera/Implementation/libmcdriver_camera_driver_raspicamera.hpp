@@ -44,7 +44,7 @@ Abstract: This is the class declaration of CDriver_RaspiCamera
 #pragma warning(disable : 4250)
 #endif
 
-class RaspiStill;
+class RaspiCamera;
 
 namespace LibMCDriver_Camera {
 namespace Impl {
@@ -56,7 +56,7 @@ namespace Impl {
 
 class CDriver_RaspiCamera : public virtual IDriver_RaspiCamera, public virtual CDriver_Camera {
 private:
-    RaspiStill* m_pCamera;
+    RaspiCamera* m_pCamera;
 
 
 protected:
@@ -65,6 +65,8 @@ protected:
 public:
 
     CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+    void Configure(const std::string& sConfigurationString) override;
 
     IRaspiCameraDeviceIterator* QueryDevices() override;
 

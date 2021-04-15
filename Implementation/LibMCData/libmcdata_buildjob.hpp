@@ -57,8 +57,10 @@ namespace Impl {
 **************************************************************************************************************************/
 
 class CBuildJob;
-
 typedef std::shared_ptr<CBuildJob> PBuildJob;
+
+class CBuildJobData;
+typedef std::shared_ptr<CBuildJobData> PBuildJobData;
 
 class CBuildJob : public virtual IBuildJob, public virtual CBase {
 private:
@@ -75,7 +77,8 @@ private:
 
     void ensureUpdate (const std::string sUpdateUUID, uint32_t nErrorCode);
 
-    IBuildJobDataIterator* ListJobDataEx (AMCData::CSQLStatement * pStatement); 
+    CBuildJobData * makeJobDataEx(AMCData::CSQLStatement* pStatement);
+    IBuildJobDataIterator* listJobDataEx(AMCData::CSQLStatement * pStatement);
 
 protected:
 
@@ -124,6 +127,8 @@ public:
     IBuildJobDataIterator* ListJobDataByType(const LibMCData::eBuildJobDataType eDataType) override;
 
     IBuildJobDataIterator* ListJobData() override;
+
+    IBuildJobData* RetrieveJobData(const std::string& sDataUUID) override;
 
     static std::string convertBuildJobStatusToString(const LibMCData::eBuildJobStatus eStatus);
     static LibMCData::eBuildJobStatus convertStringToBuildJobStatus(const std::string& sValue);

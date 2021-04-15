@@ -40,42 +40,101 @@ Abstract: This is a stub class definition of CDriver_Duet
 using namespace LibMCDriver_Duet::Impl;
 
 /*************************************************************************************************************************
- Class definition of CDriver_Duet 
+ Class definition of CDriver_Duet
 **************************************************************************************************************************/
+CDriver_Duet::CDriver_Duet(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: CDriver(sName, sType), m_pDriverEnvironment (pDriverEnvironment)
+{
+	if (pDriverEnvironment.get() == nullptr)
+		throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_INVALIDPARAM);
+
+	pDriverEnvironment->RegisterDoubleParameter("targetx", "Target X Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("targety", "Target Y Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("targetz", "Target Z Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("targeta", "Target A Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("targetb", "Target B Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currentx", "X Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currenty", "Y Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currentz", "Z Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currenta", "A Position", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currentb", "B Position", 0.0);
+	pDriverEnvironment->RegisterBoolParameter("ismoving", "Moving", false);
+	pDriverEnvironment->RegisterBoolParameter("ishomed", "Homed", false);
+	pDriverEnvironment->RegisterBoolParameter("isconnected", "Connected", false);
+}
+
+void CDriver_Duet::Configure(const std::string& sConfigurationString)
+{
+
+}
+
 
 void CDriver_Duet::Connect(const std::string & sCOMPort, const LibMCDriver_Duet_uint32 nBaudrate, const LibMCDriver_Duet_double dStatusUpdateInterval, const LibMCDriver_Duet_uint32 nConnectTimeout)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	Disconnect ();
+
+	auto pSerialController = std::make_shared<AMC::CSerialController_Duet>();
+	pSerialController->setCOMPort(sCOMPort);
+	pSerialController->setBaudrate(nBaudrate);
+	pSerialController->setConnectTimeout(nConnectTimeout);
+	pSerialController->setStatusUpdateTimerInterval(dStatusUpdateInterval);
+	pSerialController->initializeController();
+	m_pSerialController = pSerialController;
 }
 
 void CDriver_Duet::Disconnect()
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	if (m_pSerialController.get() != nullptr)
+		m_pSerialController->disconnectController();
+
+	m_pSerialController = nullptr;
 }
 
 void CDriver_Duet::SetAbsolutePositioning(const bool bAbsolute)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	if (bAbsolute) {
+		m_pSerialController->setPositioningAbsolute();
+	} else {
+		m_pSerialController->setPositioningRelative();
+	}
 }
 
-void CDriver_Duet::UpdatePositionState()
+void CDriver_Duet::QueryParameters()
+{
+	// m_pSerialController->queryPrinterState();
+
+	// double dX, dY, dZ, dA, dB;
+	// m_pSerialController->getTargetPosition(dX, dY, dZ, dA, dB);
+	// m_pDriverEnvironment->SetDoubleParameter("targetx", 0.0);
+	// m_pDriverEnvironment->SetDoubleParameter("targety", dY);
+	// m_pDriverEnvironment->SetDoubleParameter("targetz", dZ);
+	// m_pDriverEnvironment->SetDoubleParameter("targeta", dA);
+	// m_pDriverEnvironment->SetDoubleParameter("targetb", dB);
+
+	// m_pSerialController->getCurrentPosition(dX, dY, dZ, dA, dB);
+	// m_pDriverEnvironment->SetDoubleParameter("currentx", dX);
+	// m_pDriverEnvironment->SetDoubleParameter("currenty", dY);
+	// m_pDriverEnvironment->SetDoubleParameter("currentz", dZ);
+	// m_pDriverEnvironment->SetDoubleParameter("currenta", dA);
+	// m_pDriverEnvironment->SetDoubleParameter("currentb", dB);
+
+	// pDriverEnvironment->SetBoolParameter("ismoving", false);
+	// pDriverEnvironment->SetBoolParameter("ishomed", false);
+}
+
+void CDriver_Duet::GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB)
 {
 	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
 }
 
-void CDriver_Duet::GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ)
-{
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver_Duet::GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ)
+void CDriver_Duet::GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB)
 {
 	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
 }
 
 bool CDriver_Duet::CanExecuteMovement()
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	return m_pSerialController->canReceiveMovement();
 }
 
 bool CDriver_Duet::IsMoving()
@@ -93,24 +152,44 @@ bool CDriver_Duet::IsConnected()
 	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
 }
 
-void CDriver_Duet::MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dE, const LibMCDriver_Duet_double dSpeed)
+void CDriver_Duet::MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dLaserPower, const LibMCDriver_Duet_double dSpeed)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTCONNECTED);
+
+	m_pSerialController->moveXY(dX, dY, dLaserPower, dSpeed);
 }
 
 void CDriver_Duet::MoveFastToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dSpeed)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTCONNECTED);
+
+	m_pSerialController->moveFastXY(dX, dY, dSpeed);
 }
 
 void CDriver_Duet::MoveToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTCONNECTED);
+
+	m_pSerialController->moveZ(dZ, dSpeed);
 }
 
-void CDriver_Duet::MoveFastToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed)
+void CDriver_Duet::MoveToA(const LibMCDriver_Duet_double dA, const LibMCDriver_Duet_double dSpeed)
 {
-	throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTIMPLEMENTED);
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTCONNECTED);
+
+	m_pSerialController->moveA(dA, dSpeed);
+}
+
+void CDriver_Duet::MoveToB(const LibMCDriver_Duet_double dB, const LibMCDriver_Duet_double dSpeed)
+{
+	if (m_pSerialController.get() == nullptr)
+		throw ELibMCDriver_DuetInterfaceException(LIBMCDRIVER_DUET_ERROR_NOTCONNECTED);
+
+	m_pSerialController->moveB(dB, dSpeed);
 }
 
 void CDriver_Duet::StartHoming()

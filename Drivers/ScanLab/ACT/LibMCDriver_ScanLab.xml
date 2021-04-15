@@ -76,6 +76,14 @@
 		<error name="COULDNOTLOADPROGRAMFILE" code="1023" description="Could not load program file" />
 		<error name="COULDNOTLOADCORRECTIONFILE" code="1024" description="Could not load correction file" />
 		<error name="DELAYSMUSTBEMULTIPLEOF10" code="1025" description="Delays must be a multiple of 10 microseconds" />		
+		<error name="SCANLABSDKNOTLOADED" code="1026" description="Scanlab RTC has not been loaded" />
+		<error name="SCANLABSDKALREADYLOADED" code="1027" description="Scanlab RTC has already been loaded" />
+		<error name="CARDALREADYINITIALIZED" code="1028" description="Scanlab RTC card is already initialized" />
+		<error name="CARDNOTINITIALIZED" code="1029" description="Scanlab RTC card is not initialized" />		
+		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count" />
+		<error name="INVALIDMAXLASERPOWER" code="1031" description="Invalid max laser power." />
+		
+		
 	</errors>
 
 
@@ -119,6 +127,10 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 	</class>
 	
 	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
 	
 		<method name="GetName" description = "returns the name identifier of the driver">
 			<param name="Name" type="string" pass="return" description="Name of the driver." />
@@ -162,12 +174,14 @@ Custom implementation
 
 	<class name="RTCContext" parent="Base" description="Selector of the RTC Controller Card">
 
-		<method name="LoadProgramFromPath" description="Loads card firmware from given file path.">
-			<param name="Path" type="string" pass="in" description="Path to the image files." />
+		<method name="LoadFirmware" description="Loads card firmware from resource files.">
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
 		</method>
 
-		<method name="LoadCorrectionFile" description="Loads card calibration file from given file.">
-			<param name="FileName" type="string" pass="in" description="FileName to the image files." />
+		<method name="LoadCorrectionFile" description="Loads card calibration file from given resource file.">
+			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
 			<param name="TableNumber" type="uint32" pass="in" description="Correction table index of card (1..8)" />
 			<param name="Dimension" type="uint32" pass="in" description="Is it a 2D or 3D correction file." />
 		</method>
@@ -187,8 +201,17 @@ Custom implementation
 			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser Port Enum" />
 		</method>
 
-		<method name="SetLaserControl" description="Sets laser control of card.">
-			<param name="EnableLaser" type="bool" pass="in" description="Laser is enabled" />
+		<method name="DisableAutoLaserControl" description="Disables automatic laser control.">
+		</method>
+
+		<method name="SetLaserControlParameters" description="Sets laser control parameters of card.">
+			<param name="DisableLaser" type="bool" pass="in" description="Laser is disabled" />
+			<param name="FinishLaserPulseAfterOn" type="bool" pass="in" description="Finish laser pulse after LaserOn" />
+			<param name="PhaseShiftOfLaserSignal" type="bool" pass="in" description="180 degree phase shift of Laser signal" />
+			<param name="LaserOnSignalLowActive" type="bool" pass="in" description="Set Laser On Signal Low Active" />
+			<param name="LaserHalfSignalsLowActive" type="bool" pass="in" description="Set Laser Half Signal Low Active" />
+			<param name="SetDigitalInOneHighActive" type="bool" pass="in" description="Set Digital In 1 high Active" />
+			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
 		</method>
 
 		<method name="SetLaserPulsesInBits" description="Sets laser control pulse interval (in 1/64th microseconds)">
@@ -255,6 +278,7 @@ Custom implementation
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 		
 		<method name="DrawHatches" description="Writes a list of hatches into the open list">
@@ -262,6 +286,7 @@ Custom implementation
 			<param name="MarkSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="JumpSpeed" type="single" pass="in" description="Mark speed in mm/s" />
 			<param name="Power" type="single" pass="in" description="Laser power in percent" />
+			<param name="ZValue" type="single" pass="in" description="Focus Z Value" />
 		</method>
 
 		<method name="AddCustomDelay" description="Adds a custom delay to the list">
@@ -277,10 +302,38 @@ Custom implementation
 			<param name="Position" type="uint32" pass="out" description="Returns current executed position" />
 		</method>
 
+		<method name="GetHeadStatus" description="Returns status of scan head">
+			<param name="HeadNo" type="uint32" pass="in" description="Head Number" />
+			<param name="PositionXisOK" type="bool" pass="out" description="Position X is ok" />
+			<param name="PositionYisOK" type="bool" pass="out" description="Position Y is ok" />
+			<param name="TemperatureisOK" type="bool" pass="out" description="Temperature is ok" />
+			<param name="PowerisOK" type="bool" pass="out" description="Power is ok" />
+		</method>
+
+		<method name="GetStateValues" description="Returns status values of scan head">
+			<param name="LaserIsOn" type="bool" pass="out" description="Laser is on" />
+			<param name="PositionX" type="uint32" pass="out" description="Current Position X in Units" />
+			<param name="PositionY" type="uint32" pass="out" description="Current Position Y in Units" />
+			<param name="PositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
+			<param name="CorrectedPositionX" type="uint32" pass="out" description="Current Position X in Units" />
+			<param name="CorrectedPositionY" type="uint32" pass="out" description="Current Position Y in Units" />
+			<param name="CorrectedPositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
+			<param name="FocusShift" type="uint32" pass="out" description="Current Focus Shift in Units" />
+			<param name="MarkSpeed" type="uint32" pass="out" description="Current Mark Speed in Units" />
+		</method>
+
 		<method name="GetInputPointer" description="returns current input list position">
 			<param name="Position" type="uint32" pass="return" description="Returns current position of open list" />
 		</method>
-		
+
+		<method name="GetRTCVersion" description="Returns version information of the RTC Card">
+			<param name="RTCVersion" type="uint32" pass="out" description="RTC Card Version" />
+			<param name="RTCType" type="uint32" pass="out" description="RTC Card Type" />
+			<param name="DLLVersion" type="uint32" pass="out" description="RTC DLL Version" />
+			<param name="HEXVersion" type="uint32" pass="out" description="RTC HEX Version" />
+			<param name="BIOSVersion" type="uint32" pass="out" description="RTC BIOS Version" />
+		</method>
+						
 	</class>
 
 	
@@ -333,15 +386,63 @@ Custom implementation
 	</class>
 
 
+	<class name="Driver_ScanLab" parent="Driver" description="A LaserScanner Driver for a ScanLAB card.">
 
-	<class name="Driver_ScanLab_RTC5" parent="Driver" description="A LaserScanner Driver for a ScanLAB RTC5 card.">
+		<method name="LoadSDK" description="Initializes the ScanLab SDK.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name of Scanlab DLL" />
+		</method>
 
 		<method name="CreateRTCSelector" description="Creates and initializes a new RTC selector singleton. Should only be called once per Process.">
 			<param name="Instance" type="class" class="RTCSelector" pass="return" description="New Selector instance" />
 		</method>
 
-	
 	</class>
+
+
+	<class name="Driver_ScanLab_RTC5" parent="Driver_ScanLab" description="A LaserScanner Driver for a single laser ScanLAB RTC5 card.">
+
+		<method name="Initialise" description="Initializes the RTC5 Scanner Driver.">
+			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
+			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
+			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
+			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
+		</method>
+
+
+		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
+			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
+			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
+			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+		
+		<method name="SetCorrectionFile" description="Sets the correction file stream.">
+			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
+			<param name="TableNumber" type="uint32" pass="in" description="Correction table index of card (1..8)" />
+			<param name="Dimension" type="uint32" pass="in" description="Is it a 2D or 3D correction file." />
+			<param name="TableNumberHeadA" type="uint32" pass="in" description="Table number of Head A." />
+			<param name="TableNumberHeadB" type="uint32" pass="in" description="Table number of Head B." />
+		</method>		
+
+		<method name="ConfigureLaserMode" description="Configures the laser mode.">
+			<param name="LaserMode" type="enum" class="LaserMode" pass="in" description="Laser Mode Enum" />
+			<param name="LaserPort" type="enum" class="LaserPort" pass="in" description="Laser Port Enum" />
+			<param name="MaxLaserPower" type="double" pass="in" description="Maximum laser power." />
+			<param name="FinishLaserPulseAfterOn" type="bool" pass="in" description="Finish laser pulse after LaserOn" />
+			<param name="PhaseShiftOfLaserSignal" type="bool" pass="in" description="180 degree phase shift of Laser signal" />
+			<param name="LaserOnSignalLowActive" type="bool" pass="in" description="Set Laser On Signal Low Active" />
+			<param name="LaserHalfSignalsLowActive" type="bool" pass="in" description="Set Laser Half Signal Low Active" />
+			<param name="SetDigitalInOneHighActive" type="bool" pass="in" description="Set Digital In 1 high Active" />
+			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
+		</method>
+
+		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+		
+	</class>
+
+
 
 
 

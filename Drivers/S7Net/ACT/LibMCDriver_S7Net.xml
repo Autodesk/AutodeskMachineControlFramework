@@ -35,8 +35,7 @@
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
 	</implementations>
-	
-	
+		
 	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
 	
 	<errors>
@@ -51,7 +50,77 @@
 		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
+		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />
+		<error name="INVALIDDRIVERPROTOCOL" code="1003" description="invalid driver protocol definition" />
+		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1004" description="could not parse driver protocol" />
+		<error name="NOSTATUSDBDEFINITION" code="1005" description="no status db definition" />
+		<error name="NOSTATUSDBNUMBER" code="1006" description="no status db number" />
+		<error name="INVALIDSTATUSDBNUMBER" code="1007" description="invalid status db number" />
+		<error name="NOSTATUSDBSIZE" code="1008" description="no status db size" />
+		<error name="INVALIDSTATUSDBSIZE" code="1009" description="invalid status db size" />
+		<error name="NONAMEATTRIBUTE" code="1010" description="no name attribute" />
+		<error name="NOADDRESSEATTRIBUTE" code="1011" description="no address attribute" />
+		<error name="NODESCRIPTIONATTRIBUTE" code="1012" description="no description attribute" />
+		<error name="NOBITATTRIBUTE" code="1013" description="no bit attribute" />
+		
+		<error name="INVALIDNAMEATTRIBUTE" code="1014" description="invalid name attribute" />
+		<error name="INVALIDADDRESSEATTRIBUTE" code="1015" description="invalid address attribute" />
+		<error name="INVALIDDESCRIPTIONATTRIBUTE" code="1016" description="invalid description attribute" />
+		<error name="INVALIDBITATTRIBUTE" code="1017" description="invalid bit attribute" />
+		<error name="INVALIDCPUTYPE" code="1018" description="invalid cpu type" />
+		
+		<error name="NOCONTROLDBDEFINITION" code="1019" description="no control db definition" />
+		<error name="NOCONTROLDBNUMBER" code="1020" description="no control db number" />
+		<error name="INVALIDCONTROLDBNUMBER" code="1021" description="invalid control db number" />
+		
+		<error name="UNKNOWNCOMMANDNAME" code="1022" description="unknown command name" />
+		<error name="NOCOMMANDNAME" code="1023" description="no command name" />
+		<error name="NOCOMMANDID" code="1024" description="no command id" />
+		<error name="INVALIDCOMMANDNAME" code="1025" description="invalid command name" />
+		<error name="INVALIDCOMMANDID" code="1026" description="invalid command id" />
+		
+		<error name="COMMANDHASALREADYBEENEXECUTED" code="1027" description="command has already been executed" />
+		<error name="COMMANDHASNOTBEENEXECUTED" code="1028" description="command has not been executed" />
+		<error name="INVALIDSEQUENCEID" code="1029" description="invalid sequence id" />
+		<error name="COMMANDSEQUENCEERROR" code="1030" description="command sequence communication error" />
+		<error name="COMMANDREACTIONTIMEOUT" code="1031" description="command reaction timeout" />
+		<error name="NOCOMMANDSDEFINITION" code="1032" description="no commands definition" />
+		
+		<error name="NOVERSIONDEFINITION" code="1033" description="no version definition" />
+		<error name="NOMAJORVERSION" code="1034" description="no major version" />
+		<error name="NOMINORVERSION" code="1035" description="no minor version" />
+		<error name="NOPATCHVERSION" code="1036" description="no patch version" />
+		<error name="NOCONTROLDBSIZE" code="1037" description="no control db size" />
+		<error name="INVALIDCONTROLDBSIZE" code="1038" description="invalid control db size" />
+		
+		<error name="COULDNOTFINDADDRESS" code="1039" description="could not find address" />
+		<error name="FIELDISNOINTPARAM" code="1040" description="field is no int parameter" />
+		<error name="FIELDISNODINTPARAM" code="1041" description="field is no dint parameter" />
+		<error name="FIELDISNOSTRINGPARAM" code="1042" description="field is no string parameter" />
+		<error name="NOLENGTHATTRIBUTE" code="1043" description="no length attribute" />
+		<error name="INVALIDLENGTHATTRIBUTE" code="1044" description="invalid length attribute" />
+		
+		<error name="COMMANDPARAMETERNAMEMISSING" code="1045" description="command parameter name missing" />
+		<error name="COMMANDPARAMETERDESCRIPTIONMISSING" code="1046" description="command parameter description missing" />
+		<error name="COMMANDPARAMETERFIELDMISSING" code="1047" description="command parameter field missing" />
+		<error name="COMMANDPARAMETERNOTFOUND" code="1048" description="command parameter not found" />
+		<error name="COMMANDFIELDNOTFOUND" code="1049" description="command field not found" />
+		<error name="INVALIDPARAMETERTYPE" code="1050" description="command field parameter is of wrong type" />
+		<error name="COMMANDPARAMETEROUTOFBOUNDS" code="1051" description="command field parameter is out of bounds" />
+		
+		
+		
+		
 	</errors>
+
+	<enum name="S7CPUType">
+		<option name="S7200" value="0" />
+		<option name="S7300" value="10" />
+		<option name="S7400" value="20" />
+		<option name="S71200" value="30" />
+		<option name="S71500" value="40" />
+	</enum>		
 
 	
 <!--
@@ -64,6 +133,10 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 	</class>
 	
 	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
 	
 		<method name="GetName" description = "returns the name identifier of the driver">
 			<param name="Name" type="string" pass="return" description="Name of the driver." />
@@ -103,16 +176,58 @@ Custom implementation
 
 -->
 
+	<class name="PLCCommand" parent="Base">
+	
+		<method name="SetIntegerParameter" description="Sets an integer parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="int32" pass="in" description="Parameter Value" />
+		</method>		
 
+		<method name="SetStringParameter" description="Sets a string parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="string" pass="in" description="Parameter Value" />
+		</method>		
+
+		<method name="SetBoolParameter" description="Sets a bool parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="bool" pass="in" description="Parameter Value" />
+		</method>		
+
+		<method name="SetDoubleParameter" description="Sets a double parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="double" pass="in" description="Parameter Value" />
+		</method>		
+
+	</class>
 
 	<class name="Driver_S7Net" parent="Driver" description="A Driver for a S7 PLC.">
 
 		<method name="Connect" description="Creates and initializes a new S7 PLC.">
+			<param name="CPUType" type="enum" class="S7CPUType" pass="in" description="S7 CPU Type" />
+			<param name="IPAddress" type="string" pass="in" description="PLC IP Address" />
+			<param name="Rack" type="uint32" pass="in" description="Rack Number" />
+			<param name="Slot" type="uint32" pass="in" description="Slot Number" />
 		</method>
 
 		<method name="Disconnect" description="Disconnects from the S7 PLC.">
 		</method>
+		
+		<method name="CreateCommand" description="Create Command">
+			<param name="Command" type="string" pass="in" description="Command to execute" />
+			<param name="PLCCommand" type="class" class="PLCCommand" pass="return" description="Command instance" />
+		</method>		
 
+		<method name="ExecuteCommand" description="Execute Command">
+			<param name="PLCCommand" type="class" class="PLCCommand" pass="in" description="Command instance" />
+		</method>		
+
+		<method name="WaitForCommand" description="Wait for Command to finish executing">
+			<param name="PLCCommand" type="class" class="PLCCommand" pass="in" description="Command instance" />
+			<param name="ReactionTimeInMS" type="uint32" pass="in" description="How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time." />
+			<param name="WaitForTimeInMS" type="uint32" pass="in" description="How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished." />
+			<param name="CommandSuccess" type="bool" pass="return" description="Returns true if the command was finished successfully." />
+		</method>		
+		
 	</class>
 
 

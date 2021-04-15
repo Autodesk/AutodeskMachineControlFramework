@@ -340,6 +340,7 @@ public:
 	{
 	}
 	
+	inline void Configure(const std::string & sConfigurationString);
 	inline std::string GetName();
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_Duet_uint32 & nMajor, LibMCDriver_Duet_uint32 & nMinor, LibMCDriver_Duet_uint32 & nMicro, std::string & sBuild);
@@ -364,17 +365,18 @@ public:
 	inline void Connect(const std::string & sCOMPort, const LibMCDriver_Duet_uint32 nBaudrate, const LibMCDriver_Duet_double dStatusUpdateInterval, const LibMCDriver_Duet_uint32 nConnectTimeout);
 	inline void Disconnect();
 	inline void SetAbsolutePositioning(const bool bAbsolute);
-	inline void UpdatePositionState();
-	inline void GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ);
-	inline void GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ);
+	inline void QueryParameters();
+	inline void GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB);
+	inline void GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB);
 	inline bool CanExecuteMovement();
 	inline bool IsMoving();
 	inline bool IsHomed();
 	inline bool IsConnected();
-	inline void MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dE, const LibMCDriver_Duet_double dSpeed);
+	inline void MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dLaserPower, const LibMCDriver_Duet_double dSpeed);
 	inline void MoveFastToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dSpeed);
 	inline void MoveToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed);
-	inline void MoveFastToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed);
+	inline void MoveToA(const LibMCDriver_Duet_double dA, const LibMCDriver_Duet_double dSpeed);
+	inline void MoveToB(const LibMCDriver_Duet_double dB, const LibMCDriver_Duet_double dSpeed);
 	inline void StartHoming();
 	inline void EmergencyStop();
 	inline void SetAxisPosition(const std::string & sAxis, const LibMCDriver_Duet_double dValue);
@@ -502,6 +504,7 @@ public:
 			return LIBMCDRIVER_DUET_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
@@ -510,9 +513,9 @@ public:
 		pWrapperTable->m_Driver_Duet_Connect = nullptr;
 		pWrapperTable->m_Driver_Duet_Disconnect = nullptr;
 		pWrapperTable->m_Driver_Duet_SetAbsolutePositioning = nullptr;
-		pWrapperTable->m_Driver_Duet_UpdatePositionState = nullptr;
-		pWrapperTable->m_Driver_Duet_GetCurrentPosition = nullptr;
+		pWrapperTable->m_Driver_Duet_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_Duet_GetTargetPosition = nullptr;
+		pWrapperTable->m_Driver_Duet_GetCurrentPosition = nullptr;
 		pWrapperTable->m_Driver_Duet_CanExecuteMovement = nullptr;
 		pWrapperTable->m_Driver_Duet_IsMoving = nullptr;
 		pWrapperTable->m_Driver_Duet_IsHomed = nullptr;
@@ -520,7 +523,8 @@ public:
 		pWrapperTable->m_Driver_Duet_MoveToXY = nullptr;
 		pWrapperTable->m_Driver_Duet_MoveFastToXY = nullptr;
 		pWrapperTable->m_Driver_Duet_MoveToZ = nullptr;
-		pWrapperTable->m_Driver_Duet_MoveFastToZ = nullptr;
+		pWrapperTable->m_Driver_Duet_MoveToA = nullptr;
+		pWrapperTable->m_Driver_Duet_MoveToB = nullptr;
 		pWrapperTable->m_Driver_Duet_StartHoming = nullptr;
 		pWrapperTable->m_Driver_Duet_EmergencyStop = nullptr;
 		pWrapperTable->m_Driver_Duet_SetAxisPosition = nullptr;
@@ -579,6 +583,15 @@ public:
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_DuetDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_configure");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_DuetDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_duet_driver_configure");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Configure == nullptr)
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_DuetDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_getname");
@@ -653,21 +666,12 @@ public:
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Duet_UpdatePositionState = (PLibMCDriver_DuetDriver_Duet_UpdatePositionStatePtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_duet_updatepositionstate");
+		pWrapperTable->m_Driver_Duet_QueryParameters = (PLibMCDriver_DuetDriver_Duet_QueryParametersPtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_duet_queryparameters");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Duet_UpdatePositionState = (PLibMCDriver_DuetDriver_Duet_UpdatePositionStatePtr) dlsym(hLibrary, "libmcdriver_duet_driver_duet_updatepositionstate");
+		pWrapperTable->m_Driver_Duet_QueryParameters = (PLibMCDriver_DuetDriver_Duet_QueryParametersPtr) dlsym(hLibrary, "libmcdriver_duet_driver_duet_queryparameters");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Duet_UpdatePositionState == nullptr)
-			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Driver_Duet_GetCurrentPosition = (PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_duet_getcurrentposition");
-		#else // _WIN32
-		pWrapperTable->m_Driver_Duet_GetCurrentPosition = (PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr) dlsym(hLibrary, "libmcdriver_duet_driver_duet_getcurrentposition");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Duet_GetCurrentPosition == nullptr)
+		if (pWrapperTable->m_Driver_Duet_QueryParameters == nullptr)
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -677,6 +681,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_Duet_GetTargetPosition == nullptr)
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Duet_GetCurrentPosition = (PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_duet_getcurrentposition");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Duet_GetCurrentPosition = (PLibMCDriver_DuetDriver_Duet_GetCurrentPositionPtr) dlsym(hLibrary, "libmcdriver_duet_driver_duet_getcurrentposition");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Duet_GetCurrentPosition == nullptr)
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -743,12 +756,21 @@ public:
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_Duet_MoveFastToZ = (PLibMCDriver_DuetDriver_Duet_MoveFastToZPtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_duet_movefasttoz");
+		pWrapperTable->m_Driver_Duet_MoveToA = (PLibMCDriver_DuetDriver_Duet_MoveToAPtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_duet_movetoa");
 		#else // _WIN32
-		pWrapperTable->m_Driver_Duet_MoveFastToZ = (PLibMCDriver_DuetDriver_Duet_MoveFastToZPtr) dlsym(hLibrary, "libmcdriver_duet_driver_duet_movefasttoz");
+		pWrapperTable->m_Driver_Duet_MoveToA = (PLibMCDriver_DuetDriver_Duet_MoveToAPtr) dlsym(hLibrary, "libmcdriver_duet_driver_duet_movetoa");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_Duet_MoveFastToZ == nullptr)
+		if (pWrapperTable->m_Driver_Duet_MoveToA == nullptr)
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Duet_MoveToB = (PLibMCDriver_DuetDriver_Duet_MoveToBPtr) GetProcAddress(hLibrary, "libmcdriver_duet_driver_duet_movetob");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Duet_MoveToB = (PLibMCDriver_DuetDriver_Duet_MoveToBPtr) dlsym(hLibrary, "libmcdriver_duet_driver_duet_movetob");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Duet_MoveToB == nullptr)
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -866,6 +888,10 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_DuetResult eLookupError = LIBMCDRIVER_DUET_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriver_duet_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_duet_driver_getname", (void**)&(pWrapperTable->m_Driver_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetName == nullptr) )
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -898,16 +924,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_SetAbsolutePositioning == nullptr) )
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_updatepositionstate", (void**)&(pWrapperTable->m_Driver_Duet_UpdatePositionState));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_UpdatePositionState == nullptr) )
-			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_getcurrentposition", (void**)&(pWrapperTable->m_Driver_Duet_GetCurrentPosition));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_GetCurrentPosition == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_queryparameters", (void**)&(pWrapperTable->m_Driver_Duet_QueryParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_QueryParameters == nullptr) )
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_gettargetposition", (void**)&(pWrapperTable->m_Driver_Duet_GetTargetPosition));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_GetTargetPosition == nullptr) )
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_getcurrentposition", (void**)&(pWrapperTable->m_Driver_Duet_GetCurrentPosition));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_GetCurrentPosition == nullptr) )
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_canexecutemovement", (void**)&(pWrapperTable->m_Driver_Duet_CanExecuteMovement));
@@ -938,8 +964,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_MoveToZ == nullptr) )
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_movefasttoz", (void**)&(pWrapperTable->m_Driver_Duet_MoveFastToZ));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_MoveFastToZ == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_movetoa", (void**)&(pWrapperTable->m_Driver_Duet_MoveToA));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_MoveToA == nullptr) )
+			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_movetob", (void**)&(pWrapperTable->m_Driver_Duet_MoveToB));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Duet_MoveToB == nullptr) )
 			return LIBMCDRIVER_DUET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_duet_driver_duet_starthoming", (void**)&(pWrapperTable->m_Driver_Duet_StartHoming));
@@ -998,6 +1028,15 @@ public:
 	/**
 	 * Method definitions for class CDriver
 	 */
+	
+	/**
+	* CDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	void CDriver::Configure(const std::string & sConfigurationString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Configure(m_pHandle, sConfigurationString.c_str()));
+	}
 	
 	/**
 	* CDriver::GetName - returns the name identifier of the driver
@@ -1107,22 +1146,11 @@ public:
 	}
 	
 	/**
-	* CDriver_Duet::UpdatePositionState - Polls a new state from the printer.
+	* CDriver_Duet::QueryParameters - Stores the driver parameters in the driver environment.
 	*/
-	void CDriver_Duet::UpdatePositionState()
+	void CDriver_Duet::QueryParameters()
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_UpdatePositionState(m_pHandle));
-	}
-	
-	/**
-	* CDriver_Duet::GetCurrentPosition - Returns the current axis position.
-	* @param[out] dX - X Value in mm
-	* @param[out] dY - Y Value in mm
-	* @param[out] dZ - Z Value in mm
-	*/
-	void CDriver_Duet::GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_GetCurrentPosition(m_pHandle, &dX, &dY, &dZ));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_QueryParameters(m_pHandle));
 	}
 	
 	/**
@@ -1130,10 +1158,25 @@ public:
 	* @param[out] dX - X Value in mm
 	* @param[out] dY - Y Value in mm
 	* @param[out] dZ - Z Value in mm
+	* @param[out] dA - A Value in mm
+	* @param[out] dB - B Value in mm
 	*/
-	void CDriver_Duet::GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ)
+	void CDriver_Duet::GetTargetPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_GetTargetPosition(m_pHandle, &dX, &dY, &dZ));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_GetTargetPosition(m_pHandle, &dX, &dY, &dZ, &dA, &dB));
+	}
+	
+	/**
+	* CDriver_Duet::GetCurrentPosition - Returns the current position.
+	* @param[out] dX - X Value in mm
+	* @param[out] dY - Y Value in mm
+	* @param[out] dZ - Z Value in mm
+	* @param[out] dA - A Value in mm
+	* @param[out] dB - B Value in mm
+	*/
+	void CDriver_Duet::GetCurrentPosition(LibMCDriver_Duet_double & dX, LibMCDriver_Duet_double & dY, LibMCDriver_Duet_double & dZ, LibMCDriver_Duet_double & dA, LibMCDriver_Duet_double & dB)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_GetCurrentPosition(m_pHandle, &dX, &dY, &dZ, &dA, &dB));
 	}
 	
 	/**
@@ -1173,7 +1216,7 @@ public:
 	}
 	
 	/**
-	* CDriver_Duet::IsConnected - Returns if the printer is coneccted
+	* CDriver_Duet::IsConnected - Returns if the printer is connected
 	* @return True if printer is connected.
 	*/
 	bool CDriver_Duet::IsConnected()
@@ -1188,12 +1231,12 @@ public:
 	* CDriver_Duet::MoveToXY - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
 	* @param[in] dX - X Value in mm
 	* @param[in] dY - Y Value in mm
-	* @param[in] dE - E Value in mm
+	* @param[in] dLaserPower - Laser power in percent of maximum power
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	void CDriver_Duet::MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dE, const LibMCDriver_Duet_double dSpeed)
+	void CDriver_Duet::MoveToXY(const LibMCDriver_Duet_double dX, const LibMCDriver_Duet_double dY, const LibMCDriver_Duet_double dLaserPower, const LibMCDriver_Duet_double dSpeed)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_MoveToXY(m_pHandle, dX, dY, dE, dSpeed));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_MoveToXY(m_pHandle, dX, dY, dLaserPower, dSpeed));
 	}
 	
 	/**
@@ -1218,13 +1261,23 @@ public:
 	}
 	
 	/**
-	* CDriver_Duet::MoveFastToZ - Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
-	* @param[in] dZ - Z Value in mm
+	* CDriver_Duet::MoveToA - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dA - A Value in mm
 	* @param[in] dSpeed - Movement speed in mm/s
 	*/
-	void CDriver_Duet::MoveFastToZ(const LibMCDriver_Duet_double dZ, const LibMCDriver_Duet_double dSpeed)
+	void CDriver_Duet::MoveToA(const LibMCDriver_Duet_double dA, const LibMCDriver_Duet_double dSpeed)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_MoveFastToZ(m_pHandle, dZ, dSpeed));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_MoveToA(m_pHandle, dA, dSpeed));
+	}
+	
+	/**
+	* CDriver_Duet::MoveToB - Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.
+	* @param[in] dB - B Value in mm
+	* @param[in] dSpeed - Movement speed in mm/s
+	*/
+	void CDriver_Duet::MoveToB(const LibMCDriver_Duet_double dB, const LibMCDriver_Duet_double dSpeed)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Duet_MoveToB(m_pHandle, dB, dSpeed));
 	}
 	
 	/**

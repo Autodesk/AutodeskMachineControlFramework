@@ -21,29 +21,31 @@ The Autodesk Machine Control Framework is a solid, open machine controller inter
 TODO
 
 
-## Dependencies / Prerequisites (on Windows)
+## Dependencies / Prerequisites / Compilation (on Windows)
 * Visual Studio C/C++ (the Community Edition is sufficient technically) TODO
 * Get and install go https://golang.org/doc/install
 * A 64-MinGW compiler for cgo (we recommend TDM-GCC: https://jmeubank.github.io/tdm-gcc/)
 * Get and install cmake https://cmake.org/download/
 * Get and install nodejs: https://nodejs.org/en/download/ with optional chocolatey install (will install Phython as well)
+* build_clean_win64.bat should build the binaries and dev packages on Windows. The results are located in "build/Output".
 
 
-## Dependencies / Prerequisites (on x64-Linux)
-* Get and install go https://golang.org/doc/install
-* On x64 Debian, the following packages should be sufficient
-"build-essential", "cmake", "nodejs", "git", "npm".
-
+## Dependencies / Prerequisites / Compilation (on x64-Linux)
+* Get and install go binaries from https://golang.org/doc/install
+* Get and install node binaries from https://nodejs.org/en/download/ 
+* On x64 Debian, the following packages should be sufficient: 
+    - build-essential
+	- cmake
+	- git
+	- uuid-dev
+* build_clean_linux64.sh should build the binaries and dev packages on Windows. The results are located in "build/Output".
 
 ## Dependencies / Prerequisites (on ARM Linux)
 TODO
 
 ## Build and first run
-* Clone the Git repository to your local machine
-* run "build_clean.bat"
-* (copy Output folders together - should rework that)
-* Adjust config.xml, e.g.: (shoud change the defaults) [server hostname="127.0.0.1" port="8666"]  TODO
-* run "mcserver.exe"
+Build as described above.
+* run "amc_server.exe"
 * connect a web browser to http://[your server name or IP]:[your port number]
 
 
