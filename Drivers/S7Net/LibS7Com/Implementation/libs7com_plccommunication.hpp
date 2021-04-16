@@ -104,13 +104,15 @@ public:
 
 	void SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAddress, const LibS7Com_uint32 nMinorVersionAddress, const LibS7Com_uint32 nPatchVersionAddress, const LibS7Com_uint32 nBuildVersionAddress, const LibS7Com_uint32 nSequenceRunningAddress, const LibS7Com_uint32 nSequenceFinishedAddress, const LibS7Com_uint32 nSequenceStatusAddress, const LibS7Com_uint32 nSequenceErrorAddress) override;
 
+	ICommandParameters* PrepareParameters() override;
+
 	void StartCommunication(LibS7Net::PPLC pPLC) override;
 
 	void RetrieveStatus() override;
 
 	void StopCommunication() override;
 
-	LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID) override;
+	LibS7Com_uint32 ExecuteCommand(ICommandParameters* pParametersInstance, const LibS7Com_uint32 nCommandID) override;
 
 	void CheckCommandExecution(const LibS7Com_uint32 nSequenceID, bool& bSequenceIsActive, bool& bSequenceIsFinished, LibS7Com_uint32& nErrorCode) override;
 

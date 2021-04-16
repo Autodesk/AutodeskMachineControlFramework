@@ -56,6 +56,7 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
+class ICommandParameters;
 class IPLCCommunication;
 
 
@@ -238,6 +239,82 @@ typedef IBaseSharedPtr<IBase> PIBase;
 
 
 /*************************************************************************************************************************
+ Class interface for CommandParameters 
+**************************************************************************************************************************/
+
+class ICommandParameters : public virtual IBase {
+public:
+	/**
+	* ICommandParameters::WriteString - Writes string value.
+	* @param[in] nAddress - Address of String Variable.
+	* @param[in] nMaxLength - Maximum length.
+	* @param[in] sValue - Value of variable.
+	*/
+	virtual void WriteString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength, const std::string & sValue) = 0;
+
+	/**
+	* ICommandParameters::WriteBool - Writes bool value.
+	* @param[in] nAddress - Address of Bit Variable.
+	* @param[in] nBit - Bit of the variable (0-7)
+	* @param[in] bValue - Value of variable.
+	*/
+	virtual void WriteBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit, const bool bValue) = 0;
+
+	/**
+	* ICommandParameters::WriteByte - Writes byte value.
+	* @param[in] nAddress - Address of Bit Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	virtual void WriteByte(const LibS7Com_uint32 nAddress, const LibS7Com_uint8 nValue) = 0;
+
+	/**
+	* ICommandParameters::WriteInt16 - Writes Int16 value.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	virtual void WriteInt16(const LibS7Com_uint32 nAddress, const LibS7Com_int16 nValue) = 0;
+
+	/**
+	* ICommandParameters::WriteUint16 - Writes Uint16 value.
+	* @param[in] nAddress - Address of Int16 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	virtual void WriteUint16(const LibS7Com_uint32 nAddress, const LibS7Com_uint16 nValue) = 0;
+
+	/**
+	* ICommandParameters::WriteInt32 - Writes Int32 value.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	virtual void WriteInt32(const LibS7Com_uint32 nAddress, const LibS7Com_int32 nValue) = 0;
+
+	/**
+	* ICommandParameters::WriteUint32 - Writes Uint32 value.
+	* @param[in] nAddress - Address of Int32 Variable.
+	* @param[in] nValue - Value of variable.
+	*/
+	virtual void WriteUint32(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nValue) = 0;
+
+	/**
+	* ICommandParameters::WriteReal - Writes Real value.
+	* @param[in] nAddress - Address of Real Variable.
+	* @param[in] dValue - Value of variable.
+	*/
+	virtual void WriteReal(const LibS7Com_uint32 nAddress, const LibS7Com_double dValue) = 0;
+
+	/**
+	* ICommandParameters::WriteLReal - Writes LReal value.
+	* @param[in] nAddress - Address of Real Variable.
+	* @param[in] dValue - Value of variable.
+	*/
+	virtual void WriteLReal(const LibS7Com_uint32 nAddress, const LibS7Com_double dValue) = 0;
+
+};
+
+typedef IBaseSharedPtr<ICommandParameters> PICommandParameters;
+
+
+/*************************************************************************************************************************
  Class interface for PLCCommunication 
 **************************************************************************************************************************/
 
@@ -297,11 +374,18 @@ public:
 	virtual void StopCommunication() = 0;
 
 	/**
+	* IPLCCommunication::PrepareParameters - Prepares Command Parameters
+	* @return Instance of the parameters class.
+	*/
+	virtual ICommandParameters * PrepareParameters() = 0;
+
+	/**
 	* IPLCCommunication::ExecuteCommand - Executes a command
+	* @param[in] pParametersInstance - Instance of the parameters class.
 	* @param[in] nCommandID - ID of command to be triggered.
 	* @return Sequence ID of the executed command.
 	*/
-	virtual LibS7Com_uint32 ExecuteCommand(const LibS7Com_uint32 nCommandID) = 0;
+	virtual LibS7Com_uint32 ExecuteCommand(ICommandParameters* pParametersInstance, const LibS7Com_uint32 nCommandID) = 0;
 
 	/**
 	* IPLCCommunication::CheckCommandExecution - Checks the command execution state.

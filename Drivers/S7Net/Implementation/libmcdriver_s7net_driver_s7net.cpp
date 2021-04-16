@@ -78,6 +78,20 @@ double CDriver_S7RealValue::readValue(LibS7Com::CPLCCommunication* pCommunicatio
     return pCommunication->ReadVariableReal(m_nAddress);
 }
 
+ePLCFieldType CDriver_S7RealValue::getFieldType()
+{
+    return ePLCFieldType::ftReal;
+}
+
+void CDriver_S7RealValue::writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue)
+{
+    if (pCommandParameters == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    pCommandParameters->WriteReal(getAddress (), std::stod (sStringValue));
+}
+
+
 CDriver_S7LRealValue::CDriver_S7LRealValue(const std::string& sName, const uint32_t nAddress)
     : CDriver_S7Value(sName, nAddress)
 {
@@ -92,6 +106,18 @@ double CDriver_S7LRealValue::readValue(LibS7Com::CPLCCommunication* pCommunicati
     return pCommunication->ReadVariableLReal(m_nAddress);
 }
 
+ePLCFieldType CDriver_S7LRealValue::getFieldType()
+{
+    return ePLCFieldType::ftReal;
+}
+
+void CDriver_S7LRealValue::writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue)
+{
+    if (pCommandParameters == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    pCommandParameters->WriteLReal(getAddress(), std::stod(sStringValue));
+}
 
 CDriver_S7DIntValue::CDriver_S7DIntValue(const std::string& sName, const uint32_t nAddress)
     : CDriver_S7Value(sName, nAddress)
@@ -107,6 +133,20 @@ int32_t CDriver_S7DIntValue::readValue(LibS7Com::CPLCCommunication* pCommunicati
     return pCommunication->ReadVariableInt32(m_nAddress);
 }
 
+ePLCFieldType CDriver_S7DIntValue::getFieldType()
+{
+    return ePLCFieldType::ftDInt;
+}
+
+void CDriver_S7DIntValue::writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue)
+{
+    if (pCommandParameters == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    pCommandParameters->WriteInt32(getAddress(), std::stoi(sStringValue));
+}
+
+
 CDriver_S7IntValue::CDriver_S7IntValue(const std::string& sName, const uint32_t nAddress)
     : CDriver_S7Value(sName, nAddress)
 {
@@ -120,6 +160,21 @@ int32_t CDriver_S7IntValue::readValue(LibS7Com::CPLCCommunication* pCommunicatio
 
     return pCommunication->ReadVariableInt16(m_nAddress);
 }
+
+ePLCFieldType CDriver_S7IntValue::getFieldType()
+{
+    return ePLCFieldType::ftInt;
+}
+
+
+void CDriver_S7IntValue::writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue)
+{
+    if (pCommandParameters == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    pCommandParameters->WriteInt16(getAddress(), std::stoi(sStringValue));
+}
+
 
 CDriver_S7BoolValue::CDriver_S7BoolValue(const std::string& sName, const uint32_t nAddress, const uint32_t nBit)
     : CDriver_S7Value (sName, nAddress), m_nBit (nBit)
@@ -135,6 +190,25 @@ bool CDriver_S7BoolValue::readValue(LibS7Com::CPLCCommunication* pCommunication)
 
 }
 
+ePLCFieldType CDriver_S7BoolValue::getFieldType()
+{
+    return ePLCFieldType::ftBool;
+}
+
+void CDriver_S7BoolValue::writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue)
+{
+    if (pCommandParameters == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    pCommandParameters->WriteBool(getAddress(), getBit (), std::stoi(sStringValue) != 0);
+}
+
+
+uint32_t CDriver_S7BoolValue::getBit()
+{
+    return m_nBit;
+}
+
 
 CDriver_S7StringValue::CDriver_S7StringValue(const std::string& sName, const uint32_t nAddress, const uint32_t nLength)
     : CDriver_S7Value(sName, nAddress), m_nLength(nLength)
@@ -146,6 +220,41 @@ std::string CDriver_S7StringValue::readValue(LibS7Com::CPLCCommunication* pCommu
     return pCommunication->ReadVariableString(m_nAddress, m_nLength);;
 }
 
+ePLCFieldType CDriver_S7StringValue::getFieldType()
+{
+    return ePLCFieldType::ftString;
+}
+
+
+void CDriver_S7StringValue::writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue)
+{
+    if (pCommandParameters == nullptr)
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDPARAM);
+
+    pCommandParameters->WriteString(getAddress(), m_nLength, sStringValue);
+}
+
+
+CDriver_S7CommandParameter::CDriver_S7CommandParameter(const std::string& sName, const std::string& sDescription, const std::string& sField)
+    : m_sName(sName), m_sDescription (sDescription), m_sField (sField)
+{
+
+}
+
+std::string CDriver_S7CommandParameter::getName()
+{
+    return m_sName;
+}
+
+std::string CDriver_S7CommandParameter::getDescription()
+{
+    return m_sDescription;
+}
+
+std::string CDriver_S7CommandParameter::getField()
+{
+    return m_sField;
+}
 
 
 CDriver_S7Command::CDriver_S7Command(const std::string& sName, const uint32_t nCommandID)
@@ -168,6 +277,34 @@ uint32_t CDriver_S7Command::getCommandID()
 {
     return m_nCommandID;
 }
+
+PDriver_S7CommandParameter CDriver_S7Command::addParameter(const std::string& sName, const std::string& sDescription, const std::string& sField)
+{
+    auto pParameter = std::make_shared<CDriver_S7CommandParameter>(sName, sDescription, sField);
+    m_Parameters.insert(std::make_pair (sName, pParameter));
+
+    return pParameter;
+}
+
+std::list <std::string> CDriver_S7Command::getParameterNames()
+{
+    std::list <std::string> parameterNames;
+    for (auto iter : m_Parameters)
+        parameterNames.push_back(iter.second->getName ());
+
+    return parameterNames;
+}
+
+CDriver_S7CommandParameter* CDriver_S7Command::findParameter(const std::string& sName)
+{
+    auto iIter = m_Parameters.find(sName);
+    if (iIter == m_Parameters.end())
+        return nullptr;
+
+    return iIter->second.get();
+}
+
+
 
 /*************************************************************************************************************************
  Class definition of CDriver_S7Net 
@@ -469,6 +606,8 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
             if (sParamField.empty())
                 throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERFIELDMISSING);
 
+            pS7Command->addParameter(sParamName, sParamDescription, sParamField);
+
         }
 
 
@@ -612,7 +751,33 @@ void CDriver_S7Net::QueryParameters()
 
 IPLCCommand* CDriver_S7Net::CreateCommand(const std::string& sCommand)
 {
-    return new CPLCCommand(sCommand);
+    std::unique_ptr<CPLCCommand> pCommandInstance (new CPLCCommand(sCommand));
+
+    auto iIter = m_CommandDefinitions.find(sCommand);
+    if (iIter == m_CommandDefinitions.end())
+        throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_UNKNOWNCOMMANDNAME, "unknown command name: " + sCommand);
+
+    auto pCommandDefinition = iIter->second;
+    auto parameterNames = pCommandDefinition->getParameterNames();
+    for (auto parameterName : parameterNames) {
+        auto pParameter = pCommandDefinition->findParameter(parameterName);
+        if (pParameter == nullptr)
+            throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNOTFOUND);
+
+        auto sFieldName = pParameter->getField();
+        auto iControlParameter = m_ControlParameterMap.find(sFieldName);
+        if (iControlParameter == m_ControlParameterMap.end ())
+            throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COMMANDFIELDNOTFOUND, "command field not found: " + sFieldName);
+
+        auto pControlParameter = iControlParameter->second.get();
+        auto fieldType = pControlParameter->getFieldType();
+
+        pCommandInstance->addParameterDefinition(parameterName, fieldType);
+
+    }
+
+
+    return pCommandInstance.release ();
 }
 
 void CDriver_S7Net::ExecuteCommand(IPLCCommand* pPLCCommand)
@@ -639,11 +804,25 @@ void CDriver_S7Net::ExecuteCommand(IPLCCommand* pPLCCommand)
     if (iIter == m_CommandDefinitions.end ())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_UNKNOWNCOMMANDNAME, "unknown command name: " + sCommandName);
 
+    auto pParameters = m_pCommunication->PrepareParameters();
+
     auto pCommandDefinition = iIter->second;
+    auto parameterNames = pCommandDefinition->getParameterNames();
+    for (auto parameterName : parameterNames) {
+        auto sParameterValue = pPLCCommandInstance->getParameterValue(parameterName);
+        if (!sParameterValue.empty()) {
+
+            auto pParameter = pCommandDefinition->findParameter(parameterName);
+            auto sFieldName = pParameter->getField();
+            auto iControlIterator = m_ControlParameterMap.find(sFieldName);
+            iControlIterator->second->writeToPLCParameters(pParameters.get(), sParameterValue);
+        }
+    }
+
 
     if (m_pCommunication.get() == nullptr)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_DRIVERNOTCONNECTED);
-    nSequenceID = m_pCommunication->ExecuteCommand(pCommandDefinition->getCommandID());
+    nSequenceID = m_pCommunication->ExecuteCommand(pParameters, pCommandDefinition->getCommandID());
 
     if (nSequenceID == 0)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDSEQUENCEID);

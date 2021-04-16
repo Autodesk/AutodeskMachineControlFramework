@@ -41,6 +41,7 @@ Abstract: This is the class declaration of CDriver_S7Net
 
 // Parent classes
 #include "libmcdriver_s7net_driver.hpp"
+#include "libmcdriver_s7net_plccommand.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -50,6 +51,7 @@ Abstract: This is the class declaration of CDriver_S7Net
 #include "libs7com_dynamic.hpp"
 #include "libs7net_dynamic.hpp"
 
+
 namespace LibMCDriver_S7Net {
 namespace Impl {
 
@@ -57,6 +59,7 @@ namespace Impl {
 /*************************************************************************************************************************
  Class declaration of CDriver_S7Net 
 **************************************************************************************************************************/
+
 
 class CDriver_S7Value {
 protected:
@@ -70,6 +73,10 @@ public:
     std::string getName(); 
     uint32_t getAddress();
 
+    virtual ePLCFieldType getFieldType () = 0;
+
+    virtual void writeToPLCParameters (LibS7Com::CCommandParameters * pCommandParameters, const std::string & sStringValue) = 0;
+
 };
 
 
@@ -81,6 +88,10 @@ public:
 
     double readValue(LibS7Com::CPLCCommunication * pCommunication);
 
+    ePLCFieldType getFieldType() override;
+
+    void writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue) override;
+
 };
 
 class CDriver_S7LRealValue : public CDriver_S7Value {
@@ -90,6 +101,10 @@ public:
     CDriver_S7LRealValue(const std::string& sName, const uint32_t nAddress);
 
     double readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+    ePLCFieldType getFieldType() override;
+
+    void writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue) override;
 
 };
 
@@ -101,6 +116,10 @@ public:
 
     int32_t readValue(LibS7Com::CPLCCommunication* pCommunication);
 
+    ePLCFieldType getFieldType() override;
+
+    void writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue) override;
+
 };
 
 
@@ -111,6 +130,10 @@ public:
     CDriver_S7IntValue(const std::string& sName, const uint32_t nAddress);
 
     int32_t readValue(LibS7Com::CPLCCommunication* pCommunication);
+
+    ePLCFieldType getFieldType() override;
+
+    void writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue) override;
 
 };
 
@@ -127,6 +150,12 @@ public:
 
     bool readValue(LibS7Com::CPLCCommunication* pCommunication);
 
+    ePLCFieldType getFieldType() override;
+
+    uint32_t getBit();
+
+    void writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue) override;
+
 };
 
 class CDriver_S7StringValue : public CDriver_S7Value {
@@ -140,16 +169,37 @@ public:
 
     std::string readValue(LibS7Com::CPLCCommunication* pCommunication);
 
+    ePLCFieldType getFieldType() override;
+
+    void writeToPLCParameters(LibS7Com::CCommandParameters* pCommandParameters, const std::string& sStringValue) override;
+
 };
 
 
 typedef std::shared_ptr<CDriver_S7Value> PDriver_S7Value;
+
+class CDriver_S7CommandParameter {
+private:
+    std::string m_sName;
+    std::string m_sDescription;
+    std::string m_sField;
+public:
+    CDriver_S7CommandParameter(const std::string& sName, const std::string& sDescription, const std::string& sField);
+
+    std::string getName();
+    std::string getDescription();
+    std::string getField();
+};
+
+typedef std::shared_ptr<CDriver_S7CommandParameter> PDriver_S7CommandParameter;
 
 
 class CDriver_S7Command {
 protected:
     std::string m_sName;
     uint32_t m_nCommandID;
+    std::map<std::string, PDriver_S7CommandParameter> m_Parameters;
+
 public:
 
     CDriver_S7Command(const std::string& sName, const uint32_t nCommandID);
@@ -157,6 +207,10 @@ public:
 
     std::string getName();
     uint32_t getCommandID();
+
+    PDriver_S7CommandParameter addParameter(const std::string& sName, const std::string& sDescription, const std::string& sField);
+    std::list <std::string> getParameterNames();
+    CDriver_S7CommandParameter* findParameter(const std::string& sName);
 };
 
 typedef std::shared_ptr<CDriver_S7Command> PDriver_S7Command;

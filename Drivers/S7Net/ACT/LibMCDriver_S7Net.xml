@@ -104,6 +104,13 @@
 		<error name="COMMANDPARAMETERNAMEMISSING" code="1045" description="command parameter name missing" />
 		<error name="COMMANDPARAMETERDESCRIPTIONMISSING" code="1046" description="command parameter description missing" />
 		<error name="COMMANDPARAMETERFIELDMISSING" code="1047" description="command parameter field missing" />
+		<error name="COMMANDPARAMETERNOTFOUND" code="1048" description="command parameter not found" />
+		<error name="COMMANDFIELDNOTFOUND" code="1049" description="command field not found" />
+		<error name="INVALIDPARAMETERTYPE" code="1050" description="command field parameter is of wrong type" />
+		<error name="COMMANDPARAMETEROUTOFBOUNDS" code="1051" description="command field parameter is out of bounds" />
+		
+		
+		
 		
 	</errors>
 
@@ -170,6 +177,27 @@ Custom implementation
 -->
 
 	<class name="PLCCommand" parent="Base">
+	
+		<method name="SetIntegerParameter" description="Sets an integer parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="int32" pass="in" description="Parameter Value" />
+		</method>		
+
+		<method name="SetStringParameter" description="Sets a string parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="string" pass="in" description="Parameter Value" />
+		</method>		
+
+		<method name="SetBoolParameter" description="Sets a bool parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="bool" pass="in" description="Parameter Value" />
+		</method>		
+
+		<method name="SetDoubleParameter" description="Sets a double parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="double" pass="in" description="Parameter Value" />
+		</method>		
+
 	</class>
 
 	<class name="Driver_S7Net" parent="Driver" description="A Driver for a S7 PLC.">

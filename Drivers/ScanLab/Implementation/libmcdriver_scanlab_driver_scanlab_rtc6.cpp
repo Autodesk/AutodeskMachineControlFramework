@@ -28,25 +28,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmcdriver_scanlab_driver_scanlab_rtc5.hpp"
+#include "libmcdriver_scanlab_driver_scanlab_rtc6.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
 // Include custom headers here.
-#define RTC5_MIN_MAXLASERPOWER 10.0f
-#define RTC5_MAX_MAXLASERPOWER 10000.0f
+#define RTC6_MIN_MAXLASERPOWER 10.0f
+#define RTC6_MAX_MAXLASERPOWER 10000.0f
 
 using namespace LibMCDriver_ScanLab::Impl;
 
 /*************************************************************************************************************************
- Class definition of CDriver_ScanLab_RTC5 
+ Class definition of CDriver_ScanLab_RTC6 
 **************************************************************************************************************************/
 
-CDriver_ScanLab_RTC5::CDriver_ScanLab_RTC5(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+CDriver_ScanLab_RTC6::CDriver_ScanLab_RTC6(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: CDriver_ScanLab (pDriverEnvironment), m_sName (sName), m_sType (sType), m_fMaxLaserPowerInWatts (0.0f)
 {
 }
 
-void CDriver_ScanLab_RTC5::Configure(const std::string& sConfigurationString)
+void CDriver_ScanLab_RTC6::Configure(const std::string& sConfigurationString)
 {
     m_pDriverEnvironment->RegisterBoolParameter("position_x_ok", "Scan Position X is ok", false);
     m_pDriverEnvironment->RegisterBoolParameter("position_y_ok", "Scan Position Y is ok", false);
@@ -70,24 +70,24 @@ void CDriver_ScanLab_RTC5::Configure(const std::string& sConfigurationString)
     m_pDriverEnvironment->RegisterIntegerParameter("bios_version", "Scanlab BIOS Version", 0);
 }
 
-std::string CDriver_ScanLab_RTC5::GetName()
+std::string CDriver_ScanLab_RTC6::GetName()
 {
 	return m_sName;
 }
 
-std::string CDriver_ScanLab_RTC5::GetType()
+std::string CDriver_ScanLab_RTC6::GetType()
 {
 	return m_sType;
 }
 
 
-void CDriver_ScanLab_RTC5::QueryParameters()
+void CDriver_ScanLab_RTC6::QueryParameters()
 {
     updateCardStatus();
 }
 
 
-void CDriver_ScanLab_RTC5::Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber)
+void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber)
 {
 	if (m_pRTCSelector.get() != nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDALREADYINITIALIZED);
@@ -118,7 +118,7 @@ void CDriver_ScanLab_RTC5::Initialise(const std::string& sIP, const std::string&
 
 }
 
-void CDriver_ScanLab_RTC5::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
+void CDriver_ScanLab_RTC6::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
 {
 	if (m_pRTCContext.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
@@ -127,7 +127,7 @@ void CDriver_ScanLab_RTC5::LoadFirmware(const std::string& sFirmwareResource, co
 
 }
 
-void CDriver_ScanLab_RTC5::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) 
+void CDriver_ScanLab_RTC6::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) 
 {
 	if (m_pRTCContext.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
@@ -137,13 +137,13 @@ void CDriver_ScanLab_RTC5::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nC
 
 }
 
-void CDriver_ScanLab_RTC5::ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
+void CDriver_ScanLab_RTC6::ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) 
 {
 
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-    if (((float)dMaxLaserPower < RTC5_MIN_MAXLASERPOWER) || ((float)dMaxLaserPower > RTC5_MAX_MAXLASERPOWER))
+    if (((float)dMaxLaserPower < RTC6_MIN_MAXLASERPOWER) || ((float)dMaxLaserPower > RTC6_MAX_MAXLASERPOWER))
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
 
     m_fMaxLaserPowerInWatts = (float)dMaxLaserPower;
@@ -152,18 +152,49 @@ void CDriver_ScanLab_RTC5::ConfigureLaserMode(const LibMCDriver_ScanLab::eLaserM
     m_pRTCContext->SetLaserMode(eLaserMode, eLaserPort);
     m_pRTCContext->DisableAutoLaserControl ();
     m_pRTCContext->SetLaserControlParameters(false, bFinishLaserPulseAfterOn, bPhaseShiftOfLaserSignal, bLaserOnSignalLowActive, bLaserHalfSignalsLowActive, bSetDigitalInOneHighActive, bOutputSynchronizationActive); 
-    //false, false, true, true, false, false);
-
     m_pRTCContext->SetLaserPulsesInMicroSeconds(5, 5);
     m_pRTCContext->SetStandbyInMicroSeconds(1, 1);
-
 }
 
-void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
+void CDriver_ScanLab_RTC6::ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay)
 {
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-    if ((m_fMaxLaserPowerInWatts < RTC5_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC5_MAX_MAXLASERPOWER))
+
+    if ((dLaserOnDelay < 0.0) || (dLaserOnDelay > 10000000.0))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
+    if ((dLaserOffDelay < 0.0) || (dLaserOffDelay > 10000000.0))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
+    if ((dMarkDelay < 0.0) || (dMarkDelay > 10000000.0))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
+    if ((dJumpDelay < 0.0) || (dJumpDelay > 10000000.0))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
+    if ((dPolygonDelay < 0.0) || (dPolygonDelay > 10000000.0))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY);
+
+
+    int nIntMarkDelay = ((int)round(dMarkDelay / 10.0)) * 10;
+    int nIntJumpDelay = ((int)round(dJumpDelay / 10.0)) * 10;
+    int nIntPolygonDelay = ((int)round(dPolygonDelay / 10.0)) * 10;
+
+    if (nIntMarkDelay < 10)
+        nIntMarkDelay = 10;
+    if (nIntJumpDelay < 10)
+        nIntJumpDelay = 10;
+    if (nIntPolygonDelay < 10)
+        nIntPolygonDelay = 10;
+
+    m_pRTCContext->SetLaserDelaysInMicroseconds(dLaserOnDelay, dLaserOffDelay);
+    m_pRTCContext->SetDelays(nIntMarkDelay, nIntJumpDelay, nIntPolygonDelay);
+
+}
+
+
+void CDriver_ScanLab_RTC6::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+    if ((m_fMaxLaserPowerInWatts < RTC6_MIN_MAXLASERPOWER) || (m_fMaxLaserPowerInWatts > RTC6_MAX_MAXLASERPOWER))
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDMAXLASERPOWER);
     
 
@@ -248,7 +279,7 @@ void CDriver_ScanLab_RTC5::DrawLayer(const std::string& sStreamUUID, const LibMC
 }
 
 
-void CDriver_ScanLab_RTC5::internalBegin()
+void CDriver_ScanLab_RTC6::internalBegin()
 {
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
@@ -258,7 +289,7 @@ void CDriver_ScanLab_RTC5::internalBegin()
 }
 
 
-void CDriver_ScanLab_RTC5::internalExecute()
+void CDriver_ScanLab_RTC6::internalExecute()
 {
     if (m_pRTCContext.get() == nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
@@ -278,7 +309,7 @@ void CDriver_ScanLab_RTC5::internalExecute()
 
 }
 
-void CDriver_ScanLab_RTC5::updateCardStatus()
+void CDriver_ScanLab_RTC6::updateCardStatus()
 {
     bool Busy = true;
     uint32_t ListPosition = 0;

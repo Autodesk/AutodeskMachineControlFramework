@@ -153,6 +153,10 @@ typedef void * LibMCDriver_S7Net_pvoid;
 #define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNAMEMISSING 1045
 #define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERDESCRIPTIONMISSING 1046
 #define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERFIELDMISSING 1047
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNOTFOUND 1048
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDFIELDNOTFOUND 1049
+#define LIBMCDRIVER_S7NET_ERROR_INVALIDPARAMETERTYPE 1050
+#define LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETEROUTOFBOUNDS 1051
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_S7Net
@@ -218,6 +222,10 @@ inline const char * LIBMCDRIVER_S7NET_GETERRORSTRING (LibMCDriver_S7NetResult nE
     case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNAMEMISSING: return "command parameter name missing";
     case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERDESCRIPTIONMISSING: return "command parameter description missing";
     case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERFIELDMISSING: return "command parameter field missing";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETERNOTFOUND: return "command parameter not found";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDFIELDNOTFOUND: return "command field not found";
+    case LIBMCDRIVER_S7NET_ERROR_INVALIDPARAMETERTYPE: return "command field parameter is of wrong type";
+    case LIBMCDRIVER_S7NET_ERROR_COMMANDPARAMETEROUTOFBOUNDS: return "command field parameter is out of bounds";
     default: return "unknown error";
   }
 }
