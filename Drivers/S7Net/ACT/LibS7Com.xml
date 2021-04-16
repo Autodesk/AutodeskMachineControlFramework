@@ -59,6 +59,9 @@
 		<error name="READDATA" code="30" description="Error on read data." />
 		<error name="WRITEDATA" code="50" description="Error on write data." />
 		<error name="INVALIDREADADDRESS" code="60" description="Invalid address." />
+		<error name="INVALIDMAJORVERSION" code="61" description="Invalid Major PLC version." />
+		<error name="INVALIDMINORVERSION" code="62" description="Invalid Minor PLC version." />
+		
 				
 	</errors>
 	
