@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mqttconfig xmlns="http://schemas.autodesk.com/amcf/mqttconfig/2021/01" >
+
+	<iot_endpoint url="x.amazon.com" port="8294">
+		<certificate>
+		
+		</certificate>	
+	</iot_endpoint>
+	
+	
+	<client name="CLIENTNAME" topic="TOPICNAME">
+	
+		<certificate>
+		
+		</certificate>
+		
+		<privatekey>
+		
+		</privatekey>
+	
+	</client>
+
+
+</mqttconfig>
