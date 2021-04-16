@@ -1,4 +1,5 @@
 REM echo off
+set GO111MODULE=off
 
 set basepath=%~dp0
 echo %basepath%

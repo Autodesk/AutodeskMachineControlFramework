@@ -133,6 +133,9 @@ void CPLCCommunication::StartCommunication(LibS7Net::PPLC pPLC)
         throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
 
     m_pPLC = pPLC;
+    RetrieveStatus();
+
+    m_nCmdCycleCounter = ReadVariableInt32(m_nPLCtoAMC_SequenceFinishedAddress) + 1;
 }
 
 void CPLCCommunication::RetrieveStatus()
@@ -144,6 +147,10 @@ void CPLCCommunication::RetrieveStatus()
         auto pReadData = m_pPLC->ReadBytes(m_nPLCtoAMC_DBNo, 0, m_nPLCtoAMC_Size);
         pReadData->GetData(m_PLCRecvBuffer);
 
+        if ((int32_t)ReadVariableInt16 (m_nPLCtoAMC_MajorVersionAddress) != (int32_t)m_nMajorVersion)
+            throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDMAJORVERSION);
+        if ((int32_t) ReadVariableInt16(m_nPLCtoAMC_MinorVersionAddress) > (int32_t) m_nMinorVersion)
+            throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDMINORVERSION);
 
     }
 

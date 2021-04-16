@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_interfaces.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
-#include "libmcdriver_scanlab_driver_scanlab_rtc5.hpp"
+#include "libmcdriver_scanlab_driver_scanlab_rtc6.hpp"
 
 using namespace LibMCDriver_ScanLab;
 using namespace LibMCDriver_ScanLab::Impl;
@@ -68,8 +68,8 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver* CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (sType == "scanlab-rtc5")
-		return new CDriver_ScanLab_RTC5(sName, sType, pDriverEnvironment);
+	if (sType == "scanlab-rtc6")
+		return new CDriver_ScanLab_RTC6(sName, sType, pDriverEnvironment);
 
 	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DRIVERERROR);
 }

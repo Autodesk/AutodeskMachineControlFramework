@@ -125,7 +125,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		sDescription = iIter->second->getDescription();
 		sDefaultValue = iIter->second->getDefaultValue();
@@ -149,7 +149,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		return iIter->second->getStringValue();
 	}
@@ -170,7 +170,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		return iIter->second->getDoubleValue();
 	}
@@ -191,7 +191,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		return iIter->second->getIntValue();
 	}
@@ -212,7 +212,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		return iIter->second->getBoolValue();
 	}
@@ -234,7 +234,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		iIter->second->setStringValue(sValue);
 	}
@@ -255,7 +255,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		iIter->second->setDoubleValue(dValue);
 
@@ -278,7 +278,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		iIter->second->setIntValue(nValue);
 
@@ -300,7 +300,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 		iIter->second->setBoolValue(bValue);
 
@@ -339,7 +339,7 @@ namespace AMC {
 
 			auto iIter = m_Parameters.find(sName);
 			if (iIter == m_Parameters.end())
-				throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+				throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND, "parameter not found: " + sName);
 
 			iIter->second->setStringValue(sValue);
 		}
