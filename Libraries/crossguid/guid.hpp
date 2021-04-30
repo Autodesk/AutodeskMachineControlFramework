@@ -24,6 +24,14 @@ THE SOFTWARE.
 
 #pragma once
 
+#ifdef _WIN32
+#define GUID_WINDOWS
+#endif
+
+#ifdef __linux__
+#define GUID_LIBUUID
+#endif
+
 #ifdef GUID_ANDROID
 #include <thread>
 #include <jni.h>

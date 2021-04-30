@@ -39,8 +39,14 @@ namespace AMCData {
 
 
 /*************************************************************************************************************************
- Class declaration of CStorage 
+ Class declaration of CStoragePath
 **************************************************************************************************************************/
+
+typedef enum {
+    sssNew = 0,
+    sssValidated = 1,
+    sssArchived = 2
+} eStorageStreamStatus;
 
 class CStoragePath {
 private:
@@ -52,6 +58,9 @@ public:
 
     std::string getStreamPath(const std::string& sStreamUUID);
     std::string getLogPath();
+
+    static std::string storageStreamStatusToString(eStorageStreamStatus eStatus);
+    static eStorageStreamStatus stringToStorageStreamStatus(const std::string & sStatus);
 
 };
 

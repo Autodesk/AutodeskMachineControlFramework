@@ -31,6 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_abi.hpp"
 #include "libmcdriver_scanlab_abi.hpp"
 
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_configure(LibMCDriver_Driver pDriver, const char* pConfigurationString)
+{
+	return libmcdriver_scanlab_driver_configure(pDriver, pConfigurationString);
+}
+
+
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getname(LibMCDriver_Driver pDriver, const LibMCDriver_uint32 nNameBufferSize, LibMCDriver_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	return libmcdriver_scanlab_driver_getname (pDriver, nNameBufferSize, pNameNeededChars, pNameBuffer);
@@ -49,6 +55,12 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getversion(LibMCDriver
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getheaderinformation(LibMCDriver_Driver pDriver, const LibMCDriver_uint32 nNameSpaceBufferSize, LibMCDriver_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_uint32 nBaseNameBufferSize, LibMCDriver_uint32* pBaseNameNeededChars, char * pBaseNameBuffer)
 {
 	return libmcdriver_scanlab_driver_getheaderinformation(pDriver, nNameSpaceBufferSize, pNameSpaceNeededChars, pNameSpaceBuffer, nNameSpaceBufferSize, pBaseNameNeededChars, pBaseNameBuffer);
+}
+
+
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver)
+{
+	return libmcdriver_scanlab_driver_queryparameters(pDriver);
 }
 
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_getversion(LibMCDriver_uint32 * pMajor, LibMCDriver_uint32 * pMinor, LibMCDriver_uint32 * pMicro)
@@ -77,7 +89,7 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_injectcomponent(const char * 
 	return libmcdriver_scanlab_injectcomponent(pNameSpace, pSymbolAddressMethod);
 }
 
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Driver * pInstance)
 {
 	return libmcdriver_scanlab_createdriver(pName, pType, pDriverEnvironment, pInstance);
 }

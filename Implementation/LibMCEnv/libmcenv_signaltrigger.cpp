@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 
 using namespace LibMCEnv::Impl;
@@ -73,8 +74,8 @@ void CSignalTrigger::Trigger()
 
 bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOut)
 {
-	auto startTime = std::chrono::high_resolution_clock::now();
-	auto endTime = startTime + std::chrono::milliseconds(nTimeOut);
+
+	AMCCommon::CChrono chrono;
 
 	if (m_sTriggeredUUID.length() == 0)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SIGNALHASNOTBEENTRIGGERED);
@@ -89,14 +90,14 @@ bool CSignalTrigger::WaitForHandling(const LibMCEnv_uint32 nTimeOut)
 			return true;
 		}
 
-		bIsTimeOut = std::chrono::high_resolution_clock::now() >= endTime;
+		bIsTimeOut = chrono.getExistenceTimeInMilliseconds () > nTimeOut;
 
 		if (!bIsTimeOut) {
 			// TODO
 			//if (CheckForTermination())
 				//throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TERMINATED);
 			
-			AMCCommon::CUtils::sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);
+			chrono.sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);
 		}
 	}
 
@@ -118,6 +119,12 @@ void CSignalTrigger::SetString(const std::string & sName, const std::string & sV
 	m_pParameterGroup->setParameterValueByName(sName, sValue);
 }
 
+void CSignalTrigger::SetUUID(const std::string& sName, const std::string& sValue)
+{
+	m_pParameterGroup->setParameterValueByName(sName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+
+
 void CSignalTrigger::SetDouble(const std::string & sName, const LibMCEnv_double dValue)
 {
 	m_pParameterGroup->setDoubleParameterValueByName(sName, dValue);
@@ -137,6 +144,13 @@ std::string CSignalTrigger::GetStringResult(const std::string & sName)
 {
 	return m_pResultGroup->getParameterValueByName(sName);
 }
+
+
+std::string CSignalTrigger::GetUUIDResult(const std::string& sName)
+{
+	return AMCCommon::CUtils::normalizeUUIDString (m_pResultGroup->getParameterValueByName(sName));
+}
+
 
 LibMCEnv_double CSignalTrigger::GetDoubleResult(const std::string & sName)
 {

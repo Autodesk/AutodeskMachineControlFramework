@@ -100,10 +100,9 @@ uint32_t storageStream_SeekCallback(uint64_t nPosition, void* pUserData)
 }
 
 
-CStorageStream::CStorageStream(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID)
+CStorageStream::CStorageStream(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID)
 	: m_pImportStream (pImportStream),
 	m_sUUID (AMCCommon::CUtils::normalizeUUIDString(sUUID)),
-	m_sContextUUID(AMCCommon::CUtils::normalizeUUIDString(sContextUUID)),
 	m_sName (sName),
 	m_nSize (nSize),
 	m_sMIMEType (sMIMEType),
@@ -119,9 +118,9 @@ CStorageStream::CStorageStream(AMCCommon::PImportStream pImportStream, const std
 }
 
 
-CStorageStream* CStorageStream::make(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID)
+CStorageStream* CStorageStream::make(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID)
 {
-	return new CStorageStream (pImportStream, sUUID, sContextUUID, sName, nSize, sMIMEType, sSHA2, sTimeStamp, sUserID);
+	return new CStorageStream (pImportStream, sUUID, sName, nSize, sMIMEType, sSHA2, sTimeStamp, sUserID);
 }
 
 CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath)
@@ -133,29 +132,29 @@ CStorageStream* CStorageStream::makeFromDatabase(const std::string& sStreamUUID,
 
 	auto sParsedStreamUUID = AMCCommon::CUtils::normalizeUUIDString(sStreamUUID);
 
-	std::string sQuery = "SELECT uuid, contextuuid, name, mimetype, sha2, size, userid, timestamp FROM storage_streams WHERE uuid=?";
+	std::string sQuery = "SELECT uuid, name, mimetype, sha2, size, userid, timestamp FROM storage_streams WHERE uuid=?";
 	auto pStatement = pSQLHandler->prepareStatement(sQuery);
 	pStatement->setString(1, sParsedStreamUUID);
+	//pStatement->setString(2, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
 	if (!pStatement->nextRow())
 		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND);
 
 	auto sUUID = pStatement->getColumnString(1);
-	auto sContextUUID = pStatement->getColumnString(2);
-	auto sName = pStatement->getColumnString(3);
-	auto sMIMEType = pStatement->getColumnString(4);
-	auto sSHA2 = pStatement->getColumnString(5);
-	auto nSize = pStatement->getColumnInt64(6);
-	auto sUserID = pStatement->getColumnString(7);
-	auto sTimeStamp = pStatement->getColumnString(8);
+	auto sName = pStatement->getColumnString(2);
+	auto sMIMEType = pStatement->getColumnString(3);
+	auto sSHA2 = pStatement->getColumnString(4);
+	auto nSize = pStatement->getColumnInt64(5);
+	auto sUserID = pStatement->getColumnString(6);
+	auto sTimeStamp = pStatement->getColumnString(7);
 
 	auto pImportStream = std::make_shared<AMCCommon::CImportStream_Native>(pStoragePath->getStreamPath(sParsedStreamUUID));
 	
-	return make (pImportStream, sUUID, sContextUUID, sName, (uint64_t)nSize, sMIMEType, sSHA2, sTimeStamp, sUserID);
+	return make (pImportStream, sUUID, sName, (uint64_t)nSize, sMIMEType, sSHA2, sTimeStamp, sUserID);
 }
 
-PStorageStream CStorageStream::makeShared(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID)
+PStorageStream CStorageStream::makeShared(AMCCommon::PImportStream pImportStream, const std::string& sUUID, const std::string& sName, const uint64_t nSize, const std::string& sMIMEType, const std::string& sSHA2, const std::string& sTimeStamp, const std::string& sUserID)
 {
-	return std::shared_ptr<CStorageStream>(make(pImportStream, sUUID, sContextUUID, sName, nSize, sMIMEType, sSHA2, sTimeStamp, sUserID));
+	return std::shared_ptr<CStorageStream>(make(pImportStream, sUUID, sName, nSize, sMIMEType, sSHA2, sTimeStamp, sUserID));
 }
 
 PStorageStream CStorageStream::makeSharedFromDatabase(const std::string& sStreamUUID, AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath)
@@ -174,11 +173,6 @@ CStorageStream::~CStorageStream()
 std::string CStorageStream::GetUUID()
 {
 	return m_sUUID;
-}
-
-std::string CStorageStream::GetContextUUID()
-{
-	return m_sContextUUID;
 }
 
 std::string CStorageStream::GetTimeStamp()

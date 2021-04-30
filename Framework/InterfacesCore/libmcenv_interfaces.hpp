@@ -55,11 +55,19 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
+class IIterator;
 class IToolpathLayer;
 class IToolpathAccessor;
+class IBuild;
+class IWorkingFileExecution;
+class IWorkingFile;
+class IWorkingFileIterator;
+class IWorkingDirectory;
+class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
 class IStateEnvironment;
+class IUIEnvironment;
 
 
 
@@ -241,6 +249,47 @@ typedef IBaseSharedPtr<IBase> PIBase;
 
 
 /*************************************************************************************************************************
+ Class interface for Iterator 
+**************************************************************************************************************************/
+
+class IIterator : public virtual IBase {
+public:
+	/**
+	* IIterator::MoveNext - Iterates to the next object in the list.
+	* @return Iterates to the next object in the list.
+	*/
+	virtual bool MoveNext() = 0;
+
+	/**
+	* IIterator::MovePrevious - Iterates to the previous object in the list.
+	* @return Iterates to the previous object in the list.
+	*/
+	virtual bool MovePrevious() = 0;
+
+	/**
+	* IIterator::GetCurrent - Returns the object the iterator points at.
+	* @return returns the object instance.
+	*/
+	virtual IBase * GetCurrent() = 0;
+
+	/**
+	* IIterator::Clone - Creates a new object iterator with the same object list.
+	* @return returns the cloned Iterator instance
+	*/
+	virtual IIterator * Clone() = 0;
+
+	/**
+	* IIterator::Count - Returns the number of resoucres the iterator captures.
+	* @return returns the number of objects the iterator captures.
+	*/
+	virtual LibMCEnv_uint64 Count() = 0;
+
+};
+
+typedef IBaseSharedPtr<IIterator> PIIterator;
+
+
+/*************************************************************************************************************************
  Class interface for ToolpathLayer 
 **************************************************************************************************************************/
 
@@ -274,6 +323,22 @@ public:
 	virtual std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
+	* IToolpathLayer::GetSegmentProfileValue - Retrieves an assigned profile custom value.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] sValueName - Value Name to query for.
+	* @return String Value.
+	*/
+	virtual std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentProfileTypedValue - Retrieves an assigned profile value of a standard type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] eValueType - Enum to query for. MUST NOT be custom.
+	* @return Double Value
+	*/
+	virtual LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) = 0;
+
+	/**
 	* IToolpathLayer::GetSegmentPartUUID - Retrieves the assigned segment part uuid.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @return Segment Part UUID
@@ -285,9 +350,21 @@ public:
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[in] nPointDataBufferSize - Number of elements in buffer
 	* @param[out] pPointDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPointDataBuffer - Position2D buffer of The point data array
+	* @param[out] pPointDataBuffer - Position2D buffer of The point data array. Positions are absolute in units.
 	*/
 	virtual void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetZValue - Retrieves the layers Z Value in units.
+	* @return Z Value of the layer in units.
+	*/
+	virtual LibMCEnv_int32 GetZValue() = 0;
+
+	/**
+	* IToolpathLayer::GetUnits - Retrieves the toolpath units in mm.
+	* @return Toolpath units.
+	*/
+	virtual LibMCEnv_double GetUnits() = 0;
 
 };
 
@@ -301,10 +378,10 @@ typedef IBaseSharedPtr<IToolpathLayer> PIToolpathLayer;
 class IToolpathAccessor : public virtual IBase {
 public:
 	/**
-	* IToolpathAccessor::GetUUID - Returns Toolpath data UUID.
-	* @return Returns toolpath data uuid.
+	* IToolpathAccessor::GetStorageUUID - Returns Toolpath storage UUID.
+	* @return Returns toolpath storage uuid.
 	*/
-	virtual std::string GetUUID() = 0;
+	virtual std::string GetStorageUUID() = 0;
 
 	/**
 	* IToolpathAccessor::GetLayerCount - Returns layer count.
@@ -319,9 +396,382 @@ public:
 	*/
 	virtual IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) = 0;
 
+	/**
+	* IToolpathAccessor::GetUnits - Retrieves the toolpath units in mm.
+	* @return Toolpath units.
+	*/
+	virtual LibMCEnv_double GetUnits() = 0;
+
 };
 
 typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
+
+
+/*************************************************************************************************************************
+ Class interface for Build 
+**************************************************************************************************************************/
+
+class IBuild : public virtual IBase {
+public:
+	/**
+	* IBuild::GetName - Returns name of the build.
+	* @return Name of the build.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IBuild::GetBuildUUID - Returns uuid of the build.
+	* @return UUID of the build.
+	*/
+	virtual std::string GetBuildUUID() = 0;
+
+	/**
+	* IBuild::GetStorageUUID - Returns storage uuid of the build.
+	* @return Storage UUID of the build.
+	*/
+	virtual std::string GetStorageUUID() = 0;
+
+	/**
+	* IBuild::GetStorageSHA256 - Returns SHA256 of the build stream.
+	* @return SHA256 of the build stream.
+	*/
+	virtual std::string GetStorageSHA256() = 0;
+
+	/**
+	* IBuild::GetLayerCount - Returns cached layer count of the toolpath.
+	* @return Returns layer count.
+	*/
+	virtual LibMCEnv_uint32 GetLayerCount() = 0;
+
+	/**
+	* IBuild::LoadToolpath - loads the a toolpath into memory
+	*/
+	virtual void LoadToolpath() = 0;
+
+	/**
+	* IBuild::UnloadToolpath - unloads the a toolpath from memory, if it has been loaded before.
+	*/
+	virtual void UnloadToolpath() = 0;
+
+	/**
+	* IBuild::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
+	* @return returns if toolpath is loaded.
+	*/
+	virtual bool ToolpathIsLoaded() = 0;
+
+	/**
+	* IBuild::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded with LoadToolpath before.
+	* @return Toolpath instance.
+	*/
+	virtual IToolpathAccessor * CreateToolpathAccessor() = 0;
+
+	/**
+	* IBuild::AddBinaryData - Adds binary data to store with the build.
+	* @param[in] sName - Name of the attache data block.
+	* @param[in] sMIMEType - Mime type of the data.
+	* @param[in] nContentBufferSize - Number of elements in buffer
+	* @param[in] pContentBuffer - Stream content to store
+	* @return Data UUID of the attachment.
+	*/
+	virtual std::string AddBinaryData(const std::string & sName, const std::string & sMIMEType, const LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IBuild> PIBuild;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingFileExecution 
+**************************************************************************************************************************/
+
+class IWorkingFileExecution : public virtual IBase {
+public:
+	/**
+	* IWorkingFileExecution::GetStatus - Returns the execution status
+	*/
+	virtual void GetStatus() = 0;
+
+	/**
+	* IWorkingFileExecution::ReturnStdOut - Returns the output of the executable as string buffer
+	* @return stdout buffer
+	*/
+	virtual std::string ReturnStdOut() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFileExecution> PIWorkingFileExecution;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingFile 
+**************************************************************************************************************************/
+
+class IWorkingFile : public virtual IBase {
+public:
+	/**
+	* IWorkingFile::GetAbsoluteFileName - Retrieves absolute file name of the working file
+	* @return global path of the file
+	*/
+	virtual std::string GetAbsoluteFileName() = 0;
+
+	/**
+	* IWorkingFile::GetSize - Returns the size of temporary file.
+	* @return file size
+	*/
+	virtual LibMCEnv_uint64 GetSize() = 0;
+
+	/**
+	* IWorkingFile::CalculateSHA2 - Calculates the SHA256 checksum of the file.
+	* @return sha256 checksum
+	*/
+	virtual std::string CalculateSHA2() = 0;
+
+	/**
+	* IWorkingFile::ExecuteFile - Executes the temporary file, if it is an executable.
+	* @return execution object
+	*/
+	virtual IWorkingFileExecution * ExecuteFile() = 0;
+
+	/**
+	* IWorkingFile::IsManaged - Returns if the file is managed.
+	* @return returns if the file is managed.
+	*/
+	virtual bool IsManaged() = 0;
+
+	/**
+	* IWorkingFile::MakeManaged - Makes the file managed if it is not managed yet.
+	*/
+	virtual void MakeManaged() = 0;
+
+	/**
+	* IWorkingFile::FileExists - Returns if the file exists on disk.
+	* @return returns if the file exists.
+	*/
+	virtual bool FileExists() = 0;
+
+	/**
+	* IWorkingFile::DeleteFromDisk - Deletes the temporary file.
+	* @return returns if deletion was successful or file did not exist in the first place.
+	*/
+	virtual bool DeleteFromDisk() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFile> PIWorkingFile;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingFileIterator 
+**************************************************************************************************************************/
+
+class IWorkingFileIterator : public virtual IIterator {
+public:
+	/**
+	* IWorkingFileIterator::GetCurrentFile - Returns the working file the iterator points at.
+	* @return returns the WorkingFile instance.
+	*/
+	virtual IWorkingFile * GetCurrentFile() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingFileIterator> PIWorkingFileIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for WorkingDirectory 
+**************************************************************************************************************************/
+
+class IWorkingDirectory : public virtual IBase {
+public:
+	/**
+	* IWorkingDirectory::IsActive - Working directory is active.
+	* @return returns true if files can be read and written to the directory.
+	*/
+	virtual bool IsActive() = 0;
+
+	/**
+	* IWorkingDirectory::GetAbsoluteFilePath - Retrieves absolute file path.
+	* @return global path of the directory, including path delimiter.
+	*/
+	virtual std::string GetAbsoluteFilePath() = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[in] pDataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) = 0;
+
+	/**
+	* IWorkingDirectory::CleanUp - Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
+	* @return returns if deletion was successful.
+	*/
+	virtual bool CleanUp() = 0;
+
+	/**
+	* IWorkingDirectory::AddManagedFile - Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.
+	* @param[in] sFileName - Filename to manage. The file does not need to exist yet.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * AddManagedFile(const std::string & sFileName) = 0;
+
+	/**
+	* IWorkingDirectory::HasUnmanagedFiles - Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.
+	* @return returns if there are unmanaged files.
+	*/
+	virtual bool HasUnmanagedFiles() = 0;
+
+	/**
+	* IWorkingDirectory::RetrieveUnmanagedFiles - Returns a list of unmanaged files.
+	* @return working file iterator instance.
+	*/
+	virtual IWorkingFileIterator * RetrieveUnmanagedFiles() = 0;
+
+	/**
+	* IWorkingDirectory::RetrieveManagedFiles - Returns a list of managed files.
+	* @return working file iterator instance.
+	*/
+	virtual IWorkingFileIterator * RetrieveManagedFiles() = 0;
+
+	/**
+	* IWorkingDirectory::RetrieveAllFiles - Returns a list of all files in the directory.
+	* @return working file iterator instance.
+	*/
+	virtual IWorkingFileIterator * RetrieveAllFiles() = 0;
+
+};
+
+typedef IBaseSharedPtr<IWorkingDirectory> PIWorkingDirectory;
+
+
+/*************************************************************************************************************************
+ Class interface for DriverEnvironment 
+**************************************************************************************************************************/
+
+class IDriverEnvironment : public virtual IBase {
+public:
+	/**
+	* IDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
+	* @return creates a working directory
+	*/
+	virtual IWorkingDirectory * CreateWorkingDirectory() = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+	*/
+	virtual void RetrieveDriverData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IDriverEnvironment::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+	* @param[in] sStreamUUID - UUID of the stream.
+	* @return Toolpath instance.
+	*/
+	virtual IToolpathAccessor * CreateToolpathAccessor(const std::string & sStreamUUID) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	virtual void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterUUIDParameter - registers a uuid parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] sDefaultValue - default value to set
+	*/
+	virtual void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterDoubleParameter - registers a double parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] dDefaultValue - default value to set
+	*/
+	virtual void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterIntegerParameter - registers an int parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] nDefaultValue - default value to set
+	*/
+	virtual void RegisterIntegerParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_int64 nDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::RegisterBoolParameter - registers a bool parameter. Must only be called during driver creation.
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sDescription - Parameter Description
+	* @param[in] bDefaultValue - default value to set
+	*/
+	virtual void RegisterBoolParameter(const std::string & sParameterName, const std::string & sDescription, const bool bDefaultValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetStringParameter - sets a string parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetDoubleParameter - sets a double parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetIntegerParameter - sets an int parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IDriverEnvironment::SetBoolParameter - sets a bool parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IDriverEnvironment::Sleep - Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+	* @param[in] nDelay - Milliseconds to sleeps
+	*/
+	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
+
+	/**
+	* IDriverEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;
 
 
 /*************************************************************************************************************************
@@ -368,6 +818,13 @@ public:
 	virtual void SetString(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
+	* ISignalTrigger::SetUUID - sets a uuid value
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void SetUUID(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
 	* ISignalTrigger::SetDouble - sets a double
 	* @param[in] sName - Name
 	* @param[in] dValue - Value
@@ -394,6 +851,13 @@ public:
 	* @return Value
 	*/
 	virtual std::string GetStringResult(const std::string & sName) = 0;
+
+	/**
+	* ISignalTrigger::GetUUIDResult - returns a uuid value of the result
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string GetUUIDResult(const std::string & sName) = 0;
 
 	/**
 	* ISignalTrigger::GetDoubleResult - returns a string value of the result
@@ -458,6 +922,13 @@ public:
 	virtual std::string GetString(const std::string & sName) = 0;
 
 	/**
+	* ISignalHandler::GetUUID - gets a uuid value
+	* @param[in] sName - Name
+	* @return Value
+	*/
+	virtual std::string GetUUID(const std::string & sName) = 0;
+
+	/**
 	* ISignalHandler::GetDouble - gets a double
 	* @param[in] sName - Name
 	* @return Value
@@ -484,6 +955,13 @@ public:
 	* @param[in] sValue - Value
 	*/
 	virtual void SetStringResult(const std::string & sName, const std::string & sValue) = 0;
+
+	/**
+	* ISignalHandler::SetUUIDResult - returns a uuid value of the result
+	* @param[in] sName - Name
+	* @param[in] sValue - Value
+	*/
+	virtual void SetUUIDResult(const std::string & sName, const std::string & sValue) = 0;
 
 	/**
 	* ISignalHandler::SetDoubleResult - returns a string value of the result
@@ -518,12 +996,12 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 class IStateEnvironment : public virtual IBase {
 public:
 	/**
-	* IStateEnvironment::CreateSignal - creates a signal object to trigger.
+	* IStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
 	* @return Signal trigger object.
 	*/
-	virtual ISignalTrigger * CreateSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
+	virtual ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
 
 	/**
 	* IStateEnvironment::WaitForSignal - waits for a signal.
@@ -550,35 +1028,16 @@ public:
 	virtual void CreateDriverAccess(const std::string & sDriverName, LibMCEnv_pvoid & pDriverHandle) = 0;
 
 	/**
-	* IStateEnvironment::LoadToolpath - Loads a toolpath from disk into memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
+	* IStateEnvironment::GetBuildJob - Returns a instance of a build object.
+	* @param[in] sBuildUUID - UUID of the build entity.
+	* @return Build instance
 	*/
-	virtual void LoadToolpath(const std::string & sToolpathUUID) = 0;
-
-	/**
-	* IStateEnvironment::UnloadToolpath - unloads the a toolpath. It MUST have been loaded to memory before with LoadToolpath.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	*/
-	virtual void UnloadToolpath(const std::string & sToolpathUUID) = 0;
+	virtual IBuild * GetBuildJob(const std::string & sBuildUUID) = 0;
 
 	/**
 	* IStateEnvironment::UnloadAllToolpathes - unloads all toolpath in memory to clean up
 	*/
 	virtual void UnloadAllToolpathes() = 0;
-
-	/**
-	* IStateEnvironment::CreateToolpathAccessor - creates an accessor object for a toolpath, if loaded to memory before.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return UUID of the toolpath entity.
-	*/
-	virtual IToolpathAccessor * CreateToolpathAccessor(const std::string & sToolpathUUID) = 0;
-
-	/**
-	* IStateEnvironment::ToolpathIsLoaded - checks, if a toolpath object is loaded to memory.
-	* @param[in] sToolpathUUID - UUID of the toolpath entity.
-	* @return returns if toolpath is loaded.
-	*/
-	virtual bool ToolpathIsLoaded(const std::string & sToolpathUUID) = 0;
 
 	/**
 	* IStateEnvironment::SetNextState - sets the next state
@@ -617,67 +1076,11 @@ public:
 	virtual bool CheckForTermination() = 0;
 
 	/**
-	* IStateEnvironment::StoreString - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] sValue - Value
-	*/
-	virtual void StoreString(const std::string & sName, const std::string & sValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreInteger - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] nValue - Value
-	*/
-	virtual void StoreInteger(const std::string & sName, const LibMCEnv_int64 nValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreDouble - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] dValue - Value
-	*/
-	virtual void StoreDouble(const std::string & sName, const LibMCEnv_double dValue) = 0;
-
-	/**
-	* IStateEnvironment::StoreBool - stores a string in the current state machine
-	* @param[in] sName - Name
-	* @param[in] bValue - Value
-	*/
-	virtual void StoreBool(const std::string & sName, const bool bValue) = 0;
-
-	/**
 	* IStateEnvironment::StoreSignal - stores a signal handler in the current state machine
 	* @param[in] sName - Name
 	* @param[in] pHandler - Signal handler to store.
 	*/
 	virtual void StoreSignal(const std::string & sName, ISignalHandler* pHandler) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveString - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual std::string RetrieveString(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveInteger - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual LibMCEnv_int64 RetrieveInteger(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveDouble - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual LibMCEnv_double RetrieveDouble(const std::string & sName) = 0;
-
-	/**
-	* IStateEnvironment::RetrieveBool - retrieves a string from the current state machine. Fails if value has not been stored before.
-	* @param[in] sName - Name
-	* @return Value
-	*/
-	virtual bool RetrieveBool(const std::string & sName) = 0;
 
 	/**
 	* IStateEnvironment::RetrieveSignal - retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
@@ -699,6 +1102,14 @@ public:
 	* @param[in] sValue - Value to set
 	*/
 	virtual void SetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IStateEnvironment::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetUUIDParameter(const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
 
 	/**
 	* IStateEnvironment::SetDoubleParameter - sets a double parameter
@@ -733,6 +1144,14 @@ public:
 	virtual std::string GetStringParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
+	* IStateEnvironment::GetUUIDParameter - returns a uuid parameter
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual std::string GetUUIDParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
 	* IStateEnvironment::GetDoubleParameter - returns a double parameter
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
@@ -756,9 +1175,113 @@ public:
 	*/
 	virtual bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
+	/**
+	* IStateEnvironment::LoadResourceData - loads a plugin resource file into memory.
+	* @param[in] sResourceName - Name of the resource.
+	* @param[in] nResourceDataBufferSize - Number of elements in buffer
+	* @param[out] pResourceDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+	*/
+	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
+
+
+/*************************************************************************************************************************
+ Class interface for UIEnvironment 
+**************************************************************************************************************************/
+
+class IUIEnvironment : public virtual IBase {
+public:
+	/**
+	* IUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sSignalName - Name Of signal channel.
+	* @return Signal trigger object.
+	*/
+	virtual ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) = 0;
+
+	/**
+	* IUIEnvironment::GetMachineState - Retrieves the machine state
+	* @param[in] sMachineInstance - State machine instance name
+	* @return Name of current state
+	*/
+	virtual std::string GetMachineState(const std::string & sMachineInstance) = 0;
+
+	/**
+	* IUIEnvironment::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogMessage(const std::string & sLogString) = 0;
+
+	/**
+	* IUIEnvironment::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogWarning(const std::string & sLogString) = 0;
+
+	/**
+	* IUIEnvironment::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogInfo(const std::string & sLogString) = 0;
+
+	/**
+	* IUIEnvironment::GetStringParameter - returns a string parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetUUIDParameter - returns a uuid parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetDoubleParameter - returns a double parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetIntegerParameter - returns an int parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetBoolParameter - returns a bool parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @return Value to set
+	*/
+	virtual bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetEventContext - returns the event context uuid as string
+	* @return Context UUID
+	*/
+	virtual std::string GetEventContext() = 0;
+
+};
+
+typedef IBaseSharedPtr<IUIEnvironment> PIUIEnvironment;
 
 
 /*************************************************************************************************************************

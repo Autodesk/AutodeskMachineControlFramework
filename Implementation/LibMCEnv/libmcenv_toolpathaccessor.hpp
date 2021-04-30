@@ -58,19 +58,22 @@ private:
 
 protected:
 
-	std::string m_sUUID;
+	std::string m_sStorageUUID;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	double m_dDefaultJumpSpeed;
 
 
 public:
-	CToolpathAccessor(const std::string& sUUID, AMC::PToolpathHandler pToolpathHandler);
+	CToolpathAccessor(const std::string& sStorageUUID, AMC::PToolpathHandler pToolpathHandler);
 	virtual ~CToolpathAccessor();
 
-	std::string GetUUID() override;
+	std::string GetStorageUUID() override;
 
 	LibMCEnv_uint32 GetLayerCount() override;
 
 	IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) override;
+
+	LibMCEnv_double GetUnits() override;
 
 };
 

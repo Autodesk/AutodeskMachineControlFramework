@@ -105,12 +105,98 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_COULDNOTLOADLIBRARY 6
 #define LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT 7
 #define LIBMCDATA_ERROR_INCOMPATIBLEBINARYVERSION 8
+#define LIBMCDATA_ERROR_COULDNOTPARSECONFIGURATION 9
+#define LIBMCDATA_ERROR_DUPLICATESTATENAME 10
+#define LIBMCDATA_ERROR_STATENOTFOUND 11
+#define LIBMCDATA_ERROR_DUPLICATEOUTSTATE 12
+#define LIBMCDATA_ERROR_MISSINGMACHINEDEFINITION 13
+#define LIBMCDATA_ERROR_MISSINGINSTANCENAME 14
+#define LIBMCDATA_ERROR_DUPLICATEMACHINEINSTANCE 15
+#define LIBMCDATA_ERROR_MISSINGXMLSCHEMA 16
+#define LIBMCDATA_ERROR_INVALIDXMLSCHEMA 17
+#define LIBMCDATA_ERROR_MISSINGSTATENAME 18
+#define LIBMCDATA_ERROR_MISSINGOUTSTATETARGET 19
+#define LIBMCDATA_ERROR_INVALIDOUTSTATETARGET 20
+#define LIBMCDATA_ERROR_NOINITSTATE 21
+#define LIBMCDATA_ERROR_NOFAILEDSTATE 22
+#define LIBMCDATA_ERROR_INITSTATENOTFOUND 23
+#define LIBMCDATA_ERROR_FAILEDSTATENOTFOUND 24
+#define LIBMCDATA_ERROR_MISSINGINITSTATE 25
+#define LIBMCDATA_ERROR_MISSINGFAILEDSTATE 26
+#define LIBMCDATA_ERROR_MISSINGPLUGINNAME 27
+#define LIBMCDATA_ERROR_EMPTYINITSTATE 28
+#define LIBMCDATA_ERROR_EMPTYFAILEDSTATE 29
+#define LIBMCDATA_ERROR_EMPTYPLUGINNAME 30
+#define LIBMCDATA_ERROR_COULDNOTCREATESTATEFACTORY 31
+#define LIBMCDATA_ERROR_INVALIDSTATENAME 32
+#define LIBMCDATA_ERROR_COULDNOTCREATESTATE 33
+#define LIBMCDATA_ERROR_COULDNOTINITIALIZEFACTORY 34
+#define LIBMCDATA_ERROR_COULDNOTFINALIZEFACTORY 35
+#define LIBMCDATA_ERROR_COULDNOTLOADPLUGIN 36
+#define LIBMCDATA_ERROR_NOCURRENTSTATE 37
+#define LIBMCDATA_ERROR_NOPLUGINSTATE 38
+#define LIBMCDATA_ERROR_COULDNOTEXECUTEPLUGIN 39
+#define LIBMCDATA_ERROR_TOOMANYMACHINEINSTANCES 40
+#define LIBMCDATA_ERROR_INVALIDINDEX 41
+#define LIBMCDATA_ERROR_NOOUTSTATEGIVEN 42
+#define LIBMCDATA_ERROR_INVALIDOUTSTATEGIVEN 43
+#define LIBMCDATA_ERROR_INVALIDREPEATDELAY 44
+#define LIBMCDATA_ERROR_INVALIDEXECUTIONDELAY 45
+#define LIBMCDATA_ERROR_MISSINGREPEATDELAY 46
+#define LIBMCDATA_ERROR_THREADISRUNNING 47
+#define LIBMCDATA_ERROR_THREADISNOTRUNNING 48
+#define LIBMCDATA_ERROR_DUPLICATESIGNAL 49
+#define LIBMCDATA_ERROR_INVALIDSIGNALNAME 50
+#define LIBMCDATA_ERROR_MISSINGSIGNALNAME 51
+#define LIBMCDATA_ERROR_MISSINGSERVERNODE 52
+#define LIBMCDATA_ERROR_MISSINGHOSTNAME 53
+#define LIBMCDATA_ERROR_MISSINGPORT 54
+#define LIBMCDATA_ERROR_UUIDGENERATIONFAILED 55
+#define LIBMCDATA_ERROR_INVALIDBUFFERSIZE 56
+#define LIBMCDATA_ERROR_COULDNOTCONVERTTOUTF8 57
 #define LIBMCDATA_ERROR_NOCOLUMNAVAILABLE 58
 #define LIBMCDATA_ERROR_INVALIDTEXTCOLUMN 59
 #define LIBMCDATA_ERROR_INVALIDCOLUMNTYPE 60
+#define LIBMCDATA_ERROR_TOOMANYREQUESTEDLOGS 61
+#define LIBMCDATA_ERROR_MISSINGINSTANCEDESCRIPTION 62
+#define LIBMCDATA_ERROR_DUPLICATEPARAMETERGROUPNAME 63
+#define LIBMCDATA_ERROR_MISSINGPARAMETERGROUPNAME 64
+#define LIBMCDATA_ERROR_EMPTYPARAMETERGROUPNAME 65
+#define LIBMCDATA_ERROR_MISSINGPARAMETERGROUPDESCRIPTION 66
+#define LIBMCDATA_ERROR_EMPTYPARAMETERGROUPDESCRIPTION 67
+#define LIBMCDATA_ERROR_TOOMANYPARAMETERS 68
+#define LIBMCDATA_ERROR_TOOMANYPARAMETERGROUPS 69
+#define LIBMCDATA_ERROR_DUPLICATEPARAMETERNAME 70
+#define LIBMCDATA_ERROR_MISSINGPARAMETERNAME 71
+#define LIBMCDATA_ERROR_EMPTYPARAMETERNAME 72
+#define LIBMCDATA_ERROR_MISSINGPARAMETERDESCRIPTION 73
+#define LIBMCDATA_ERROR_EMPTYPARAMETERDESCRIPTION 74
+#define LIBMCDATA_ERROR_PARAMETERNOTFOUND 75
+#define LIBMCDATA_ERROR_MISSINGPARAMETERDEFAULTVALUE 76
+#define LIBMCDATA_ERROR_MISSINGDATACONFIGNODE 77
+#define LIBMCDATA_ERROR_MISSINGDIRECTORY 78
+#define LIBMCDATA_ERROR_MISSINGDATABASETYPE 79
+#define LIBMCDATA_ERROR_MISSINGSQLITEINFO 80
+#define LIBMCDATA_ERROR_UNKNOWNDATABASETYPE 81
+#define LIBMCDATA_ERROR_STORAGENOTINITIALISED 82
+#define LIBMCDATA_ERROR_COULDNOTCONVERTTOUTF16 83
+#define LIBMCDATA_ERROR_COULDNOTCREATEFILE 84
+#define LIBMCDATA_ERROR_COULDNOTSEEKSTREAM 85
+#define LIBMCDATA_ERROR_COULDNOTGETSTREAMPOSITION 86
+#define LIBMCDATA_ERROR_COULDNOTWRITESTREAM 87
 #define LIBMCDATA_ERROR_INVALIDDATABASEMIGRATION 88
 #define LIBMCDATA_ERROR_INTERNALERROR 89
-#define LIBMCDATA_ERROR_UNKNOWNDATABASETYPE 81
+#define LIBMCDATA_ERROR_COULDNOTSTORECONTENTSTREAM 90
+#define LIBMCDATA_ERROR_DATABASENOTINITIALISED 91
+#define LIBMCDATA_ERROR_PARAMETERGROUPNOTFOUND 92
+#define LIBMCDATA_ERROR_SIGNALNOTFOUND 93
+#define LIBMCDATA_ERROR_STATEMACHINENOTFOUND 94
+#define LIBMCDATA_ERROR_MISSINGPARAMETERTYPE 95
+#define LIBMCDATA_ERROR_INVALIDPARAMETERTYPE 96
+#define LIBMCDATA_ERROR_COULDNOTPARSEJSON 97
+#define LIBMCDATA_ERROR_INVALIDJSONFORMAT 98
+#define LIBMCDATA_ERROR_URLNOTFOUND 99
+#define LIBMCDATA_ERROR_GENERICBADREQUEST 100
 #define LIBMCDATA_ERROR_SQLITE_ERROR 101
 #define LIBMCDATA_ERROR_SQLITE_INTERNAL 102
 #define LIBMCDATA_ERROR_SQLITE_PERM 103
@@ -139,6 +225,45 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_SQLITE_WARNING 128
 #define LIBMCDATA_ERROR_SQLITE_OTHER 130
 #define LIBMCDATA_ERROR_SQLITE_TOOMANYRESULTROWS 131
+#define LIBMCDATA_ERROR_COULDNOTREADZIPFILE 200
+#define LIBMCDATA_ERROR_COULDNOTOPENZIPFILE 201
+#define LIBMCDATA_ERROR_COULDNOTGETZIPENTRIES 202
+#define LIBMCDATA_ERROR_ZIPENTRYNOTFOUND 203
+#define LIBMCDATA_ERROR_COULDNOTSTATZIPENTRY 204
+#define LIBMCDATA_ERROR_COULDNOTOPENZIPENTRY 205
+#define LIBMCDATA_ERROR_COULDNOTREADZIPSTREAM 206
+#define LIBMCDATA_ERROR_COULDNOTREADFULLZIPDATA 207
+#define LIBMCDATA_ERROR_COULDNOTFINDDISTRIBUTIONINDEX 208
+#define LIBMCDATA_ERROR_COULDNOTPARSEDISTRIBUTIONINDEX 209
+#define LIBMCDATA_ERROR_EMPTYDISTRIBUTIONINDEX 210
+#define LIBMCDATA_ERROR_MISSINGDISTRIBUTIONINDEX 211
+#define LIBMCDATA_ERROR_MISSINGDISTRIBUTIONURL 212
+#define LIBMCDATA_ERROR_MISSINGDISTRIBUTIONFILENAME 213
+#define LIBMCDATA_ERROR_MISSINGDISTRIBUTIONSIZE 214
+#define LIBMCDATA_ERROR_MISSINGDISTRIBUTIONCONTENTTYPE 215
+#define LIBMCDATA_ERROR_DRIVERALREADYREGISTERED 216
+#define LIBMCDATA_ERROR_DRIVERNOTFOUND 217
+#define LIBMCDATA_ERROR_MISSINGDRIVERNAME 218
+#define LIBMCDATA_ERROR_MISSINGDRIVERTYPE 219
+#define LIBMCDATA_ERROR_MISSINGDRIVERLIBRARY 220
+#define LIBMCDATA_ERROR_DRIVERALREADYRESERVED 221
+#define LIBMCDATA_ERROR_LIBRARYPATHNOTFOUND 222
+#define LIBMCDATA_ERROR_TOOLPATHENTITYNOTLOADED 223
+#define LIBMCDATA_ERROR_TOOLPATHENTITYREFERENCEERROR 224
+#define LIBMCDATA_ERROR_TOOLPATHENTITYINVALIDFILE 225
+#define LIBMCDATA_ERROR_NO3MFLIBRARY 226
+#define LIBMCDATA_ERROR_INVALIDPOINTCOUNT 227
+#define LIBMCDATA_ERROR_DUPLICATEJOBUUID 228
+#define LIBMCDATA_ERROR_INVALIDJOBSTATUS 229
+#define LIBMCDATA_ERROR_INVALIDSTREAMCONTEXT 230
+#define LIBMCDATA_ERROR_JOBUUIDNOTFOUND 231
+#define LIBMCDATA_ERROR_INVALIDJOBNAME 232
+#define LIBMCDATA_ERROR_INVALIDJOBTIMESTAMP 233
+#define LIBMCDATA_ERROR_INVALIDUSERID 234
+#define LIBMCDATA_ERROR_INVALIDSTORAGECALLBACKSIGNATURE 235
+#define LIBMCDATA_ERROR_INVALIDSTORAGECALLBACKSTREAM 236
+#define LIBMCDATA_ERROR_INVALIDSTORAGEPATH 237
+#define LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND 238
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -155,12 +280,98 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
     case LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBMCDATA_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
+    case LIBMCDATA_ERROR_COULDNOTPARSECONFIGURATION: return "could not parse configuration";
+    case LIBMCDATA_ERROR_DUPLICATESTATENAME: return "duplicate state name";
+    case LIBMCDATA_ERROR_STATENOTFOUND: return "state not found";
+    case LIBMCDATA_ERROR_DUPLICATEOUTSTATE: return "duplicate out state";
+    case LIBMCDATA_ERROR_MISSINGMACHINEDEFINITION: return "missing machine definition";
+    case LIBMCDATA_ERROR_MISSINGINSTANCENAME: return "missing instance name";
+    case LIBMCDATA_ERROR_DUPLICATEMACHINEINSTANCE: return "duplicate machine instance";
+    case LIBMCDATA_ERROR_MISSINGXMLSCHEMA: return "missing XML schema";
+    case LIBMCDATA_ERROR_INVALIDXMLSCHEMA: return "invalid XML schema";
+    case LIBMCDATA_ERROR_MISSINGSTATENAME: return "missing state name";
+    case LIBMCDATA_ERROR_MISSINGOUTSTATETARGET: return "missing outstate target";
+    case LIBMCDATA_ERROR_INVALIDOUTSTATETARGET: return "invalid outstate target";
+    case LIBMCDATA_ERROR_NOINITSTATE: return "no init state";
+    case LIBMCDATA_ERROR_NOFAILEDSTATE: return "no failed state";
+    case LIBMCDATA_ERROR_INITSTATENOTFOUND: return "init state not found";
+    case LIBMCDATA_ERROR_FAILEDSTATENOTFOUND: return "failed state not found";
+    case LIBMCDATA_ERROR_MISSINGINITSTATE: return "missing init state";
+    case LIBMCDATA_ERROR_MISSINGFAILEDSTATE: return "missing failed state";
+    case LIBMCDATA_ERROR_MISSINGPLUGINNAME: return "missing plugin name";
+    case LIBMCDATA_ERROR_EMPTYINITSTATE: return "empty init state";
+    case LIBMCDATA_ERROR_EMPTYFAILEDSTATE: return "empty failed state";
+    case LIBMCDATA_ERROR_EMPTYPLUGINNAME: return "empty plugin name";
+    case LIBMCDATA_ERROR_COULDNOTCREATESTATEFACTORY: return "could not create state factory";
+    case LIBMCDATA_ERROR_INVALIDSTATENAME: return "invalid state name";
+    case LIBMCDATA_ERROR_COULDNOTCREATESTATE: return "could not create state";
+    case LIBMCDATA_ERROR_COULDNOTINITIALIZEFACTORY: return "could not initialize factory";
+    case LIBMCDATA_ERROR_COULDNOTFINALIZEFACTORY: return "could not finalize factory";
+    case LIBMCDATA_ERROR_COULDNOTLOADPLUGIN: return "could not load plugin";
+    case LIBMCDATA_ERROR_NOCURRENTSTATE: return "no current state";
+    case LIBMCDATA_ERROR_NOPLUGINSTATE: return "no plugin state";
+    case LIBMCDATA_ERROR_COULDNOTEXECUTEPLUGIN: return "could not execute plugin";
+    case LIBMCDATA_ERROR_TOOMANYMACHINEINSTANCES: return "too many machine instances";
+    case LIBMCDATA_ERROR_INVALIDINDEX: return "invalid index";
+    case LIBMCDATA_ERROR_NOOUTSTATEGIVEN: return "no new outstate has been given";
+    case LIBMCDATA_ERROR_INVALIDOUTSTATEGIVEN: return "invalid outstate has been given";
+    case LIBMCDATA_ERROR_INVALIDREPEATDELAY: return "invalid repeat delay";
+    case LIBMCDATA_ERROR_INVALIDEXECUTIONDELAY: return "invalid execution delay";
+    case LIBMCDATA_ERROR_MISSINGREPEATDELAY: return "missing repeat delay";
+    case LIBMCDATA_ERROR_THREADISRUNNING: return "thread is running";
+    case LIBMCDATA_ERROR_THREADISNOTRUNNING: return "thread is not running";
+    case LIBMCDATA_ERROR_DUPLICATESIGNAL: return "duplicate signal";
+    case LIBMCDATA_ERROR_INVALIDSIGNALNAME: return "invalid signal name";
+    case LIBMCDATA_ERROR_MISSINGSIGNALNAME: return "missing signal name";
+    case LIBMCDATA_ERROR_MISSINGSERVERNODE: return "missing server node";
+    case LIBMCDATA_ERROR_MISSINGHOSTNAME: return "missing host name";
+    case LIBMCDATA_ERROR_MISSINGPORT: return "missing port";
+    case LIBMCDATA_ERROR_UUIDGENERATIONFAILED: return "uuid generation failed";
+    case LIBMCDATA_ERROR_INVALIDBUFFERSIZE: return "invalid buffer size";
+    case LIBMCDATA_ERROR_COULDNOTCONVERTTOUTF8: return "could not convert to utf8";
     case LIBMCDATA_ERROR_NOCOLUMNAVAILABLE: return "no column available";
     case LIBMCDATA_ERROR_INVALIDTEXTCOLUMN: return "invalid text column";
     case LIBMCDATA_ERROR_INVALIDCOLUMNTYPE: return "invalid column type";
+    case LIBMCDATA_ERROR_TOOMANYREQUESTEDLOGS: return "too many requested logs";
+    case LIBMCDATA_ERROR_MISSINGINSTANCEDESCRIPTION: return "missing instance description";
+    case LIBMCDATA_ERROR_DUPLICATEPARAMETERGROUPNAME: return "duplicate parameter group name";
+    case LIBMCDATA_ERROR_MISSINGPARAMETERGROUPNAME: return "missing parameter group name";
+    case LIBMCDATA_ERROR_EMPTYPARAMETERGROUPNAME: return "empty parameter group name";
+    case LIBMCDATA_ERROR_MISSINGPARAMETERGROUPDESCRIPTION: return "missing parameter group description";
+    case LIBMCDATA_ERROR_EMPTYPARAMETERGROUPDESCRIPTION: return "empty parameter group description";
+    case LIBMCDATA_ERROR_TOOMANYPARAMETERS: return "too many parameters";
+    case LIBMCDATA_ERROR_TOOMANYPARAMETERGROUPS: return "too many parameter groups";
+    case LIBMCDATA_ERROR_DUPLICATEPARAMETERNAME: return "duplicate parameter name";
+    case LIBMCDATA_ERROR_MISSINGPARAMETERNAME: return "missing parameter name";
+    case LIBMCDATA_ERROR_EMPTYPARAMETERNAME: return "empty parameter name";
+    case LIBMCDATA_ERROR_MISSINGPARAMETERDESCRIPTION: return "missing parameter description";
+    case LIBMCDATA_ERROR_EMPTYPARAMETERDESCRIPTION: return "empty parameter description";
+    case LIBMCDATA_ERROR_PARAMETERNOTFOUND: return "parameter not found";
+    case LIBMCDATA_ERROR_MISSINGPARAMETERDEFAULTVALUE: return "missing parameter default value";
+    case LIBMCDATA_ERROR_MISSINGDATACONFIGNODE: return "missing data config node";
+    case LIBMCDATA_ERROR_MISSINGDIRECTORY: return "missing directory";
+    case LIBMCDATA_ERROR_MISSINGDATABASETYPE: return "missing database type";
+    case LIBMCDATA_ERROR_MISSINGSQLITEINFO: return "missing sqlite info";
+    case LIBMCDATA_ERROR_UNKNOWNDATABASETYPE: return "unknown database type";
+    case LIBMCDATA_ERROR_STORAGENOTINITIALISED: return "storage not initialised";
+    case LIBMCDATA_ERROR_COULDNOTCONVERTTOUTF16: return "could not convert to utf 16";
+    case LIBMCDATA_ERROR_COULDNOTCREATEFILE: return "could not create file";
+    case LIBMCDATA_ERROR_COULDNOTSEEKSTREAM: return "could not seek stream";
+    case LIBMCDATA_ERROR_COULDNOTGETSTREAMPOSITION: return "could not get stream position";
+    case LIBMCDATA_ERROR_COULDNOTWRITESTREAM: return "could not write stream";
     case LIBMCDATA_ERROR_INVALIDDATABASEMIGRATION: return "invalid database migration";
     case LIBMCDATA_ERROR_INTERNALERROR: return "internal error";
-    case LIBMCDATA_ERROR_UNKNOWNDATABASETYPE: return "unknown database type";
+    case LIBMCDATA_ERROR_COULDNOTSTORECONTENTSTREAM: return "could not store content stream";
+    case LIBMCDATA_ERROR_DATABASENOTINITIALISED: return "database not initialised";
+    case LIBMCDATA_ERROR_PARAMETERGROUPNOTFOUND: return "parameter group not found";
+    case LIBMCDATA_ERROR_SIGNALNOTFOUND: return "signal not found";
+    case LIBMCDATA_ERROR_STATEMACHINENOTFOUND: return "state machine not found.";
+    case LIBMCDATA_ERROR_MISSINGPARAMETERTYPE: return "missing parameter type.";
+    case LIBMCDATA_ERROR_INVALIDPARAMETERTYPE: return "invalid parameter type.";
+    case LIBMCDATA_ERROR_COULDNOTPARSEJSON: return "could not parse json.";
+    case LIBMCDATA_ERROR_INVALIDJSONFORMAT: return "invalid json format.";
+    case LIBMCDATA_ERROR_URLNOTFOUND: return "url not found.";
+    case LIBMCDATA_ERROR_GENERICBADREQUEST: return "generic bad request.";
     case LIBMCDATA_ERROR_SQLITE_ERROR: return "SQLite: Generic Error";
     case LIBMCDATA_ERROR_SQLITE_INTERNAL: return "SQLite: Internal logic error in SQLite";
     case LIBMCDATA_ERROR_SQLITE_PERM: return "SQLite: Access permission denied";
@@ -189,6 +400,45 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_SQLITE_WARNING: return "SQLite: Warnings from sqlite3_log";
     case LIBMCDATA_ERROR_SQLITE_OTHER: return "SQLite: Other Error";
     case LIBMCDATA_ERROR_SQLITE_TOOMANYRESULTROWS: return "too many result rows";
+    case LIBMCDATA_ERROR_COULDNOTREADZIPFILE: return "Could not read ZIP file";
+    case LIBMCDATA_ERROR_COULDNOTOPENZIPFILE: return "Could not open ZIP file";
+    case LIBMCDATA_ERROR_COULDNOTGETZIPENTRIES: return "Could not get ZIP file entries";
+    case LIBMCDATA_ERROR_ZIPENTRYNOTFOUND: return "ZIP Entry not found";
+    case LIBMCDATA_ERROR_COULDNOTSTATZIPENTRY: return "Could not stat ZIP entry";
+    case LIBMCDATA_ERROR_COULDNOTOPENZIPENTRY: return "Could not open ZIP entry";
+    case LIBMCDATA_ERROR_COULDNOTREADZIPSTREAM: return "Could not read ZIP stream";
+    case LIBMCDATA_ERROR_COULDNOTREADFULLZIPDATA: return "Could not read full zip data";
+    case LIBMCDATA_ERROR_COULDNOTFINDDISTRIBUTIONINDEX: return "Could not find distribution index.";
+    case LIBMCDATA_ERROR_COULDNOTPARSEDISTRIBUTIONINDEX: return "Could not parse distribution index.";
+    case LIBMCDATA_ERROR_EMPTYDISTRIBUTIONINDEX: return "Empty distribution index.";
+    case LIBMCDATA_ERROR_MISSINGDISTRIBUTIONINDEX: return "Missing distribution index.";
+    case LIBMCDATA_ERROR_MISSINGDISTRIBUTIONURL: return "Missing distribution url.";
+    case LIBMCDATA_ERROR_MISSINGDISTRIBUTIONFILENAME: return "Missing distribution filename.";
+    case LIBMCDATA_ERROR_MISSINGDISTRIBUTIONSIZE: return "Missing distribution size.";
+    case LIBMCDATA_ERROR_MISSINGDISTRIBUTIONCONTENTTYPE: return "Missing distribution content type.";
+    case LIBMCDATA_ERROR_DRIVERALREADYREGISTERED: return "Driver already registered.";
+    case LIBMCDATA_ERROR_DRIVERNOTFOUND: return "Driver not found.";
+    case LIBMCDATA_ERROR_MISSINGDRIVERNAME: return "Missing driver name.";
+    case LIBMCDATA_ERROR_MISSINGDRIVERTYPE: return "Missing driver type.";
+    case LIBMCDATA_ERROR_MISSINGDRIVERLIBRARY: return "Missing driver library.";
+    case LIBMCDATA_ERROR_DRIVERALREADYRESERVED: return "Driver has already been reserved by an instance.";
+    case LIBMCDATA_ERROR_LIBRARYPATHNOTFOUND: return "Library path not found.";
+    case LIBMCDATA_ERROR_TOOLPATHENTITYNOTLOADED: return "Toolpath entity not loaded";
+    case LIBMCDATA_ERROR_TOOLPATHENTITYREFERENCEERROR: return "Toolpath entity reference error";
+    case LIBMCDATA_ERROR_TOOLPATHENTITYINVALIDFILE: return "Toolpath entity is invalid";
+    case LIBMCDATA_ERROR_NO3MFLIBRARY: return "No 3MF Library specified";
+    case LIBMCDATA_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
+    case LIBMCDATA_ERROR_DUPLICATEJOBUUID: return "Duplicate job uuid";
+    case LIBMCDATA_ERROR_INVALIDJOBSTATUS: return "Invalid job status";
+    case LIBMCDATA_ERROR_INVALIDSTREAMCONTEXT: return "Invalid stream context";
+    case LIBMCDATA_ERROR_JOBUUIDNOTFOUND: return "Job uuid not found";
+    case LIBMCDATA_ERROR_INVALIDJOBNAME: return "Invalid job name";
+    case LIBMCDATA_ERROR_INVALIDJOBTIMESTAMP: return "Invalid job timestamp";
+    case LIBMCDATA_ERROR_INVALIDUSERID: return "Invalid job name";
+    case LIBMCDATA_ERROR_INVALIDSTORAGECALLBACKSIGNATURE: return "Invalid storage callback signature";
+    case LIBMCDATA_ERROR_INVALIDSTORAGECALLBACKSTREAM: return "Invalid storage callback stream";
+    case LIBMCDATA_ERROR_INVALIDSTORAGEPATH: return "Invalid storage path";
+    case LIBMCDATA_ERROR_STORAGESTREAMNOTFOUND: return "Storage Stream not found";
     default: return "unknown error";
   }
 }
@@ -198,10 +448,13 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCDataHandle LibMCData_Base;
-typedef LibMCDataHandle LibMCData_StorageStream;
-typedef LibMCDataHandle LibMCData_StorageEntity;
-typedef LibMCDataHandle LibMCData_Storage;
+typedef LibMCDataHandle LibMCData_Iterator;
 typedef LibMCDataHandle LibMCData_LogSession;
+typedef LibMCDataHandle LibMCData_StorageStream;
+typedef LibMCDataHandle LibMCData_Storage;
+typedef LibMCDataHandle LibMCData_BuildJob;
+typedef LibMCDataHandle LibMCData_BuildJobIterator;
+typedef LibMCDataHandle LibMCData_BuildJobHandler;
 typedef LibMCDataHandle LibMCData_DataModel;
 
 /*************************************************************************************************************************
@@ -209,19 +462,26 @@ typedef LibMCDataHandle LibMCData_DataModel;
 **************************************************************************************************************************/
 
 typedef enum eLibMCDataLogLevel {
-  eLogLevelFatalError = 1,
-  eLogLevelCriticalError = 2,
-  eLogLevelWarning = 3,
-  eLogLevelMessage = 4,
-  eLogLevelInfo = 5,
-  eLogLevelDebug = 6,
-  eLogLevelUnknown = 7
+  eLibMCDataLogLevelFatalError = 1,
+  eLibMCDataLogLevelCriticalError = 2,
+  eLibMCDataLogLevelWarning = 3,
+  eLibMCDataLogLevelMessage = 4,
+  eLibMCDataLogLevelInfo = 5,
+  eLibMCDataLogLevelDebug = 6,
+  eLibMCDataLogLevelUnknown = 7
 } eLibMCDataLogLevel;
 
 typedef enum eLibMCDataDataBaseType {
   eDataBaseTypeUnknown = 0,
   eDataBaseTypeSqLite = 1
 } eLibMCDataDataBaseType;
+
+typedef enum eLibMCDataBuildJobStatus {
+  eBuildJobStatusCreated = 0,
+  eBuildJobStatusValidating = 100,
+  eBuildJobStatusValidated = 200,
+  eBuildJobStatusArchived = 300
+} eLibMCDataBuildJobStatus;
 
 /*************************************************************************************************************************
  Declaration of enum members for 4 byte struct alignment
@@ -236,6 +496,34 @@ typedef union {
   eLibMCDataDataBaseType m_enum;
   int m_code;
 } structEnumLibMCDataDataBaseType;
+
+typedef union {
+  eLibMCDataBuildJobStatus m_enum;
+  int m_code;
+} structEnumLibMCDataBuildJobStatus;
+
+/*************************************************************************************************************************
+ Declaration of function pointers 
+**************************************************************************************************************************/
+
+/**
+* LibMCDataStreamReadCallback - Callback to call for reading a data chunk
+*
+* @param[in] pByteData - Pointer to a buffer to read data into
+* @param[in] nNumBytes - Number of bytes to read
+* @param[in] pStreamHandle - Handle of the stream to read.
+* @param[out] pErrorCode - LibMCData return code (0 for success)
+*/
+typedef void(*LibMCDataStreamReadCallback)(LibMCData_pvoid, LibMCData_uint64, LibMCData_pvoid, LibMCData_uint32 *);
+
+/**
+* LibMCDataStreamSeekCallback - Callback to call for seeking in the stream
+*
+* @param[in] nPosition - Position in the stream to move to
+* @param[in] pStreamHandle - Handle of the stream to read.
+* @param[out] pErrorCode - LibMCData return code (0 for success)
+*/
+typedef void(*LibMCDataStreamSeekCallback)(LibMCData_uint64, LibMCData_pvoid, LibMCData_uint32 *);
 
 
 #endif // __LIBMCDATA_TYPES_HEADER

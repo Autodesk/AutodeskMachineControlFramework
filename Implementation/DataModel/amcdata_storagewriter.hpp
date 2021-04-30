@@ -46,7 +46,7 @@ namespace AMCData {
 class CStorageWriter {
 private:
     std::string m_sUUID;
-    std::string m_sPath;
+    std::string m_sPath;    
 	uint64_t m_nSize;
     AMCCommon::PExportStream m_pExportStream;
 
@@ -58,7 +58,7 @@ public:
 	
 	void writeChunkAsync (const uint8_t * pChunkData, const uint64_t nChunkSize, const uint64_t nOffset);
 
-    void finalize();
+    void finalize(const std::string& sNeededSHA256);
 
 };
 

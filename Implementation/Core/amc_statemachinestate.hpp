@@ -36,10 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <memory>
 #include <map>
-#include <chrono>
+#include "common_chrono.hpp"
 
 #include "libmcplugin_dynamic.hpp"
 #include "libmcenv_stateenvironment.hpp"
+
+#include "amc_parameterhandler.hpp"
 
 #define AMC_MINREPEATDELAY_MS 1 // 1 milliseconds minimum repeat delay
 #define AMC_MAXREPEATDELAY_MS 10000 // 10000 milliseconds maximum repeat delay
@@ -57,7 +59,9 @@ namespace AMC {
 		std::map <std::string, PStateMachineState> m_OutStates;
 		std::vector <PStateMachineState> m_OutStateList;
 
-		std::chrono::high_resolution_clock::time_point m_LastExecutionTime;
+		AMCCommon::PChrono m_pGlobalChrono;
+
+		uint64_t m_LastExecutionTimeInMilliseconds;
 		uint32_t m_nRepeatDelay;
 
 		LibMCPlugin::PState m_pPluginState;
@@ -68,7 +72,7 @@ namespace AMC {
 		
 	public:
 
-		CStateMachineState(const std::string & sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper);
+		CStateMachineState(const std::string & sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono);
 		virtual ~CStateMachineState();
 
 		std::string getName() const;

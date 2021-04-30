@@ -37,7 +37,7 @@
 	</implementations>
 	
 	
-	<importcomponent uri="../../../ACT/LibMCDriverEnv.xml" namespace="LibMCDriverEnv"/>
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
 	
 	<errors>
 		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
@@ -65,6 +65,10 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 	</class>
 	
 	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
 	
 		<method name="GetName" description = "returns the name identifier of the driver">
 			<param name="Name" type="string" pass="return" description="Name of the driver." />
@@ -84,6 +88,9 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 		<method name="GetHeaderInformation" description = "returns the header information">
 			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
 			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
+		</method>
+		
+		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
 		</method>
 	
 	</class>
@@ -108,6 +115,8 @@ Custom implementation
 		<method name="Connect" description="Creates and initializes a new Marlin Connector.">
 			<param name="COMPort" type="string" pass="in" description="Device Port to connect to" />
 			<param name="Baudrate" type="uint32" pass="in" description="Baudrate to use" />
+			<param name="StatusUpdateInterval" type="uint32" pass="in" description="Timer interval [ms] for updating status" />
+			<param name="ConnectTimeout" type="uint32" pass="in" description="Timeout [ms] for connecting printer" />
 		</method>
 
 		<method name="Disconnect" description="Disconnects from the Marlin board.">
@@ -117,7 +126,33 @@ Custom implementation
 			<param name="Absolute" type="bool" pass="in" description="If true, sets positioning to absolute, if false to relative" />
 		</method>
 		
-		<method name="UpdateState" description="Polls a new state from the firmware.">
+		<method name="SetHeatedBedTargetTemperature" description="Sets heated bed target temperature.">
+			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Bed target temperature." />
+			<param name="WaitForTemp" type="bool" pass="in" description="If true, waits for the target bed temperature to be reached before proceeding" />
+		</method>
+
+		<method name="SetExtruderTargetTemperature" description="Sets target temperature of the given extruder.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of extruder." />
+			<param name="TemperatureInDegreeCelcius" type="double" pass="in" description="Extruder target temperature." />
+			<param name="WaitForTemp" type="bool" pass="in" description="If true, waits for the target extruder temperature to be reached before proceeding" />
+		</method>
+
+		<method name="SetFanSpeed" description="Turns on one of the fans and set its speed.">
+			<param name="FanID" type="uint32" pass="in" description="ID of fan." />
+			<param name="Speed" type="uint32" pass="in" description="Fan speed [0..255]. 0=0%...255=100%" />
+		</method>
+
+		<method name="SetPidParameters" description="Sets PID parameters.">
+			<param name="P" type="double" pass="in" description="New value for P parameter." />
+			<param name="I" type="double" pass="in" description="New value for I parameter." />
+			<param name="D" type="double" pass="in" description="New value for D parameter." />
+		</method>
+
+		<method name="UpdatePositionState" description="Polls a new state from the printer.">
+		</method>
+
+		<method name="UpdateTemperatureState" description="Polls a new temperature state from the printer.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of extruder." />
 		</method>
 
 		<method name="GetCurrentPosition" description="Returns the current axis position.">
@@ -132,10 +167,32 @@ Custom implementation
 			<param name="Z" type="double" pass="out" description="Z Value in mm" />
 		</method>
 
-		<method name="GetExtruderTemperature" description="Returns the current temperature of an extruder.">
+		<method name="GetExtruderTargetPosition" description="Returns the target extruder position.">
+			<param name="E" type="double" pass="out" description="E Value in mm" />
+		</method>
+
+		<method name="GetHeatedBedTargetTemperature" description="Returns the the target bed temperature.">
+			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
+		</method>
+
+		<method name="GetHeatedBedCurrentTemperature" description="Returns the current bed temperature.">
+			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
+		</method>
+
+		<method name="GetExtruderCurrentTemperature" description="Returns the current temperature of an extruder.">
 			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
 			<param name="CurrentTemperature" type="double" pass="out" description="Current Temperature in degree celsius." />
+		</method>
+
+		<method name="GetExtruderTargetTemperature" description="Returns the target temperature of an extruder.">
+			<param name="ExtruderID" type="uint32" pass="in" description="ID of Extruder" />
 			<param name="TargetTemperature" type="double" pass="out" description="Target Temperature in degree celsius." />
+		</method>
+
+		<method name="GetPidParameters" description="Returns the current PID values.">
+			<param name="P" type="double" pass="out" description="Current P value." />
+			<param name="I" type="double" pass="out" description="Current I value." />
+			<param name="D" type="double" pass="out" description="Current D value." />
 		</method>
 
 
@@ -147,21 +204,64 @@ Custom implementation
 			<param name="Value" type="bool" pass="return" description="Extruder is moving" />
 		</method>
 
-		<method name="MoveTo" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+		<method name="IsHomed" description="Returns if the printer is homed">
+			<param name="Value" type="bool" pass="return" description="True if printer is homed." />
+		</method>
+
+		<method name="IsConnected" description="Returns if the printer is coneccted">
+			<param name="Value" type="bool" pass="return" description="True if printer is connected." />
+		</method>
+
+		<method name="MoveToXY" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="X" type="double" pass="in" description="X Value in mm" />
 			<param name="Y" type="double" pass="in" description="Y Value in mm" />
-			<param name="Z" type="double" pass="in" description="Z Value in mm" />
+			<param name="E" type="double" pass="in" description="E Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 
-		<method name="MoveFastTo" description="Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+		<method name="MoveFastToXY" description="Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
 			<param name="X" type="double" pass="in" description="X Value in mm" />
 			<param name="Y" type="double" pass="in" description="Y Value in mm" />
-			<param name="Z" type="double" pass="in" description="Z Value in mm" />
 			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
 		</method>
 		
+		<method name="MoveToZ" description="Moves to/by a certain position by a linear move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+			<param name="Z" type="double" pass="in" description="Z Value in mm" />
+			<param name="E" type="double" pass="in" description="E Value in mm" />
+			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
+		</method>
+
+		<method name="MoveFastToZ" description="Moves to/by a certain position by a fast move. Takes the relative/absolute mode into account. Fails if it cannot execute a movement.">
+			<param name="Z" type="double" pass="in" description="Z Value in mm" />
+			<param name="Speed" type="double" pass="in" description="Movement speed in mm/s" />
+		</method>
 	
+		<method name="StartHoming" description="Start Homing of printer.">
+		</method>
+
+		<method name="EmergencyStop" description="Used for emergency stopping. Shuts down the machine, turns off all the steppers and heaters, and if possible, turns off the power supply.">
+		</method>
+
+		<method name="SetAxisPosition" description="Set the current position of given axis to the specified value.">
+			<param name="Axis" type="string" pass="in" description="Axis whose value is to be set." />
+			<param name="Value" type="double" pass="in" description="New value for given Axis." />
+		</method>
+
+		<method name="ExtruderDoExtrude" description="Extrudes the specified value with given Feedrate.">
+			<param name="E" type="double" pass="in" description="E value in mm" />
+			<param name="Speed" type="double" pass="in" description="Extrusion speed in mm/s" />
+		</method>
+
+		<method name="SetAbsoluteExtrusion" description="Sets the extrusion (E axis) to absolute mode.">
+			<param name="Absolute" type="bool" pass="in" description="If true, sets mode to absolute, if false to relative" />
+		</method>
+		
+		<method name="StopIdleHold" description="Stop the idle hold on all axis and extruder.">
+		</method>
+
+		<method name="PowerOff" description="Turn off the high-voltage power supply.">
+		</method>
+
 	</class>
 
 
@@ -202,7 +302,7 @@ End of Custom implementation
 		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
 			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
 			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
-			<param name="DriverEnvironment" type="class" class="LibMCDriverEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
 			<param name="Instance" type="class" class="Driver" pass="return" description="New Driver instance" />
 		</method>
 		

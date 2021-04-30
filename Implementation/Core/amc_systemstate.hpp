@@ -32,16 +32,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_SYSTEMSTATE
 #define __AMC_SYSTEMSTATE
 
-#include "amc_logger.hpp"
-#include "amc_parameterhandler.hpp"
-#include "amc_statesignalhandler.hpp"
-#include "amc_driverhandler.hpp"
-#include "amc_toolpathhandler.hpp"
+#include <memory>
+#include <map>
+#include <string>
 
-#include "libmcdata_dynamic.hpp"
+namespace LibMCData {
+	class CDataModel;
+	class CStorage;
+	class CBuildJobHandler;
+	class CLoginHandler;
 
+	typedef std::shared_ptr<CDataModel> PDataModel;
+	typedef std::shared_ptr<CStorage> PStorage;
+	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
+	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
+}
+
+
+namespace AMCCommon {
+	class CChrono;
+	typedef std::shared_ptr<CChrono> PChrono;
+}
+
+namespace LibMCEnv {
+	class CWrapper;
+	typedef std::shared_ptr<CWrapper> PWrapper;
+}
 
 namespace AMC {
+
+	class CLogger;
+	class CStateSignalHandler;
+	class CDriverHandler;
+	class CToolpathHandler;
+	class CServiceHandler;
+	class CUIHandler;
+	class CParameterHandler;
+	class CParameterInstances;
+
+	typedef std::shared_ptr<CLogger> PLogger;
+	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
+	typedef std::shared_ptr<CDriverHandler> PDriverHandler;
+	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
+	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
+	typedef std::shared_ptr<CUIHandler> PUIHandler;
+	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	typedef std::shared_ptr<CParameterInstances> PParameterInstances;
 
 	class CSystemState {
 	private:
@@ -49,15 +85,25 @@ namespace AMC {
 		AMC::PStateSignalHandler m_pSignalHandler;
 		AMC::PDriverHandler m_pDriverHandler;
 		AMC::PToolpathHandler m_pToolpathHandler;
-		
+		AMC::PServiceHandler m_pServiceHandler;
+		AMC::PUIHandler m_pUIHandler;
+		AMC::PParameterInstances m_pParameterInstances;
+
+		AMCCommon::PChrono m_pGlobalChrono;
+
 		LibMCData::PDataModel m_pDataModel;
 		LibMCData::PStorage m_pStorage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		LibMCData::PLoginHandler m_pLoginHandler;
 
-		std::map <std::string, std::string> m_LibraryPathes;
+		std::map <std::string, std::pair <std::string, std::string>> m_LibraryPathes;
+
+		std::string m_sInstallationUUID;
+		std::string m_sInstallationSecret;		
+
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper);
 
 		virtual ~CSystemState();
 
@@ -65,14 +111,35 @@ namespace AMC {
 		CStateSignalHandler* stateSignalHandler();
 		CDriverHandler* driverHandler();
 		CToolpathHandler* toolpathHandler();
+		CServiceHandler* serviceHandler();
+		CUIHandler* uiHandler();
+		CParameterInstances* parameterInstances();
 
-		PLogger getLoggerInstance();
+		LibMCData::CStorage * storage();
+		LibMCData::CBuildJobHandler * buildJobHandler();
+		LibMCData::CLoginHandler* loginHandler();
+
+		AMCCommon::CChrono * globalChrono();
+
+		PLogger getLoggerInstance();		
 		PStateSignalHandler getStateSignalHandlerInstance();
 		PDriverHandler getDriverHandlerInstance();
 		PToolpathHandler getToolpathHandlerInstance();
+		PParameterInstances getParameterInstances ();
 
-		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath);
+		LibMCData::PLoginHandler getLoginHandlerInstance();
+		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
+		AMCCommon::PChrono getGlobalChronoInstance();
+
+		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);
 		std::string getLibraryPath(const std::string& sLibraryName);
+		std::string getLibraryResourcePath(const std::string& sLibraryName);
+
+		std::string getSystemUserID();
+		std::string getInstallationUUID(); // Returns a unique UUID of the installation
+		std::string getInstallationSecret(); // Returns a unique Secret SHA256 String of the installation. MUST NOT be shared externally.
+		std::string getGitHash();
+
 
 
 	};

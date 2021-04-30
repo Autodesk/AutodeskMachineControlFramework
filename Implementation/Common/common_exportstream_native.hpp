@@ -51,6 +51,8 @@ namespace AMCCommon {
 		bool seekFromEnd(uint64_t bytes, bool bHasToSucceed) override;
 		uint64_t getPosition() override;
 		uint64_t writeBuffer(const void* pBuffer, uint64_t cbTotalBytesToWrite) override;
+
+		void writeZeros(uint64_t bytes) override;
 	};
 
 }

@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <mutex>
 
+#define AMC_UI_IMAGE_MINASPECTRATIO 0.001
+#define AMC_UI_IMAGE_MAXASPECTRATIO 1000.0
+
 namespace AMC {
 
 	class CParameterHandler;
@@ -52,10 +55,12 @@ namespace AMC {
 		std::vector<PParameterGroup> m_GroupList;
 
 		std::mutex m_Mutex;
+		std::string m_sDescription;
+		std::string m_sInstanceState;
 		
 	public:
 
-		CParameterHandler();
+		CParameterHandler(std::string sDescription);
 		
 		virtual ~CParameterHandler();		
 		
@@ -64,10 +69,16 @@ namespace AMC {
 		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
 
 		uint32_t getGroupCount();
-		CParameterGroup* getGroup(const uint32_t nIndex);
-		CParameterGroup* findGroup(const std::string& sName, const bool bFailIfNotExisting);
+		PParameterGroup getGroup(const uint32_t nIndex);
+		PParameterGroup findGroup(const std::string& sName, const bool bFailIfNotExisting);
 
 		CParameterGroup * getDataStore ();
+
+		std::string getDescription();
+		void setDescription(const std::string & sDescription);
+
+		void setInstanceStateName(const std::string & sInstanceState);
+		std::string getInstanceStateName();
 
 	};
 

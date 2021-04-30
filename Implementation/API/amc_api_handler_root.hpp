@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMC_API_HANDLER_ROOT
 
 #include "amc_api_handler.hpp"
+#include "amc_resourcepackage.hpp"
+
 #include <string>
 #include <map>
 
@@ -50,12 +52,12 @@ namespace AMC {
 		virtual ~CAPIHandler_Root();
 				
 		virtual std::string getBaseURI () override;
+
+		virtual void checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) override;
 		
-		virtual PAPIResponse handleGetRequest(const std::string& sURI) override;
+		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
 
-		virtual PAPIResponse handlePostRequest(const std::string& sURI, const uint8_t* pBodyData, const size_t nBodyDataSize) override;
-
-		void LoadClientPackage(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer);
+		void LoadClientPackage(PResourcePackage pResourcePackage);
 
 	};
 

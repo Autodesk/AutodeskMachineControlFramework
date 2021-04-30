@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_interfaceexception.hpp"
 
 #include "common_utils.hpp"
+#include "common_chrono.hpp"
 
 namespace AMCData {
 		
@@ -49,10 +50,33 @@ namespace AMCData {
 
 	std::string CStoragePath::getLogPath()
 	{
-		auto sTimeFileName = AMCCommon::CUtils::getCurrentTimeFileName();
+		AMCCommon::CChrono chrono;
+		auto sTimeFileName = chrono.getStartTimeFileName();
 		return m_sDataPath + "/log_" + sTimeFileName + ".db";
 	}
 
+	std::string CStoragePath::storageStreamStatusToString(eStorageStreamStatus eStatus)
+	{
+		switch (eStatus) {
+		case sssNew: return "new";
+		case sssValidated: return "validated";
+		case sssArchived: return "archived";
+		default: 
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS);
+		}
+	}
+
+	eStorageStreamStatus CStoragePath::stringToStorageStreamStatus(const std::string& sStatus)
+	{
+		if (sStatus == "new")
+			return sssNew;
+		if (sStatus == "validated")
+			return sssValidated;
+		if (sStatus == "archived")
+			return sssArchived;
+
+		throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDSTORAGESTREAMSTATUS);
+	}
 
 }
 

@@ -34,8 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_signalhandler.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
+#include "libmcenv_build.hpp"
 
+#include "amc_logger.hpp"
+#include "amc_driverhandler.hpp"
+#include "amc_parameterhandler.hpp"
+#include "amc_ui_handler.hpp"
 
+#include "common_chrono.hpp"
 #include <thread> 
 
 // Include custom headers here.
@@ -59,7 +65,7 @@ CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParam
 }
 
 
-ISignalTrigger* CStateEnvironment::CreateSignal(const std::string& sMachineInstance, const std::string& sSignalName)
+ISignalTrigger* CStateEnvironment::PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName)
 {
 	if (!m_pSystemState->stateSignalHandler()->hasSignalDefinition(sMachineInstance, sSignalName))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTFINDSIGNALDEFINITON);
@@ -90,7 +96,8 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 			if (CheckForTermination())
 				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TERMINATED);
 
-			AMCCommon::CUtils::sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);			
+			AMCCommon::CChrono chrono;
+			chrono.sleepMilliseconds(DEFAULT_WAITFOR_SLEEP_MS);
 		}
 	}
 
@@ -98,26 +105,19 @@ bool CStateEnvironment::WaitForSignal(const std::string& sSignalName, const LibM
 }
 
 
-void CStateEnvironment::LoadToolpath(const std::string& sToolpathUUID)
+IBuild* CStateEnvironment::GetBuildJob(const std::string& sBuildUUID)
 {
-	m_pSystemState->toolpathHandler()->loadToolpathEntity(sToolpathUUID);
+	auto pBuildJobHandler = m_pSystemState->buildJobHandler();
+	auto pBuildJob = pBuildJobHandler->RetrieveJob(sBuildUUID);
+	return new CBuild(pBuildJob, m_pSystemState);
 }
 
-void CStateEnvironment::UnloadToolpath(const std::string& sToolpathUUID)
-{
-	m_pSystemState->toolpathHandler()->unloadToolpathEntity(sToolpathUUID);
-}
 
 void CStateEnvironment::UnloadAllToolpathes()
 {
 	m_pSystemState->toolpathHandler()->unloadAllEntities();
 }
 
-
-IToolpathAccessor* CStateEnvironment::CreateToolpathAccessor(const std::string& sToolpathUUID)
-{
-	return new CToolpathAccessor(sToolpathUUID, m_pSystemState->getToolpathHandlerInstance ());
-}
 
 
 void CStateEnvironment::GetDriverLibrary(const std::string& sDriverName, std::string& sDriverType, LibMCEnv_pvoid& pDriverLookup)
@@ -128,12 +128,6 @@ void CStateEnvironment::GetDriverLibrary(const std::string& sDriverName, std::st
 void CStateEnvironment::CreateDriverAccess(const std::string& sDriverName, LibMCEnv_pvoid& pDriverHandle) 
 {	
 	pDriverHandle = m_pSystemState->driverHandler()->acquireDriver(sDriverName, m_sInstanceName);
-}
-
-
-bool CStateEnvironment::ToolpathIsLoaded(const std::string& sToolpathUUID)
-{
-	return (m_pSystemState->toolpathHandler ()->findToolpathEntity(sToolpathUUID, false) != nullptr);
 }
 
 
@@ -165,7 +159,8 @@ void CStateEnvironment::LogInfo(const std::string& sLogString)
 
 void CStateEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 {
-	AMCCommon::CUtils::sleepMilliseconds(nDelay);	
+	AMCCommon::CChrono chrono;
+	chrono.sleepMilliseconds(nDelay);
 }
 
 bool CStateEnvironment::CheckForTermination()
@@ -175,56 +170,6 @@ bool CStateEnvironment::CheckForTermination()
 }
 
 
-void CStateEnvironment::StoreString(const std::string& sName, const std::string& sValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewStringParameter(sName, "", sValue);
-	}
-	else {
-		pGroup->setParameterValueByName(sName, sValue);
-	}
-
-}
-
-void CStateEnvironment::StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewIntParameter(sName, "", nValue);
-	}
-	else {
-		pGroup->setIntParameterValueByName(sName, nValue);
-	}
-
-}
-
-void CStateEnvironment::StoreDouble(const std::string& sName, const LibMCEnv_double dValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewDoubleParameter(sName, "", dValue);
-	}
-	else {
-		pGroup->setDoubleParameterValueByName(sName, dValue);
-	}
-}
-
-
-void CStateEnvironment::StoreBool(const std::string& sName, const bool bValue)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	if (!pGroup->hasParameter(sName)) {
-		pGroup->addNewBoolParameter(sName, "", bValue);
-	}
-	else {
-		pGroup->setBoolParameterValueByName(sName, bValue);
-	}
-}
 
 void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pHandler)
 {
@@ -240,34 +185,6 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 		pGroup->setParameterValueByName(sName, pHandler->GetSignalID());
 	}
 
-}
-
-std::string CStateEnvironment::RetrieveString(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getParameterValueByName(sName);
-}
-
-LibMCEnv_int64 CStateEnvironment::RetrieveInteger(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getIntParameterValueByName(sName);
-}
-
-LibMCEnv_double CStateEnvironment::RetrieveDouble(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getDoubleParameterValueByName(sName);
-}
-
-bool CStateEnvironment::RetrieveBool(const std::string& sName)
-{
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
-
-	return pGroup->getBoolParameterValueByName(sName);
 }
 
 ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
@@ -297,6 +214,20 @@ void CStateEnvironment::SetStringParameter(const std::string& sParameterGroup, c
 
 	pGroup->setParameterValueByName(sParameterName, sValue);
 }
+
+
+void CStateEnvironment::SetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (!pGroup->hasParameter(sParameterName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+
+	pGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+
 
 void CStateEnvironment::SetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue)
 {
@@ -346,6 +277,19 @@ std::string CStateEnvironment::GetStringParameter(const std::string& sParameterG
 	return pGroup->getParameterValueByName(sParameterName);
 }
 
+
+std::string CStateEnvironment::GetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName)
+{
+	if (!m_pParameterHandler->hasGroup(sParameterGroup))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERGROUPNOTFOUND);
+
+	auto pGroup = m_pParameterHandler->findGroup(sParameterGroup, true);
+	if (!pGroup->hasParameter(sParameterName))
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_PARAMETERNOTFOUND);
+
+	return AMCCommon::CUtils::normalizeUUIDString (pGroup->getParameterValueByName(sParameterName));
+}
+
 LibMCEnv_double CStateEnvironment::GetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName)
 {
 	if (!m_pParameterHandler->hasGroup(sParameterGroup))
@@ -382,4 +326,30 @@ bool CStateEnvironment::GetBoolParameter(const std::string& sParameterGroup, con
 	return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+
+void CStateEnvironment::LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get () == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourceEntry = pResourcePackage->findEntryByName(sResourceName, true);
+	auto nResourceSize = pResourceEntry->getSize();
+
+	if (pResourceDataNeededCount != nullptr)
+		*pResourceDataNeededCount = nResourceSize;
+
+	if (pResourceDataBuffer != nullptr) {
+		if (nResourceDataBufferSize < nResourceSize)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+		pResourcePackage->readEntryEx(sResourceName, pResourceDataBuffer, nResourceDataBufferSize);
+	}
+
+
+}
 

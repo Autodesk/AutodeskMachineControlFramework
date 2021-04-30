@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"fmt"
+	"runtime"
 	"io/ioutil"
 	"strings"
 	"path/filepath"
@@ -16,7 +17,7 @@ import (
 
 type DistXMLEntry struct {
 	XMLName xml.Name `xml:"entry"`
-	URL string `xml:"url,attr"`
+	Name string `xml:"name,attr"`
 	FileName string `xml:"filename,attr"`
 	Size uint32 `xml:"size,attr"`
 	ContentType string `xml:"contenttype,attr"`
@@ -24,7 +25,7 @@ type DistXMLEntry struct {
 
 
 type DistXMLRoot struct {
-	XMLName xml.Name `xml:"serve"`
+	XMLName xml.Name `xml:"package"`
 	XMLNs string `xml:"xmlns,attr"`
 	Entries []DistXMLEntry `xml:"entry"`
 }
@@ -34,9 +35,42 @@ type DistXMLRoot struct {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-func createMCServerTemplate (outputName string, packageName string, clientName string, libraryName string, configName string, gitHash string) (error) {
+func createMCServerTemplate (outputDir string, packageName string, clientName string, libraryName string, configName string, gitHash string, dllExtension string, coreResourcesName string) (error) {
 
-	file, err := os.Create(outputName);
+	pkgfile, err := os.Create(outputDir + gitHash + "_package.xml");
+	if (err != nil) {
+		return err
+	}
+
+	defer pkgfile.Close()	
+
+	fmt.Fprintf(pkgfile, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+	fmt.Fprintf(pkgfile, "<amcpackage xmlns=\"http://schemas.autodesk.com/amcpackage/2020/06\">\n");
+	fmt.Fprintf(pkgfile, "  <build name=\"%s\" configuration=\"%s\" coreclient=\"%s\">\n", packageName, configName, clientName);
+	
+	fmt.Fprintf(pkgfile, "    <library name=\"core\" import=\"%s\" resources=\"%s\" />\n", libraryName, coreResourcesName);
+	fmt.Fprintf(pkgfile, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_demo\" import=\"%s_plugin_demo.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_mechanics\" import=\"%s_plugin_mechanics.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_plc\" import=\"%s_plugin_plc.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_printerconnection\" import=\"%s_plugin_printerconnection.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_userinterface\" import=\"%s_plugin_userinterface.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.%s\" resources=\"%s_driver_marlin.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.%s\" resources=\"%s_driver_scanlab.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_camera\" import=\"%s_driver_camera.%s\" resources=\"%s_driver_camera.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.%s\" resources=\"%s_driver_scanlaboie.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.%s\" resources=\"%s_driver_s7net.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "  </build>\n");
+	fmt.Fprintf(pkgfile, "</amcpackage>\n");
+	
+	pkgfile.Close()	
+	
+
+	file, err := os.Create(outputDir + "amc_server.xml");
 	if (err != nil) {
 		return err
 	}
@@ -45,21 +79,12 @@ func createMCServerTemplate (outputName string, packageName string, clientName s
 	
 	fmt.Fprintf(file, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
 	fmt.Fprintf(file, "<amc xmlns=\"http://schemas.autodesk.com/amc/2020/06\">\n");
-	fmt.Fprintf(file, "  <server hostname=\"127.0.0.1\" port=\"8869\" />\n");
+	fmt.Fprintf(file, "  <server hostname=\"0.0.0.0\" port=\"8869\" />\n");
 	fmt.Fprintf(file, "  <data directory=\"data/\" database=\"sqlite\" sqlitedb=\"storage.db\" />\n");
-	fmt.Fprintf(file, "  <package name=\"%s\" coreclient=\"%s\" config=\"%s\">\n", packageName, clientName, configName);
-	
-	fmt.Fprintf(file, "    <library name=\"core\" import=\"%s\" />\n", libraryName);
-	fmt.Fprintf(file, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"plugin_main\" import=\"%s_plugin_main.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"plugin_movement\" import=\"%s_plugin_movement.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.dll\" />\n", gitHash);
-	fmt.Fprintf(file, "  </package>\n");
+	fmt.Fprintf(file, "  <defaultpackage name=\"%s_package.xml\" githash=\"%s\" sha256=\"%s\" />\n", gitHash, gitHash, "");	
 	fmt.Fprintf(file, "</amc>\n");
-	
+
+
 	return nil;
 
 }
@@ -67,7 +92,15 @@ func createMCServerTemplate (outputName string, packageName string, clientName s
 func main() {
 
 	var Root DistXMLRoot;
-	Root.XMLNs = "http://schemas.autodesk.com/amc/clientdistribution/2020/07";
+	Root.XMLNs = "http://schemas.autodesk.com/amc/resourcepackage/2020/07";
+	
+	var dllExtension string
+	if runtime.GOOS == "windows" {
+		dllExtension = "dll";
+	} else {
+		dllExtension = "so";
+	}
+	
 		
 	argsWithProg := os.Args;
 	if (len (argsWithProg) < 3) {
@@ -78,13 +111,13 @@ func main() {
 	OutputDir := filepath.Clean (argsWithProg[1]) + "/";
 	hexSum := argsWithProg[2];
 	
-	
-	ClientZIPName := hexSum + "_core_client.zip";
-	LibraryName := hexSum + "_core_libmc.dll";
+		
+	ClientZIPName := hexSum + "_core.client";
+	CoreResourcesName := hexSum + "_core.data";
+	LibraryName := hexSum + "_core_libmc." + dllExtension;
 	ConfigName := hexSum + "_config.xml";
 	
-	DistXMLName := "dist.xml";
-	MCServerXMLPath := OutputDir + "amc_server.xml";
+	DistXMLName := "package.xml";
 	
 	packageName := "Build " + hexSum;
 	
@@ -128,40 +161,44 @@ func main() {
 				}
 				
 				
-				var entry DistXMLEntry;
-				entry.URL = url;
-				entry.FileName = file;
-				entry.Size = uint32 (info.Size());
-				entry.ContentType = contenttype;
+				if (fileext!=".map") {
 				
-				Root.Entries = append (Root.Entries, entry);
+					var entry DistXMLEntry;
+					entry.Name = url;
+					entry.FileName = file;
+					entry.Size = uint32 (info.Size());
+					entry.ContentType = contenttype;
+					
+					Root.Entries = append (Root.Entries, entry);
+					
+					fmt.Printf("Adding %s (%d bytes)\n", path, info.Size())
+					
+					input, err := ioutil.ReadFile(path)
+					if err != nil {
+						return err
+					}
+					
+					
+					var header zip.FileHeader;
+					header.Name = file;
+					header.Method = zip.Deflate;
+					
+					filewriter, err := zipWriter.CreateHeader(&header)
+					if err != nil {
+						return err
+					}
+					
+					_, err = filewriter.Write(input)
+					if err != nil {
+						return err
+					}
+					
+					/*err = ioutil.WriteFile(OutputDir + "/" + TargetDistDir + "/" + file, input, 0644)
+					if err != nil {				
+						return err;
+					} */
 				
-				fmt.Printf("Adding %s (%d bytes)\n", path, info.Size())
-				
-				input, err := ioutil.ReadFile(path)
-				if err != nil {
-					return err
 				}
-				
-				
-				var header zip.FileHeader;
-				header.Name = file;
-				header.Method = zip.Deflate;
-				
-				filewriter, err := zipWriter.CreateHeader(&header)
-				if err != nil {
-					return err
-				}
-				
-				_, err = filewriter.Write(input)
-    			if err != nil {
-					return err
-				}
-				
-				/*err = ioutil.WriteFile(OutputDir + "/" + TargetDistDir + "/" + file, input, 0644)
-				if err != nil {				
-					return err;
-				} */
 				
 			}
 			
@@ -201,9 +238,9 @@ func main() {
 		}
 	}
 	
-	fmt.Printf("creating %s\n", MCServerXMLPath);
+	fmt.Printf("creating server config in %s\n", OutputDir);
 	
-	err = createMCServerTemplate (MCServerXMLPath, packageName, ClientZIPName, LibraryName, ConfigName, hexSum);
+	err = createMCServerTemplate (OutputDir, packageName, ClientZIPName, LibraryName, ConfigName, hexSum, dllExtension, CoreResourcesName);
 	if err != nil {
 		log.Fatal(err)
 	}

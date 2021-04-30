@@ -28,10 +28,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_API_RESPONSE
+
 #include "amc_api.hpp"
+#include "amc_api_auth.hpp"
 #include "amc_api_handler.hpp"
 #include "amc_api_response.hpp"
+#include "amc_api_jsonrequest.hpp"
+#include "amc_api_sessionhandler.hpp"
+
 #include "libmc_interfaceexception.hpp"
+
+
+#include "common_utils.hpp"
 
 #include <vector>
 #include <memory>
@@ -42,69 +51,21 @@ using namespace AMC;
 
 CAPI::CAPI()
 {
-
+	m_pSessionHandler = std::make_shared<CAPISessionHandler>();
 }
 
 CAPI::~CAPI()
 {
 }
 
-PAPIResponse CAPI::handleGetRequest(const std::string& sURI, uint32_t& nHTTPCode)
+
+PAPIHandler CAPI::getURIMatch(const std::string& sURI)
 {
+	for (auto pHandler : m_ApiHandlers) {
+		std::string sBaseURI = pHandler->getBaseURI();
+		bool bIsMatch;
 
-	try {
-
-		for (auto pHandler : m_ApiHandlers) {
-			std::string sBaseURI = pHandler->getBaseURI();
-			bool bIsMatch;
-
-			if (sBaseURI.length() > 0) {
-				if (sBaseURI.length() < sURI.length()) {
-					std::string sSlashURI = sBaseURI + "/";
-
-					bIsMatch = (sSlashURI == sURI.substr(0, sSlashURI.length()));
-				}
-				else {
-					bIsMatch = (sBaseURI == sURI);
-				}
-			}
-			else {
-				bIsMatch = true;
-			}
-
-			if (bIsMatch) {
-				auto pResponse = pHandler->handleGetRequest(sURI);
-				if (pResponse.get() != nullptr) {
-					nHTTPCode = AMC_API_HTTP_SUCCESS;
-					return pResponse;
-				}
-
-				break;
-			}
-		}
-
-		nHTTPCode = AMC_API_HTTP_NOTFOUND;
-		return makeError (LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
-	}
-	catch (ELibMCInterfaceException & IntfException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(IntfException.getErrorCode(), IntfException.what ());
-	}
-	catch (std::exception& StdException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(LIBMC_ERROR_GENERICBADREQUEST, StdException.what());
-	}
-}
-
-PAPIResponse CAPI::handlePostRequest(const std::string& sURI, const uint8_t* pBody, const size_t nStreamSize, uint32_t& nHTTPCode)
-{
-
-	try {
-
-		for (auto pHandler : m_ApiHandlers) {
-			std::string sBaseURI = pHandler->getBaseURI();
-			bool bIsMatch;
-
+		if (sBaseURI.length() > 0) {
 			if (sBaseURI.length() < sURI.length()) {
 				std::string sSlashURI = sBaseURI + "/";
 
@@ -113,30 +74,126 @@ PAPIResponse CAPI::handlePostRequest(const std::string& sURI, const uint8_t* pBo
 			else {
 				bIsMatch = (sBaseURI == sURI);
 			}
-
-			if (bIsMatch) {
-				PAPIResponse pResponse = pHandler->handlePostRequest(sURI, pBody, nStreamSize);
-				if (pResponse.get() != nullptr) {
-					nHTTPCode = AMC_API_HTTP_SUCCESS;
-					return pResponse;
-				}
-
-				break;
-			}
+		}
+		else {
+			bIsMatch = true;
 		}
 
-		nHTTPCode = AMC_API_HTTP_NOTFOUND;
-		return makeError(LIBMC_ERROR_URLNOTFOUND, "url not found" + sURI);
+		if (bIsMatch) {
+			return pHandler;
+		}
+	}
+
+	return nullptr;
+}
+
+
+bool CAPI::expectsRawBody(const std::string& sURI, const eAPIRequestType requestType)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr)
+		return false;
+
+	return pHandler->expectsRawBody(sURI, requestType);
+}
+
+
+std::string CAPI::removeLeadingSlashFromURI(const std::string& sURI)
+{
+	std::string sURIWithoutLeadingSlash;
+	if (sURI.length() > 0) {
+		if (sURI.substr(0, 1) == "/")
+			sURIWithoutLeadingSlash = sURI.substr(1);
+		else
+			sURIWithoutLeadingSlash = sURI;
+	}
+
+	return sURIWithoutLeadingSlash;
+
+}
+
+eAPIRequestType CAPI::getRequestTypeFromString(const std::string& sRequestType)
+{
+	std::string sLowerCaseType = AMCCommon::CUtils::trimString(AMCCommon::CUtils::toLowerString(sRequestType));
+
+	if (sLowerCaseType == "get")
+		return AMC::eAPIRequestType::rtGet;
+	if (sLowerCaseType == "post")
+		return AMC::eAPIRequestType::rtPost;
+
+	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAPIREQUESTTYPE);
+}
+
+
+void CAPI::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession)
+{
+
+	bNeedsToBeAuthorized = true;
+	bCreateNewSession = false;
+
+	std::string sURIWithoutLeadingSlash = removeLeadingSlashFromURI(sURI);
+
+	auto pHandler = getURIMatch(sURIWithoutLeadingSlash);
+	if (pHandler.get() == nullptr)
+		return;
+
+	pHandler->checkAuthorizationMode(sURIWithoutLeadingSlash, requestType, bNeedsToBeAuthorized, bCreateNewSession);
+}
+
+
+
+
+PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr)
+		return makeError(AMC_API_HTTP_NOTFOUND, LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
+
+	bool bNeedsToBeAuthorized = true;
+	bool bCreateNewSession = false;
+	pHandler->checkAuthorizationMode (sURI, requestType, bNeedsToBeAuthorized, bCreateNewSession);
+
+	if (bNeedsToBeAuthorized && (!pAuth->userIsAuthorized ()))
+		return makeError(AMC_API_HTTP_FORBIDDEN, LIBMC_ERROR_SESSIONNOTAUTHORIZED, "session not authorized");
+
+
+	try {
+		
+		auto pResponse = pHandler->handleRequest (sURI, requestType, pFormFields, pData, nCount, pAuth);
+
+		if (pResponse.get() == nullptr)
+			return makeError(AMC_API_HTTP_NOTFOUND, LIBMC_ERROR_URLNOTFOUND, "url not found: " + sURI);
+		
+		return pResponse;		
 	}
 	catch (ELibMCInterfaceException& IntfException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(IntfException.getErrorCode(), IntfException.what());
+		return makeError(AMC_API_HTTP_BADREQUEST, IntfException.getErrorCode(), IntfException.what());
 	}
 	catch (std::exception& StdException) {
-		nHTTPCode = AMC_API_HTTP_BADREQUEST;
-		return makeError(LIBMC_ERROR_GENERICBADREQUEST, StdException.what());
+		return makeError(AMC_API_HTTP_BADREQUEST, LIBMC_ERROR_GENERICBADREQUEST, StdException.what());
 	}
 }
+
+uint32_t CAPI::getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr)
+		return false;
+
+	return pHandler->getFormDataFieldCount(sURI, requestType);
+
+}
+
+CAPIFieldDetails CAPI::getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex)
+{
+	auto pHandler = getURIMatch(sURI);
+	if (pHandler.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_URLNOTFOUND);
+
+	return pHandler->getFormDataFieldDetails(sURI, requestType, nFieldIndex);
+
+}
+
 
 void CAPI::registerHandler(PAPIHandler pAPIHandler)
 {
@@ -147,12 +204,19 @@ void CAPI::registerHandler(PAPIHandler pAPIHandler)
 }
 
 
-PAPIResponse CAPI::makeError(LibMCResult errorCode, const std::string& sErrorString)
+PAPIResponse CAPI::makeError(uint32_t nHTTPError, LibMCResult errorCode, const std::string& sErrorString)
 {
 	CJSONWriter writer;
 	writer.addString(AMC_API_KEY_PROTOCOL, AMC_API_PROTOCOL_ERROR);
 	writer.addString(AMC_API_KEY_VERSION, AMC_API_PROTOCOL_VERSION);
 	writer.addInteger(AMC_API_KEY_ERRORCODE, errorCode);
 	writer.addString(AMC_API_KEY_MESSAGE, sErrorString);
-	return std::make_shared<CAPIStringResponse> (AMC_API_CONTENTTYPE, writer.saveToString () );
+	return std::make_shared<CAPIStringResponse> (nHTTPError, AMC_API_CONTENTTYPE, writer.saveToString () );
 }
+
+
+PAPISessionHandler CAPI::getSessionHandler()
+{
+	return m_pSessionHandler;
+}
+

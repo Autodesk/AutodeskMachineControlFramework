@@ -47,7 +47,7 @@ Interface version: 1.0.0
 #include "libmcdriver_types.hpp"
 
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 namespace LibMCDriver {
 namespace Impl {
@@ -265,6 +265,12 @@ typedef IBaseSharedPtr<IBase> PIBase;
 class IDriver : public virtual IBase {
 public:
 	/**
+	* IDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	virtual void Configure(const std::string & sConfigurationString) = 0;
+
+	/**
 	* IDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/
@@ -292,6 +298,11 @@ public:
 	*/
 	virtual void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) = 0;
 
+	/**
+	* IDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	virtual void QueryParameters() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver> PIDriver;
@@ -303,7 +314,7 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class CWrapper {
 public:
 	// Injected Components
-	static LibMCDriverEnv::PWrapper sPLibMCDriverEnvWrapper;
+	static LibMCEnv::PWrapper sPLibMCEnvWrapper;
 
 	/**
 	* Ilibmcdriver::GetVersion - retrieves the binary version of this library.
@@ -340,7 +351,7 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 };
 

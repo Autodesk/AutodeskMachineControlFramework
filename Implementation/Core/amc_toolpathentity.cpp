@@ -99,7 +99,17 @@ namespace AMC {
 		double dUnits = m_pToolpath->GetUnits();
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
-		return std::make_shared<CToolpathLayerData> (p3MFLayerData, dUnits);
+		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue);
+	}
+
+
+	double CToolpathEntity::getUnits()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		return m_pToolpath->GetUnits();
+
 	}
 
 

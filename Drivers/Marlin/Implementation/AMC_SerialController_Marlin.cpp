@@ -30,23 +30,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AMC_SerialController_Marlin.hpp"
 
+#include <algorithm>
 #include <thread>
+
+#include <cmath>
+
+#define MARLINDRIVER_MINSPEED 0.0001
 
 namespace AMC {
 
-	CSerialController_Marlin::CSerialController_Marlin(bool bDebug)
-		: m_sCOMPort ("COM1"), 
-		m_nBaudRate (115200), 
-		m_sAckSymbol ("ok"), 
-		m_nLineNumber (1), 
-		m_bDebug (bDebug),
-		m_sResendSymbol ("Resend:"), 
-		 m_nMinBufferSpace (3), m_nMaxBufferSpace (0), m_nCurrentBufferSpace (0)
-	{
+	CSerialController_Marlin::CSerialController_Marlin(bool bDebug, bool bDoQueryFirmwareInfo, bool bDisableHoming)
+		: m_sCOMPort("COM1"),
+		m_nBaudRate(115200),
+		m_nConnectTimeout(2000),
+		m_bIsConnected(false),
+		m_bDoQueryFirmwareInfo(bDoQueryFirmwareInfo),
+		m_bDisableHoming(bDisableHoming),
+		m_nStatusUpdateTimerInterval(100),
+		m_sAckSymbol("ok"),
+		m_nLineNumber(1),
+		m_bDebug(bDebug),
+		m_sResendSymbol("Resend:"),
+		m_nMinBufferSpace(3),
+		m_nMaxBufferSpace(0),
+		m_nCurrentBufferSpace(0),
+		m_bIsHomed(false),
+		m_iExtruderCount(0),
+		m_dCurrentBedTemp(0),
+		m_dTargetBedTemp(0),
+		m_dTargetPosX(0),
+		m_dTargetPosY(0),
+		m_dTargetPosZ(0),
+		m_dTargetPosE(0),
+		m_dCurrentPosX(0),
+		m_dCurrentPosY(0),
+		m_dCurrentPosZ(0),
+		m_dAxisStepsPerUnitX(0),
+		m_dAxisStepsPerUnitY(0),
+		m_dAxisStepsPerUnitZ(0),
+		m_dAxisStepsPerUnitE(0),
+		m_dCurrentSpeedInMMperSecond(0),
+		m_dPidValueP(0),
+		m_dPidValueI(0),
+		m_dPidValueD(0)
 
+	{
+		// If we disabled homing, then we expect to be at the home position at creation
+		if (m_bDisableHoming)
+			m_bIsHomed = true;
 	}
 
-	void CSerialController_Marlin::setCOMPort(const std::string& sCOMPort)
+	void CSerialController_Marlin::setStatusUpdateTimerInterval(const uint32_t nStatusUpdateTimerInterval)
+	{
+		m_nStatusUpdateTimerInterval = nStatusUpdateTimerInterval;
+	}
+
+
+		void CSerialController_Marlin::setCOMPort(const std::string& sCOMPort)
 	{
 		m_sCOMPort = sCOMPort;
 	}
@@ -58,7 +98,7 @@ namespace AMC {
 
 		return m_sCOMPort;
 	}
-
+	
 	void CSerialController_Marlin::setBaudrate(const uint32_t nBaudrate)
 	{
 		if (m_pConnection.get() != nullptr)
@@ -72,39 +112,104 @@ namespace AMC {
 		return m_nBaudRate;
 	}
 
+	bool CSerialController_Marlin::isConnected()
+	{
+		return m_bIsConnected;
+	}
+
+	void CSerialController_Marlin::setConnectTimeout(const uint32_t nConnectTimeout)
+	{
+		if (m_pConnection.get() != nullptr)
+			throw std::runtime_error("Serial Port already initialized");
+
+		m_nConnectTimeout = nConnectTimeout;
+	}
+
+	uint32_t CSerialController_Marlin::getConnectTimeout()
+	{
+		return m_nConnectTimeout;
+	}
+
 	CSerialController_Marlin::~CSerialController_Marlin()
 	{
 	}
 
 	void CSerialController_Marlin::initializeController()
 	{
+		m_bIsConnected = false;
 		if (m_pConnection.get() != nullptr)
 			throw std::runtime_error("Serial Port already initialized");
 
-		m_pConnection.reset(new serial::Serial(m_sCOMPort, m_nBaudRate, serial::Timeout::simpleTimeout(1000)));
+		// set timeout >1000 => 2000 (default of m_nConnectTimeout)
+		// 
+		// if printer is booting (echoing start+ Date+Memory... after switch on printer or plug in cable) and
+		// timeout would be 1000 the while loop below we be leaved "to early" (after timeout of 1sec) and
+		// the next command is sent, but printer can't respond to this command with OK,
+		// because he's not ready to receive commands => boot initialize hags up!!
+		//
+		// if printer is not booting (no echoing text... after software" reconnect)
+		// "start" will no be received,
+		// but timeout after 2000 will respond with an empty string and
+		// printer is ready to receive commands
+		m_pConnection.reset(new serial::Serial(m_sCOMPort, m_nBaudRate, serial::Timeout::simpleTimeout(m_nConnectTimeout)));
 
 		if (!m_pConnection->isOpen()) {
 			m_pConnection.reset();
 			throw std::runtime_error("Could not connect to serial port");
 		}
 
-		m_nLineNumber = 1;
+		// instead of waiting a fixed time wait until "start" or "" (after timeout) received from device??
+		//std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		bool bAck = false;
+		while (!bAck) {
+			std::string sLineRead = m_pConnection->readline();
+			if (m_bDebug) {
+				std::cout << "RETURN: " << sLineRead << std::endl;
+			}
 
-		sendCommand("M110 N1");
+			bAck = sLineRead.empty() || (sLineRead.find("start") != std::string::npos);
+		}
+
+
+		// reset line number
+		std::stringstream sCommand;
+		sCommand << "M110 " << m_nLineNumber;
+		sendCommand(sCommand.str());
 
 		m_nCurrentBufferSpace = 0;
-		sendCommand("M400");
 
+		sendCommand("M400");
+		sendCommand("G21"); // set mm units
+		sendCommand("M149 C"); // set temperature unit to Celsius
+		sendCommand("M113 S1"); // keep alive period 0-60 possible, no decimals!
+		setPositioningAbolute();
+		setAbsoluteExtrusion(true);
+		
 		if (m_nCurrentBufferSpace > 0) {
 			m_nMaxBufferSpace = m_nCurrentBufferSpace;
 		}
 
-		sendCommand("G21");
+		queryAxisStepsPerUnitStateAndPidValues();
 
+		m_iExtruderCount = 1;
+
+		if (m_bDoQueryFirmwareInfo)
+			queryFirmwareInfo();
+
+		// add an element to list of extruder for every detected extruder
+		for (uint32_t i = 0; i < m_iExtruderCount; ++i)
+		{
+			m_dTargetExtruderTemp.push_back(0);
+			m_dCurrentExtruderTemp.push_back(0);
+		}
+
+		checkIsHomed();
+		m_bIsConnected = true;
 	}
 
 	void CSerialController_Marlin::disconnectController()
 	{
+		m_bIsConnected = false;
 		m_pConnection.reset();
 	}
 
@@ -112,6 +217,35 @@ namespace AMC {
 	{
 		disconnectController();
 		initializeController();
+	}
+
+
+
+	void CSerialController_Marlin::checkIsHomed()
+	{
+		if (m_pConnection.get() == nullptr)
+			throw std::runtime_error("Serial Port not initialized");
+
+		if (!m_bDisableHoming) {
+
+			// get endstops states
+			auto sStream = sendCommand("M119");
+			auto sLine = sStream.str();
+			std::transform(sLine.begin(), sLine.end(), sLine.begin(), ::tolower);
+
+			auto nPosition = sLine.find("_min: open\n");
+
+			if (nPosition == std::string::npos) {
+				// no axis is open => all are TRIGGERED => homed
+				m_bIsHomed = true;
+			}
+			else {
+				// at least on end stop of an axis is "open" => not homed
+				m_bIsHomed = false;
+			}
+
+		}
+
 	}
 
 	uint32_t CSerialController_Marlin::calculateLineChecksum(const std::string& sCommand)
@@ -187,7 +321,6 @@ namespace AMC {
 			bool bResend = (sLineRead.find(m_sResendSymbol) != std::string::npos);
 			if (bResend) {
 				// For now fail, because firmware was not in reset state...
-				// TODO: Find out how to reset firmware
 				throw std::runtime_error("line number mismatch in firmware");
 			}
 
@@ -200,23 +333,245 @@ namespace AMC {
 
 
 
-	void CSerialController_Marlin::setHeatedBedTargetTemperature(double nTemperatureInDegreeCelcius)
+	void CSerialController_Marlin::setHeatedBedTargetTemperature(double nTemperatureInDegreeCelcius, bool bWait)
 	{
+		if (bWait) {
+			// wait for the target bed temperature to be reached before proceeding
+			sendCommand("M190 S" + std::to_string(nTemperatureInDegreeCelcius));
+		}
+		else {
+			// don't wait
+			sendCommand("M140 S" + std::to_string(nTemperatureInDegreeCelcius));
+		}
 	}
 
-	void CSerialController_Marlin::setExtruderTargetTemperature(uint32_t nExtruderIndex, double nTemperatureInDegreeCelcius)
+	void CSerialController_Marlin::setExtruderTargetTemperature(uint32_t nExtruderIndex, double nTemperatureInDegreeCelcius, bool bWait)
 	{
+		if ((nExtruderIndex >= 0) && (nExtruderIndex < m_iExtruderCount))
+		{
+			if (bWait) {
+				// wait for the target extruder temperature to be reached before proceeding
+				sendCommand("M109 T" + std::to_string(nExtruderIndex) + " S" + std::to_string(nTemperatureInDegreeCelcius));
+			}
+			else {
+				// don't wait
+				sendCommand("M104 T" + std::to_string(nExtruderIndex) + " S" + std::to_string(nTemperatureInDegreeCelcius));
+			}
+		}
+	}
+
+	void CSerialController_Marlin::setPidParameters(double dP, double dI, double dD)
+	{
+		sendCommand("M301 P" + std::to_string(dP) + " I" + std::to_string(dI) + " D" + std::to_string(dD));
+
+		m_dPidValueP = dP;
+		m_dPidValueI = dI;
+		m_dPidValueD = dD;
 
 	}
 
+	void CSerialController_Marlin::setFanSpeed(uint32_t nFanIndex, uint32_t nSpeed)
+	{
+		if ((nFanIndex >= 0))
+		{
+			if ((nSpeed > 0) && (nSpeed < 256))	 {
+				// turn fan on
+				sendCommand("M106 P" + std::to_string(nFanIndex) + " S" + std::to_string(nSpeed));
+			}
+			else {
+				// turn fan off
+				sendCommand("M107 P" + std::to_string(nFanIndex));
+			}
+		}
+	}
+	
 	void CSerialController_Marlin::queryTemperatureState(uint32_t nExtruderIndex)
 	{
-		auto sStream = sendCommand("M105 T" + std::to_string (nExtruderIndex));
+		if ((nExtruderIndex >= 0) && (nExtruderIndex < m_iExtruderCount))
+		{
+			auto sStream = sendCommand("M105 T" + std::to_string(nExtruderIndex));
+			
+			auto sLine = sStream.str();
+			auto nPosition = sLine.find("T:");
+
+			if (nPosition == std::string::npos)
+				throw std::runtime_error("could not query extruder temperature state.");
+
+
+			// get extruder temperature
+			auto sExtruderTempPosString = sLine.substr(nPosition + 2);
+
+			auto nCurrentExtruderTempPosition = sExtruderTempPosString.find('/');
+			auto nTargetExtruderTempPosition = sExtruderTempPosString.find('B');
+
+			if (nCurrentExtruderTempPosition == std::string::npos)
+				throw std::runtime_error("could not find extruder current temperature position.");
+			if (nTargetExtruderTempPosition == std::string::npos)
+				throw std::runtime_error("could not find extruder target temperature position.");
+
+			if (!(nCurrentExtruderTempPosition < nTargetExtruderTempPosition))
+				throw std::runtime_error("invalid extruder temperature position order.");
+
+			auto sCurrentExtTemp = sExtruderTempPosString.substr(0, nCurrentExtruderTempPosition);
+			auto sTargetExtTemp = sExtruderTempPosString.substr(nCurrentExtruderTempPosition + 1, nTargetExtruderTempPosition - (nCurrentExtruderTempPosition + 1));
+
+			m_dCurrentExtruderTemp[nExtruderIndex] = std::stod(sCurrentExtTemp);
+			m_dTargetExtruderTemp[nExtruderIndex] = std::stod(sTargetExtTemp);
+
+
+			// get bed temperature
+			auto sBedTempPosString = sExtruderTempPosString.substr(nTargetExtruderTempPosition + 2);
+
+			auto nCurrentBedTempPosition = sBedTempPosString.find('/');
+			auto nTargetBedTempPosition = sBedTempPosString.find('@');
+
+			if (nCurrentBedTempPosition == std::string::npos)
+				throw std::runtime_error("could not find bed current temperature position.");
+			if (nTargetBedTempPosition == std::string::npos)
+				throw std::runtime_error("could not find bed target temperature position.");
+
+			if (!(nCurrentBedTempPosition < nTargetBedTempPosition))
+				throw std::runtime_error("invalid bed temperature position order.");
+
+			auto sCurrentBedTemp = sBedTempPosString.substr(0, nCurrentBedTempPosition);
+			auto sTargetBedTemp = sBedTempPosString.substr(nCurrentBedTempPosition + 1, nTargetBedTempPosition - (nCurrentBedTempPosition + 1));
+
+			m_dCurrentBedTemp = std::stod(sCurrentBedTemp);
+			m_dTargetBedTemp = std::stod(sTargetBedTemp);
+		}
+	}
+
+	void CSerialController_Marlin::queryAxisStepsPerUnitStateAndPidValues()
+	{
+		auto sStream = sendCommand("M503 S0");
+		auto sLine = sStream.str();
+
+		// get AXIS_STEPS_PER_UNIT
+		auto nPosition = sLine.find("M92");
+
+		if (nPosition == std::string::npos)
+			throw std::runtime_error("could not query axis_steps_per_unit state.");
+
+		auto sTempString = sLine.substr(nPosition + 4);
+		nPosition = sTempString.find("\n");
+		auto sAxisStepsPerUnitString = sTempString.substr(0, nPosition);
+
+		auto nAxisStepsPerUnitXPosition = sAxisStepsPerUnitString.find("X");
+		auto nAxisStepsPerUnitYPosition = sAxisStepsPerUnitString.find("Y");
+		auto nAxisStepsPerUnitZPosition = sAxisStepsPerUnitString.find("Z");
+		auto nAxisStepsPerUnitEPosition = sAxisStepsPerUnitString.find("E");
+
+		if (nAxisStepsPerUnitXPosition == std::string::npos)
+			throw std::runtime_error("could not find axis_steps_per_unit X position.");
+		if (nAxisStepsPerUnitYPosition == std::string::npos)
+			throw std::runtime_error("could not find axis_steps_per_unit Y position.");
+		if (nAxisStepsPerUnitZPosition == std::string::npos)
+			throw std::runtime_error("could not find axis_steps_per_unit Z position.");
+		if (nAxisStepsPerUnitEPosition == std::string::npos)
+			throw std::runtime_error("could not find axis_steps_per_unit E position.");
+
+		if (!((nAxisStepsPerUnitXPosition < nAxisStepsPerUnitYPosition) && (nAxisStepsPerUnitYPosition < nAxisStepsPerUnitZPosition) &&
+			(nAxisStepsPerUnitZPosition < nAxisStepsPerUnitEPosition)))
+			throw std::runtime_error("invalid axis_steps_per_unit position order.");
+
+		auto sAxis_steps_per_unitXString = sAxisStepsPerUnitString.substr(nAxisStepsPerUnitXPosition + 1, nAxisStepsPerUnitYPosition - (nAxisStepsPerUnitXPosition + 1));
+		auto sAxis_steps_per_unitYString = sAxisStepsPerUnitString.substr(nAxisStepsPerUnitYPosition + 1, nAxisStepsPerUnitZPosition - (nAxisStepsPerUnitYPosition + 1));
+		auto sAxis_steps_per_unitZString = sAxisStepsPerUnitString.substr(nAxisStepsPerUnitZPosition + 1, nAxisStepsPerUnitEPosition - (nAxisStepsPerUnitZPosition + 1));
+		auto sAxis_steps_per_unitEString = sAxisStepsPerUnitString.substr(nAxisStepsPerUnitEPosition + 1);
+
+		m_dAxisStepsPerUnitX = std::stod(sAxis_steps_per_unitXString);
+		m_dAxisStepsPerUnitY = std::stod(sAxis_steps_per_unitYString);
+		m_dAxisStepsPerUnitZ = std::stod(sAxis_steps_per_unitZString);
+		m_dAxisStepsPerUnitE = std::stod(sAxis_steps_per_unitEString);
+
+		// get PID values
+		nPosition = sLine.find("M301");
+
+		if (nPosition == std::string::npos)
+			throw std::runtime_error("could not query PID values.");
+
+		sTempString = sLine.substr(nPosition + 5);
+		nPosition = sTempString.find("\n");
+		auto sPidValuesString = sTempString.substr(0, nPosition);
+
+		auto nPidValuePPosition = sPidValuesString.find("P");
+		auto nPidValueIPosition = sPidValuesString.find("I");
+		auto nPidValueDPosition = sPidValuesString.find("D");
+
+		if (nPidValuePPosition == std::string::npos)
+			throw std::runtime_error("could not find PID value P position.");
+		if (nPidValueIPosition == std::string::npos)
+			throw std::runtime_error("could not find PID value I position.");
+		if (nPidValueDPosition == std::string::npos)
+			throw std::runtime_error("could not find PID value D position.");
+
+		if (!((nPidValuePPosition < nPidValueIPosition) && (nPidValueIPosition < nPidValueDPosition)))
+			throw std::runtime_error("invalid PID values position order.");
+
+		auto sPidValuePString = sPidValuesString.substr(nPidValuePPosition + 1, nPidValueIPosition - (nPidValuePPosition + 1));
+		auto sPidValueIString = sPidValuesString.substr(nPidValueIPosition + 1, nPidValueDPosition - (nPidValueIPosition + 1));
+		auto sPidValueDString = sPidValuesString.substr(nPidValueDPosition + 1);
+
+		m_dPidValueP = std::stod(sPidValuePString);
+		m_dPidValueI = std::stod(sPidValueIString);
+		m_dPidValueD = std::stod(sPidValueDString);
+
+	}
+
+	void CSerialController_Marlin::queryFirmwareInfo()
+	{
+		auto sStream = sendCommand("M115");
+		auto sLine = sStream.str();
+
+
+		const std::string sFirmwareName = "FIRMWARE_NAME:";
+		const std::string sSourceCodeUrl = "SOURCE_CODE_URL:";
+		const std::string sProtocolVersion = "PROTOCOL_VERSION:";
+		const std::string sMachineType = "MACHINE_TYPE:";
+		const std::string sExtruderCount = "EXTRUDER_COUNT:";
+		const std::string sUuid = "UUID:";
+
+		auto nPosFirmwareName = sLine.find(sFirmwareName);
+		auto nPosSourceCodeUrl = sLine.find(sSourceCodeUrl);
+		auto nPosProtocolVersion = sLine.find(sProtocolVersion);
+		auto nPosMachineType = sLine.find(sMachineType);
+		auto nPosExtruderCount = sLine.find(sExtruderCount);
+		auto nPosUuid = sLine.find(sUuid);
+		auto nPosEol = sLine.find("\n");
+
+		if (nPosFirmwareName == std::string::npos)
+			throw std::runtime_error("could not query FIRMWARE_NAME in firmware info.");
+		if (nPosSourceCodeUrl == std::string::npos)
+			throw std::runtime_error("could not query SOURCE_CODE_URL in firmware info.");
+		if (nPosProtocolVersion == std::string::npos)
+			throw std::runtime_error("could not query PROTOCOL_VERSION in firmware info.");
+		if (nPosMachineType == std::string::npos)
+			throw std::runtime_error("could not query MACHINE_TYPE in firmware info.");
+		if (nPosExtruderCount == std::string::npos)
+			throw std::runtime_error("could not query EXTRUDER_COUNT in firmware info.");
+		if (nPosUuid == std::string::npos)
+			throw std::runtime_error("could not query UUID in firmware info.");
+		if (nPosEol == std::string::npos)
+			throw std::runtime_error("could not query EOL in firmware info.");
+
+		if (!((nPosFirmwareName < nPosSourceCodeUrl) && (nPosSourceCodeUrl < nPosProtocolVersion) &&
+			(nPosProtocolVersion < nPosMachineType) && (nPosMachineType < nPosExtruderCount) &&
+			(nPosExtruderCount < nPosUuid) && (nPosUuid < nPosEol)))
+			throw std::runtime_error("invalid order of firmware info.");
+
+		m_sFirmwareName = sLine.substr(sFirmwareName.length(), nPosSourceCodeUrl - sFirmwareName.length() - 1);
+		m_sSourceCodeUrl = sLine.substr(nPosSourceCodeUrl + sSourceCodeUrl.length(), nPosProtocolVersion - (nPosSourceCodeUrl + sSourceCodeUrl.length() + 1));
+		m_sProtocolVersion = sLine.substr(nPosProtocolVersion + sProtocolVersion.length(), nPosMachineType - (nPosProtocolVersion + sProtocolVersion.length() + 1));
+		m_sMachineType = sLine.substr(nPosMachineType + sMachineType.length(), nPosExtruderCount - (nPosMachineType + sMachineType.length() + 1));
+		m_iExtruderCount = std::stoi(sLine.substr(nPosExtruderCount + sExtruderCount.length(), nPosUuid - (nPosExtruderCount + sExtruderCount.length() + 1)));
+		m_sUUID = sLine.substr(nPosUuid + sUuid.length(), nPosEol - (nPosUuid + sUuid.length())); 
+
 	}
 
 	void CSerialController_Marlin::queryPositionState()
 	{
 		auto sStream = sendCommand("M114");
+		
 		auto sLine = sStream.str();
 
 		auto nPosition = sLine.find("Count");
@@ -258,6 +613,8 @@ namespace AMC {
 		auto nCurrentXPosition = sCurrentPosString.find("X:");
 		auto nCurrentYPosition = sCurrentPosString.find("Y:");
 		auto nCurrentZPosition = sCurrentPosString.find("Z:");
+		auto nCurrentEolPosition = sCurrentPosString.find("\n");
+
 
 		if (nCurrentXPosition == std::string::npos)
 			throw std::runtime_error("could not find current X position.");
@@ -271,25 +628,45 @@ namespace AMC {
 
 		auto sCurrentXString = sCurrentPosString.substr(nCurrentXPosition + 2, nCurrentYPosition - (nCurrentXPosition + 2));
 		auto sCurrentYString = sCurrentPosString.substr(nCurrentYPosition + 2, nCurrentZPosition - (nCurrentYPosition + 2));
-		auto sCurrentZString = sCurrentPosString.substr(nCurrentZPosition + 2);
+		auto sCurrentZString = sCurrentPosString.substr(nCurrentZPosition + 2, nCurrentEolPosition - (nCurrentZPosition + 2));
 
-		m_dCurrentPosX = std::stod(sCurrentXString);
-		m_dCurrentPosY = std::stod(sCurrentYString);
-		m_dCurrentPosZ = std::stod(sCurrentZString);
+		m_dCurrentPosX = std::stod(sCurrentXString) / m_dAxisStepsPerUnitX;;
+		m_dCurrentPosY = std::stod(sCurrentYString) / m_dAxisStepsPerUnitY;;
+		m_dCurrentPosZ = std::stod(sCurrentZString) / m_dAxisStepsPerUnitZ;;
 
 	}
 
-	void CSerialController_Marlin::getHeatedBedTemperature(double& dTargetTemperature, double& dCurrentTemperature)
+	void CSerialController_Marlin::getHeatedBedTargetTemperature(double& dTargetTemperature)
 	{
-
+		dTargetTemperature = m_dTargetBedTemp;
 	}
 
-	void CSerialController_Marlin::getExtruderTemperature(uint32_t nExtruderIndex, double& dTargetTemperature, double& dCurrentTemperature)
+	void CSerialController_Marlin::getHeatedBedCurrentTemperature(double& dCurrentTemperature)
 	{
-		dTargetTemperature = 0.0;
-		dCurrentTemperature = 0.0;
+		dCurrentTemperature = m_dCurrentBedTemp;
 	}
 
+	void CSerialController_Marlin::getExtruderTargetTemperature(uint32_t nExtruderIndex, double& dTargetTemperature)
+	{
+		if (nExtruderIndex < m_iExtruderCount) {
+			dTargetTemperature = m_dTargetExtruderTemp[nExtruderIndex];
+		}
+	}
+
+	void CSerialController_Marlin::getExtruderCurrentTemperature(uint32_t nExtruderIndex, double& dCurrentTemperature)
+	{
+		if (nExtruderIndex < m_iExtruderCount) {
+			dCurrentTemperature = m_dCurrentExtruderTemp[nExtruderIndex];
+		}
+	}
+
+
+	void CSerialController_Marlin::getPidParameters(double& dP, double& dI, double& dD)
+	{
+		dP = m_dPidValueP;
+		dI = m_dPidValueI;
+		dD = m_dPidValueD;
+	}
 
 	void CSerialController_Marlin::getTargetPosition(double& dX, double& dY, double& dZ)
 	{
@@ -305,15 +682,18 @@ namespace AMC {
 		dZ = m_dCurrentPosZ;
 	}
 
-	void CSerialController_Marlin::getExtruderPosition(double& dE)
+	void CSerialController_Marlin::getExtruderTargetPosition(double& dE)
 	{
-		dE = m_dCurrentPosE;
+		dE = m_dTargetPosE;
 	}
 
 	void CSerialController_Marlin::startHoming()
 	{
-		sendCommand("G28");
+		if (!m_bDisableHoming) {
+			sendCommand("G28");
+		}
 		sendCommand("M400");
+		checkIsHomed();
 	}
 
 	void CSerialController_Marlin::setLcdMsg(const std::string& sLcdMsg)
@@ -332,42 +712,162 @@ namespace AMC {
 		sendCommand("G91");
 	}
 
-	void CSerialController_Marlin::move(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond)
+	void CSerialController_Marlin::moveToEx(bool bFastMove, 
+		bool bInX, const double dX, 
+		bool bInY, const double dY, 
+		bool bInZ, const double dZ,
+		bool bInE, const double dE,
+		const double dSpeedInMMperSecond)
 	{
 		std::stringstream sCommand;
-		sCommand << "G1 X" << dX << " Y" << dY << " Z" << dZ << " F" << dSpeedInMMperSecond * 60.0;
+
+		if (bFastMove) {
+			sCommand << "G0";
+		}
+		else {
+			sCommand << "G1";
+		}
+
+		if (bInX) {
+			// X given => add X+value to command str
+			sCommand << " X" << dX;
+		}
+		if (bInY) {
+			// Y given => add Y+value to command str
+			sCommand << " Y" << dY;
+		}
+		if (bInZ) {
+			// Z given => add Z+value to command str
+			sCommand << " Z" << dZ;
+		}
+		if (bInE && !bFastMove) {
+			// E given => add E+value to command str
+			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
+			sCommand << " E" << dE;
+			//std::cout << "CALCULATED E = " << dE << std::endl;
+		}
+		if (dSpeedInMMperSecond > 0) {
+			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
+				m_dCurrentSpeedInMMperSecond = dSpeedInMMperSecond;
+				sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
+			}
+		}
 		sendCommand(sCommand.str());
 
-		m_dTargetPosX = dX;
-		m_dTargetPosY = dY;
-		m_dTargetPosZ = dZ;
+		if (bInX) {
+			m_dTargetPosX = dX;
+		}
+		if (bInY) {
+			m_dTargetPosY = dY;
+		}
+		if (bInZ) {
+			m_dTargetPosZ = dZ;
+		}
+		if (bInE) {
+			m_dTargetPosE = dE;
+		}
 	}
 
-	void CSerialController_Marlin::moveFast(const double dX, const double dY, const double dZ, const double dSpeedInMMperSecond)
+
+	void CSerialController_Marlin::moveXY(const double dX, const double dY, const double dE, const double dSpeedInMMperSecond)
 	{
-		std::stringstream sCommand;
-		sCommand << "G0 X" << dX << " Y" << dY << " Z" << dZ << " F" << dSpeedInMMperSecond * 60.0;
+		bool dInE = false;
+		if (fabs(dE) > MARLINDRIVER_MINSPEED) {
+			dInE = true;
+		}
+		moveToEx(false, true, dX, true, dY, false, 0.0, dInE, dE, dSpeedInMMperSecond);
+	}
 
-		sendCommand(sCommand.str());
+	void CSerialController_Marlin::moveFastXY(const double dX, const double dY, const double dSpeedInMMperSecond)
+	{
+		moveToEx(true, true, dX, true, dY, false, 0.0, false, 0.0, dSpeedInMMperSecond);
+	}
 
-		m_dTargetPosX = dX;
-		m_dTargetPosY = dY;
-		m_dTargetPosZ = dZ;
+	void CSerialController_Marlin::moveZ(const double dZ, const double dE, const double dSpeedInMMperSecond)
+	{
+		bool dInE = false;
+		if (fabs(dE) > MARLINDRIVER_MINSPEED) {
+			dInE = true;
+		}
+		moveToEx(false, false, 0.0, false, 0.0, true, dZ, dInE, dE, dSpeedInMMperSecond);
+	}
+
+	void CSerialController_Marlin::moveFastZ(const double dZ, const double dSpeedInMMperSecond)
+	{
+		moveToEx(true, false, 0.0, false, 0.0, true, dZ, false, 0.0, dSpeedInMMperSecond);
 	}
 
 	void CSerialController_Marlin::waitForMovement()
 	{
 		sendCommand("M400");		
+		// Print time (M31) responses immediately with ok (+ADVANCED_OK) + print time
+		// not added to the planning buffer
+		//sendCommand("M31");
 	}
 
 	bool CSerialController_Marlin::canReceiveMovement()
 	{
-		return (m_nCurrentBufferSpace > m_nMinBufferSpace);
+		return (m_bIsConnected && (m_nCurrentBufferSpace > m_nMinBufferSpace));
 	}
 
 	bool CSerialController_Marlin::isMoving()
 	{
-		return (m_nCurrentBufferSpace != m_nMaxBufferSpace);
+		return (m_bIsConnected && m_nCurrentBufferSpace != m_nMaxBufferSpace);
+	}
+
+	bool CSerialController_Marlin::isHomed()
+	{
+		return (m_bIsConnected && m_bIsHomed);
+	}
+
+	void CSerialController_Marlin::emergencyStop()
+	{
+		sendCommand("M112");
+	}
+
+
+	void CSerialController_Marlin::powerOff()
+	{
+		sendCommand("M81");
+	}
+
+	void CSerialController_Marlin::stopIdleHold()
+	{
+		sendCommand("M84");
+	}
+
+	void CSerialController_Marlin::setAbsoluteExtrusion(bool bAbsolute)
+	{
+		std::string sCommand;
+		if (bAbsolute) {
+			// absolute mode
+			sCommand  = "M82";
+		}
+		else {
+			// relative mode
+			sCommand = "M83";
+		}
+		sendCommand(sCommand);
+	}
+
+
+	void CSerialController_Marlin::setAxisPosition(const std::string& sAxis, double dValue)
+	{
+		sendCommand("G92 " + sAxis + std::to_string(dValue));		
+	}
+
+	void CSerialController_Marlin::extruderDoExtrude(double dE, double dSpeedInMMperSecond)
+	{
+		std::stringstream sCommand;
+
+		sCommand << "G1 E" << dE;
+
+		if (dSpeedInMMperSecond > 0) {
+			sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
+		}
+		// TODO XXXXXXXXXXXXXXXX activate to do extrusion
+		sendCommand(sCommand.str());
+		//std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
 	}
 
 

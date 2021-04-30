@@ -232,14 +232,14 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_COULDNOTOPENZIPENTRY 205
 #define LIBMC_ERROR_COULDNOTREADZIPSTREAM 206
 #define LIBMC_ERROR_COULDNOTREADFULLZIPDATA 207
-#define LIBMC_ERROR_COULDNOTFINDDISTRIBUTIONINDEX 208
-#define LIBMC_ERROR_COULDNOTPARSEDISTRIBUTIONINDEX 209
-#define LIBMC_ERROR_EMPTYDISTRIBUTIONINDEX 210
-#define LIBMC_ERROR_MISSINGDISTRIBUTIONINDEX 211
-#define LIBMC_ERROR_MISSINGDISTRIBUTIONURL 212
-#define LIBMC_ERROR_MISSINGDISTRIBUTIONFILENAME 213
-#define LIBMC_ERROR_MISSINGDISTRIBUTIONSIZE 214
-#define LIBMC_ERROR_MISSINGDISTRIBUTIONCONTENTTYPE 215
+#define LIBMC_ERROR_COULDNOTFINDRESOURCEINDEX 208
+#define LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX 209
+#define LIBMC_ERROR_EMPTYRESOURCEINDEX 210
+#define LIBMC_ERROR_MISSINGRESOURCEINDEX 211
+#define LIBMC_ERROR_MISSINGRESOURCENAME 212
+#define LIBMC_ERROR_MISSINGRESOURCEFILENAME 213
+#define LIBMC_ERROR_MISSINGRESOURCESIZE 214
+#define LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE 215
 #define LIBMC_ERROR_DRIVERALREADYREGISTERED 216
 #define LIBMC_ERROR_DRIVERNOTFOUND 217
 #define LIBMC_ERROR_MISSINGDRIVERNAME 218
@@ -266,6 +266,95 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DUPLICATESTORAGESTREAM 239
 #define LIBMC_ERROR_INVALIDPARTIALUPLOAD 240
 #define LIBMC_ERROR_PARTIALUPLOADNOTFINISHED 241
+#define LIBMC_ERROR_APIREQUESTNOTHANDLED 242
+#define LIBMC_ERROR_APIREQUESTALREADYHANDLED 243
+#define LIBMC_ERROR_INVALIDAPIREQUESTTYPE 244
+#define LIBMC_ERROR_INVALIDUPLOADSTREAM 245
+#define LIBMC_ERROR_COULDNOTPARSEJSONREQUEST 246
+#define LIBMC_ERROR_INVALIDCONTEXTUUID 247
+#define LIBMC_ERROR_INVALIDUPLOADNAME 248
+#define LIBMC_ERROR_INVALIDMIMETYPE 249
+#define LIBMC_ERROR_INVALIDSTREAMSIZE 250
+#define LIBMC_ERROR_INVALIDSHA256SUM 251
+#define LIBMC_ERROR_INVALIDSTREAMUUID 252
+#define LIBMC_ERROR_INVALIDFIELDNAME 253
+#define LIBMC_ERROR_UPLOADSIZEMISMATCH 254
+#define LIBMC_ERROR_CONTENTTYPENOTACCEPTED 255
+#define LIBMC_ERROR_NOCURRENTUPLOAD 256
+#define LIBMC_ERROR_UPLOADCHECKSUMMISMATCH 257
+#define LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS 258
+#define LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED 259
+#define LIBMC_ERROR_INVALIDBUILDUUID 260
+#define LIBMC_ERROR_MISSINGTHREADCOUNT 261
+#define LIBMC_ERROR_INVALIDTHREADCOUNT 262
+#define LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS 263
+#define LIBMC_ERROR_INVALIDITERATOR 264
+#define LIBMC_ERROR_INVALIDDATATYPE 265
+#define LIBMC_ERROR_COULDNOTSENDSIGNAL 266
+#define LIBMC_ERROR_MISSINGSIGNALPARAMETER 267
+#define LIBMC_ERROR_NOUSERINTERFACEDEFINITION 268
+#define LIBMC_ERROR_MISSINGAPPNAME 269
+#define LIBMC_ERROR_MISSINGCOPYRIGHT 270
+#define LIBMC_ERROR_MISSINGMAINPAGE 271
+#define LIBMC_ERROR_MISSINGMENUITEMID 272
+#define LIBMC_ERROR_MISSINGMENUITEMICON 273
+#define LIBMC_ERROR_MISSINGMENUITEMCAPTION 274
+#define LIBMC_ERROR_MISSINGTARGETPAGE 275
+#define LIBMC_ERROR_MISSINGMENUNODE 276
+#define LIBMC_ERROR_MISSINGTOOLBARNODE 277
+#define LIBMC_ERROR_MISSINGTOOLBARITEMID 278
+#define LIBMC_ERROR_MISSINGTOOLBARITEMICON 279
+#define LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION 280
+#define LIBMC_ERROR_MISSINGSERVICESNODE 281
+#define LIBMC_ERROR_INVALIDSESSIONUUID 282
+#define LIBMC_ERROR_INVALIDSESSIONKEY 283
+#define LIBMC_ERROR_SESSIONNOTAUTHORIZED 284
+#define LIBMC_ERROR_INVALIDUSERNAME 285
+#define LIBMC_ERROR_INVALIDPASSWORD 286
+#define LIBMC_ERROR_INVALIDAUTHORIZATION 287
+#define LIBMC_ERROR_USERALREADYAUTHORIZED 288
+#define LIBMC_ERROR_INVALIDSESSIONTOKEN 289
+#define LIBMC_ERROR_INVALIDCLIENTKEY 290
+#define LIBMC_ERROR_INVALIDLOGIN 291
+#define LIBMC_ERROR_DUPLICATEPAGE 292
+#define LIBMC_ERROR_PAGENOTFOUND 293
+#define LIBMC_ERROR_MISSINGPAGENAME 294
+#define LIBMC_ERROR_INVALIDPAGENAME 295
+#define LIBMC_ERROR_MODULENOTFOUND 296
+#define LIBMC_ERROR_DUPLICATEMODULE 297
+#define LIBMC_ERROR_INVALIDMODULENAME 298
+#define LIBMC_ERROR_INVALIDMODULETYPE 299
+#define LIBMC_ERROR_INVALIDHEADLINE 300
+#define LIBMC_ERROR_USERNOTFOUND 301
+#define LIBMC_ERROR_STREAMISNOTIMAGE 302
+#define LIBMC_ERROR_TOOMANYCONTENTPARAMETERS 303
+#define LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME 304
+#define LIBMC_ERROR_MISSINGCONTENTGROUPNAME 305
+#define LIBMC_ERROR_INVALIDENTRIESPERPAGE 306
+#define LIBMC_ERROR_MODULEITEMNOTFOUND 307
+#define LIBMC_ERROR_DERIVEDPARAMETERSREADONLY 308
+#define LIBMC_ERROR_TOOMANYJOURNALVARIABLES 309
+#define LIBMC_ERROR_JOURNALISNOTINITIALISING 310
+#define LIBMC_ERROR_JOURNALISNOTRECORDING 311
+#define LIBMC_ERROR_INVALIDVARIABLETYPE 312
+#define LIBMC_ERROR_INVALIDVARIABLEUNITS 313
+#define LIBMC_ERROR_UNITSHAVEALREADYBEENSET 314
+#define LIBMC_ERROR_UNITSHAVENOTBEENSET 315
+#define LIBMC_ERROR_INVALIDTIMESTAMP 316
+#define LIBMC_ERROR_NOCURRENTJOURNALCHUNK 317
+#define LIBMC_ERROR_DUPLICATEJOURNALID 318
+#define LIBMC_ERROR_RESOURCEENTRYNOTFOUND 319
+#define LIBMC_ERROR_NOCORERESOURCEPACKAGE 320
+#define LIBMC_ERROR_INVALIDASPECTRATIO 321
+#define LIBMC_ERROR_MISSINGLOGORESOURCE 322
+#define LIBMC_ERROR_NOUSERINTERFACEPLUGIN 323
+#define LIBMC_ERROR_COULDNOTLOADUILIBRARY 324
+#define LIBMC_ERROR_EVENTNAMENOTFOUND 325
+#define LIBMC_ERROR_INVALIDEVENTSENDER 326
+#define LIBMC_ERROR_INVALIDEVENTCONTEXT 327
+#define LIBMC_ERROR_INVALIDLAYERINDEX 328
+#define LIBMC_ERROR_TEMPBASEPATHEMPTY 329
+#define LIBMC_ERROR_PROFILENOTFOUND 330
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -410,14 +499,14 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_COULDNOTOPENZIPENTRY: return "Could not open ZIP entry";
     case LIBMC_ERROR_COULDNOTREADZIPSTREAM: return "Could not read ZIP stream";
     case LIBMC_ERROR_COULDNOTREADFULLZIPDATA: return "Could not read full zip data";
-    case LIBMC_ERROR_COULDNOTFINDDISTRIBUTIONINDEX: return "Could not find distribution index.";
-    case LIBMC_ERROR_COULDNOTPARSEDISTRIBUTIONINDEX: return "Could not parse distribution index.";
-    case LIBMC_ERROR_EMPTYDISTRIBUTIONINDEX: return "Empty distribution index.";
-    case LIBMC_ERROR_MISSINGDISTRIBUTIONINDEX: return "Missing distribution index.";
-    case LIBMC_ERROR_MISSINGDISTRIBUTIONURL: return "Missing distribution url.";
-    case LIBMC_ERROR_MISSINGDISTRIBUTIONFILENAME: return "Missing distribution filename.";
-    case LIBMC_ERROR_MISSINGDISTRIBUTIONSIZE: return "Missing distribution size.";
-    case LIBMC_ERROR_MISSINGDISTRIBUTIONCONTENTTYPE: return "Missing distribution content type.";
+    case LIBMC_ERROR_COULDNOTFINDRESOURCEINDEX: return "Could not find resource index.";
+    case LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX: return "Could not parse resource index.";
+    case LIBMC_ERROR_EMPTYRESOURCEINDEX: return "Empty resource index.";
+    case LIBMC_ERROR_MISSINGRESOURCEINDEX: return "Missing resource index.";
+    case LIBMC_ERROR_MISSINGRESOURCENAME: return "Missing resource name.";
+    case LIBMC_ERROR_MISSINGRESOURCEFILENAME: return "Missing resource filename.";
+    case LIBMC_ERROR_MISSINGRESOURCESIZE: return "Missing resource size.";
+    case LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE: return "Missing resource content type.";
     case LIBMC_ERROR_DRIVERALREADYREGISTERED: return "Driver already registered.";
     case LIBMC_ERROR_DRIVERNOTFOUND: return "Driver not found.";
     case LIBMC_ERROR_MISSINGDRIVERNAME: return "Missing driver name.";
@@ -431,7 +520,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_NO3MFLIBRARY: return "No 3MF Library specified";
     case LIBMC_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
     case LIBMC_ERROR_DUPLICATEJOBUUID: return "Duplicate job uuid";
-    case LIBMC_ERROR_INVALIDJOBSTATUS: return "Invalid Job status";
+    case LIBMC_ERROR_INVALIDJOBSTATUS: return "Invalid job status";
     case LIBMC_ERROR_INVALIDSTREAMCONTEXT: return "Invalid stream context";
     case LIBMC_ERROR_JOBUUIDNOTFOUND: return "Job uuid not found";
     case LIBMC_ERROR_INVALIDJOBNAME: return "Invalid job name";
@@ -444,6 +533,95 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DUPLICATESTORAGESTREAM: return "Duplicate Storage Stream";
     case LIBMC_ERROR_INVALIDPARTIALUPLOAD: return "Invalid Partial Upload";
     case LIBMC_ERROR_PARTIALUPLOADNOTFINISHED: return "Partial Upload not finished";
+    case LIBMC_ERROR_APIREQUESTNOTHANDLED: return "API Request not handled";
+    case LIBMC_ERROR_APIREQUESTALREADYHANDLED: return "API Request already handled";
+    case LIBMC_ERROR_INVALIDAPIREQUESTTYPE: return "Invalid API Request type";
+    case LIBMC_ERROR_INVALIDUPLOADSTREAM: return "Invalid Upload Stream";
+    case LIBMC_ERROR_COULDNOTPARSEJSONREQUEST: return "Could not parse JSON request";
+    case LIBMC_ERROR_INVALIDCONTEXTUUID: return "Invalid Context UUID";
+    case LIBMC_ERROR_INVALIDUPLOADNAME: return "Invalid Upload Name";
+    case LIBMC_ERROR_INVALIDMIMETYPE: return "Invalid Mime Type";
+    case LIBMC_ERROR_INVALIDSTREAMSIZE: return "Invalid Stream Size";
+    case LIBMC_ERROR_INVALIDSHA256SUM: return "Invalid SHA256 Sum";
+    case LIBMC_ERROR_INVALIDSTREAMUUID: return "Invalid Stream UUID";
+    case LIBMC_ERROR_INVALIDFIELDNAME: return "Invalid field name";
+    case LIBMC_ERROR_UPLOADSIZEMISMATCH: return "Upload size mismatch";
+    case LIBMC_ERROR_CONTENTTYPENOTACCEPTED: return "Content type not accepted";
+    case LIBMC_ERROR_NOCURRENTUPLOAD: return "No current upload";
+    case LIBMC_ERROR_UPLOADCHECKSUMMISMATCH: return "Upload checksum mismatch";
+    case LIBMC_ERROR_INVALIDSTORAGESTREAMSTATUS: return "Invalid storage stream status";
+    case LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED: return "Context uuid not accepted";
+    case LIBMC_ERROR_INVALIDBUILDUUID: return "Invalid build uuid";
+    case LIBMC_ERROR_MISSINGTHREADCOUNT: return "Missing thread count";
+    case LIBMC_ERROR_INVALIDTHREADCOUNT: return "Invalid thread count";
+    case LIBMC_ERROR_COULDNOTUPDATEBUILDSTATUS: return "Could not update build status";
+    case LIBMC_ERROR_INVALIDITERATOR: return "Invalid iterator";
+    case LIBMC_ERROR_INVALIDDATATYPE: return "Invalid data type";
+    case LIBMC_ERROR_COULDNOTSENDSIGNAL: return "Could not send signal";
+    case LIBMC_ERROR_MISSINGSIGNALPARAMETER: return "Missing signal parameter";
+    case LIBMC_ERROR_NOUSERINTERFACEDEFINITION: return "No user interface definition";
+    case LIBMC_ERROR_MISSINGAPPNAME: return "Missing app name";
+    case LIBMC_ERROR_MISSINGCOPYRIGHT: return "Missing copyright";
+    case LIBMC_ERROR_MISSINGMAINPAGE: return "Missing main page";
+    case LIBMC_ERROR_MISSINGMENUITEMID: return "Missing menu item id";
+    case LIBMC_ERROR_MISSINGMENUITEMICON: return "Missing menu item icon";
+    case LIBMC_ERROR_MISSINGMENUITEMCAPTION: return "Missing menu item caption";
+    case LIBMC_ERROR_MISSINGTARGETPAGE: return "Missing menu item target page";
+    case LIBMC_ERROR_MISSINGMENUNODE: return "Missing menu node";
+    case LIBMC_ERROR_MISSINGTOOLBARNODE: return "Missing toolbar node";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMID: return "Missing toolbar item id";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMICON: return "Missing toolbar item icon";
+    case LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION: return "Missing toolbar item caption";
+    case LIBMC_ERROR_MISSINGSERVICESNODE: return "Missing services node";
+    case LIBMC_ERROR_INVALIDSESSIONUUID: return "Invalid session UUID";
+    case LIBMC_ERROR_INVALIDSESSIONKEY: return "Invalid session Key";
+    case LIBMC_ERROR_SESSIONNOTAUTHORIZED: return "Session not authorized";
+    case LIBMC_ERROR_INVALIDUSERNAME: return "Invalid user name";
+    case LIBMC_ERROR_INVALIDPASSWORD: return "Invalid password";
+    case LIBMC_ERROR_INVALIDAUTHORIZATION: return "Invalid Authorization";
+    case LIBMC_ERROR_USERALREADYAUTHORIZED: return "User already authorized";
+    case LIBMC_ERROR_INVALIDSESSIONTOKEN: return "Invalid session token";
+    case LIBMC_ERROR_INVALIDCLIENTKEY: return "Invalid client key";
+    case LIBMC_ERROR_INVALIDLOGIN: return "Invalid login credentials";
+    case LIBMC_ERROR_DUPLICATEPAGE: return "Duplicate page";
+    case LIBMC_ERROR_PAGENOTFOUND: return "Page not found";
+    case LIBMC_ERROR_MISSINGPAGENAME: return "Missing page name";
+    case LIBMC_ERROR_INVALIDPAGENAME: return "Invalid page name";
+    case LIBMC_ERROR_MODULENOTFOUND: return "Module not found";
+    case LIBMC_ERROR_DUPLICATEMODULE: return "Duplicate module";
+    case LIBMC_ERROR_INVALIDMODULENAME: return "Invalid module name";
+    case LIBMC_ERROR_INVALIDMODULETYPE: return "Invalid module type";
+    case LIBMC_ERROR_INVALIDHEADLINE: return "Invalid headline";
+    case LIBMC_ERROR_USERNOTFOUND: return "User not found";
+    case LIBMC_ERROR_STREAMISNOTIMAGE: return "Stream is not image";
+    case LIBMC_ERROR_TOOMANYCONTENTPARAMETERS: return "Too many content parameters";
+    case LIBMC_ERROR_MISSINGCONTENTSTATEMACHINENAME: return "Missing content state machine name";
+    case LIBMC_ERROR_MISSINGCONTENTGROUPNAME: return "Missing content group name";
+    case LIBMC_ERROR_INVALIDENTRIESPERPAGE: return "Invalid entries per page";
+    case LIBMC_ERROR_MODULEITEMNOTFOUND: return "Module item not found";
+    case LIBMC_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
+    case LIBMC_ERROR_TOOMANYJOURNALVARIABLES: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTINITIALISING: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTRECORDING: return "Too many journal variables";
+    case LIBMC_ERROR_INVALIDVARIABLETYPE: return "Invalid variable type";
+    case LIBMC_ERROR_INVALIDVARIABLEUNITS: return "Invalid variable units";
+    case LIBMC_ERROR_UNITSHAVEALREADYBEENSET: return "Units have already been set";
+    case LIBMC_ERROR_UNITSHAVENOTBEENSET: return "Units have not been set";
+    case LIBMC_ERROR_INVALIDTIMESTAMP: return "Invalid time stamp";
+    case LIBMC_ERROR_NOCURRENTJOURNALCHUNK: return "No current journal chunk";
+    case LIBMC_ERROR_DUPLICATEJOURNALID: return "Duplicate journal id";
+    case LIBMC_ERROR_RESOURCEENTRYNOTFOUND: return "Resource entry not found";
+    case LIBMC_ERROR_NOCORERESOURCEPACKAGE: return "No core resource package";
+    case LIBMC_ERROR_INVALIDASPECTRATIO: return "Invalid aspect ratio";
+    case LIBMC_ERROR_MISSINGLOGORESOURCE: return "Missing logo resource";
+    case LIBMC_ERROR_NOUSERINTERFACEPLUGIN: return "No user interface plugin";
+    case LIBMC_ERROR_COULDNOTLOADUILIBRARY: return "Could not load UI library";
+    case LIBMC_ERROR_EVENTNAMENOTFOUND: return "Event name not found";
+    case LIBMC_ERROR_INVALIDEVENTSENDER: return "Invalid event context";
+    case LIBMC_ERROR_INVALIDEVENTCONTEXT: return "Invalid event sender";
+    case LIBMC_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
+    case LIBMC_ERROR_TEMPBASEPATHEMPTY: return "Empty base path for temporary files";
+    case LIBMC_ERROR_PROFILENOTFOUND: return "Profile not found.";
     default: return "unknown error";
   }
 }
@@ -453,7 +631,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibMCHandle LibMC_Base;
-typedef LibMCHandle LibMC_APIResponse;
+typedef LibMCHandle LibMC_APIRequestHandler;
 typedef LibMCHandle LibMC_MCContext;
 
 namespace LibMC {

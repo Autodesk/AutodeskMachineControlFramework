@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_systemstate.hpp"
+#include "amc_parameterhandler.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -70,19 +71,13 @@ public:
 
 	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName);
 
-	ISignalTrigger* CreateSignal(const std::string& sMachineInstance, const std::string& sSignalName) override;
+	ISignalTrigger* PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName) override;
 
 	bool WaitForSignal(const std::string& sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) override;
 
-	void LoadToolpath(const std::string& sToolpathUUID) override;
-
-	void UnloadToolpath(const std::string& sToolpathUUID) override;
+	IBuild* GetBuildJob(const std::string& sBuildUUID) override;
 
 	void UnloadAllToolpathes() override;
-
-	bool ToolpathIsLoaded(const std::string& sToolpathUUID) override;
-
-	IToolpathAccessor* CreateToolpathAccessor(const std::string& sToolpathUUID) override;
 
 	void GetDriverLibrary(const std::string& sDriverName, std::string& sDriverType, LibMCEnv_pvoid& pDriverLookup) override;
 
@@ -102,29 +97,15 @@ public:
 
 	bool CheckForTermination() override;
 
-	void StoreString(const std::string& sName, const std::string& sValue);
+	void StoreSignal(const std::string& sName, ISignalHandler* pHandler) override;
 
-	void StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue);
+	ISignalHandler* RetrieveSignal(const std::string& sName) override;
 
-	void StoreDouble(const std::string& sName, const LibMCEnv_double dValue);
-
-	void StoreBool(const std::string& sName, const bool bValue);
-
-	void StoreSignal(const std::string& sName, ISignalHandler* pHandler);
-
-	std::string RetrieveString(const std::string& sName);
-
-	LibMCEnv_int64 RetrieveInteger(const std::string& sName);
-
-	LibMCEnv_double RetrieveDouble(const std::string& sName);
-
-	bool RetrieveBool(const std::string& sName);
-
-	ISignalHandler* RetrieveSignal(const std::string& sName);
-
-	void ClearStoredValue(const std::string& sName);
+	void ClearStoredValue(const std::string& sName) override;
 
 	void SetStringParameter(const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
+
+	void SetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
 
 	void SetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue) override;
 
@@ -134,11 +115,15 @@ public:
 
 	std::string GetStringParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
+	std::string GetUUIDParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
+
 	LibMCEnv_double GetDoubleParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
 	LibMCEnv_int64 GetIntegerParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
 	bool GetBoolParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
+
+	void LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer) override;
 
 };
 
