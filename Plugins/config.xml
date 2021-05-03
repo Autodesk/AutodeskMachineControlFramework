@@ -5,7 +5,6 @@
 
   <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
   <driver name="scanlab" library="driver_scanlab" type="scanlab-rtc5" />
-  <driver name="mqtt" library="driver_mqtt" type="mqtt" configurationresource="mqtt_config" />
   
   <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
   	 	  		  

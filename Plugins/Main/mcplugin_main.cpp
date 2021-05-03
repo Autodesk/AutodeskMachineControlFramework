@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCPlugin::Impl;
 
-#include "libmcdriver_mqtt_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
 #ifdef _MSC_VER
@@ -42,19 +41,12 @@ using namespace LibMCPlugin::Impl;
 #pragma warning(disable : 4250)
 #endif
 
-/*************************************************************************************************************************
- Import functionality for Driver into current plugin
-**************************************************************************************************************************/
-typedef LibMCDriver_MQTT::PDriver_MQTT PDriver_MQTT;
-typedef LibMCEnv::CDriverCast <LibMCDriver_MQTT::CDriver_MQTT, LibMCDriver_MQTT::CWrapper> PDriverCast_MQTT;
-
 
 /*************************************************************************************************************************
  Class definition of CMainData
 **************************************************************************************************************************/
 class CMainData : public virtual CPluginData {
 protected:
-	PDriverCast_MQTT m_DriverCast_MQTT;
 
 public:
 
@@ -97,10 +89,6 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 
-		pStateEnvironment->LogMessage("Connecting to MQTT Server");
-		auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
-		pMQTTDriver->Connect ();
-
 		pStateEnvironment->SetNextState("idle");
 
 
@@ -132,10 +120,6 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-
-		pStateEnvironment->LogMessage("Sending MQTT Message");
-		auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
-		pMQTTDriver->SendMQTTMessage("TestMessage");
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
 		if (pStateEnvironment->GetBoolParameter("jobinfo", "autostart")) {

@@ -46,8 +46,8 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-typedef LibMCDriver_ScanLab::PDriver_ScanLab_RTC5 PDriver_ScanLab;
-typedef LibMCEnv::CDriverCast <LibMCDriver_ScanLab::CDriver_ScanLab_RTC5, LibMCDriver_ScanLab::CWrapper> PDriverCast_ScanLab;
+typedef LibMCDriver_ScanLab::PDriver_ScanLab_RTC6 PDriver_ScanLab;
+typedef LibMCEnv::CDriverCast <LibMCDriver_ScanLab::CDriver_ScanLab_RTC6, LibMCDriver_ScanLab::CWrapper> PDriverCast_ScanLab;
 
 /*************************************************************************************************************************
  Class definition of CLaserData
