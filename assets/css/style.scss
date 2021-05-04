@@ -1,0 +1,59 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+nav ul {
+    margin: 0;
+    list-style: none;
+    text-align: center;
+    padding: 8px 0 5px 0;
+    background-color: #9295a3;
+}
+
+nav ul li {
+    display: inline-block;
+    padding: 0 24px 0 23px;
+    position: relative;
+}
+
+nav ul li a {
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    color: #f2f2f2;
+}
+
+nav ul li a:hover {
+    color: #f2ff00;
+}
+
+nav ul li ul {
+    margin: 0;
+    list-style: none;
+    text-align: left;
+    background-color: #9295a3;
+    position: absolute;
+    display: none;
+}
+
+nav ul li:hover ul {
+    display: block;
+}
+
+nav ul li ul li {
+    display: block;
+    padding: 7px 7px 7px 14px;
+    width: 400px;
+}
+
+nav ul li ul li a {
+    text-align: left;
+    text-decoration: none;
+    font-size: 18px;
+    color: #f2f2f2;
+}
+
+nav ul li ul li a:hover {
+    color: #f2ff00;
+}

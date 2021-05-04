@@ -1,37 +1,19 @@
-## Welcome to GitHub Pages
+## Welcome to Autodesk Machine Control Framework
 
-You can use the [editor on GitHub](https://github.com/Autodesk/AutodeskMachineControlFramework/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Currently, Autodesk Manufacturing software is not directly controlling the hardware: our customers use various proprietary software from the machine builders to make the part. Autodesk Machine Control is an open source middleware framework to integrate CAD/CAM software with machine hardware systems into a production-ready, complete and cohesive closed loop system, that can produce high quality products out of the box. Autodesk Machine Control is an Android equivalent open source framework for any manufacturing machines/robots and it reduces the costs and time-to-market for any machine builder in a similar way to what Android did for the mobile phone industry during the last decade. Thanks to the collaboration between Autodesk Research, Fusion 360 and any engineering organization can quickly combine the Autodesk CAD/CAM stack together with any manufacturing hardware to create beyond-state-of-the-art industrial manufacturing system with a fraction of the traditional effort.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
+## Documentation
+- [Overview](overview.md): Briefly introduces Autodesk Machine Control Framework.
+- [Solutions](solutions.md): Samples of AMCF in use.
+- [What's New](whatsnew.md): Latest Developments.
+- [Getting Started](getting_started/): Explains how to use Autodesk Machine Control Framework, step by step.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Download
 
-```markdown
-Syntax highlighted code block
+Download the latest Autodesk Machine Control Framework release [here](https://github.com/Autodesk/AutodeskMachineControlFramework/releases), or fork, clone, and build the [repo](https://github.com/Autodesk/AutodeskMachineControlFramework).
 
-# Header 1
-## Header 2
-### Header 3
+See Readme.md or Getting Started about Dependencies, Prerequisites etc..
 
-- Bulleted
-- List
+Autodesk Machine Control Framework is released under the [BSD-3-Clause License](https://github.com/Autodesk/AutodeskMachineControlFramework/blob/master/LICENSE.md).
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Autodesk/AutodeskMachineControlFramework/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
