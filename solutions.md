@@ -14,11 +14,10 @@ Another application would be the optical monitoring of the printing process. To 
 
 ![AMCF Printing Images](doc/images/AmcfPrintingImages.png "Captured images while printing")
 
-
-
-
-
-
+<br>
+<br>
+<br>
+<br>
 
 ## Collaboration with SCANLAB
 We collaborated with SCANLAB – the leading provider of hard- and software of laser controls for almost every metal additive manufacturing machine in the world. SCANLAB used Autodesk Machine Control to develop their control software and have direct connection from CAD/CAM software to their hardware. The usage of Autodesk Machine Control showed huge benefits in software development productivity: from 4 years with 8 engineers earlier to 8 months with 3 engineers now.
@@ -28,12 +27,10 @@ We collaborated with SCANLAB – the leading provider of hard- and software of l
 ### Autodesk Machine Control at FormNext 2020: 
 ["Save millions of dollars with the Autodesk Machine Control Framework"](https://www.youtube.com/watch?v=DHLzwTHs2b4) is the title of the video showing the collaboration between Autodesk and SCANLAB in using AMCF.
 
-
-
-
-
-
-
+<br>
+<br>
+<br>
+<br>
 
 ## Collaboration with EVOBEAM
 We collaborated with EVOBEAM that develops high-precision, high-productivity processes in the automotive and aerospace industry. EVOBEAM successfully used Autodesk Machine Control for their latest high temperature powder bed fusion metal additive machine in vacuum which allowed them to implement closed loop feedback to design and simulation stages.
