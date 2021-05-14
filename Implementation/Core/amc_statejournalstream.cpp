@@ -49,8 +49,7 @@ namespace AMC {
 
 		void writeData(const uint8_t* pData, uint32_t nLength)
 		{
-			if (pData == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			LibMCAssertNotNull(pData);
 
 			const uint8_t* pSrc = pData;
 			for (uint32_t nIndex = 0; nIndex < nLength; nIndex++) {

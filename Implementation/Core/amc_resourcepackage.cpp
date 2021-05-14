@@ -54,8 +54,7 @@ namespace AMC {
 		CResourcePackage_ZIPFilePtr(zip_file_t* pFile)
 			: m_pFile(pFile)
 		{
-			if (m_pFile == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			LibMCAssertNotNull(m_pFile);
 
 		}
 

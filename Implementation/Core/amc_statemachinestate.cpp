@@ -48,7 +48,7 @@ namespace AMC {
 		LibMCAssertNotNull(pGlobalChrono.get());
 
 		if ((nRepeatDelay < AMC_MINREPEATDELAY_MS) || (nRepeatDelay > AMC_MAXREPEATDELAY_MS))
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDREPEATDELAY);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDREPEATDELAY, m_sInstanceName);
 
 		updateExecutionTime();
 

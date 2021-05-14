@@ -192,7 +192,7 @@ namespace AMC {
 
 		auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
 		if (iter == m_SignalMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND, sInstanceName + "/" + sSignalName);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sInstanceName + "/" + sSignalName);
 
 		iter->second->populateResultGroup(pResultGroup);
 	}
