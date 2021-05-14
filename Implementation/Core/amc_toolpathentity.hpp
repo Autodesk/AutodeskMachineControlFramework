@@ -59,9 +59,11 @@ namespace AMC {
 		Lib3MF::PReader m_p3MFReader;
 		Lib3MF::PToolpath m_pToolpath;
 
+		std::string m_sDebugName;
+
 	public:
 
-		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper);
+		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
 		virtual ~CToolpathEntity();		
 
 		void IncRef();
@@ -72,6 +74,9 @@ namespace AMC {
 		PToolpathLayerData readLayer(uint32_t nLayerIndex);
 
 		double getUnits();
+
+		std::string getDebugName ();
+
 
 	};
 

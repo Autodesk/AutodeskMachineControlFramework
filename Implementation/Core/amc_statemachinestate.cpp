@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_utils.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include "libmcenv_stateenvironment.hpp"
 #include <thread>
@@ -44,14 +44,11 @@ namespace AMC {
 	CStateMachineState::CStateMachineState(const std::string& sInstanceName, const std::string& sName, uint32_t nRepeatDelay, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMCCommon::PChrono pGlobalChrono)
 		: m_sInstanceName(sInstanceName), m_sName (sName), m_pEnvironmentWrapper (pEnvironmentWrapper), m_nRepeatDelay (nRepeatDelay), m_pGlobalChrono (pGlobalChrono), m_LastExecutionTimeInMilliseconds(0)
 	{
-		if (pEnvironmentWrapper.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pGlobalChrono.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pEnvironmentWrapper.get());
+		LibMCAssertNotNull(pGlobalChrono.get());
 
 		if ((nRepeatDelay < AMC_MINREPEATDELAY_MS) || (nRepeatDelay > AMC_MAXREPEATDELAY_MS))
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDREPEATDELAY);
-
 
 		updateExecutionTime();
 
@@ -75,7 +72,7 @@ namespace AMC {
 	std::string CStateMachineState::getOutstateName(uint32_t nIndex) const
 	{
 		if (nIndex >= m_OutStateList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pOutState = m_OutStateList[nIndex];
 		return pOutState->getName();
@@ -90,13 +87,12 @@ namespace AMC {
 
 	void CStateMachineState::addOutState(PStateMachineState pState)
 	{
-		if (pState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pState.get());
 
 		std::string sName = pState->getName();
 
 		if (hasOutState (sName))
-			throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEOUTSTATE);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEOUTSTATE, sName);
 
 
 		m_OutStates.insert(std::make_pair (sName, pState));
@@ -111,8 +107,7 @@ namespace AMC {
 
 	void CStateMachineState::setPluginState(LibMCPlugin::PState pPluginState)
 	{
-		if (pPluginState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pPluginState.get());
 
 		m_pPluginState = pPluginState;
 	}
@@ -126,14 +121,9 @@ namespace AMC {
 
 	void CStateMachineState::execute(std::string& sNextState, PSystemState pSystemState, PParameterHandler pParameterHandler)
 	{
-		if (pSystemState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pParameterHandler.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-
-		if (m_pPluginState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_NOPLUGINSTATE);
-
+		LibMCAssertNotNull(pSystemState.get());
+		LibMCAssertNotNull(pParameterHandler.get());
+		LibMCAssertNotNull(m_pPluginState.get());
 
 		auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CStateEnvironment>(pSystemState, pParameterHandler, m_sInstanceName);
 		auto pExternalEnvironment = mapInternalStateEnvInstance<LibMCEnv::CStateEnvironment>  (pInternalEnvironment, m_pEnvironmentWrapper);
@@ -157,7 +147,7 @@ namespace AMC {
 
 			updateExecutionTime();
 			pSystemState->driverHandler()->releaseDriverLocks(m_sInstanceName);
-			throw ELibMCInterfaceException (LIBMC_ERROR_COULDNOTEXECUTEPLUGIN, E.what());
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTEXECUTEPLUGIN, m_sInstanceName + ": " + E.what());
 		}
 		
 	}
@@ -166,7 +156,7 @@ namespace AMC {
 	{
 
 		if (chunkInMilliseconds < AMC_MINREPEATDELAY_MS)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDREPEATDELAY, m_sInstanceName);
 		
 		auto deltaExecutionTime = m_pGlobalChrono->getDurationTimeInMilliseconds (m_LastExecutionTimeInMilliseconds);
 
@@ -176,7 +166,7 @@ namespace AMC {
 
 			auto newDeltaExecutionTime = m_pGlobalChrono->getDurationTimeInMilliseconds(m_LastExecutionTimeInMilliseconds);
 			if (newDeltaExecutionTime <= deltaExecutionTime)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDEXECUTIONDELAY);
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDEXECUTIONDELAY, m_sInstanceName);
 
 			deltaExecutionTime = newDeltaExecutionTime;
 		}

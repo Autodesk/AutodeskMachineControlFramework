@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_statesignal.hpp"
 #include "common_utils.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
 	
@@ -128,8 +128,7 @@ namespace AMC {
 
 	void CStateSignal::populateParameterGroup(CParameterGroup* pParameterGroup)
 	{
-		if (pParameterGroup == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterGroup);
 
 		for (auto Definition : m_ParameterDefinitions) {
 			std::string sType = Definition.getType();
@@ -141,8 +140,7 @@ namespace AMC {
 
 	void CStateSignal::populateResultGroup(CParameterGroup* pResultGroup)
 	{
-		if (pResultGroup == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pResultGroup);
 
 		for (auto Definition : m_ResultDefinitions) {
 			std::string sType = Definition.getType();

@@ -355,6 +355,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDLAYERINDEX 328
 #define LIBMC_ERROR_TEMPBASEPATHEMPTY 329
 #define LIBMC_ERROR_PROFILENOTFOUND 330
+#define LIBMC_ERROR_INVALIDSERVICEHANDLER 331
+#define LIBMC_ERROR_INVALIDMAXTHREADCOUNT 332
+#define LIBMC_ERROR_INVALIDTOOLPATHSTREAMUUID 333
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -622,6 +625,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
     case LIBMC_ERROR_TEMPBASEPATHEMPTY: return "Empty base path for temporary files";
     case LIBMC_ERROR_PROFILENOTFOUND: return "Profile not found.";
+    case LIBMC_ERROR_INVALIDSERVICEHANDLER: return "Invalid service handler.";
+    case LIBMC_ERROR_INVALIDMAXTHREADCOUNT: return "Invalid max thread count.";
+    case LIBMC_ERROR_INVALIDTOOLPATHSTREAMUUID: return "Invalid toolpath stream uuid";
     default: return "unknown error";
   }
 }

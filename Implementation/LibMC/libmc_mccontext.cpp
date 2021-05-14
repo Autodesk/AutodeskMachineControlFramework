@@ -146,7 +146,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
         m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
         auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native>(sCoreResourcePath);
-        m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
+        m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream, sCoreResourcePath);
 
 
         m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -208,7 +208,7 @@ void CMCContext::SetTempBasePath(const std::string& sTempBasePath)
 void CMCContext::LoadClientPackage(const std::string& sResourcePath)
 {
     auto pStream = std::make_shared<AMCCommon::CImportStream_Native>(sResourcePath);
-    auto pPackage = CResourcePackage::makeFromStream(pStream);
+    auto pPackage = CResourcePackage::makeFromStream(pStream, sResourcePath);
 
     m_pClientDistHandler->LoadClientPackage (pPackage);
 }

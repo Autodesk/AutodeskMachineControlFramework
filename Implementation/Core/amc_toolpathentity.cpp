@@ -29,17 +29,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amc_toolpathentity.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
 
-	CToolpathEntity::CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper)
-		: m_ReferenceCount (0), m_pStorageStream (pStorageStream)
+	CToolpathEntity::CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName)
+		: m_ReferenceCount (0), m_pStorageStream (pStorageStream), m_sDebugName (sDebugName)
 	{
-		if (pStorageStream.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (p3MFWrapper.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pStorageStream.get());
+		LibMCAssertNotNull(p3MFWrapper.get());
 
 		void* pReadCallback = nullptr;
 		void* pSeekCallback = nullptr;
@@ -56,7 +54,7 @@ namespace AMC {
 
 		auto pToolpathIterator = m_p3MFModel->GetToolpaths();
 		if (!pToolpathIterator->MoveNext())
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE, m_sDebugName);
 
 		m_pToolpath = pToolpathIterator->GetCurrentToolpath();
 
@@ -71,7 +69,7 @@ namespace AMC {
 	void CToolpathEntity::IncRef()
 	{
 		if (m_ReferenceCount >= AMC_TOOLPATH_MAXREFCOUNT)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR, m_sDebugName);
 
 		m_ReferenceCount++;
 
@@ -80,7 +78,7 @@ namespace AMC {
 	bool CToolpathEntity::DecRef()
 	{
 		if (m_ReferenceCount == 0)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR, m_sDebugName);
 
 		m_ReferenceCount--;
 		return (m_ReferenceCount == 0);
@@ -100,7 +98,7 @@ namespace AMC {
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
 		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
-		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue);
+		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName);
 	}
 
 
@@ -110,6 +108,11 @@ namespace AMC {
 
 		return m_pToolpath->GetUnits();
 
+	}
+
+	std::string CToolpathEntity::getDebugName()
+	{
+		return m_sDebugName;
 	}
 
 
