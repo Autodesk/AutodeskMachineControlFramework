@@ -47,27 +47,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
 CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
 : CUIModule (getNameFromXML(xmlNode))
 {
+	LibMCAssertNotNull(pParameterInstances.get());
+	LibMCAssertNotNull(pResourcePackage.get());
+	LibMCAssertNotNull(pBuildJobHandler.get());
 
-	if (pParameterInstances.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pResourcePackage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pBuildJobHandler.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (getTypeFromXML(xmlNode) != getStaticType())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
 
 	auto headlineAttrib = xmlNode.attribute("headline");
 	if (!headlineAttrib.empty ())
 		m_sHeadLine = headlineAttrib.as_string();
 
+	auto captionAttrib = xmlNode.attribute("caption");
+	if (!captionAttrib.empty())
+		m_sCaption = captionAttrib.as_string();
+	
 	auto titleAttrib = xmlNode.attribute("title");
 	if (!titleAttrib.empty())
 		m_sTitle = titleAttrib.as_string();
@@ -237,6 +238,12 @@ std::string CUIModule_Content::getHeadLine()
 	return m_sHeadLine;
 }
 
+std::string CUIModule_Content::getCaption()
+{
+	return m_sCaption;
+}
+
+
 std::string CUIModule_Content::getTitle()
 {
 	return m_sTitle;
@@ -251,9 +258,11 @@ void CUIModule_Content::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
+	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_HEADLINE, m_sHeadLine);
 	moduleObject.addString(AMC_API_KEY_UI_TITLE, m_sTitle);
 	moduleObject.addString(AMC_API_KEY_UI_SUBTITLE, m_sSubtitle);
+	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
 
 	CJSONWriterArray itemsNode(writer);
 	for (auto item : m_Items) {
@@ -276,8 +285,7 @@ PUIModuleItem CUIModule_Content::findItem(const std::string& sUUID)
 
 void CUIModule_Content::addItem(PUIModule_ContentItem pItem)
 {
-	if (pItem.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pItem.get());
 
 	m_Items.push_back(pItem);
 	m_ItemMap.insert(std::make_pair (pItem->getUUID (), pItem));

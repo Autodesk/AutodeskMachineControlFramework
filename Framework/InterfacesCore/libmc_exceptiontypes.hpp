@@ -62,7 +62,29 @@ public:
 };
 
 
-#define LibMCAssertNotNull(PTR) if (PTR == nullptr) throw ELibMCInvalidParamException (__FILE__, __LINE__);
-#define LibMCAssertNull(PTR) if (PTR != nullptr) throw ELibMCInvalidParamException (__FILE__, __LINE__);
+#ifdef _MSC_VER
+
+static constexpr const char * past_last_slash(const char* str, const char* last_slash)
+{
+	return
+		*str == '\0' ? last_slash :
+		*str == '/' ? past_last_slash(str + 1, str + 1) :
+		past_last_slash(str + 1, last_slash);
+}
+
+static constexpr const char* past_last_slash(const char* str)
+{
+	return past_last_slash(str, str);
+}
+
+#define __SHORT_FILE__ past_last_slash(__FILE__)
+
+#define _LIBMCASSERTCONTEXT __SHORT_FILE__
+#else
+#define _LIBMCASSERTCONTEXT __FILE__
+#endif
+
+#define LibMCAssertNotNull(PTR) if (PTR == nullptr) throw ELibMCInvalidParamException (_LIBMCASSERTCONTEXT, __LINE__);
+#define LibMCAssertNull(PTR) if (PTR != nullptr) throw ELibMCInvalidParamException (_LIBMCASSERTCONTEXT, __LINE__);
 
 #endif // __LIBMC_EXCEPTIONTYPES

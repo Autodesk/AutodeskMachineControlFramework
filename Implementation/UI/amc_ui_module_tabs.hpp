@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE
-#define __AMC_UI_MODULE
+#ifndef __AMC_UI_MODULE_TABS
+#define __AMC_UI_MODULE_TABS
 
 #include "header_protection.hpp"
 
@@ -39,39 +39,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
-#include "Core/amc_jsonwriter.hpp"
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModule_Tabs, PUIModule_Tabs);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
-	class CUIModule {
-	protected:
-		std::string m_sName;
-		std::string m_sUUID;
-		
+	class CUIModule_Tabs : public CUIModule {
+	protected:		
+
+		std::map<std::string, PUIModuleItem> m_ItemMap;
+		std::map<std::string, PUIModule> m_TabMap;
+		std::vector<PUIModule> m_Tabs;
+
+		std::string m_sCaption;
+
+		void addTab(PUIModule pModule);
+
 	public:
 
-		CUIModule(const std::string & sName);	
+		CUIModule_Tabs(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 		
-		virtual ~CUIModule();
+		virtual ~CUIModule_Tabs();
 
-		std::string getName();
+		virtual std::string getType() override;
 
-		virtual std::string getType() = 0;
+		static std::string getStaticType();
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+		std::string getCaption () override;
 
-		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
 
-		virtual std::string getCaption() = 0;
-
-		virtual std::string getUUID();
-
-		static std::string getNameFromXML(pugi::xml_node& xmlNode);
-		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
+		virtual PUIModuleItem findItem(const std::string& sUUID) override;
+		PUIModule findTab(const std::string& sUUID);
 
 	};
 
@@ -79,5 +87,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE
+#endif //__AMC_UI_MODULE_TABS
 

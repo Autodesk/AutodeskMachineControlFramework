@@ -77,6 +77,7 @@
 						<template v-for="uiModule in uiPage.modules">
 																
 							<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
+							<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />	
 							
 						</template>										
 
@@ -103,8 +104,8 @@
 	import Dialog_Login from "./Dialog_Login.vue";
 	import Dialog_Error from "./Dialog_Error.vue";
 	import Module_Content from "./Module_Content.vue";
+	import Module_Tabs from "./Module_Tabs.vue";
 	
-
 	export default {
 
 		created() {
@@ -180,6 +181,7 @@
 		
 		components: {
 			Module_Content,
+			Module_Tabs,
 			Dialog_Login,
 			Dialog_Error
 		},	

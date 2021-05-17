@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterinstances.hpp"
 
 #include "amc_ui_module_content.hpp"
+#include "amc_ui_module_tabs.hpp"
 
 using namespace AMC;
 
@@ -46,6 +47,9 @@ PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInst
 
 	if (sType == CUIModule_Content::getStaticType())
 		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+
+	if (sType == CUIModule_Tabs::getStaticType())
+		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 
 	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 

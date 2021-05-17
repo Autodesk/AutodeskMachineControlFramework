@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE
-#define __AMC_UI_MODULE
+#ifndef __AMC_UI_MODULE_TAB
+#define __AMC_UI_MODULE_TAB
 
 #include "header_protection.hpp"
 
@@ -39,39 +39,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
-#include "Core/amc_jsonwriter.hpp"
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CUIModule_Tab, PUIModule_Tab);
 
-	class CUIModule {
-	protected:
+	class CUIModule_Tab {
+	protected:		
+
 		std::string m_sName;
-		std::string m_sUUID;
-		
+		std::string m_sCaption;
+
+		PUIModule m_pModule;
+
 	public:
 
-		CUIModule(const std::string & sName);	
+		CUIModule_Tab(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 		
-		virtual ~CUIModule();
+		virtual ~CUIModule_Tab();
 
-		std::string getName();
+		virtual std::string getName();
 
-		virtual std::string getType() = 0;
+		virtual std::string getCaption();
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+		CUIModule * getModule ();
 
-		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
-
-		virtual std::string getCaption() = 0;
-
-		virtual std::string getUUID();
-
-		static std::string getNameFromXML(pugi::xml_node& xmlNode);
-		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
 
 	};
 
@@ -79,5 +77,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE
+#endif //__AMC_UI_MODULE_TABS
 

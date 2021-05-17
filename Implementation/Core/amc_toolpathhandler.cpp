@@ -74,7 +74,7 @@ namespace AMC {
 
 			auto pStorageStream = m_pStorage->RetrieveStream(sStreamUUID);
 
-			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pStorageStream, getLib3MFWrapper(), pToolpathEntity->getDebugName ());
+			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pStorageStream, getLib3MFWrapper(), pStorageStream->GetName ());
 			pNewToolpathEntity->IncRef();
 			m_Entities.insert(std::make_pair(sStreamUUID, pNewToolpathEntity));
 			return pNewToolpathEntity.get();

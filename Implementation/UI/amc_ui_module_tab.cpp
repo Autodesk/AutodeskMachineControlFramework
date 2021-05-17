@@ -28,56 +28,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_UI_MODULE
+#define __AMCIMPL_API_CONSTANTS
 
-#ifndef __AMC_UI_MODULE
-#define __AMC_UI_MODULE
+#include "amc_ui_module.hpp"
+#include "amc_ui_module_tabs.hpp"
+#include "amc_ui_module_tab.hpp"
 
-#include "header_protection.hpp"
+#include "amc_ui_module.hpp"
+#include "amc_ui_modulefactory.hpp"
 
-#ifndef __AMCIMPL_UI_MODULE
-#error this header is protected and should only be included in the corresponding implementation CPP files.
-#endif
+#include "amc_api_constants.hpp"
+#include "amc_resourcepackage.hpp"
 
-#include "Libraries/PugiXML/pugixml.hpp"
-#include "Core/amc_jsonwriter.hpp"
+#include "libmc_exceptiontypes.hpp"
+
+using namespace AMC;
 
 
-namespace AMC {
 
-	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+CUIModule_Tab::CUIModule_Tab(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+{
+	LibMCAssertNotNull(pParameterInstances.get());
+	LibMCAssertNotNull(pResourcePackage.get());
+	LibMCAssertNotNull(pBuildJobHandler.get());
 
-	class CUIModule {
-	protected:
-		std::string m_sName;
-		std::string m_sUUID;
-		
-	public:
 
-		CUIModule(const std::string & sName);	
-		
-		virtual ~CUIModule();
 
-		std::string getName();
-
-		virtual std::string getType() = 0;
-
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
-
-		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
-
-		virtual std::string getCaption() = 0;
-
-		virtual std::string getUUID();
-
-		static std::string getNameFromXML(pugi::xml_node& xmlNode);
-		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
-
-	};
-
-	
+	m_pModule = CUIModuleFactory::createModule(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 }
 
+CUIModule_Tab::~CUIModule_Tab()
+{
 
-#endif //__AMC_UI_MODULE
+}
+
+std::string CUIModule_Tab::getName()
+{
+	return m_sName;
+}
+
+std::string CUIModule_Tab::getCaption()
+{
+	return m_sCaption;
+}
+
+CUIModule* CUIModule_Tab::getModule()
+{
+	return m_pModule.get();
+}
 

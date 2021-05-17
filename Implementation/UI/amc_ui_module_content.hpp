@@ -57,6 +57,7 @@ namespace AMC {
 	protected:		
 
 		std::string m_sHeadLine;
+		std::string m_sCaption;
 		std::string m_sTitle;
 		std::string m_sSubtitle;
 
@@ -72,6 +73,8 @@ namespace AMC {
 		virtual ~CUIModule_Content();
 
 		virtual std::string getType() override;
+
+		virtual std::string getCaption() override;
 
 		static std::string getStaticType();
 
