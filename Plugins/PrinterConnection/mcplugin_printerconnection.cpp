@@ -560,6 +560,10 @@ public:
 		auto sJobUUID = pSignal->GetString("jobuuid");
 		auto nLayerIndex = pSignal->GetInteger("layerindex");
 		auto nLayerTimeout = pSignal->GetInteger("layertimeout");
+		double dLastZ = 0.0;
+		if (nLayerIndex > 0) {
+			dLastZ = pStateEnvironment->GetDoubleParameter("printerstate", "targetz");
+		}
 
 		auto pToolpathAccessor = pStateEnvironment->GetBuildJob(sJobUUID)->CreateToolpathAccessor();
 		auto pLayer = pToolpathAccessor->LoadLayer((uint32_t)nLayerIndex);
@@ -567,180 +571,191 @@ public:
 		auto dLayerZ = pLayer->GetZValue();
 		double dZ = dLayerZ * dUnit;
 
-		// TODO set speed values by reading data from toolptah... uncomment if data is available
-		//const double dSpeedMmPerSecond = pLayer->GetSegmentProfileTypedValue(LibMCEnv::eToolpathProfileValueType::Speed);
-		//const double dSpeedFastMmPerSecond = pLayer->GetSegmentProfileTypedValue(LibMCEnv::eToolpathProfileValueType::JumpSpeed);
-		//const double dExtrusionFactor = pLayer->GetSegmentProfileTypedValue(LibMCEnv::eToolpathProfileValueType::ExtrusionFactor);
-		const double dSpeedMmPerSecond = 20;
-		const double dSpeedFastMmPerSecond = 50;
-		// TODO calculated value, use others for testing => const double dExtrusionFactor = 0.0166;
-		const double dExtrusionFactor = 0.012;
-
-		auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
-
-		// do initial move to read z value/layer height
-		auto nSegmentCount = pLayer->GetSegmentCount();
-		auto tStart = std::chrono::system_clock::now();
-		if ((nSegmentCount > 0) && (dZ > 0)) {
-			if (!moveFastToZ(pStateEnvironment, pDriver, tStart, nLayerTimeout, dStatusUpdateInterval, dZ, dSpeedFastMmPerSecond)) {
-				sNoSuccessMsg << "Timeout while moving to layer height Z=" << dZ << " of layer " << nLayerIndex;
-			}
+		double dSpeedMmPerSecond = 0.0;
+		double dSpeedFastMmPerSecond = 0.0;
+		double dExtrusionFactor = 0.0;
+		double dLayerThickness = dZ - dLastZ;
+		if (dLayerThickness < 0.001) {
+			bSucces = false;
+			sNoSuccessMsg << "Invalid layer thickness!";
 		}
-
-		double dE = 0.0;
-		// restore filament, to negated retract value (compensate retract at end of print layer), if it's not 1. layer (1. layer has no previous layer => no retract done)
-		if ((nSegmentCount > 0) && (nLayerIndex > 1) && (dRetractExtrude > 0)) {
-			pDriver->ExtruderDoExtrude(dRetractExtrude, 30);
-			pStateEnvironment->LogMessage("Filament restored.");
-		}
-
-		for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
-			LibMCEnv::eToolpathSegmentType eSegmentType;
-			uint32_t nPointCount;
-			std::vector<LibMCEnv::sPosition2D> PointData;
-
-			pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
-			pLayer->GetSegmentPointData(nSegmentIndex, PointData);
+		else {
 			
-			if (eSegmentType != LibMCEnv::eToolpathSegmentType::Unknown && nPointCount > 0 && nPointCount == PointData.size() && dZ > 0.0) {
-				// handle x/y coordinates, dependent on SegmentType, no z value provided
-				// => printer head remains on z level of given layer, no retract movement handled
-				switch (eSegmentType) {
-				case LibMCEnv::eToolpathSegmentType::Hatch:
-					if (!(nPointCount % 2)) {
-						// even number draw hatch lines
-						for (uint32_t i = 0; i < nPointCount; i+=2) {
-							// move fast to first hatch coord (first of a pair of coord)
-							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
-							if (bSucces) {
-								pDriver->MoveFastToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
-								pDriver->QueryParameters();
-								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+			auto pDriver = m_pPluginData->acquireDriver(pStateEnvironment);
 
-								// move to second hatch coord with extrusion (second of a pair of coord)
+			// do initial move to read z value/layer height
+			auto nSegmentCount = pLayer->GetSegmentCount();
+			auto tStart = std::chrono::system_clock::now();
+			if ((nSegmentCount > 0) && (dZ > 0)) {
+				// TODO JumpSpeed not yet set in Utility => use Speed instead
+				// dSpeedFastMmPerSecond = pLayer->GetSegmentProfileTypedValue(0, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+				dSpeedFastMmPerSecond = pLayer->GetSegmentProfileTypedValue(0, LibMCEnv::eToolpathProfileValueType::Speed);
+				if (!moveFastToZ(pStateEnvironment, pDriver, tStart, nLayerTimeout, dStatusUpdateInterval, dZ, dSpeedFastMmPerSecond)) {
+					sNoSuccessMsg << "Timeout while moving to layer height Z=" << dZ << " of layer " << nLayerIndex;
+				}
+			}
+
+			double dE = 0.0;
+			// restore filament, to negated retract value (compensate retract at end of print layer), if it's not 1. layer (1. layer has no previous layer => no retract done)
+			if ((nSegmentCount > 0) && (nLayerIndex > 1) && (dRetractExtrude > 0)) {
+				pDriver->ExtruderDoExtrude(dRetractExtrude, 30);
+				pStateEnvironment->LogMessage("Filament restored.");
+			}
+
+			for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
+				LibMCEnv::eToolpathSegmentType eSegmentType;
+				uint32_t nPointCount;
+				std::vector<LibMCEnv::sPosition2D> PointData;
+
+				dSpeedMmPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
+				// TODO JumpSpeed not yet set in Utility => use Speed instead
+				// dSpeedFastMmPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+				dSpeedFastMmPerSecond = dSpeedMmPerSecond;
+				
+				dExtrusionFactor = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::ExtrusionFactor);
+
+				pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
+				pLayer->GetSegmentPointData(nSegmentIndex, PointData);
+				
+				if (eSegmentType != LibMCEnv::eToolpathSegmentType::Unknown && nPointCount > 0 && nPointCount == PointData.size() && dZ > 0.0) {
+					// handle x/y coordinates, dependent on SegmentType, no z value provided
+					// => printer head remains on z level of given layer, no retract movement handled
+					switch (eSegmentType) {
+					case LibMCEnv::eToolpathSegmentType::Hatch:
+						if (!(nPointCount % 2)) {
+							// even number draw hatch lines
+							for (uint32_t i = 0; i < nPointCount; i+=2) {
+								// move fast to first hatch coord (first of a pair of coord)
 								bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 								if (bSucces) {
-									auto dDistance = sqrt(
-										pow(PointData[i + 1].m_Coordinates[0] - PointData[i].m_Coordinates[0], 2) +
-										pow(PointData[i + 1].m_Coordinates[1] - PointData[i].m_Coordinates[1], 2)) * dUnit;
-									dE = dDistance * dExtrusionFactor;
-									pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + (int)1].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
+									pDriver->MoveFastToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
 									pDriver->QueryParameters();
 									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+
+									// move to second hatch coord with extrusion (second of a pair of coord)
+									bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
+									if (bSucces) {
+										auto dDistance = sqrt(
+											pow(PointData[i + 1].m_Coordinates[0] - PointData[i].m_Coordinates[0], 2) +
+											pow(PointData[i + 1].m_Coordinates[1] - PointData[i].m_Coordinates[1], 2)) * dUnit;
+										dE = dDistance * dExtrusionFactor * dLayerThickness;
+										pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + (int)1].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
+										pDriver->QueryParameters();
+										m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+									}
+									else {
+										sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Hatch of layer " << nLayerIndex;
+									}
 								}
 								else {
 									sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Hatch of layer " << nLayerIndex;
 								}
+								if (!bSucces) {
+									break;
+								}
 							}
-							else {
-								sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Hatch of layer " << nLayerIndex;
-							}
-							if (!bSucces) {
-								break;
-							}
-						}
-					}
-					else {
-						// odd number => can't draw hatch lines
-						bSucces = false;
-						sNoSuccessMsg << "Segment " << nSegmentIndex << " of type Hatch  of layer " << nLayerIndex << " has not an odd number of coordinates";
-					}
-					break;
-
-				case LibMCEnv::eToolpathSegmentType::Loop:
-					// move fast to first point of loop
-					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
-					if (bSucces) {
-						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
-						pDriver->QueryParameters();
-						m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
-
-						for (uint32_t i = 1; i < nPointCount; i++) {
-							// move to rest of points of loop (with extrusion)
-							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
-							if (bSucces) {
-								auto dDistance = sqrt(
-									pow(PointData[i].m_Coordinates[0] - PointData[i - 1].m_Coordinates[0], 2) +
-									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
-								dE = dDistance * dExtrusionFactor;
-								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
-								pDriver->QueryParameters();
-								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
-							}
-							else {
-								sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop of layer " << nLayerIndex;
-							}
-							if (!bSucces) {
-								break;
-							}
-						}
-						// move from last point in list to first point to close the of loop (with extrusion)
-						bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
-						if (bSucces) {
-							auto dDistance = sqrt(
-								pow(PointData[0].m_Coordinates[0] - PointData[nPointCount - 1].m_Coordinates[0], 2) +
-								pow(PointData[0].m_Coordinates[1] - PointData[nPointCount - 1].m_Coordinates[1], 2)) * dUnit;
-							dE = dDistance * dExtrusionFactor;
-							pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
-							pDriver->QueryParameters();
-							m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 						}
 						else {
-							sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop to close loop of layer " << nLayerIndex;
+							// odd number => can't draw hatch lines
+							bSucces = false;
+							sNoSuccessMsg << "Segment " << nSegmentIndex << " of type Hatch  of layer " << nLayerIndex << " has not an odd number of coordinates";
 						}
-					}
-					else {
-						sNoSuccessMsg << "Timeout while moving in segment " << nSegmentIndex << " of type Loop of layer " << nLayerIndex;
-					}
-					break;
+						break;
 
-				case LibMCEnv::eToolpathSegmentType::Polyline:
-					// move fast to first point of Polyline
-					bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
-					if (bSucces) {
-						pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
-						pDriver->QueryParameters();
-						m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+					case LibMCEnv::eToolpathSegmentType::Loop:
+						// move fast to first point of loop
+						bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
+						if (bSucces) {
+							pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
+							pDriver->QueryParameters();
+							m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
 
-
-						for (uint32_t i = 1; i < nPointCount; i++) {
-							// move to rest of points of polyline (with extrusion)
+							for (uint32_t i = 1; i < nPointCount; i++) {
+								// move to rest of points of loop (with extrusion)
+								bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
+								if (bSucces) {
+									auto dDistance = sqrt(
+										pow(PointData[i].m_Coordinates[0] - PointData[i - 1].m_Coordinates[0], 2) +
+										pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
+									dE = dDistance * dExtrusionFactor * dLayerThickness;
+									pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
+									pDriver->QueryParameters();
+									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+								}
+								else {
+									sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop of layer " << nLayerIndex;
+								}
+								if (!bSucces) {
+									break;
+								}
+							}
+							// move from last point in list to first point to close the of loop (with extrusion)
 							bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
 							if (bSucces) {
 								auto dDistance = sqrt(
-									pow(PointData[i].m_Coordinates[0] - PointData[i -1].m_Coordinates[0], 2) +
-									pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
-								dE = dDistance * dExtrusionFactor;
-								pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
+									pow(PointData[0].m_Coordinates[0] - PointData[nPointCount - 1].m_Coordinates[0], 2) +
+									pow(PointData[0].m_Coordinates[1] - PointData[nPointCount - 1].m_Coordinates[1], 2)) * dUnit;
+								dE = dDistance * dExtrusionFactor * dLayerThickness;
+								pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 								pDriver->QueryParameters();
 								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
-
 							}
 							else {
-								sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Polyline of layer " << nLayerIndex;
-							}
-							if (!bSucces) {
-								break;
+								sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop to close loop of layer " << nLayerIndex;
 							}
 						}
+						else {
+							sNoSuccessMsg << "Timeout while moving in segment " << nSegmentIndex << " of type Loop of layer " << nLayerIndex;
+						}
+						break;
+
+					case LibMCEnv::eToolpathSegmentType::Polyline:
+						// move fast to first point of Polyline
+						bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
+						if (bSucces) {
+							pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
+							pDriver->QueryParameters();
+							m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+
+
+							for (uint32_t i = 1; i < nPointCount; i++) {
+								// move to rest of points of polyline (with extrusion)
+								bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
+								if (bSucces) {
+									auto dDistance = sqrt(
+										pow(PointData[i].m_Coordinates[0] - PointData[i -1].m_Coordinates[0], 2) +
+										pow(PointData[i].m_Coordinates[1] - PointData[i - 1].m_Coordinates[1], 2)) * dUnit;
+									dE = dDistance * dExtrusionFactor * dLayerThickness;
+									pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
+									pDriver->QueryParameters();
+									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+
+								}
+								else {
+									sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Polyline of layer " << nLayerIndex;
+								}
+								if (!bSucces) {
+									break;
+								}
+							}
+						}
+						else {
+							sNoSuccessMsg << "Timeout while moving in segment " << nSegmentIndex << " of type Polyline of layer " << nLayerIndex;
+						}
+						break;
 					}
-					else {
-						sNoSuccessMsg << "Timeout while moving in segment " << nSegmentIndex << " of type Polyline of layer " << nLayerIndex;
-					}
+				}
+				if (!bSucces) {
 					break;
 				}
 			}
-			if (!bSucces) {
-				break;
+			// retract filament
+			if ((nSegmentCount > 0) && (nLayerIndex > 0) && (dRetractExtrude > 0)) {
+				pDriver->ExtruderDoExtrude(-dRetractExtrude, 30);
+				pStateEnvironment->LogMessage("Filament retracted.");
 			}
 		}
 
-		// retract filament
-		if ((nSegmentCount > 0) && (nLayerIndex > 0) && (dRetractExtrude > 0)) {
-			pDriver->ExtruderDoExtrude(-dRetractExtrude, 30);
-			pStateEnvironment->LogMessage("Filament retracted.");
-		}
-		
 		if (!bSucces) {
 			pStateEnvironment->LogWarning("Extrude error: " + sNoSuccessMsg.str());
 		}

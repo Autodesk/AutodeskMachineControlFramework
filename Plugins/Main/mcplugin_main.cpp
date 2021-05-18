@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCPlugin::Impl;
 
-// TODO uncomment to activate camera driver
+// TODO uncomment to activate camera/MQTT driver
 //#include "libmcdriver_camera_dynamic.hpp"
-#include "libmcdriver_mqtt_dynamic.hpp"
+//#include "libmcdriver_mqtt_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
 #ifdef _MSC_VER
@@ -47,12 +47,11 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-// TODO uncomment to activate camera driver
+// TODO uncomment to activate camera/MQQTT driver
 //typedef LibMCDriver_Camera::PDriver_RaspiCamera PDriver_RaspiCamera;
 //typedef LibMCEnv::CDriverCast <LibMCDriver_Camera::CDriver_RaspiCamera, LibMCDriver_Camera::CWrapper> PDriverCast_RaspiCamera;
-
-typedef LibMCDriver_MQTT::PDriver_MQTT PDriver_MQTT;
-typedef LibMCEnv::CDriverCast <LibMCDriver_MQTT::CDriver_MQTT, LibMCDriver_MQTT::CWrapper> PDriverCast_MQTT;
+//typedef LibMCDriver_MQTT::PDriver_MQTT PDriver_MQTT;
+//typedef LibMCEnv::CDriverCast <LibMCDriver_MQTT::CDriver_MQTT, LibMCDriver_MQTT::CWrapper> PDriverCast_MQTT;
 
 /*************************************************************************************************************************
  Class definition of CMainData
@@ -60,22 +59,21 @@ typedef LibMCEnv::CDriverCast <LibMCDriver_MQTT::CDriver_MQTT, LibMCDriver_MQTT:
 class CMainData : public virtual CPluginData {
 protected:
 	// We need to globally store driver wrappers in the plugin
-	// TODO uncomment to activate camera driver
+	// TODO uncomment to activate camera/MQTT driver
 	//PDriverCast_RaspiCamera m_DriverCast_RaspiCamera;
-	PDriverCast_MQTT m_DriverCast_MQTT;
+//	PDriverCast_MQTT m_DriverCast_MQTT;
 
 public:
 
-	// TODO uncomment to activate camera driver
+	// TODO uncomment to activate camera/MQTT driver
 	//PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
 	//{
 	//	return m_DriverCast_RaspiCamera.acquireDriver(pStateEnvironment, "camera");
 	//}
-
-	PDriver_MQTT acquireMQTTDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		return m_DriverCast_MQTT.acquireDriver(pStateEnvironment, "mqtt");
-	}
+	//PDriver_MQTT acquireMQTTDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	//{
+	//	return m_DriverCast_MQTT.acquireDriver(pStateEnvironment, "mqtt");
+	//}
 
 	bool deviceSetFanSpeed(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nFanId, double dFanSpeed)
 	{
@@ -247,10 +245,10 @@ public:
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
 
-		pStateEnvironment->LogMessage("Establishing MQTT Connection...");
-		auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
-		pMQTTDriver->Connect();
-
+		// TODO uncomment to activate camera/MQTT driver
+		//pStateEnvironment->LogMessage("Establishing MQTT Connection...");
+		//auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
+		//pMQTTDriver->Connect();
 		//auto pCameraDriver = m_pPluginData->acquireCameraDriver(pStateEnvironment);
 		//pCameraDriver->Initialize("", 600, 400, LibMCDriver_Camera::eImagePixelFormat::RGB32);
 
@@ -283,8 +281,10 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
-		pMQTTDriver->SendMQTTMessage ("TestMessage");
+		// TODO activate MQTT sending...
+		//auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
+		//pMQTTDriver->SendMQTTMessage ("TestMessage for testing :-) ");
+		//pStateEnvironment->LogMessage("SendMQTTMessage done");
 
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
@@ -485,6 +485,13 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
+
+		// TODO uncomment to activate MQTT driver
+		//pStateEnvironment->LogMessage("MQTT Disconnect done");
+		//auto pMQTTDriver = m_pPluginData->acquireMQTTDriver(pStateEnvironment);
+		//pMQTTDriver->Disconnect();
+
+
 		// finalize extrude/print process (retract...)
 		m_pPluginData->deviceDoFinalizeExtrude(pStateEnvironment);
 		// stop fan
@@ -601,8 +608,6 @@ public:
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
-		// TODO just for testing set  LayCount = to small value => print stops earlier !!!
-		//nLayerCount = 5;
 
 		
 		// TODO activate/uncomment following lines to test emergency stop when proceeding to layer 3
