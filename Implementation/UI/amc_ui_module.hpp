@@ -70,6 +70,8 @@ namespace AMC {
 
 		virtual std::string getUUID();
 
+		virtual void populateItemMap (std::map<std::string, PUIModuleItem> & itemMap) = 0;
+
 		static std::string getNameFromXML(pugi::xml_node& xmlNode);
 		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
 

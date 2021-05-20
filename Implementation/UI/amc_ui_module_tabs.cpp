@@ -129,5 +129,13 @@ void CUIModule_Tabs::addTab(PUIModule pTab)
 	m_Tabs.push_back(pTab);
 	m_TabMap.insert(std::make_pair (pTab->getUUID (), pTab));
 
+	pTab->populateItemMap(m_ItemMap);
+
+}
+
+void CUIModule_Tabs::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
+{
+	for (auto pTab : m_Tabs)
+		pTab->populateItemMap(itemMap);
 }
 

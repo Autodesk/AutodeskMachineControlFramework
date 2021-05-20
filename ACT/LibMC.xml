@@ -339,8 +339,11 @@
 		<error name="PROFILENOTFOUND" code="330" description="Profile not found." />				
 		<error name="INVALIDSERVICEHANDLER" code="331" description="Invalid service handler." />				
 		<error name="INVALIDMAXTHREADCOUNT" code="332" description="Invalid max thread count." />
-		<error name="INVALIDTOOLPATHSTREAMUUID" code="333" description="Invalid toolpath stream uuid" />
-		
+		<error name="INVALIDTOOLPATHSTREAMUUID" code="333" description="Invalid toolpath stream uuid" />		
+		<error name="MISSINGSECTIONHEIGHT" code="334" description="Missing section height" />
+		<error name="INVALIDSECTIONHEIGHT" code="335" description="Invalid section height" />		
+		<error name="MISSINGSECTIONWIDTH" code="336" description="Missing section width" />
+		<error name="INVALIDSECTIONWIDTH" code="337" description="Invalid section width" />		
 		
 	</errors>
 	

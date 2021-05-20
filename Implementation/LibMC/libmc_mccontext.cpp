@@ -540,16 +540,29 @@ void CMCContext::loadParameterGroupDerives(const pugi::xml_node& xmlNode, AMC::P
             pParameterHandler = m_pSystemState->parameterInstances()->getParameterHandler(sourceStateMachineAttrib.as_string());
         }
 
+
+        std::string sSourceGroupName;
         auto groupAttrib = parameterNode.attribute("group");
-        if (groupAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPNAME);
-        AMC::PParameterGroup pSourceGroup = pParameterHandler->findGroup (groupAttrib.as_string(), true);
+        if (!groupAttrib.empty()) {
+            sSourceGroupName = groupAttrib.as_string();
+        }
+        else {
+            sSourceGroupName = pGroup->getName();
+        }
+   
 
+        AMC::PParameterGroup pSourceGroup = pParameterHandler->findGroup (sSourceGroupName, true);
+
+        std::string sSourceParameterName;
         auto sourceParameterAttrib = parameterNode.attribute("parameter");
-        if (sourceParameterAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERNAME);
+        if (!sourceParameterAttrib.empty()) {
+            sSourceParameterName = sourceParameterAttrib.as_string();
+        }
+        else {
+            sSourceParameterName = nameAttrib.as_string();
+        }
 
-        pGroup->addNewDerivedParameter (nameAttrib.as_string(), pSourceGroup, sourceParameterAttrib.as_string ());
+        pGroup->addNewDerivedParameter (nameAttrib.as_string(), pSourceGroup, sSourceParameterName);
     }
 
 }

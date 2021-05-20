@@ -194,7 +194,7 @@ export default class AMCApplication {
 
 	prepareModule (module) 
 	{
-		var item, tab;
+		var item, tab, section;
 		
 		if (module.type === "content") {
 			for (item of module.items) {
@@ -206,10 +206,20 @@ export default class AMCApplication {
 		if (module.type === "tabs") {
 			for (tab of module.tabs) {
 				this.prepareModule (tab)
-			}
-			
+			}			
 		}
 
+		if (module.type === "verticalsplit") {
+			for (section of module.sections) {
+				this.prepareModule (section)
+			}			
+		}
+
+		if (module.type === "horizontalsplit") {
+			for (section of module.sections) {
+				this.prepareModule (section)
+			}			
+		}
 	}
 
 	

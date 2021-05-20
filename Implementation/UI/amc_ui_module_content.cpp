@@ -292,3 +292,10 @@ void CUIModule_Content::addItem(PUIModule_ContentItem pItem)
 
 }
 
+
+void CUIModule_Content::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
+{
+	for (auto item : m_Items) 
+		itemMap.insert(std::make_pair(item->getUUID(), item));
+}
+

@@ -78,6 +78,8 @@ namespace AMC {
 
 		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
 
+		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
+
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
 		PUIModule findTab(const std::string& sUUID);
 

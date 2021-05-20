@@ -358,6 +358,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDSERVICEHANDLER 331
 #define LIBMC_ERROR_INVALIDMAXTHREADCOUNT 332
 #define LIBMC_ERROR_INVALIDTOOLPATHSTREAMUUID 333
+#define LIBMC_ERROR_MISSINGSECTIONHEIGHT 334
+#define LIBMC_ERROR_INVALIDSECTIONHEIGHT 335
+#define LIBMC_ERROR_MISSINGSECTIONWIDTH 336
+#define LIBMC_ERROR_INVALIDSECTIONWIDTH 337
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -628,6 +632,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDSERVICEHANDLER: return "Invalid service handler.";
     case LIBMC_ERROR_INVALIDMAXTHREADCOUNT: return "Invalid max thread count.";
     case LIBMC_ERROR_INVALIDTOOLPATHSTREAMUUID: return "Invalid toolpath stream uuid";
+    case LIBMC_ERROR_MISSINGSECTIONHEIGHT: return "Missing section height";
+    case LIBMC_ERROR_INVALIDSECTIONHEIGHT: return "Invalid section height";
+    case LIBMC_ERROR_MISSINGSECTIONWIDTH: return "Missing section width";
+    case LIBMC_ERROR_INVALIDSECTIONWIDTH: return "Invalid section width";
     default: return "unknown error";
   }
 }
