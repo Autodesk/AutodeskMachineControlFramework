@@ -29,11 +29,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __LIBMCENV_TOOLPATHACCESSOR
-#define __LIBMCENV_TOOLPATHACCESSOR
+#ifndef __LIBMCENV_TOOLPATHPART
+#define __LIBMCENV_TOOLPATHPART
 
 #include "libmcenv_interfaces.hpp"
-#include "amc_toolpathhandler.hpp"
+#include "amc_toolpathpart.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -53,39 +53,24 @@ namespace Impl {
  Class declaration of CToolpathAccessor 
 **************************************************************************************************************************/
 
-class CToolpathAccessor : public virtual IToolpathAccessor, public virtual CBase {
+class CToolpathPart : public virtual IToolpathPart, public virtual CBase {
 private:
 
 protected:
 
-	std::string m_sStorageUUID;
-	AMC::PToolpathHandler m_pToolpathHandler;
-	double m_dDefaultJumpSpeed;
-
+	AMC::PToolpathPart m_pPart;
 
 public:
-	CToolpathAccessor(const std::string& sStorageUUID, AMC::PToolpathHandler pToolpathHandler);
-	virtual ~CToolpathAccessor();
+	CToolpathPart(AMC::PToolpathPart pPart);
+	virtual ~CToolpathPart();
 
-	std::string GetStorageUUID() override;
+	std::string GetName() override;
 
-	LibMCEnv_uint32 GetLayerCount() override;
+	std::string GetUUID() override;
 
-	IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) override;
-
-	LibMCEnv_double GetUnits() override;
-
-	bool HasMetaData(const std::string& sNameSpace, const std::string& sName) override;
-
-	std::string GetMetaDataValue(const std::string& sNameSpace, const std::string& sName) override;
-
-	std::string GetMetaDataType(const std::string& sNameSpace, const std::string& sName) override;
-
-	LibMCEnv_uint32 GetPartCount() override;
-
-	IToolpathPart* GetPart(const LibMCEnv_uint32 nPartIndex) override;
-
-	IToolpathPart* FindPartByUUID(const std::string& sPartUUID) override;
+	std::string GetMeshUUID() override;
+	
+	LibMCEnv::sToolpathPartTransform GetTransform() override;
 
 };
 
@@ -95,4 +80,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCENV_TOOLPATHACCESSOR
+#endif // __LIBMCENV_TOOLPATHPART

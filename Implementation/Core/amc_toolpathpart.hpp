@@ -29,65 +29,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_TOOLPATHENTITY
-#define __AMC_TOOLPATHENTITY
+#ifndef __AMC_TOOLPATHPART
+#define __AMC_TOOLPATHPART
 
 #include <memory>
 #include <string>
 #include <thread>
 #include <mutex>
 
-#include "amc_toolpathlayerdata.hpp"
-#include "amc_toolpathpart.hpp"
 #include "lib3mf/lib3mf_dynamic.hpp"
 #include "libmcdata_dynamic.hpp"
 
 
-#define AMC_TOOLPATH_MAXREFCOUNT (1024 * 1024 * 1024)
-
 namespace AMC {
 
-	class CToolpathEntity;
-	typedef std::shared_ptr<CToolpathEntity> PToolpathEntity;
+	class CToolpathPart;
+	typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 
-	class CToolpathEntity {
+	class CToolpathPart {
 	private:		
-		uint32_t m_ReferenceCount;
-
-		std::mutex m_Mutex;
-		LibMCData::PStorageStream m_pStorageStream;
-		Lib3MF::PModel m_p3MFModel;
-		Lib3MF::PReader m_p3MFReader;
-		Lib3MF::PToolpath m_pToolpath;
-
-		std::map<std::string, PToolpathPart> m_PartMap;
-		std::vector<PToolpathPart> m_PartList;
-
-		std::string m_sDebugName;
-
-	public:
-
-		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
-		virtual ~CToolpathEntity();		
-
-		void IncRef();
-		bool DecRef();
-
-		uint32_t getLayerCount();	
-
-		PToolpathLayerData readLayer(uint32_t nLayerIndex);
-
-		double getUnits();
-
-		std::string getDebugName ();
+		std::string m_sUUID;
+		std::string m_sMeshUUID;
+		std::string m_sName;		
 		
-		std::string getMetaDataValue (const std::string & sNameSpace, const std::string & sName);
-		std::string getMetaDataType (const std::string& sNameSpace, const std::string& sName);
-		bool hasMetaData (const std::string& sNameSpace, const std::string& sName);
+		Lib3MF::PModel m_p3MFModel;
+		Lib3MF::PBuildItem m_pBuildItem;
+		
+	public:
+	
+		CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem);
+		virtual ~CToolpathPart();		
 
-		uint32_t getPartCount();
-		PToolpathPart getPart(uint32_t nIndex);
-		PToolpathPart findPartByUUID(const std::string & sUUID);
+		std::string getUUID ();
+		std::string getMeshUUID ();
+		std::string getName ();
 
 	};
 

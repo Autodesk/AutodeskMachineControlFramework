@@ -28,72 +28,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-#ifndef __AMC_TOOLPATHENTITY
-#define __AMC_TOOLPATHENTITY
-
-#include <memory>
-#include <string>
-#include <thread>
-#include <mutex>
-
-#include "amc_toolpathlayerdata.hpp"
 #include "amc_toolpathpart.hpp"
-#include "lib3mf/lib3mf_dynamic.hpp"
-#include "libmcdata_dynamic.hpp"
+#include "libmc_exceptiontypes.hpp"
 
-
-#define AMC_TOOLPATH_MAXREFCOUNT (1024 * 1024 * 1024)
+#include "Common/common_utils.hpp"
 
 namespace AMC {
 
-	class CToolpathEntity;
-	typedef std::shared_ptr<CToolpathEntity> PToolpathEntity;
+	CToolpathPart::CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem)
+		: m_p3MFModel (p3MFModel), m_pBuildItem (pBuildItem)
+	{
+		auto p3MFObject = m_pBuildItem->GetObjectResource();
+		m_sName = p3MFObject->GetName();
 
-	class CToolpathEntity {
-	private:		
-		uint32_t m_ReferenceCount;
+		bool bHasUUID;
+		m_sUUID = m_pBuildItem->GetUUID(bHasUUID);
+		if (!bHasUUID)
+			throw ELibMCCustomException (LIBMC_ERROR_BUILDITEMHASNOUUID, m_sName);
 
-		std::mutex m_Mutex;
-		LibMCData::PStorageStream m_pStorageStream;
-		Lib3MF::PModel m_p3MFModel;
-		Lib3MF::PReader m_p3MFReader;
-		Lib3MF::PToolpath m_pToolpath;
+		m_sMeshUUID = p3MFObject->GetUUID(bHasUUID);
+		if (!bHasUUID)
+			throw ELibMCCustomException(LIBMC_ERROR_OBJECTHASNOUUID, m_sName);
 
-		std::map<std::string, PToolpathPart> m_PartMap;
-		std::vector<PToolpathPart> m_PartList;
+	}
 
-		std::string m_sDebugName;
+	CToolpathPart::~CToolpathPart()
+	{
 
-	public:
+	}
 
-		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
-		virtual ~CToolpathEntity();		
+	std::string CToolpathPart::getUUID()
+	{
+		return m_sUUID;
+	}
 
-		void IncRef();
-		bool DecRef();
+	std::string CToolpathPart::getMeshUUID()
+	{
+		return m_sMeshUUID;
+	}
 
-		uint32_t getLayerCount();	
-
-		PToolpathLayerData readLayer(uint32_t nLayerIndex);
-
-		double getUnits();
-
-		std::string getDebugName ();
-		
-		std::string getMetaDataValue (const std::string & sNameSpace, const std::string & sName);
-		std::string getMetaDataType (const std::string& sNameSpace, const std::string& sName);
-		bool hasMetaData (const std::string& sNameSpace, const std::string& sName);
-
-		uint32_t getPartCount();
-		PToolpathPart getPart(uint32_t nIndex);
-		PToolpathPart findPartByUUID(const std::string & sUUID);
-
-	};
-
-	
+	std::string CToolpathPart::getName()
+	{
+		return m_sName;
+	}
 }
 
-
-#endif //__AMC_TOOLPATHENTITY
 

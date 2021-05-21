@@ -362,6 +362,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDSECTIONHEIGHT 335
 #define LIBMC_ERROR_MISSINGSECTIONWIDTH 336
 #define LIBMC_ERROR_INVALIDSECTIONWIDTH 337
+#define LIBMC_ERROR_TOOLPATHMETADATANOTFOUND 338
+#define LIBMC_ERROR_BUILDITEMHASNOUUID 339
+#define LIBMC_ERROR_OBJECTHASNOUUID 340
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -636,6 +639,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDSECTIONHEIGHT: return "Invalid section height";
     case LIBMC_ERROR_MISSINGSECTIONWIDTH: return "Missing section width";
     case LIBMC_ERROR_INVALIDSECTIONWIDTH: return "Invalid section width";
+    case LIBMC_ERROR_TOOLPATHMETADATANOTFOUND: return "Toolpath metadata not found";
+    case LIBMC_ERROR_BUILDITEMHASNOUUID: return "Build item has no uuid";
+    case LIBMC_ERROR_OBJECTHASNOUUID: return "Object has no uuid";
     default: return "unknown error";
   }
 }

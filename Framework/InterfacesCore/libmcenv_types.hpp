@@ -158,6 +158,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
+typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
 typedef LibMCEnvHandle LibMCEnv_Build;
@@ -211,6 +212,11 @@ namespace LibMCEnv {
       LibMCEnv_int32 m_Coordinates[2];
   } sPosition2D;
   
+  typedef struct {
+      LibMCEnv_double m_Matrix[3][3];
+      LibMCEnv_double m_Translation[3];
+  } sToolpathPartTransform;
+  
   #pragma pack ()
   
 } // namespace LibMCEnv;
@@ -219,5 +225,6 @@ namespace LibMCEnv {
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
+typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP

@@ -344,6 +344,11 @@
 		<error name="INVALIDSECTIONHEIGHT" code="335" description="Invalid section height" />		
 		<error name="MISSINGSECTIONWIDTH" code="336" description="Missing section width" />
 		<error name="INVALIDSECTIONWIDTH" code="337" description="Invalid section width" />		
+		<error name="TOOLPATHMETADATANOTFOUND" code="338" description="Toolpath metadata not found" />		
+		
+		<error name="BUILDITEMHASNOUUID" code="339" description="Build item has no uuid" />		
+		<error name="OBJECTHASNOUUID" code="340" description="Object has no uuid" />		
+		
 		
 	</errors>
 	

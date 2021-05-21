@@ -29,70 +29,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __LIBMCENV_TOOLPATHACCESSOR
-#define __LIBMCENV_TOOLPATHACCESSOR
-
-#include "libmcenv_interfaces.hpp"
-#include "amc_toolpathhandler.hpp"
-
-// Parent classes
-#include "libmcenv_base.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcenv_toolpathpart.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
 
-
-namespace LibMCEnv {
-namespace Impl {
-
+using namespace LibMCEnv::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CToolpathAccessor 
+ Class definition of CToolpathPart
 **************************************************************************************************************************/
+CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart)
+	: m_pPart (pPart)
+{
+	if (pPart.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+}
 
-class CToolpathAccessor : public virtual IToolpathAccessor, public virtual CBase {
-private:
+CToolpathPart::~CToolpathPart()
+{
 
-protected:
+}
 
-	std::string m_sStorageUUID;
-	AMC::PToolpathHandler m_pToolpathHandler;
-	double m_dDefaultJumpSpeed;
+std::string CToolpathPart::GetName()
+{
+	return m_pPart->getName();
+}
 
+std::string CToolpathPart::GetUUID()
+{
+	return m_pPart->getUUID();
+}
 
-public:
-	CToolpathAccessor(const std::string& sStorageUUID, AMC::PToolpathHandler pToolpathHandler);
-	virtual ~CToolpathAccessor();
+std::string CToolpathPart::GetMeshUUID()
+{
+	return m_pPart->getMeshUUID();
+}
 
-	std::string GetStorageUUID() override;
+LibMCEnv::sToolpathPartTransform CToolpathPart::GetTransform()
+{
+	LibMCEnv::sToolpathPartTransform transform;
+	// TODO
 
-	LibMCEnv_uint32 GetLayerCount() override;
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			transform.m_Matrix[i][j] = (i == j) ? 1.0 : 0.0;
 
-	IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) override;
+	transform.m_Translation[0] = 0.0;
+	transform.m_Translation[1] = 0.0;
+	transform.m_Translation[2] = 0.0;
 
-	LibMCEnv_double GetUnits() override;
+	return transform;
 
-	bool HasMetaData(const std::string& sNameSpace, const std::string& sName) override;
-
-	std::string GetMetaDataValue(const std::string& sNameSpace, const std::string& sName) override;
-
-	std::string GetMetaDataType(const std::string& sNameSpace, const std::string& sName) override;
-
-	LibMCEnv_uint32 GetPartCount() override;
-
-	IToolpathPart* GetPart(const LibMCEnv_uint32 nPartIndex) override;
-
-	IToolpathPart* FindPartByUUID(const std::string& sPartUUID) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCEnv
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCENV_TOOLPATHACCESSOR
+}
