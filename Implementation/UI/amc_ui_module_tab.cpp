@@ -29,36 +29,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #define __AMCIMPL_UI_MODULE
+#define __AMCIMPL_API_CONSTANTS
+
+#include "amc_ui_module.hpp"
+#include "amc_ui_module_tabs.hpp"
+#include "amc_ui_module_tab.hpp"
 
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
-#include "libmc_exceptiontypes.hpp"
-#include "amc_parameterinstances.hpp"
 
-#include "amc_ui_module_content.hpp"
-#include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_verticalsplit.hpp"
-#include "amc_ui_module_horizontalsplit.hpp"
+#include "amc_api_constants.hpp"
+#include "amc_resourcepackage.hpp"
+
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+
+
+CUIModule_Tab::CUIModule_Tab(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+{
+	LibMCAssertNotNull(pParameterInstances.get());
+	LibMCAssertNotNull(pResourcePackage.get());
+	LibMCAssertNotNull(pBuildJobHandler.get());
+
+
+
+	m_pModule = CUIModuleFactory::createModule(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+}
+
+CUIModule_Tab::~CUIModule_Tab()
 {
 
-	std::string sType = xmlNode.name();
-
-	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	if (sType == CUIModule_VerticalSplit::getStaticType())
-		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	if (sType == CUIModule_HorizontalSplit::getStaticType())
-		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
-
 }
+
+std::string CUIModule_Tab::getName()
+{
+	return m_sName;
+}
+
+std::string CUIModule_Tab::getCaption()
+{
+	return m_sCaption;
+}
+
+CUIModule* CUIModule_Tab::getModule()
+{
+	return m_pModule.get();
+}
+

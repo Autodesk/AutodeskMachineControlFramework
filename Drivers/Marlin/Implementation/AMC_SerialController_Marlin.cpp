@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <thread>
+#include <iostream>
 
 #include <cmath>
 
@@ -171,7 +172,7 @@ namespace AMC {
 
 		// reset line number
 		std::stringstream sCommand;
-		sCommand << "M110 " << m_nLineNumber;
+		sCommand << "M110 N" << m_nLineNumber;
 		sendCommand(sCommand.str());
 
 		m_nCurrentBufferSpace = 0;

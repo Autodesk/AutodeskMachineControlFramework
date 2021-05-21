@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_parameterhandler.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #define AMC_MAXPARAMETERGROUPCOUNT (1024 * 1024)
 
@@ -58,16 +58,14 @@ namespace AMC {
 	void CParameterHandler::addGroup(PParameterGroup pGroup)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
-
-		if (pGroup.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pGroup.get());
 
 		auto sName = pGroup->getName();
 		if (m_Groups.find(sName) != m_Groups.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME, m_sInstanceState + "/" + sName);
 
 		if (m_GroupList.size() >= AMC_MAXPARAMETERGROUPCOUNT)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS, m_sInstanceState + "/" + sName);
 
 		m_Groups.insert(std::make_pair(sName, pGroup));
 		m_GroupList.push_back(pGroup);
@@ -94,7 +92,7 @@ namespace AMC {
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		if (nIndex >= m_GroupList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sInstanceState);
 
 		return m_GroupList[nIndex];
 	}
@@ -108,7 +106,7 @@ namespace AMC {
 			return iter->second;
 
 		if (bFailIfNotExisting)
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERGROUPNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERGROUPNOTFOUND, sName);
 
 		return nullptr;	
 	}

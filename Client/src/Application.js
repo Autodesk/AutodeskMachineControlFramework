@@ -169,6 +169,60 @@ export default class AMCApplication {
 	}
 	
 	
+	prepareModuleItem (item) 
+	{
+		if (item.type === "parameterlist") {
+		
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			item.entries = this.AppContent.ContentItems[item.uuid].entries;
+			
+		}
+
+		if (item.type === "buildlist") {
+		
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			item.entries = this.AppContent.ContentItems[item.uuid].entries;
+			
+		}
+		
+		if (item.type === "upload") {
+			item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
+		
+		}
+	}
+	
+
+	prepareModule (module) 
+	{
+		var item, tab, section;
+		
+		if (module.type === "content") {
+			for (item of module.items) {
+				this.prepareModuleItem (item)
+			}
+			
+		}
+
+		if (module.type === "tabs") {
+			for (tab of module.tabs) {
+				this.prepareModule (tab)
+			}			
+		}
+
+		if (module.type === "verticalsplit") {
+			for (section of module.sections) {
+				this.prepareModule (section)
+			}			
+		}
+
+		if (module.type === "horizontalsplit") {
+			for (section of module.sections) {
+				this.prepareModule (section)
+			}			
+		}
+	}
+
+	
 	retrieveStateUpdate () {
 		
 		this.axiosGetRequest ("/ui/state")		
@@ -177,32 +231,10 @@ export default class AMCApplication {
                     this.AppContent.MenuItems = resultJSON.data.menuitems;
                     this.AppContent.ToolbarItems = resultJSON.data.toolbaritems;
 					
-					var page, module, item;
+					var page, module;
 					for (page of resultJSON.data.pages) {
 						for (module of page.modules) {
-							if (module.type === "content") {
-								for (item of module.items) {
-									if (item.type === "parameterlist") {
-									
-										this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-										item.entries = this.AppContent.ContentItems[item.uuid].entries;
-										
-									}
-
-									if (item.type === "buildlist") {
-									
-										this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-										item.entries = this.AppContent.ContentItems[item.uuid].entries;
-										
-									}
-									
-									if (item.type === "upload") {
-										item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
-									
-									}
-								}
-								
-							}
+							this.prepareModule (module)
 						}						
 					
 					}

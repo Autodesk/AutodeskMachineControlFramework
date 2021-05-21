@@ -61,6 +61,7 @@ namespace LibMCEnv {
 class CWrapper;
 class CBase;
 class CIterator;
+class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
 class CBuild;
@@ -80,6 +81,7 @@ class CUIEnvironment;
 typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
+typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
 typedef CBuild CLibMCEnvBuild;
@@ -99,6 +101,7 @@ typedef CUIEnvironment CLibMCEnvUIEnvironment;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
+typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
 typedef std::shared_ptr<CBuild> PBuild;
@@ -118,6 +121,7 @@ typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
+typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
 typedef PBuild PLibMCEnvBuild;
@@ -303,6 +307,7 @@ private:
 
 	friend class CBase;
 	friend class CIterator;
+	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
 	friend class CBuild;
@@ -397,6 +402,26 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CToolpathPart 
+**************************************************************************************************************************/
+class CToolpathPart : public CBase {
+public:
+	
+	/**
+	* CToolpathPart::CToolpathPart - Constructor for ToolpathPart class.
+	*/
+	CToolpathPart(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetName();
+	inline std::string GetUUID();
+	inline std::string GetMeshUUID();
+	inline sToolpathPartTransform GetTransform();
+};
+	
+/*************************************************************************************************************************
  Class CToolpathLayer 
 **************************************************************************************************************************/
 class CToolpathLayer : public CBase {
@@ -440,6 +465,12 @@ public:
 	inline LibMCEnv_uint32 GetLayerCount();
 	inline PToolpathLayer LoadLayer(const LibMCEnv_uint32 nLayerIndex);
 	inline LibMCEnv_double GetUnits();
+	inline bool HasMetaData(const std::string & sNameSpace, const std::string & sName);
+	inline std::string GetMetaDataValue(const std::string & sNameSpace, const std::string & sName);
+	inline std::string GetMetaDataType(const std::string & sNameSpace, const std::string & sName);
+	inline LibMCEnv_uint32 GetPartCount();
+	inline PToolpathPart GetPart(const LibMCEnv_uint32 nPartIndex);
+	inline PToolpathPart FindPartByUUID(const std::string & sPartUUID);
 };
 	
 /*************************************************************************************************************************
@@ -801,6 +832,10 @@ public:
 		pWrapperTable->m_Iterator_GetCurrent = nullptr;
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
+		pWrapperTable->m_ToolpathPart_GetName = nullptr;
+		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
+		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
+		pWrapperTable->m_ToolpathPart_GetTransform = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
@@ -815,6 +850,12 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
 		pWrapperTable->m_ToolpathAccessor_LoadLayer = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetUnits = nullptr;
+		pWrapperTable->m_ToolpathAccessor_HasMetaData = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataValue = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataType = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetPartCount = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetPart = nullptr;
+		pWrapperTable->m_ToolpathAccessor_FindPartByUUID = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
@@ -1027,6 +1068,42 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathPart_GetName = (PLibMCEnvToolpathPart_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_getname");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathPart_GetName = (PLibMCEnvToolpathPart_GetNamePtr) dlsym(hLibrary, "libmcenv_toolpathpart_getname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathPart_GetName == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathPart_GetUUID = (PLibMCEnvToolpathPart_GetUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_getuuid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathPart_GetUUID = (PLibMCEnvToolpathPart_GetUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathpart_getuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathPart_GetUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathPart_GetMeshUUID = (PLibMCEnvToolpathPart_GetMeshUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_getmeshuuid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathPart_GetMeshUUID = (PLibMCEnvToolpathPart_GetMeshUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathpart_getmeshuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathPart_GetMeshUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathPart_GetTransform = (PLibMCEnvToolpathPart_GetTransformPtr) GetProcAddress(hLibrary, "libmcenv_toolpathpart_gettransform");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathPart_GetTransform = (PLibMCEnvToolpathPart_GetTransformPtr) dlsym(hLibrary, "libmcenv_toolpathpart_gettransform");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathPart_GetTransform == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = (PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getlayerdatauuid");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = (PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getlayerdatauuid");
@@ -1150,6 +1227,60 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_GetUnits == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_HasMetaData = (PLibMCEnvToolpathAccessor_HasMetaDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_hasmetadata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_HasMetaData = (PLibMCEnvToolpathAccessor_HasMetaDataPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_hasmetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_HasMetaData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataValue = (PLibMCEnvToolpathAccessor_GetMetaDataValuePtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getmetadatavalue");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataValue = (PLibMCEnvToolpathAccessor_GetMetaDataValuePtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getmetadatavalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetMetaDataValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataType = (PLibMCEnvToolpathAccessor_GetMetaDataTypePtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getmetadatatype");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetMetaDataType = (PLibMCEnvToolpathAccessor_GetMetaDataTypePtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getmetadatatype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetMetaDataType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetPartCount = (PLibMCEnvToolpathAccessor_GetPartCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getpartcount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetPartCount = (PLibMCEnvToolpathAccessor_GetPartCountPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getpartcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetPartCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetPart = (PLibMCEnvToolpathAccessor_GetPartPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getpart");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetPart = (PLibMCEnvToolpathAccessor_GetPartPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getpart");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetPart == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_FindPartByUUID = (PLibMCEnvToolpathAccessor_FindPartByUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_findpartbyuuid");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_FindPartByUUID = (PLibMCEnvToolpathAccessor_FindPartByUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_findpartbyuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_FindPartByUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2250,6 +2381,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Count == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetName == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathpart_getuuid", (void**)&(pWrapperTable->m_ToolpathPart_GetUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathpart_getmeshuuid", (void**)&(pWrapperTable->m_ToolpathPart_GetMeshUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetMeshUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathpart_gettransform", (void**)&(pWrapperTable->m_ToolpathPart_GetTransform));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathPart_GetTransform == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getlayerdatauuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetLayerDataUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetLayerDataUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2304,6 +2451,30 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getunits", (void**)&(pWrapperTable->m_ToolpathAccessor_GetUnits));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetUnits == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_hasmetadata", (void**)&(pWrapperTable->m_ToolpathAccessor_HasMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_HasMetaData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getmetadatavalue", (void**)&(pWrapperTable->m_ToolpathAccessor_GetMetaDataValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetMetaDataValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getmetadatatype", (void**)&(pWrapperTable->m_ToolpathAccessor_GetMetaDataType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetMetaDataType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getpartcount", (void**)&(pWrapperTable->m_ToolpathAccessor_GetPartCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetPartCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getpart", (void**)&(pWrapperTable->m_ToolpathAccessor_GetPart));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetPart == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_findpartbyuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_FindPartByUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_FindPartByUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
@@ -2858,6 +3029,67 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CToolpathPart
+	 */
+	
+	/**
+	* CToolpathPart::GetName - Returns Part Name.
+	* @return Returns toolpath part name.
+	*/
+	std::string CToolpathPart::GetName()
+	{
+		LibMCEnv_uint32 bytesNeededName = 0;
+		LibMCEnv_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CToolpathPart::GetUUID - Returns Part UUID.
+	* @return Returns toolpath part uuid.
+	*/
+	std::string CToolpathPart::GetUUID()
+	{
+		LibMCEnv_uint32 bytesNeededUUID = 0;
+		LibMCEnv_uint32 bytesWrittenUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetUUID(m_pHandle, 0, &bytesNeededUUID, nullptr));
+		std::vector<char> bufferUUID(bytesNeededUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetUUID(m_pHandle, bytesNeededUUID, &bytesWrittenUUID, &bufferUUID[0]));
+		
+		return std::string(&bufferUUID[0]);
+	}
+	
+	/**
+	* CToolpathPart::GetMeshUUID - Returns Mesh UUID of the part.
+	* @return Returns toolpath part mesh uuid.
+	*/
+	std::string CToolpathPart::GetMeshUUID()
+	{
+		LibMCEnv_uint32 bytesNeededMeshUUID = 0;
+		LibMCEnv_uint32 bytesWrittenMeshUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetMeshUUID(m_pHandle, 0, &bytesNeededMeshUUID, nullptr));
+		std::vector<char> bufferMeshUUID(bytesNeededMeshUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetMeshUUID(m_pHandle, bytesNeededMeshUUID, &bytesWrittenMeshUUID, &bufferMeshUUID[0]));
+		
+		return std::string(&bufferMeshUUID[0]);
+	}
+	
+	/**
+	* CToolpathPart::GetTransform - Returns Mesh Transform of the part.
+	* @return Returns the mesh transform of the toolpath.
+	*/
+	sToolpathPartTransform CToolpathPart::GetTransform()
+	{
+		sToolpathPartTransform resultMeshUUID;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathPart_GetTransform(m_pHandle, &resultMeshUUID));
+		
+		return resultMeshUUID;
+	}
+	
+	/**
 	 * Method definitions for class CToolpathLayer
 	 */
 	
@@ -3057,6 +3289,99 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetUnits(m_pHandle, &resultUnits));
 		
 		return resultUnits;
+	}
+	
+	/**
+	* CToolpathAccessor::HasMetaData - Checks if a metadata value exists for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns if metadata exists.
+	*/
+	bool CToolpathAccessor::HasMetaData(const std::string & sNameSpace, const std::string & sName)
+	{
+		bool resultExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_HasMetaData(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultExists));
+		
+		return resultExists;
+	}
+	
+	/**
+	* CToolpathAccessor::GetMetaDataValue - Returns the value of a metadata for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns the value
+	*/
+	std::string CToolpathAccessor::GetMetaDataValue(const std::string & sNameSpace, const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededMetaDataValue = 0;
+		LibMCEnv_uint32 bytesWrittenMetaDataValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededMetaDataValue, nullptr));
+		std::vector<char> bufferMetaDataValue(bytesNeededMetaDataValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataValue(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededMetaDataValue, &bytesWrittenMetaDataValue, &bufferMetaDataValue[0]));
+		
+		return std::string(&bufferMetaDataValue[0]);
+	}
+	
+	/**
+	* CToolpathAccessor::GetMetaDataType - Returns the type of a metadata for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns the type
+	*/
+	std::string CToolpathAccessor::GetMetaDataType(const std::string & sNameSpace, const std::string & sName)
+	{
+		LibMCEnv_uint32 bytesNeededMetaDataType = 0;
+		LibMCEnv_uint32 bytesWrittenMetaDataType = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataType(m_pHandle, sNameSpace.c_str(), sName.c_str(), 0, &bytesNeededMetaDataType, nullptr));
+		std::vector<char> bufferMetaDataType(bytesNeededMetaDataType);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetMetaDataType(m_pHandle, sNameSpace.c_str(), sName.c_str(), bytesNeededMetaDataType, &bytesWrittenMetaDataType, &bufferMetaDataType[0]));
+		
+		return std::string(&bufferMetaDataType[0]);
+	}
+	
+	/**
+	* CToolpathAccessor::GetPartCount - Retrieves the number of parts in the toolpath.
+	* @return Number of parts.
+	*/
+	LibMCEnv_uint32 CToolpathAccessor::GetPartCount()
+	{
+		LibMCEnv_uint32 resultPartCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetPartCount(m_pHandle, &resultPartCount));
+		
+		return resultPartCount;
+	}
+	
+	/**
+	* CToolpathAccessor::GetPart - Retrieves the part information of a toolpath.
+	* @param[in] nPartIndex - Index of part. MUST be between 0 and PartCount-1
+	* @return Part Instance
+	*/
+	PToolpathPart CToolpathAccessor::GetPart(const LibMCEnv_uint32 nPartIndex)
+	{
+		LibMCEnvHandle hPart = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetPart(m_pHandle, nPartIndex, &hPart));
+		
+		if (!hPart) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CToolpathPart>(m_pWrapper, hPart);
+	}
+	
+	/**
+	* CToolpathAccessor::FindPartByUUID - Finds the part information of a toolpath.
+	* @param[in] sPartUUID - UUID of part.
+	* @return Part Instance. Returns null if part does not exist.
+	*/
+	PToolpathPart CToolpathAccessor::FindPartByUUID(const std::string & sPartUUID)
+	{
+		LibMCEnvHandle hPart = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_FindPartByUUID(m_pHandle, sPartUUID.c_str(), &hPart));
+		
+		if (hPart) {
+			return std::make_shared<CToolpathPart>(m_pWrapper, hPart);
+		} else {
+			return nullptr;
+		}
 	}
 	
 	/**

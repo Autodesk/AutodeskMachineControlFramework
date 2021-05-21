@@ -32,12 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module.hpp"
 #include "libmc_interfaceexception.hpp"
+#include "Common/common_utils.hpp"
 
 
 using namespace AMC;
 
 CUIModule::CUIModule(const std::string& sName)
-	: m_sName (sName)
+	: m_sName (sName), m_sUUID (AMCCommon::CUtils::createUUID ())
 {
 
 }
@@ -52,6 +53,10 @@ std::string CUIModule::getName()
 	return m_sName;
 }
 
+std::string CUIModule::getUUID()
+{
+	return m_sUUID;
+}
 
 std::string CUIModule::getNameFromXML(pugi::xml_node& xmlNode)
 {

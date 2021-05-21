@@ -336,7 +336,19 @@
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
 		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
-		<error name="PROFILENOTFOUND" code="330" description="Profile not found." />		
+		<error name="PROFILENOTFOUND" code="330" description="Profile not found." />				
+		<error name="INVALIDSERVICEHANDLER" code="331" description="Invalid service handler." />				
+		<error name="INVALIDMAXTHREADCOUNT" code="332" description="Invalid max thread count." />
+		<error name="INVALIDTOOLPATHSTREAMUUID" code="333" description="Invalid toolpath stream uuid" />		
+		<error name="MISSINGSECTIONHEIGHT" code="334" description="Missing section height" />
+		<error name="INVALIDSECTIONHEIGHT" code="335" description="Invalid section height" />		
+		<error name="MISSINGSECTIONWIDTH" code="336" description="Missing section width" />
+		<error name="INVALIDSECTIONWIDTH" code="337" description="Invalid section width" />		
+		<error name="TOOLPATHMETADATANOTFOUND" code="338" description="Toolpath metadata not found" />		
+		
+		<error name="BUILDITEMHASNOUUID" code="339" description="Build item has no uuid" />		
+		<error name="OBJECTHASNOUUID" code="340" description="Object has no uuid" />		
+		
 		
 	</errors>
 	

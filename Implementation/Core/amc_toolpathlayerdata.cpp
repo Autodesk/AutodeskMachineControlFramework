@@ -30,17 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_toolpathlayerdata.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
 
-	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue)
-		: m_dUnits (dUnits), m_nZValue (nZValue)
+	CToolpathLayerData::CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string& sDebugName)
+		: m_dUnits (dUnits), m_nZValue (nZValue), m_sDebugName (sDebugName)
 	{
-		if (p3MFLayer.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pToolpath.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(p3MFLayer.get());
+		LibMCAssertNotNull(pToolpath.get());
 
 		m_sUUID = p3MFLayer->GetLayerDataUUID();
 		uint32_t nSegmentCount = p3MFLayer->GetSegmentCount();
@@ -76,12 +74,12 @@ namespace AMC {
 			p3MFLayer->GetSegmentPointData(nSegmentIndex, PointData);
 
 			if ((uint32_t)PointData.size() != pSegment->m_PointCount)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPOINTCOUNT);
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPOINTCOUNT, m_sDebugName);
 
 			if (pSegment->m_PointCount > 0) {
 
 				if (pSegment->m_PointStartIndex + pSegment->m_PointCount > m_Points.size())
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPOINTCOUNT);
+					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPOINTCOUNT, m_sDebugName);
 
 				auto pSrcPoint = &PointData[0];
 				auto pDstPoint = &m_Points[pSegment->m_PointStartIndex];
@@ -120,7 +118,7 @@ namespace AMC {
 	uint32_t CToolpathLayerData::getSegmentPointCount(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
 
 		return m_Segments[nSegmentIndex].m_PointCount;
 	}
@@ -128,17 +126,16 @@ namespace AMC {
 	LibMCEnv::eToolpathSegmentType CToolpathLayerData::getSegmentType(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
 
 		return m_Segments[nSegmentIndex].m_Type;
 	}
 
 	void CToolpathLayerData::storePointsToBuffer(const uint32_t nSegmentIndex, LibMCEnv::sPosition2D* pPositionData)
 	{
-		if (pPositionData == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pPositionData);
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
 
 		auto pSegment = &m_Segments[nSegmentIndex];
 		if (pSegment->m_PointCount > 0) {
@@ -176,7 +173,7 @@ namespace AMC {
 			return "";
 
 		if (nID > m_UUIDs.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
 
 		return m_UUIDs[nID - 1];
 	}
@@ -185,7 +182,7 @@ namespace AMC {
 	std::string CToolpathLayerData::getSegmentProfileUUID(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
 
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
 	}
@@ -193,7 +190,7 @@ namespace AMC {
 	std::string CToolpathLayerData::getSegmentPartUUID(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
 
 		return getRegisteredUUID(m_Segments[nSegmentIndex].m_PartID);
 	}
@@ -201,7 +198,7 @@ namespace AMC {
 	sToolpathLayerProfile CToolpathLayerData::getSegmentProfile(const uint32_t nSegmentIndex)
 	{
 		if (nSegmentIndex >= m_Segments.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
 
 		auto sProfileUUID = getRegisteredUUID(m_Segments[nSegmentIndex].m_ProfileID);
 		return retrieveProfileData(sProfileUUID);
@@ -219,8 +216,7 @@ namespace AMC {
 
 	void CToolpathLayerData::storeProfileData(Lib3MF::PToolpath pToolpath, const std::string & sProfileUUID)
 	{
-		if (pToolpath.get () == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pToolpath.get());
 
 		auto iIter = m_ProfileMap.find(sProfileUUID);
 		if (iIter == m_ProfileMap.end()) {
@@ -250,7 +246,7 @@ namespace AMC {
 	{
 		auto iIter = m_ProfileMap.find(sProfileUUID);
 		if (iIter == m_ProfileMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PROFILENOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PROFILENOTFOUND, m_sDebugName + "/" + sProfileUUID);
 
 		return iIter->second;
 	}

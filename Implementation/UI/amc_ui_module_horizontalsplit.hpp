@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_CONTENT
-#define __AMC_UI_MODULE_CONTENT
+#ifndef __AMC_UI_MODULE_HORIZONTALSPLIT
+#define __AMC_UI_MODULE_HORIZONTALSPLIT
 
 #include "header_protection.hpp"
 
@@ -48,46 +48,53 @@ namespace LibMCData {
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
-	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
+	amcDeclareDependingClass(CUIModule_HorizontalSplit, PUIModule_HorizontalSplit);
+	amcDeclareDependingClass(CUIModule_HorizontalSection, PUIModule_HorizontalSection);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
-	class CUIModule_Content : public CUIModule {
+	class CUIModule_HorizontalSection {
+	private:
+		PUIModule m_pModule;
+		double m_fixedWidthInPercentiles;
+	public:
+		CUIModule_HorizontalSection(PUIModule pModule, double fixedWidthInPercentiles);
+
+		CUIModule * getModule();
+		double getFixedWidthInPercentiles();
+	};
+
+
+	class CUIModule_HorizontalSplit : public CUIModule {
 	protected:		
 
-		std::string m_sHeadLine;
+		std::map<std::string, PUIModuleItem> m_ItemMap;
+		std::map<std::string, PUIModule_HorizontalSection> m_SectionMap;
+		std::vector<PUIModule_HorizontalSection> m_SectionList;
+
 		std::string m_sCaption;
-		std::string m_sTitle;
-		std::string m_sSubtitle;
 
-		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
-		std::vector<PUIModule_ContentItem> m_Items;
-
-		void addItem(PUIModule_ContentItem pItem);
+		void addSection(PUIModule pModule, double fixedWidthInPercentiles);
 
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CUIModule_HorizontalSplit(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 		
-		virtual ~CUIModule_Content();
+		virtual ~CUIModule_HorizontalSplit();
 
 		virtual std::string getType() override;
 
-		virtual std::string getCaption() override;
-
 		static std::string getStaticType();
 
-		std::string getHeadLine ();
-		std::string getTitle ();
-		std::string getSubtitle ();
+		std::string getCaption () override;
 
 		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
 
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
-
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
+		PUIModule_HorizontalSection findSection(const std::string& sUUID);
 
 	};
 
@@ -95,5 +102,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE_CONTENT
+#endif //__AMC_UI_MODULE_HORIZONTALSPLIT
 

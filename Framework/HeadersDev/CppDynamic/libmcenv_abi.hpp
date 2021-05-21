@@ -110,6 +110,52 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_clone(LibMCEnv_Iterator pIter
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_count(LibMCEnv_Iterator pIterator, LibMCEnv_uint64 * pCount);
 
 /*************************************************************************************************************************
+ Class definition for ToolpathPart
+**************************************************************************************************************************/
+
+/**
+* Returns Part Name.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns toolpath part name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getname(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns Part UUID.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns toolpath part uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns Mesh UUID of the part.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nMeshUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMeshUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMeshUUIDBuffer -  buffer of Returns toolpath part mesh uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getmeshuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nMeshUUIDBufferSize, LibMCEnv_uint32* pMeshUUIDNeededChars, char * pMeshUUIDBuffer);
+
+/**
+* Returns Mesh Transform of the part.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[out] pMeshUUID - Returns the mesh transform of the toolpath.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_gettransform(LibMCEnv_ToolpathPart pToolpathPart, LibMCEnv::sToolpathPartTransform * pMeshUUID);
+
+/*************************************************************************************************************************
  Class definition for ToolpathLayer
 **************************************************************************************************************************/
 
@@ -264,6 +310,72 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_loadlayer(LibMCEnv_To
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pUnits);
+
+/**
+* Checks if a metadata value exists for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[out] pExists - Returns if metadata exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasmetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, bool * pExists);
+
+/**
+* Returns the value of a metadata for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[in] nMetaDataValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMetaDataValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMetaDataValueBuffer -  buffer of Returns the value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatavalue(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataValueBufferSize, LibMCEnv_uint32* pMetaDataValueNeededChars, char * pMetaDataValueBuffer);
+
+/**
+* Returns the type of a metadata for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[in] nMetaDataTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMetaDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMetaDataTypeBuffer -  buffer of Returns the type, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatatype(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataTypeBufferSize, LibMCEnv_uint32* pMetaDataTypeNeededChars, char * pMetaDataTypeBuffer);
+
+/**
+* Retrieves the number of parts in the toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pPartCount - Number of parts.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getpartcount(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pPartCount);
+
+/**
+* Retrieves the part information of a toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nPartIndex - Index of part. MUST be between 0 and PartCount-1
+* @param[out] pPart - Part Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getpart(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nPartIndex, LibMCEnv_ToolpathPart * pPart);
+
+/**
+* Finds the part information of a toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pPartUUID - UUID of part.
+* @param[out] pPart - Part Instance. Returns null if part does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_findpartbyuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPartUUID, LibMCEnv_ToolpathPart * pPart);
 
 /*************************************************************************************************************************
  Class definition for Build

@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_parameterinstances.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 
 namespace AMC {
@@ -48,8 +48,7 @@ namespace AMC {
 
 	void CParameterInstances::registerParameterHandler(const std::string& sInstanceName, PParameterHandler pParameterHandler)
 	{
-		if (pParameterHandler.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterHandler.get());
 
 		m_StateMachineParameters.insert(std::make_pair(sInstanceName, pParameterHandler));
 	}
@@ -58,7 +57,7 @@ namespace AMC {
 	{
 		auto iter = m_StateMachineParameters.find(sInstanceName);
 		if(iter == m_StateMachineParameters.end ())
-			throw ELibMCInterfaceException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
+			throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
 
 		return iter->second;
 	}

@@ -50,10 +50,8 @@ namespace AMC {
 	class CUIModule {
 	protected:
 		std::string m_sName;
+		std::string m_sUUID;
 		
-		static std::string getNameFromXML(pugi::xml_node& xmlNode);
-		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
-
 	public:
 
 		CUIModule(const std::string & sName);	
@@ -67,6 +65,15 @@ namespace AMC {
 		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
+
+		virtual std::string getCaption() = 0;
+
+		virtual std::string getUUID();
+
+		virtual void populateItemMap (std::map<std::string, PUIModuleItem> & itemMap) = 0;
+
+		static std::string getNameFromXML(pugi::xml_node& xmlNode);
+		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
 
 	};
 
