@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_servicehandler.hpp"
 
 #include "common_utils.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 
 
@@ -42,8 +42,7 @@ namespace AMC {
 	CService::CService(CServiceHandler* pServiceHandler)
 		: m_pServiceHandler (pServiceHandler), m_bHasBeenExecuted (false), m_bIsRunning (false)
 	{
-		if (pServiceHandler == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pServiceHandler);
 
 	}
 

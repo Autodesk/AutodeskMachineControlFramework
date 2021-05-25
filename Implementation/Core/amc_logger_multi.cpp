@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_logger_multi.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
 		
@@ -45,8 +45,7 @@ namespace AMC {
 
 	void CLogger_Multi::addLogger(PLogger pLogger)
 	{
-		if (pLogger.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pLogger.get());
 
 		std::lock_guard<std::mutex> lockguard(m_LoggersMutex);
 		m_Loggers.push_back(pLogger);

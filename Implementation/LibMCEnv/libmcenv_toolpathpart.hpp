@@ -28,37 +28,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
 
-#include "amc_ui_module.hpp"
-#include "amc_ui_modulefactory.hpp"
-#include "libmc_exceptiontypes.hpp"
-#include "amc_parameterinstances.hpp"
+#ifndef __LIBMCENV_TOOLPATHPART
+#define __LIBMCENV_TOOLPATHPART
 
-#include "amc_ui_module_content.hpp"
-#include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_verticalsplit.hpp"
-#include "amc_ui_module_horizontalsplit.hpp"
+#include "libmcenv_interfaces.hpp"
+#include "amc_toolpathpart.hpp"
 
-using namespace AMC;
+// Parent classes
+#include "libmcenv_base.hpp"
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4250)
+#endif
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
-{
+// Include custom headers here.
 
-	std::string sType = xmlNode.name();
 
-	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+namespace LibMCEnv {
+namespace Impl {
 
-	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 
-	if (sType == CUIModule_VerticalSplit::getStaticType())
-		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+/*************************************************************************************************************************
+ Class declaration of CToolpathAccessor 
+**************************************************************************************************************************/
 
-	if (sType == CUIModule_HorizontalSplit::getStaticType())
-		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+class CToolpathPart : public virtual IToolpathPart, public virtual CBase {
+private:
 
-	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
+protected:
 
-}
+	AMC::PToolpathPart m_pPart;
+
+public:
+	CToolpathPart(AMC::PToolpathPart pPart);
+	virtual ~CToolpathPart();
+
+	std::string GetName() override;
+
+	std::string GetUUID() override;
+
+	std::string GetMeshUUID() override;
+	
+	LibMCEnv::sToolpathPartTransform GetTransform() override;
+
+};
+
+} // namespace Impl
+} // namespace LibMCEnv
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+#endif // __LIBMCENV_TOOLPATHPART

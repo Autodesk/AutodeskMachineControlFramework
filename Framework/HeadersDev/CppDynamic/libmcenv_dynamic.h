@@ -97,6 +97,52 @@ typedef LibMCEnvResult (*PLibMCEnvIterator_ClonePtr) (LibMCEnv_Iterator pIterato
 typedef LibMCEnvResult (*PLibMCEnvIterator_CountPtr) (LibMCEnv_Iterator pIterator, LibMCEnv_uint64 * pCount);
 
 /*************************************************************************************************************************
+ Class definition for ToolpathPart
+**************************************************************************************************************************/
+
+/**
+* Returns Part Name.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns toolpath part name., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathPart_GetNamePtr) (LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns Part UUID.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns toolpath part uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathPart_GetUUIDPtr) (LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns Mesh UUID of the part.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nMeshUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMeshUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMeshUUIDBuffer -  buffer of Returns toolpath part mesh uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathPart_GetMeshUUIDPtr) (LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nMeshUUIDBufferSize, LibMCEnv_uint32* pMeshUUIDNeededChars, char * pMeshUUIDBuffer);
+
+/**
+* Returns Mesh Transform of the part.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[out] pMeshUUID - Returns the mesh transform of the toolpath.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathPart_GetTransformPtr) (LibMCEnv_ToolpathPart pToolpathPart, LibMCEnv::sToolpathPartTransform * pMeshUUID);
+
+/*************************************************************************************************************************
  Class definition for ToolpathLayer
 **************************************************************************************************************************/
 
@@ -251,6 +297,72 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_LoadLayerPtr) (LibMCEnv_Toolp
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetUnitsPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pUnits);
+
+/**
+* Checks if a metadata value exists for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[out] pExists - Returns if metadata exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_HasMetaDataPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, bool * pExists);
+
+/**
+* Returns the value of a metadata for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[in] nMetaDataValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMetaDataValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMetaDataValueBuffer -  buffer of Returns the value, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetMetaDataValuePtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataValueBufferSize, LibMCEnv_uint32* pMetaDataValueNeededChars, char * pMetaDataValueBuffer);
+
+/**
+* Returns the type of a metadata for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[in] nMetaDataTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMetaDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMetaDataTypeBuffer -  buffer of Returns the type, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetMetaDataTypePtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataTypeBufferSize, LibMCEnv_uint32* pMetaDataTypeNeededChars, char * pMetaDataTypeBuffer);
+
+/**
+* Retrieves the number of parts in the toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pPartCount - Number of parts.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetPartCountPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pPartCount);
+
+/**
+* Retrieves the part information of a toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nPartIndex - Index of part. MUST be between 0 and PartCount-1
+* @param[out] pPart - Part Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_GetPartPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nPartIndex, LibMCEnv_ToolpathPart * pPart);
+
+/**
+* Finds the part information of a toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pPartUUID - UUID of part.
+* @param[out] pPart - Part Instance. Returns null if part does not exist.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathAccessor_FindPartByUUIDPtr) (LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPartUUID, LibMCEnv_ToolpathPart * pPart);
 
 /*************************************************************************************************************************
  Class definition for Build
@@ -1517,6 +1629,10 @@ typedef struct {
 	PLibMCEnvIterator_GetCurrentPtr m_Iterator_GetCurrent;
 	PLibMCEnvIterator_ClonePtr m_Iterator_Clone;
 	PLibMCEnvIterator_CountPtr m_Iterator_Count;
+	PLibMCEnvToolpathPart_GetNamePtr m_ToolpathPart_GetName;
+	PLibMCEnvToolpathPart_GetUUIDPtr m_ToolpathPart_GetUUID;
+	PLibMCEnvToolpathPart_GetMeshUUIDPtr m_ToolpathPart_GetMeshUUID;
+	PLibMCEnvToolpathPart_GetTransformPtr m_ToolpathPart_GetTransform;
 	PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr m_ToolpathLayer_GetLayerDataUUID;
 	PLibMCEnvToolpathLayer_GetSegmentCountPtr m_ToolpathLayer_GetSegmentCount;
 	PLibMCEnvToolpathLayer_GetSegmentInfoPtr m_ToolpathLayer_GetSegmentInfo;
@@ -1531,6 +1647,12 @@ typedef struct {
 	PLibMCEnvToolpathAccessor_GetLayerCountPtr m_ToolpathAccessor_GetLayerCount;
 	PLibMCEnvToolpathAccessor_LoadLayerPtr m_ToolpathAccessor_LoadLayer;
 	PLibMCEnvToolpathAccessor_GetUnitsPtr m_ToolpathAccessor_GetUnits;
+	PLibMCEnvToolpathAccessor_HasMetaDataPtr m_ToolpathAccessor_HasMetaData;
+	PLibMCEnvToolpathAccessor_GetMetaDataValuePtr m_ToolpathAccessor_GetMetaDataValue;
+	PLibMCEnvToolpathAccessor_GetMetaDataTypePtr m_ToolpathAccessor_GetMetaDataType;
+	PLibMCEnvToolpathAccessor_GetPartCountPtr m_ToolpathAccessor_GetPartCount;
+	PLibMCEnvToolpathAccessor_GetPartPtr m_ToolpathAccessor_GetPart;
+	PLibMCEnvToolpathAccessor_FindPartByUUIDPtr m_ToolpathAccessor_FindPartByUUID;
 	PLibMCEnvBuild_GetNamePtr m_Build_GetName;
 	PLibMCEnvBuild_GetBuildUUIDPtr m_Build_GetBuildUUID;
 	PLibMCEnvBuild_GetStorageUUIDPtr m_Build_GetStorageUUID;

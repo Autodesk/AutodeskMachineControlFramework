@@ -28,37 +28,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
 
-#include "amc_ui_module.hpp"
-#include "amc_ui_modulefactory.hpp"
-#include "libmc_exceptiontypes.hpp"
-#include "amc_parameterinstances.hpp"
+#ifndef __AMC_UI_MODULE_TAB
+#define __AMC_UI_MODULE_TAB
 
-#include "amc_ui_module_content.hpp"
-#include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_verticalsplit.hpp"
-#include "amc_ui_module_horizontalsplit.hpp"
+#include "header_protection.hpp"
 
-using namespace AMC;
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
-{
+#include "Libraries/PugiXML/pugixml.hpp"
 
-	std::string sType = xmlNode.name();
-
-	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	if (sType == CUIModule_VerticalSplit::getStaticType())
-		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	if (sType == CUIModule_HorizontalSplit::getStaticType())
-		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
-
-	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
-
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
 }
+
+
+namespace AMC {
+
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModule_Tab, PUIModule_Tab);
+
+	class CUIModule_Tab {
+	protected:		
+
+		std::string m_sName;
+		std::string m_sCaption;
+
+		PUIModule m_pModule;
+
+	public:
+
+		CUIModule_Tab(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		
+		virtual ~CUIModule_Tab();
+
+		virtual std::string getName();
+
+		virtual std::string getCaption();
+
+		CUIModule * getModule ();
+
+
+	};
+
+	
+}
+
+
+#endif //__AMC_UI_MODULE_TABS
+

@@ -91,6 +91,11 @@
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
+
+	<struct name="ToolpathPartTransform">
+		<member name="Matrix" type="double" rows="3" columns="3"/>
+		<member name="Translation" type="double" rows="3"/>
+	</struct>
 	
 	<class name="Base">
 	</class>
@@ -113,6 +118,27 @@
 			<param name="Count" type="uint64" pass="return" description="returns the number of objects the iterator captures."/>
 		</method>
 	</class>
+
+	<class name="ToolpathPart" parent="Base">
+	
+		<method name="GetName" description="Returns Part Name.">
+			<param name="Name" type="string" pass="return" description="Returns toolpath part name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns Part UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns toolpath part uuid." />
+		</method>
+
+		<method name="GetMeshUUID" description="Returns Mesh UUID of the part.">
+			<param name="MeshUUID" type="string" pass="return" description="Returns toolpath part mesh uuid." />
+		</method>
+
+		<method name="GetTransform" description="Returns Mesh Transform of the part.">
+			<param name="MeshUUID" type="struct" class="ToolpathPartTransform" pass="return" description="Returns the mesh transform of the toolpath." />		
+		</method>
+	
+	</class>
+
 
 	<class name="ToolpathLayer" parent="Base">
 	  
@@ -152,7 +178,8 @@
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />
 		</method>
-		
+	
+
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array. Positions are absolute in units." />
@@ -187,7 +214,39 @@
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
+
+		<method name="HasMetaData" description="Checks if a metadata value exists for this toolpath model.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
+			<param name="Name" type="string" pass="in" description="Name of metadata." />
+			<param name="Exists" type="bool" pass="return" description="Returns if metadata exists." />
+		</method>
+
+		<method name="GetMetaDataValue" description="Returns the value of a metadata for this toolpath model.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
+			<param name="Name" type="string" pass="in" description="Name of metadata." />
+			<param name="MetaDataValue" type="string" pass="return" description="Returns the value" />
+		</method>
 			
+		<method name="GetMetaDataType" description="Returns the type of a metadata for this toolpath model.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
+			<param name="Name" type="string" pass="in" description="Name of metadata." />
+			<param name="MetaDataType" type="string" pass="return" description="Returns the type" />
+		</method>
+
+		<method name="GetPartCount" description="Retrieves the number of parts in the toolpath.">
+			<param name="PartCount" type="uint32" pass="return" description="Number of parts." />
+		</method>
+
+		<method name="GetPart" description="Retrieves the part information of a toolpath.">
+			<param name="PartIndex" type="uint32" pass="in" description="Index of part. MUST be between 0 and PartCount-1" />
+			<param name="Part" type="class" class="ToolpathPart" pass="return" description="Part Instance" />
+		</method>
+
+		<method name="FindPartByUUID" description="Finds the part information of a toolpath.">
+			<param name="PartUUID" type="string" pass="in" description="UUID of part." />
+			<param name="Part" type="optionalclass" class="ToolpathPart" pass="return" description="Part Instance. Returns null if part does not exist." />
+		</method>
+
 	</class>
 
 

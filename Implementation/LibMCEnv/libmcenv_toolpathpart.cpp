@@ -28,37 +28,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
 
-#include "amc_ui_module.hpp"
-#include "amc_ui_modulefactory.hpp"
-#include "libmc_exceptiontypes.hpp"
-#include "amc_parameterinstances.hpp"
+#include "libmcenv_toolpathpart.hpp"
+#include "libmcenv_interfaceexception.hpp"
 
-#include "amc_ui_module_content.hpp"
-#include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_verticalsplit.hpp"
-#include "amc_ui_module_horizontalsplit.hpp"
+// Include custom headers here.
 
-using namespace AMC;
+using namespace LibMCEnv::Impl;
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+/*************************************************************************************************************************
+ Class definition of CToolpathPart
+**************************************************************************************************************************/
+CToolpathPart::CToolpathPart(AMC::PToolpathPart pPart)
+	: m_pPart (pPart)
+{
+	if (pPart.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+}
+
+CToolpathPart::~CToolpathPart()
 {
 
-	std::string sType = xmlNode.name();
+}
 
-	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+std::string CToolpathPart::GetName()
+{
+	return m_pPart->getName();
+}
 
-	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+std::string CToolpathPart::GetUUID()
+{
+	return m_pPart->getUUID();
+}
 
-	if (sType == CUIModule_VerticalSplit::getStaticType())
-		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+std::string CToolpathPart::GetMeshUUID()
+{
+	return m_pPart->getMeshUUID();
+}
 
-	if (sType == CUIModule_HorizontalSplit::getStaticType())
-		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+LibMCEnv::sToolpathPartTransform CToolpathPart::GetTransform()
+{
+	LibMCEnv::sToolpathPartTransform transform;
+	// TODO
 
-	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			transform.m_Matrix[i][j] = (i == j) ? 1.0 : 0.0;
+
+	transform.m_Translation[0] = 0.0;
+	transform.m_Translation[1] = 0.0;
+	transform.m_Translation[2] = 0.0;
+
+	return transform;
 
 }

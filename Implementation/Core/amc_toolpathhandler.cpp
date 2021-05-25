@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_toolpathhandler.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 
 #define LIBRARYNAME_LIB3MF "lib3mf"
@@ -41,10 +41,8 @@ namespace AMC {
 	CToolpathHandler::CToolpathHandler(LibMCData::PStorage pStorage, LibMCData::PBuildJobHandler pBuildJobHandler)
 		: m_pStorage (pStorage), m_pBuildJobHandler (pBuildJobHandler)
 	{
-		if (pStorage.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pBuildJobHandler.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pStorage.get());
+		LibMCAssertNotNull(pBuildJobHandler.get());
 
 	}
 
@@ -61,7 +59,7 @@ namespace AMC {
 		}
 
 		if (bFailIfNotExistent)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOLPATHENTITYNOTLOADED);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYNOTLOADED, sStreamUUID);
 
 		return nullptr;
 	}
@@ -69,14 +67,14 @@ namespace AMC {
 	CToolpathEntity* CToolpathHandler::loadToolpathEntity(const std::string& sStreamUUID)
 	{
 		if (sStreamUUID.empty())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDTOOLPATHSTREAMUUID, sStreamUUID);
 
 		auto pToolpathEntity = findToolpathEntity(sStreamUUID, false);
 		if (pToolpathEntity == nullptr) {
 
 			auto pStorageStream = m_pStorage->RetrieveStream(sStreamUUID);
 
-			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pStorageStream, getLib3MFWrapper());
+			auto pNewToolpathEntity = std::make_shared<CToolpathEntity>(pStorageStream, getLib3MFWrapper(), pStorageStream->GetName ());
 			pNewToolpathEntity->IncRef();
 			m_Entities.insert(std::make_pair(sStreamUUID, pNewToolpathEntity));
 			return pNewToolpathEntity.get();

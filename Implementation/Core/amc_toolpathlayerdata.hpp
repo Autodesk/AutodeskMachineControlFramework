@@ -80,6 +80,8 @@ namespace AMC {
 		std::map<std::string, uint32_t> m_UUIDMap;
 		std::map<std::string, sToolpathLayerProfile> m_ProfileMap;
 
+		std::string m_sDebugName;
+
 		uint32_t registerUUID(const std::string& sUUID);
 		std::string getRegisteredUUID(const uint32_t nID);
 
@@ -88,7 +90,7 @@ namespace AMC {
 
 	public:
 
-		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue);
+		CToolpathLayerData(Lib3MF::PToolpath pToolpath, Lib3MF::PToolpathLayerReader p3MFLayer, double dUnits, int32_t nZValue, const std::string & sDebugName);
 		virtual ~CToolpathLayerData();		
 
 		std::string getUUID ();

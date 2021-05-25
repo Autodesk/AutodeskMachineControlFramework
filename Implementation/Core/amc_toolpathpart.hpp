@@ -28,37 +28,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
 
-#include "amc_ui_module.hpp"
-#include "amc_ui_modulefactory.hpp"
-#include "libmc_exceptiontypes.hpp"
-#include "amc_parameterinstances.hpp"
+#ifndef __AMC_TOOLPATHPART
+#define __AMC_TOOLPATHPART
 
-#include "amc_ui_module_content.hpp"
-#include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_verticalsplit.hpp"
-#include "amc_ui_module_horizontalsplit.hpp"
+#include <memory>
+#include <string>
+#include <thread>
+#include <mutex>
 
-using namespace AMC;
+#include "lib3mf/lib3mf_dynamic.hpp"
+#include "libmcdata_dynamic.hpp"
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
-{
 
-	std::string sType = xmlNode.name();
+namespace AMC {
 
-	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+	class CToolpathPart;
+	typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 
-	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+	class CToolpathPart {
+	private:		
+		std::string m_sUUID;
+		std::string m_sMeshUUID;
+		std::string m_sName;		
+		
+		Lib3MF::PModel m_p3MFModel;
+		Lib3MF::PBuildItem m_pBuildItem;
+		
+	public:
+	
+		CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem);
+		virtual ~CToolpathPart();		
 
-	if (sType == CUIModule_VerticalSplit::getStaticType())
-		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+		std::string getUUID ();
+		std::string getMeshUUID ();
+		std::string getName ();
 
-	if (sType == CUIModule_HorizontalSplit::getStaticType())
-		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+	};
 
-	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
-
+	
 }
+
+
+#endif //__AMC_TOOLPATHENTITY
+

@@ -28,37 +28,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#define __AMCIMPL_UI_MODULE
-
-#include "amc_ui_module.hpp"
-#include "amc_ui_modulefactory.hpp"
+#include "amc_toolpathpart.hpp"
 #include "libmc_exceptiontypes.hpp"
-#include "amc_parameterinstances.hpp"
 
-#include "amc_ui_module_content.hpp"
-#include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_verticalsplit.hpp"
-#include "amc_ui_module_horizontalsplit.hpp"
+#include "Common/common_utils.hpp"
 
-using namespace AMC;
+namespace AMC {
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
-{
+	CToolpathPart::CToolpathPart(Lib3MF::PModel p3MFModel, Lib3MF::PBuildItem pBuildItem)
+		: m_p3MFModel (p3MFModel), m_pBuildItem (pBuildItem)
+	{
+		auto p3MFObject = m_pBuildItem->GetObjectResource();
+		m_sName = p3MFObject->GetName();
 
-	std::string sType = xmlNode.name();
+		bool bHasUUID;
+		m_sUUID = m_pBuildItem->GetUUID(bHasUUID);
+		if (!bHasUUID)
+			throw ELibMCCustomException (LIBMC_ERROR_BUILDITEMHASNOUUID, m_sName);
 
-	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+		m_sMeshUUID = p3MFObject->GetUUID(bHasUUID);
+		if (!bHasUUID)
+			throw ELibMCCustomException(LIBMC_ERROR_OBJECTHASNOUUID, m_sName);
 
-	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+	}
 
-	if (sType == CUIModule_VerticalSplit::getStaticType())
-		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+	CToolpathPart::~CToolpathPart()
+	{
 
-	if (sType == CUIModule_HorizontalSplit::getStaticType())
-		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+	}
 
-	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
+	std::string CToolpathPart::getUUID()
+	{
+		return m_sUUID;
+	}
 
+	std::string CToolpathPart::getMeshUUID()
+	{
+		return m_sMeshUUID;
+	}
+
+	std::string CToolpathPart::getName()
+	{
+		return m_sName;
+	}
 }
+
+

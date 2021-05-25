@@ -56,6 +56,7 @@ namespace Impl {
 */
 class IBase;
 class IIterator;
+class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
 class IBuild;
@@ -290,6 +291,41 @@ typedef IBaseSharedPtr<IIterator> PIIterator;
 
 
 /*************************************************************************************************************************
+ Class interface for ToolpathPart 
+**************************************************************************************************************************/
+
+class IToolpathPart : public virtual IBase {
+public:
+	/**
+	* IToolpathPart::GetName - Returns Part Name.
+	* @return Returns toolpath part name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IToolpathPart::GetUUID - Returns Part UUID.
+	* @return Returns toolpath part uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IToolpathPart::GetMeshUUID - Returns Mesh UUID of the part.
+	* @return Returns toolpath part mesh uuid.
+	*/
+	virtual std::string GetMeshUUID() = 0;
+
+	/**
+	* IToolpathPart::GetTransform - Returns Mesh Transform of the part.
+	* @return Returns the mesh transform of the toolpath.
+	*/
+	virtual LibMCEnv::sToolpathPartTransform GetTransform() = 0;
+
+};
+
+typedef IBaseSharedPtr<IToolpathPart> PIToolpathPart;
+
+
+/*************************************************************************************************************************
  Class interface for ToolpathLayer 
 **************************************************************************************************************************/
 
@@ -401,6 +437,50 @@ public:
 	* @return Toolpath units.
 	*/
 	virtual LibMCEnv_double GetUnits() = 0;
+
+	/**
+	* IToolpathAccessor::HasMetaData - Checks if a metadata value exists for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns if metadata exists.
+	*/
+	virtual bool HasMetaData(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataValue - Returns the value of a metadata for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns the value
+	*/
+	virtual std::string GetMetaDataValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataType - Returns the type of a metadata for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns the type
+	*/
+	virtual std::string GetMetaDataType(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetPartCount - Retrieves the number of parts in the toolpath.
+	* @return Number of parts.
+	*/
+	virtual LibMCEnv_uint32 GetPartCount() = 0;
+
+	/**
+	* IToolpathAccessor::GetPart - Retrieves the part information of a toolpath.
+	* @param[in] nPartIndex - Index of part. MUST be between 0 and PartCount-1
+	* @return Part Instance
+	*/
+	virtual IToolpathPart * GetPart(const LibMCEnv_uint32 nPartIndex) = 0;
+
+	/**
+	* IToolpathAccessor::FindPartByUUID - Finds the part information of a toolpath.
+	* @param[in] sPartUUID - UUID of part.
+	* @return Part Instance. Returns null if part does not exist.
+	*/
+	virtual IToolpathPart * FindPartByUUID(const std::string & sPartUUID) = 0;
 
 };
 

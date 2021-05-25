@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_systemstate.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_parameterhandler.hpp"
@@ -53,12 +53,9 @@ namespace AMC {
 
 	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper)
 	{
-		if (pLogger.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pDataModel.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pEnvWrapper.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pLogger.get());
+		LibMCAssertNotNull(pDataModel.get());
+		LibMCAssertNotNull(pEnvWrapper.get());
 
 		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
 
@@ -197,7 +194,7 @@ namespace AMC {
 	{
 		auto iIter = m_LibraryPathes.find(sLibraryName);
 		if (iIter == m_LibraryPathes.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_LIBRARYPATHNOTFOUND, sLibraryName);
+			throw ELibMCCustomException(LIBMC_ERROR_LIBRARYPATHNOTFOUND, sLibraryName);
 
 		return iIter->second.first;
 	}
@@ -206,7 +203,7 @@ namespace AMC {
 	{
 		auto iIter = m_LibraryPathes.find(sLibraryName);
 		if (iIter == m_LibraryPathes.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_LIBRARYPATHNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_LIBRARYPATHNOTFOUND, sLibraryName);
 
 		return iIter->second.second;
 

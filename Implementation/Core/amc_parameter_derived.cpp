@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_parameter_derived.hpp"
 #include "amc_parametergroup.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
 
@@ -43,8 +43,7 @@ namespace AMC {
 	CParameter_Derived::CParameter_Derived(const std::string& sName, PParameterGroup pParameterGroup, std::string sSourceParameterName)
 		: m_sName (sName), m_pParameterGroup(pParameterGroup), m_sSourceParameterName(sSourceParameterName)
 	{
-		if (pParameterGroup.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterGroup.get());
 
 		// Ensure that source parameter exists
 		std::string sDescription, sDefaultValue;
@@ -86,7 +85,7 @@ namespace AMC {
 
 	void CParameter_Derived::setStringValue(const std::string& sValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException (LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 
@@ -97,7 +96,7 @@ namespace AMC {
 
 	void CParameter_Derived::setDoubleValue(const double dValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 	int64_t CParameter_Derived::getIntValue() const
@@ -107,7 +106,7 @@ namespace AMC {
 
 	void CParameter_Derived::setIntValue(const int64_t nValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 	bool CParameter_Derived::getBoolValue() const
@@ -117,7 +116,7 @@ namespace AMC {
 
 	void CParameter_Derived::setBoolValue(const bool bValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 

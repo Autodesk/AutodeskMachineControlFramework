@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_resourcepackage.hpp"
 
 #include "common_utils.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include "Libraries/libzip/zip.h"
 #include "pugixml.hpp"
 
@@ -54,8 +54,7 @@ namespace AMC {
 		CResourcePackage_ZIPFilePtr(zip_file_t* pFile)
 			: m_pFile(pFile)
 		{
-			if (m_pFile == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			LibMCAssertNotNull(m_pFile);
 
 		}
 
@@ -77,16 +76,15 @@ namespace AMC {
 		zip_t* m_ZIParchive;
 		zip_source_t* m_ZIPsource;
 		std::map <std::string, uint64_t> m_ZIPEntries;
-
+		std::string m_sZIPDebugName;
+		
 	public:
 
-		CResourcePackageZIP(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer)
-			: m_ZIParchive(nullptr), m_ZIPsource(nullptr)
+		CResourcePackageZIP(const uint64_t nZIPStreamBufferSize, const uint8_t* pZIPStreamBuffer, const std::string & sZIPDebugName)
+			: m_ZIParchive(nullptr), m_ZIPsource(nullptr), m_sZIPDebugName (sZIPDebugName)
 
 		{
-
-			if (pZIPStreamBuffer == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			LibMCAssertNotNull(pZIPStreamBuffer);
 
 			m_ZIPError.str = nullptr;
 			m_ZIPError.sys_err = 0;
@@ -97,15 +95,15 @@ namespace AMC {
 			m_ZIPsource = zip_source_buffer_create(pZIPStreamBuffer, (size_t)nZIPStreamBufferSize, 0, &m_ZIPError);
 
 			if (m_ZIPsource == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTREADZIPFILE);
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTREADZIPFILE, sZIPDebugName);
 
 			m_ZIParchive = zip_open_from_source(m_ZIPsource, ZIP_RDONLY | ZIP_CHECKCONS, &m_ZIPError);
 			if (m_ZIParchive == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTOPENZIPFILE);
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTOPENZIPFILE, sZIPDebugName);
 
 			int64_t nEntryCount = zip_get_num_entries(m_ZIParchive, ZIP_FL_UNCHANGED);
 			if (nEntryCount < 0)
-				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTGETZIPENTRIES);
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTGETZIPENTRIES, sZIPDebugName);
 
 			for (int64_t nIndex = 0; nIndex < nEntryCount; nIndex++) {
 				const char* pszName = zip_get_name(m_ZIParchive, (uint64_t)nIndex, ZIP_FL_ENC_GUESS);
@@ -142,27 +140,26 @@ namespace AMC {
 		{
 			auto iIter = m_ZIPEntries.find(sName);
 			if (iIter == m_ZIPEntries.end())
-				throw ELibMCInterfaceException(LIBMC_ERROR_ZIPENTRYNOTFOUND);
+				throw ELibMCCustomException(LIBMC_ERROR_ZIPENTRYNOTFOUND, m_sZIPDebugName + "|" + sName);
 
 			zip_stat_t Stat;
 			int32_t nResult = zip_stat_index(m_ZIParchive, iIter->second, ZIP_FL_UNCHANGED, &Stat);
 			if (nResult != 0)
-				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTSTATZIPENTRY);
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTSTATZIPENTRY, m_sZIPDebugName + "|" + sName);
 
 			uint64_t nSize = Stat.size;
 
 			zip_file_t* pFile = zip_fopen_index(m_ZIParchive, iIter->second, ZIP_FL_UNCHANGED);
 			if (pFile == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTOPENZIPENTRY);
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTOPENZIPENTRY, m_sZIPDebugName + "|" + sName);
 
 			CResourcePackage_ZIPFilePtr pZIPFilePtr(pFile);
 			
 			if (nSize > 0) {
 
-				if (pBuffer == nullptr)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+				LibMCAssertNotNull(pBuffer);
 				if (nBufferSize < nSize)
-					throw ELibMCInterfaceException(LIBMC_ERROR_BUFFERTOOSMALL);
+					throw ELibMCCustomException(LIBMC_ERROR_BUFFERTOOSMALL, m_sZIPDebugName + "|" + sName);
 
 				uint64_t cbBytesLeft = nSize;
 				uint64_t cbBytesRead = 0;
@@ -178,7 +175,7 @@ namespace AMC {
 
 					uint64_t readSize = zip_fread(pFile, pData, cbBytesToRead);
 					if (readSize < 0)
-						throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTREADZIPSTREAM);
+						throw ELibMCCustomException(LIBMC_ERROR_COULDNOTREADZIPSTREAM, m_sZIPDebugName + "|" + sName);
 					cbBytesRead += readSize;
 
 					if (readSize != (uint64_t)cbBytesToRead)
@@ -189,7 +186,7 @@ namespace AMC {
 
 
 				if ((uint64_t)cbBytesRead != nSize) {
-					throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTREADFULLZIPDATA);
+					throw ELibMCCustomException(LIBMC_ERROR_COULDNOTREADFULLZIPDATA, m_sZIPDebugName + "|" + sName);
 				}
 
 			}
@@ -202,18 +199,18 @@ namespace AMC {
 
 			auto iIter = m_ZIPEntries.find(sName);
 			if (iIter == m_ZIPEntries.end())
-				throw ELibMCInterfaceException(LIBMC_ERROR_ZIPENTRYNOTFOUND);
+				throw ELibMCCustomException(LIBMC_ERROR_ZIPENTRYNOTFOUND, m_sZIPDebugName + "|" + sName);
 
 			zip_stat_t Stat;
 			int32_t nResult = zip_stat_index(m_ZIParchive, iIter->second, ZIP_FL_UNCHANGED, &Stat);
 			if (nResult != 0)
-				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTSTATZIPENTRY);
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTSTATZIPENTRY, m_sZIPDebugName + "|" + sName);
 
 			uint64_t nSize = Stat.size;
 
 			zip_file_t* pFile = zip_fopen_index(m_ZIParchive, iIter->second, ZIP_FL_UNCHANGED);
 			if (pFile == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTOPENZIPENTRY);
+				throw ELibMCCustomException(LIBMC_ERROR_COULDNOTOPENZIPENTRY, m_sZIPDebugName + "|" + sName);
 
 			CResourcePackage_ZIPFilePtr pZIPFilePtr(pFile);
 
@@ -234,7 +231,7 @@ namespace AMC {
 
 					uint64_t readSize = zip_fread(pFile, pData, cbBytesToRead);
 					if (readSize < 0)
-						throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTREADZIPSTREAM);
+						throw ELibMCCustomException(LIBMC_ERROR_COULDNOTREADZIPSTREAM, m_sZIPDebugName + "|" + sName);
 					cbBytesRead += readSize;
 
 					if (readSize != (uint64_t)cbBytesToRead)
@@ -245,7 +242,7 @@ namespace AMC {
 
 
 				if ((uint64_t)cbBytesRead != nSize) {
-					throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTREADFULLZIPDATA);
+					throw ELibMCCustomException(LIBMC_ERROR_COULDNOTREADFULLZIPDATA, m_sZIPDebugName + "|" + sName);
 				}
 
 			}
@@ -288,85 +285,85 @@ namespace AMC {
 
 
 
-    PResourcePackage CResourcePackage::makeFromStream(AMCCommon::PImportStream pStream)
+    PResourcePackage CResourcePackage::makeFromStream(AMCCommon::PImportStream pStream, const std::string& sPackageDebugName)
 	{
-		return makeFromStream(pStream.get());
+		return makeFromStream(pStream.get(), sPackageDebugName);
 	}
 
-	PResourcePackage CResourcePackage::makeFromStream(AMCCommon::CImportStream* pStream)
+	PResourcePackage CResourcePackage::makeFromStream(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName)
 	{
-		if (pStream == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pStream);
 
-		return std::make_shared<CResourcePackage>(pStream);
+		return std::make_shared<CResourcePackage>(pStream, sPackageDebugName);
 	}
 
-	PResourcePackage CResourcePackage::makeEmpty()
+	PResourcePackage CResourcePackage::makeEmpty(const std::string& sPackageDebugName)
 	{
-		return std::make_shared<CResourcePackage>();
+		return std::make_shared<CResourcePackage>(sPackageDebugName);
 	}
 
-	CResourcePackage::CResourcePackage()
+	CResourcePackage::CResourcePackage(const std::string& sPackageDebugName)
+		: m_sPackageDebugName (sPackageDebugName)
 	{
 		m_pResourcePackageZIP = nullptr;
 	}
 
 
-	CResourcePackage::CResourcePackage(AMCCommon::CImportStream* pStream)
+	CResourcePackage::CResourcePackage(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName)
+		: m_sPackageDebugName (sPackageDebugName)
 	{
-		if (pStream == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pStream);
 
 		pStream->readIntoMemory(m_ZIPBuffer);
 
 		if (m_ZIPBuffer.size () == 0)
-			throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX, m_sPackageDebugName);
 
-		m_pResourcePackageZIP = std::make_shared<CResourcePackageZIP>(m_ZIPBuffer.size(), m_ZIPBuffer.data());
+		m_pResourcePackageZIP = std::make_shared<CResourcePackageZIP>(m_ZIPBuffer.size(), m_ZIPBuffer.data(), sPackageDebugName);
 
 		if (!m_pResourcePackageZIP->hasFile(ROOT_PACKAGEFILENAME))
-			throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTFINDRESOURCEINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDRESOURCEINDEX, m_sPackageDebugName);
 
 		std::vector<uint8_t> DistBuffer;
 		m_pResourcePackageZIP->unzipFile(ROOT_PACKAGEFILENAME, DistBuffer);
 
 		if (DistBuffer.size() == 0)
-			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYRESOURCEINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_EMPTYRESOURCEINDEX, m_sPackageDebugName);
 
 		pugi::xml_document doc;
 		pugi::xml_parse_result result = doc.load_buffer(DistBuffer.data(), DistBuffer.size());
 		if (!result)
-			throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSERESOURCEINDEX, m_sPackageDebugName);
 
 		auto rootNode = doc.child("package");
 		if (rootNode.empty())
-			throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGRESOURCEINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCEINDEX, m_sPackageDebugName);
 
 		auto xmlnsAttrib = rootNode.attribute("xmlns");
 		if (xmlnsAttrib.empty())
-			throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGXMLSCHEMA);
+			throw ELibMCCustomException(LIBMC_ERROR_MISSINGXMLSCHEMA, m_sPackageDebugName);
 
 		std::string xmlns(xmlnsAttrib.as_string());
 		if (xmlns != RESOURCEPACKAGE_XMLSCHEMA)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDXMLSCHEMA);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLSCHEMA, m_sPackageDebugName);
 
 		auto entryNodes = rootNode.children("entry");
 		for (pugi::xml_node entryNode : entryNodes) {
 			auto nameAttrib = entryNode.attribute("name");
 			if (nameAttrib.empty())
-				throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGRESOURCENAME);
+				throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCENAME, m_sPackageDebugName);
 
 			auto fileNameAttrib = entryNode.attribute("filename");
 			if (fileNameAttrib.empty())
-				throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGRESOURCEFILENAME);
+				throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCEFILENAME, m_sPackageDebugName);
 
 			auto sizeAttrib = entryNode.attribute("size");
 			if (sizeAttrib.empty())
-				throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGRESOURCESIZE);
+				throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCESIZE, m_sPackageDebugName);
 
 			auto contenttypeAttrib = entryNode.attribute("contenttype");
 			if (contenttypeAttrib.empty())
-				throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE);
+				throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCECONTENTTYPE, m_sPackageDebugName);
 
 			std::string sName = nameAttrib.as_string();
 			std::string sFileName = fileNameAttrib.as_string();
@@ -399,7 +396,7 @@ namespace AMC {
 	PResourcePackageEntry CResourcePackage::getEntry(uint64_t nIndex)
 	{
 		if (nIndex >= m_Entries.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sPackageDebugName);
 
 		return m_Entries[nIndex];
 	}
@@ -409,7 +406,7 @@ namespace AMC {
 		auto iIter = m_UUIDMap.find(AMCCommon::CUtils::normalizeUUIDString (sUUID));
 		if (iIter == m_UUIDMap.end()) {
 			if (bHasToExist)
-				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sUUID);
+				throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sUUID);
 
 			return nullptr;
 		}
@@ -423,7 +420,7 @@ namespace AMC {
 		auto iIter = m_NameMap.find(sName);
 		if (iIter == m_NameMap.end()) {
 			if (bHasToExist)
-				throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
+				throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
 
 			return nullptr;
 		}
@@ -441,7 +438,7 @@ namespace AMC {
 
 		auto iIter = m_NameMap.find(sName);
 		if (iIter == m_NameMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
+			throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
 
 		auto sFileName = iIter->second->getFileName ();
 		m_pResourcePackageZIP->unzipFile(sFileName, Buffer);
@@ -455,7 +452,7 @@ namespace AMC {
 
 		auto iIter = m_NameMap.find(sName);
 		if (iIter == m_NameMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, sName);
+			throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
 
 		auto sFileName = iIter->second->getFileName();
 		m_pResourcePackageZIP->unzipFileEx(sFileName, pBuffer, nBufferSize);

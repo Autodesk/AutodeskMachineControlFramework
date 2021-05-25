@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_CONTENT
-#define __AMC_UI_MODULE_CONTENT
+#ifndef __AMC_UI_MODULE_TABS
+#define __AMC_UI_MODULE_TABS
 
 #include "header_protection.hpp"
 
@@ -48,46 +48,40 @@ namespace LibMCData {
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
-	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
+	amcDeclareDependingClass(CUIModule_Tabs, PUIModule_Tabs);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
-	class CUIModule_Content : public CUIModule {
+	class CUIModule_Tabs : public CUIModule {
 	protected:		
 
-		std::string m_sHeadLine;
+		std::map<std::string, PUIModuleItem> m_ItemMap;
+		std::map<std::string, PUIModule> m_TabMap;
+		std::vector<PUIModule> m_Tabs;
+
 		std::string m_sCaption;
-		std::string m_sTitle;
-		std::string m_sSubtitle;
 
-		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
-		std::vector<PUIModule_ContentItem> m_Items;
-
-		void addItem(PUIModule_ContentItem pItem);
+		void addTab(PUIModule pModule);
 
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CUIModule_Tabs(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 		
-		virtual ~CUIModule_Content();
+		virtual ~CUIModule_Tabs();
 
 		virtual std::string getType() override;
 
-		virtual std::string getCaption() override;
-
 		static std::string getStaticType();
 
-		std::string getHeadLine ();
-		std::string getTitle ();
-		std::string getSubtitle ();
+		std::string getCaption () override;
 
 		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
 
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
-
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
+		PUIModule findTab(const std::string& sUUID);
 
 	};
 
@@ -95,5 +89,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE_CONTENT
+#endif //__AMC_UI_MODULE_TABS
 

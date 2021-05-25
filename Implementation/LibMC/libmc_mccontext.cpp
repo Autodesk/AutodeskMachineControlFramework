@@ -146,7 +146,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
         m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
         auto pResourcePackageStream = std::make_shared<AMCCommon::CImportStream_Native>(sCoreResourcePath);
-        m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream);
+        m_pCoreResourcePackage = CResourcePackage::makeFromStream(pResourcePackageStream, sCoreResourcePath);
 
 
         m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -208,7 +208,7 @@ void CMCContext::SetTempBasePath(const std::string& sTempBasePath)
 void CMCContext::LoadClientPackage(const std::string& sResourcePath)
 {
     auto pStream = std::make_shared<AMCCommon::CImportStream_Native>(sResourcePath);
-    auto pPackage = CResourcePackage::makeFromStream(pStream);
+    auto pPackage = CResourcePackage::makeFromStream(pStream, sResourcePath);
 
     m_pClientDistHandler->LoadClientPackage (pPackage);
 }
@@ -540,16 +540,29 @@ void CMCContext::loadParameterGroupDerives(const pugi::xml_node& xmlNode, AMC::P
             pParameterHandler = m_pSystemState->parameterInstances()->getParameterHandler(sourceStateMachineAttrib.as_string());
         }
 
+
+        std::string sSourceGroupName;
         auto groupAttrib = parameterNode.attribute("group");
-        if (groupAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERGROUPNAME);
-        AMC::PParameterGroup pSourceGroup = pParameterHandler->findGroup (groupAttrib.as_string(), true);
+        if (!groupAttrib.empty()) {
+            sSourceGroupName = groupAttrib.as_string();
+        }
+        else {
+            sSourceGroupName = pGroup->getName();
+        }
+   
 
+        AMC::PParameterGroup pSourceGroup = pParameterHandler->findGroup (sSourceGroupName, true);
+
+        std::string sSourceParameterName;
         auto sourceParameterAttrib = parameterNode.attribute("parameter");
-        if (sourceParameterAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERNAME);
+        if (!sourceParameterAttrib.empty()) {
+            sSourceParameterName = sourceParameterAttrib.as_string();
+        }
+        else {
+            sSourceParameterName = nameAttrib.as_string();
+        }
 
-        pGroup->addNewDerivedParameter (nameAttrib.as_string(), pSourceGroup, sourceParameterAttrib.as_string ());
+        pGroup->addNewDerivedParameter (nameAttrib.as_string(), pSourceGroup, sSourceParameterName);
     }
 
 }
