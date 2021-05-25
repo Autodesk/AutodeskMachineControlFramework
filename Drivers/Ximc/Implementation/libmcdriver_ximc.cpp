@@ -39,6 +39,7 @@ Interface version: 1.0.0
 #include "libmcdriver_ximc_abi.hpp"
 #include "libmcdriver_ximc_interfaces.hpp"
 #include "libmcdriver_ximc_interfaceexception.hpp"
+#include "libmcdriver_ximc_driver_ximc.hpp"
 
 using namespace LibMCDriver_Ximc;
 using namespace LibMCDriver_Ximc::Impl;
@@ -74,7 +75,11 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_XimcInterfaceException(LIBMCDRIVER_XIMC_ERROR_NOTIMPLEMENTED);
+
+	if (sType == "ximc")
+		return new CDriver_Ximc(sName, pDriverEnvironment);
+
+	throw ELibMCDriver_XimcInterfaceException(LIBMCDRIVER_XIMC_ERROR_DRIVERERROR, "driver type not found: " + sType);
 }
 
 

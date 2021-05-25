@@ -45,13 +45,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #endif
 
+#define XIMC_ENUMERATEFLAG_PROBE    0x01
+#define XIMC_ENUMERATEFLAG_ALL_COM  0x02
+#define XIMC_ENUMERATEFLAG_NETWORK  0x04
 
 namespace LibMCDriver_Ximc {
 	namespace Impl {
 
+		typedef uint64_t ximc_device_enumeration_t;
+		typedef int ximc_result_t;
 
-		typedef void (XIMC_CALLINGCONVENTION *PXimcPtr_ximc_version) (char * version);
-
+		typedef void (XIMC_CALLINGCONVENTION *PXimcPtr_ximc_version) (char * pVersion);
+		typedef ximc_device_enumeration_t(XIMC_CALLINGCONVENTION* PXimcPtr_enumerate_devices) (int enumerateFlags, const char* pHints);
+		typedef ximc_result_t (XIMC_CALLINGCONVENTION* PXimcPtr_free_enumerate_devices) (ximc_device_enumeration_t deviceEnumeration);
+		typedef int (XIMC_CALLINGCONVENTION* PXimcPtr_get_device_count) (ximc_device_enumeration_t deviceEnumeration);
+		typedef char* (XIMC_CALLINGCONVENTION* PXimcPtr_get_device_name) (ximc_device_enumeration_t deviceEnumeration, int deviceIndex);
+		
 		class CXimcSDK {
 		private:
 			bool m_bIsInitialized;
@@ -61,6 +70,10 @@ namespace LibMCDriver_Ximc {
 		public:
 
 			PXimcPtr_ximc_version ximc_version = nullptr;
+			PXimcPtr_enumerate_devices enumerate_devices = nullptr;
+			PXimcPtr_free_enumerate_devices free_enumerate_devices = nullptr;
+			PXimcPtr_get_device_count get_device_count = nullptr;
+			PXimcPtr_get_device_name get_device_name = nullptr;
 
 			CXimcSDK(const std::string & sDLLNameUTF8);
 			~CXimcSDK();

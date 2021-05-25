@@ -96,6 +96,10 @@ CXimcSDK::CXimcSDK(const std::string& sDLLNameUTF8)
 
 
 	this->ximc_version = (PXimcPtr_ximc_version)_loadXimcAddress(hLibrary, "ximc_version");
+	this->enumerate_devices = (PXimcPtr_enumerate_devices)_loadXimcAddress(hLibrary, "enumerate_devices");
+	this->free_enumerate_devices = (PXimcPtr_free_enumerate_devices)_loadXimcAddress(hLibrary, "free_enumerate_devices");
+	this->get_device_count = (PXimcPtr_get_device_count)_loadXimcAddress(hLibrary, "get_device_count");
+	this->get_device_name = (PXimcPtr_get_device_name)_loadXimcAddress(hLibrary, "get_device_name");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -122,5 +126,9 @@ CXimcSDK::~CXimcSDK()
 void CXimcSDK::resetFunctionPtrs()
 {
 	ximc_version = nullptr;
+	enumerate_devices = nullptr;
+	free_enumerate_devices = nullptr;
+	get_device_count = nullptr;
+	get_device_name = nullptr;
 }
 

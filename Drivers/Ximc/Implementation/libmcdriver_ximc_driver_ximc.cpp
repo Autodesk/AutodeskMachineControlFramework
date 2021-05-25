@@ -46,13 +46,27 @@ using namespace LibMCDriver_Ximc::Impl;
 CDriver_Ximc::CDriver_Ximc(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
     : m_sName (sName), m_pDriverEnvironment (pDriverEnvironment)
 {
-
+    pDriverEnvironment->RegisterStringParameter("dllversion", "Version of the XIMC DLL", "unknown");
 }
 
 
 void CDriver_Ximc::Configure(const std::string& sConfigurationString)
 {
-   
+    m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+    m_pLibXimcDLL = m_pWorkingDirectory->StoreDriverData("libximc.dll", "libximc");
+    m_pBindyDLL = m_pWorkingDirectory->StoreDriverData("bindy.dll", "bindy");
+    m_pXiWrapperDLL = m_pWorkingDirectory->StoreDriverData("xiwrapper.dll", "xiwrapper");
+
+    SetDllDirectory(m_pWorkingDirectory->GetAbsoluteFilePath().c_str());
+    m_pXimcSDK = std::make_shared<CXimcSDK>(m_pLibXimcDLL->GetAbsoluteFileName());
+
+    char ximc_version_str[33];
+    m_pXimcSDK->ximc_version(ximc_version_str);
+    ximc_version_str[32] = 0;
+    std::string sVersionString = ximc_version_str;
+
+    m_pDriverEnvironment->SetStringParameter("dllversion", sVersionString);
+    findDevices();
 }
 
 std::string CDriver_Ximc::GetName()
@@ -83,21 +97,35 @@ void CDriver_Ximc::QueryParameters()
     
 }
 
+void CDriver_Ximc::findDevices()
+{
+    m_FoundDevices.clear();
+    if (m_pXimcSDK.get() == nullptr)
+        return;
 
+    ximc_device_enumeration_t deviceEnumeration = m_pXimcSDK->enumerate_devices(XIMC_ENUMERATEFLAG_PROBE, "");
+    if (!deviceEnumeration)
+        throw std::runtime_error("could not enumerate devices");
+
+    int deviceCount = m_pXimcSDK->get_device_count(deviceEnumeration);
+    if (deviceCount < 0) {
+        m_pXimcSDK->free_enumerate_devices(deviceEnumeration);
+        throw std::runtime_error("could not get number of devices");
+    }
+
+    for (int deviceIndex = 0; deviceIndex < deviceCount; deviceIndex++) {
+        char* pName = m_pXimcSDK->get_device_name(deviceEnumeration, deviceIndex);
+        if (pName != "") {
+            m_FoundDevices.push_back(pName);
+        }
+    }
+
+    m_pXimcSDK->free_enumerate_devices(deviceEnumeration);
+
+}
 
 void CDriver_Ximc::Initialize(const std::string& sDeviceName)
 {
-    m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-    m_pLibXimcDLL = m_pWorkingDirectory->StoreDriverData("libximc.dll", "libximc");
-    m_pBindyDLL = m_pWorkingDirectory->StoreDriverData("bindy.dll", "bindy");
-    m_pXiWrapperDLL = m_pWorkingDirectory->StoreDriverData("xiwrapper.dll", "xiwrapper");
-
-    m_pXimcSDK = std::make_shared<CXimcSDK> (m_pLibXimcDLL->GetAbsoluteFileName ());
-
-    char ximc_version_str[33];
-    m_pXimcSDK->ximc_version (ximc_version_str);
-    ximc_version_str[32] = 0;
-    std::string sVersionString = ximc_version_str;
 
 
 }
@@ -106,4 +134,18 @@ void CDriver_Ximc::Initialize(const std::string& sDeviceName)
 LibMCDriver_Ximc_double CDriver_Ximc::GetCurrentPosition()
 {
     return 5.0;
+}
+
+
+LibMCDriver_Ximc_uint32 CDriver_Ximc::GetDetectedDeviceCount()
+{
+    return (uint32_t) m_FoundDevices.size();
+}
+
+std::string CDriver_Ximc::GetDetectedDeviceName(const LibMCDriver_Ximc_uint32 nDeviceIndex)
+{
+    if (nDeviceIndex < m_FoundDevices.size())
+        return m_FoundDevices[nDeviceIndex];
+    else
+        return "";
 }

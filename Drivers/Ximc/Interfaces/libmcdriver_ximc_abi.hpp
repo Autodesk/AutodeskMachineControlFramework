@@ -137,6 +137,27 @@ LIBMCDRIVER_XIMC_DECLSPEC LibMCDriver_XimcResult libmcdriver_ximc_driver_querypa
 **************************************************************************************************************************/
 
 /**
+* Returns how many devices have been detected.
+*
+* @param[in] pDriver_Ximc - Driver_Ximc instance.
+* @param[out] pDeviceCount - Number of Devices.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_XIMC_DECLSPEC LibMCDriver_XimcResult libmcdriver_ximc_driver_ximc_getdetecteddevicecount(LibMCDriver_Ximc_Driver_Ximc pDriver_Ximc, LibMCDriver_Ximc_uint32 * pDeviceCount);
+
+/**
+* Returns the name of a detected device.
+*
+* @param[in] pDriver_Ximc - Driver_Ximc instance.
+* @param[in] nDeviceIndex - Index of Device.
+* @param[in] nDeviceNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDeviceNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDeviceNameBuffer -  buffer of Name of Device., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_XIMC_DECLSPEC LibMCDriver_XimcResult libmcdriver_ximc_driver_ximc_getdetecteddevicename(LibMCDriver_Ximc_Driver_Ximc pDriver_Ximc, LibMCDriver_Ximc_uint32 nDeviceIndex, const LibMCDriver_Ximc_uint32 nDeviceNameBufferSize, LibMCDriver_Ximc_uint32* pDeviceNameNeededChars, char * pDeviceNameBuffer);
+
+/**
 * Initializes the Ximc controller.
 *
 * @param[in] pDriver_Ximc - Driver_Ximc instance.

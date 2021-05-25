@@ -124,6 +124,27 @@ typedef LibMCDriver_XimcResult (*PLibMCDriver_XimcDriver_QueryParametersPtr) (Li
 **************************************************************************************************************************/
 
 /**
+* Returns how many devices have been detected.
+*
+* @param[in] pDriver_Ximc - Driver_Ximc instance.
+* @param[out] pDeviceCount - Number of Devices.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_XimcResult (*PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceCountPtr) (LibMCDriver_Ximc_Driver_Ximc pDriver_Ximc, LibMCDriver_Ximc_uint32 * pDeviceCount);
+
+/**
+* Returns the name of a detected device.
+*
+* @param[in] pDriver_Ximc - Driver_Ximc instance.
+* @param[in] nDeviceIndex - Index of Device.
+* @param[in] nDeviceNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDeviceNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDeviceNameBuffer -  buffer of Name of Device., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_XimcResult (*PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceNamePtr) (LibMCDriver_Ximc_Driver_Ximc pDriver_Ximc, LibMCDriver_Ximc_uint32 nDeviceIndex, const LibMCDriver_Ximc_uint32 nDeviceNameBufferSize, LibMCDriver_Ximc_uint32* pDeviceNameNeededChars, char * pDeviceNameBuffer);
+
+/**
 * Initializes the Ximc controller.
 *
 * @param[in] pDriver_Ximc - Driver_Ximc instance.
@@ -223,6 +244,8 @@ typedef struct {
 	PLibMCDriver_XimcDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_XimcDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_XimcDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceCountPtr m_Driver_Ximc_GetDetectedDeviceCount;
+	PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceNamePtr m_Driver_Ximc_GetDetectedDeviceName;
 	PLibMCDriver_XimcDriver_Ximc_InitializePtr m_Driver_Ximc_Initialize;
 	PLibMCDriver_XimcDriver_Ximc_GetCurrentPositionPtr m_Driver_Ximc_GetCurrentPosition;
 	PLibMCDriver_XimcGetVersionPtr m_GetVersion;

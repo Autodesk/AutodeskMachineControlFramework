@@ -362,6 +362,8 @@ public:
 	{
 	}
 	
+	inline LibMCDriver_Ximc_uint32 GetDetectedDeviceCount();
+	inline std::string GetDetectedDeviceName(const LibMCDriver_Ximc_uint32 nDeviceIndex);
 	inline void Initialize(const std::string & sDeviceName);
 	inline LibMCDriver_Ximc_double GetCurrentPosition();
 };
@@ -493,6 +495,8 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_Driver_Ximc_GetDetectedDeviceCount = nullptr;
+		pWrapperTable->m_Driver_Ximc_GetDetectedDeviceName = nullptr;
 		pWrapperTable->m_Driver_Ximc_Initialize = nullptr;
 		pWrapperTable->m_Driver_Ximc_GetCurrentPosition = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
@@ -602,6 +606,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
+			return LIBMCDRIVER_XIMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Ximc_GetDetectedDeviceCount = (PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceCountPtr) GetProcAddress(hLibrary, "libmcdriver_ximc_driver_ximc_getdetecteddevicecount");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Ximc_GetDetectedDeviceCount = (PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceCountPtr) dlsym(hLibrary, "libmcdriver_ximc_driver_ximc_getdetecteddevicecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Ximc_GetDetectedDeviceCount == nullptr)
+			return LIBMCDRIVER_XIMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Ximc_GetDetectedDeviceName = (PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceNamePtr) GetProcAddress(hLibrary, "libmcdriver_ximc_driver_ximc_getdetecteddevicename");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Ximc_GetDetectedDeviceName = (PLibMCDriver_XimcDriver_Ximc_GetDetectedDeviceNamePtr) dlsym(hLibrary, "libmcdriver_ximc_driver_ximc_getdetecteddevicename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Ximc_GetDetectedDeviceName == nullptr)
 			return LIBMCDRIVER_XIMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -723,6 +745,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_ximc_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
+			return LIBMCDRIVER_XIMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_ximc_driver_ximc_getdetecteddevicecount", (void**)&(pWrapperTable->m_Driver_Ximc_GetDetectedDeviceCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Ximc_GetDetectedDeviceCount == nullptr) )
+			return LIBMCDRIVER_XIMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_ximc_driver_ximc_getdetecteddevicename", (void**)&(pWrapperTable->m_Driver_Ximc_GetDetectedDeviceName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Ximc_GetDetectedDeviceName == nullptr) )
 			return LIBMCDRIVER_XIMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_ximc_driver_ximc_initialize", (void**)&(pWrapperTable->m_Driver_Ximc_Initialize));
@@ -860,6 +890,34 @@ public:
 	/**
 	 * Method definitions for class CDriver_Ximc
 	 */
+	
+	/**
+	* CDriver_Ximc::GetDetectedDeviceCount - Returns how many devices have been detected.
+	* @return Number of Devices.
+	*/
+	LibMCDriver_Ximc_uint32 CDriver_Ximc::GetDetectedDeviceCount()
+	{
+		LibMCDriver_Ximc_uint32 resultDeviceCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Ximc_GetDetectedDeviceCount(m_pHandle, &resultDeviceCount));
+		
+		return resultDeviceCount;
+	}
+	
+	/**
+	* CDriver_Ximc::GetDetectedDeviceName - Returns the name of a detected device.
+	* @param[in] nDeviceIndex - Index of Device.
+	* @return Name of Device.
+	*/
+	std::string CDriver_Ximc::GetDetectedDeviceName(const LibMCDriver_Ximc_uint32 nDeviceIndex)
+	{
+		LibMCDriver_Ximc_uint32 bytesNeededDeviceName = 0;
+		LibMCDriver_Ximc_uint32 bytesWrittenDeviceName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Ximc_GetDetectedDeviceName(m_pHandle, nDeviceIndex, 0, &bytesNeededDeviceName, nullptr));
+		std::vector<char> bufferDeviceName(bytesNeededDeviceName);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Ximc_GetDetectedDeviceName(m_pHandle, nDeviceIndex, bytesNeededDeviceName, &bytesWrittenDeviceName, &bufferDeviceName[0]));
+		
+		return std::string(&bufferDeviceName[0]);
+	}
 	
 	/**
 	* CDriver_Ximc::Initialize - Initializes the Ximc controller.

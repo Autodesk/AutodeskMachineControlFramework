@@ -112,6 +112,15 @@ Custom implementation
 
 	<class name="Driver_Ximc" parent="Driver" description="A Driver for a Ximc controller.">
 
+		<method name="GetDetectedDeviceCount" description="Returns how many devices have been detected.">		
+			<param name="DeviceCount" type="uint32" pass="return" description="Number of Devices." />
+		</method>
+
+		<method name="GetDetectedDeviceName" description="Returns the name of a detected device.">		
+			<param name="DeviceIndex" type="uint32" pass="in" description="Index of Device." />
+			<param name="DeviceName" type="string" pass="return" description="Name of Device." />
+		</method>
+
 		<method name="Initialize" description="Initializes the Ximc controller.">		
 			<param name="DeviceName" type="string" pass="in" description="Name of Device." />					
 		</method>

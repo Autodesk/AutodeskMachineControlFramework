@@ -348,6 +348,80 @@ LibMCDriver_XimcResult libmcdriver_ximc_driver_queryparameters(LibMCDriver_Ximc_
 /*************************************************************************************************************************
  Class implementation for Driver_Ximc
 **************************************************************************************************************************/
+LibMCDriver_XimcResult libmcdriver_ximc_driver_ximc_getdetecteddevicecount(LibMCDriver_Ximc_Driver_Ximc pDriver_Ximc, LibMCDriver_Ximc_uint32 * pDeviceCount)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Ximc;
+
+	try {
+		if (pDeviceCount == nullptr)
+			throw ELibMCDriver_XimcInterfaceException (LIBMCDRIVER_XIMC_ERROR_INVALIDPARAM);
+		IDriver_Ximc* pIDriver_Ximc = dynamic_cast<IDriver_Ximc*>(pIBaseClass);
+		if (!pIDriver_Ximc)
+			throw ELibMCDriver_XimcInterfaceException(LIBMCDRIVER_XIMC_ERROR_INVALIDCAST);
+		
+		*pDeviceCount = pIDriver_Ximc->GetDetectedDeviceCount();
+
+		return LIBMCDRIVER_XIMC_SUCCESS;
+	}
+	catch (ELibMCDriver_XimcInterfaceException & Exception) {
+		return handleLibMCDriver_XimcException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_XimcResult libmcdriver_ximc_driver_ximc_getdetecteddevicename(LibMCDriver_Ximc_Driver_Ximc pDriver_Ximc, LibMCDriver_Ximc_uint32 nDeviceIndex, const LibMCDriver_Ximc_uint32 nDeviceNameBufferSize, LibMCDriver_Ximc_uint32* pDeviceNameNeededChars, char * pDeviceNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Ximc;
+
+	try {
+		if ( (!pDeviceNameBuffer) && !(pDeviceNameNeededChars) )
+			throw ELibMCDriver_XimcInterfaceException (LIBMCDRIVER_XIMC_ERROR_INVALIDPARAM);
+		std::string sDeviceName("");
+		IDriver_Ximc* pIDriver_Ximc = dynamic_cast<IDriver_Ximc*>(pIBaseClass);
+		if (!pIDriver_Ximc)
+			throw ELibMCDriver_XimcInterfaceException(LIBMCDRIVER_XIMC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDeviceNameBuffer == nullptr);
+		if (isCacheCall) {
+			sDeviceName = pIDriver_Ximc->GetDetectedDeviceName(nDeviceIndex);
+
+			pIDriver_Ximc->_setCache (new ParameterCache_1<std::string> (sDeviceName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDriver_Ximc->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_XimcInterfaceException(LIBMCDRIVER_XIMC_ERROR_INVALIDCAST);
+			cache->retrieveData (sDeviceName);
+			pIDriver_Ximc->_setCache (nullptr);
+		}
+		
+		if (pDeviceNameNeededChars)
+			*pDeviceNameNeededChars = (LibMCDriver_Ximc_uint32) (sDeviceName.size()+1);
+		if (pDeviceNameBuffer) {
+			if (sDeviceName.size() >= nDeviceNameBufferSize)
+				throw ELibMCDriver_XimcInterfaceException (LIBMCDRIVER_XIMC_ERROR_BUFFERTOOSMALL);
+			for (size_t iDeviceName = 0; iDeviceName < sDeviceName.size(); iDeviceName++)
+				pDeviceNameBuffer[iDeviceName] = sDeviceName[iDeviceName];
+			pDeviceNameBuffer[sDeviceName.size()] = 0;
+		}
+		return LIBMCDRIVER_XIMC_SUCCESS;
+	}
+	catch (ELibMCDriver_XimcInterfaceException & Exception) {
+		return handleLibMCDriver_XimcException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_XimcResult libmcdriver_ximc_driver_ximc_initialize(LibMCDriver_Ximc_Driver_Ximc pDriver_Ximc, const char * pDeviceName)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Ximc;
@@ -428,6 +502,10 @@ LibMCDriver_XimcResult LibMCDriver_Ximc::Impl::LibMCDriver_Ximc_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_ximc_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_ximc_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_ximc_driver_queryparameters;
+	if (sProcName == "libmcdriver_ximc_driver_ximc_getdetecteddevicecount") 
+		*ppProcAddress = (void*) &libmcdriver_ximc_driver_ximc_getdetecteddevicecount;
+	if (sProcName == "libmcdriver_ximc_driver_ximc_getdetecteddevicename") 
+		*ppProcAddress = (void*) &libmcdriver_ximc_driver_ximc_getdetecteddevicename;
 	if (sProcName == "libmcdriver_ximc_driver_ximc_initialize") 
 		*ppProcAddress = (void*) &libmcdriver_ximc_driver_ximc_initialize;
 	if (sProcName == "libmcdriver_ximc_driver_ximc_getcurrentposition") 

@@ -316,6 +316,19 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IDriver_Ximc : public virtual IDriver {
 public:
 	/**
+	* IDriver_Ximc::GetDetectedDeviceCount - Returns how many devices have been detected.
+	* @return Number of Devices.
+	*/
+	virtual LibMCDriver_Ximc_uint32 GetDetectedDeviceCount() = 0;
+
+	/**
+	* IDriver_Ximc::GetDetectedDeviceName - Returns the name of a detected device.
+	* @param[in] nDeviceIndex - Index of Device.
+	* @return Name of Device.
+	*/
+	virtual std::string GetDetectedDeviceName(const LibMCDriver_Ximc_uint32 nDeviceIndex) = 0;
+
+	/**
 	* IDriver_Ximc::Initialize - Initializes the Ximc controller.
 	* @param[in] sDeviceName - Name of Device.
 	*/

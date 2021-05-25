@@ -69,6 +69,10 @@ protected:
 
     PXimcSDK m_pXimcSDK;
 
+    std::vector<std::string> m_FoundDevices;
+
+    void findDevices();
+
 public:
     CDriver_Ximc (const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
@@ -87,6 +91,10 @@ public:
 	void Initialize(const std::string& sDeviceName) override;
 
     LibMCDriver_Ximc_double GetCurrentPosition() override;
+
+    LibMCDriver_Ximc_uint32 GetDetectedDeviceCount() override;
+
+    std::string GetDetectedDeviceName(const LibMCDriver_Ximc_uint32 nDeviceIndex) override;
 };
 
 } // namespace Impl
