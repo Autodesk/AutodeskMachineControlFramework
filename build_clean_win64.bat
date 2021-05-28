@@ -88,6 +88,7 @@ copy ..\..\Framework\HeadersDev\CppDynamic\*.* Framework\HeadersDev\CppDynamic
 copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
 copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
 copy ..\..\Framework\PluginPython\*.* Framework\PluginPython
+del Framework\Dist\%GITHASH%_core.data
 
 go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %GITHASH%
 
