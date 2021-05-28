@@ -33,6 +33,10 @@ git rev-parse --verify --short HEAD >"%builddir%\githash.txt"
 SET /p GITHASH=<"%builddir%\githash.txt"
 echo git hash: %GITHASH%
 
+git rev-parse --verify HEAD >"%builddir%\longgithash.txt"
+SET /p LONGGITHASH=<"%builddir%\longgithash.txt"
+echo long git hash: %LONGGITHASH%
+
 cd /d "%basepath%"
 
 echo "Building Resource builder (Win64)..."
@@ -90,7 +94,7 @@ copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
 copy ..\..\Framework\PluginPython\*.* Framework\PluginPython
 del Framework\Dist\%GITHASH%_core.data
 
-go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %GITHASH%
+go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %LONGGITHASH%
 
 echo "Build done!"
 
