@@ -216,8 +216,9 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
 	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
 	auto sContextUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTCONTEXT, LIBMC_ERROR_INVALIDEVENTCONTEXT);
+	auto sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
 
-	m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID);
+	m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID, sFormValueJSON);
 }
 
 

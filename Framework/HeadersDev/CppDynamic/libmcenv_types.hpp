@@ -118,6 +118,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME 20
 #define LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED 21
 #define LIBMCENV_ERROR_INVALIDITERATOR 22
+#define LIBMCENV_ERROR_FORMVALUENOTFOUND 23
+#define LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE 24
+#define LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE 25
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -148,6 +151,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME: return "invalid character in filename.";
     case LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED: return "working directory has been cleaned.";
     case LIBMCENV_ERROR_INVALIDITERATOR: return "invalid iterator.";
+    case LIBMCENV_ERROR_FORMVALUENOTFOUND: return "Form value not found.";
+    case LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE: return "Invalid double form value.";
+    case LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE: return "Invalid integer form value.";
     default: return "unknown error";
   }
 }

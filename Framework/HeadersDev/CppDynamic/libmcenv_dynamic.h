@@ -1502,7 +1502,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LogInfoPtr) (LibMCEnv_UIEnvironm
 * @param[in] pParameterName - Parameter Name
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value to set, may be NULL
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetStringParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
@@ -1516,7 +1516,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetStringParameterPtr) (LibMCEnv
 * @param[in] pParameterName - Parameter Name
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value to set, may be NULL
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetUUIDParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
@@ -1528,7 +1528,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetUUIDParameterPtr) (LibMCEnv_U
 * @param[in] pMachineInstance - State machine instance name
 * @param[in] pParameterGroup - Parameter Group
 * @param[in] pParameterName - Parameter Name
-* @param[out] pValue - Value to set
+* @param[out] pValue - Current Parameter Value
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetDoubleParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_double * pValue);
@@ -1540,7 +1540,7 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetDoubleParameterPtr) (LibMCEnv
 * @param[in] pMachineInstance - State machine instance name
 * @param[in] pParameterGroup - Parameter Group
 * @param[in] pParameterName - Parameter Name
-* @param[out] pValue - Value to set
+* @param[out] pValue - Current Parameter Value
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetIntegerParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_int64 * pValue);
@@ -1552,10 +1552,124 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetIntegerParameterPtr) (LibMCEn
 * @param[in] pMachineInstance - State machine instance name
 * @param[in] pParameterGroup - Parameter Group
 * @param[in] pParameterName - Parameter Name
-* @param[out] pValue - Value to set
+* @param[out] pValue - Current Parameter Value
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetBoolParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* sets a string parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SetStringParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const char * pValue);
+
+/**
+* returns a uuid parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SetUUIDParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const char * pValue);
+
+/**
+* returns a double parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SetDoubleParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_double dValue);
+
+/**
+* returns an int parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SetIntegerParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_int64 nValue);
+
+/**
+* returns a bool parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_SetBoolParameterPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool bValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Form Value, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetFormStringValuePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Form Value, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetFormUUIDValuePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetFormDoubleValuePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, LibMCEnv_double * pValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetFormIntegerValuePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, LibMCEnv_int64 * pValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetFormBoolValuePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, bool * pValue);
 
 /**
 * returns the event context uuid as string
@@ -1765,6 +1879,16 @@ typedef struct {
 	PLibMCEnvUIEnvironment_GetDoubleParameterPtr m_UIEnvironment_GetDoubleParameter;
 	PLibMCEnvUIEnvironment_GetIntegerParameterPtr m_UIEnvironment_GetIntegerParameter;
 	PLibMCEnvUIEnvironment_GetBoolParameterPtr m_UIEnvironment_GetBoolParameter;
+	PLibMCEnvUIEnvironment_SetStringParameterPtr m_UIEnvironment_SetStringParameter;
+	PLibMCEnvUIEnvironment_SetUUIDParameterPtr m_UIEnvironment_SetUUIDParameter;
+	PLibMCEnvUIEnvironment_SetDoubleParameterPtr m_UIEnvironment_SetDoubleParameter;
+	PLibMCEnvUIEnvironment_SetIntegerParameterPtr m_UIEnvironment_SetIntegerParameter;
+	PLibMCEnvUIEnvironment_SetBoolParameterPtr m_UIEnvironment_SetBoolParameter;
+	PLibMCEnvUIEnvironment_GetFormStringValuePtr m_UIEnvironment_GetFormStringValue;
+	PLibMCEnvUIEnvironment_GetFormUUIDValuePtr m_UIEnvironment_GetFormUUIDValue;
+	PLibMCEnvUIEnvironment_GetFormDoubleValuePtr m_UIEnvironment_GetFormDoubleValue;
+	PLibMCEnvUIEnvironment_GetFormIntegerValuePtr m_UIEnvironment_GetFormIntegerValue;
+	PLibMCEnvUIEnvironment_GetFormBoolValuePtr m_UIEnvironment_GetFormBoolValue;
 	PLibMCEnvUIEnvironment_GetEventContextPtr m_UIEnvironment_GetEventContext;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;

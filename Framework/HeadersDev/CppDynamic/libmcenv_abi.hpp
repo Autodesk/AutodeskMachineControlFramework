@@ -1515,7 +1515,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loginfo(LibMCEnv_UIEnvir
 * @param[in] pParameterName - Parameter Name
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value to set, may be NULL
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getstringparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
@@ -1529,7 +1529,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getstringparameter(LibMC
 * @param[in] pParameterName - Parameter Name
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value to set, may be NULL
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getuuidparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
@@ -1541,7 +1541,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getuuidparameter(LibMCEn
 * @param[in] pMachineInstance - State machine instance name
 * @param[in] pParameterGroup - Parameter Group
 * @param[in] pParameterName - Parameter Name
-* @param[out] pValue - Value to set
+* @param[out] pValue - Current Parameter Value
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getdoubleparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_double * pValue);
@@ -1553,7 +1553,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getdoubleparameter(LibMC
 * @param[in] pMachineInstance - State machine instance name
 * @param[in] pParameterGroup - Parameter Group
 * @param[in] pParameterName - Parameter Name
-* @param[out] pValue - Value to set
+* @param[out] pValue - Current Parameter Value
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getintegerparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_int64 * pValue);
@@ -1565,10 +1565,124 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getintegerparameter(LibM
 * @param[in] pMachineInstance - State machine instance name
 * @param[in] pParameterGroup - Parameter Group
 * @param[in] pParameterName - Parameter Name
-* @param[out] pValue - Value to set
+* @param[out] pValue - Current Parameter Value
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getboolparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* sets a string parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setstringparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const char * pValue);
+
+/**
+* returns a uuid parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setuuidparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const char * pValue);
+
+/**
+* returns a double parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setdoubleparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_double dValue);
+
+/**
+* returns an int parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setintegerparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_int64 nValue);
+
+/**
+* returns a bool parameter
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setboolparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool bValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Form Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformstringvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Form Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformuuidvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformdoublevalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, LibMCEnv_double * pValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformintegervalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, LibMCEnv_int64 * pValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformboolvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, bool * pValue);
 
 /**
 * returns the event context uuid as string

@@ -365,6 +365,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_TOOLPATHMETADATANOTFOUND 338
 #define LIBMC_ERROR_BUILDITEMHASNOUUID 339
 #define LIBMC_ERROR_OBJECTHASNOUUID 340
+#define LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS 341
+#define LIBMC_ERROR_INVALIDEVENTPARAMETERS 342
+#define LIBMC_ERROR_INVALIDFORMVALUES 343
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -642,6 +645,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_TOOLPATHMETADATANOTFOUND: return "Toolpath metadata not found";
     case LIBMC_ERROR_BUILDITEMHASNOUUID: return "Build item has no uuid";
     case LIBMC_ERROR_OBJECTHASNOUUID: return "Object has no uuid";
+    case LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS: return "Could not parse event parameters";
+    case LIBMC_ERROR_INVALIDEVENTPARAMETERS: return "Invalid event parameters";
+    case LIBMC_ERROR_INVALIDFORMVALUES: return "Invalid form values";
     default: return "unknown error";
   }
 }

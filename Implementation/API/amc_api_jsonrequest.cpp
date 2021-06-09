@@ -90,6 +90,19 @@ std::string CAPIJSONRequest::getUUID(const std::string& sKeyName, uint32_t nErro
 	return AMCCommon::CUtils::normalizeUUIDString(sRawString);
 }
 
+
+std::string CAPIJSONRequest::getJSONObjectString(const std::string& sKeyName, uint32_t nErrorCode)
+{
+	if (!hasValue(sKeyName))
+		throw ELibMCInterfaceException(nErrorCode);
+	if (!m_pImpl->m_Document[sKeyName.c_str()].IsObject())
+		throw ELibMCInterfaceException(nErrorCode);
+
+	//m_pImpl->m_Document[sKeyName.c_str()].Accept ()
+
+}
+
+
 std::string CAPIJSONRequest::getNameString(const std::string& sKeyName, uint32_t nErrorCode)
 {
 	auto sRawString = getRawString(sKeyName, nErrorCode);

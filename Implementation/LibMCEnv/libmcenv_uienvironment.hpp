@@ -65,7 +65,10 @@ private:
 	AMC::PStateSignalHandler m_pSignalHandler;
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
+
+
 	std::string m_sContextUUID;
+	std::map<std::string, std::string> m_FormValues;
 
 protected:
 
@@ -93,7 +96,29 @@ public:
 
 	bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
+	void SetStringParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
+
+	void SetUUIDParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
+
+	void SetDoubleParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue) override;
+
+	void SetIntegerParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_int64 nValue) override;
+
+	void SetBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const bool bValue) override;
+
+	std::string GetFormStringValue(const std::string& sValueIdentifier) override;
+
+	std::string GetFormUUIDValue(const std::string& sValueIdentifier) override;
+
+	LibMCEnv_double GetFormDoubleValue(const std::string& sValueIdentifier) override;
+
+	LibMCEnv_int64 GetFormIntegerValue(const std::string& sValueIdentifier) override;
+
+	bool GetFormBoolValue(const std::string& sValueIdentifier) override;
+
 	std::string GetEventContext() override;
+
+	void addFormValue(const std::string & sValueIdentifier, const std::string & sValue);
 
 };
 

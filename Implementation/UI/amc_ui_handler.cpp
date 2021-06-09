@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
+
 #include "libmcenv_uienvironment.hpp"
 
 #include "libmcui_dynamic.hpp"
@@ -356,12 +358,40 @@ template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<L
 }
 
 
-void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID)
+void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sEventParameterJSON)
 {    
+
     LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pParameterInstances, m_pSignalHandler, sSenderUUID, sContextUUID);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+
+    rapidjson::Document document;
+    document.Parse(sEventParameterJSON.c_str());
+    if (!document.IsObject())
+        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
+
+    if (document.HasMember("fields")) {
+
+        auto & fieldObject = document["fields"];
+        if (!fieldObject.IsObject ())
+            throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+
+        for (rapidjson::Value::ConstMemberIterator itr = fieldObject.MemberBegin();
+            itr != fieldObject.MemberEnd(); ++itr)
+        {
+            if (!itr->name.IsString())
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+            if (!itr->value.IsString())
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+
+            std::string sName = itr->name.GetString();
+            std::string sValue = itr->value.GetString();            
+            pInternalUIEnvironment->addFormValue(sName, sValue);
+
+        }
+
+    }
 
     pEvent->Handle(pExternalEnvironment);
 

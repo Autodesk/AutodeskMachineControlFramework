@@ -349,7 +349,11 @@
 		<error name="BUILDITEMHASNOUUID" code="339" description="Build item has no uuid" />		
 		<error name="OBJECTHASNOUUID" code="340" description="Object has no uuid" />		
 		
-		
+		<error name="COULDNOTPARSEEVENTPARAMETERS" code="341" description="Could not parse event parameters" />		
+		<error name="INVALIDEVENTPARAMETERS" code="342" description="Invalid event parameters" />		
+		<error name="INVALIDFORMVALUES" code="343" description="Invalid form values" />		
+
+			
 	</errors>
 	
 	

@@ -743,6 +743,16 @@ public:
 	inline LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline void SetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue);
+	inline void SetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue);
+	inline void SetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_double dValue);
+	inline void SetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_int64 nValue);
+	inline void SetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const bool bValue);
+	inline std::string GetFormStringValue(const std::string & sValueIdentifier);
+	inline std::string GetFormUUIDValue(const std::string & sValueIdentifier);
+	inline LibMCEnv_double GetFormDoubleValue(const std::string & sValueIdentifier);
+	inline LibMCEnv_int64 GetFormIntegerValue(const std::string & sValueIdentifier);
+	inline bool GetFormBoolValue(const std::string & sValueIdentifier);
 	inline std::string GetEventContext();
 };
 	
@@ -968,6 +978,16 @@ public:
 		pWrapperTable->m_UIEnvironment_GetDoubleParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_GetBoolParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_SetStringParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_SetUUIDParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_SetDoubleParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_SetIntegerParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_SetBoolParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetFormStringValue = nullptr;
+		pWrapperTable->m_UIEnvironment_GetFormUUIDValue = nullptr;
+		pWrapperTable->m_UIEnvironment_GetFormDoubleValue = nullptr;
+		pWrapperTable->m_UIEnvironment_GetFormIntegerValue = nullptr;
+		pWrapperTable->m_UIEnvironment_GetFormBoolValue = nullptr;
 		pWrapperTable->m_UIEnvironment_GetEventContext = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
@@ -2292,6 +2312,96 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetStringParameter = (PLibMCEnvUIEnvironment_SetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetStringParameter = (PLibMCEnvUIEnvironment_SetStringParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_setstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetUUIDParameter = (PLibMCEnvUIEnvironment_SetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetUUIDParameter = (PLibMCEnvUIEnvironment_SetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_setuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetDoubleParameter = (PLibMCEnvUIEnvironment_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetDoubleParameter = (PLibMCEnvUIEnvironment_SetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetIntegerParameter = (PLibMCEnvUIEnvironment_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetIntegerParameter = (PLibMCEnvUIEnvironment_SetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetBoolParameter = (PLibMCEnvUIEnvironment_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetBoolParameter = (PLibMCEnvUIEnvironment_SetBoolParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormStringValue = (PLibMCEnvUIEnvironment_GetFormStringValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getformstringvalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormStringValue = (PLibMCEnvUIEnvironment_GetFormStringValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_getformstringvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetFormStringValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormUUIDValue = (PLibMCEnvUIEnvironment_GetFormUUIDValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getformuuidvalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormUUIDValue = (PLibMCEnvUIEnvironment_GetFormUUIDValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_getformuuidvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetFormUUIDValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormDoubleValue = (PLibMCEnvUIEnvironment_GetFormDoubleValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getformdoublevalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormDoubleValue = (PLibMCEnvUIEnvironment_GetFormDoubleValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_getformdoublevalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetFormDoubleValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormIntegerValue = (PLibMCEnvUIEnvironment_GetFormIntegerValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getformintegervalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormIntegerValue = (PLibMCEnvUIEnvironment_GetFormIntegerValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_getformintegervalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetFormIntegerValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormBoolValue = (PLibMCEnvUIEnvironment_GetFormBoolValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getformboolvalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetFormBoolValue = (PLibMCEnvUIEnvironment_GetFormBoolValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_getformboolvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetFormBoolValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_geteventcontext");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) dlsym(hLibrary, "libmcenv_uienvironment_geteventcontext");
@@ -2923,6 +3033,46 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getboolparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setstringparameter", (void**)&(pWrapperTable->m_UIEnvironment_SetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setuuidparameter", (void**)&(pWrapperTable->m_UIEnvironment_SetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setdoubleparameter", (void**)&(pWrapperTable->m_UIEnvironment_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setintegerparameter", (void**)&(pWrapperTable->m_UIEnvironment_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setboolparameter", (void**)&(pWrapperTable->m_UIEnvironment_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getformstringvalue", (void**)&(pWrapperTable->m_UIEnvironment_GetFormStringValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetFormStringValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getformuuidvalue", (void**)&(pWrapperTable->m_UIEnvironment_GetFormUUIDValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetFormUUIDValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getformdoublevalue", (void**)&(pWrapperTable->m_UIEnvironment_GetFormDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetFormDoubleValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getformintegervalue", (void**)&(pWrapperTable->m_UIEnvironment_GetFormIntegerValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetFormIntegerValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getformboolvalue", (void**)&(pWrapperTable->m_UIEnvironment_GetFormBoolValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetFormBoolValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_geteventcontext", (void**)&(pWrapperTable->m_UIEnvironment_GetEventContext));
@@ -4779,7 +4929,7 @@ public:
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
 	std::string CUIEnvironment::GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
@@ -4797,7 +4947,7 @@ public:
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
 	std::string CUIEnvironment::GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
@@ -4815,7 +4965,7 @@ public:
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
 	LibMCEnv_double CUIEnvironment::GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
@@ -4830,7 +4980,7 @@ public:
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
 	LibMCEnv_int64 CUIEnvironment::GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
@@ -4845,12 +4995,143 @@ public:
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
 	bool CUIEnvironment::GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
 		bool resultValue = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetBoolParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::SetStringParameter - sets a string parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CUIEnvironment::SetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetStringParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::SetUUIDParameter - returns a uuid parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CUIEnvironment::SetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetUUIDParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::SetDoubleParameter - returns a double parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	void CUIEnvironment::SetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetDoubleParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), dValue));
+	}
+	
+	/**
+	* CUIEnvironment::SetIntegerParameter - returns an int parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	void CUIEnvironment::SetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetIntegerParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), nValue));
+	}
+	
+	/**
+	* CUIEnvironment::SetBoolParameter - returns a bool parameter
+	* @param[in] sMachineInstance - State machine instance name
+	* @param[in] sParameterGroup - Parameter Group
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	void CUIEnvironment::SetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetBoolParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CUIEnvironment::GetFormStringValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	std::string CUIEnvironment::GetFormStringValue(const std::string & sValueIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormStringValue(m_pHandle, sValueIdentifier.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormStringValue(m_pHandle, sValueIdentifier.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetFormUUIDValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	std::string CUIEnvironment::GetFormUUIDValue(const std::string & sValueIdentifier)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormUUIDValue(m_pHandle, sValueIdentifier.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormUUIDValue(m_pHandle, sValueIdentifier.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetFormDoubleValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	LibMCEnv_double CUIEnvironment::GetFormDoubleValue(const std::string & sValueIdentifier)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormDoubleValue(m_pHandle, sValueIdentifier.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetFormIntegerValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string & sValueIdentifier)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormIntegerValue(m_pHandle, sValueIdentifier.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetFormBoolValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	bool CUIEnvironment::GetFormBoolValue(const std::string & sValueIdentifier)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormBoolValue(m_pHandle, sValueIdentifier.c_str(), &resultValue));
 		
 		return resultValue;
 	}

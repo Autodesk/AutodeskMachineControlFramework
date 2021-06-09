@@ -61,6 +61,11 @@
 		<error name="INVALIDCHARACTERINFILENAME" code="20" description="invalid character in filename." />
 		<error name="WORKINGDIRECTORYHASBEENCLEANED" code="21" description="working directory has been cleaned." />
 		<error name="INVALIDITERATOR" code="22" description="invalid iterator." />
+		<error name="FORMVALUENOTFOUND" code="23" description="Form value not found." />
+		<error name="INVALIDDOUBLEFORMVALUE" code="24" description="Invalid double form value." />
+		<error name="INVALIDINTEGERFORMVALUE" code="25" description="Invalid integer form value." />
+		
+		
 			
 	</errors>
 	
@@ -816,37 +821,98 @@
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="string" pass="return" description="Value to set" />
+			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
 		<method name="GetUUIDParameter" description="returns a uuid parameter">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="string" pass="return" description="Value to set" />
+			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
 		<method name="GetDoubleParameter" description="returns a double parameter">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="double" pass="return" description="Value to set" />
+			<param name="Value" type="double" pass="return" description="Current Parameter Value" />
 		</method>
 
 		<method name="GetIntegerParameter" description="returns an int parameter">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="int64" pass="return" description="Value to set" />
+			<param name="Value" type="int64" pass="return" description="Current Parameter Value" />
 		</method>
 
 		<method name="GetBoolParameter" description="returns a bool parameter">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="bool" pass="return" description="Value to set" />
+			<param name="Value" type="bool" pass="return" description="Current Parameter Value" />
+		</method>
+
+		<method name="SetStringParameter" description="sets a string parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetUUIDParameter" description="returns a uuid parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetDoubleParameter" description="returns a double parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetIntegerParameter" description="returns an int parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetBoolParameter" description="returns a bool parameter">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="in" description="Value to set" />
+		</method>
+
+
+		<method name="GetFormStringValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
+			<param name="Value" type="string" pass="return" description="Form Value" />
+		</method>
+
+		<method name="GetFormUUIDValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
+			<param name="Value" type="string" pass="return" description="Form Value" />
+		</method>
+
+		<method name="GetFormDoubleValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
+			<param name="Value" type="double" pass="return" description="Form Value" />
+		</method>
+
+		<method name="GetFormIntegerValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
+			<param name="Value" type="int64" pass="return" description="Form Value" />
 		</method>
 		
+		<method name="GetFormBoolValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
+			<param name="Value" type="bool" pass="return" description="Form Value" />
+		</method>
+				
 		<method name="GetEventContext" description="returns the event context uuid as string">
 			<param name="ContextUUID" type="string" pass="return" description="Context UUID" />
 		</method>

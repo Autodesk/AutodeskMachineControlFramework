@@ -129,8 +129,108 @@ bool CUIEnvironment::GetBoolParameter(const std::string & sMachineInstance, cons
     return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
+void CUIEnvironment::SetStringParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue)
+{
+    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    pGroup->setParameterValueByName(sParameterName, sValue);
+
+}
+
+void CUIEnvironment::SetUUIDParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) 
+{
+
+    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    pGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+}
+    
+
+void CUIEnvironment::SetDoubleParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue) 
+{
+    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    pGroup->setDoubleParameterValueByName(sParameterName, dValue);
+
+}
+
+
+void CUIEnvironment::SetIntegerParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_int64 nValue) 
+{
+    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    pGroup->setIntParameterValueByName(sParameterName, nValue);
+}
+
+
+void CUIEnvironment::SetBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const bool bValue) 
+{
+    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
+    pGroup->setBoolParameterValueByName(sParameterName, bValue);
+}
+
+
+std::string CUIEnvironment::GetFormStringValue(const std::string& sValueIdentifier) 
+{
+    auto iIter = m_FormValues.find(sValueIdentifier);
+
+    if (iIter == m_FormValues.end ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_FORMVALUENOTFOUND, "form value not found: " + sValueIdentifier);
+
+    return iIter->second;
+}
+
+
+std::string CUIEnvironment::GetFormUUIDValue(const std::string& sValueIdentifier) 
+{
+    return AMCCommon::CUtils::normalizeUUIDString(GetFormStringValue (sValueIdentifier));
+}
+
+
+LibMCEnv_double CUIEnvironment::GetFormDoubleValue(const std::string& sValueIdentifier) 
+{
+    auto sValue = GetFormStringValue(sValueIdentifier);
+
+    try {
+        return std::stod(sValue);
+    }
+    catch (std::exception & e) {
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE, e.what () + (" / " + sValueIdentifier));
+
+    }
+}
+
+
+LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string& sValueIdentifier) 
+{
+    auto sValue = GetFormStringValue(sValueIdentifier);
+
+    try {
+        return std::stoll(sValue);
+    }
+    catch (std::exception& e) {
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE, e.what() + (" / " + sValueIdentifier));
+
+    }
+}
+
+
+bool CUIEnvironment::GetFormBoolValue(const std::string& sValueIdentifier) 
+{
+    return (GetFormIntegerValue(sValueIdentifier) != 0);
+}
+
+
+
 
 std::string CUIEnvironment::GetEventContext()
 {
     return m_sContextUUID;
+}
+
+
+void CUIEnvironment::addFormValue(const std::string& sValueIdentifier, const std::string& sValue)
+{
+    m_FormValues.insert(std::make_pair (sValueIdentifier, sValue));
 }
