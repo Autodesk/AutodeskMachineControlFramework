@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 
 #include "RapidJSON/document.h"
+#include "RapidJSON/stringbuffer.h"
+#include "RapidJSON/writer.h"
 #include "Common/common_utils.hpp"
 
 using namespace AMC;
@@ -98,8 +100,11 @@ std::string CAPIJSONRequest::getJSONObjectString(const std::string& sKeyName, ui
 	if (!m_pImpl->m_Document[sKeyName.c_str()].IsObject())
 		throw ELibMCInterfaceException(nErrorCode);
 
-	//m_pImpl->m_Document[sKeyName.c_str()].Accept ()
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	m_pImpl->m_Document[sKeyName.c_str()].Accept(writer);
 
+	return buffer.GetString();
 }
 
 

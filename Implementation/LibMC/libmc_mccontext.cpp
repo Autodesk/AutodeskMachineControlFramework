@@ -680,7 +680,7 @@ IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI,
 
      
 
-    return new CAPIRequestHandler(m_pAPI, sURI, requestType, pAuth);
+    return new CAPIRequestHandler(m_pAPI, sURI, requestType, pAuth, m_pSystemState->getLoggerInstance ());
 
 }
 

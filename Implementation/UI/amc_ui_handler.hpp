@@ -121,7 +121,7 @@ namespace AMC {
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
 
-		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sEventParameterJSON);
+		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

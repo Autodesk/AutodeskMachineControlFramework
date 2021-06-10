@@ -45,7 +45,7 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIFormFields, PAPIFormFields);	
 	amcDeclareDependingClass(CAPIFieldDetails, PAPIFieldDetails);
 	amcDeclareDependingClass(CAPISessionHandler, PAPISessionHandler);
-
+	amcDeclareDependingClass(CLogger, PLogger);
 
 	class CAPI {
 	private:
@@ -68,7 +68,7 @@ namespace AMC {
 
 		bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType);
 
-		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth);
+		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth, CLogger* pLogger);
 
 		uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType);
 

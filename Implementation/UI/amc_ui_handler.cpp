@@ -358,27 +358,24 @@ template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<L
 }
 
 
-void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sEventParameterJSON)
-{    
+void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON)
+{
 
     LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pParameterInstances, m_pSignalHandler, sSenderUUID, sContextUUID);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
-    rapidjson::Document document;
-    document.Parse(sEventParameterJSON.c_str());
-    if (!document.IsObject())
-        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
+    if (!sFormValueJSON.empty()) {
 
-    if (document.HasMember("fields")) {
+        rapidjson::Document document;
+        document.Parse(sFormValueJSON.c_str());
+        if (!document.IsObject())
+            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
 
-        auto & fieldObject = document["fields"];
-        if (!fieldObject.IsObject ())
-            throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
 
-        for (rapidjson::Value::ConstMemberIterator itr = fieldObject.MemberBegin();
-            itr != fieldObject.MemberEnd(); ++itr)
+        for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin();
+            itr != document.MemberEnd(); ++itr)
         {
             if (!itr->name.IsString())
                 throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
@@ -386,7 +383,7 @@ void CUIHandler::handleEvent(const std::string& sEventName, const std::string& s
                 throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
 
             std::string sName = itr->name.GetString();
-            std::string sValue = itr->value.GetString();            
+            std::string sValue = itr->value.GetString();
             pInternalUIEnvironment->addFormValue(sName, sValue);
 
         }

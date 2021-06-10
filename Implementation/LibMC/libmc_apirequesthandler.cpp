@@ -46,12 +46,14 @@ using namespace LibMC::Impl;
  Class definition of CAPIRequestHandler 
 **************************************************************************************************************************/
 
-CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth)
-    : m_RequestType(eRequestType), m_pAPI (pAPI), m_pAuth (pAuth)
+CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth, AMC::PLogger pLogger)
+    : m_RequestType(eRequestType), m_pAPI (pAPI), m_pAuth (pAuth), m_pLogger (pLogger)
 {
     if (pAPI.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pAuth.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pLogger.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
     m_sURIWithoutLeadingSlash = pAPI->removeLeadingSlashFromURI(sURI);
@@ -117,8 +119,8 @@ void CAPIRequestHandler::Handle(const LibMC_uint64 nRawBodyBufferSize, const Lib
 
     if (m_pResponse.get() != nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_APIREQUESTALREADYHANDLED);
-
-    m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields, m_pAuth);
+   
+    m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields, m_pAuth, m_pLogger.get());
 
     if (m_pResponse.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);

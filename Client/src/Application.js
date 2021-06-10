@@ -415,12 +415,13 @@ export default class AMCApplication {
 		}
 		
 		
-		triggerUIEvent (eventname, senderuuid, contextuuid) {
+		triggerUIEvent (eventname, senderuuid, contextuuid, formvalues) {
 			
             this.axiosPostRequest("/ui/event", {
 				"eventname": eventname,
 				"senderuuid": senderuuid,
-				"contextuuid": contextuuid						
+				"contextuuid": contextuuid,
+				"formvalues": formvalues
 			})
 				.then(resultHandleEvent => {
 					resultHandleEvent;
