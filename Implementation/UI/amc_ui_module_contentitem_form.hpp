@@ -52,12 +52,13 @@ namespace AMC {
 	class CUIModule_ContentFormEntity {
 	protected:
 
+		std::string m_sName;
 		std::string m_sUUID;
 		std::string m_sCaption;
 
 	public:
 
-		CUIModule_ContentFormEntity(const std::string& sCaption);
+		CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption);
 
 		virtual ~CUIModule_ContentFormEntity();
 
@@ -75,7 +76,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormEdit(const std::string& sCaption);
+		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption);
 
 		virtual ~CUIModule_ContentFormEdit();
 
@@ -89,7 +90,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormSwitch(const std::string& sCaption);
+		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption);
 
 		virtual ~CUIModule_ContentFormSwitch();
 
@@ -102,7 +103,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormMemo(const std::string& sCaption);
+		CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption);
 
 		virtual ~CUIModule_ContentFormMemo();
 
@@ -115,7 +116,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormCombobox(const std::string& sCaption);
+		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption);
 
 		virtual ~CUIModule_ContentFormCombobox();
 
@@ -126,19 +127,22 @@ namespace AMC {
 	class CUIModule_ContentForm : public CUIModule_ContentItem {
 	protected:		
 		std::list<PUIModule_ContentFormEntity> m_Entities;
+		std::string m_sName;
 
 	public:
 
-		CUIModule_ContentForm();
+		CUIModule_ContentForm(const std::string & sName);
 
 		virtual ~CUIModule_ContentForm();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
-		void addEdit(const std::string& sCaption);
-		void addSwitch(const std::string& sCaption);
-		void addMemo(const std::string& sCaption);
-		void addCombobox(const std::string& sCaption);
+		void addEdit(const std::string& sName, const std::string& sCaption);
+		void addSwitch(const std::string& sName, const std::string& sCaption);
+		void addMemo(const std::string& sName, const std::string& sCaption);
+		void addCombobox(const std::string& sName, const std::string& sCaption);
+		
+		std::string getName();
 
 	};
 

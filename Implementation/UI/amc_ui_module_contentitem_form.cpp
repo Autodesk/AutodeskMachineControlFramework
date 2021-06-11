@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentFormEntity::CUIModule_ContentFormEntity(const std::string& sCaption)
-	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption)
+CUIModule_ContentFormEntity::CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption)
+	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption), m_sName (sName)
 {
 
 }
@@ -63,8 +63,8 @@ std::string CUIModule_ContentFormEntity::getCaption()
 
 
 
-CUIModule_ContentFormEdit::CUIModule_ContentFormEdit(const std::string& sCaption)
-	: CUIModule_ContentFormEntity (sCaption)
+CUIModule_ContentFormEdit::CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption)
+	: CUIModule_ContentFormEntity (sName, sCaption)
 {
 
 }
@@ -80,8 +80,8 @@ std::string CUIModule_ContentFormEdit::getTypeString()
 }
 
 
-CUIModule_ContentFormSwitch::CUIModule_ContentFormSwitch(const std::string& sCaption)
-	: CUIModule_ContentFormEntity (sCaption)
+CUIModule_ContentFormSwitch::CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption)
+	: CUIModule_ContentFormEntity (sName, sCaption)
 {
 
 }
@@ -97,8 +97,8 @@ std::string CUIModule_ContentFormSwitch::getTypeString()
 }
 
 
-CUIModule_ContentFormMemo::CUIModule_ContentFormMemo(const std::string& sCaption)
-	: CUIModule_ContentFormEntity (sCaption)
+CUIModule_ContentFormMemo::CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption)
+	: CUIModule_ContentFormEntity (sName, sCaption)
 {
 
 }
@@ -113,8 +113,8 @@ std::string CUIModule_ContentFormMemo::getTypeString()
 	return "memo";
 }
 
-CUIModule_ContentFormCombobox::CUIModule_ContentFormCombobox(const std::string& sCaption)
-	: CUIModule_ContentFormEntity(sCaption)
+CUIModule_ContentFormCombobox::CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption)
+	: CUIModule_ContentFormEntity(sName, sCaption)
 {
 
 }
@@ -131,13 +131,13 @@ std::string CUIModule_ContentFormCombobox::getTypeString()
 }
 
 
-CUIModule_ContentForm::CUIModule_ContentForm()
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID())
+CUIModule_ContentForm::CUIModule_ContentForm(const std::string& sName)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sName(sName)
 {
 
 }
 
-CUIModule_ContentForm::~CUIModule_ContentForm()
+CUIModule_ContentForm::~CUIModule_ContentForm()	
 {
 
 }
@@ -164,23 +164,27 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 }
 
 
-void CUIModule_ContentForm::addEdit(const std::string& sCaption)
+void CUIModule_ContentForm::addEdit(const std::string& sName, const std::string& sCaption)
 {
-	m_Entities.push_back(std::make_shared<CUIModule_ContentFormEdit> (sCaption));
+	m_Entities.push_back(std::make_shared<CUIModule_ContentFormEdit> (sName, sCaption));
 }
 
-void CUIModule_ContentForm::addSwitch(const std::string& sCaption)
+void CUIModule_ContentForm::addSwitch(const std::string& sName, const std::string& sCaption)
 {
-	m_Entities.push_back(std::make_shared<CUIModule_ContentFormSwitch>(sCaption));
+	m_Entities.push_back(std::make_shared<CUIModule_ContentFormSwitch>(sName, sCaption));
 }
 
-void CUIModule_ContentForm::addMemo(const std::string& sCaption)
+void CUIModule_ContentForm::addMemo(const std::string& sName, const std::string& sCaption)
 {
-	m_Entities.push_back(std::make_shared<CUIModule_ContentFormMemo>(sCaption));
+	m_Entities.push_back(std::make_shared<CUIModule_ContentFormMemo>(sName, sCaption));
 }
 
-void CUIModule_ContentForm::addCombobox(const std::string& sCaption)
+void CUIModule_ContentForm::addCombobox(const std::string& sName, const std::string& sCaption)
 {
-	m_Entities.push_back(std::make_shared<CUIModule_ContentFormCombobox>(sCaption));
+	m_Entities.push_back(std::make_shared<CUIModule_ContentFormCombobox>(sName, sCaption));
 }
 
+std::string CUIModule_ContentForm::getName()
+{
+	return m_sName;
+}

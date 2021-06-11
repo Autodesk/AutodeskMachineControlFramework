@@ -53,9 +53,11 @@ namespace AMC {
 		std::string m_sTargetPage;
 		std::string m_sEvent;
 
+		std::list<std::string> m_EventFormValues;
+
 	public:
 
-		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent);
+		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValues);
 
 		virtual ~CUIModule_ContentButton();
 
@@ -81,7 +83,7 @@ namespace AMC {
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
-		void addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent);
+		PUIModule_ContentButton addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValues);
 
 	};
 

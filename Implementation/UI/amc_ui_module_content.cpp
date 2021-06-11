@@ -150,7 +150,8 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				auto captionAttrib = buttonNode.attribute("caption");
 				auto targetpageAttrib = buttonNode.attribute("targetpage");
 				auto eventAttrib = buttonNode.attribute("event");
-				pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string());
+				auto formvaluesAttrib = buttonNode.attribute("formvalues");
+				auto pButton = pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string(), formvaluesAttrib.as_string ());
 			}
 
 		}
@@ -158,7 +159,11 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 
 		if (sChildName == "form") {
 
-			auto pForm = std::make_shared <CUIModule_ContentForm>();
+			auto formNameAttrib = childNode.attribute("name");
+			if (formNameAttrib.empty ())
+				throw ELibMCCustomException(LIBMC_ERROR_FORMNAMEMISSING, getName());
+
+			auto pForm = std::make_shared <CUIModule_ContentForm>(formNameAttrib.as_string ());
 			addItem(pForm);
 
 			auto formNodes = childNode.children();
@@ -166,21 +171,25 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 
 				std::string sNodeName = formNode.name();
 				auto captionAttrib = formNode.attribute("caption");
+				auto nameAttrib = formNode.attribute("name");
+
+				if (nameAttrib.empty ())
+					throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNAMEMISSING, pForm->getName ());
 
 				if (sNodeName == "edit") {
-					pForm->addEdit(captionAttrib.as_string());
+					pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string());
 				}
 
 				if (sNodeName == "switch") {
-					pForm->addSwitch(captionAttrib.as_string());
+					pForm->addSwitch(nameAttrib.as_string(), captionAttrib.as_string());
 				}
 
 				if (sNodeName == "memo") {
-					pForm->addMemo(captionAttrib.as_string());
+					pForm->addMemo(nameAttrib.as_string(), captionAttrib.as_string());
 				}
 
 				if (sNodeName == "combobox") {
-					pForm->addCombobox(captionAttrib.as_string());
+					pForm->addCombobox(nameAttrib.as_string(), captionAttrib.as_string());
 				}
 			}
 

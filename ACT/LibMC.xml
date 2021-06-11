@@ -352,6 +352,10 @@
 		<error name="COULDNOTPARSEEVENTPARAMETERS" code="341" description="Could not parse event parameters" />		
 		<error name="INVALIDEVENTPARAMETERS" code="342" description="Invalid event parameters" />		
 		<error name="INVALIDFORMVALUES" code="343" description="Invalid form values" />		
+		<error name="FORMNAMEMISSING" code="344" description="Form name is missing" />		
+		<error name="FORMENTITYNAMEMISSING" code="345" description="Form entity name is missing" />		
+			
+		
 
 			
 	</errors>
