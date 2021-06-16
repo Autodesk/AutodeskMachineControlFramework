@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
+#include "amc_ui_module_contentitem_form.hpp"
+
+#include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
 #include "amc_parameterinstances.hpp"
 #include "amc_jsonwriter.hpp"
@@ -265,7 +268,8 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModule = CUIModuleFactory::createModule(pageChild, m_pParameterInstances, m_pCoreResourcePackage, pBuildJobHandler);
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pParameterInstances, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
+            auto pModule = CUIModuleFactory::createModule(pageChild, pModuleEnvironment);
             pPage->addModule(pModule);
 
         }
@@ -324,12 +328,17 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
     }
 
     m_pMainPage = findPage (sMainPage);
+
+    // Update all cross-references!
+    for (auto pPage : m_Pages)
+        pPage.second->configurePostLoading();
+
 }
 
 PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
 {
     for (auto pPage : m_Pages) {
-        auto pModuleItem = pPage.second->findModuleItem(sUUID);
+        auto pModuleItem = pPage.second->findModuleItemByUUID(sUUID);
         if (pModuleItem.get() != nullptr)
             return pModuleItem;
     }
@@ -337,6 +346,16 @@ PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
     return nullptr;
 }
 
+PUIPage CUIHandler::findPageOfModuleItem(const std::string& sUUID)
+{
+    for (auto pPage : m_Pages) {
+        auto pModuleItem = pPage.second->findModuleItemByUUID(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pPage.second;
+    }
+
+    return nullptr;
+}
 
 PResourcePackage CUIHandler::getCoreResourcePackage()
 {
@@ -364,6 +383,14 @@ void CUIHandler::handleEvent(const std::string& sEventName, const std::string& s
     LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pParameterInstances, m_pSignalHandler, sSenderUUID, sContextUUID);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
+    auto pPage = findPageOfModuleItem(sSenderUUID);
+    if (pPage.get() == nullptr)
+        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
+
+    auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
+    if (pModuleItem.get() == nullptr)
+        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+
     auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
     if (!sFormValueJSON.empty()) {
@@ -379,12 +406,38 @@ void CUIHandler::handleEvent(const std::string& sEventName, const std::string& s
         {
             if (!itr->name.IsString())
                 throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
-            if (!itr->value.IsString())
+            std::string sEntityUUID = itr->name.GetString();
+            std::string sFormValue;
+
+            if (itr->value.IsString()) {
+                sFormValue = itr->value.GetString();
+            }
+            else if (itr->value.IsInt64()) {
+                sFormValue = std::to_string (itr->value.GetInt64());
+            }
+            else if (itr->value.IsBool()) {
+                sFormValue = std::to_string(itr->value.GetBool());
+            }
+            else if (itr->value.IsDouble()) {
+                sFormValue = std::to_string(itr->value.GetDouble());
+            }
+            else
                 throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
 
-            std::string sName = itr->name.GetString();
-            std::string sValue = itr->value.GetString();
-            pInternalUIEnvironment->addFormValue(sName, sValue);
+            
+
+            auto pFormItem = pPage->findModuleItemByUUID(sEntityUUID);
+            auto pForm = std::dynamic_pointer_cast<CUIModule_ContentForm> (pFormItem);
+            if (pForm.get() != nullptr) {
+
+                auto pFormEntity = pForm->findEntityByUUID(sEntityUUID);
+                if (pFormEntity.get() == nullptr) 
+                    throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNOTFOUND, sEventName + "/" + sEntityUUID);
+
+                pInternalUIEnvironment->addFormValue(pForm->getName (), pFormEntity->getName (), sFormValue);
+                
+            }
+                        
 
         }
 

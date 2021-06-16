@@ -40,12 +40,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Libraries/PugiXML/pugixml.hpp"
 #include "Core/amc_jsonwriter.hpp"
+#include "amc_ui_interfaces.hpp"
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+
+	class CUIModuleEnvironment {
+	private:
+		PParameterInstances m_pParameterInstances;
+		PResourcePackage m_pResourcePackage;
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		CUIModule_ContentRegistry* m_pFormRegistry;
+
+	public:
+		CUIModuleEnvironment(PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry);
+
+		PParameterInstances parameterInstances();
+		PResourcePackage resourcePackage();
+		LibMCData::PBuildJobHandler buildJobHandler ();
+		CUIModule_ContentRegistry* formRegistry ();
+
+	};
 
 	class CUIModule {
 	protected:
@@ -74,6 +100,8 @@ namespace AMC {
 
 		static std::string getNameFromXML(pugi::xml_node& xmlNode);
 		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
+
+		virtual void configurePostLoading() = 0;
 
 	};
 

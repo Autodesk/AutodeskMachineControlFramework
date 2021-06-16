@@ -39,26 +39,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
-CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
-	if (pParameterInstances.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pResourcePackage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pBuildJobHandler.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (getTypeFromXML(xmlNode) != getStaticType())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
 
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
-		auto pTab = CUIModuleFactory::createModule(childNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+		auto pTab = CUIModuleFactory::createModule(childNode, pUIModuleEnvironment);
 		addTab (pTab);			
 	}
 
@@ -139,3 +132,8 @@ void CUIModule_Tabs::populateItemMap(std::map<std::string, PUIModuleItem>& itemM
 		pTab->populateItemMap(itemMap);
 }
 
+void CUIModule_Tabs::configurePostLoading()
+{
+	for (auto pTab : m_Tabs)
+		pTab->configurePostLoading();
+}

@@ -68,7 +68,7 @@ private:
 
 
 	std::string m_sContextUUID;
-	std::map<std::string, std::string> m_FormValues;
+	std::map<std::pair <std::string, std::string>, std::string> m_FormValues;
 
 protected:
 
@@ -106,19 +106,21 @@ public:
 
 	void SetBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const bool bValue) override;
 
-	std::string GetFormStringValue(const std::string& sValueIdentifier) override;
+	bool HasFormValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier) override;
 
-	std::string GetFormUUIDValue(const std::string& sValueIdentifier) override;
+	std::string GetFormStringValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier) override;
 
-	LibMCEnv_double GetFormDoubleValue(const std::string& sValueIdentifier) override;
+	std::string GetFormUUIDValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier) override;
 
-	LibMCEnv_int64 GetFormIntegerValue(const std::string& sValueIdentifier) override;
+	LibMCEnv_double GetFormDoubleValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier) override;
 
-	bool GetFormBoolValue(const std::string& sValueIdentifier) override;
+	LibMCEnv_int64 GetFormIntegerValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier) override;
+
+	bool GetFormBoolValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier) override;
 
 	std::string GetEventContext() override;
 
-	void addFormValue(const std::string & sValueIdentifier, const std::string & sValue);
+	void addFormValue(const std::string& sFormIdentifier, const std::string & sValueIdentifier, const std::string & sValue);
 
 };
 

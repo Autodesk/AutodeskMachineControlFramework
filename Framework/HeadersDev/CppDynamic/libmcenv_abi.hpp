@@ -1631,58 +1631,74 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setintegerparameter(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setboolparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool bValue);
 
 /**
+* returns if a form value has been passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValuePassed - Form Value has been passed
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasformvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, bool * pValuePassed);
+
+/**
 * returns a passed form value from the client. Fails if value is not passed.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
 * @param[in] pValueIdentifier - Identifier of the form value.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of Form Value, may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformstringvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformstringvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * returns a passed form value from the client. Fails if value is not passed.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
 * @param[in] pValueIdentifier - Identifier of the form value.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of Form Value, may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformuuidvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformuuidvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * returns a passed form value from the client. Fails if value is not passed.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
 * @param[in] pValueIdentifier - Identifier of the form value.
 * @param[out] pValue - Form Value
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformdoublevalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, LibMCEnv_double * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformdoublevalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, LibMCEnv_double * pValue);
 
 /**
 * returns a passed form value from the client. Fails if value is not passed.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
 * @param[in] pValueIdentifier - Identifier of the form value.
 * @param[out] pValue - Form Value
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformintegervalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, LibMCEnv_int64 * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformintegervalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, LibMCEnv_int64 * pValue);
 
 /**
 * returns a passed form value from the client. Fails if value is not passed.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
 * @param[in] pValueIdentifier - Identifier of the form value.
 * @param[out] pValue - Form Value
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformboolvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pValueIdentifier, bool * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformboolvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, bool * pValue);
 
 /**
 * returns the event context uuid as string

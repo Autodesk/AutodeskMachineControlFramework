@@ -887,28 +887,38 @@
 			<param name="Value" type="bool" pass="in" description="Value to set" />
 		</method>
 
+		<method name="HasFormValue" description="returns if a form value has been passed.">
+			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
+			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
+			<param name="ValuePassed" type="bool" pass="return" description="Form Value has been passed" />
+		</method>
 
 		<method name="GetFormStringValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
 			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
 			<param name="Value" type="string" pass="return" description="Form Value" />
 		</method>
 
 		<method name="GetFormUUIDValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
 			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
 			<param name="Value" type="string" pass="return" description="Form Value" />
 		</method>
 
 		<method name="GetFormDoubleValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
 			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
 			<param name="Value" type="double" pass="return" description="Form Value" />
 		</method>
 
 		<method name="GetFormIntegerValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
 			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
 			<param name="Value" type="int64" pass="return" description="Form Value" />
 		</method>
 		
 		<method name="GetFormBoolValue" description="returns a passed form value from the client. Fails if value is not passed.">
+			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
 			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
 			<param name="Value" type="bool" pass="return" description="Form Value" />
 		</method>

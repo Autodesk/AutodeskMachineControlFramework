@@ -38,12 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_interfaces.hpp"
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentButtonGroup, PUIModule_ContentButtonGroup);
 	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
+	amcDeclareDependingClass(CUIModule_ContentFormEntity, PUIModule_ContentFormEntity);
+
 
 	class CUIModule_ContentButton {
 	protected:
@@ -53,11 +56,12 @@ namespace AMC {
 		std::string m_sTargetPage;
 		std::string m_sEvent;
 
-		std::list<std::string> m_EventFormValues;
+		std::string m_sEventFormValueSetting;
+		std::list<PUIModule_ContentFormEntity> m_pFormValues;
 
 	public:
 
-		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValues);
+		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValueSetting);
 
 		virtual ~CUIModule_ContentButton();
 
@@ -69,21 +73,34 @@ namespace AMC {
 
 		std::string getEvent();
 
+		std::string getEventFormValueSetting();
+
+		void addFormFieldValue(PUIModule_ContentFormEntity pEntity);
+
+		void writeFormValuesToJSON (CJSONWriterArray & pArray);
+
 	};
 
 	class CUIModule_ContentButtonGroup : public CUIModule_ContentItem {
 	protected:		
 		std::list<PUIModule_ContentButton> m_Buttons;
+		CUIModule_ContentRegistry* m_pFormOwner;
 
 	public:
 
-		CUIModule_ContentButtonGroup();
+		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner);
 
 		virtual ~CUIModule_ContentButtonGroup();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 		PUIModule_ContentButton addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValues);
+
+		virtual void configurePostLoading() override;
+
+		// Returns all UUIDs that could be contained in this Item
+		virtual std::list <std::string> getReferenceUUIDs() override;
+
 
 	};
 

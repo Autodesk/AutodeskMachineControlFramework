@@ -47,15 +47,11 @@ using namespace AMC;
 
 
 
-CUIModule_Tab::CUIModule_Tab(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+CUIModule_Tab::CUIModule_Tab(pugi::xml_node& xmlNode, PUIModuleEnvironment pModuleEnvironment)
 {
-	LibMCAssertNotNull(pParameterInstances.get());
-	LibMCAssertNotNull(pResourcePackage.get());
-	LibMCAssertNotNull(pBuildJobHandler.get());
+	LibMCAssertNotNull(pModuleEnvironment.get());
 
-
-
-	m_pModule = CUIModuleFactory::createModule(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+	m_pModule = CUIModuleFactory::createModule(xmlNode, pModuleEnvironment);
 }
 
 CUIModule_Tab::~CUIModule_Tab()

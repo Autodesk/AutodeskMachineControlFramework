@@ -31,11 +31,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_MODULE
 
 #include "amc_ui_module.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include "Common/common_utils.hpp"
 
 
 using namespace AMC;
+
+
+CUIModuleEnvironment::CUIModuleEnvironment(PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry)
+	: m_pParameterInstances (pParameterInstances), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pFormRegistry (pFormRegistry)
+{
+	LibMCAssertNotNull(pParameterInstances.get());
+	LibMCAssertNotNull(pResourcePackage.get());
+	LibMCAssertNotNull(pBuildJobHandler.get());
+	LibMCAssertNotNull(pFormRegistry);
+}
+
+PParameterInstances CUIModuleEnvironment::parameterInstances()
+{
+	return m_pParameterInstances;
+}
+
+PResourcePackage CUIModuleEnvironment::resourcePackage()
+{
+	return m_pResourcePackage;
+}
+
+LibMCData::PBuildJobHandler CUIModuleEnvironment::buildJobHandler()
+{
+	return m_pBuildJobHandler;
+}
+
+CUIModule_ContentRegistry* CUIModuleEnvironment::formRegistry()
+{
+	return m_pFormRegistry;
+}
+
 
 CUIModule::CUIModule(const std::string& sName)
 	: m_sName (sName), m_sUUID (AMCCommon::CUtils::createUUID ())

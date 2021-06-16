@@ -354,9 +354,14 @@
 		<error name="INVALIDFORMVALUES" code="343" description="Invalid form values" />		
 		<error name="FORMNAMEMISSING" code="344" description="Form name is missing" />		
 		<error name="FORMENTITYNAMEMISSING" code="345" description="Form entity name is missing" />		
-			
+		<error name="FORMNOTFOUND" code="346" description="Form not found" />		
+		<error name="FORMENTITYNOTFOUND" code="347" description="Form entity not found" />		
+		<error name="DUPLICATEENTITYNAME" code="348" description="Duplicate form entity name" />				
+		<error name="COULDNOTFINDEVENTSENDERPAGE" code="349" description="Could not find event sender page" />		
+		<error name="COULDNOTFINDEVENTSENDER" code="350" description="Could not find event sender" />
+		<error name="DUPLICATEFORMNAME" code="351" description="Duplicate form name" />
 		
-
+		
 			
 	</errors>
 	

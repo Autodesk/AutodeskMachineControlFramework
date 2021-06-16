@@ -748,11 +748,12 @@ public:
 	inline void SetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_double dValue);
 	inline void SetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_int64 nValue);
 	inline void SetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const bool bValue);
-	inline std::string GetFormStringValue(const std::string & sValueIdentifier);
-	inline std::string GetFormUUIDValue(const std::string & sValueIdentifier);
-	inline LibMCEnv_double GetFormDoubleValue(const std::string & sValueIdentifier);
-	inline LibMCEnv_int64 GetFormIntegerValue(const std::string & sValueIdentifier);
-	inline bool GetFormBoolValue(const std::string & sValueIdentifier);
+	inline bool HasFormValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier);
+	inline std::string GetFormStringValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier);
+	inline std::string GetFormUUIDValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier);
+	inline LibMCEnv_double GetFormDoubleValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier);
+	inline LibMCEnv_int64 GetFormIntegerValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier);
+	inline bool GetFormBoolValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier);
 	inline std::string GetEventContext();
 };
 	
@@ -983,6 +984,7 @@ public:
 		pWrapperTable->m_UIEnvironment_SetDoubleParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_SetIntegerParameter = nullptr;
 		pWrapperTable->m_UIEnvironment_SetBoolParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_HasFormValue = nullptr;
 		pWrapperTable->m_UIEnvironment_GetFormStringValue = nullptr;
 		pWrapperTable->m_UIEnvironment_GetFormUUIDValue = nullptr;
 		pWrapperTable->m_UIEnvironment_GetFormDoubleValue = nullptr;
@@ -2357,6 +2359,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HasFormValue = (PLibMCEnvUIEnvironment_HasFormValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hasformvalue");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HasFormValue = (PLibMCEnvUIEnvironment_HasFormValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_hasformvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HasFormValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_GetFormStringValue = (PLibMCEnvUIEnvironment_GetFormStringValuePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getformstringvalue");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_GetFormStringValue = (PLibMCEnvUIEnvironment_GetFormStringValuePtr) dlsym(hLibrary, "libmcenv_uienvironment_getformstringvalue");
@@ -3053,6 +3064,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_setboolparameter", (void**)&(pWrapperTable->m_UIEnvironment_SetBoolParameter));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hasformvalue", (void**)&(pWrapperTable->m_UIEnvironment_HasFormValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HasFormValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_getformstringvalue", (void**)&(pWrapperTable->m_UIEnvironment_GetFormStringValue));
@@ -5066,72 +5081,91 @@ public:
 	}
 	
 	/**
+	* CUIEnvironment::HasFormValue - returns if a form value has been passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value has been passed
+	*/
+	bool CUIEnvironment::HasFormValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier)
+	{
+		bool resultValuePassed = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HasFormValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), &resultValuePassed));
+		
+		return resultValuePassed;
+	}
+	
+	/**
 	* CUIEnvironment::GetFormStringValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
 	* @param[in] sValueIdentifier - Identifier of the form value.
 	* @return Form Value
 	*/
-	std::string CUIEnvironment::GetFormStringValue(const std::string & sValueIdentifier)
+	std::string CUIEnvironment::GetFormStringValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormStringValue(m_pHandle, sValueIdentifier.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormStringValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormStringValue(m_pHandle, sValueIdentifier.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormStringValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CUIEnvironment::GetFormUUIDValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
 	* @param[in] sValueIdentifier - Identifier of the form value.
 	* @return Form Value
 	*/
-	std::string CUIEnvironment::GetFormUUIDValue(const std::string & sValueIdentifier)
+	std::string CUIEnvironment::GetFormUUIDValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormUUIDValue(m_pHandle, sValueIdentifier.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormUUIDValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormUUIDValue(m_pHandle, sValueIdentifier.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormUUIDValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
 	* CUIEnvironment::GetFormDoubleValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
 	* @param[in] sValueIdentifier - Identifier of the form value.
 	* @return Form Value
 	*/
-	LibMCEnv_double CUIEnvironment::GetFormDoubleValue(const std::string & sValueIdentifier)
+	LibMCEnv_double CUIEnvironment::GetFormDoubleValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormDoubleValue(m_pHandle, sValueIdentifier.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormDoubleValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CUIEnvironment::GetFormIntegerValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
 	* @param[in] sValueIdentifier - Identifier of the form value.
 	* @return Form Value
 	*/
-	LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string & sValueIdentifier)
+	LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier)
 	{
 		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormIntegerValue(m_pHandle, sValueIdentifier.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormIntegerValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
 	* CUIEnvironment::GetFormBoolValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
 	* @param[in] sValueIdentifier - Identifier of the form value.
 	* @return Form Value
 	*/
-	bool CUIEnvironment::GetFormBoolValue(const std::string & sValueIdentifier)
+	bool CUIEnvironment::GetFormBoolValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier)
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormBoolValue(m_pHandle, sValueIdentifier.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetFormBoolValue(m_pHandle, sFormIdentifier.c_str(), sValueIdentifier.c_str(), &resultValue));
 		
 		return resultValue;
 	}

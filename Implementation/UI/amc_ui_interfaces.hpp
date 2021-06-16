@@ -28,54 +28,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-
-#ifndef __AMC_UI_MODULE_TAB
-#define __AMC_UI_MODULE_TAB
+#ifndef __AMC_UI_INTERFACES
+#define __AMC_UI_INTERFACES
 
 #include "header_protection.hpp"
 
-#ifndef __AMCIMPL_UI_MODULE
-#error this header is protected and should only be included in the corresponding implementation CPP files.
-#endif
-
-#include "Libraries/PugiXML/pugixml.hpp"
-
-namespace LibMCData {
-	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
-}
-
-
 namespace AMC {
 
-	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_Tab, PUIModule_Tab);
-
-	class CUIModule_Tab {
-	protected:		
-
-		std::string m_sName;
-		std::string m_sCaption;
-
-		PUIModule m_pModule;
-
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+		
+	class CUIModule_ContentRegistry {
 	public:
 
-		CUIModule_Tab(pugi::xml_node & xmlNode, PUIModuleEnvironment pModuleEnvironment);
-		
-		virtual ~CUIModule_Tab();
+		virtual void registerFormName(const std::string& sFormUUID, const std::string & sFormName) = 0;
+		virtual std::string findFormUUIDByName(const std::string & sFormName) = 0;
 
-		virtual std::string getName();
-
-		virtual std::string getCaption();
-
-		CUIModule * getModule ();
-
-
+		virtual PUIModuleItem findModuleItemByUUID(const std::string& sItemUUID) = 0;
 	};
-
+	
+	
 	
 }
 
 
-#endif //__AMC_UI_MODULE_TABS
-
+#endif // __AMC_UI_INTERFACES

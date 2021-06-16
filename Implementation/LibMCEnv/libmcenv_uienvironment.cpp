@@ -171,40 +171,44 @@ void CUIEnvironment::SetBoolParameter(const std::string& sMachineInstance, const
 }
 
 
-std::string CUIEnvironment::GetFormStringValue(const std::string& sValueIdentifier) 
-{
-    auto iIter = m_FormValues.find(sValueIdentifier);
 
-    if (iIter == m_FormValues.end ())
+bool CUIEnvironment::HasFormValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
+{
+    auto iIter = m_FormValues.find(std::make_pair(sFormIdentifier, sValueIdentifier));
+    return (iIter != m_FormValues.end());
+}
+
+std::string CUIEnvironment::GetFormStringValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
+{
+    auto iIter = m_FormValues.find(std::make_pair (sFormIdentifier, sValueIdentifier));
+
+    if (iIter == m_FormValues.end())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_FORMVALUENOTFOUND, "form value not found: " + sValueIdentifier);
 
     return iIter->second;
 }
 
-
-std::string CUIEnvironment::GetFormUUIDValue(const std::string& sValueIdentifier) 
+std::string CUIEnvironment::GetFormUUIDValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
 {
-    return AMCCommon::CUtils::normalizeUUIDString(GetFormStringValue (sValueIdentifier));
+    return AMCCommon::CUtils::normalizeUUIDString(GetFormStringValue(sFormIdentifier, sValueIdentifier));
 }
 
-
-LibMCEnv_double CUIEnvironment::GetFormDoubleValue(const std::string& sValueIdentifier) 
+LibMCEnv_double CUIEnvironment::GetFormDoubleValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
 {
-    auto sValue = GetFormStringValue(sValueIdentifier);
+    auto sValue = GetFormStringValue(sFormIdentifier, sValueIdentifier);
 
     try {
         return std::stod(sValue);
     }
-    catch (std::exception & e) {
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE, e.what () + (" / " + sValueIdentifier));
+    catch (std::exception& e) {
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE, e.what() + (" / " + sValueIdentifier));
 
     }
 }
 
-
-LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string& sValueIdentifier) 
+LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
 {
-    auto sValue = GetFormStringValue(sValueIdentifier);
+    auto sValue = GetFormStringValue(sFormIdentifier, sValueIdentifier);
 
     try {
         return std::stoll(sValue);
@@ -213,14 +217,13 @@ LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string& sValueIden
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE, e.what() + (" / " + sValueIdentifier));
 
     }
+
 }
 
-
-bool CUIEnvironment::GetFormBoolValue(const std::string& sValueIdentifier) 
+bool CUIEnvironment::GetFormBoolValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
 {
-    return (GetFormIntegerValue(sValueIdentifier) != 0);
+    return (GetFormIntegerValue(sFormIdentifier, sValueIdentifier) != 0);
 }
-
 
 
 
@@ -230,7 +233,7 @@ std::string CUIEnvironment::GetEventContext()
 }
 
 
-void CUIEnvironment::addFormValue(const std::string& sValueIdentifier, const std::string& sValue)
+void CUIEnvironment::addFormValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier, const std::string& sValue)
 {
-    m_FormValues.insert(std::make_pair (sValueIdentifier, sValue));
+    m_FormValues.insert(std::make_pair (std::make_pair (sFormIdentifier, sValueIdentifier), sValue));
 }

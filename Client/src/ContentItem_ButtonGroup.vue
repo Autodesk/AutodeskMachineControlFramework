@@ -28,9 +28,7 @@
 		uiModuleButtonClick: function (button) {
 					
 			var contextuuid = this.Application.AppState.activeObject;
-			var formvalues = {
-			   
-			};
+			var formvalues = this.Application.assembleFormValues (button.eventformvalues);
 			
 			if (button.event != "") {		
 				this.Application.triggerUIEvent (button.event, button.uuid, contextuuid, formvalues);

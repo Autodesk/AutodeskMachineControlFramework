@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
+#include "amc_ui_module_contentitem_form.hpp"
+#include "amc_ui_interfaces.hpp"
 
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
@@ -50,8 +52,11 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
+	amcDeclareDependingClass(CUIModule_ContentForm, PUIModule_ContentForm);
 	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CUIModule_ContentFormRegistry, PUIModule_ContentFormRegistry);
+	
 
 	class CUIModule_Content : public CUIModule {
 	protected:		
@@ -68,7 +73,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CUIModule_Content(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_Content();
 
@@ -88,6 +93,8 @@ namespace AMC {
 
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
+
+		void configurePostLoading() override;
 
 	};
 

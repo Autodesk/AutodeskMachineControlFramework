@@ -54,6 +54,10 @@ namespace AMC {
 
 		}
 
+		virtual void configurePostLoading()
+		{
+		}
+
 		virtual std::string getUUID () = 0;
 
 		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) = 0;

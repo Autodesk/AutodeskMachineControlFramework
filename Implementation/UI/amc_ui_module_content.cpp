@@ -51,12 +51,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
-	LibMCAssertNotNull(pParameterInstances.get());
-	LibMCAssertNotNull(pResourcePackage.get());
-	LibMCAssertNotNull(pBuildJobHandler.get());
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
 
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
@@ -87,7 +85,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 
 		if (sChildName == "image") {
 			auto resourceAttrib = childNode.attribute("resource");
-			auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+			auto pResourceEntry = pUIModuleEnvironment->resourcePackage()->findEntryByName(resourceAttrib.as_string(), true);
 			double dLogoAspectRatio = 1.0;
 			auto aspectratioAttrib = childNode.attribute("aspectratio");
 			if (!aspectratioAttrib.empty()) {
@@ -134,7 +132,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 			}
 
-			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pParameterInstances);
+			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pUIModuleEnvironment->parameterInstances());
 			addItem (pParameterList);
 
 			pParameterList->loadFromXML(childNode);
@@ -142,7 +140,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 
 		if (sChildName == "buttongroup") {
 
-			auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>();
+			auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->formRegistry());
 			addItem(pButtonGroup);
 
 			auto buttonsNodes = childNode.children("button");
@@ -166,6 +164,8 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 			auto pForm = std::make_shared <CUIModule_ContentForm>(formNameAttrib.as_string ());
 			addItem(pForm);
 
+			pUIModuleEnvironment->formRegistry()->registerFormName(pForm->getUUID(), pForm->getName ());
+
 			auto formNodes = childNode.children();
 			for (auto formNode : formNodes) {
 
@@ -176,21 +176,24 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				if (nameAttrib.empty ())
 					throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNAMEMISSING, pForm->getName ());
 
+				PUIModule_ContentFormEntity pEntity;
+
 				if (sNodeName == "edit") {
-					pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string());
+					pEntity = pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string());
 				}
 
 				if (sNodeName == "switch") {
-					pForm->addSwitch(nameAttrib.as_string(), captionAttrib.as_string());
+					pEntity = pForm->addSwitch(nameAttrib.as_string(), captionAttrib.as_string());
 				}
 
 				if (sNodeName == "memo") {
-					pForm->addMemo(nameAttrib.as_string(), captionAttrib.as_string());
+					pEntity = pForm->addMemo(nameAttrib.as_string(), captionAttrib.as_string());
 				}
 
 				if (sNodeName == "combobox") {
-					pForm->addCombobox(nameAttrib.as_string(), captionAttrib.as_string());
+					pEntity = pForm->addCombobox(nameAttrib.as_string(), captionAttrib.as_string());
 				}
+
 			}
 
 		}
@@ -215,13 +218,12 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 			}
 
-			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pBuildJobHandler);
+			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pUIModuleEnvironment->buildJobHandler());
 			addItem(pBuildList);
 			
 		}
 
 	}
-
 
 }
 
@@ -297,14 +299,27 @@ void CUIModule_Content::addItem(PUIModule_ContentItem pItem)
 	LibMCAssertNotNull(pItem.get());
 
 	m_Items.push_back(pItem);
-	m_ItemMap.insert(std::make_pair (pItem->getUUID (), pItem));
+
+	auto referenceList = pItem->getReferenceUUIDs();
+	for (auto sUUID : referenceList)
+		m_ItemMap.insert(std::make_pair (sUUID, pItem));
 
 }
 
 
 void CUIModule_Content::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
 {
-	for (auto item : m_Items) 
-		itemMap.insert(std::make_pair(item->getUUID(), item));
+	for (auto item : m_Items) {
+		auto referenceList = item->getReferenceUUIDs();
+		for (auto sUUID : referenceList)
+			itemMap.insert(std::make_pair(sUUID, item));
+
+	}
+}
+
+void CUIModule_Content::configurePostLoading()
+{
+	for (auto item : m_Items)
+		item->configurePostLoading();
 }
 

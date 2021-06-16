@@ -79,7 +79,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_HorizontalSplit(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CUIModule_HorizontalSplit(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_HorizontalSplit();
 
@@ -95,6 +95,8 @@ namespace AMC {
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
 		PUIModule_HorizontalSection findSection(const std::string& sUUID);
+
+		void configurePostLoading() override;
 
 	};
 

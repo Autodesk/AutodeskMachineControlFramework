@@ -370,6 +370,12 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDFORMVALUES 343
 #define LIBMC_ERROR_FORMNAMEMISSING 344
 #define LIBMC_ERROR_FORMENTITYNAMEMISSING 345
+#define LIBMC_ERROR_FORMNOTFOUND 346
+#define LIBMC_ERROR_FORMENTITYNOTFOUND 347
+#define LIBMC_ERROR_DUPLICATEENTITYNAME 348
+#define LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE 349
+#define LIBMC_ERROR_COULDNOTFINDEVENTSENDER 350
+#define LIBMC_ERROR_DUPLICATEFORMNAME 351
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -652,6 +658,12 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDFORMVALUES: return "Invalid form values";
     case LIBMC_ERROR_FORMNAMEMISSING: return "Form name is missing";
     case LIBMC_ERROR_FORMENTITYNAMEMISSING: return "Form entity name is missing";
+    case LIBMC_ERROR_FORMNOTFOUND: return "Form not found";
+    case LIBMC_ERROR_FORMENTITYNOTFOUND: return "Form entity not found";
+    case LIBMC_ERROR_DUPLICATEENTITYNAME: return "Duplicate form entity name";
+    case LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE: return "Could not find event sender page";
+    case LIBMC_ERROR_COULDNOTFINDEVENTSENDER: return "Could not find event sender";
+    case LIBMC_ERROR_DUPLICATEFORMNAME: return "Duplicate form name";
     default: return "unknown error";
   }
 }

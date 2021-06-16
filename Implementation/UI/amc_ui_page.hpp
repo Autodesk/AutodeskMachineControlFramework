@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 #include "Libraries/PugiXML/pugixml.hpp"
+#include "amc_ui_interfaces.hpp"
 
 namespace AMC {
 
@@ -51,12 +52,17 @@ namespace AMC {
 	amcDeclareDependingClass(CUIPage, PUIPage);	
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 
-	class CUIPage {
+
+	class CUIPage : public CUIModule_ContentRegistry {
 	protected:
 		std::string m_sName;
 
 		std::vector<PUIModule> m_Modules;
 		std::map <std::string, PUIModule> m_ModuleMap;
+		std::map<std::string, PUIModuleItem> m_ItemMapOfPage;
+
+		std::map<std::string, std::string> m_FormNameMap;
+
 
 	public:
 
@@ -74,7 +80,11 @@ namespace AMC {
 
 		void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray);
 
-		PUIModuleItem findModuleItem(const std::string& sUUID);
+		virtual PUIModuleItem findModuleItemByUUID(const std::string& sUUID) override;
+		virtual void registerFormName(const std::string& sFormUUID, const std::string& sFormName) override;
+		virtual std::string findFormUUIDByName(const std::string& sFormName) override;
+
+		virtual void configurePostLoading();
 										
 	};
 		

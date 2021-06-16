@@ -120,6 +120,9 @@ namespace AMC {
 		PResourcePackage getCoreResourcePackage ();
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
+		
+		PUIPage findPageOfModuleItem(const std::string& sUUID);
+
 
 		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON);
 	};

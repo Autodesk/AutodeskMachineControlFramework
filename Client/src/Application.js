@@ -35,7 +35,8 @@ export default class AMCApplication {
             MenuItems: [],
             ToolbarItems: [],
 			ContentItems: [],					
-			Pages: []
+			Pages: [],
+			FormEntities: []
 		}
 
 		
@@ -189,6 +190,19 @@ export default class AMCApplication {
 			item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
 		
 		}
+		
+		if (item.type === "form") {
+			
+			for (var entity of item.entities) {
+				
+				this.AppContent.FormEntities[entity.uuid] = { uuid: entity.uuid, value: entity.defaultvalue, remotevalue: entity.defaultvalue };
+				entity.dataObject = this.AppContent.FormEntities[entity.uuid];
+			}
+			
+		
+			
+		}
+		
 	}
 	
 
@@ -430,6 +444,20 @@ export default class AMCApplication {
                 .catch(err => {
 					alert (err);
                 });				
+		}
+		
+		
+		assembleFormValues (formValueUUIDList)
+		{
+			var resultObject = {}
+			
+			for (var entityuuid of formValueUUIDList) {
+				var formValue = this.AppContent.FormEntities[entityuuid].value;
+				resultObject[entityuuid] = formValue;				
+			}
+			
+			return resultObject;
+			
 		}
 
 }

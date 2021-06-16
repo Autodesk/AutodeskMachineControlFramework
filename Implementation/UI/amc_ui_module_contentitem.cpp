@@ -70,5 +70,10 @@ void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObj
 
 }
 
+std::list <std::string> CUIModule_ContentItem::getReferenceUUIDs()
+{
+	std::list <std::string> resultList;
+	resultList.push_back(m_sUUID);
 
-
+	return resultList;
+}

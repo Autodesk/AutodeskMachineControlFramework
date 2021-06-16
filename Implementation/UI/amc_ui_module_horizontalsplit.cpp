@@ -60,13 +60,11 @@ double CUIModule_HorizontalSection::getFixedWidthInPercentiles()
 	return m_fixedWidthInPercentiles;
 }
 
-CUIModule_HorizontalSplit::CUIModule_HorizontalSplit(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+CUIModule_HorizontalSplit::CUIModule_HorizontalSplit(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
-	LibMCAssertNotNull(pParameterInstances.get());
-	LibMCAssertNotNull(pResourcePackage.get());
-	LibMCAssertNotNull(pBuildJobHandler.get());
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
 	if (getTypeFromXML(xmlNode) != getStaticType())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
 
@@ -83,7 +81,7 @@ CUIModule_HorizontalSplit::CUIModule_HorizontalSplit(pugi::xml_node& xmlNode, PP
 		if (fixedWidthInPercentiles <= 0.0)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSECTIONWIDTH, nameAttrib.as_string());
 
-		auto pSection = CUIModuleFactory::createModule(childNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+		auto pSection = CUIModuleFactory::createModule(childNode, pUIModuleEnvironment);
 		addSection (pSection, fixedWidthInPercentiles);
 	}
 
@@ -162,4 +160,10 @@ void CUIModule_HorizontalSplit::populateItemMap(std::map<std::string, PUIModuleI
 {
 	for (auto pSection : m_SectionList)
 		pSection->getModule()->populateItemMap(m_ItemMap);
+}
+
+void CUIModule_HorizontalSplit::configurePostLoading()
+{
+	for (auto pSection : m_SectionList)
+		pSection->getModule()->configurePostLoading();
 }
