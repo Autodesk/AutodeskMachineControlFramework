@@ -13,7 +13,8 @@ export default class AMCApplication {
 	{
 		this.API = {
 			baseURL : apiBaseURL,
-			authToken: nullToken			
+			authToken: nullToken,
+			unsuccessfulUpdateCounter: 0
 		}
 
 		this.AppState = {
@@ -265,13 +266,22 @@ export default class AMCApplication {
 		updateContentItem (uuid) {
 		
 			this.AppContent.ContentItems[uuid].refresh = false;
+
+			var headers = {}
+			var authToken = this.API.authToken; 
+		
+			if (authToken != nullToken)
+				headers.Authorization = "Bearer " + authToken;
 		
             var url = this.API.baseURL + "/ui/contentitem/" + uuid;
             Axios({
                     method: "GET",
+					"headers": headers,
                     url: url
                 })
                 .then(resultJSON => {					
+				
+					this.unsuccessfulUpdateCounter = 0;
 
 					var oldentrycount = this.AppContent.ContentItems[uuid].entries.length;					
 					for (var i = 0; i < oldentrycount; i++) {
@@ -284,8 +294,14 @@ export default class AMCApplication {
 					this.AppContent.ContentItems[uuid].refresh = true;
                 })
                 .catch(err => {
-					err;
-                    this.AppContent.ContentItems[uuid].refresh = true;                    
+					
+					this.unsuccessfulUpdateCounter = this.unsuccessfulUpdateCounter + 1;
+					if (this.unsuccessfulUpdateCounter > 5) {
+						this.setStatusToError (err.message);
+					} else {
+						this.AppContent.ContentItems[uuid].refresh = true;
+					}
+					
                 });
 				
 		}

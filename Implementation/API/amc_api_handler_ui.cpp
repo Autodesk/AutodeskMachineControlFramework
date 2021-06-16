@@ -115,7 +115,7 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 	std::string sParameterUUID;
 	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
 
-	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage) || (uiType == APIHandler_UIType::utContentItem)) {
+	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage)) {
 
 		bNeedsToBeAuthorized = false;
 		bCreateNewSession = false;

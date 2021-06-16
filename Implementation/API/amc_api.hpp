@@ -52,9 +52,7 @@ namespace AMC {
 
 		std::list<PAPIHandler> m_ApiHandlers;
 
-		PAPISessionHandler m_pSessionHandler;
-
-		PAPIResponse makeError (uint32_t nHTTPError, int32_t errorCode, const std::string & sErrorString);
+		PAPISessionHandler m_pSessionHandler;		
 
 		PAPIHandler getURIMatch (const std::string& sURI);
 			
@@ -81,6 +79,8 @@ namespace AMC {
 		static std::string removeLeadingSlashFromURI(const std::string& sURI);
 
 		static eAPIRequestType getRequestTypeFromString(const std::string & sRequestType);
+
+		static PAPIResponse makeError(uint32_t nHTTPError, int32_t errorCode, const std::string& sErrorString);
 
 	};
 

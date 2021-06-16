@@ -66,7 +66,8 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		auto iIterator = m_SessionMap.find (sSessionUUID);
 		if (iIterator == m_SessionMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONUUID);		
+			return nullptr;
+
 		auto pSession = iIterator->second;
 
 		if (pSession->getToken () != sToken)
@@ -75,7 +76,7 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->getUserName(), pSession->isAuthenticated());
 	}
 	else {
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONUUID);
+		return nullptr;
 	}
 
 }

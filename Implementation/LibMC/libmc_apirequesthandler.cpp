@@ -36,7 +36,7 @@ Abstract: This is a stub class definition of CAPIRequestHandler
 #include "libmc_apirequesthandler.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "amc_api_constants.hpp"
-
+#include "amc_api_response.hpp"
 // Include custom headers here.
 
 
@@ -50,8 +50,6 @@ CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, 
     : m_RequestType(eRequestType), m_pAPI (pAPI), m_pAuth (pAuth), m_pLogger (pLogger)
 {
     if (pAPI.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pAuth.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pLogger.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -117,17 +115,24 @@ void CAPIRequestHandler::SetFormStringField(const std::string& sName, const std:
 void CAPIRequestHandler::Handle(const LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8* pRawBodyBuffer, std::string& sContentType, LibMC_uint32& nHTTPCode)
 {
 
-    if (m_pResponse.get() != nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_APIREQUESTALREADYHANDLED);
-   
-    m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields, m_pAuth, m_pLogger.get());
+    if (m_pAuth.get() != nullptr) {
 
-    if (m_pResponse.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
+        if (m_pResponse.get() != nullptr)
+            throw ELibMCInterfaceException(LIBMC_ERROR_APIREQUESTALREADYHANDLED);
+
+        m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields, m_pAuth, m_pLogger.get());
+
+        if (m_pResponse.get() == nullptr)
+            throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
+
+    }
+    else {
+
+        m_pResponse = AMC::CAPI::makeError (AMC_API_HTTP_FORBIDDEN, LIBMC_ERROR_INVALIDAUTHORIZATION, "Invalid Authorization.");
+    }
 
     sContentType = m_pResponse->getContentType();
-
-    nHTTPCode = m_pResponse->getHTTPCode ();
+    nHTTPCode = m_pResponse->getHTTPCode();
 }
 
 void CAPIRequestHandler::GetResultData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)
