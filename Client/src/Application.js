@@ -196,7 +196,13 @@ export default class AMCApplication {
 			
 			for (var entity of item.entities) {
 				
-				this.AppContent.FormEntities[entity.uuid] = { uuid: entity.uuid, value: entity.defaultvalue, remotevalue: entity.defaultvalue };
+				this.AppContent.FormEntities[entity.uuid] = 
+					{ uuid: entity.uuid, 
+					  value: entity.defaultvalue, 
+					  remotevalue: entity.defaultvalue, 
+					  disabled: entity.disabled, 
+					  readonly: entity.readonly
+					  };
 				entity.dataObject = this.AppContent.FormEntities[entity.uuid];
 			}
 			

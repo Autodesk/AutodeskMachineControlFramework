@@ -172,6 +172,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironme
 				std::string sNodeName = formNode.name();
 				auto captionAttrib = formNode.attribute("caption");
 				auto nameAttrib = formNode.attribute("name");
+				auto valueAttrib = formNode.attribute("value");
 
 				if (nameAttrib.empty ())
 					throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNAMEMISSING, pForm->getName ());
@@ -179,20 +180,29 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironme
 				PUIModule_ContentFormEntity pEntity;
 
 				if (sNodeName == "edit") {
-					pEntity = pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string());
+					pEntity = pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string(), valueAttrib.as_string ());
 				}
 
 				if (sNodeName == "switch") {
-					pEntity = pForm->addSwitch(nameAttrib.as_string(), captionAttrib.as_string());
+					pEntity = pForm->addSwitch(nameAttrib.as_string(), captionAttrib.as_string(), valueAttrib.as_string());
 				}
 
 				if (sNodeName == "memo") {
-					pEntity = pForm->addMemo(nameAttrib.as_string(), captionAttrib.as_string());
+					pEntity = pForm->addMemo(nameAttrib.as_string(), captionAttrib.as_string(), valueAttrib.as_string());
 				}
 
 				if (sNodeName == "combobox") {
-					pEntity = pForm->addCombobox(nameAttrib.as_string(), captionAttrib.as_string());
+					pEntity = pForm->addCombobox(nameAttrib.as_string(), captionAttrib.as_string(), valueAttrib.as_string());
 				}
+
+				auto disabledAttrib = formNode.attribute("disabled");
+				if (!disabledAttrib.empty())
+					pEntity->setDisabled(disabledAttrib.as_bool());
+
+				auto readonlyAttrib = formNode.attribute("readonly");
+				if (!readonlyAttrib.empty())
+					pEntity->setReadOnly(readonlyAttrib.as_bool());
+
 
 			}
 
