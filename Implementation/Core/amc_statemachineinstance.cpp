@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_statemachineinstance.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 
@@ -52,7 +52,7 @@ namespace AMC {
 		LibMCAssertNotNull(pStateJournal.get());
 
 		m_ParameterHandler = std::make_shared<CParameterHandler>(sDescription);
-		m_pSystemState->parameterInstances()->registerParameterHandler (sName, m_ParameterHandler);
+		m_pSystemState->stateMachineData()->registerParameterHandler (sName, m_ParameterHandler);
 
 	}
 
@@ -143,10 +143,10 @@ namespace AMC {
 	{
 		m_pCurrentState = pCurrentState;
 		if (pCurrentState.get() != nullptr) {
-			m_ParameterHandler->setInstanceStateName(m_pCurrentState->getName());
+			m_pSystemState->stateMachineData()->setInstanceStateName(m_sName, m_pCurrentState->getName());
 		}
 		else {
-			m_ParameterHandler->setInstanceStateName("");
+			m_pSystemState->stateMachineData()->setInstanceStateName(m_sName, "");
 		}
 
 	}
@@ -300,10 +300,6 @@ namespace AMC {
 	}
 
 
-	std::string CStateMachineInstance::getCurrentStateName()
-	{
-		return m_ParameterHandler->getInstanceStateName();
-	}
 
 	uint32_t CStateMachineInstance::getStateCount() const
 	{

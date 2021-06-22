@@ -39,7 +39,6 @@ namespace AMC {
 	CParameterHandler::CParameterHandler(std::string sDescription)
 		: m_sDescription (sDescription)
 	{
-		m_DataStore = std::make_shared <CParameterGroup>();
 	}
 
 	CParameterHandler::~CParameterHandler()
@@ -62,10 +61,10 @@ namespace AMC {
 
 		auto sName = pGroup->getName();
 		if (m_Groups.find(sName) != m_Groups.end())
-			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME, m_sInstanceState + "/" + sName);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME, m_sDescription + "/" + sName);
 
 		if (m_GroupList.size() >= AMC_MAXPARAMETERGROUPCOUNT)
-			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS, m_sInstanceState + "/" + sName);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS, m_sDescription + "/" + sName);
 
 		m_Groups.insert(std::make_pair(sName, pGroup));
 		m_GroupList.push_back(pGroup);
@@ -92,7 +91,7 @@ namespace AMC {
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		if (nIndex >= m_GroupList.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sInstanceState);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDescription);
 
 		return m_GroupList[nIndex];
 	}
@@ -112,11 +111,6 @@ namespace AMC {
 	}
 
 
-	CParameterGroup* CParameterHandler::getDataStore()
-	{
-		return m_DataStore.get();
-	}
-
 
 	std::string CParameterHandler::getDescription()
 	{
@@ -132,16 +126,12 @@ namespace AMC {
 
 	}
 
-	void CParameterHandler::setInstanceStateName(const std::string& sInstanceState)
-	{
-		std::lock_guard <std::mutex> lockGuard(m_Mutex);
-		m_sInstanceState = sInstanceState;
-	}
 
-	std::string CParameterHandler::getInstanceStateName()
+	PParameterHandler CParameterHandler::duplicate()
 	{
-		std::lock_guard <std::mutex> lockGuard(m_Mutex);
-		return m_sInstanceState;
+		auto pResult = std::make_shared<CParameterHandler>(m_sDescription);
+
+		return pResult;
 	}
 
 

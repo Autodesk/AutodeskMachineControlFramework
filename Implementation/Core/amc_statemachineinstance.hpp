@@ -108,7 +108,6 @@ namespace AMC {
 		// External accessors
 		std::string getName() const;
 		std::string getDescription() const;
-		std::string getCurrentStateName();
 		uint32_t getStateCount() const;
 		std::string getNameOfState(uint32_t nStateIndex) const;
 		uint32_t getOutstateCountOfState(uint32_t nStateIndex) const;

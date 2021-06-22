@@ -39,10 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
+#include "amc_parameterhandler.hpp"
 
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 #include "amc_jsonwriter.hpp"
 #include "amc_ui_module_item.hpp"
 #include "amc_logger.hpp"
@@ -61,14 +62,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIHandler::CUIHandler(PParameterInstances pParameterInstances, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
+CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
     : m_dLogoAspectRatio (1.0), 
-    m_pParameterInstances (pParameterInstances),
+    m_pStateMachineData(pStateMachineData),
     m_pEnvironmentWrapper (pEnvironmentWrapper),
     m_pSignalHandler (pSignalHandler),
     m_pLogger(pLogger)
 {
-    if (pParameterInstances.get() == nullptr)
+    if (pStateMachineData.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
     if (pEnvironmentWrapper.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -268,7 +269,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pParameterInstances, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
             auto pModule = CUIModuleFactory::createModule(pageChild, pModuleEnvironment);
             pPage->addModule(pModule);
 
@@ -377,10 +378,10 @@ template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<L
 }
 
 
-void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON)
+void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
 {
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pParameterInstances, m_pSignalHandler, sSenderUUID, sContextUUID);
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sContextUUID, pClientVariableHandler);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     auto pPage = findPageOfModuleItem(sSenderUUID);

@@ -50,7 +50,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModule_Tabs, PUIModule_Tabs);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
 	class CUIModule_Tabs : public CUIModule {

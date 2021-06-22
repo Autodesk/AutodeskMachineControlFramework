@@ -645,6 +645,12 @@
 
 
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
+
+		<method name="GetMachineState" description="Retrieves the machine state">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="StateName" type="string" pass="return" description="Name of current state" />
+		</method>
+
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
@@ -817,75 +823,107 @@
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
 				
-		<method name="GetStringParameter" description="returns a string parameter">
+				
+		<method name="GetMachineStringParameter" description="returns a string parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetUUIDParameter" description="returns a uuid parameter">
+		<method name="GetMachineUUIDParameter" description="returns a uuid parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetDoubleParameter" description="returns a double parameter">
+		<method name="GetMachineDoubleParameter" description="returns a double parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="double" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetIntegerParameter" description="returns an int parameter">
+		<method name="GetMachineIntegerParameter" description="returns an int parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="int64" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetBoolParameter" description="returns a bool parameter">
+		<method name="GetMachineBoolParameter" description="returns a bool parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="bool" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="SetStringParameter" description="sets a string parameter">
-			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
-			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
-			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+
+
+
+		<method name="GetClientStringVariable" description="returns a string variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
+			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
+		</method>
+
+		<method name="GetClientUUIDVariable" description="returns a uuid variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
+			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
+		</method>
+
+		<method name="GetClientDoubleVariable" description="returns a double variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
+			<param name="Value" type="double" pass="return" description="Current Parameter Value" />
+		</method>
+
+		<method name="GetClientIntegerVariable" description="returns an int variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
+			<param name="Value" type="int64" pass="return" description="Current Parameter Value" />
+		</method>
+
+		<method name="GetClientBoolVariable" description="returns a bool variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
+			<param name="Value" type="bool" pass="return" description="Current Parameter Value" />
+		</method>
+
+
+		<method name="SetClientStringVariable" description="sets a string variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetUUIDParameter" description="returns a uuid parameter">
-			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
-			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
-			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+		<method name="SetClientUUIDVariable" description="returns a uuid variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
 			<param name="Value" type="string" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetDoubleParameter" description="returns a double parameter">
-			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
-			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
-			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+		<method name="SetClientDoubleVariable" description="returns a double variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
 			<param name="Value" type="double" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetIntegerParameter" description="returns an int parameter">
-			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
-			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
-			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+		<method name="SetClientIntegerVariable" description="returns an int variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
 			<param name="Value" type="int64" pass="in" description="Value to set" />
 		</method>
 
-		<method name="SetBoolParameter" description="returns a bool parameter">
-			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
-			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
-			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+		<method name="SetClientBoolVariable" description="returns a bool variable of the client">
+			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
+			<param name="VariableName" type="string" pass="in" description="Variable Name" />
 			<param name="Value" type="bool" pass="in" description="Value to set" />
 		</method>
+
+
 
 		<method name="HasFormValue" description="returns if a form value has been passed.">
 			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />

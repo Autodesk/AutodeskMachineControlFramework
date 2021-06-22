@@ -53,7 +53,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
 	amcDeclareDependingClass(CUIModule_ContentForm, PUIModule_ContentForm);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CUIModule_ContentFormRegistry, PUIModule_ContentFormRegistry);
 	

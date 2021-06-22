@@ -125,7 +125,14 @@ export default class AMCApplication {
 			.catch(err => {
 				this.setStatusToError (err.response.data.message);
 			});
-	}				
+	}			
+
+
+	performLogout ()
+	{
+		this.authToken = nullToken;		
+		this.unsuccessfulUpdateCounter = 0;
+	}
 	
 	requestLogin (userName, userPassword) 
 	{

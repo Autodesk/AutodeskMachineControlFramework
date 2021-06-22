@@ -71,6 +71,8 @@ public:
 
 	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName);
 
+	std::string GetMachineState(const std::string& sMachineInstance);
+
 	ISignalTrigger* PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName) override;
 
 	bool WaitForSignal(const std::string& sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) override;

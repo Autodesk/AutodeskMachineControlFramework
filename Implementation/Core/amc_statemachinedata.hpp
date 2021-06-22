@@ -41,22 +41,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	class CParameterInstances;
-	typedef std::shared_ptr<CParameterInstances> PParameterInstances;
+	class CStateMachineData;
+	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
 
-	class CParameterInstances {
+	class CStateMachineData {
 	private:
 
 		std::map <std::string, PParameterHandler> m_StateMachineParameters;
+		std::map <std::string, PParameterGroup> m_StateMachineDataStores;
+		std::map <std::string, std::string> m_StateMachineStates;
+
+		std::mutex m_Mutex;
 		
 	public:
 	
-		CParameterInstances ();
-		virtual ~CParameterInstances ();
+		CStateMachineData();
+		virtual ~CStateMachineData();
 
 		void registerParameterHandler (const std::string & sInstanceName, PParameterHandler pParameterHandler);
 		PParameterHandler getParameterHandler (const std::string& sInstanceName);
 
+		CParameterGroup* getDataStore(const std::string& sInstanceName);
+		void setInstanceStateName(const std::string& sInstanceName, const std::string& sInstanceState);
+		std::string getInstanceStateName(const std::string& sInstanceName);
 	};
 
 	

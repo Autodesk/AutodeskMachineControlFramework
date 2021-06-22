@@ -36,7 +36,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "amc_systemstate.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "amc_logger.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -47,20 +47,23 @@ using namespace LibMCEnv::Impl;
  Class definition of CUIEnvironment 
 **************************************************************************************************************************/
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PParameterInstances pParameterInstances, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID, AMC::PParameterHandler pClientVariableHandler)
     : 
       m_pLogger(pLogger),
-      m_pParameterInstances (pParameterInstances), 
+      m_pStateMachineData(pStateMachineData),
       m_pSignalHandler (pSignalHandler),
       m_sLogSubSystem ("ui"),
       m_sContextUUID (AMCCommon::CUtils::normalizeUUIDString (sContextUUID)),
-      m_sSenderUUID (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID))
+      m_sSenderUUID (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID)),
+      m_pClientVariableHandler (pClientVariableHandler)
 {
     if (pLogger.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pParameterInstances.get() == nullptr)
+    if (pStateMachineData.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
@@ -75,8 +78,7 @@ ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInsta
 
 std::string CUIEnvironment::GetMachineState(const std::string & sMachineInstance)
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
-    return pParameterHandler->getInstanceStateName ();
+    return m_pStateMachineData->getInstanceStateName (sMachineInstance);
 }
 
 void CUIEnvironment::LogMessage(const std::string & sLogString)
@@ -94,80 +96,105 @@ void CUIEnvironment::LogInfo(const std::string & sLogString)
     m_pLogger->logMessage(sLogString, m_sLogSubSystem, AMC::eLogLevel::Info);
 }
 
-std::string CUIEnvironment::GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+
+
+std::string CUIEnvironment::GetMachineStringParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
-std::string CUIEnvironment::GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+std::string CUIEnvironment::GetMachineUUIDParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) 
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
-LibMCEnv_double CUIEnvironment::GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+LibMCEnv_double CUIEnvironment::GetMachineDoubleParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getDoubleParameterValueByName(sParameterName);
 }
 
-LibMCEnv_int64 CUIEnvironment::GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+LibMCEnv_int64 CUIEnvironment::GetMachineIntegerParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getIntParameterValueByName(sParameterName);
 }
 
-bool CUIEnvironment::GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+bool CUIEnvironment::GetMachineBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
+    auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getBoolParameterValueByName(sParameterName);
 }
 
-void CUIEnvironment::SetStringParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue)
+
+
+std::string CUIEnvironment::GetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName)
+{   
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    return pGroup->getParameterValueByName(sVariableName);
+}
+
+std::string CUIEnvironment::GetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName) 
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
-    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
-    pGroup->setParameterValueByName(sParameterName, sValue);
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    return pGroup->getParameterValueByName(sVariableName);
 
 }
 
-void CUIEnvironment::SetUUIDParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) 
+LibMCEnv_double CUIEnvironment::GetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName)
 {
-
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
-    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
-    pGroup->setParameterValueByName(sParameterName, AMCCommon::CUtils::normalizeUUIDString (sValue));
-}
-    
-
-void CUIEnvironment::SetDoubleParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue) 
-{
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
-    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
-    pGroup->setDoubleParameterValueByName(sParameterName, dValue);
-
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    return pGroup->getDoubleParameterValueByName(sVariableName);
 }
 
-
-void CUIEnvironment::SetIntegerParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_int64 nValue) 
+LibMCEnv_int64 CUIEnvironment::GetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName)
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
-    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
-    pGroup->setIntParameterValueByName(sParameterName, nValue);
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    return pGroup->getIntParameterValueByName(sVariableName);
 }
 
-
-void CUIEnvironment::SetBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const bool bValue) 
+bool CUIEnvironment::GetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName)
 {
-    auto pParameterHandler = m_pParameterInstances->getParameterHandler(sMachineInstance);
-    auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
-    pGroup->setBoolParameterValueByName(sParameterName, bValue);
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    return pGroup->getBoolParameterValueByName(sVariableName);
+}
+
+void CUIEnvironment::SetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue)
+{
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    pGroup->setParameterValueByName(sVariableName, sValue);
+}
+
+void CUIEnvironment::SetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue)
+{
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    pGroup->setParameterValueByName(sVariableName, AMCCommon::CUtils::normalizeUUIDString ( sValue));
+}
+
+void CUIEnvironment::SetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_double dValue)
+{
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    pGroup->setDoubleParameterValueByName(sVariableName, dValue);
+
+}
+
+void CUIEnvironment::SetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_int64 nValue) 
+{
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    pGroup->setIntParameterValueByName(sVariableName, nValue);
+}
+
+void CUIEnvironment::SetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName, const bool bValue)
+{
+    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
+    pGroup->setBoolParameterValueByName(sVariableName, bValue);
 }
 
 

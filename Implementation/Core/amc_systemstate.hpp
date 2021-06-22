@@ -68,7 +68,7 @@ namespace AMC {
 	class CServiceHandler;
 	class CUIHandler;
 	class CParameterHandler;
-	class CParameterInstances;
+	class CStateMachineData;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -77,7 +77,7 @@ namespace AMC {
 	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
 	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
-	typedef std::shared_ptr<CParameterInstances> PParameterInstances;
+	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
 
 	class CSystemState {
 	private:
@@ -87,7 +87,7 @@ namespace AMC {
 		AMC::PToolpathHandler m_pToolpathHandler;
 		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
-		AMC::PParameterInstances m_pParameterInstances;
+		AMC::PStateMachineData m_pStateMachineData;
 
 		AMCCommon::PChrono m_pGlobalChrono;
 
@@ -113,7 +113,7 @@ namespace AMC {
 		CToolpathHandler* toolpathHandler();
 		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
-		CParameterInstances* parameterInstances();
+		CStateMachineData* stateMachineData();
 
 		LibMCData::CStorage * storage();
 		LibMCData::CBuildJobHandler * buildJobHandler();
@@ -125,7 +125,7 @@ namespace AMC {
 		PStateSignalHandler getStateSignalHandlerInstance();
 		PDriverHandler getDriverHandlerInstance();
 		PToolpathHandler getToolpathHandlerInstance();
-		PParameterInstances getParameterInstances ();
+		PStateMachineData getStateMachineData ();
 
 		LibMCData::PLoginHandler getLoginHandlerInstance();
 		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();

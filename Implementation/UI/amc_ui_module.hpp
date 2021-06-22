@@ -52,21 +52,21 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 	class CUIModuleEnvironment {
 	private:
-		PParameterInstances m_pParameterInstances;
+		PStateMachineData m_pStateMachineData;
 		PResourcePackage m_pResourcePackage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		CUIModule_ContentRegistry* m_pFormRegistry;
 
 	public:
-		CUIModuleEnvironment(PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry);
+		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry);
 
-		PParameterInstances parameterInstances();
+		PStateMachineData stateMachineData();
 		PResourcePackage resourcePackage();
 		LibMCData::PBuildJobHandler buildJobHandler ();
 		CUIModule_ContentRegistry* formRegistry ();

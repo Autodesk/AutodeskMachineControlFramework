@@ -38,18 +38,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModuleEnvironment::CUIModuleEnvironment(PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry)
-	: m_pParameterInstances (pParameterInstances), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pFormRegistry (pFormRegistry)
+CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry)
+	: m_pStateMachineData(pStateMachineData), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pFormRegistry (pFormRegistry)
 {
-	LibMCAssertNotNull(pParameterInstances.get());
+	LibMCAssertNotNull(pStateMachineData.get());
 	LibMCAssertNotNull(pResourcePackage.get());
 	LibMCAssertNotNull(pBuildJobHandler.get());
 	LibMCAssertNotNull(pFormRegistry);
 }
 
-PParameterInstances CUIModuleEnvironment::parameterInstances()
+PStateMachineData CUIModuleEnvironment::stateMachineData()
 {
-	return m_pParameterInstances;
+	return m_pStateMachineData;
 }
 
 PResourcePackage CUIModuleEnvironment::resourcePackage()

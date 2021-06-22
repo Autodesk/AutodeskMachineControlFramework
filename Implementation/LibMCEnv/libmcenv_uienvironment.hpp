@@ -37,7 +37,7 @@ Abstract: This is the class declaration of CUIEnvironment
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_logger.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 #include "amc_statesignalhandler.hpp"
 
 // Parent classes
@@ -61,7 +61,8 @@ namespace Impl {
 class CUIEnvironment : public virtual IUIEnvironment, public virtual CBase {
 private:
 	AMC::PLogger m_pLogger;
-	AMC::PParameterInstances m_pParameterInstances;
+	AMC::PStateMachineData m_pStateMachineData;
+	AMC::PParameterHandler m_pClientVariableHandler;
 	AMC::PStateSignalHandler m_pSignalHandler;
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
@@ -74,7 +75,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PParameterInstances pParameterInstances, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID, AMC::PParameterHandler pClientVariableHandler);
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
@@ -86,25 +87,37 @@ public:
 
 	void LogInfo(const std::string & sLogString) override;
 
-	std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
-	std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
+	std::string GetMachineStringParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
-	LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
+	std::string GetMachineUUIDParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
-	LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
+	LibMCEnv_double GetMachineDoubleParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
-	bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
+	LibMCEnv_int64 GetMachineIntegerParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
-	void SetStringParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
+	bool GetMachineBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
 
-	void SetUUIDParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const std::string& sValue) override;
 
-	void SetDoubleParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_double dValue) override;
+	std::string GetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName) override;
 
-	void SetIntegerParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const LibMCEnv_int64 nValue) override;
+	std::string GetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName) override;
 
-	void SetBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName, const bool bValue) override;
+	LibMCEnv_double GetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName) override;
+
+	LibMCEnv_int64 GetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName) override;
+
+	bool GetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName) override;
+
+	void SetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue) override;
+
+	void SetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue) override;
+
+	void SetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_double dValue) override;
+
+	void SetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_int64 nValue) override;
+
+	void SetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName, const bool bValue) override;
 
 	bool HasFormValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier) override;
 

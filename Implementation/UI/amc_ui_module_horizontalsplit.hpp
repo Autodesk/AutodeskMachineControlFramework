@@ -51,7 +51,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_HorizontalSplit, PUIModule_HorizontalSplit);
 	amcDeclareDependingClass(CUIModule_HorizontalSection, PUIModule_HorizontalSection);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
 	class CUIModule_HorizontalSection {

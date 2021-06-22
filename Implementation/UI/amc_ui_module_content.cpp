@@ -132,7 +132,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironme
 				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 			}
 
-			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pUIModuleEnvironment->parameterInstances());
+			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pUIModuleEnvironment->stateMachineData());
 			addItem (pParameterList);
 
 			pParameterList->loadFromXML(childNode);

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statemachineinstance.hpp"
 #include "amc_logger.hpp"
 #include "amc_parameterhandler.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 #include "amc_logger_multi.hpp"
 #include "amc_logger_stdout.hpp"
 #include "amc_logger_database.hpp"
@@ -534,10 +534,10 @@ void CMCContext::loadParameterGroupDerives(const pugi::xml_node& xmlNode, AMC::P
 
         auto sourceStateMachineAttrib = parameterNode.attribute("statemachine");
         if (sourceStateMachineAttrib.empty()) {
-            pParameterHandler = m_pSystemState->parameterInstances()->getParameterHandler(sStateMachineInstance);
+            pParameterHandler = m_pSystemState->stateMachineData()->getParameterHandler(sStateMachineInstance);
         }
         else {
-            pParameterHandler = m_pSystemState->parameterInstances()->getParameterHandler(sourceStateMachineAttrib.as_string());
+            pParameterHandler = m_pSystemState->stateMachineData()->getParameterHandler(sourceStateMachineAttrib.as_string());
         }
 
 

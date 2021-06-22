@@ -1084,6 +1084,13 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 class IStateEnvironment : public virtual IBase {
 public:
 	/**
+	* IStateEnvironment::GetMachineState - Retrieves the machine state
+	* @param[in] sMachineInstance - State machine instance name
+	* @return Name of current state
+	*/
+	virtual std::string GetMachineState(const std::string & sMachineInstance) = 0;
+
+	/**
 	* IStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
@@ -1317,94 +1324,129 @@ public:
 	virtual void LogInfo(const std::string & sLogString) = 0;
 
 	/**
-	* IUIEnvironment::GetStringParameter - returns a string parameter
+	* IUIEnvironment::GetMachineStringParameter - returns a string parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual std::string GetMachineStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetUUIDParameter - returns a uuid parameter
+	* IUIEnvironment::GetMachineUUIDParameter - returns a uuid parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual std::string GetMachineUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetDoubleParameter - returns a double parameter
+	* IUIEnvironment::GetMachineDoubleParameter - returns a double parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual LibMCEnv_double GetMachineDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetIntegerParameter - returns an int parameter
+	* IUIEnvironment::GetMachineIntegerParameter - returns an int parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual LibMCEnv_int64 GetMachineIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetBoolParameter - returns a bool parameter
+	* IUIEnvironment::GetMachineBoolParameter - returns a bool parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual bool GetMachineBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::SetStringParameter - sets a string parameter
-	* @param[in] sMachineInstance - State machine instance name
-	* @param[in] sParameterGroup - Parameter Group
-	* @param[in] sParameterName - Parameter Name
+	* IUIEnvironment::GetClientStringVariable - returns a string variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual std::string GetClientStringVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientUUIDVariable - returns a uuid variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual std::string GetClientUUIDVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientDoubleVariable - returns a double variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual LibMCEnv_double GetClientDoubleVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientIntegerVariable - returns an int variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual LibMCEnv_int64 GetClientIntegerVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientBoolVariable - returns a bool variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual bool GetClientBoolVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::SetClientStringVariable - sets a string variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
 	* @param[in] sValue - Value to set
 	*/
-	virtual void SetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
+	virtual void SetClientStringVariable(const std::string & sVariableGroup, const std::string & sVariableName, const std::string & sValue) = 0;
 
 	/**
-	* IUIEnvironment::SetUUIDParameter - returns a uuid parameter
-	* @param[in] sMachineInstance - State machine instance name
-	* @param[in] sParameterGroup - Parameter Group
-	* @param[in] sParameterName - Parameter Name
+	* IUIEnvironment::SetClientUUIDVariable - returns a uuid variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
 	* @param[in] sValue - Value to set
 	*/
-	virtual void SetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const std::string & sValue) = 0;
+	virtual void SetClientUUIDVariable(const std::string & sVariableGroup, const std::string & sVariableName, const std::string & sValue) = 0;
 
 	/**
-	* IUIEnvironment::SetDoubleParameter - returns a double parameter
-	* @param[in] sMachineInstance - State machine instance name
-	* @param[in] sParameterGroup - Parameter Group
-	* @param[in] sParameterName - Parameter Name
+	* IUIEnvironment::SetClientDoubleVariable - returns a double variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
 	* @param[in] dValue - Value to set
 	*/
-	virtual void SetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_double dValue) = 0;
+	virtual void SetClientDoubleVariable(const std::string & sVariableGroup, const std::string & sVariableName, const LibMCEnv_double dValue) = 0;
 
 	/**
-	* IUIEnvironment::SetIntegerParameter - returns an int parameter
-	* @param[in] sMachineInstance - State machine instance name
-	* @param[in] sParameterGroup - Parameter Group
-	* @param[in] sParameterName - Parameter Name
+	* IUIEnvironment::SetClientIntegerVariable - returns an int variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
 	* @param[in] nValue - Value to set
 	*/
-	virtual void SetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const LibMCEnv_int64 nValue) = 0;
+	virtual void SetClientIntegerVariable(const std::string & sVariableGroup, const std::string & sVariableName, const LibMCEnv_int64 nValue) = 0;
 
 	/**
-	* IUIEnvironment::SetBoolParameter - returns a bool parameter
-	* @param[in] sMachineInstance - State machine instance name
-	* @param[in] sParameterGroup - Parameter Group
-	* @param[in] sParameterName - Parameter Name
+	* IUIEnvironment::SetClientBoolVariable - returns a bool variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
 	* @param[in] bValue - Value to set
 	*/
-	virtual void SetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName, const bool bValue) = 0;
+	virtual void SetClientBoolVariable(const std::string & sVariableGroup, const std::string & sVariableName, const bool bValue) = 0;
 
 	/**
 	* IUIEnvironment::HasFormValue - returns if a form value has been passed.

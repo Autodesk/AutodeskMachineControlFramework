@@ -29,37 +29,70 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 #include "libmc_exceptiontypes.hpp"
 
 
 namespace AMC {
 
-	CParameterInstances::CParameterInstances()
+	CStateMachineData::CStateMachineData()
 	{
 
 	}
 
-	CParameterInstances::~CParameterInstances()
+	CStateMachineData::~CStateMachineData()
 	{
 
 	}
 
 
-	void CParameterInstances::registerParameterHandler(const std::string& sInstanceName, PParameterHandler pParameterHandler)
+	void CStateMachineData::registerParameterHandler(const std::string& sInstanceName, PParameterHandler pParameterHandler)
 	{
 		LibMCAssertNotNull(pParameterHandler.get());
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 		m_StateMachineParameters.insert(std::make_pair(sInstanceName, pParameterHandler));
+		m_StateMachineDataStores.insert(std::make_pair(sInstanceName, std::make_shared<CParameterGroup> ("", "")));
+		m_StateMachineStates.insert(std::make_pair(sInstanceName, ""));
 	}
 
-	PParameterHandler CParameterInstances::getParameterHandler(const std::string& sInstanceName)
+	PParameterHandler CStateMachineData::getParameterHandler(const std::string& sInstanceName)
 	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
 		auto iter = m_StateMachineParameters.find(sInstanceName);
 		if(iter == m_StateMachineParameters.end ())
 			throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
 
 		return iter->second;
+	}
+
+
+	CParameterGroup* CStateMachineData::getDataStore(const std::string& sInstanceName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_StateMachineDataStores.find(sInstanceName);
+		if (iIter != m_StateMachineDataStores.end())
+			return iIter->second.get();
+
+		throw ELibMCCustomException(LIBMC_ERROR_STATEMACHINENOTFOUND, sInstanceName);
+	}
+
+	void CStateMachineData::setInstanceStateName(const std::string& sInstanceName, const std::string& sInstanceState)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		m_StateMachineStates.insert(std::make_pair (sInstanceName, sInstanceState));
+
+	}
+
+	std::string CStateMachineData::getInstanceStateName(const std::string& sInstanceName)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_StateMachineStates.find(sInstanceName);
+		if (iIter != m_StateMachineStates.end())
+			return iIter->second;
+
+		return "";
 	}
 
 }

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
 #include "libmc_exceptiontypes.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "amc_ui_module_content.hpp"
 #include "amc_ui_module_tabs.hpp"

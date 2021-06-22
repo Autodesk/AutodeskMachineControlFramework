@@ -70,7 +70,8 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);	
 	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CUIHandler {
 	protected:
@@ -82,7 +83,7 @@ namespace AMC {
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
 
-		PParameterInstances m_pParameterInstances;
+		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
 		PResourcePackage m_pCoreResourcePackage;
 		PLogger m_pLogger;
@@ -105,7 +106,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PParameterInstances pParameterInstances, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
+		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
 		
 		virtual ~CUIHandler();
 		
@@ -124,7 +125,7 @@ namespace AMC {
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
 
-		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON);
+		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
