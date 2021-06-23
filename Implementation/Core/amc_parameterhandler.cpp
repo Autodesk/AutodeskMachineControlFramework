@@ -135,6 +135,8 @@ namespace AMC {
 			pNewGroup->addDuplicatesFromGroup(pGroup.get());
 		}		
 
+		
+
 		return pResult;
 	}
 
