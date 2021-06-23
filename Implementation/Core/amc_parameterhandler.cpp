@@ -131,6 +131,8 @@ namespace AMC {
 	{
 		auto pResult = std::make_shared<CParameterHandler>(m_sDescription);
 
+		
+
 		return pResult;
 	}
 
