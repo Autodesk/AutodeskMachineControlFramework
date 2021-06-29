@@ -130,8 +130,10 @@ namespace AMC {
 	PParameterHandler CParameterHandler::duplicate()
 	{
 		auto pResult = std::make_shared<CParameterHandler>(m_sDescription);
-
-		
+		for (auto pGroup : m_GroupList) {
+			auto pNewGroup = pResult->addGroup(pGroup->getName(), pGroup->getDescription());
+			pNewGroup->addDuplicatesFromGroup(pGroup.get());
+		}		
 
 		return pResult;
 	}
