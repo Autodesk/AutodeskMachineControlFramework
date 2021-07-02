@@ -70,6 +70,13 @@ APIHandler_UploadType CAPIHandler_Upload::parseRequest(const std::string& sURI, 
 	// Leave away base URI
 	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(10));
 	uploadUUID = "";
+	if (requestType == eAPIRequestType::rtPut) {
+		if ((sParameterString.substr(0, 1) == "/") && (sParameterString.length() == 37)) {
+			uploadUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(1));
+			return utStreamUpload;
+		}
+	}
+
 
 	if (requestType == eAPIRequestType::rtPost) {
 		if ((sParameterString == "") || (sParameterString == "/")) {
@@ -223,7 +230,7 @@ PAPIResponse CAPIHandler_Upload::handleRequest(const std::string& sURI, const eA
 {
 
 
-	if (requestType == eAPIRequestType::rtPost) {
+	if ((requestType == eAPIRequestType::rtPost) || (requestType == eAPIRequestType::rtPut)) {
 
 		std::string sUploadUUID;
 		auto uploadType = parseRequest(sURI, requestType, sUploadUUID);
