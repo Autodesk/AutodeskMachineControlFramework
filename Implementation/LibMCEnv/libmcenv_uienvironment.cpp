@@ -63,8 +63,6 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
-    if (pClientVariableHandler.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
 
@@ -137,12 +135,18 @@ bool CUIEnvironment::GetMachineBoolParameter(const std::string& sMachineInstance
 
 std::string CUIEnvironment::GetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName)
 {   
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     return pGroup->getParameterValueByName(sVariableName);
 }
 
 std::string CUIEnvironment::GetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName) 
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     return pGroup->getParameterValueByName(sVariableName);
 
@@ -150,36 +154,54 @@ std::string CUIEnvironment::GetClientUUIDVariable(const std::string& sVariableGr
 
 LibMCEnv_double CUIEnvironment::GetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName)
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     return pGroup->getDoubleParameterValueByName(sVariableName);
 }
 
 LibMCEnv_int64 CUIEnvironment::GetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName)
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     return pGroup->getIntParameterValueByName(sVariableName);
 }
 
 bool CUIEnvironment::GetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName)
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     return pGroup->getBoolParameterValueByName(sVariableName);
 }
 
 void CUIEnvironment::SetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue)
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     pGroup->setParameterValueByName(sVariableName, sValue);
 }
 
 void CUIEnvironment::SetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue)
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     pGroup->setParameterValueByName(sVariableName, AMCCommon::CUtils::normalizeUUIDString ( sValue));
 }
 
 void CUIEnvironment::SetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_double dValue)
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     pGroup->setDoubleParameterValueByName(sVariableName, dValue);
 
@@ -187,12 +209,18 @@ void CUIEnvironment::SetClientDoubleVariable(const std::string& sVariableGroup, 
 
 void CUIEnvironment::SetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_int64 nValue) 
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     pGroup->setIntParameterValueByName(sVariableName, nValue);
 }
 
 void CUIEnvironment::SetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName, const bool bValue)
 {
+    if (m_pClientVariableHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
+
     auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
     pGroup->setBoolParameterValueByName(sVariableName, bValue);
 }

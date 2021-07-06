@@ -121,6 +121,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_FORMVALUENOTFOUND 23
 #define LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE 24
 #define LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE 25
+#define LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES 26
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -154,6 +155,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_FORMVALUENOTFOUND: return "Form value not found.";
     case LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE: return "Invalid double form value.";
     case LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE: return "Invalid integer form value.";
+    case LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES: return "Could not access client variables.";
     default: return "unknown error";
   }
 }

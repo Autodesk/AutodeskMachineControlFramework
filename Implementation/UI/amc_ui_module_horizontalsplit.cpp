@@ -159,7 +159,7 @@ void CUIModule_HorizontalSplit::addSection(PUIModule pModule, double fixedWidthI
 void CUIModule_HorizontalSplit::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
 {
 	for (auto pSection : m_SectionList)
-		pSection->getModule()->populateItemMap(m_ItemMap);
+		pSection->getModule()->populateItemMap(itemMap);
 }
 
 void CUIModule_HorizontalSplit::configurePostLoading()

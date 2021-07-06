@@ -160,7 +160,7 @@ void CUIModule_VerticalSplit::addSection(PUIModule pModule, double fixedHeightIn
 void CUIModule_VerticalSplit::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
 {
 	for (auto pSection : m_SectionList)
-		pSection->getModule()->populateItemMap(m_ItemMap);
+		pSection->getModule()->populateItemMap(itemMap);
 }
 
 

@@ -64,6 +64,8 @@
 		<error name="FORMVALUENOTFOUND" code="23" description="Form value not found." />
 		<error name="INVALIDDOUBLEFORMVALUE" code="24" description="Invalid double form value." />
 		<error name="INVALIDINTEGERFORMVALUE" code="25" description="Invalid integer form value." />
+		<error name="COULDNNOTACCESSCLIENTVARIABLES" code="26" description="Could not access client variables." />
+		
 		
 		
 			

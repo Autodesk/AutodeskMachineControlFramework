@@ -187,7 +187,7 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
     if (iIterator != m_Pages.end())
         throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPAGE);
 
-    auto pPage = std::make_shared<CUIPage> (sName);
+    auto pPage = std::make_shared<CUIPage> (sName, this);
     m_Pages.insert (std::make_pair (sName, pPage));
 
     return pPage;
@@ -375,6 +375,21 @@ template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<L
     auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
     pImplInstance->IncRefCount();
     return pExternalInstance;
+}
+
+
+void CUIHandler::ensureUIEventExists(const std::string& sEventName)
+{
+    std::string sSenderUUID = AMCCommon::CUtils::createUUID();
+    std::string sContextUUID = AMCCommon::CUtils::createUUID();
+
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sContextUUID, nullptr);
+    auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
+
+    // Create event to see if it exists.
+    auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+    pEvent = nullptr;
+
 }
 
 

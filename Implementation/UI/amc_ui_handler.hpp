@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_ui_interfaces.hpp"
 
 #include <memory>
 #include <vector>
@@ -73,7 +74,7 @@ namespace AMC {
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
-	class CUIHandler {
+	class CUIHandler : public CUIModule_UIEventHandler {
 	protected:
 
 		std::mutex m_Mutex;
@@ -124,8 +125,9 @@ namespace AMC {
 		
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-
 		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
+
+		virtual void ensureUIEventExists(const std::string& sEventName) override;
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

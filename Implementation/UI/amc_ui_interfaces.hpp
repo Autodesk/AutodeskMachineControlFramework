@@ -44,9 +44,16 @@ namespace AMC {
 		virtual std::string findFormUUIDByName(const std::string & sFormName) = 0;
 
 		virtual PUIModuleItem findModuleItemByUUID(const std::string& sItemUUID) = 0;
+
+		virtual void ensureUIEventExists(const std::string& sEventName) = 0;
 	};
 	
-	
+	class CUIModule_UIEventHandler {
+	public:
+
+		virtual void ensureUIEventExists(const std::string& sEventName) = 0;
+	};
+
 	
 }
 

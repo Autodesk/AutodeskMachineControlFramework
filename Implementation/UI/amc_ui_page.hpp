@@ -63,10 +63,12 @@ namespace AMC {
 
 		std::map<std::string, std::string> m_FormNameMap;
 
+		CUIModule_UIEventHandler* m_pUIEventHandler;
+
 
 	public:
 
-		CUIPage(const std::string & sName);
+		CUIPage(const std::string & sName, CUIModule_UIEventHandler* pUIEventHandler);
 		
 		virtual ~CUIPage();
 
@@ -85,6 +87,8 @@ namespace AMC {
 		virtual std::string findFormUUIDByName(const std::string& sFormName) override;
 
 		virtual void configurePostLoading();
+
+		virtual void ensureUIEventExists(const std::string& sEventName) override;
 										
 	};
 		

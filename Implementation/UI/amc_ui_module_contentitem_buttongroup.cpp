@@ -144,6 +144,11 @@ void CUIModule_ContentButtonGroup::configurePostLoading()
 {
 	for (auto pButton : m_Buttons) {
 
+		auto sEvent = pButton->getEvent();
+		if (!sEvent.empty()) {
+			m_pFormOwner->ensureUIEventExists (sEvent);
+		}
+
 		auto sFormValuesSetting = pButton->getEventFormValueSetting();
 		if (!sFormValuesSetting.empty()) {
 			std::vector <std::string> formValueList;

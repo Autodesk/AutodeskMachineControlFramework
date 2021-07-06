@@ -40,11 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIPage::CUIPage(const std::string& sName)
-	:  m_sName(sName)
+CUIPage::CUIPage(const std::string& sName, CUIModule_UIEventHandler* pUIEventHandler)
+	:  m_sName(sName), m_pUIEventHandler (pUIEventHandler)
 {
 	if (sName.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pUIEventHandler);
 
 
 }
@@ -150,5 +151,8 @@ std::string CUIPage::findFormUUIDByName(const std::string& sFormName)
 	return "";
 }
 
-
+void CUIPage::ensureUIEventExists(const std::string& sEventName)
+{
+	m_pUIEventHandler->ensureUIEventExists(sEventName);
+}
 
