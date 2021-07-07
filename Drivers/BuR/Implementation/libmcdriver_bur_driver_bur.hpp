@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CDriver_BuR
 #endif
 
 // Include custom headers here.
-
+#include <mutex>
 
 namespace brynet {
     namespace net {
@@ -70,11 +70,18 @@ protected:
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
     std::string m_sName;
 
+    uint32_t m_nWorkerThreadCount;
+    uint32_t m_nMaxReceiveBufferSize;
+
     std::shared_ptr<brynet::net::TcpService> m_pTcpService;
     std::shared_ptr <brynet::net::AsyncConnector> m_pAsyncConnector;
 
-    void enterCallback(const std::shared_ptr <brynet::net::TcpConnection> session);
+    std::mutex m_ConnectionMutex;
+
+    void enterCallback(const std::shared_ptr <brynet::net::TcpConnection> session, const std::string & sIPAddress, const uint32_t nPort);
     void failedCallback();
+
+    std::weak_ptr<brynet::net::TcpConnection> m_pCurrentConnection;
 
 public:
 
@@ -91,6 +98,10 @@ public:
     void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
 
     void QueryParameters() override;
+
+    void Connect(const std::string& sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout) override;
+
+    void Disconnect() override;
 
 };
 

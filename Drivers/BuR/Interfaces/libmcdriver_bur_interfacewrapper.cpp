@@ -348,6 +348,57 @@ LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Dri
 /*************************************************************************************************************************
  Class implementation for Driver_BuR
 **************************************************************************************************************************/
+LibMCDriver_BuRResult libmcdriver_bur_driver_bur_connect(LibMCDriver_BuR_Driver_BuR pDriver_BuR, const char * pIPAddress, LibMCDriver_BuR_uint32 nPort, LibMCDriver_BuR_uint32 nTimeout)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BuR;
+
+	try {
+		if (pIPAddress == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sIPAddress(pIPAddress);
+		IDriver_BuR* pIDriver_BuR = dynamic_cast<IDriver_BuR*>(pIBaseClass);
+		if (!pIDriver_BuR)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIDriver_BuR->Connect(sIPAddress, nPort, nTimeout);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_driver_bur_disconnect(LibMCDriver_BuR_Driver_BuR pDriver_BuR)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BuR;
+
+	try {
+		IDriver_BuR* pIDriver_BuR = dynamic_cast<IDriver_BuR*>(pIBaseClass);
+		if (!pIDriver_BuR)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIDriver_BuR->Disconnect();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -375,6 +426,10 @@ LibMCDriver_BuRResult LibMCDriver_BuR::Impl::LibMCDriver_BuR_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_bur_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_queryparameters;
+	if (sProcName == "libmcdriver_bur_driver_bur_connect") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_connect;
+	if (sProcName == "libmcdriver_bur_driver_bur_disconnect") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_disconnect;
 	if (sProcName == "libmcdriver_bur_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_bur_getversion;
 	if (sProcName == "libmcdriver_bur_getlasterror") 

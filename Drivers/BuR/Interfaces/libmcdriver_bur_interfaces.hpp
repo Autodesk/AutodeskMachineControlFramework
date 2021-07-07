@@ -315,6 +315,19 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 class IDriver_BuR : public virtual IDriver {
 public:
+	/**
+	* IDriver_BuR::Connect - Connects to a BuR PLC Controller.
+	* @param[in] sIPAddress - IP Address of PLC Service.
+	* @param[in] nPort - Port of PLC Service.
+	* @param[in] nTimeout - Timeout in milliseconds.
+	*/
+	virtual void Connect(const std::string & sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout) = 0;
+
+	/**
+	* IDriver_BuR::Disconnect - Disconnects from the BuR PLC Controller.
+	*/
+	virtual void Disconnect() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver_BuR> PIDriver_BuR;

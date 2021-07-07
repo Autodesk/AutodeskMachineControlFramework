@@ -48,29 +48,22 @@ using namespace LibMCDriver_BuR::Impl;
 **************************************************************************************************************************/
 
 CDriver_BuR::CDriver_BuR(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_sName(sName), m_pDriverEnvironment (pDriverEnvironment)
+    : m_sName(sName), m_pDriverEnvironment (pDriverEnvironment), m_nWorkerThreadCount (1), m_nMaxReceiveBufferSize (1024*1024)
 {  
     if (pDriverEnvironment.get() == nullptr)
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
 }
 
+
+
 void CDriver_BuR::Configure(const std::string& sConfigurationString)
 {
-    uint32_t workerThreadCount = 1;
-    uint32_t maxReceiveBufferSize = 1024 * 1024;
 
     m_pTcpService = brynet::net::TcpService::Create();
-    m_pTcpService->startWorkerThread(workerThreadCount);
+    m_pTcpService->startWorkerThread(m_nWorkerThreadCount);
 
     m_pAsyncConnector = brynet::net::AsyncConnector::Create();
     m_pAsyncConnector->startWorkerThread();
-
-    brynet::net::wrapper::ConnectionBuilder connectionBuilder;
-
-    connectionBuilder.WithService(m_pTcpService)
-        .WithConnector(m_pAsyncConnector)
-        .WithMaxRecvBufferSize(maxReceiveBufferSize)
-        .AddEnterCallback([this](const brynet::net::TcpConnection::Ptr& session) { enterCallback(session); });
 
 }
 
@@ -100,14 +93,75 @@ void CDriver_BuR::GetHeaderInformation(std::string& sNameSpace, std::string& sBa
 void CDriver_BuR::QueryParameters()
 {
     brynet::base::app_kbhit();
+
+    if (!m_pCurrentConnection.expired()) {
+        auto pConnection = m_pCurrentConnection.lock();
+        //pConnection->send ();
+    }
+
 }
 
-void CDriver_BuR::enterCallback(const std::shared_ptr <brynet::net::TcpConnection> session)
+void CDriver_BuR::enterCallback(const std::shared_ptr <brynet::net::TcpConnection> session, const std::string& sIPAddress, const uint32_t nPort)
 {
+
+    std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+
+    if (!m_pCurrentConnection.expired()) {        
+        auto pConnection = m_pCurrentConnection.lock();
+        pConnection->postDisConnect();        
+    }
+
+
+    session->setDataCallback([session](brynet::base::BasePacketReader& reader) 
+    {
+
+
+    });
+
+    m_pCurrentConnection = session->weak_from_this();
+    std::cout << "Connected!" << std::endl;
     
+
 }
 
 void CDriver_BuR::failedCallback()
 {
+    if (!m_pCurrentConnection.expired()) {
+        std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+        auto pConnection = m_pCurrentConnection.lock();
+        pConnection->postDisConnect();
+    }
+    m_pCurrentConnection.reset();
 
+}
+
+
+void CDriver_BuR::Connect(const std::string& sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout)
+{
+    brynet::net::wrapper::ConnectionBuilder connectionBuilder;
+
+    connectionBuilder.WithService(m_pTcpService)
+        .WithConnector(m_pAsyncConnector)
+        .WithMaxRecvBufferSize(m_nMaxReceiveBufferSize)
+        .AddEnterCallback([this, sIPAddress, nPort](const brynet::net::TcpConnection::Ptr& session) { enterCallback(session, sIPAddress, nPort); });
+
+    connectionBuilder
+        .WithAddr(sIPAddress, nPort)
+        .WithTimeout(std::chrono::milliseconds(nTimeout))
+        .WithFailedCallback([this]() { failedCallback(); })
+        .AddSocketProcessCallback([](brynet::net::TcpSocket& socket) {
+            socket.setNodelay();
+        })
+        .asyncConnect();
+
+}
+
+void CDriver_BuR::Disconnect()
+{
+    if (!m_pCurrentConnection.expired()) {
+        std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+        auto pConnection = m_pCurrentConnection.lock();
+        pConnection->postDisConnect();
+    }
+    m_pCurrentConnection.reset();
 }

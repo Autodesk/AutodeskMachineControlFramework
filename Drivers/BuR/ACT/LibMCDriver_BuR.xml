@@ -62,6 +62,7 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 	
 	<class name="Base">
 	</class>
+
 	
 	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
 
@@ -91,9 +92,6 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 		
 		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
 		</method>
-
-		<method name="Connect" description= "Connects to .">			
-		</method>
 	
 	</class>
 
@@ -113,6 +111,17 @@ Custom implementation
 
 
 	<class name="Driver_BuR" parent="Driver" description="A Driver for a BR Automation PLC.">
+
+		<method name="Connect" description= "Connects to a BuR PLC Controller.">
+			<param name="IPAddress" type="string" pass="in" description="IP Address of PLC Service." />
+			<param name="Port" type="uint32" pass="in" description="Port of PLC Service." />				
+			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+		</method>
+
+
+		<method name="Disconnect" description= "Disconnects from the BuR PLC Controller.">
+		</method>
+
 
 	</class>
 

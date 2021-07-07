@@ -136,6 +136,25 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_queryparam
  Class definition for Driver_BuR
 **************************************************************************************************************************/
 
+/**
+* Connects to a BuR PLC Controller.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[in] pIPAddress - IP Address of PLC Service.
+* @param[in] nPort - Port of PLC Service.
+* @param[in] nTimeout - Timeout in milliseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_connect(LibMCDriver_BuR_Driver_BuR pDriver_BuR, const char * pIPAddress, LibMCDriver_BuR_uint32 nPort, LibMCDriver_BuR_uint32 nTimeout);
+
+/**
+* Disconnects from the BuR PLC Controller.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_disconnect(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/

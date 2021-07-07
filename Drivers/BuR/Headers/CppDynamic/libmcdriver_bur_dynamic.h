@@ -123,6 +123,25 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_QueryParametersPtr) (LibM
  Class definition for Driver_BuR
 **************************************************************************************************************************/
 
+/**
+* Connects to a BuR PLC Controller.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[in] pIPAddress - IP Address of PLC Service.
+* @param[in] nPort - Port of PLC Service.
+* @param[in] nTimeout - Timeout in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_ConnectPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR, const char * pIPAddress, LibMCDriver_BuR_uint32 nPort, LibMCDriver_BuR_uint32 nTimeout);
+
+/**
+* Disconnects from the BuR PLC Controller.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_DisconnectPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -205,6 +224,8 @@ typedef struct {
 	PLibMCDriver_BuRDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_BuRDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_BuRDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_BuRDriver_BuR_ConnectPtr m_Driver_BuR_Connect;
+	PLibMCDriver_BuRDriver_BuR_DisconnectPtr m_Driver_BuR_Disconnect;
 	PLibMCDriver_BuRGetVersionPtr m_GetVersion;
 	PLibMCDriver_BuRGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_BuRReleaseInstancePtr m_ReleaseInstance;

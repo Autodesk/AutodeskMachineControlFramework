@@ -362,6 +362,8 @@ public:
 	{
 	}
 	
+	inline void Connect(const std::string & sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout);
+	inline void Disconnect();
 };
 	
 	/**
@@ -491,6 +493,8 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_Driver_BuR_Connect = nullptr;
+		pWrapperTable->m_Driver_BuR_Disconnect = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -601,6 +605,24 @@ public:
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_Connect = (PLibMCDriver_BuRDriver_BuR_ConnectPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_connect");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_Connect = (PLibMCDriver_BuRDriver_BuR_ConnectPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_connect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_Connect == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_Disconnect = (PLibMCDriver_BuRDriver_BuR_DisconnectPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_disconnect");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_Disconnect = (PLibMCDriver_BuRDriver_BuR_DisconnectPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_disconnect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_Disconnect == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_BuRGetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_bur_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_BuRGetVersionPtr) dlsym(hLibrary, "libmcdriver_bur_getversion");
@@ -701,6 +723,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_connect", (void**)&(pWrapperTable->m_Driver_BuR_Connect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_Connect == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_disconnect", (void**)&(pWrapperTable->m_Driver_BuR_Disconnect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_Disconnect == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -830,6 +860,25 @@ public:
 	/**
 	 * Method definitions for class CDriver_BuR
 	 */
+	
+	/**
+	* CDriver_BuR::Connect - Connects to a BuR PLC Controller.
+	* @param[in] sIPAddress - IP Address of PLC Service.
+	* @param[in] nPort - Port of PLC Service.
+	* @param[in] nTimeout - Timeout in milliseconds.
+	*/
+	void CDriver_BuR::Connect(const std::string & sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_Connect(m_pHandle, sIPAddress.c_str(), nPort, nTimeout));
+	}
+	
+	/**
+	* CDriver_BuR::Disconnect - Disconnects from the BuR PLC Controller.
+	*/
+	void CDriver_BuR::Disconnect()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_Disconnect(m_pHandle));
+	}
 
 } // namespace LibMCDriver_BuR
 
