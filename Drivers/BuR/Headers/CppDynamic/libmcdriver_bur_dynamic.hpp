@@ -61,6 +61,7 @@ namespace LibMCDriver_BuR {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
+class CPLCCommand;
 class CDriver;
 class CDriver_BuR;
 
@@ -69,6 +70,7 @@ class CDriver_BuR;
 **************************************************************************************************************************/
 typedef CWrapper CLibMCDriver_BuRWrapper;
 typedef CBase CLibMCDriver_BuRBase;
+typedef CPLCCommand CLibMCDriver_BuRPLCCommand;
 typedef CDriver CLibMCDriver_BuRDriver;
 typedef CDriver_BuR CLibMCDriver_BuRDriver_BuR;
 
@@ -77,6 +79,7 @@ typedef CDriver_BuR CLibMCDriver_BuRDriver_BuR;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
+typedef std::shared_ptr<CPLCCommand> PPLCCommand;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<CDriver_BuR> PDriver_BuR;
 
@@ -85,6 +88,7 @@ typedef std::shared_ptr<CDriver_BuR> PDriver_BuR;
 **************************************************************************************************************************/
 typedef PWrapper PLibMCDriver_BuRWrapper;
 typedef PBase PLibMCDriver_BuRBase;
+typedef PPLCCommand PLibMCDriver_BuRPLCCommand;
 typedef PDriver PLibMCDriver_BuRDriver;
 typedef PDriver_BuR PLibMCDriver_BuRDriver_BuR;
 
@@ -264,6 +268,7 @@ private:
 	LibMCDriver_BuRResult loadWrapperTableFromSymbolLookupMethod(sLibMCDriver_BuRDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
+	friend class CPLCCommand;
 	friend class CDriver;
 	friend class CDriver_BuR;
 
@@ -324,6 +329,25 @@ public:
 	}
 	
 	friend class CWrapper;
+};
+	
+/*************************************************************************************************************************
+ Class CPLCCommand 
+**************************************************************************************************************************/
+class CPLCCommand : public CBase {
+public:
+	
+	/**
+	* CPLCCommand::CPLCCommand - Constructor for PLCCommand class.
+	*/
+	CPLCCommand(CWrapper* pWrapper, LibMCDriver_BuRHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int32 nValue);
+	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue);
 };
 	
 /*************************************************************************************************************************
@@ -487,6 +511,9 @@ public:
 			return LIBMCDRIVER_BUR_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = nullptr;
+		pWrapperTable->m_PLCCommand_SetBoolParameter = nullptr;
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = nullptr;
 		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
@@ -549,6 +576,33 @@ public:
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTLOADLIBRARY;
 		dlerror();
 		#endif // _WIN32
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
 		pWrapperTable->m_Driver_Configure = (PLibMCDriver_BuRDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_configure");
@@ -701,6 +755,18 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_BuRResult eLookupError = LIBMCDRIVER_BUR_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setintegerparameter", (void**)&(pWrapperTable->m_PLCCommand_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setboolparameter", (void**)&(pWrapperTable->m_PLCCommand_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setdoubleparameter", (void**)&(pWrapperTable->m_PLCCommand_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -769,6 +835,40 @@ public:
 	/**
 	 * Method definitions for class CBase
 	 */
+	
+	/**
+	 * Method definitions for class CPLCCommand
+	 */
+	
+	/**
+	* CPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] nValue - Parameter Value
+	*/
+	void CPLCCommand::SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
+	}
+	
+	/**
+	* CPLCCommand::SetBoolParameter - Sets a bool parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] bValue - Parameter Value
+	*/
+	void CPLCCommand::SetBoolParameter(const std::string & sParameterName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CPLCCommand::SetDoubleParameter - Sets a double parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] dValue - Parameter Value
+	*/
+	void CPLCCommand::SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
+	}
 	
 	/**
 	 * Method definitions for class CDriver

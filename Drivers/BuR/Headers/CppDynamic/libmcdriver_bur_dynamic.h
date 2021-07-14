@@ -49,6 +49,40 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for PLCCommand
+**************************************************************************************************************************/
+
+/**
+* Sets an integer parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] nValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int32 nValue);
+
+/**
+* Sets a bool parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] bValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
+
+/**
+* Sets a double parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] dValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue);
+
+/*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
 
@@ -218,6 +252,9 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRCreateDriverPtr) (const char * p
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr m_PLCCommand_SetIntegerParameter;
+	PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr m_PLCCommand_SetBoolParameter;
+	PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr m_PLCCommand_SetDoubleParameter;
 	PLibMCDriver_BuRDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_BuRDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_BuRDriver_GetTypePtr m_Driver_GetType;

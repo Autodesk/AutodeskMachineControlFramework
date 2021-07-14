@@ -62,6 +62,40 @@ extern "C" {
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for PLCCommand
+**************************************************************************************************************************/
+
+/**
+* Sets an integer parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] nValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setintegerparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int32 nValue);
+
+/**
+* Sets a bool parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] bValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setboolparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
+
+/**
+* Sets a double parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] dValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setdoubleparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue);
+
+/*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
 

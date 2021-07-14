@@ -56,6 +56,7 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
+class IPLCCommand;
 class IDriver;
 class IDriver_BuR;
 
@@ -257,6 +258,38 @@ public:
 
 
 typedef IBaseSharedPtr<IBase> PIBase;
+
+
+/*************************************************************************************************************************
+ Class interface for PLCCommand 
+**************************************************************************************************************************/
+
+class IPLCCommand : public virtual IBase {
+public:
+	/**
+	* IPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] nValue - Parameter Value
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int32 nValue) = 0;
+
+	/**
+	* IPLCCommand::SetBoolParameter - Sets a bool parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] bValue - Parameter Value
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IPLCCommand::SetDoubleParameter - Sets a double parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] dValue - Parameter Value
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue) = 0;
+
+};
+
+typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;
 
 
 /*************************************************************************************************************************

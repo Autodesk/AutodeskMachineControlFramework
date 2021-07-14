@@ -81,6 +81,91 @@ LibMCDriver_BuRResult handleUnhandledException(IBase * pIBaseClass)
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class implementation for PLCCommand
+**************************************************************************************************************************/
+LibMCDriver_BuRResult libmcdriver_bur_plccommand_setintegerparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetIntegerParameter(sParameterName, nValue);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommand_setboolparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetBoolParameter(sParameterName, bValue);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommand_setdoubleparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetDoubleParameter(sParameterName, dValue);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
 LibMCDriver_BuRResult libmcdriver_bur_driver_configure(LibMCDriver_BuR_Driver pDriver, const char * pConfigurationString)
@@ -414,6 +499,12 @@ LibMCDriver_BuRResult LibMCDriver_BuR::Impl::LibMCDriver_BuR_GetProcAddress (con
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_bur_plccommand_setintegerparameter") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setintegerparameter;
+	if (sProcName == "libmcdriver_bur_plccommand_setboolparameter") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setboolparameter;
+	if (sProcName == "libmcdriver_bur_plccommand_setdoubleparameter") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setdoubleparameter;
 	if (sProcName == "libmcdriver_bur_driver_configure") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_configure;
 	if (sProcName == "libmcdriver_bur_driver_getname") 
