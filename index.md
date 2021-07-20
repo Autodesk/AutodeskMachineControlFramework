@@ -1,5 +1,16 @@
 ## Welcome to Autodesk Machine Control Framework
 
+<div class="embed-container">
+  <iframe
+      src="https://www.youtube.com/embed/jR1DZRMFpZw"
+      width="700"
+      height="480"
+      frameborder="0"
+      allowfullscreen="">
+  </iframe>
+</div>
+
+
 Autodesk Machine Control Framework (AMCF) is an open source middleware framework to integrate CAD/CAM software with machine hardware systems into a production-ready, complete and cohesive closed loop system, that can produce high quality products out of the box. Autodesk Machine Control is an Android equivalent open source framework for any manufacturing machines/robots and it reduces the costs and time-to-market for any machine builder in a similar way to what Android did for the mobile phone industry during the last decade. Any engineering organization can quickly combine the Autodesk CAD/CAM stack together with any manufacturing hardware to create beyond-state-of-the-art industrial manufacturing system with a fraction of the traditional effort.
 
 
