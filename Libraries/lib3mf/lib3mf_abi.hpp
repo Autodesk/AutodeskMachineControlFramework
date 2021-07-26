@@ -605,6 +605,17 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_getmetadatacount(Lib3MF_MetaDa
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_getmetadata(Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 nIndex, Lib3MF_MetaData * pMetaData);
 
 /**
+* returns if a metadata value exists within this metadatagroup
+*
+* @param[in] pMetaDataGroup - MetaDataGroup instance.
+* @param[in] pNameSpace - the namespace of the metadata
+* @param[in] pName - the name of the Metadata
+* @param[out] pMetaDataExists - returns true if metadata exists
+* @return error code or 0 (success)
+*/
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_hasmetadata(Lib3MF_MetaDataGroup pMetaDataGroup, const char * pNameSpace, const char * pName, bool * pMetaDataExists);
+
+/**
 * returns a metadata value within this metadatagroup
 *
 * @param[in] pMetaDataGroup - MetaDataGroup instance.
@@ -2332,10 +2343,10 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentprofileuuid(Li
 *
 * @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 * @param[in] nIndex - Index. Must be between 0 and Count - 1.
-* @param[out] pProfile - Segment Profile
+* @param[out] pBuildItem - Segment Build Item
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentpart(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_ToolpathProfile * pProfile);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentpart(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_BuildItem * pBuildItem);
 
 /**
 * Retrieves the assigned segment part uuid.
@@ -2387,14 +2398,14 @@ LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_getlayerdatauuid(Lib3MF_To
 LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_registerprofile(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_ToolpathProfile pProfile, Lib3MF_uint32 * pProfileID);
 
 /**
-* Registers a Model Object
+* Registers a Model Build Item
 *
 * @param[in] pToolpathLayerData - ToolpathLayerData instance.
-* @param[in] pPart - The model object to use.
+* @param[in] pBuildItem - The model build item to use.
 * @param[out] pPartID - returns the local part ID for the layer.
 * @return error code or 0 (success)
 */
-LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_registerpart(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_Object pPart, Lib3MF_uint32 * pPartID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_registerbuilditem(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_BuildItem pBuildItem, Lib3MF_uint32 * pPartID);
 
 /**
 * writes hatch data to the layer.
