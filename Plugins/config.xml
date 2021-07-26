@@ -33,7 +33,6 @@
 
   	  <signaldefinition name="signal_startjob">
   		<parameter name="jobuuid" type="string" />
-   		<parameter name="jobname" type="string" />
   		<result name="success" type="bool" />		
   	  </signaldefinition>	 	  	  	     
     

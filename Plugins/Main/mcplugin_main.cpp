@@ -198,7 +198,7 @@ public:
 					pSignalGetTemperature->SetBoolResult("success", true);
 					pSignalGetTemperature->SignalHandled();
 
-					pStateEnvironment->LogMessage("Wait for temperature: Eid" + std::to_string(nExtruderId) + "=" + std::to_string(dExtruderTemperature) + " B=" + std::to_string(dBedTemperature));
+					//pStateEnvironment->LogMessage("Wait for temperature: Eid" + std::to_string(nExtruderId) + "=" + std::to_string(dExtruderTemperature) + " B=" + std::to_string(dBedTemperature));
 				}
 				// TODO add timeout/cancellation of "Wait for temperature"
 			}
@@ -297,18 +297,14 @@ public:
 
 				pStateEnvironment->LogMessage("Starting job..");
 				try {
-					auto sJobName = pHandlerInstance->GetString("jobname");
-					auto	 sJobUUID = pHandlerInstance->GetString("jobuuid");
+					auto sJobUUID = pHandlerInstance->GetString("jobuuid");
 
-					if (sJobName == "")
-						throw std::runtime_error ("empty job name!");
-					if (sJobName.length () > 64)
-						throw std::runtime_error("invalid job name: " + sJobName);
+					if (sJobUUID.empty())
+						throw std::runtime_error ("empty job UUID!");
 
 					// Check if build job exists
 					pStateEnvironment->GetBuildJob(sJobUUID);
 
-					pStateEnvironment->SetStringParameter("jobinfo", "jobname", sJobName);
 					pStateEnvironment->SetUUIDParameter("jobinfo", "jobuuid", sJobUUID);
 					pHandlerInstance->SetBoolResult("success", true);
 
@@ -357,6 +353,14 @@ public:
 **************************************************************************************************************************/
 
 class CMainState_StartProcess : public virtual CMainState {
+private:
+	struct OperationSetup {   
+		std::string operationId;
+		std::string operationName;
+		std::string setupId;
+		std::string setupName;
+	};
+	
 public:
 
 	CMainState_StartProcess(const std::string& sStateName, PPluginData pPluginData)
@@ -370,6 +374,134 @@ public:
 	}
 
 
+	void read3mfMetaData(LibMCEnv::PStateEnvironment pStateEnvironment, std::string sJobUUID)
+	{
+		const std::string s3mfNamespace = "http://autodesk.com/fusion360/amcf/";
+		std::string sAppVersion = "";
+		std::string sAppUserName = "";
+		std::string sAppUserId = "";
+		std::string sProjectName = "";
+		std::string sProjectId = "";
+		std::string sDataFileName = "";
+		std::string sDataFileId = "";
+		std::string sDataFileVersionId = "";
+		std::string sDataFileVersionNr = "";
+		std::string sDocName = "";
+		std::string sDocVersion = "";
+		std::string sDocId = "";
+		std::string sMachineName = "";
+		std::string sMachineUUID = "";
+		std::vector<OperationSetup> sOperationSetups;
+
+		std::string sBedTemp = "";
+		std::string sExt1Temp = "";
+
+		auto pToolpathAccessor = pStateEnvironment->GetBuildJob(sJobUUID)->CreateToolpathAccessor();
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationVersion")) {
+			sAppVersion = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationVersion");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationUserName")) {
+			sAppUserName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationUserName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationUserId")) {
+			sAppUserId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationUserId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ProjectName")) {
+			sProjectName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ProjectName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ProjectId")) {
+			sProjectId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ProjectId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileName")) {
+			sDataFileName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileId")) {
+			sDataFileId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileVersionId")) {
+			sDataFileVersionId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileVersionId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileVersionNr")) {
+			sDataFileVersionNr = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileVersionNr");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DocumentName")) {
+			sDocName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DocumentName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DocumentVersion")) {
+			sDocVersion = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DocumentVersion");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-document-id")) {
+			sDocId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-document-id");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "MachineName")) {
+			sMachineName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "MachineName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "MachineUUID")) {
+			sMachineUUID = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "MachineUUID");
+		}
+		int opIndex = 0;
+		bool doLoop = true;
+		while (doLoop) {
+			if (pToolpathAccessor->HasMetaData(s3mfNamespace, "OperationId" + std::to_string(opIndex))) {
+				OperationSetup opSetup;
+				opSetup.operationId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "OperationId" + std::to_string(opIndex));
+				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "OperationName" + std::to_string(opIndex))) {
+					opSetup.operationName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "OperationName" + std::to_string(opIndex));
+				}
+				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "SetupId" + std::to_string(opIndex))) {
+					opSetup.setupId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "SetupId" + std::to_string(opIndex));
+				}
+				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "setupName" + std::to_string(opIndex))) {
+					opSetup.setupName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "setupName" + std::to_string(opIndex));
+				}
+				sOperationSetups.push_back(opSetup);
+			
+				opIndex++;
+				// TODO HasMetaData doesn't work => as a workaround, do loop just once => remove following line when HasMetaData works as expected
+				doLoop = false;
+			}
+			else {
+				doLoop = false;
+			}
+		}
+
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-bed-temp")) {
+			sBedTemp = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-bed-temp");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-ext1-temp")) {
+			sExt1Temp = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-ext1-temp");
+		}
+
+		pStateEnvironment->LogMessage("AppVersion: " + sAppVersion);
+		pStateEnvironment->LogMessage("AppUserName: " + sAppUserName);
+		pStateEnvironment->LogMessage("AppUserId: " + sAppUserId);
+		pStateEnvironment->LogMessage("ProjectName: " + sProjectName);
+		pStateEnvironment->LogMessage("ProjectId: " + sProjectId);
+		pStateEnvironment->LogMessage("DataFileName: " + sDataFileName);
+		pStateEnvironment->LogMessage("DataFileId: " + sDataFileId);
+		pStateEnvironment->LogMessage("DataFileVersionId: " + sDataFileVersionId);
+		pStateEnvironment->LogMessage("DataFileVersionNr: " + sDataFileVersionNr);
+		pStateEnvironment->LogMessage("DocName: " + sDocName);
+		pStateEnvironment->LogMessage("DocVersion: " + sDocVersion);
+		pStateEnvironment->LogMessage("DocId: " + sDocId);
+		pStateEnvironment->LogMessage("MachineName: " + sMachineName);
+		pStateEnvironment->LogMessage("MachineUUID: " + sMachineUUID);
+
+		opIndex = 0;
+		for (const auto& sOperationSetups : sOperationSetups) {
+			pStateEnvironment->LogMessage("OperationId" + std::to_string(opIndex) + ": " + sOperationSetups.operationId);
+			pStateEnvironment->LogMessage("OperationName" + std::to_string(opIndex) + ": " + sOperationSetups.operationName);
+			pStateEnvironment->LogMessage("SetupId" + std::to_string(opIndex) + ": " + sOperationSetups.setupId);
+			pStateEnvironment->LogMessage("SetupName" + std::to_string(opIndex) + ": " + sOperationSetups.setupName);
+			opIndex++;
+		}
+
+		pStateEnvironment->LogMessage("BedTemp: " + sBedTemp);
+		pStateEnvironment->LogMessage("Ext1Temp: " + sExt1Temp);
+		// jobname not sent by UI (together with UUID) => so we need to set parameter jobname by reading it from 3mf file (meta data)
+		pStateEnvironment->SetStringParameter("jobinfo", "jobname", sDocName);
+	}
+
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		if (pStateEnvironment.get() == nullptr)
@@ -381,6 +513,8 @@ public:
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
 		pBuildJob->LoadToolpath();
+		
+		read3mfMetaData(pStateEnvironment, sJobUUID);
 
 		// Find out layer count
 		auto nLayerCount = pBuildJob->GetLayerCount();
