@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CPLCCommand
 #endif
 
 // Include custom headers here.
-
+#include <map>
 
 namespace LibMCDriver_S7Net {
 namespace Impl {
@@ -55,6 +55,16 @@ namespace Impl {
  Class declaration of CPLCCommand 
 **************************************************************************************************************************/
 
+enum class ePLCFieldType : int32_t {
+    ftUnknown = 0,
+    ftString = 1,
+    ftInt = 2,
+    ftDInt = 3,
+    ftBool = 4,
+    ftReal = 5,
+};
+
+
 class CPLCCommand : public virtual IPLCCommand, public virtual CBase {
 private:
 
@@ -63,6 +73,9 @@ protected:
     std::string m_sName;
     uint32_t m_nSequenceID;
 
+    std::map<std::string, ePLCFieldType> m_ParameterTypeMap;
+    std::map<std::string, std::string> m_ParameterValues; // Store values as strings
+
 public:
 
     CPLCCommand(const std::string& sName);
@@ -70,6 +83,18 @@ public:
     std::string getName();
     uint32_t getSequenceID ();
     void setSequenceID(const uint32_t nSequenceID);
+
+    void addParameterDefinition (const std::string & sName, const ePLCFieldType fieldType);
+    
+    void SetIntegerParameter(const std::string& sParameterName, const LibMCDriver_S7Net_int32 nValue) override;    
+
+    void SetStringParameter(const std::string& sParameterName, const std::string& sValue) override;
+
+    void SetBoolParameter(const std::string& sParameterName, const bool bValue) override;
+
+    void SetDoubleParameter(const std::string& sParameterName, const LibMCDriver_S7Net_double dValue) override;
+
+    std::string getParameterValue (const std::string& sParameterName);
 
 };
 

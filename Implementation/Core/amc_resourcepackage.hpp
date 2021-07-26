@@ -77,17 +77,18 @@ namespace AMC {
 		std::vector<PResourcePackageEntry> m_Entries;
 
 		PResourcePackageZIP m_pResourcePackageZIP;
+		std::string m_sPackageDebugName;
 		
 	protected:
 
 	public:
 
-		static PResourcePackage makeFromStream (AMCCommon::CImportStream * pStream);
-		static PResourcePackage makeFromStream (AMCCommon::PImportStream pStream);
-		static PResourcePackage makeEmpty ();
+		static PResourcePackage makeFromStream (AMCCommon::CImportStream * pStream, const std::string & sPackageDebugName);
+		static PResourcePackage makeFromStream (AMCCommon::PImportStream pStream, const std::string& sPackageDebugName);
+		static PResourcePackage makeEmpty (const std::string& sPackageDebugName);
 
-		CResourcePackage(AMCCommon::CImportStream* pStream);
-		CResourcePackage();
+		CResourcePackage(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName);
+		CResourcePackage(const std::string& sPackageDebugName);
 		virtual ~CResourcePackage();
 
 

@@ -298,6 +298,30 @@ set_target_properties(libmcdata
 )
 
 
+add_custom_target(configuration_xml ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml)
+
+set_property(TARGET configuration_xml APPEND PROPERTY SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml)
+
+add_custom_command(
+	TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "creating output directory")
+
+add_custom_command(
+	TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory			
+			${CMAKE_CURRENT_BINARY_DIR}/Output)
+
+add_custom_command(
+	TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E echo "copying config.xml...")
+
+
+add_custom_command(
+	TARGET configuration_xml PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+			${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml
+			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
+
 add_custom_target(copy_distribution_libraries ALL)
 add_dependencies(copy_distribution_libraries copy_framework)
 
@@ -322,11 +346,6 @@ add_custom_command(
 endif()
 
 
-add_custom_command(
-	TARGET copy_distribution_libraries POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml
-			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
 			
 
 add_custom_target(create_core_resources ALL)

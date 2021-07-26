@@ -75,6 +75,18 @@ public:
 
 	LibMCEnv_double GetUnits() override;
 
+	bool HasMetaData(const std::string& sNameSpace, const std::string& sName) override;
+
+	std::string GetMetaDataValue(const std::string& sNameSpace, const std::string& sName) override;
+
+	std::string GetMetaDataType(const std::string& sNameSpace, const std::string& sName) override;
+
+	LibMCEnv_uint32 GetPartCount() override;
+
+	IToolpathPart* GetPart(const LibMCEnv_uint32 nPartIndex) override;
+
+	IToolpathPart* FindPartByUUID(const std::string& sPartUUID) override;
+
 };
 
 } // namespace Impl

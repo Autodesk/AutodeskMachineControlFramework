@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CUIModule_ContentParameterListEntry, PUIModule_ContentParameterListEntry);
 	
 	class CUIModule_ContentParameterListEntry {
@@ -79,11 +79,11 @@ namespace AMC {
 
 		uint32_t m_nEntriesPerPage;
 
-		PParameterInstances m_pParameterInstances;
+		PStateMachineData m_pStateMachineData;
 
 	public:
 
-		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PParameterInstances pParameterInstances);
+		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentParameterList();
 

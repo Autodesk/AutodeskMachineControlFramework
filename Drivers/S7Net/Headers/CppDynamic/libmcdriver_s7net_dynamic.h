@@ -123,6 +123,46 @@ typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetDriver_QueryParametersPtr) (
  Class definition for PLCCommand
 **************************************************************************************************************************/
 
+/**
+* Sets an integer parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] nValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetPLCCommand_SetIntegerParameterPtr) (LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_S7Net_int32 nValue);
+
+/**
+* Sets a string parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] pValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetPLCCommand_SetStringParameterPtr) (LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, const char * pValue);
+
+/**
+* Sets a bool parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] bValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetPLCCommand_SetBoolParameterPtr) (LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
+
+/**
+* Sets a double parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] dValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_S7NetResult (*PLibMCDriver_S7NetPLCCommand_SetDoubleParameterPtr) (LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_S7Net_double dValue);
+
 /*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/
@@ -260,6 +300,10 @@ typedef struct {
 	PLibMCDriver_S7NetDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_S7NetDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_S7NetDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_S7NetPLCCommand_SetIntegerParameterPtr m_PLCCommand_SetIntegerParameter;
+	PLibMCDriver_S7NetPLCCommand_SetStringParameterPtr m_PLCCommand_SetStringParameter;
+	PLibMCDriver_S7NetPLCCommand_SetBoolParameterPtr m_PLCCommand_SetBoolParameter;
+	PLibMCDriver_S7NetPLCCommand_SetDoubleParameterPtr m_PLCCommand_SetDoubleParameter;
 	PLibMCDriver_S7NetDriver_S7Net_ConnectPtr m_Driver_S7Net_Connect;
 	PLibMCDriver_S7NetDriver_S7Net_DisconnectPtr m_Driver_S7Net_Disconnect;
 	PLibMCDriver_S7NetDriver_S7Net_CreateCommandPtr m_Driver_S7Net_CreateCommand;

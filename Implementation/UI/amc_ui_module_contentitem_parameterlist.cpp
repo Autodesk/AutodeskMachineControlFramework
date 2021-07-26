@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -79,10 +79,10 @@ bool CUIModule_ContentParameterListEntry::isFullGroup()
 
 
 
-CUIModule_ContentParameterList::CUIModule_ContentParameterList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, PParameterInstances pParameterInstances)
-	: CUIModule_ContentItem (AMCCommon::CUtils::createUUID()), m_sLoadingText (sLoadingText), m_nEntriesPerPage (nEntriesPerPage), m_pParameterInstances(pParameterInstances)
+CUIModule_ContentParameterList::CUIModule_ContentParameterList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData)
+	: CUIModule_ContentItem (AMCCommon::CUtils::createUUID()), m_sLoadingText (sLoadingText), m_nEntriesPerPage (nEntriesPerPage), m_pStateMachineData(pStateMachineData)
 {
-	if (pParameterInstances.get() == nullptr)
+	if (pStateMachineData.get() == nullptr)
 		throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 
 	m_sParameterDescCaption = "Parameter";
@@ -140,7 +140,7 @@ void CUIModule_ContentParameterList::addContentToJSON(CJSONWriter& writer, CJSON
 	CJSONWriterArray entryArray(writer);
 
 	for (auto entry : m_List) {
-		auto pParameterHandler = m_pParameterInstances->getParameterHandler(entry->getStateMachine ());
+		auto pParameterHandler = m_pStateMachineData->getParameterHandler(entry->getStateMachine ());
 		auto sParameterHandlerDescription = pParameterHandler->getDescription();
 
 		auto pParameterGroup = pParameterHandler->findGroup(entry->getParameterGroup(), true);
@@ -232,7 +232,7 @@ void CUIModule_ContentParameterList::loadFromXML(pugi::xml_node& xmlNode)
 			throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCONTENTGROUPNAME);
 		std::string sGroupName = groupAttrib.as_string();
 
-		auto pStateMachineInstance = m_pParameterInstances->getParameterHandler(sStateMachineName);
+		auto pStateMachineInstance = m_pStateMachineData->getParameterHandler(sStateMachineName);
 		pStateMachineInstance->findGroup(sGroupName, true);
 
 		// Parameter may be empty (then add full group)

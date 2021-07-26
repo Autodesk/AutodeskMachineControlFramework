@@ -32,21 +32,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
-#include "libmc_interfaceexception.hpp"
-#include "amc_parameterinstances.hpp"
+#include "libmc_exceptiontypes.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "amc_ui_module_content.hpp"
+#include "amc_ui_module_tabs.hpp"
+#include "amc_ui_module_verticalsplit.hpp"
+#include "amc_ui_module_horizontalsplit.hpp"
 
 using namespace AMC;
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
 {
 
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
 	std::string sType = xmlNode.name();
 
 	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
+		return std::make_shared<CUIModule_Content>(xmlNode, pUIModuleEnvironment);
 
-	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
+	if (sType == CUIModule_Tabs::getStaticType())
+		return std::make_shared<CUIModule_Tabs>(xmlNode, pUIModuleEnvironment);
+
+	if (sType == CUIModule_VerticalSplit::getStaticType())
+		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pUIModuleEnvironment);
+
+	if (sType == CUIModule_HorizontalSplit::getStaticType())
+		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pUIModuleEnvironment);
+
+	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 
 }

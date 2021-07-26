@@ -115,7 +115,7 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 	std::string sParameterUUID;
 	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
 
-	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage) || (uiType == APIHandler_UIType::utContentItem)) {
+	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage)) {
 
 		bNeedsToBeAuthorized = false;
 		bCreateNewSession = false;
@@ -217,7 +217,12 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
 	auto sContextUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTCONTEXT, LIBMC_ERROR_INVALIDEVENTCONTEXT);
 
-	m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID);
+	std::string sFormValueJSON;
+	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
+		sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
+	}
+
+	m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID, sFormValueJSON, pAuth->getClientVariableHandler ());
 }
 
 

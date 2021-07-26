@@ -13,7 +13,7 @@
 		width="100%"
 		loadingText="moduleitem.loadingtext">
 	</v-data-table>											
-	
+
 </div>
 
 </template>

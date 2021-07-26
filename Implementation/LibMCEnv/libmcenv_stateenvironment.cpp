@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_driverhandler.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -62,6 +63,12 @@ CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParam
 	if (pParameterHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+}
+
+
+std::string CStateEnvironment::GetMachineState(const std::string& sMachineInstance)
+{
+	return m_pSystemState->stateMachineData()->getInstanceStateName(sMachineInstance);
 }
 
 
@@ -176,7 +183,7 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 	if (pHandler == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(sName);
 
 	if (!pGroup->hasParameter(sName)) {
 		pGroup->addNewStringParameter(sName, "", pHandler->GetSignalID());
@@ -189,7 +196,7 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 
 ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
 {
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(sName);
 
 	std::string sSignalID = pGroup->getParameterValueByName(sName);
 	return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sSignalID);
@@ -198,7 +205,7 @@ ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
 
 void CStateEnvironment::ClearStoredValue(const std::string& sName)
 {
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(sName);
 	pGroup->removeValue(sName);
 
 }

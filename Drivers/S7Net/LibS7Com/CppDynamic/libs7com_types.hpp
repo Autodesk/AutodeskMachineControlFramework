@@ -116,6 +116,8 @@ typedef void * LibS7Com_pvoid;
 #define LIBS7COM_ERROR_READDATA 30
 #define LIBS7COM_ERROR_WRITEDATA 50
 #define LIBS7COM_ERROR_INVALIDREADADDRESS 60
+#define LIBS7COM_ERROR_INVALIDMAJORVERSION 61
+#define LIBS7COM_ERROR_INVALIDMINORVERSION 62
 
 /*************************************************************************************************************************
  Error strings for LibS7Com
@@ -144,6 +146,8 @@ inline const char * LIBS7COM_GETERRORSTRING (LibS7ComResult nErrorCode) {
     case LIBS7COM_ERROR_READDATA: return "Error on read data.";
     case LIBS7COM_ERROR_WRITEDATA: return "Error on write data.";
     case LIBS7COM_ERROR_INVALIDREADADDRESS: return "Invalid address.";
+    case LIBS7COM_ERROR_INVALIDMAJORVERSION: return "Invalid Major PLC version.";
+    case LIBS7COM_ERROR_INVALIDMINORVERSION: return "Invalid Minor PLC version.";
     default: return "unknown error";
   }
 }
@@ -153,6 +157,7 @@ inline const char * LIBS7COM_GETERRORSTRING (LibS7ComResult nErrorCode) {
 **************************************************************************************************************************/
 
 typedef LibS7ComHandle LibS7Com_Base;
+typedef LibS7ComHandle LibS7Com_CommandParameters;
 typedef LibS7ComHandle LibS7Com_PLCCommunication;
 
 namespace LibS7Com {

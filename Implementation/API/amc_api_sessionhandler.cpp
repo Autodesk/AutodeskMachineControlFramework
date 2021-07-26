@@ -66,16 +66,17 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 		auto iIterator = m_SessionMap.find (sSessionUUID);
 		if (iIterator == m_SessionMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONUUID);		
+			return nullptr;
+
 		auto pSession = iIterator->second;
 
 		if (pSession->getToken () != sToken)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONTOKEN);
 
-		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->getUserName(), pSession->isAuthenticated());
+		return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->getUserName(), pSession->isAuthenticated(), pSession->getClientVariableHandler ());
 	}
 	else {
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSESSIONUUID);
+		return nullptr;
 	}
 
 }
@@ -83,12 +84,12 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 
 PAPIAuth CAPISessionHandler::createNewAuthenticationSession()
 {
-	auto pSession = std::make_shared<CAPISession>();
+	auto pSession = std::make_shared<CAPISession>(m_pDefaultClientVariableHandler.get());
 
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	m_SessionMap.insert (std::make_pair (pSession->getUUID(), pSession));
 
-	return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->getUserName(), pSession->isAuthenticated());
+	return std::make_shared<CAPIAuth>(pSession->getUUID(), pSession->getKey(), pSession->getUserName(), pSession->isAuthenticated(), pSession->getClientVariableHandler());
 
 }
 
@@ -99,7 +100,7 @@ PAPIAuth CAPISessionHandler::createEmptyAuthenticationSession()
 	std::string sEmptyUUID = "00000000-0000-0000-0000-000000000000";
 	std::string sEmptyKey = "0000000000000000000000000000000000000000000000000000000000000000";
 	
-	return std::make_shared<CAPIAuth>(sEmptyUUID, sEmptyKey, "", false);
+	return std::make_shared<CAPIAuth>(sEmptyUUID, sEmptyKey, "", false, nullptr);
 }
 
 

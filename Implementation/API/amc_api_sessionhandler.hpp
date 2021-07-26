@@ -44,13 +44,16 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
 	amcDeclareDependingClass(CAPISession, PAPISession);
 	amcDeclareDependingClass(CAPISessionHandler, PAPISessionHandler);
-	
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+
 	class CAPISessionHandler {
 	private:
 	
 		std::mutex m_Mutex;
 
 		std::map <std::string, PAPISession> m_SessionMap;
+
+		PParameterHandler m_pDefaultClientVariableHandler;
 			
 	protected:
 			
