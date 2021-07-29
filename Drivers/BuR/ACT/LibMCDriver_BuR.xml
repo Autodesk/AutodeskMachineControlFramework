@@ -55,11 +55,7 @@
 		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />
 		<error name="INVALIDDRIVERPROTOCOL" code="1003" description="invalid driver protocol definition" />
 		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1004" description="could not parse driver protocol" />
-		<error name="NOSTATUSDBDEFINITION" code="1005" description="no status db definition" />
-		<error name="NOSTATUSDBNUMBER" code="1006" description="no status db number" />
-		<error name="INVALIDSTATUSDBNUMBER" code="1007" description="invalid status db number" />
-		<error name="NOSTATUSDBSIZE" code="1008" description="no status db size" />
-		<error name="INVALIDSTATUSDBSIZE" code="1009" description="invalid status db size" />
+		<error name="NOMACHINESTATUSDEFINITION" code="1005" description="no machine status definition" />
 		<error name="NONAMEATTRIBUTE" code="1010" description="no name attribute" />
 		<error name="NOADDRESSEATTRIBUTE" code="1011" description="no address attribute" />
 		<error name="NODESCRIPTIONATTRIBUTE" code="1012" description="no description attribute" />
@@ -70,11 +66,7 @@
 		<error name="INVALIDDESCRIPTIONATTRIBUTE" code="1016" description="invalid description attribute" />
 		<error name="INVALIDBITATTRIBUTE" code="1017" description="invalid bit attribute" />
 		<error name="INVALIDCPUTYPE" code="1018" description="invalid cpu type" />
-		
-		<error name="NOCONTROLDBDEFINITION" code="1019" description="no control db definition" />
-		<error name="NOCONTROLDBNUMBER" code="1020" description="no control db number" />
-		<error name="INVALIDCONTROLDBNUMBER" code="1021" description="invalid control db number" />
-		
+				
 		<error name="UNKNOWNCOMMANDNAME" code="1022" description="unknown command name" />
 		<error name="NOCOMMANDNAME" code="1023" description="no command name" />
 		<error name="NOCOMMANDID" code="1024" description="no command id" />
@@ -92,8 +84,6 @@
 		<error name="NOMAJORVERSION" code="1034" description="no major version" />
 		<error name="NOMINORVERSION" code="1035" description="no minor version" />
 		<error name="NOPATCHVERSION" code="1036" description="no patch version" />
-		<error name="NOCONTROLDBSIZE" code="1037" description="no control db size" />
-		<error name="INVALIDCONTROLDBSIZE" code="1038" description="invalid control db size" />
 		
 		<error name="COULDNOTFINDADDRESS" code="1039" description="could not find address" />
 		<error name="FIELDISNOINTPARAM" code="1040" description="field is no int parameter" />
@@ -117,6 +107,39 @@
 		<error name="INVALIDCLIENTSEQUENCEID" code="1056" description="Invalid client sequence id" />
 		<error name="INVALIDCLIENTID" code="1057" description="Invalid client id" />
 		<error name="PACKETQUEUEOVERFLOW" code="1058" description="Packet queue overflow." />
+
+		<error name="NOCOMMANDSLIST" code="1059" description="No commands list." />
+		<error name="COMMANDNAMEMISSING" code="1060" description="Command name missing." />
+		<error name="COMMANDIDMISSING" code="1061" description="Command ID missing." />
+		
+		<error name="DUPLICATECOMMANDPARAMETER" code="1062" description="Duplicate command parameter." />
+		<error name="INTEGERPARAMETERNOTFOUND" code="1063" description="Integer parameter not found." />
+		<error name="BOOLPARAMETERNOTFOUND" code="1064" description="Bool parameter not found." />
+		<error name="DOUBLEPARAMETERNOTFOUND" code="1065" description="Double parameter not found." />		
+		
+		<error name="VALUEISNOTINTEGERVALUE" code="1066" description="Value is not integer value." />
+		<error name="VALUEISNOTBOOLVALUE" code="1067" description="Value is not bool value." />
+		<error name="VALUEISNOTDOUBLEVALUE" code="1068" description="Value is not double value." />
+		<error name="COMMANDDEFINITIONNOTFOUND" code="1069" description="Command definition not found." />
+				
+		<error name="NOTCONNECTED" code="1070" description="Not connected." />
+
+		<error name="COULDNOTGETADDRESSINFO" code="1071" description="Could not get address info." />
+		<error name="COULDNOTCREATESOCKET" code="1072" description="Could not create socket." />
+		<error name="COULDNOTCONNECT" code="1073" description="Could not connect." />
+		<error name="SENDERROR" code="1074" description="Send error." />
+		<error name="RECEIVECOUNTEXCEEDSMAXIMUM" code="1075" description="Receive count exceeds maximum." />
+		<error name="CONNECTIONCLOSED" code="1076" description="Connection closed." />
+		<error name="RECEIVEERROR" code="1077" description="Receive error." />
+		<error name="SENDCOUNTEXCEEDSMAXIMUM" code="1078" description="Send count exceeds maximum." />
+		<error name="RECEIVEDINVALIDPACKETLENGTH" code="1079" description="Received invalid packet length." />
+
+		<error name="COULDNOTWRITETOPAYLOAD" code="1080" description="Could not write to payload." />
+		<error name="INVALIDPAYLOADADDRESS" code="1081" description="Invalid payload address." />
+		
+		
+		
+		
 		
 		
 	</errors>
@@ -131,25 +154,6 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 	<class name="Base">
 	</class>
 
-	
-	<class name="PLCCommand" parent="Base">
-	
-		<method name="SetIntegerParameter" description="Sets an integer parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="int32" pass="in" description="Parameter Value" />
-		</method>		
-	
-		<method name="SetBoolParameter" description="Sets a bool parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="bool" pass="in" description="Parameter Value" />
-		</method>
-
-		<method name="SetDoubleParameter" description="Sets a double parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="double" pass="in" description="Parameter Value" />
-		</method>		
-
-	</class>
 	
 	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
 
@@ -195,6 +199,50 @@ Custom implementation
 
 -->
 
+	<class name="PLCCommand" parent="Base">
+	
+		<method name="SetIntegerParameter" description="Sets an integer parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="int64" pass="in" description="Parameter Value" />
+		</method>		
+	
+		<method name="SetBoolParameter" description="Sets a bool parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="bool" pass="in" description="Parameter Value" />
+		</method>
+
+		<method name="SetDoubleParameter" description="Sets a double parameter of the command">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
+			<param name="Value" type="double" pass="in" description="Parameter Value" />
+		</method>		
+
+	</class>
+
+	<class name="PLCCommandList" parent="Base">
+	
+		<method name="AddCommand" description="Adds a command to the list. List must not be executed before.">
+			<param name="CommandInstance" type="class" class="PLCCommand" pass="in" description="Add a command instance." />
+		</method>		
+				
+		<method name="FinishList" description="Finish command list.">
+		</method>		
+
+		<method name="ExecuteList" description="Execute command list.">
+		</method>		
+
+		<method name="WaitForList" description="Wait for command list to finish executing">
+			<param name="ReactionTimeInMS" type="uint32" pass="in" description="How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time." />
+			<param name="WaitForTimeInMS" type="uint32" pass="in" description="How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished." />
+			<param name="CommandSuccess" type="bool" pass="return" description="Returns true if the command was finished successfully." />
+		</method>
+
+		<method name="PauseList" description="Pause command list. Must be executed or resumed before.">
+		</method>		
+		
+		<method name="ResumeList" description="Resume command list. Must be paused before.">
+		</method>		
+
+	</class>
 
 
 	<class name="Driver_BuR" parent="Driver" description="A Driver for a BR Automation PLC.">
@@ -209,6 +257,23 @@ Custom implementation
 		<method name="Disconnect" description= "Disconnects from the BuR PLC Controller.">
 		</method>
 
+		<method name="CreateCommandList" description="Create Command">
+			<param name="ListInstance" type="class" class="PLCCommandList" pass="return" description="Command list instance" />
+		</method>		
+		
+		<method name="CreateCommand" description="Creates a command instance.">
+			<param name="CommandName" type="string" pass="in" description="Command Name." />
+			<param name="CommandInstance" type="class" class="PLCCommand" pass="return" description="Returns a command instance." />
+		</method>		
+		
+		<method name="StartJournaling" description="Start Journaling.">
+		</method>		
+		
+		<method name="StopJournaling" description="Stop Journaling.">
+		</method>		
+
+		<method name="RefreshJournal" description="Refresh Journal.">
+		</method>		
 
 	</class>
 

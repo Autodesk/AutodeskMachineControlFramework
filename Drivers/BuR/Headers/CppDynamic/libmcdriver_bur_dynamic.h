@@ -49,40 +49,6 @@ Interface version: 1.0.0
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
- Class definition for PLCCommand
-**************************************************************************************************************************/
-
-/**
-* Sets an integer parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] nValue - Parameter Value
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int32 nValue);
-
-/**
-* Sets a bool parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] bValue - Parameter Value
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
-
-/**
-* Sets a double parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] dValue - Parameter Value
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue);
-
-/*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
 
@@ -154,6 +120,96 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_GetHeaderInformationPtr) 
 typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_QueryParametersPtr) (LibMCDriver_BuR_Driver pDriver);
 
 /*************************************************************************************************************************
+ Class definition for PLCCommand
+**************************************************************************************************************************/
+
+/**
+* Sets an integer parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] nValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int64 nValue);
+
+/**
+* Sets a bool parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] bValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
+
+/**
+* Sets a double parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] dValue - Parameter Value
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) (LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue);
+
+/*************************************************************************************************************************
+ Class definition for PLCCommandList
+**************************************************************************************************************************/
+
+/**
+* Adds a command to the list. List must not be executed before.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @param[in] pCommandInstance - Add a command instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_AddCommandPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList, LibMCDriver_BuR_PLCCommand pCommandInstance);
+
+/**
+* Finish command list.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_FinishListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Execute command list.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_ExecuteListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Wait for command list to finish executing
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+* @param[out] pCommandSuccess - Returns true if the command was finished successfully.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_WaitForListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList, LibMCDriver_BuR_uint32 nReactionTimeInMS, LibMCDriver_BuR_uint32 nWaitForTimeInMS, bool * pCommandSuccess);
+
+/**
+* Pause command list. Must be executed or resumed before.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_PauseListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Resume command list. Must be paused before.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_ResumeListPtr) (LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/*************************************************************************************************************************
  Class definition for Driver_BuR
 **************************************************************************************************************************/
 
@@ -175,6 +231,49 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_ConnectPtr) (LibMCDri
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_DisconnectPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Create Command
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[out] pListInstance - Command list instance
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR, LibMCDriver_BuR_PLCCommandList * pListInstance);
+
+/**
+* Creates a command instance.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[in] pCommandName - Command Name.
+* @param[out] pCommandInstance - Returns a command instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_CreateCommandPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR, const char * pCommandName, LibMCDriver_BuR_PLCCommand * pCommandInstance);
+
+/**
+* Start Journaling.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_StartJournalingPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Stop Journaling.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_StopJournalingPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Refresh Journal.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_RefreshJournalPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
 
 /*************************************************************************************************************************
  Global functions
@@ -252,17 +351,28 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRCreateDriverPtr) (const char * p
 
 typedef struct {
 	void * m_LibraryHandle;
-	PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr m_PLCCommand_SetIntegerParameter;
-	PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr m_PLCCommand_SetBoolParameter;
-	PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr m_PLCCommand_SetDoubleParameter;
 	PLibMCDriver_BuRDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_BuRDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_BuRDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_BuRDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_BuRDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_BuRDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr m_PLCCommand_SetIntegerParameter;
+	PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr m_PLCCommand_SetBoolParameter;
+	PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr m_PLCCommand_SetDoubleParameter;
+	PLibMCDriver_BuRPLCCommandList_AddCommandPtr m_PLCCommandList_AddCommand;
+	PLibMCDriver_BuRPLCCommandList_FinishListPtr m_PLCCommandList_FinishList;
+	PLibMCDriver_BuRPLCCommandList_ExecuteListPtr m_PLCCommandList_ExecuteList;
+	PLibMCDriver_BuRPLCCommandList_WaitForListPtr m_PLCCommandList_WaitForList;
+	PLibMCDriver_BuRPLCCommandList_PauseListPtr m_PLCCommandList_PauseList;
+	PLibMCDriver_BuRPLCCommandList_ResumeListPtr m_PLCCommandList_ResumeList;
 	PLibMCDriver_BuRDriver_BuR_ConnectPtr m_Driver_BuR_Connect;
 	PLibMCDriver_BuRDriver_BuR_DisconnectPtr m_Driver_BuR_Disconnect;
+	PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr m_Driver_BuR_CreateCommandList;
+	PLibMCDriver_BuRDriver_BuR_CreateCommandPtr m_Driver_BuR_CreateCommand;
+	PLibMCDriver_BuRDriver_BuR_StartJournalingPtr m_Driver_BuR_StartJournaling;
+	PLibMCDriver_BuRDriver_BuR_StopJournalingPtr m_Driver_BuR_StopJournaling;
+	PLibMCDriver_BuRDriver_BuR_RefreshJournalPtr m_Driver_BuR_RefreshJournal;
 	PLibMCDriver_BuRGetVersionPtr m_GetVersion;
 	PLibMCDriver_BuRGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_BuRReleaseInstancePtr m_ReleaseInstance;

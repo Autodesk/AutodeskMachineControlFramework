@@ -81,91 +81,6 @@ LibMCDriver_BuRResult handleUnhandledException(IBase * pIBaseClass)
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
- Class implementation for PLCCommand
-**************************************************************************************************************************/
-LibMCDriver_BuRResult libmcdriver_bur_plccommand_setintegerparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int32 nValue)
-{
-	IBase* pIBaseClass = (IBase *)pPLCCommand;
-
-	try {
-		if (pParameterName == nullptr)
-			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
-		std::string sParameterName(pParameterName);
-		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
-		if (!pIPLCCommand)
-			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
-		
-		pIPLCCommand->SetIntegerParameter(sParameterName, nValue);
-
-		return LIBMCDRIVER_BUR_SUCCESS;
-	}
-	catch (ELibMCDriver_BuRInterfaceException & Exception) {
-		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_BuRResult libmcdriver_bur_plccommand_setboolparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue)
-{
-	IBase* pIBaseClass = (IBase *)pPLCCommand;
-
-	try {
-		if (pParameterName == nullptr)
-			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
-		std::string sParameterName(pParameterName);
-		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
-		if (!pIPLCCommand)
-			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
-		
-		pIPLCCommand->SetBoolParameter(sParameterName, bValue);
-
-		return LIBMCDRIVER_BUR_SUCCESS;
-	}
-	catch (ELibMCDriver_BuRInterfaceException & Exception) {
-		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_BuRResult libmcdriver_bur_plccommand_setdoubleparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue)
-{
-	IBase* pIBaseClass = (IBase *)pPLCCommand;
-
-	try {
-		if (pParameterName == nullptr)
-			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
-		std::string sParameterName(pParameterName);
-		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
-		if (!pIPLCCommand)
-			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
-		
-		pIPLCCommand->SetDoubleParameter(sParameterName, dValue);
-
-		return LIBMCDRIVER_BUR_SUCCESS;
-	}
-	catch (ELibMCDriver_BuRInterfaceException & Exception) {
-		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-
-/*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
 LibMCDriver_BuRResult libmcdriver_bur_driver_configure(LibMCDriver_BuR_Driver pDriver, const char * pConfigurationString)
@@ -431,6 +346,246 @@ LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Dri
 
 
 /*************************************************************************************************************************
+ Class implementation for PLCCommand
+**************************************************************************************************************************/
+LibMCDriver_BuRResult libmcdriver_bur_plccommand_setintegerparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetIntegerParameter(sParameterName, nValue);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommand_setboolparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetBoolParameter(sParameterName, bValue);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommand_setdoubleparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommand;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IPLCCommand* pIPLCCommand = dynamic_cast<IPLCCommand*>(pIBaseClass);
+		if (!pIPLCCommand)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommand->SetDoubleParameter(sParameterName, dValue);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for PLCCommandList
+**************************************************************************************************************************/
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_addcommand(LibMCDriver_BuR_PLCCommandList pPLCCommandList, LibMCDriver_BuR_PLCCommand pCommandInstance)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		IBase* pIBaseClassCommandInstance = (IBase *)pCommandInstance;
+		IPLCCommand* pICommandInstance = dynamic_cast<IPLCCommand*>(pIBaseClassCommandInstance);
+		if (!pICommandInstance)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommandList->AddCommand(pICommandInstance);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_finishlist(LibMCDriver_BuR_PLCCommandList pPLCCommandList)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommandList->FinishList();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_executelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommandList->ExecuteList();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_waitforlist(LibMCDriver_BuR_PLCCommandList pPLCCommandList, LibMCDriver_BuR_uint32 nReactionTimeInMS, LibMCDriver_BuR_uint32 nWaitForTimeInMS, bool * pCommandSuccess)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		if (pCommandSuccess == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		*pCommandSuccess = pIPLCCommandList->WaitForList(nReactionTimeInMS, nWaitForTimeInMS);
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_pauselist(LibMCDriver_BuR_PLCCommandList pPLCCommandList)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommandList->PauseList();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_resumelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommandList;
+
+	try {
+		IPLCCommandList* pIPLCCommandList = dynamic_cast<IPLCCommandList*>(pIBaseClass);
+		if (!pIPLCCommandList)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIPLCCommandList->ResumeList();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for Driver_BuR
 **************************************************************************************************************************/
 LibMCDriver_BuRResult libmcdriver_bur_driver_bur_connect(LibMCDriver_BuR_Driver_BuR pDriver_BuR, const char * pIPAddress, LibMCDriver_BuR_uint32 nPort, LibMCDriver_BuR_uint32 nTimeout)
@@ -484,6 +639,137 @@ LibMCDriver_BuRResult libmcdriver_bur_driver_bur_disconnect(LibMCDriver_BuR_Driv
 	}
 }
 
+LibMCDriver_BuRResult libmcdriver_bur_driver_bur_createcommandlist(LibMCDriver_BuR_Driver_BuR pDriver_BuR, LibMCDriver_BuR_PLCCommandList * pListInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BuR;
+
+	try {
+		if (pListInstance == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		IBase* pBaseListInstance(nullptr);
+		IDriver_BuR* pIDriver_BuR = dynamic_cast<IDriver_BuR*>(pIBaseClass);
+		if (!pIDriver_BuR)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pBaseListInstance = pIDriver_BuR->CreateCommandList();
+
+		*pListInstance = (IBase*)(pBaseListInstance);
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_driver_bur_createcommand(LibMCDriver_BuR_Driver_BuR pDriver_BuR, const char * pCommandName, LibMCDriver_BuR_PLCCommand * pCommandInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BuR;
+
+	try {
+		if (pCommandName == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		if (pCommandInstance == nullptr)
+			throw ELibMCDriver_BuRInterfaceException (LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		std::string sCommandName(pCommandName);
+		IBase* pBaseCommandInstance(nullptr);
+		IDriver_BuR* pIDriver_BuR = dynamic_cast<IDriver_BuR*>(pIBaseClass);
+		if (!pIDriver_BuR)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pBaseCommandInstance = pIDriver_BuR->CreateCommand(sCommandName);
+
+		*pCommandInstance = (IBase*)(pBaseCommandInstance);
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_driver_bur_startjournaling(LibMCDriver_BuR_Driver_BuR pDriver_BuR)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BuR;
+
+	try {
+		IDriver_BuR* pIDriver_BuR = dynamic_cast<IDriver_BuR*>(pIBaseClass);
+		if (!pIDriver_BuR)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIDriver_BuR->StartJournaling();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_driver_bur_stopjournaling(LibMCDriver_BuR_Driver_BuR pDriver_BuR)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BuR;
+
+	try {
+		IDriver_BuR* pIDriver_BuR = dynamic_cast<IDriver_BuR*>(pIBaseClass);
+		if (!pIDriver_BuR)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIDriver_BuR->StopJournaling();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_driver_bur_refreshjournal(LibMCDriver_BuR_Driver_BuR pDriver_BuR)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_BuR;
+
+	try {
+		IDriver_BuR* pIDriver_BuR = dynamic_cast<IDriver_BuR*>(pIBaseClass);
+		if (!pIDriver_BuR)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIDriver_BuR->RefreshJournal();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -499,12 +785,6 @@ LibMCDriver_BuRResult LibMCDriver_BuR::Impl::LibMCDriver_BuR_GetProcAddress (con
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
-	if (sProcName == "libmcdriver_bur_plccommand_setintegerparameter") 
-		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setintegerparameter;
-	if (sProcName == "libmcdriver_bur_plccommand_setboolparameter") 
-		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setboolparameter;
-	if (sProcName == "libmcdriver_bur_plccommand_setdoubleparameter") 
-		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setdoubleparameter;
 	if (sProcName == "libmcdriver_bur_driver_configure") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_configure;
 	if (sProcName == "libmcdriver_bur_driver_getname") 
@@ -517,10 +797,38 @@ LibMCDriver_BuRResult LibMCDriver_BuR::Impl::LibMCDriver_BuR_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_bur_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_queryparameters;
+	if (sProcName == "libmcdriver_bur_plccommand_setintegerparameter") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setintegerparameter;
+	if (sProcName == "libmcdriver_bur_plccommand_setboolparameter") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setboolparameter;
+	if (sProcName == "libmcdriver_bur_plccommand_setdoubleparameter") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setdoubleparameter;
+	if (sProcName == "libmcdriver_bur_plccommandlist_addcommand") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_addcommand;
+	if (sProcName == "libmcdriver_bur_plccommandlist_finishlist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_finishlist;
+	if (sProcName == "libmcdriver_bur_plccommandlist_executelist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_executelist;
+	if (sProcName == "libmcdriver_bur_plccommandlist_waitforlist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_waitforlist;
+	if (sProcName == "libmcdriver_bur_plccommandlist_pauselist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_pauselist;
+	if (sProcName == "libmcdriver_bur_plccommandlist_resumelist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_plccommandlist_resumelist;
 	if (sProcName == "libmcdriver_bur_driver_bur_connect") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_connect;
 	if (sProcName == "libmcdriver_bur_driver_bur_disconnect") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_disconnect;
+	if (sProcName == "libmcdriver_bur_driver_bur_createcommandlist") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_createcommandlist;
+	if (sProcName == "libmcdriver_bur_driver_bur_createcommand") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_createcommand;
+	if (sProcName == "libmcdriver_bur_driver_bur_startjournaling") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_startjournaling;
+	if (sProcName == "libmcdriver_bur_driver_bur_stopjournaling") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_stopjournaling;
+	if (sProcName == "libmcdriver_bur_driver_bur_refreshjournal") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_bur_refreshjournal;
 	if (sProcName == "libmcdriver_bur_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_bur_getversion;
 	if (sProcName == "libmcdriver_bur_getlasterror") 
