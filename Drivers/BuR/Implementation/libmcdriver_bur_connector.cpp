@@ -263,6 +263,9 @@ uint32_t CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCP
         m_nSequenceID++;
     } 
 
+
+    handlePacket();
+
     return pSendInfo->getSequenceID(); 
 
 }
@@ -367,7 +370,20 @@ PDriver_BuRPacket CDriver_BuRConnector::receiveCommandFromPLCEx(CDriver_BuRSocke
     
 } */
 
+void CDriver_BuRConnector::handlePacket()
+{
+    if (m_pCurrentConnection.get() == nullptr)
+        return;
 
+    while (!m_PacketsToSend.empty()) {
+        auto& packetToSend = m_PacketsToSend.front();
+        m_PacketsToSend.pop();
+
+        m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(packetToSend));
+        receiveCommandFromPLCEx(m_pCurrentConnection.get());
+    }
+
+}
 
 void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t nPort, const uint32_t nTimeout)
 {
@@ -377,16 +393,17 @@ void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t
     }
 
     CDriver_BuRSocketConnection::initializeNetworking();
+    auto pConnection = std::make_shared <CDriver_BuRSocketConnection>(sIPAddress, nPort);
+
+    {
+        std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
+        m_pCurrentConnection = pConnection;
+    }
     
-    std::thread connectionThread([this, sIPAddress, nPort] {
+/*    std::thread connectionThread([this, sIPAddress, nPort] {
 
         try {
-            auto pConnection = std::make_shared <CDriver_BuRSocketConnection>(sIPAddress, nPort);
-
-            {
-                std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
-                m_pCurrentConnection = pConnection;
-            }
+            
 
             while (pConnection->isConnected()) {
 
@@ -407,7 +424,7 @@ void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t
 
     }); 
 
-    connectionThread.detach();
+    connectionThread.detach(); */
 
 }
 

@@ -183,7 +183,7 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 	if (pHandler == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(sName);
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(m_sInstanceName);
 
 	if (!pGroup->hasParameter(sName)) {
 		pGroup->addNewStringParameter(sName, "", pHandler->GetSignalID());
@@ -196,7 +196,7 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 
 ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
 {
-	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(sName);
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(m_sInstanceName);
 
 	std::string sSignalID = pGroup->getParameterValueByName(sName);
 	return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sSignalID);
@@ -205,7 +205,7 @@ ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
 
 void CStateEnvironment::ClearStoredValue(const std::string& sName)
 {
-	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(sName);
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(m_sInstanceName);
 	pGroup->removeValue(sName);
 
 }

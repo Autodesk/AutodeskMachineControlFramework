@@ -195,6 +195,7 @@ protected:
 
     PDriver_BuRPacket receiveCommandFromPLCEx (CDriver_BuRSocketConnection* pConnection);
 
+    void handlePacket();
 
 public:
 

@@ -387,8 +387,16 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
-    auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
-    pEvent = nullptr;
+    try {
+        auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+        pEvent = nullptr;
+    }
+    catch (LibMCUI::ELibMCUIException& E) {
+        throw ELibMCCustomException(LIBMC_ERROR_EVENTNOTFOUND, sEventName + "/" + E.what ());
+    }
+    catch (...) {
+        throw;
+    }
 
 }
 

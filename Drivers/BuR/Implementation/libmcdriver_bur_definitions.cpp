@@ -131,7 +131,7 @@ PDriver_BuRValue CDriver_BuRStringValue::duplicate()
 
 
 CDriver_BuRRealValue::CDriver_BuRRealValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress)
-    : CDriver_BuRValue(sName, sDescription, nAddress)
+    : CDriver_BuRValue(sName, sDescription, nAddress), m_dValue(0.0)
 {
 
 }
@@ -161,7 +161,7 @@ void CDriver_BuRRealValue::writeToPayload(sAMCFToPLCPacketPayload& payLoad)
 }
 
 CDriver_BuRLRealValue::CDriver_BuRLRealValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress)
-    : CDriver_BuRValue(sName, sDescription, nAddress)
+    : CDriver_BuRValue(sName, sDescription, nAddress), m_dValue(0.0)
 {
 
 }
@@ -192,7 +192,7 @@ void CDriver_BuRLRealValue::writeToPayload(sAMCFToPLCPacketPayload& payLoad)
 
 
 CDriver_BuRDIntValue::CDriver_BuRDIntValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress)
-    : CDriver_BuRValue(sName, sDescription, nAddress)
+    : CDriver_BuRValue(sName, sDescription, nAddress), m_nValue (0)
 {
 
 }
@@ -222,7 +222,7 @@ void CDriver_BuRDIntValue::writeToPayload(sAMCFToPLCPacketPayload& payLoad)
 
 
 CDriver_BuRIntValue::CDriver_BuRIntValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress)
-    : CDriver_BuRValue(sName, sDescription, nAddress)
+    : CDriver_BuRValue(sName, sDescription, nAddress), m_nValue(0)
 {
 
 }
@@ -253,7 +253,7 @@ void CDriver_BuRIntValue::writeToPayload(sAMCFToPLCPacketPayload& payLoad)
 
 
 CDriver_BuRBoolValue::CDriver_BuRBoolValue(const std::string& sName, const std::string& sDescription, const uint32_t nAddress)
-    : CDriver_BuRValue(sName, sDescription, nAddress)
+    : CDriver_BuRValue(sName, sDescription, nAddress), m_bValue(false)
 {
 }
 
