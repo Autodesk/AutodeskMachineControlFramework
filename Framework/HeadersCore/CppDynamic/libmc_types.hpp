@@ -376,6 +376,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE 349
 #define LIBMC_ERROR_COULDNOTFINDEVENTSENDER 350
 #define LIBMC_ERROR_DUPLICATEFORMNAME 351
+#define LIBMC_ERROR_EVENTNOTFOUND 352
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -664,6 +665,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE: return "Could not find event sender page";
     case LIBMC_ERROR_COULDNOTFINDEVENTSENDER: return "Could not find event sender";
     case LIBMC_ERROR_DUPLICATEFORMNAME: return "Duplicate form name";
+    case LIBMC_ERROR_EVENTNOTFOUND: return "Event not found";
     default: return "unknown error";
   }
 }
