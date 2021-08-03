@@ -37,9 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <RapidJSON/document.h>
 #include <RapidJSON/writer.h>
 
+#ifndef _WASM
 #include <restclient-cpp/connection.h>
 #include <restclient-cpp/restclient.h>
-
+#endif //_WASM
 
 CRestHandler::CRestHandler(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount)
     : m_sIdentifier(sIdentifier), m_sURL (sURL), m_sAuthToken (sAuthToken), m_nTimeout (nTimeOut), m_nRetryCount (nRetryCount)
@@ -97,19 +98,22 @@ void CRestHandler_Post::sendRequest()
     Request.Accept(writer);
     std::string sRequestBody = jsonBuffer.GetString();
 
+#ifndef _WASM
     RestClient::HeaderFields headers;
     if (!m_sAuthToken.empty())
         headers.insert(std::make_pair("Authorization", "Bearer " + m_sAuthToken));
+#endif // _WASM
 
     std::string sResponseBody;
     int32_t nResponseCode = -1;
     uint32_t nRetries = m_nRetryCount;
 
     while ((nResponseCode < 0) && (nRetries > 0)) {
+#ifndef _WASM
         RestClient::Response RESTresponse = RestClient::post(m_sURL, "application/json", sRequestBody, headers, m_nTimeout, true);
         sResponseBody = RESTresponse.body;
         nResponseCode = RESTresponse.code;
-
+#endif //_WASM
         nRetries--;
     }
 

@@ -185,8 +185,10 @@ IOperationResult * CConnection::AuthenticateWithPassword(const std::string & sUs
 	m_pRequestHandler->executeRequest(pRequest, [this](CAsyncResult * pResult) {
 
 		auto pTokenData = dynamic_cast<CAsyncTokenData*> (pResult);
-		if (pTokenData != nullptr)
-			SetAuthToken(pTokenData->getToken ());
+		if (pTokenData != nullptr) {
+			auto sToken = pTokenData->getToken ();
+			SetAuthToken(sToken);
+		}
 	});
 
 	return new COperationResult (pRequest->getFuture ());
