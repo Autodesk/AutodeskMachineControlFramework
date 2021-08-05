@@ -66,6 +66,14 @@
 		<error name="COULDNOTRECEIVETOKEN" code="18" description="Could not retrieve token" />
 		<error name="OPERATIONRESULTNOTREADY" code="19" description="Operation result is not ready" />
 		<error name="RESTERROR" code="20" description="REST error:" />
+		<error name="INVALIDUPLOADCHUNKSIZE" code="21" description="Invalid upload chunk size" />
+		<error name="CANNOTUPLOADEMPTYDATA" code="22" description="Can not upload empty data" />
+		<error name="COULDNOTBEGINSTREAMUPLOAD" code="23" description="Could not begin stream upload" />
+		<error name="BEGINCHUNKINGALREADYCALLED" code="24" description="Begin chunking already called" />
+		<error name="BEGINCHUNKINGNOTCALLED" code="25" description="Begin chunking not called" />
+		<error name="UPLOADDATAEXCEEDSTOTALSIZE" code="26" description="Upload exceeds total size" />
+		<error name="BEGINCHUNKINGFAILED" code="27" description="Begin chunking failed" />		
+		
 		
 
 	</errors>
@@ -126,31 +134,43 @@
 	
 
 	<class name="StreamUpload" parent="Base" description="Class for uploading data to an AMCF Connection.">
-	
+
+		<method name="GetName" description="returns the name of the stream upload">
+			<param name="Name" type="string" pass="return" description="Name String." />
+		</method>
+
+		<method name="GetMimeType" description="returns the mimetype of the stream upload">
+			<param name="MimeType" type="string" pass="return" description="MimeType String." />
+		</method>
+
+		<method name="GetUsageContext" description="returns the usage context of the stream upload">
+			<param name="UsageContext" type="string" pass="return" description="UsageContext String." />
+		</method>
+		
 		<method name="UploadData" description="uploads the passed data to the server. MUST only be called once.">
 			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to be uploaded." />
-			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be at least 64kB." />
+			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB." />
 			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
 		</method>
 		
 		<method name="UploadFile" description="uploads a file to the server. MUST only be called once.">
 			<param name="FileName" type="string" class="string" pass="in" description="File to be uploaded." />
-			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be at least 64kB." />
+			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB." />
 			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
 		</method>
 
 		<method name="BeginChunking" description="Starts a chunked upload. MUST not be used together with uploadData or uploadFile">
 			<param name="DataSize" type="uint64" pass="in" description="Full data size to be uploaded." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if request was successful." />
 		</method>
 
 		<method name="UploadChunk" description="Uploads another chunk to the server. Chunks are added sequentially together.">
-			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to be uploaded." />
-			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if request was successful." />
 		</method>
 
 		<method name="FinishChunking" description="MUST only be called after all chunks have been uploaded.">
-			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to be uploaded." />
-			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if request was successful." />
 		</method>
 
 		<method name="GetStatus" description="Retrieves current upload status.">

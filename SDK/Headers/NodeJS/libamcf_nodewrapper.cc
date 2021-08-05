@@ -534,6 +534,9 @@ void CLibAMCFStreamUpload::Init()
 		tpl->InstanceTemplate()->SetInternalFieldCount(NODEWRAPPER_FIELDCOUNT);
 
 		// Prototype
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetName", GetName);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetMimeType", GetMimeType);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetUsageContext", GetUsageContext);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "UploadData", UploadData);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "UploadFile", UploadFile);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "BeginChunking", BeginChunking);
@@ -571,6 +574,87 @@ Local<Object> CLibAMCFStreamUpload::NewInstance(Local<Object> pParent, LibAMCFHa
 			instance->SetInternalField(NODEWRAPPER_HANDLEINDEX, External::New(isolate, pHandle));
 		}
 		return instance;
+}
+
+
+void CLibAMCFStreamUpload::GetName(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        unsigned int bytesNeededName = 0;
+        unsigned int bytesWrittenName = 0;
+        sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetName.");
+        if (wrapperTable->m_StreamUpload_GetName == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method StreamUpload::GetName.");
+        LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
+        LibAMCFResult initErrorCode = wrapperTable->m_StreamUpload_GetName(instanceHandle, 0, &bytesNeededName, nullptr);
+        CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
+        std::vector<char> bufferName;
+        bufferName.resize(bytesNeededName);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_GetName(instanceHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(String::NewFromUtf8(isolate, &bufferName[0]));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLibAMCFStreamUpload::GetMimeType(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        unsigned int bytesNeededMimeType = 0;
+        unsigned int bytesWrittenMimeType = 0;
+        sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetMimeType.");
+        if (wrapperTable->m_StreamUpload_GetMimeType == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method StreamUpload::GetMimeType.");
+        LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
+        LibAMCFResult initErrorCode = wrapperTable->m_StreamUpload_GetMimeType(instanceHandle, 0, &bytesNeededMimeType, nullptr);
+        CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
+        std::vector<char> bufferMimeType;
+        bufferMimeType.resize(bytesNeededMimeType);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_GetMimeType(instanceHandle, bytesNeededMimeType, &bytesWrittenMimeType, &bufferMimeType[0]);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(String::NewFromUtf8(isolate, &bufferMimeType[0]));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLibAMCFStreamUpload::GetUsageContext(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        unsigned int bytesNeededUsageContext = 0;
+        unsigned int bytesWrittenUsageContext = 0;
+        sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetUsageContext.");
+        if (wrapperTable->m_StreamUpload_GetUsageContext == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method StreamUpload::GetUsageContext.");
+        LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
+        LibAMCFResult initErrorCode = wrapperTable->m_StreamUpload_GetUsageContext(instanceHandle, 0, &bytesNeededUsageContext, nullptr);
+        CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
+        std::vector<char> bufferUsageContext;
+        bufferUsageContext.resize(bytesNeededUsageContext);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_GetUsageContext(instanceHandle, bytesNeededUsageContext, &bytesWrittenUsageContext, &bufferUsageContext[0]);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(String::NewFromUtf8(isolate, &bufferUsageContext[0]));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
 }
 
 
@@ -644,14 +728,17 @@ void CLibAMCFStreamUpload::BeginChunking(const FunctionCallbackInfo<Value>& args
         v8::String::Utf8Value sutf8DataSize(isolate, args[0]);
         std::string sDataSize = *sutf8DataSize;
         uint64_t nDataSize = stoull(sDataSize);
+        LibAMCFHandle hReturnSuccess = nullptr;
         sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
             throw std::runtime_error("Could not get wrapper table for LibAMCF method BeginChunking.");
         if (wrapperTable->m_StreamUpload_BeginChunking == nullptr)
             throw std::runtime_error("Could not call LibAMCF method StreamUpload::BeginChunking.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_BeginChunking(instanceHandle, nDataSize);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_BeginChunking(instanceHandle, nDataSize, &hReturnSuccess);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        Local<Object> instanceObjSuccess = CLibAMCFOperationResult::NewInstance(args.Holder(), hReturnSuccess);
+        args.GetReturnValue().Set(instanceObjSuccess);
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -694,7 +781,7 @@ void CLibAMCFStreamUpload::FinishChunking(const FunctionCallbackInfo<Value>& arg
         if (wrapperTable->m_StreamUpload_FinishChunking == nullptr)
             throw std::runtime_error("Could not call LibAMCF method StreamUpload::FinishChunking.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_FinishChunking(instanceHandle, 0, nullptr, &hReturnSuccess);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_FinishChunking(instanceHandle, &hReturnSuccess);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         Local<Object> instanceObjSuccess = CLibAMCFOperationResult::NewInstance(args.Holder(), hReturnSuccess);
         args.GetReturnValue().Set(instanceObjSuccess);

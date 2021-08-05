@@ -435,6 +435,150 @@ LibAMCFResult libamcf_datastream_getsize(LibAMCF_DataStream pDataStream, LibAMCF
 /*************************************************************************************************************************
  Class implementation for StreamUpload
 **************************************************************************************************************************/
+LibAMCFResult libamcf_streamupload_getname(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nNameBufferSize, LibAMCF_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStreamUpload;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IStreamUpload* pIStreamUpload = dynamic_cast<IStreamUpload*>(pIBaseClass);
+		if (!pIStreamUpload)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			sName = pIStreamUpload->GetName();
+
+			pIStreamUpload->_setCache (new ParameterCache_1<std::string> (sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStreamUpload->_getCache ());
+			if (cache == nullptr)
+				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+			cache->retrieveData (sName);
+			pIStreamUpload->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibAMCF_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibAMCFInterfaceException (LIBAMCF_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBAMCF_SUCCESS;
+	}
+	catch (ELibAMCFInterfaceException & Exception) {
+		return handleLibAMCFException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibAMCFResult libamcf_streamupload_getmimetype(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nMimeTypeBufferSize, LibAMCF_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStreamUpload;
+
+	try {
+		if ( (!pMimeTypeBuffer) && !(pMimeTypeNeededChars) )
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		std::string sMimeType("");
+		IStreamUpload* pIStreamUpload = dynamic_cast<IStreamUpload*>(pIBaseClass);
+		if (!pIStreamUpload)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pMimeTypeBuffer == nullptr);
+		if (isCacheCall) {
+			sMimeType = pIStreamUpload->GetMimeType();
+
+			pIStreamUpload->_setCache (new ParameterCache_1<std::string> (sMimeType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStreamUpload->_getCache ());
+			if (cache == nullptr)
+				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+			cache->retrieveData (sMimeType);
+			pIStreamUpload->_setCache (nullptr);
+		}
+		
+		if (pMimeTypeNeededChars)
+			*pMimeTypeNeededChars = (LibAMCF_uint32) (sMimeType.size()+1);
+		if (pMimeTypeBuffer) {
+			if (sMimeType.size() >= nMimeTypeBufferSize)
+				throw ELibAMCFInterfaceException (LIBAMCF_ERROR_BUFFERTOOSMALL);
+			for (size_t iMimeType = 0; iMimeType < sMimeType.size(); iMimeType++)
+				pMimeTypeBuffer[iMimeType] = sMimeType[iMimeType];
+			pMimeTypeBuffer[sMimeType.size()] = 0;
+		}
+		return LIBAMCF_SUCCESS;
+	}
+	catch (ELibAMCFInterfaceException & Exception) {
+		return handleLibAMCFException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibAMCFResult libamcf_streamupload_getusagecontext(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStreamUpload;
+
+	try {
+		if ( (!pUsageContextBuffer) && !(pUsageContextNeededChars) )
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		std::string sUsageContext("");
+		IStreamUpload* pIStreamUpload = dynamic_cast<IStreamUpload*>(pIBaseClass);
+		if (!pIStreamUpload)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pUsageContextBuffer == nullptr);
+		if (isCacheCall) {
+			sUsageContext = pIStreamUpload->GetUsageContext();
+
+			pIStreamUpload->_setCache (new ParameterCache_1<std::string> (sUsageContext));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStreamUpload->_getCache ());
+			if (cache == nullptr)
+				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+			cache->retrieveData (sUsageContext);
+			pIStreamUpload->_setCache (nullptr);
+		}
+		
+		if (pUsageContextNeededChars)
+			*pUsageContextNeededChars = (LibAMCF_uint32) (sUsageContext.size()+1);
+		if (pUsageContextBuffer) {
+			if (sUsageContext.size() >= nUsageContextBufferSize)
+				throw ELibAMCFInterfaceException (LIBAMCF_ERROR_BUFFERTOOSMALL);
+			for (size_t iUsageContext = 0; iUsageContext < sUsageContext.size(); iUsageContext++)
+				pUsageContextBuffer[iUsageContext] = sUsageContext[iUsageContext];
+			pUsageContextBuffer[sUsageContext.size()] = 0;
+		}
+		return LIBAMCF_SUCCESS;
+	}
+	catch (ELibAMCFInterfaceException & Exception) {
+		return handleLibAMCFException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pStreamUpload;
@@ -496,17 +640,21 @@ LibAMCFResult libamcf_streamupload_uploadfile(LibAMCF_StreamUpload pStreamUpload
 	}
 }
 
-LibAMCFResult libamcf_streamupload_beginchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize)
+LibAMCFResult libamcf_streamupload_beginchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize, LibAMCF_OperationResult * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pStreamUpload;
 
 	try {
+		if (pSuccess == nullptr)
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		IBase* pBaseSuccess(nullptr);
 		IStreamUpload* pIStreamUpload = dynamic_cast<IStreamUpload*>(pIBaseClass);
 		if (!pIStreamUpload)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		pIStreamUpload->BeginChunking(nDataSize);
+		pBaseSuccess = pIStreamUpload->BeginChunking(nDataSize);
 
+		*pSuccess = (IBase*)(pBaseSuccess);
 		return LIBAMCF_SUCCESS;
 	}
 	catch (ELibAMCFInterfaceException & Exception) {
@@ -550,13 +698,11 @@ LibAMCFResult libamcf_streamupload_uploadchunk(LibAMCF_StreamUpload pStreamUploa
 	}
 }
 
-LibAMCFResult libamcf_streamupload_finishchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_OperationResult * pSuccess)
+LibAMCFResult libamcf_streamupload_finishchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_OperationResult * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pStreamUpload;
 
 	try {
-		if ( (!pDataBuffer) && (nDataBufferSize>0))
-			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
 		if (pSuccess == nullptr)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
 		IBase* pBaseSuccess(nullptr);
@@ -564,7 +710,7 @@ LibAMCFResult libamcf_streamupload_finishchunking(LibAMCF_StreamUpload pStreamUp
 		if (!pIStreamUpload)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		pBaseSuccess = pIStreamUpload->FinishChunking(nDataBufferSize, pDataBuffer);
+		pBaseSuccess = pIStreamUpload->FinishChunking();
 
 		*pSuccess = (IBase*)(pBaseSuccess);
 		return LIBAMCF_SUCCESS;
@@ -1000,6 +1146,12 @@ LibAMCFResult LibAMCF::Impl::LibAMCF_GetProcAddress (const char * pProcName, voi
 		*ppProcAddress = (void*) &libamcf_datastream_getmimetype;
 	if (sProcName == "libamcf_datastream_getsize") 
 		*ppProcAddress = (void*) &libamcf_datastream_getsize;
+	if (sProcName == "libamcf_streamupload_getname") 
+		*ppProcAddress = (void*) &libamcf_streamupload_getname;
+	if (sProcName == "libamcf_streamupload_getmimetype") 
+		*ppProcAddress = (void*) &libamcf_streamupload_getmimetype;
+	if (sProcName == "libamcf_streamupload_getusagecontext") 
+		*ppProcAddress = (void*) &libamcf_streamupload_getusagecontext;
 	if (sProcName == "libamcf_streamupload_uploaddata") 
 		*ppProcAddress = (void*) &libamcf_streamupload_uploaddata;
 	if (sProcName == "libamcf_streamupload_uploadfile") 

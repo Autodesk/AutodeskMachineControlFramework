@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CStreamUpload
 #define __LIBAMCF_STREAMUPLOAD
 
 #include "libamcf_interfaces.hpp"
+#include "libamcf_connectionstate.hpp"
 
 // Parent classes
 #include "libamcf_base.hpp"
@@ -57,37 +58,39 @@ namespace Impl {
 
 class CStreamUpload : public virtual IStreamUpload, public virtual CBase {
 private:
+    std::string m_sStreamUUID;
+    std::string m_sContextUUID;
 
-	/**
-	* Put private members here.
-	*/
 
 protected:
+    std::string m_sName;
+    std::string m_sMimeType;
+    std::string m_sUsageContext;
 
-	/**
-	* Put protected members here.
-	*/
+    PConnectionState m_pConnectionState;
+
+    uint64_t m_nTotalUploadSize;
+    uint64_t m_nCurrentUploadSize;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+    CStreamUpload(PConnectionState pConnectionState, const std::string& sName, const std::string& sMimeType, const std::string& sUsageContext);
 
+	std::string GetName() override;
 
-	/**
-	* Public member functions to implement.
-	*/
+	std::string GetMimeType() override;
+
+	std::string GetUsageContext() override;
 
 	IOperationResult * UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, const LibAMCF_uint32 nChunkSize) override;
 
 	IOperationResult * UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize) override;
 
-	void BeginChunking(const LibAMCF_uint64 nDataSize) override;
+    IOperationResult* BeginChunking(const LibAMCF_uint64 nDataSize) override;
 
 	IOperationResult * UploadChunk(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer) override;
 
-	IOperationResult * FinishChunking(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer) override;
+	IOperationResult * FinishChunking() override;
 
 	void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished) override;
 

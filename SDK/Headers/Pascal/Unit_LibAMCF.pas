@@ -100,6 +100,13 @@ const
 	LIBAMCF_ERROR_COULDNOTRECEIVETOKEN = 18;
 	LIBAMCF_ERROR_OPERATIONRESULTNOTREADY = 19;
 	LIBAMCF_ERROR_RESTERROR = 20;
+	LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE = 21;
+	LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA = 22;
+	LIBAMCF_ERROR_COULDNOTBEGINSTREAMUPLOAD = 23;
+	LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED = 24;
+	LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED = 25;
+	LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE = 26;
+	LIBAMCF_ERROR_BEGINCHUNKINGFAILED = 27;
 
 
 (*************************************************************************************************************************
@@ -227,12 +234,45 @@ type
 **************************************************************************************************************************)
 
 	(**
+	* returns the name of the stream upload
+	*
+	* @param[in] pStreamUpload - StreamUpload instance.
+	* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+	* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+	* @param[out] pNameBuffer -  buffer of Name String., may be NULL
+	* @return error code or 0 (success)
+	*)
+	TLibAMCFStreamUpload_GetNameFunc = function(pStreamUpload: TLibAMCFHandle; const nNameBufferSize: Cardinal; out pNameNeededChars: Cardinal; pNameBuffer: PAnsiChar): TLibAMCFResult; cdecl;
+	
+	(**
+	* returns the mimetype of the stream upload
+	*
+	* @param[in] pStreamUpload - StreamUpload instance.
+	* @param[in] nMimeTypeBufferSize - size of the buffer (including trailing 0)
+	* @param[out] pMimeTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+	* @param[out] pMimeTypeBuffer -  buffer of MimeType String., may be NULL
+	* @return error code or 0 (success)
+	*)
+	TLibAMCFStreamUpload_GetMimeTypeFunc = function(pStreamUpload: TLibAMCFHandle; const nMimeTypeBufferSize: Cardinal; out pMimeTypeNeededChars: Cardinal; pMimeTypeBuffer: PAnsiChar): TLibAMCFResult; cdecl;
+	
+	(**
+	* returns the usage context of the stream upload
+	*
+	* @param[in] pStreamUpload - StreamUpload instance.
+	* @param[in] nUsageContextBufferSize - size of the buffer (including trailing 0)
+	* @param[out] pUsageContextNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+	* @param[out] pUsageContextBuffer -  buffer of UsageContext String., may be NULL
+	* @return error code or 0 (success)
+	*)
+	TLibAMCFStreamUpload_GetUsageContextFunc = function(pStreamUpload: TLibAMCFHandle; const nUsageContextBufferSize: Cardinal; out pUsageContextNeededChars: Cardinal; pUsageContextBuffer: PAnsiChar): TLibAMCFResult; cdecl;
+	
+	(**
 	* uploads the passed data to the server. MUST only be called once.
 	*
 	* @param[in] pStreamUpload - StreamUpload instance.
 	* @param[in] nDataCount - Number of elements in buffer
 	* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 	* @param[out] pSuccess - Returns if upload was successful.
 	* @return error code or 0 (success)
 	*)
@@ -243,7 +283,7 @@ type
 	*
 	* @param[in] pStreamUpload - StreamUpload instance.
 	* @param[in] pFileName - File to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 	* @param[out] pSuccess - Returns if upload was successful.
 	* @return error code or 0 (success)
 	*)
@@ -254,17 +294,18 @@ type
 	*
 	* @param[in] pStreamUpload - StreamUpload instance.
 	* @param[in] nDataSize - Full data size to be uploaded.
+	* @param[out] pSuccess - Returns if request was successful.
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFStreamUpload_BeginChunkingFunc = function(pStreamUpload: TLibAMCFHandle; const nDataSize: QWord): TLibAMCFResult; cdecl;
+	TLibAMCFStreamUpload_BeginChunkingFunc = function(pStreamUpload: TLibAMCFHandle; const nDataSize: QWord; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
 	
 	(**
 	* Uploads another chunk to the server. Chunks are added sequentially together.
 	*
 	* @param[in] pStreamUpload - StreamUpload instance.
 	* @param[in] nDataCount - Number of elements in buffer
-	* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-	* @param[out] pSuccess - Returns if upload was successful.
+	* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB.
+	* @param[out] pSuccess - Returns if request was successful.
 	* @return error code or 0 (success)
 	*)
 	TLibAMCFStreamUpload_UploadChunkFunc = function(pStreamUpload: TLibAMCFHandle; const nDataCount: QWord; const pDataBuffer: PByte; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
@@ -273,12 +314,10 @@ type
 	* MUST only be called after all chunks have been uploaded.
 	*
 	* @param[in] pStreamUpload - StreamUpload instance.
-	* @param[in] nDataCount - Number of elements in buffer
-	* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-	* @param[out] pSuccess - Returns if upload was successful.
+	* @param[out] pSuccess - Returns if request was successful.
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFStreamUpload_FinishChunkingFunc = function(pStreamUpload: TLibAMCFHandle; const nDataCount: QWord; const pDataBuffer: PByte; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
+	TLibAMCFStreamUpload_FinishChunkingFunc = function(pStreamUpload: TLibAMCFHandle; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
 	
 	(**
 	* Retrieves current upload status.
@@ -549,11 +588,14 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 	public
 		constructor Create(AWrapper: TLibAMCFWrapper; AHandle: TLibAMCFHandle);
 		destructor Destroy; override;
+		function GetName(): String;
+		function GetMimeType(): String;
+		function GetUsageContext(): String;
 		function UploadData(const AData: TByteDynArray; const AChunkSize: Cardinal): TLibAMCFOperationResult;
 		function UploadFile(const AFileName: String; const AChunkSize: Cardinal): TLibAMCFOperationResult;
-		procedure BeginChunking(const ADataSize: QWord);
+		function BeginChunking(const ADataSize: QWord): TLibAMCFOperationResult;
 		function UploadChunk(const AData: TByteDynArray): TLibAMCFOperationResult;
-		function FinishChunking(const AData: TByteDynArray): TLibAMCFOperationResult;
+		function FinishChunking(): TLibAMCFOperationResult;
 		procedure GetStatus(out AUploadSize: QWord; out AUploadedBytes: QWord; out AFinished: Boolean);
 		function GetDataStream(): TLibAMCFDataStream;
 	end;
@@ -595,6 +637,9 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		FLibAMCFDataStream_GetNameFunc: TLibAMCFDataStream_GetNameFunc;
 		FLibAMCFDataStream_GetMimeTypeFunc: TLibAMCFDataStream_GetMimeTypeFunc;
 		FLibAMCFDataStream_GetSizeFunc: TLibAMCFDataStream_GetSizeFunc;
+		FLibAMCFStreamUpload_GetNameFunc: TLibAMCFStreamUpload_GetNameFunc;
+		FLibAMCFStreamUpload_GetMimeTypeFunc: TLibAMCFStreamUpload_GetMimeTypeFunc;
+		FLibAMCFStreamUpload_GetUsageContextFunc: TLibAMCFStreamUpload_GetUsageContextFunc;
 		FLibAMCFStreamUpload_UploadDataFunc: TLibAMCFStreamUpload_UploadDataFunc;
 		FLibAMCFStreamUpload_UploadFileFunc: TLibAMCFStreamUpload_UploadFileFunc;
 		FLibAMCFStreamUpload_BeginChunkingFunc: TLibAMCFStreamUpload_BeginChunkingFunc;
@@ -638,6 +683,9 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		property LibAMCFDataStream_GetNameFunc: TLibAMCFDataStream_GetNameFunc read FLibAMCFDataStream_GetNameFunc;
 		property LibAMCFDataStream_GetMimeTypeFunc: TLibAMCFDataStream_GetMimeTypeFunc read FLibAMCFDataStream_GetMimeTypeFunc;
 		property LibAMCFDataStream_GetSizeFunc: TLibAMCFDataStream_GetSizeFunc read FLibAMCFDataStream_GetSizeFunc;
+		property LibAMCFStreamUpload_GetNameFunc: TLibAMCFStreamUpload_GetNameFunc read FLibAMCFStreamUpload_GetNameFunc;
+		property LibAMCFStreamUpload_GetMimeTypeFunc: TLibAMCFStreamUpload_GetMimeTypeFunc read FLibAMCFStreamUpload_GetMimeTypeFunc;
+		property LibAMCFStreamUpload_GetUsageContextFunc: TLibAMCFStreamUpload_GetUsageContextFunc read FLibAMCFStreamUpload_GetUsageContextFunc;
 		property LibAMCFStreamUpload_UploadDataFunc: TLibAMCFStreamUpload_UploadDataFunc read FLibAMCFStreamUpload_UploadDataFunc;
 		property LibAMCFStreamUpload_UploadFileFunc: TLibAMCFStreamUpload_UploadFileFunc read FLibAMCFStreamUpload_UploadFileFunc;
 		property LibAMCFStreamUpload_BeginChunkingFunc: TLibAMCFStreamUpload_BeginChunkingFunc read FLibAMCFStreamUpload_BeginChunkingFunc;
@@ -710,6 +758,13 @@ implementation
 			LIBAMCF_ERROR_COULDNOTRECEIVETOKEN: ADescription := 'Could not retrieve token';
 			LIBAMCF_ERROR_OPERATIONRESULTNOTREADY: ADescription := 'Operation result is not ready';
 			LIBAMCF_ERROR_RESTERROR: ADescription := 'REST error:';
+			LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE: ADescription := 'Invalid upload chunk size';
+			LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA: ADescription := 'Can not upload empty data';
+			LIBAMCF_ERROR_COULDNOTBEGINSTREAMUPLOAD: ADescription := 'Could not begin stream upload';
+			LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED: ADescription := 'Begin chunking already called';
+			LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED: ADescription := 'Begin chunking not called';
+			LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE: ADescription := 'Upload exceeds total size';
+			LIBAMCF_ERROR_BEGINCHUNKINGFAILED: ADescription := 'Begin chunking failed';
 			else
 				ADescription := 'unknown';
 		end;
@@ -890,6 +945,48 @@ implementation
 		inherited;
 	end;
 
+	function TLibAMCFStreamUpload.GetName(): String;
+	var
+		bytesNeededName: Cardinal;
+		bytesWrittenName: Cardinal;
+		bufferName: array of Char;
+	begin
+		bytesNeededName:= 0;
+		bytesWrittenName:= 0;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetNameFunc(FHandle, 0, bytesNeededName, nil));
+		SetLength(bufferName, bytesNeededName);
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetNameFunc(FHandle, bytesNeededName, bytesWrittenName, @bufferName[0]));
+		Result := StrPas(@bufferName[0]);
+	end;
+
+	function TLibAMCFStreamUpload.GetMimeType(): String;
+	var
+		bytesNeededMimeType: Cardinal;
+		bytesWrittenMimeType: Cardinal;
+		bufferMimeType: array of Char;
+	begin
+		bytesNeededMimeType:= 0;
+		bytesWrittenMimeType:= 0;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetMimeTypeFunc(FHandle, 0, bytesNeededMimeType, nil));
+		SetLength(bufferMimeType, bytesNeededMimeType);
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetMimeTypeFunc(FHandle, bytesNeededMimeType, bytesWrittenMimeType, @bufferMimeType[0]));
+		Result := StrPas(@bufferMimeType[0]);
+	end;
+
+	function TLibAMCFStreamUpload.GetUsageContext(): String;
+	var
+		bytesNeededUsageContext: Cardinal;
+		bytesWrittenUsageContext: Cardinal;
+		bufferUsageContext: array of Char;
+	begin
+		bytesNeededUsageContext:= 0;
+		bytesWrittenUsageContext:= 0;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetUsageContextFunc(FHandle, 0, bytesNeededUsageContext, nil));
+		SetLength(bufferUsageContext, bytesNeededUsageContext);
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetUsageContextFunc(FHandle, bytesNeededUsageContext, bytesWrittenUsageContext, @bufferUsageContext[0]));
+		Result := StrPas(@bufferUsageContext[0]);
+	end;
+
 	function TLibAMCFStreamUpload.UploadData(const AData: TByteDynArray; const AChunkSize: Cardinal): TLibAMCFOperationResult;
 	var
 		PtrData: PByte;
@@ -922,9 +1019,15 @@ implementation
 			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
 
-	procedure TLibAMCFStreamUpload.BeginChunking(const ADataSize: QWord);
+	function TLibAMCFStreamUpload.BeginChunking(const ADataSize: QWord): TLibAMCFOperationResult;
+	var
+		HSuccess: TLibAMCFHandle;
 	begin
-		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_BeginChunkingFunc(FHandle, ADataSize));
+		Result := nil;
+		HSuccess := nil;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_BeginChunkingFunc(FHandle, ADataSize, HSuccess));
+		if Assigned(HSuccess) then
+			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
 
 	function TLibAMCFStreamUpload.UploadChunk(const AData: TByteDynArray): TLibAMCFOperationResult;
@@ -948,23 +1051,13 @@ implementation
 			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
 
-	function TLibAMCFStreamUpload.FinishChunking(const AData: TByteDynArray): TLibAMCFOperationResult;
+	function TLibAMCFStreamUpload.FinishChunking(): TLibAMCFOperationResult;
 	var
-		PtrData: PByte;
-		LenData: QWord;
 		HSuccess: TLibAMCFHandle;
 	begin
-		LenData := Length(AData);
-		if LenData > $FFFFFFFF then
-			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_INVALIDPARAM, 'array has too many entries.');
-		if LenData > 0 then
-			PtrData := @AData[0]
-		else
-			PtrData := nil;
-		
 		Result := nil;
 		HSuccess := nil;
-		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_FinishChunkingFunc(FHandle, QWord(LenData), PtrData, HSuccess));
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_FinishChunkingFunc(FHandle, HSuccess));
 		if Assigned(HSuccess) then
 			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
@@ -1130,6 +1223,9 @@ implementation
 		FLibAMCFDataStream_GetNameFunc := LoadFunction('libamcf_datastream_getname');
 		FLibAMCFDataStream_GetMimeTypeFunc := LoadFunction('libamcf_datastream_getmimetype');
 		FLibAMCFDataStream_GetSizeFunc := LoadFunction('libamcf_datastream_getsize');
+		FLibAMCFStreamUpload_GetNameFunc := LoadFunction('libamcf_streamupload_getname');
+		FLibAMCFStreamUpload_GetMimeTypeFunc := LoadFunction('libamcf_streamupload_getmimetype');
+		FLibAMCFStreamUpload_GetUsageContextFunc := LoadFunction('libamcf_streamupload_getusagecontext');
 		FLibAMCFStreamUpload_UploadDataFunc := LoadFunction('libamcf_streamupload_uploaddata');
 		FLibAMCFStreamUpload_UploadFileFunc := LoadFunction('libamcf_streamupload_uploadfile');
 		FLibAMCFStreamUpload_BeginChunkingFunc := LoadFunction('libamcf_streamupload_beginchunking');
@@ -1190,6 +1286,15 @@ implementation
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getsize'), @FLibAMCFDataStream_GetSizeFunc);
+		if AResult <> LIBAMCF_SUCCESS then
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_getname'), @FLibAMCFStreamUpload_GetNameFunc);
+		if AResult <> LIBAMCF_SUCCESS then
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_getmimetype'), @FLibAMCFStreamUpload_GetMimeTypeFunc);
+		if AResult <> LIBAMCF_SUCCESS then
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_getusagecontext'), @FLibAMCFStreamUpload_GetUsageContextFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_uploaddata'), @FLibAMCFStreamUpload_UploadDataFunc);

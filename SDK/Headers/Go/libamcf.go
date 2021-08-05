@@ -156,6 +156,33 @@ LibAMCFResult CCall_libamcf_datastream_getsize(LibAMCFHandle libraryHandle, LibA
 }
 
 
+LibAMCFResult CCall_libamcf_streamupload_getname(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nNameBufferSize, LibAMCF_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	if (libraryHandle == 0) 
+		return LIBAMCF_ERROR_INVALIDCAST;
+	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_StreamUpload_GetName (pStreamUpload, nNameBufferSize, pNameNeededChars, pNameBuffer);
+}
+
+
+LibAMCFResult CCall_libamcf_streamupload_getmimetype(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nMimeTypeBufferSize, LibAMCF_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer)
+{
+	if (libraryHandle == 0) 
+		return LIBAMCF_ERROR_INVALIDCAST;
+	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_StreamUpload_GetMimeType (pStreamUpload, nMimeTypeBufferSize, pMimeTypeNeededChars, pMimeTypeBuffer);
+}
+
+
+LibAMCFResult CCall_libamcf_streamupload_getusagecontext(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer)
+{
+	if (libraryHandle == 0) 
+		return LIBAMCF_ERROR_INVALIDCAST;
+	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_StreamUpload_GetUsageContext (pStreamUpload, nUsageContextBufferSize, pUsageContextNeededChars, pUsageContextBuffer);
+}
+
+
 LibAMCFResult CCall_libamcf_streamupload_uploaddata(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess)
 {
 	if (libraryHandle == 0) 
@@ -174,12 +201,12 @@ LibAMCFResult CCall_libamcf_streamupload_uploadfile(LibAMCFHandle libraryHandle,
 }
 
 
-LibAMCFResult CCall_libamcf_streamupload_beginchunking(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize)
+LibAMCFResult CCall_libamcf_streamupload_beginchunking(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize, LibAMCF_OperationResult * pSuccess)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_StreamUpload_BeginChunking (pStreamUpload, nDataSize);
+	return wrapperTable->m_StreamUpload_BeginChunking (pStreamUpload, nDataSize, pSuccess);
 }
 
 
@@ -192,12 +219,12 @@ LibAMCFResult CCall_libamcf_streamupload_uploadchunk(LibAMCFHandle libraryHandle
 }
 
 
-LibAMCFResult CCall_libamcf_streamupload_finishchunking(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_OperationResult * pSuccess)
+LibAMCFResult CCall_libamcf_streamupload_finishchunking(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_OperationResult * pSuccess)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_StreamUpload_FinishChunking (pStreamUpload, nDataBufferSize, pDataBuffer, pSuccess);
+	return wrapperTable->m_StreamUpload_FinishChunking (pStreamUpload, pSuccess);
 }
 
 
@@ -403,6 +430,13 @@ const LIBAMCF_ERROR_COULDNOTCREATESESSION = 17;
 const LIBAMCF_ERROR_COULDNOTRECEIVETOKEN = 18;
 const LIBAMCF_ERROR_OPERATIONRESULTNOTREADY = 19;
 const LIBAMCF_ERROR_RESTERROR = 20;
+const LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE = 21;
+const LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA = 22;
+const LIBAMCF_ERROR_COULDNOTBEGINSTREAMUPLOAD = 23;
+const LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED = 24;
+const LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED = 25;
+const LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE = 26;
+const LIBAMCF_ERROR_BEGINCHUNKINGFAILED = 27;
 
 // WrappedError is an error that wraps a LibAMCF error.
 type WrappedError struct {
@@ -456,6 +490,20 @@ func errorMessage(errorcode uint32) string {
 		return "Operation result is not ready";
 	case LIBAMCF_ERROR_RESTERROR:
 		return "REST error:";
+	case LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE:
+		return "Invalid upload chunk size";
+	case LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA:
+		return "Can not upload empty data";
+	case LIBAMCF_ERROR_COULDNOTBEGINSTREAMUPLOAD:
+		return "Could not begin stream upload";
+	case LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED:
+		return "Begin chunking already called";
+	case LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED:
+		return "Begin chunking not called";
+	case LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE:
+		return "Upload exceeds total size";
+	case LIBAMCF_ERROR_BEGINCHUNKINGFAILED:
+		return "Begin chunking failed";
 	default:
 		return "unknown";
 	}
@@ -655,6 +703,57 @@ func (wrapper Wrapper) NewStreamUpload(r ref) StreamUpload {
 	return StreamUpload{wrapper.NewBase(r)}
 }
 
+// GetName returns the name of the stream upload.
+func (inst StreamUpload) GetName() (string, error) {
+	var neededforname C.uint32_t
+	var filledinname C.uint32_t
+	returnValue := C.CCall_libamcf_streamupload_getname(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededforname, nil)
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	bufferSizename := neededforname
+	buffername := make([]byte, bufferSizename)
+	returnValue = C.CCall_libamcf_streamupload_getname(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizename, &filledinname, (*C.char)(unsafe.Pointer(&buffername[0])))
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	return string(buffername[:(filledinname-1)]), nil
+}
+
+// GetMimeType returns the mimetype of the stream upload.
+func (inst StreamUpload) GetMimeType() (string, error) {
+	var neededformimeType C.uint32_t
+	var filledinmimeType C.uint32_t
+	returnValue := C.CCall_libamcf_streamupload_getmimetype(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededformimeType, nil)
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	bufferSizemimeType := neededformimeType
+	buffermimeType := make([]byte, bufferSizemimeType)
+	returnValue = C.CCall_libamcf_streamupload_getmimetype(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizemimeType, &filledinmimeType, (*C.char)(unsafe.Pointer(&buffermimeType[0])))
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	return string(buffermimeType[:(filledinmimeType-1)]), nil
+}
+
+// GetUsageContext returns the usage context of the stream upload.
+func (inst StreamUpload) GetUsageContext() (string, error) {
+	var neededforusageContext C.uint32_t
+	var filledinusageContext C.uint32_t
+	returnValue := C.CCall_libamcf_streamupload_getusagecontext(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededforusageContext, nil)
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	bufferSizeusageContext := neededforusageContext
+	bufferusageContext := make([]byte, bufferSizeusageContext)
+	returnValue = C.CCall_libamcf_streamupload_getusagecontext(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizeusageContext, &filledinusageContext, (*C.char)(unsafe.Pointer(&bufferusageContext[0])))
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	return string(bufferusageContext[:(filledinusageContext-1)]), nil
+}
+
 // UploadData uploads the passed data to the server. MUST only be called once.
 func (inst StreamUpload) UploadData(data []uint8, chunkSize uint32) (OperationResult, error) {
 	var success ref
@@ -676,12 +775,13 @@ func (inst StreamUpload) UploadFile(fileName string, chunkSize uint32) (Operatio
 }
 
 // BeginChunking starts a chunked upload. MUST not be used together with uploadData or uploadFile.
-func (inst StreamUpload) BeginChunking(dataSize uint64) error {
-	returnValue := C.CCall_libamcf_streamupload_beginchunking(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(dataSize))
+func (inst StreamUpload) BeginChunking(dataSize uint64) (OperationResult, error) {
+	var success ref
+	returnValue := C.CCall_libamcf_streamupload_beginchunking(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(dataSize), &success)
 	if returnValue != 0 {
-		return makeError(uint32(returnValue))
+		return OperationResult{}, makeError(uint32(returnValue))
 	}
-	return nil
+	return inst.wrapperRef.NewOperationResult(success), nil
 }
 
 // UploadChunk uploads another chunk to the server. Chunks are added sequentially together.
@@ -695,9 +795,9 @@ func (inst StreamUpload) UploadChunk(data []uint8) (OperationResult, error) {
 }
 
 // FinishChunking mUST only be called after all chunks have been uploaded.
-func (inst StreamUpload) FinishChunking(data []uint8) (OperationResult, error) {
+func (inst StreamUpload) FinishChunking() (OperationResult, error) {
 	var success ref
-	returnValue := C.CCall_libamcf_streamupload_finishchunking(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(len(data)), (*C.uint8_t)(unsafe.Pointer(&data[0])), &success)
+	returnValue := C.CCall_libamcf_streamupload_finishchunking(inst.wrapperRef.LibraryHandle, inst.Ref, &success)
 	if returnValue != 0 {
 		return OperationResult{}, makeError(uint32(returnValue))
 	}

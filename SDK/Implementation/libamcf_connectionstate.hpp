@@ -26,66 +26,56 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 */
 
 
-#ifndef __LIBAMCF_RESTHANDLER
-#define __LIBAMCF_RESTHANDLER
+#ifndef __LIBAMCF_CONNECTIONSTATE
+#define __LIBAMCF_CONNECTIONSTATE
 
-#include <cstdint>
+#include <memory>
 #include <string>
-#include <map>
+#include <mutex>
 
-class CRestHandler {
-protected:
-    std::string m_sIdentifier;
-    std::string m_sURL;
-    std::string m_sAuthToken;
-    uint32_t m_nTimeout;
+#include "libamcf_asyncrequest.hpp"
+
+class CConnectionState
+{
+private:
+
+    std::string m_sBaseURL;
+
+    std::mutex m_Mutex;
+    uint32_t m_nTimeOut;
     uint32_t m_nRetryCount;
+    std::string m_sAuthTokenInternal;
 
-    std::map<std::string, std::string> m_ResultValues;
+    PAsyncRequestHandler m_pRequestHandler;
 
 public:
 
-    CRestHandler(const std::string& sIdentifier, const std::string & sURL, const std::string & sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount);
+    CConnectionState(const std::string & sBaseURL);
+    ~CConnectionState();
 
-    std::string getResultValue(const std::string& sKey);
-    bool hasResultValue(const std::string& sKey);
+    std::string getBaseURL();
+    PAsyncRequestHandler getRequestHandler();
 
+    uint32_t getTimeOut();
+    void setTimeOut(uint32_t nValue);
 
+    uint32_t getRetryCount();
+    void setRetryCount(uint32_t nValue);
+
+    void setTimeOutAndRetryCount(uint32_t nTimeOut, uint32_t nRetryCount);
+
+    std::string getAuthToken();
+    void setAuthToken(const std::string & sAuthToken);
+
+    
 };
 
 
-class CRestHandler_RawPost : public CRestHandler {
-protected:
-
-public:
-    CRestHandler_RawPost(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount);
-
-    void sendRawRequest(const std::string& sRequestBody, const std::string & sContentType);
-
-};
-
-
-class CRestHandler_JSONPost : public CRestHandler_RawPost {
-protected:
-    std::map<std::string, std::string> m_PostValues;
-    std::map<std::string, int64_t> m_PostIntValues;
-
-public:
-    CRestHandler_JSONPost(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount);
-
-    void addValue(const std::string & sKey, const std::string & sValue);
-
-    void addIntegerValue(const std::string& sKey, const int64_t nValue);
-
-    void sendRequest ();
-
-};
+typedef std::shared_ptr<CConnectionState> PConnectionState;
 
 
 
-
-#endif // __LIBAMCF_RESTHANDLER
+#endif // __LIBAMCF_CONNECTIONSTATE

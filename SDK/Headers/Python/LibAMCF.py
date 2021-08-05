@@ -87,6 +87,13 @@ class ErrorCodes(enum.IntEnum):
 	COULDNOTRECEIVETOKEN = 18
 	OPERATIONRESULTNOTREADY = 19
 	RESTERROR = 20
+	INVALIDUPLOADCHUNKSIZE = 21
+	CANNOTUPLOADEMPTYDATA = 22
+	COULDNOTBEGINSTREAMUPLOAD = 23
+	BEGINCHUNKINGALREADYCALLED = 24
+	BEGINCHUNKINGNOTCALLED = 25
+	UPLOADDATAEXCEEDSTOTALSIZE = 26
+	BEGINCHUNKINGFAILED = 27
 
 '''Definition of Function Table
 '''
@@ -107,6 +114,9 @@ class FunctionTable:
 	libamcf_datastream_getname = None
 	libamcf_datastream_getmimetype = None
 	libamcf_datastream_getsize = None
+	libamcf_streamupload_getname = None
+	libamcf_streamupload_getmimetype = None
+	libamcf_streamupload_getusagecontext = None
 	libamcf_streamupload_uploaddata = None
 	libamcf_streamupload_uploadfile = None
 	libamcf_streamupload_beginchunking = None
@@ -263,6 +273,24 @@ class Wrapper:
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64))
 			self.lib.libamcf_datastream_getsize = methodType(int(methodAddress.value))
 			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getname")), methodAddress)
+			if err != 0:
+				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
+			self.lib.libamcf_streamupload_getname = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getmimetype")), methodAddress)
+			if err != 0:
+				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
+			self.lib.libamcf_streamupload_getmimetype = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getusagecontext")), methodAddress)
+			if err != 0:
+				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
+			self.lib.libamcf_streamupload_getusagecontext = methodType(int(methodAddress.value))
+			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_uploaddata")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
@@ -278,7 +306,7 @@ class Wrapper:
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_beginchunking")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64)
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_void_p))
 			self.lib.libamcf_streamupload_beginchunking = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_uploadchunk")), methodAddress)
@@ -290,7 +318,7 @@ class Wrapper:
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_finishchunking")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_void_p))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p))
 			self.lib.libamcf_streamupload_finishchunking = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getstatus")), methodAddress)
@@ -418,6 +446,15 @@ class Wrapper:
 			self.lib.libamcf_datastream_getsize.restype = ctypes.c_int32
 			self.lib.libamcf_datastream_getsize.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64)]
 			
+			self.lib.libamcf_streamupload_getname.restype = ctypes.c_int32
+			self.lib.libamcf_streamupload_getname.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
+			
+			self.lib.libamcf_streamupload_getmimetype.restype = ctypes.c_int32
+			self.lib.libamcf_streamupload_getmimetype.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
+			
+			self.lib.libamcf_streamupload_getusagecontext.restype = ctypes.c_int32
+			self.lib.libamcf_streamupload_getusagecontext.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
+			
 			self.lib.libamcf_streamupload_uploaddata.restype = ctypes.c_int32
 			self.lib.libamcf_streamupload_uploaddata.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p)]
 			
@@ -425,13 +462,13 @@ class Wrapper:
 			self.lib.libamcf_streamupload_uploadfile.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p)]
 			
 			self.lib.libamcf_streamupload_beginchunking.restype = ctypes.c_int32
-			self.lib.libamcf_streamupload_beginchunking.argtypes = [ctypes.c_void_p, ctypes.c_uint64]
+			self.lib.libamcf_streamupload_beginchunking.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_void_p)]
 			
 			self.lib.libamcf_streamupload_uploadchunk.restype = ctypes.c_int32
 			self.lib.libamcf_streamupload_uploadchunk.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_void_p)]
 			
 			self.lib.libamcf_streamupload_finishchunking.restype = ctypes.c_int32
-			self.lib.libamcf_streamupload_finishchunking.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_void_p)]
+			self.lib.libamcf_streamupload_finishchunking.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
 			
 			self.lib.libamcf_streamupload_getstatus.restype = ctypes.c_int32
 			self.lib.libamcf_streamupload_getstatus.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_bool)]
@@ -669,6 +706,39 @@ class DataStream(Base):
 class StreamUpload(Base):
 	def __init__(self, handle, wrapper):
 		Base.__init__(self, handle, wrapper)
+	def GetName(self):
+		nNameBufferSize = ctypes.c_uint64(0)
+		nNameNeededChars = ctypes.c_uint64(0)
+		pNameBuffer = ctypes.c_char_p(None)
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getname(self._handle, nNameBufferSize, nNameNeededChars, pNameBuffer))
+		nNameBufferSize = ctypes.c_uint64(nNameNeededChars.value)
+		pNameBuffer = (ctypes.c_char * (nNameNeededChars.value))()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getname(self._handle, nNameBufferSize, nNameNeededChars, pNameBuffer))
+		
+		return pNameBuffer.value.decode()
+	
+	def GetMimeType(self):
+		nMimeTypeBufferSize = ctypes.c_uint64(0)
+		nMimeTypeNeededChars = ctypes.c_uint64(0)
+		pMimeTypeBuffer = ctypes.c_char_p(None)
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getmimetype(self._handle, nMimeTypeBufferSize, nMimeTypeNeededChars, pMimeTypeBuffer))
+		nMimeTypeBufferSize = ctypes.c_uint64(nMimeTypeNeededChars.value)
+		pMimeTypeBuffer = (ctypes.c_char * (nMimeTypeNeededChars.value))()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getmimetype(self._handle, nMimeTypeBufferSize, nMimeTypeNeededChars, pMimeTypeBuffer))
+		
+		return pMimeTypeBuffer.value.decode()
+	
+	def GetUsageContext(self):
+		nUsageContextBufferSize = ctypes.c_uint64(0)
+		nUsageContextNeededChars = ctypes.c_uint64(0)
+		pUsageContextBuffer = ctypes.c_char_p(None)
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getusagecontext(self._handle, nUsageContextBufferSize, nUsageContextNeededChars, pUsageContextBuffer))
+		nUsageContextBufferSize = ctypes.c_uint64(nUsageContextNeededChars.value)
+		pUsageContextBuffer = (ctypes.c_char * (nUsageContextNeededChars.value))()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getusagecontext(self._handle, nUsageContextBufferSize, nUsageContextNeededChars, pUsageContextBuffer))
+		
+		return pUsageContextBuffer.value.decode()
+	
 	def UploadData(self, Data, ChunkSize):
 		nDataCount = ctypes.c_uint64(len(Data))
 		pDataBuffer = (ctypes.c_uint8*len(Data))(*Data)
@@ -696,8 +766,14 @@ class StreamUpload(Base):
 	
 	def BeginChunking(self, DataSize):
 		nDataSize = ctypes.c_uint64(DataSize)
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_beginchunking(self._handle, nDataSize))
+		SuccessHandle = ctypes.c_void_p()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_beginchunking(self._handle, nDataSize, SuccessHandle))
+		if SuccessHandle:
+			SuccessObject = OperationResult(SuccessHandle, self._wrapper)
+		else:
+			raise ELibAMCFException(ErrorCodes.INVALIDCAST, 'Invalid return/output value')
 		
+		return SuccessObject
 	
 	def UploadChunk(self, Data):
 		nDataCount = ctypes.c_uint64(len(Data))
@@ -711,11 +787,9 @@ class StreamUpload(Base):
 		
 		return SuccessObject
 	
-	def FinishChunking(self, Data):
-		nDataCount = ctypes.c_uint64(len(Data))
-		pDataBuffer = (ctypes.c_uint8*len(Data))(*Data)
+	def FinishChunking(self):
 		SuccessHandle = ctypes.c_void_p()
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_finishchunking(self._handle, nDataCount, pDataBuffer, SuccessHandle))
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_finishchunking(self._handle, SuccessHandle))
 		if SuccessHandle:
 			SuccessObject = OperationResult(SuccessHandle, self._wrapper)
 		else:

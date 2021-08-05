@@ -64,39 +64,15 @@ bool CRestHandler::hasResultValue(const std::string& sKey)
 
 }
 
-
-CRestHandler_Post::CRestHandler_Post(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount)
-    : CRestHandler (sIdentifier, sURL, sAuthToken, nTimeOut, nRetryCount)
+CRestHandler_RawPost::CRestHandler_RawPost(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount)
+    : CRestHandler(sIdentifier, sURL, sAuthToken, nTimeOut, nRetryCount)
 {
 
 }
 
-void CRestHandler_Post::addValue(const std::string& sKey, const std::string& sValue)
+
+void CRestHandler_RawPost::sendRawRequest(const std::string& sRequestBody, const std::string& sContentType)
 {
-    if (sKey.empty())
-        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDKEYNAME);
-
-    m_PostValues.insert(std::make_pair(sKey, sValue));
-}
-
-void CRestHandler_Post::sendRequest()
-{
-
-    rapidjson::Document Request;
-    Request.SetObject();
-
-    for (auto iPair : m_PostValues) {
-        rapidjson::Value KeyValue(iPair.first.c_str(), Request.GetAllocator());
-        rapidjson::Value StringValue(iPair.second.c_str(), Request.GetAllocator());
-        Request.AddMember(KeyValue, StringValue, Request.GetAllocator());
-    }
-
-
-    rapidjson::StringBuffer jsonBuffer;
-    jsonBuffer.Clear();
-    rapidjson::Writer<rapidjson::StringBuffer> writer(jsonBuffer);
-    Request.Accept(writer);
-    std::string sRequestBody = jsonBuffer.GetString();
 
 #ifndef _WASM
     RestClient::HeaderFields headers;
@@ -110,7 +86,7 @@ void CRestHandler_Post::sendRequest()
 
     while ((nResponseCode < 0) && (nRetries > 0)) {
 #ifndef _WASM
-        RestClient::Response RESTresponse = RestClient::post(m_sURL, "application/json", sRequestBody, headers, m_nTimeout, true);
+        RestClient::Response RESTresponse = RestClient::post(m_sURL, sContentType, sRequestBody, headers, m_nTimeout, true);
         sResponseBody = RESTresponse.body;
         nResponseCode = RESTresponse.code;
 #endif //_WASM
@@ -130,13 +106,13 @@ void CRestHandler_Post::sendRequest()
                     std::string sName = member->name.GetString();
                     if (member->value.IsString()) {
                         std::string sValue = member->value.GetString();
-                        m_ResultValues.insert(std::make_pair (sName, sValue));                        
-                    }                    
+                        m_ResultValues.insert(std::make_pair(sName, sValue));
+                    }
                     if (member->value.IsInt64()) {
                         int64_t nValue = member->value.GetInt64();
-                        m_ResultValues.insert(std::make_pair(sName, std::to_string (nValue)));
+                        m_ResultValues.insert(std::make_pair(sName, std::to_string(nValue)));
                     }
-                }              
+                }
 
                 if (nResponseCode == 400) {
                     std::string sErrorMessage = getResultValue("message");
@@ -145,10 +121,12 @@ void CRestHandler_Post::sendRequest()
 
                 }
 
-            } else
+            }
+            else
                 throw ELibAMCFInterfaceException(LIBAMCF_ERROR_RESTRESPONSEISNOOBJECT, "REST response is no object: " + m_sIdentifier);
 
-        } else
+        }
+        else
             throw ELibAMCFInterfaceException(LIBAMCF_ERROR_COULDNOTPARSERESTRESPONSE, "Could not parse REST response: " + m_sIdentifier);
 
     }
@@ -157,7 +135,62 @@ void CRestHandler_Post::sendRequest()
         if (nResponseCode < 0)
             throw ELibAMCFInterfaceException(LIBAMCF_ERROR_RESTRESPONSETIMEOUT, "REST response timeout: " + m_sIdentifier + " (" + std::to_string(nResponseCode) + ")");
 
-        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDRESTRESPONSE, "Invalid REST response: " + m_sIdentifier + " (" + std::to_string (nResponseCode) + ")");
+        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDRESTRESPONSE, "Invalid REST response: " + m_sIdentifier + " (" + std::to_string(nResponseCode) + ")");
     }
 
 }
+
+
+
+
+CRestHandler_JSONPost::CRestHandler_JSONPost(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount)
+    : CRestHandler_RawPost(sIdentifier, sURL, sAuthToken, nTimeOut, nRetryCount)
+{
+
+}
+
+void CRestHandler_JSONPost::addValue(const std::string& sKey, const std::string& sValue)
+{
+    if (sKey.empty())
+        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDKEYNAME);
+
+    m_PostValues.insert(std::make_pair(sKey, sValue));
+}
+
+void CRestHandler_JSONPost::addIntegerValue(const std::string& sKey, const int64_t nValue)
+{
+    if (sKey.empty())
+        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDKEYNAME);
+
+    m_PostIntValues.insert(std::make_pair(sKey, nValue));
+}
+
+
+void CRestHandler_JSONPost::sendRequest()
+{
+
+    rapidjson::Document Request;
+    Request.SetObject();
+
+    for (auto iPair : m_PostValues) {
+        rapidjson::Value KeyValue(iPair.first.c_str(), Request.GetAllocator());
+        rapidjson::Value StringValue(iPair.second.c_str(), Request.GetAllocator());
+        Request.AddMember(KeyValue, StringValue, Request.GetAllocator());
+    }
+
+    for (auto iPair : m_PostIntValues) {
+        rapidjson::Value KeyValue(iPair.first.c_str(), Request.GetAllocator());
+        rapidjson::Value IntValue(iPair.second);
+        Request.AddMember(KeyValue, IntValue, Request.GetAllocator());
+    }
+
+    rapidjson::StringBuffer jsonBuffer;
+    jsonBuffer.Clear();
+    rapidjson::Writer<rapidjson::StringBuffer> writer(jsonBuffer);
+    Request.Accept(writer);
+    std::string sRequestBody = jsonBuffer.GetString();
+
+    sendRawRequest(sRequestBody, "application/json");
+}
+
+

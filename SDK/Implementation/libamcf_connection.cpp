@@ -43,17 +43,12 @@ Abstract: This is a stub class definition of CConnection
 #include <restclient-cpp/restclient.h>
 
 #include "libamcf_resthandler.hpp"
+#include "libamcf_streamupload.hpp"
 
 #include "../../Implementation/Common/common_utils.hpp"
 
 // Include custom headers here.
-#define AMCF_MINRETRYCOUNT 1
-#define AMCF_MAXRETRYCOUNT 1024
-#define AMCF_DEFAULTRETRYCOUNT 3
 
-#define AMCF_MINTIMEOUT 1
-#define AMCF_MAXTIMEOUT 65536
-#define AMCF_DEFAULTTIMEOUT 1000
 
 
 
@@ -63,47 +58,30 @@ using namespace LibAMCF::Impl;
  Class definition of CConnection 
 **************************************************************************************************************************/
 
-CConnection::CConnection(const std::string& sBaseURL)
-	: m_sBaseURL(sBaseURL), m_nTimeOut (AMCF_DEFAULTTIMEOUT), m_nRetryCount (AMCF_DEFAULTRETRYCOUNT)
+CConnection::CConnection(const std::string& sBaseURL)	
 {
-	if (m_sBaseURL.empty ())
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDBASEURL);
-
-	if (m_sBaseURL.back() != '/')
-		m_sBaseURL = m_sBaseURL + "/";
-
-	m_pRequestHandler = std::make_shared<CAsyncRequestHandler>();
+	m_pConnectionState = std::make_shared<CConnectionState>(sBaseURL);
 
 }
 
 std::string CConnection::GetBaseURL()
 {
-	return m_sBaseURL;
+	return m_pConnectionState->getBaseURL ();
 }
 
 void CConnection::SetTimeouts(const LibAMCF_uint32 nTimeout, const LibAMCF_uint32 nRetryCount)
 {
-	if (nTimeout < AMCF_MINTIMEOUT)
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDTIMEOUT);
-	if (nTimeout > AMCF_MAXTIMEOUT)
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDTIMEOUT);
-	if (nRetryCount < AMCF_MINRETRYCOUNT)
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDRETRYCOUNT);
-	if (nRetryCount > AMCF_MAXRETRYCOUNT)
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDRETRYCOUNT);
-
-	m_nTimeOut = nTimeout;
-	m_nRetryCount = nRetryCount;
+	m_pConnectionState->setTimeOutAndRetryCount(nTimeout, nRetryCount);
 }
 
 LibAMCF_uint32 CConnection::GetTimeout()
 {
-	return m_nTimeOut;
+	return m_pConnectionState->getTimeOut ();
 }
 
 LibAMCF_uint32 CConnection::GetRetryCount()
 {
-	return m_nRetryCount;
+	return m_pConnectionState->getRetryCount ();
 }
 
 
@@ -137,15 +115,20 @@ private:
 
 public:
 
-	CAsyncAuthenticationRequest(const std::string& sBaseURL, const std::string& sUserName, const std::string& sPassword, uint32_t nTimeOut, uint32_t nRetryCount)
-		: CAsyncRequest(), m_sBaseURL(sBaseURL), m_sUserName(sUserName), m_sPassword(sPassword), m_nTimeout (nTimeOut), m_nRetryCount (nRetryCount)
+	CAsyncAuthenticationRequest(PConnectionState pConnectionState, const std::string& sUserName, const std::string& sPassword)
+		: CAsyncRequest(), m_sUserName(sUserName), m_sPassword(sPassword)
 	{
+		if (pConnectionState.get() == nullptr)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
 
+		m_sBaseURL = pConnectionState->getBaseURL();
+		m_nTimeout = pConnectionState->getTimeOut();
+		m_nRetryCount = pConnectionState->getRetryCount();
 	}
 
 	PAsyncResult onExecute() override {
 
-		CRestHandler_Post sessionRequest ("retrievesession", m_sBaseURL + "api/auth", "", m_nTimeout, m_nRetryCount);
+		CRestHandler_JSONPost sessionRequest ("retrievesession", m_sBaseURL + "api/auth", "", m_nTimeout, m_nRetryCount);
 		sessionRequest.addValue("username", m_sUserName);
 		sessionRequest.sendRequest();
 
@@ -161,7 +144,7 @@ public:
 		auto sClientKeyHash = AMCCommon::CUtils::calculateSHA256FromString(sClientKey + sSaltedPassword);
 		auto sSessionKeyHash = AMCCommon::CUtils::calculateSHA256FromString(sSessionKey + sClientKeyHash);
 
-		CRestHandler_Post tokenRequest("retrievetoken", m_sBaseURL + "api/auth/" + sSessionUUID, "", m_nTimeout, m_nRetryCount);
+		CRestHandler_JSONPost tokenRequest("retrievetoken", m_sBaseURL + "api/auth/" + sSessionUUID, "", m_nTimeout, m_nRetryCount);
 		tokenRequest.addValue("clientkey", sClientKey);
 		tokenRequest.addValue("password", sSessionKeyHash);
 		tokenRequest.sendRequest();
@@ -181,13 +164,14 @@ public:
 IOperationResult * CConnection::AuthenticateWithPassword(const std::string & sUserName, const std::string & sPassword)
 {
 
-	auto pRequest = std::make_shared<CAsyncAuthenticationRequest>(m_sBaseURL, sUserName, sPassword, m_nTimeOut, m_nRetryCount);
-	m_pRequestHandler->executeRequest(pRequest, [this](CAsyncResult * pResult) {
+	auto pRequest = std::make_shared<CAsyncAuthenticationRequest>(m_pConnectionState, sUserName, sPassword);
+	auto pRequestHandler = m_pConnectionState->getRequestHandler();
+	pRequestHandler->executeRequest(pRequest, [this](CAsyncResult * pResult) {
 
 		auto pTokenData = dynamic_cast<CAsyncTokenData*> (pResult);
 		if (pTokenData != nullptr) {
 			auto sToken = pTokenData->getToken ();
-			SetAuthToken(sToken);
+			m_pConnectionState->setAuthToken(sToken);
 		}
 	});
 
@@ -214,19 +198,13 @@ IOperationResult * CConnection::Ping()
 
 std::string CConnection::GetAuthToken()
 {
-	std::lock_guard<std::mutex> lockGuard(m_AuthTokenMutex);
-	return m_sAuthTokenInternal;
+	return m_pConnectionState->getAuthToken();
 }
 
-void CConnection::SetAuthToken(std::string& sToken)
-{
-	std::lock_guard<std::mutex> lockGuard(m_AuthTokenMutex);
-	m_sAuthTokenInternal = sToken;
-}
 
 IStreamUpload * CConnection::CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext)
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+	return new CStreamUpload(m_pConnectionState, sName, sMimeType, sUsageContext);
 }
 
 

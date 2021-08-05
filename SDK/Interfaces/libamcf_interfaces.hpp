@@ -323,10 +323,28 @@ typedef IBaseSharedPtr<IDataStream> PIDataStream;
 class IStreamUpload : public virtual IBase {
 public:
 	/**
+	* IStreamUpload::GetName - returns the name of the stream upload
+	* @return Name String.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IStreamUpload::GetMimeType - returns the mimetype of the stream upload
+	* @return MimeType String.
+	*/
+	virtual std::string GetMimeType() = 0;
+
+	/**
+	* IStreamUpload::GetUsageContext - returns the usage context of the stream upload
+	* @return UsageContext String.
+	*/
+	virtual std::string GetUsageContext() = 0;
+
+	/**
 	* IStreamUpload::UploadData - uploads the passed data to the server. MUST only be called once.
 	* @param[in] nDataBufferSize - Number of elements in buffer
 	* @param[in] pDataBuffer - Data to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 	* @return Returns if upload was successful.
 	*/
 	virtual IOperationResult * UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, const LibAMCF_uint32 nChunkSize) = 0;
@@ -334,7 +352,7 @@ public:
 	/**
 	* IStreamUpload::UploadFile - uploads a file to the server. MUST only be called once.
 	* @param[in] sFileName - File to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 	* @return Returns if upload was successful.
 	*/
 	virtual IOperationResult * UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize) = 0;
@@ -342,24 +360,23 @@ public:
 	/**
 	* IStreamUpload::BeginChunking - Starts a chunked upload. MUST not be used together with uploadData or uploadFile
 	* @param[in] nDataSize - Full data size to be uploaded.
+	* @return Returns if request was successful.
 	*/
-	virtual void BeginChunking(const LibAMCF_uint64 nDataSize) = 0;
+	virtual IOperationResult * BeginChunking(const LibAMCF_uint64 nDataSize) = 0;
 
 	/**
 	* IStreamUpload::UploadChunk - Uploads another chunk to the server. Chunks are added sequentially together.
 	* @param[in] nDataBufferSize - Number of elements in buffer
-	* @param[in] pDataBuffer - Data to be uploaded.
-	* @return Returns if upload was successful.
+	* @param[in] pDataBuffer - Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB.
+	* @return Returns if request was successful.
 	*/
 	virtual IOperationResult * UploadChunk(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer) = 0;
 
 	/**
 	* IStreamUpload::FinishChunking - MUST only be called after all chunks have been uploaded.
-	* @param[in] nDataBufferSize - Number of elements in buffer
-	* @param[in] pDataBuffer - Data to be uploaded.
-	* @return Returns if upload was successful.
+	* @return Returns if request was successful.
 	*/
-	virtual IOperationResult * FinishChunking(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer) = 0;
+	virtual IOperationResult * FinishChunking() = 0;
 
 	/**
 	* IStreamUpload::GetStatus - Retrieves current upload status.

@@ -52,6 +52,8 @@ Interface version: 1.0.0
 #include <memory>
 #include <vector>
 #include <exception>
+#include <future>
+#include <mutex>
 
 namespace LibAMCF {
 
@@ -288,6 +290,8 @@ protected:
 	/* Handle to Instance in library*/
 	LibAMCFHandle m_pHandle;
 
+	std::mutex m_InstanceMutex;
+
 	/* Checks for an Error code and raises Exceptions */
 	void CheckError(LibAMCFResult nResult)
 	{
@@ -387,14 +391,11 @@ public:
 	{
 	}
 	
-	inline std::string GetName();
-	inline std::string GetMimeType();
-	inline std::string GetUsageContext();
 	inline POperationResult UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize);
 	inline POperationResult UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize);
-	inline POperationResult BeginChunking(const LibAMCF_uint64 nDataSize);
+	inline void BeginChunking(const LibAMCF_uint64 nDataSize);
 	inline POperationResult UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer);
-	inline POperationResult FinishChunking();
+	inline POperationResult FinishChunking(const CInputVector<LibAMCF_uint8> & DataBuffer);
 	inline void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished);
 	inline PDataStream GetDataStream();
 };
@@ -418,6 +419,7 @@ public:
 	inline LibAMCF_uint32 GetTimeout();
 	inline LibAMCF_uint32 GetRetryCount();
 	inline POperationResult AuthenticateWithPassword(const std::string & sUserName, const std::string & sPassword);
+	std::future<bool> asyncAuthenticateWithPassword(const std::string& sUserName, const std::string& sPassword);
 	inline bool IsAuthenticated();
 	inline POperationResult RefreshAuthentication();
 	inline POperationResult Ping();
@@ -545,9 +547,6 @@ public:
 		pWrapperTable->m_DataStream_GetName = nullptr;
 		pWrapperTable->m_DataStream_GetMimeType = nullptr;
 		pWrapperTable->m_DataStream_GetSize = nullptr;
-		pWrapperTable->m_StreamUpload_GetName = nullptr;
-		pWrapperTable->m_StreamUpload_GetMimeType = nullptr;
-		pWrapperTable->m_StreamUpload_GetUsageContext = nullptr;
 		pWrapperTable->m_StreamUpload_UploadData = nullptr;
 		pWrapperTable->m_StreamUpload_UploadFile = nullptr;
 		pWrapperTable->m_StreamUpload_BeginChunking = nullptr;
@@ -699,33 +698,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataStream_GetSize == nullptr)
-			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StreamUpload_GetName = (PLibAMCFStreamUpload_GetNamePtr) GetProcAddress(hLibrary, "libamcf_streamupload_getname");
-		#else // _WIN32
-		pWrapperTable->m_StreamUpload_GetName = (PLibAMCFStreamUpload_GetNamePtr) dlsym(hLibrary, "libamcf_streamupload_getname");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StreamUpload_GetName == nullptr)
-			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StreamUpload_GetMimeType = (PLibAMCFStreamUpload_GetMimeTypePtr) GetProcAddress(hLibrary, "libamcf_streamupload_getmimetype");
-		#else // _WIN32
-		pWrapperTable->m_StreamUpload_GetMimeType = (PLibAMCFStreamUpload_GetMimeTypePtr) dlsym(hLibrary, "libamcf_streamupload_getmimetype");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StreamUpload_GetMimeType == nullptr)
-			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) GetProcAddress(hLibrary, "libamcf_streamupload_getusagecontext");
-		#else // _WIN32
-		pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) dlsym(hLibrary, "libamcf_streamupload_getusagecontext");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_StreamUpload_GetUsageContext == nullptr)
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -996,18 +968,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetSize == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libamcf_streamupload_getname", (void**)&(pWrapperTable->m_StreamUpload_GetName));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StreamUpload_GetName == nullptr) )
-			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libamcf_streamupload_getmimetype", (void**)&(pWrapperTable->m_StreamUpload_GetMimeType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StreamUpload_GetMimeType == nullptr) )
-			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libamcf_streamupload_getusagecontext", (void**)&(pWrapperTable->m_StreamUpload_GetUsageContext));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StreamUpload_GetUsageContext == nullptr) )
-			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libamcf_streamupload_uploaddata", (void**)&(pWrapperTable->m_StreamUpload_UploadData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StreamUpload_UploadData == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1250,54 +1210,9 @@ public:
 	 */
 	
 	/**
-	* CStreamUpload::GetName - returns the name of the stream upload
-	* @return Name String.
-	*/
-	std::string CStreamUpload::GetName()
-	{
-		LibAMCF_uint32 bytesNeededName = 0;
-		LibAMCF_uint32 bytesWrittenName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetName(m_pHandle, 0, &bytesNeededName, nullptr));
-		std::vector<char> bufferName(bytesNeededName);
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetName(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
-		
-		return std::string(&bufferName[0]);
-	}
-	
-	/**
-	* CStreamUpload::GetMimeType - returns the mimetype of the stream upload
-	* @return MimeType String.
-	*/
-	std::string CStreamUpload::GetMimeType()
-	{
-		LibAMCF_uint32 bytesNeededMimeType = 0;
-		LibAMCF_uint32 bytesWrittenMimeType = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetMimeType(m_pHandle, 0, &bytesNeededMimeType, nullptr));
-		std::vector<char> bufferMimeType(bytesNeededMimeType);
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetMimeType(m_pHandle, bytesNeededMimeType, &bytesWrittenMimeType, &bufferMimeType[0]));
-		
-		return std::string(&bufferMimeType[0]);
-	}
-	
-	/**
-	* CStreamUpload::GetUsageContext - returns the usage context of the stream upload
-	* @return UsageContext String.
-	*/
-	std::string CStreamUpload::GetUsageContext()
-	{
-		LibAMCF_uint32 bytesNeededUsageContext = 0;
-		LibAMCF_uint32 bytesWrittenUsageContext = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetUsageContext(m_pHandle, 0, &bytesNeededUsageContext, nullptr));
-		std::vector<char> bufferUsageContext(bytesNeededUsageContext);
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetUsageContext(m_pHandle, bytesNeededUsageContext, &bytesWrittenUsageContext, &bufferUsageContext[0]));
-		
-		return std::string(&bufferUsageContext[0]);
-	}
-	
-	/**
 	* CStreamUpload::UploadData - uploads the passed data to the server. MUST only be called once.
 	* @param[in] DataBuffer - Data to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
 	* @return Returns if upload was successful.
 	*/
 	POperationResult CStreamUpload::UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize)
@@ -1314,7 +1229,7 @@ public:
 	/**
 	* CStreamUpload::UploadFile - uploads a file to the server. MUST only be called once.
 	* @param[in] sFileName - File to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
 	* @return Returns if upload was successful.
 	*/
 	POperationResult CStreamUpload::UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize)
@@ -1331,23 +1246,16 @@ public:
 	/**
 	* CStreamUpload::BeginChunking - Starts a chunked upload. MUST not be used together with uploadData or uploadFile
 	* @param[in] nDataSize - Full data size to be uploaded.
-	* @return Returns if request was successful.
 	*/
-	POperationResult CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
+	void CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
 	{
-		LibAMCFHandle hSuccess = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_BeginChunking(m_pHandle, nDataSize, &hSuccess));
-		
-		if (!hSuccess) {
-			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<COperationResult>(m_pWrapper, hSuccess);
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_BeginChunking(m_pHandle, nDataSize));
 	}
 	
 	/**
 	* CStreamUpload::UploadChunk - Uploads another chunk to the server. Chunks are added sequentially together.
-	* @param[in] DataBuffer - Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB.
-	* @return Returns if request was successful.
+	* @param[in] DataBuffer - Data to be uploaded.
+	* @return Returns if upload was successful.
 	*/
 	POperationResult CStreamUpload::UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer)
 	{
@@ -1362,12 +1270,13 @@ public:
 	
 	/**
 	* CStreamUpload::FinishChunking - MUST only be called after all chunks have been uploaded.
-	* @return Returns if request was successful.
+	* @param[in] DataBuffer - Data to be uploaded.
+	* @return Returns if upload was successful.
 	*/
-	POperationResult CStreamUpload::FinishChunking()
+	POperationResult CStreamUpload::FinishChunking(const CInputVector<LibAMCF_uint8> & DataBuffer)
 	{
 		LibAMCFHandle hSuccess = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_FinishChunking(m_pHandle, &hSuccess));
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_FinishChunking(m_pHandle, (LibAMCF_uint64)DataBuffer.size(), DataBuffer.data(), &hSuccess));
 		
 		if (!hSuccess) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
@@ -1462,6 +1371,8 @@ public:
 	*/
 	POperationResult CConnection::AuthenticateWithPassword(const std::string & sUserName, const std::string & sPassword)
 	{
+		std::lock_guard<std::mutex> lockGuard(m_InstanceMutex);
+
 		LibAMCFHandle hSuccess = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_Connection_AuthenticateWithPassword(m_pHandle, sUserName.c_str(), sPassword.c_str(), &hSuccess));
 		

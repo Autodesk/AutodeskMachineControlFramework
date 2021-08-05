@@ -165,12 +165,45 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getsize(LibAMCF_DataStream pDa
 **************************************************************************************************************************/
 
 /**
+* returns the name of the stream upload
+*
+* @param[in] pStreamUpload - StreamUpload instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name String., may be NULL
+* @return error code or 0 (success)
+*/
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getname(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nNameBufferSize, LibAMCF_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the mimetype of the stream upload
+*
+* @param[in] pStreamUpload - StreamUpload instance.
+* @param[in] nMimeTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMimeTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMimeTypeBuffer -  buffer of MimeType String., may be NULL
+* @return error code or 0 (success)
+*/
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getmimetype(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nMimeTypeBufferSize, LibAMCF_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer);
+
+/**
+* returns the usage context of the stream upload
+*
+* @param[in] pStreamUpload - StreamUpload instance.
+* @param[in] nUsageContextBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsageContextNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsageContextBuffer -  buffer of UsageContext String., may be NULL
+* @return error code or 0 (success)
+*/
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getusagecontext(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer);
+
+/**
 * uploads the passed data to the server. MUST only be called once.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] nDataBufferSize - Number of elements in buffer
 * @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
@@ -181,7 +214,7 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpl
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] pFileName - File to be uploaded.
-* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
@@ -192,17 +225,18 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploadfile(LibAMCF_StreamUpl
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] nDataSize - Full data size to be uploaded.
+* @param[out] pSuccess - Returns if request was successful.
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_beginchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_beginchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize, LibAMCF_OperationResult * pSuccess);
 
 /**
 * Uploads another chunk to the server. Chunks are added sequentially together.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] nDataBufferSize - Number of elements in buffer
-* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-* @param[out] pSuccess - Returns if upload was successful.
+* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB.
+* @param[out] pSuccess - Returns if request was successful.
 * @return error code or 0 (success)
 */
 LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploadchunk(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_OperationResult * pSuccess);
@@ -211,12 +245,10 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploadchunk(LibAMCF_StreamUp
 * MUST only be called after all chunks have been uploaded.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
-* @param[in] nDataBufferSize - Number of elements in buffer
-* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-* @param[out] pSuccess - Returns if upload was successful.
+* @param[out] pSuccess - Returns if request was successful.
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_finishchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_OperationResult * pSuccess);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_finishchunking(LibAMCF_StreamUpload pStreamUpload, LibAMCF_OperationResult * pSuccess);
 
 /**
 * Retrieves current upload status.

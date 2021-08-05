@@ -116,6 +116,13 @@ typedef void * LibAMCF_pvoid;
 #define LIBAMCF_ERROR_COULDNOTRECEIVETOKEN 18
 #define LIBAMCF_ERROR_OPERATIONRESULTNOTREADY 19
 #define LIBAMCF_ERROR_RESTERROR 20
+#define LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE 21
+#define LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA 22
+#define LIBAMCF_ERROR_COULDNOTBEGINSTREAMUPLOAD 23
+#define LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED 24
+#define LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED 25
+#define LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE 26
+#define LIBAMCF_ERROR_BEGINCHUNKINGFAILED 27
 
 /*************************************************************************************************************************
  Error strings for LibAMCF
@@ -144,6 +151,13 @@ inline const char * LIBAMCF_GETERRORSTRING (LibAMCFResult nErrorCode) {
     case LIBAMCF_ERROR_COULDNOTRECEIVETOKEN: return "Could not retrieve token";
     case LIBAMCF_ERROR_OPERATIONRESULTNOTREADY: return "Operation result is not ready";
     case LIBAMCF_ERROR_RESTERROR: return "REST error:";
+    case LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE: return "Invalid upload chunk size";
+    case LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA: return "Can not upload empty data";
+    case LIBAMCF_ERROR_COULDNOTBEGINSTREAMUPLOAD: return "Could not begin stream upload";
+    case LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED: return "Begin chunking already called";
+    case LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED: return "Begin chunking not called";
+    case LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE: return "Upload exceeds total size";
+    case LIBAMCF_ERROR_BEGINCHUNKINGFAILED: return "Begin chunking failed";
     default: return "unknown error";
   }
 }

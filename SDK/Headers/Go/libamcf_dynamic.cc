@@ -60,6 +60,9 @@ LibAMCFResult InitLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	pWrapperTable->m_DataStream_GetName = NULL;
 	pWrapperTable->m_DataStream_GetMimeType = NULL;
 	pWrapperTable->m_DataStream_GetSize = NULL;
+	pWrapperTable->m_StreamUpload_GetName = NULL;
+	pWrapperTable->m_StreamUpload_GetMimeType = NULL;
+	pWrapperTable->m_StreamUpload_GetUsageContext = NULL;
 	pWrapperTable->m_StreamUpload_UploadData = NULL;
 	pWrapperTable->m_StreamUpload_UploadFile = NULL;
 	pWrapperTable->m_StreamUpload_BeginChunking = NULL;
@@ -215,6 +218,33 @@ LibAMCFResult LoadLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_DataStream_GetSize == NULL)
+		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_StreamUpload_GetName = (PLibAMCFStreamUpload_GetNamePtr) GetProcAddress(hLibrary, "libamcf_streamupload_getname");
+	#else // _WIN32
+	pWrapperTable->m_StreamUpload_GetName = (PLibAMCFStreamUpload_GetNamePtr) dlsym(hLibrary, "libamcf_streamupload_getname");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_StreamUpload_GetName == NULL)
+		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_StreamUpload_GetMimeType = (PLibAMCFStreamUpload_GetMimeTypePtr) GetProcAddress(hLibrary, "libamcf_streamupload_getmimetype");
+	#else // _WIN32
+	pWrapperTable->m_StreamUpload_GetMimeType = (PLibAMCFStreamUpload_GetMimeTypePtr) dlsym(hLibrary, "libamcf_streamupload_getmimetype");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_StreamUpload_GetMimeType == NULL)
+		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) GetProcAddress(hLibrary, "libamcf_streamupload_getusagecontext");
+	#else // _WIN32
+	pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) dlsym(hLibrary, "libamcf_streamupload_getusagecontext");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_StreamUpload_GetUsageContext == NULL)
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32

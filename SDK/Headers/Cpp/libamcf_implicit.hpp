@@ -363,11 +363,14 @@ public:
 	{
 	}
 	
+	inline std::string GetName();
+	inline std::string GetMimeType();
+	inline std::string GetUsageContext();
 	inline POperationResult UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize);
 	inline POperationResult UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize);
-	inline void BeginChunking(const LibAMCF_uint64 nDataSize);
+	inline POperationResult BeginChunking(const LibAMCF_uint64 nDataSize);
 	inline POperationResult UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer);
-	inline POperationResult FinishChunking(const CInputVector<LibAMCF_uint8> & DataBuffer);
+	inline POperationResult FinishChunking();
 	inline void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished);
 	inline PDataStream GetDataStream();
 };
@@ -645,9 +648,54 @@ public:
 	 */
 	
 	/**
+	* CStreamUpload::GetName - returns the name of the stream upload
+	* @return Name String.
+	*/
+	std::string CStreamUpload::GetName()
+	{
+		LibAMCF_uint32 bytesNeededName = 0;
+		LibAMCF_uint32 bytesWrittenName = 0;
+		CheckError(libamcf_streamupload_getname(m_pHandle, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(libamcf_streamupload_getname(m_pHandle, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CStreamUpload::GetMimeType - returns the mimetype of the stream upload
+	* @return MimeType String.
+	*/
+	std::string CStreamUpload::GetMimeType()
+	{
+		LibAMCF_uint32 bytesNeededMimeType = 0;
+		LibAMCF_uint32 bytesWrittenMimeType = 0;
+		CheckError(libamcf_streamupload_getmimetype(m_pHandle, 0, &bytesNeededMimeType, nullptr));
+		std::vector<char> bufferMimeType(bytesNeededMimeType);
+		CheckError(libamcf_streamupload_getmimetype(m_pHandle, bytesNeededMimeType, &bytesWrittenMimeType, &bufferMimeType[0]));
+		
+		return std::string(&bufferMimeType[0]);
+	}
+	
+	/**
+	* CStreamUpload::GetUsageContext - returns the usage context of the stream upload
+	* @return UsageContext String.
+	*/
+	std::string CStreamUpload::GetUsageContext()
+	{
+		LibAMCF_uint32 bytesNeededUsageContext = 0;
+		LibAMCF_uint32 bytesWrittenUsageContext = 0;
+		CheckError(libamcf_streamupload_getusagecontext(m_pHandle, 0, &bytesNeededUsageContext, nullptr));
+		std::vector<char> bufferUsageContext(bytesNeededUsageContext);
+		CheckError(libamcf_streamupload_getusagecontext(m_pHandle, bytesNeededUsageContext, &bytesWrittenUsageContext, &bufferUsageContext[0]));
+		
+		return std::string(&bufferUsageContext[0]);
+	}
+	
+	/**
 	* CStreamUpload::UploadData - uploads the passed data to the server. MUST only be called once.
 	* @param[in] DataBuffer - Data to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 	* @return Returns if upload was successful.
 	*/
 	POperationResult CStreamUpload::UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize)
@@ -664,7 +712,7 @@ public:
 	/**
 	* CStreamUpload::UploadFile - uploads a file to the server. MUST only be called once.
 	* @param[in] sFileName - File to be uploaded.
-	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 	* @return Returns if upload was successful.
 	*/
 	POperationResult CStreamUpload::UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize)
@@ -681,16 +729,23 @@ public:
 	/**
 	* CStreamUpload::BeginChunking - Starts a chunked upload. MUST not be used together with uploadData or uploadFile
 	* @param[in] nDataSize - Full data size to be uploaded.
+	* @return Returns if request was successful.
 	*/
-	void CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
+	POperationResult CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
 	{
-		CheckError(libamcf_streamupload_beginchunking(m_pHandle, nDataSize));
+		LibAMCFHandle hSuccess = nullptr;
+		CheckError(libamcf_streamupload_beginchunking(m_pHandle, nDataSize, &hSuccess));
+		
+		if (!hSuccess) {
+			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<COperationResult>(m_pWrapper, hSuccess);
 	}
 	
 	/**
 	* CStreamUpload::UploadChunk - Uploads another chunk to the server. Chunks are added sequentially together.
-	* @param[in] DataBuffer - Data to be uploaded.
-	* @return Returns if upload was successful.
+	* @param[in] DataBuffer - Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB.
+	* @return Returns if request was successful.
 	*/
 	POperationResult CStreamUpload::UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer)
 	{
@@ -705,13 +760,12 @@ public:
 	
 	/**
 	* CStreamUpload::FinishChunking - MUST only be called after all chunks have been uploaded.
-	* @param[in] DataBuffer - Data to be uploaded.
-	* @return Returns if upload was successful.
+	* @return Returns if request was successful.
 	*/
-	POperationResult CStreamUpload::FinishChunking(const CInputVector<LibAMCF_uint8> & DataBuffer)
+	POperationResult CStreamUpload::FinishChunking()
 	{
 		LibAMCFHandle hSuccess = nullptr;
-		CheckError(libamcf_streamupload_finishchunking(m_pHandle, (LibAMCF_uint64)DataBuffer.size(), DataBuffer.data(), &hSuccess));
+		CheckError(libamcf_streamupload_finishchunking(m_pHandle, &hSuccess));
 		
 		if (!hSuccess) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);

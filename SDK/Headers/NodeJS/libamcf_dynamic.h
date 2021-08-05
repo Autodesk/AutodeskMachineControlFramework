@@ -152,12 +152,45 @@ typedef LibAMCFResult (*PLibAMCFDataStream_GetSizePtr) (LibAMCF_DataStream pData
 **************************************************************************************************************************/
 
 /**
+* returns the name of the stream upload
+*
+* @param[in] pStreamUpload - StreamUpload instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name String., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibAMCFResult (*PLibAMCFStreamUpload_GetNamePtr) (LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nNameBufferSize, LibAMCF_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* returns the mimetype of the stream upload
+*
+* @param[in] pStreamUpload - StreamUpload instance.
+* @param[in] nMimeTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMimeTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMimeTypeBuffer -  buffer of MimeType String., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibAMCFResult (*PLibAMCFStreamUpload_GetMimeTypePtr) (LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nMimeTypeBufferSize, LibAMCF_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer);
+
+/**
+* returns the usage context of the stream upload
+*
+* @param[in] pStreamUpload - StreamUpload instance.
+* @param[in] nUsageContextBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUsageContextNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUsageContextBuffer -  buffer of UsageContext String., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibAMCFResult (*PLibAMCFStreamUpload_GetUsageContextPtr) (LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer);
+
+/**
 * uploads the passed data to the server. MUST only be called once.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] nDataBufferSize - Number of elements in buffer
 * @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
@@ -168,7 +201,7 @@ typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadDataPtr) (LibAMCF_StreamUploa
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] pFileName - File to be uploaded.
-* @param[in] nChunkSize - Chunk size to use in bytes. MUST be at least 64kB.
+* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
@@ -179,17 +212,18 @@ typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadFilePtr) (LibAMCF_StreamUploa
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] nDataSize - Full data size to be uploaded.
+* @param[out] pSuccess - Returns if request was successful.
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFStreamUpload_BeginChunkingPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize);
+typedef LibAMCFResult (*PLibAMCFStreamUpload_BeginChunkingPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataSize, LibAMCF_OperationResult * pSuccess);
 
 /**
 * Uploads another chunk to the server. Chunks are added sequentially together.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] nDataBufferSize - Number of elements in buffer
-* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-* @param[out] pSuccess - Returns if upload was successful.
+* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB.
+* @param[out] pSuccess - Returns if request was successful.
 * @return error code or 0 (success)
 */
 typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadChunkPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_OperationResult * pSuccess);
@@ -198,12 +232,10 @@ typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadChunkPtr) (LibAMCF_StreamUplo
 * MUST only be called after all chunks have been uploaded.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
-* @param[in] nDataBufferSize - Number of elements in buffer
-* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
-* @param[out] pSuccess - Returns if upload was successful.
+* @param[out] pSuccess - Returns if request was successful.
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFStreamUpload_FinishChunkingPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_OperationResult * pSuccess);
+typedef LibAMCFResult (*PLibAMCFStreamUpload_FinishChunkingPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_OperationResult * pSuccess);
 
 /**
 * Retrieves current upload status.
@@ -412,6 +444,9 @@ typedef struct {
 	PLibAMCFDataStream_GetNamePtr m_DataStream_GetName;
 	PLibAMCFDataStream_GetMimeTypePtr m_DataStream_GetMimeType;
 	PLibAMCFDataStream_GetSizePtr m_DataStream_GetSize;
+	PLibAMCFStreamUpload_GetNamePtr m_StreamUpload_GetName;
+	PLibAMCFStreamUpload_GetMimeTypePtr m_StreamUpload_GetMimeType;
+	PLibAMCFStreamUpload_GetUsageContextPtr m_StreamUpload_GetUsageContext;
 	PLibAMCFStreamUpload_UploadDataPtr m_StreamUpload_UploadData;
 	PLibAMCFStreamUpload_UploadFilePtr m_StreamUpload_UploadFile;
 	PLibAMCFStreamUpload_BeginChunkingPtr m_StreamUpload_BeginChunking;

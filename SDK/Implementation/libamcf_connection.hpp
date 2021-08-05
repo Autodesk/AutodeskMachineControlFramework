@@ -37,6 +37,7 @@ Abstract: This is the class declaration of CConnection
 
 #include "libamcf_interfaces.hpp"
 #include "libamcf_asyncrequest.hpp"
+#include "libamcf_connectionstate.hpp"
 
 // Parent classes
 #include "libamcf_base.hpp"
@@ -59,14 +60,7 @@ namespace Impl {
 class CConnection : public virtual IConnection, public virtual CBase {
 private:
 
-	std::string m_sBaseURL;
-	uint32_t m_nTimeOut;
-	uint32_t m_nRetryCount;
-
-	std::string m_sAuthTokenInternal;
-	std::mutex m_AuthTokenMutex;
-
-	PAsyncRequestHandler m_pRequestHandler;
+	PConnectionState m_pConnectionState;
 
 protected:
 
@@ -94,7 +88,6 @@ public:
 
 	IStreamUpload * CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext) override;
 
-	void SetAuthToken(std::string & sToken);
 
 };
 
