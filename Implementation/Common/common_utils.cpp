@@ -595,6 +595,59 @@ namespace AMCCommon {
 
 
 
+	std::string CUtils::calculateBlockwiseSHA256FromFile(const std::string& sFileNameUTF8, uint32_t nBlockSize)
+	{
+		if (nBlockSize == 0)
+			throw std::runtime_error("invalid hash block size!");
+
+#ifndef __GNUC__
+		auto sWidePath = AMCCommon::CUtils::UTF8toUTF16(sFileNameUTF8);
+		std::ifstream shaStream;
+		shaStream.open(sWidePath, std::ios::binary);
+#else
+		std::ifstream shaStream;
+		shaStream.open(sFileNameUTF8, std::ios::binary);
+#endif			
+		if (!shaStream.is_open())
+			throw std::runtime_error("could not open file for hash calculation.");
+
+		std::vector<uint8_t> BlockData;
+		BlockData.resize(nBlockSize);
+
+		std::stringstream sConcatenatedSHASums;
+
+		shaStream.seekg(0, shaStream.end);
+		size_t totalBytesToRead = shaStream.tellg();
+		shaStream.seekg(0, shaStream.beg);
+
+		while (totalBytesToRead > 0) {
+			size_t bytesToRead;
+			if (totalBytesToRead >= nBlockSize) {
+				bytesToRead = nBlockSize;
+				totalBytesToRead -= nBlockSize;
+			}
+			else {
+				bytesToRead = totalBytesToRead;
+				BlockData.resize(bytesToRead);
+				totalBytesToRead = 0;
+			}
+
+			shaStream.read((char*)BlockData.data(), bytesToRead);
+			if (!shaStream)
+				throw std::runtime_error("could not read hash stream");
+
+
+			std::vector<unsigned char> hash(picosha2::k_digest_size);
+			picosha2::hash256(BlockData, hash.begin(), hash.end());
+			std::string sBlockChecksum = picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+			sConcatenatedSHASums << sBlockChecksum;
+		}
+
+		return calculateSHA256FromString(sConcatenatedSHASums.str());
+
+	}
+
+
 	std::string CUtils::calculateSHA256FromFile(const std::string& sFileNameUTF8)
 	{
 		std::vector<unsigned char> hash(picosha2::k_digest_size);
@@ -616,6 +669,21 @@ namespace AMCCommon {
 		picosha2::hash256(sString.begin(), sString.end(), hash.begin(), hash.end());
 		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
 	}
+
+	std::string CUtils::calculateSHA256FromData(const uint8_t* pData, uint64_t nDataSize)
+	{
+		if ((nDataSize == 0) || (pData == nullptr))
+			throw std::runtime_error("could not calculate SHA256 from empty data");
+
+		auto startIter = static_cast<const uint8_t*> (pData);
+		auto endIter = startIter + nDataSize;
+
+		std::vector<unsigned char> hash(picosha2::k_digest_size);
+		picosha2::hash256(startIter, endIter, hash.begin(), hash.end());
+		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+
+	}
+
 
 
 	std::string CUtils::calculateRandomSHA256String(const uint32_t nIterations)

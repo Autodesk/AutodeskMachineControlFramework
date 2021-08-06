@@ -448,6 +448,7 @@ public:
 	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
+	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
@@ -726,6 +727,7 @@ public:
 		pWrapperTable->m_Storage_BeginPartialStream = nullptr;
 		pWrapperTable->m_Storage_StorePartialStream = nullptr;
 		pWrapperTable->m_Storage_FinishPartialStream = nullptr;
+		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = nullptr;
 		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
 		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
 		pWrapperTable->m_Storage_StreamIsImage = nullptr;
@@ -1006,6 +1008,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Storage_FinishPartialStream == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = (PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr) GetProcAddress(hLibrary, "libmcdata_storage_finishpartialstreamblockwisesha256");
+		#else // _WIN32
+		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = (PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr) dlsym(hLibrary, "libmcdata_storage_finishpartialstreamblockwisesha256");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1590,6 +1601,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishPartialStream == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_storage_finishpartialstreamblockwisesha256", (void**)&(pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_storage_getmaxstreamsize", (void**)&(pWrapperTable->m_Storage_GetMaxStreamSize));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_GetMaxStreamSize == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2096,6 +2111,16 @@ public:
 	void CStorage::FinishPartialStream(const std::string & sUUID, const std::string & sSHA2)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStream(m_pHandle, sUUID.c_str(), sSHA2.c_str()));
+	}
+	
+	/**
+	* CStorage::FinishPartialStreamBlockwiseSHA256 - Finishes storing a stream with a 64k-Blockwise calculated Checksum.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	* @param[in] sBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
+	*/
+	void CStorage::FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStreamBlockwiseSHA256(m_pHandle, sUUID.c_str(), sBlockwiseSHA2.c_str()));
 	}
 	
 	/**

@@ -805,6 +805,7 @@ public:
 	
 	inline Lib3MF_uint32 GetMetaDataCount();
 	inline PMetaData GetMetaData(const Lib3MF_uint32 nIndex);
+	inline bool HasMetaData(const std::string & sNameSpace, const std::string & sName);
 	inline PMetaData GetMetaDataByKey(const std::string & sNameSpace, const std::string & sName);
 	inline void RemoveMetaDataByIndex(const Lib3MF_uint32 nIndex);
 	inline void RemoveMetaData(CMetaData * pTheMetaData);
@@ -1261,7 +1262,7 @@ public:
 	inline void GetSegmentInfo(const Lib3MF_uint32 nIndex, eToolpathSegmentType & eType, Lib3MF_uint32 & nPointCount);
 	inline PToolpathProfile GetSegmentProfile(const Lib3MF_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const Lib3MF_uint32 nIndex);
-	inline PToolpathProfile GetSegmentPart(const Lib3MF_uint32 nIndex);
+	inline PBuildItem GetSegmentPart(const Lib3MF_uint32 nIndex);
 	inline std::string GetSegmentPartUUID(const Lib3MF_uint32 nIndex);
 	inline void GetSegmentPointData(const Lib3MF_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 };
@@ -1282,7 +1283,7 @@ public:
 	
 	inline std::string GetLayerDataUUID();
 	inline Lib3MF_uint32 RegisterProfile(CToolpathProfile * pProfile);
-	inline Lib3MF_uint32 RegisterPart(CObject * pPart);
+	inline Lib3MF_uint32 RegisterBuildItem(CBuildItem * pBuildItem);
 	inline void WriteHatchData(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
 	inline void WriteLoop(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
 	inline void WritePolyline(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
@@ -1762,6 +1763,7 @@ public:
 		pWrapperTable->m_MetaData_SetValue = nullptr;
 		pWrapperTable->m_MetaDataGroup_GetMetaDataCount = nullptr;
 		pWrapperTable->m_MetaDataGroup_GetMetaData = nullptr;
+		pWrapperTable->m_MetaDataGroup_HasMetaData = nullptr;
 		pWrapperTable->m_MetaDataGroup_GetMetaDataByKey = nullptr;
 		pWrapperTable->m_MetaDataGroup_RemoveMetaDataByIndex = nullptr;
 		pWrapperTable->m_MetaDataGroup_RemoveMetaData = nullptr;
@@ -1935,7 +1937,7 @@ public:
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayerData_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayerData_RegisterProfile = nullptr;
-		pWrapperTable->m_ToolpathLayerData_RegisterPart = nullptr;
+		pWrapperTable->m_ToolpathLayerData_RegisterBuildItem = nullptr;
 		pWrapperTable->m_ToolpathLayerData_WriteHatchData = nullptr;
 		pWrapperTable->m_ToolpathLayerData_WriteLoop = nullptr;
 		pWrapperTable->m_ToolpathLayerData_WritePolyline = nullptr;
@@ -2534,6 +2536,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MetaDataGroup_GetMetaData == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MetaDataGroup_HasMetaData = (PLib3MFMetaDataGroup_HasMetaDataPtr) GetProcAddress(hLibrary, "lib3mf_metadatagroup_hasmetadata");
+		#else // _WIN32
+		pWrapperTable->m_MetaDataGroup_HasMetaData = (PLib3MFMetaDataGroup_HasMetaDataPtr) dlsym(hLibrary, "lib3mf_metadatagroup_hasmetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MetaDataGroup_HasMetaData == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4094,12 +4105,12 @@ public:
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathLayerData_RegisterPart = (PLib3MFToolpathLayerData_RegisterPartPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_registerpart");
+		pWrapperTable->m_ToolpathLayerData_RegisterBuildItem = (PLib3MFToolpathLayerData_RegisterBuildItemPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_registerbuilditem");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathLayerData_RegisterPart = (PLib3MFToolpathLayerData_RegisterPartPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_registerpart");
+		pWrapperTable->m_ToolpathLayerData_RegisterBuildItem = (PLib3MFToolpathLayerData_RegisterBuildItemPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_registerbuilditem");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathLayerData_RegisterPart == nullptr)
+		if (pWrapperTable->m_ToolpathLayerData_RegisterBuildItem == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5236,6 +5247,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MetaDataGroup_GetMetaData == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("lib3mf_metadatagroup_hasmetadata", (void**)&(pWrapperTable->m_MetaDataGroup_HasMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MetaDataGroup_HasMetaData == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("lib3mf_metadatagroup_getmetadatabykey", (void**)&(pWrapperTable->m_MetaDataGroup_GetMetaDataByKey));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MetaDataGroup_GetMetaDataByKey == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5928,8 +5943,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerData_RegisterProfile == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("lib3mf_toolpathlayerdata_registerpart", (void**)&(pWrapperTable->m_ToolpathLayerData_RegisterPart));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerData_RegisterPart == nullptr) )
+		eLookupError = (*pLookup)("lib3mf_toolpathlayerdata_registerbuilditem", (void**)&(pWrapperTable->m_ToolpathLayerData_RegisterBuildItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerData_RegisterBuildItem == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("lib3mf_toolpathlayerdata_writehatchdata", (void**)&(pWrapperTable->m_ToolpathLayerData_WriteHatchData));
@@ -7051,6 +7066,20 @@ public:
 			CheckError(LIB3MF_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CMetaData>(m_pWrapper, hMetaData);
+	}
+	
+	/**
+	* CMetaDataGroup::HasMetaData - returns if a metadata value exists within this metadatagroup
+	* @param[in] sNameSpace - the namespace of the metadata
+	* @param[in] sName - the name of the Metadata
+	* @return returns true if metadata exists
+	*/
+	bool CMetaDataGroup::HasMetaData(const std::string & sNameSpace, const std::string & sName)
+	{
+		bool resultMetaDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MetaDataGroup_HasMetaData(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultMetaDataExists));
+		
+		return resultMetaDataExists;
 	}
 	
 	/**
@@ -9175,17 +9204,17 @@ public:
 	/**
 	* CToolpathLayerReader::GetSegmentPart - Retrieves the assigned segment profile.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
-	* @return Segment Profile
+	* @return Segment Build Item
 	*/
-	PToolpathProfile CToolpathLayerReader::GetSegmentPart(const Lib3MF_uint32 nIndex)
+	PBuildItem CToolpathLayerReader::GetSegmentPart(const Lib3MF_uint32 nIndex)
 	{
-		Lib3MFHandle hProfile = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetSegmentPart(m_pHandle, nIndex, &hProfile));
+		Lib3MFHandle hBuildItem = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetSegmentPart(m_pHandle, nIndex, &hBuildItem));
 		
-		if (!hProfile) {
+		if (!hBuildItem) {
 			CheckError(LIB3MF_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CToolpathProfile>(m_pWrapper, hProfile);
+		return std::make_shared<CBuildItem>(m_pWrapper, hBuildItem);
 	}
 	
 	/**
@@ -9255,18 +9284,18 @@ public:
 	}
 	
 	/**
-	* CToolpathLayerData::RegisterPart - Registers a Model Object
-	* @param[in] pPart - The model object to use.
+	* CToolpathLayerData::RegisterBuildItem - Registers a Model Build Item
+	* @param[in] pBuildItem - The model build item to use.
 	* @return returns the local part ID for the layer.
 	*/
-	Lib3MF_uint32 CToolpathLayerData::RegisterPart(CObject * pPart)
+	Lib3MF_uint32 CToolpathLayerData::RegisterBuildItem(CBuildItem * pBuildItem)
 	{
-		Lib3MFHandle hPart = nullptr;
-		if (pPart != nullptr) {
-			hPart = pPart->GetHandle();
+		Lib3MFHandle hBuildItem = nullptr;
+		if (pBuildItem != nullptr) {
+			hBuildItem = pBuildItem->GetHandle();
 		};
 		Lib3MF_uint32 resultPartID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerData_RegisterPart(m_pHandle, hPart, &resultPartID));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerData_RegisterBuildItem(m_pHandle, hBuildItem, &resultPartID));
 		
 		return resultPartID;
 	}

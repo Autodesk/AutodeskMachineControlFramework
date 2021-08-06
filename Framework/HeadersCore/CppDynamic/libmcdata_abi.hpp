@@ -291,6 +291,16 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_storepartialstream(LibMCDat
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2);
 
 /**
+* Finishes storing a stream with a 64k-Blockwise calculated Checksum.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @param[in] pBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_storage_finishpartialstreamblockwisesha256(LibMCData_Storage pStorage, const char * pUUID, const char * pBlockwiseSHA2);
+
+/**
 * Returns the maximum stream size that the data model allows.
 *
 * @param[in] pStorage - Storage instance.

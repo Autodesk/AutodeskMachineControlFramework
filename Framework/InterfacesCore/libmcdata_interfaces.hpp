@@ -430,6 +430,13 @@ public:
 	virtual void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2) = 0;
 
 	/**
+	* IStorage::FinishPartialStreamBlockwiseSHA256 - Finishes storing a stream with a 64k-Blockwise calculated Checksum.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	* @param[in] sBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
+	*/
+	virtual void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2) = 0;
+
+	/**
 	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
 	* @return Maximum Stream Size in Bytes.
 	*/

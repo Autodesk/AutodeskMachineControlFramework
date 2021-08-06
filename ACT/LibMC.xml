@@ -360,6 +360,7 @@
 		<error name="COULDNOTFINDEVENTSENDERPAGE" code="349" description="Could not find event sender page" />		
 		<error name="COULDNOTFINDEVENTSENDER" code="350" description="Could not find event sender" />
 		<error name="DUPLICATEFORMNAME" code="351" description="Duplicate form name" />
+		<error name="EVENTNOTFOUND" code="352" description="Event not found" />
 		
 		
 			

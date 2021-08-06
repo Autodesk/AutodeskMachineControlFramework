@@ -56,8 +56,9 @@ namespace Impl {
  Forward declarations of class interfaces
 */
 class IBase;
-class IPLCCommand;
 class IDriver;
+class IPLCCommand;
+class IPLCCommandList;
 class IDriver_BuR;
 
 
@@ -261,38 +262,6 @@ typedef IBaseSharedPtr<IBase> PIBase;
 
 
 /*************************************************************************************************************************
- Class interface for PLCCommand 
-**************************************************************************************************************************/
-
-class IPLCCommand : public virtual IBase {
-public:
-	/**
-	* IPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] nValue - Parameter Value
-	*/
-	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int32 nValue) = 0;
-
-	/**
-	* IPLCCommand::SetBoolParameter - Sets a bool parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] bValue - Parameter Value
-	*/
-	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
-
-	/**
-	* IPLCCommand::SetDoubleParameter - Sets a double parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] dValue - Parameter Value
-	*/
-	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue) = 0;
-
-};
-
-typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;
-
-
-/*************************************************************************************************************************
  Class interface for Driver 
 **************************************************************************************************************************/
 
@@ -343,6 +312,83 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for PLCCommand 
+**************************************************************************************************************************/
+
+class IPLCCommand : public virtual IBase {
+public:
+	/**
+	* IPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] nValue - Parameter Value
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int64 nValue) = 0;
+
+	/**
+	* IPLCCommand::SetBoolParameter - Sets a bool parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] bValue - Parameter Value
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IPLCCommand::SetDoubleParameter - Sets a double parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] dValue - Parameter Value
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue) = 0;
+
+};
+
+typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;
+
+
+/*************************************************************************************************************************
+ Class interface for PLCCommandList 
+**************************************************************************************************************************/
+
+class IPLCCommandList : public virtual IBase {
+public:
+	/**
+	* IPLCCommandList::AddCommand - Adds a command to the list. List must not be executed before.
+	* @param[in] pCommandInstance - Add a command instance.
+	*/
+	virtual void AddCommand(IPLCCommand* pCommandInstance) = 0;
+
+	/**
+	* IPLCCommandList::FinishList - Finish command list.
+	*/
+	virtual void FinishList() = 0;
+
+	/**
+	* IPLCCommandList::ExecuteList - Execute command list.
+	*/
+	virtual void ExecuteList() = 0;
+
+	/**
+	* IPLCCommandList::WaitForList - Wait for command list to finish executing
+	* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+	* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+	* @return Returns true if the command was finished successfully.
+	*/
+	virtual bool WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS) = 0;
+
+	/**
+	* IPLCCommandList::PauseList - Pause command list. Must be executed or resumed before.
+	*/
+	virtual void PauseList() = 0;
+
+	/**
+	* IPLCCommandList::ResumeList - Resume command list. Must be paused before.
+	*/
+	virtual void ResumeList() = 0;
+
+};
+
+typedef IBaseSharedPtr<IPLCCommandList> PIPLCCommandList;
+
+
+/*************************************************************************************************************************
  Class interface for Driver_BuR 
 **************************************************************************************************************************/
 
@@ -360,6 +406,34 @@ public:
 	* IDriver_BuR::Disconnect - Disconnects from the BuR PLC Controller.
 	*/
 	virtual void Disconnect() = 0;
+
+	/**
+	* IDriver_BuR::CreateCommandList - Create Command
+	* @return Command list instance
+	*/
+	virtual IPLCCommandList * CreateCommandList() = 0;
+
+	/**
+	* IDriver_BuR::CreateCommand - Creates a command instance.
+	* @param[in] sCommandName - Command Name.
+	* @return Returns a command instance.
+	*/
+	virtual IPLCCommand * CreateCommand(const std::string & sCommandName) = 0;
+
+	/**
+	* IDriver_BuR::StartJournaling - Start Journaling.
+	*/
+	virtual void StartJournaling() = 0;
+
+	/**
+	* IDriver_BuR::StopJournaling - Stop Journaling.
+	*/
+	virtual void StopJournaling() = 0;
+
+	/**
+	* IDriver_BuR::RefreshJournal - Refresh Journal.
+	*/
+	virtual void RefreshJournal() = 0;
 
 };
 

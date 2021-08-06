@@ -62,40 +62,6 @@ extern "C" {
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
- Class definition for PLCCommand
-**************************************************************************************************************************/
-
-/**
-* Sets an integer parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] nValue - Parameter Value
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setintegerparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int32 nValue);
-
-/**
-* Sets a bool parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] bValue - Parameter Value
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setboolparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
-
-/**
-* Sets a double parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] dValue - Parameter Value
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setdoubleparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue);
-
-/*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
 
@@ -167,6 +133,96 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_getheaderi
 LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Driver pDriver);
 
 /*************************************************************************************************************************
+ Class definition for PLCCommand
+**************************************************************************************************************************/
+
+/**
+* Sets an integer parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] nValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setintegerparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_int64 nValue);
+
+/**
+* Sets a bool parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] bValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setboolparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
+
+/**
+* Sets a double parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] dValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommand_setdoubleparameter(LibMCDriver_BuR_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_BuR_double dValue);
+
+/*************************************************************************************************************************
+ Class definition for PLCCommandList
+**************************************************************************************************************************/
+
+/**
+* Adds a command to the list. List must not be executed before.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @param[in] pCommandInstance - Add a command instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_addcommand(LibMCDriver_BuR_PLCCommandList pPLCCommandList, LibMCDriver_BuR_PLCCommand pCommandInstance);
+
+/**
+* Finish command list.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_finishlist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Execute command list.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_executelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Wait for command list to finish executing
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+* @param[out] pCommandSuccess - Returns true if the command was finished successfully.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_waitforlist(LibMCDriver_BuR_PLCCommandList pPLCCommandList, LibMCDriver_BuR_uint32 nReactionTimeInMS, LibMCDriver_BuR_uint32 nWaitForTimeInMS, bool * pCommandSuccess);
+
+/**
+* Pause command list. Must be executed or resumed before.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_pauselist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/**
+* Resume command list. Must be paused before.
+*
+* @param[in] pPLCCommandList - PLCCommandList instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_resumelist(LibMCDriver_BuR_PLCCommandList pPLCCommandList);
+
+/*************************************************************************************************************************
  Class definition for Driver_BuR
 **************************************************************************************************************************/
 
@@ -188,6 +244,49 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_connec
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_disconnect(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Create Command
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[out] pListInstance - Command list instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_createcommandlist(LibMCDriver_BuR_Driver_BuR pDriver_BuR, LibMCDriver_BuR_PLCCommandList * pListInstance);
+
+/**
+* Creates a command instance.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[in] pCommandName - Command Name.
+* @param[out] pCommandInstance - Returns a command instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_createcommand(LibMCDriver_BuR_Driver_BuR pDriver_BuR, const char * pCommandName, LibMCDriver_BuR_PLCCommand * pCommandInstance);
+
+/**
+* Start Journaling.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_startjournaling(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Stop Journaling.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_stopjournaling(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Refresh Journal.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_refreshjournal(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
 
 /*************************************************************************************************************************
  Global functions

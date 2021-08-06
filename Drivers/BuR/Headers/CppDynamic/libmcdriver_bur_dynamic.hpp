@@ -61,8 +61,9 @@ namespace LibMCDriver_BuR {
 **************************************************************************************************************************/
 class CWrapper;
 class CBase;
-class CPLCCommand;
 class CDriver;
+class CPLCCommand;
+class CPLCCommandList;
 class CDriver_BuR;
 
 /*************************************************************************************************************************
@@ -70,8 +71,9 @@ class CDriver_BuR;
 **************************************************************************************************************************/
 typedef CWrapper CLibMCDriver_BuRWrapper;
 typedef CBase CLibMCDriver_BuRBase;
-typedef CPLCCommand CLibMCDriver_BuRPLCCommand;
 typedef CDriver CLibMCDriver_BuRDriver;
+typedef CPLCCommand CLibMCDriver_BuRPLCCommand;
+typedef CPLCCommandList CLibMCDriver_BuRPLCCommandList;
 typedef CDriver_BuR CLibMCDriver_BuRDriver_BuR;
 
 /*************************************************************************************************************************
@@ -79,8 +81,9 @@ typedef CDriver_BuR CLibMCDriver_BuRDriver_BuR;
 **************************************************************************************************************************/
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
-typedef std::shared_ptr<CPLCCommand> PPLCCommand;
 typedef std::shared_ptr<CDriver> PDriver;
+typedef std::shared_ptr<CPLCCommand> PPLCCommand;
+typedef std::shared_ptr<CPLCCommandList> PPLCCommandList;
 typedef std::shared_ptr<CDriver_BuR> PDriver_BuR;
 
 /*************************************************************************************************************************
@@ -88,8 +91,9 @@ typedef std::shared_ptr<CDriver_BuR> PDriver_BuR;
 **************************************************************************************************************************/
 typedef PWrapper PLibMCDriver_BuRWrapper;
 typedef PBase PLibMCDriver_BuRBase;
-typedef PPLCCommand PLibMCDriver_BuRPLCCommand;
 typedef PDriver PLibMCDriver_BuRDriver;
+typedef PPLCCommand PLibMCDriver_BuRPLCCommand;
+typedef PPLCCommandList PLibMCDriver_BuRPLCCommandList;
 typedef PDriver_BuR PLibMCDriver_BuRDriver_BuR;
 
 
@@ -268,8 +272,9 @@ private:
 	LibMCDriver_BuRResult loadWrapperTableFromSymbolLookupMethod(sLibMCDriver_BuRDynamicWrapperTable * pWrapperTable, void* pSymbolLookupMethod);
 
 	friend class CBase;
-	friend class CPLCCommand;
 	friend class CDriver;
+	friend class CPLCCommand;
+	friend class CPLCCommandList;
 	friend class CDriver_BuR;
 
 };
@@ -332,25 +337,6 @@ public:
 };
 	
 /*************************************************************************************************************************
- Class CPLCCommand 
-**************************************************************************************************************************/
-class CPLCCommand : public CBase {
-public:
-	
-	/**
-	* CPLCCommand::CPLCCommand - Constructor for PLCCommand class.
-	*/
-	CPLCCommand(CWrapper* pWrapper, LibMCDriver_BuRHandle pHandle)
-		: CBase(pWrapper, pHandle)
-	{
-	}
-	
-	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int32 nValue);
-	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
-	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue);
-};
-	
-/*************************************************************************************************************************
  Class CDriver 
 **************************************************************************************************************************/
 class CDriver : public CBase {
@@ -373,6 +359,47 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CPLCCommand 
+**************************************************************************************************************************/
+class CPLCCommand : public CBase {
+public:
+	
+	/**
+	* CPLCCommand::CPLCCommand - Constructor for PLCCommand class.
+	*/
+	CPLCCommand(CWrapper* pWrapper, LibMCDriver_BuRHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int64 nValue);
+	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue);
+};
+	
+/*************************************************************************************************************************
+ Class CPLCCommandList 
+**************************************************************************************************************************/
+class CPLCCommandList : public CBase {
+public:
+	
+	/**
+	* CPLCCommandList::CPLCCommandList - Constructor for PLCCommandList class.
+	*/
+	CPLCCommandList(CWrapper* pWrapper, LibMCDriver_BuRHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void AddCommand(classParam<CPLCCommand> pCommandInstance);
+	inline void FinishList();
+	inline void ExecuteList();
+	inline bool WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS);
+	inline void PauseList();
+	inline void ResumeList();
+};
+	
+/*************************************************************************************************************************
  Class CDriver_BuR 
 **************************************************************************************************************************/
 class CDriver_BuR : public CDriver {
@@ -388,6 +415,11 @@ public:
 	
 	inline void Connect(const std::string & sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout);
 	inline void Disconnect();
+	inline PPLCCommandList CreateCommandList();
+	inline PPLCCommand CreateCommand(const std::string & sCommandName);
+	inline void StartJournaling();
+	inline void StopJournaling();
+	inline void RefreshJournal();
 };
 	
 	/**
@@ -511,17 +543,28 @@ public:
 			return LIBMCDRIVER_BUR_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
-		pWrapperTable->m_PLCCommand_SetIntegerParameter = nullptr;
-		pWrapperTable->m_PLCCommand_SetBoolParameter = nullptr;
-		pWrapperTable->m_PLCCommand_SetDoubleParameter = nullptr;
 		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = nullptr;
+		pWrapperTable->m_PLCCommand_SetBoolParameter = nullptr;
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = nullptr;
+		pWrapperTable->m_PLCCommandList_AddCommand = nullptr;
+		pWrapperTable->m_PLCCommandList_FinishList = nullptr;
+		pWrapperTable->m_PLCCommandList_ExecuteList = nullptr;
+		pWrapperTable->m_PLCCommandList_WaitForList = nullptr;
+		pWrapperTable->m_PLCCommandList_PauseList = nullptr;
+		pWrapperTable->m_PLCCommandList_ResumeList = nullptr;
 		pWrapperTable->m_Driver_BuR_Connect = nullptr;
 		pWrapperTable->m_Driver_BuR_Disconnect = nullptr;
+		pWrapperTable->m_Driver_BuR_CreateCommandList = nullptr;
+		pWrapperTable->m_Driver_BuR_CreateCommand = nullptr;
+		pWrapperTable->m_Driver_BuR_StartJournaling = nullptr;
+		pWrapperTable->m_Driver_BuR_StopJournaling = nullptr;
+		pWrapperTable->m_Driver_BuR_RefreshJournal = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -578,33 +621,6 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setintegerparameter");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setintegerparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr)
-			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setboolparameter");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setboolparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr)
-			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setdoubleparameter");
-		#else // _WIN32
-		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setdoubleparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr)
-			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_Driver_Configure = (PLibMCDriver_BuRDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_configure");
 		#else // _WIN32
 		pWrapperTable->m_Driver_Configure = (PLibMCDriver_BuRDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_bur_driver_configure");
@@ -659,6 +675,87 @@ public:
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommand_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr) dlsym(hLibrary, "libmcdriver_bur_plccommand_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_AddCommand = (PLibMCDriver_BuRPLCCommandList_AddCommandPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_addcommand");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_AddCommand = (PLibMCDriver_BuRPLCCommandList_AddCommandPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_addcommand");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_AddCommand == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_FinishList = (PLibMCDriver_BuRPLCCommandList_FinishListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_finishlist");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_FinishList = (PLibMCDriver_BuRPLCCommandList_FinishListPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_finishlist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_FinishList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_ExecuteList = (PLibMCDriver_BuRPLCCommandList_ExecuteListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_executelist");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_ExecuteList = (PLibMCDriver_BuRPLCCommandList_ExecuteListPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_executelist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_ExecuteList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_WaitForList = (PLibMCDriver_BuRPLCCommandList_WaitForListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_waitforlist");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_WaitForList = (PLibMCDriver_BuRPLCCommandList_WaitForListPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_waitforlist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_WaitForList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_PauseList = (PLibMCDriver_BuRPLCCommandList_PauseListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_pauselist");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_PauseList = (PLibMCDriver_BuRPLCCommandList_PauseListPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_pauselist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_PauseList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommandList_ResumeList = (PLibMCDriver_BuRPLCCommandList_ResumeListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_plccommandlist_resumelist");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommandList_ResumeList = (PLibMCDriver_BuRPLCCommandList_ResumeListPtr) dlsym(hLibrary, "libmcdriver_bur_plccommandlist_resumelist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommandList_ResumeList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_BuR_Connect = (PLibMCDriver_BuRDriver_BuR_ConnectPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_connect");
 		#else // _WIN32
 		pWrapperTable->m_Driver_BuR_Connect = (PLibMCDriver_BuRDriver_BuR_ConnectPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_connect");
@@ -674,6 +771,51 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_BuR_Disconnect == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_CreateCommandList = (PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_createcommandlist");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_CreateCommandList = (PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_createcommandlist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_CreateCommandList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_CreateCommand = (PLibMCDriver_BuRDriver_BuR_CreateCommandPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_createcommand");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_CreateCommand = (PLibMCDriver_BuRDriver_BuR_CreateCommandPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_createcommand");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_CreateCommand == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_StartJournaling = (PLibMCDriver_BuRDriver_BuR_StartJournalingPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_startjournaling");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_StartJournaling = (PLibMCDriver_BuRDriver_BuR_StartJournalingPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_startjournaling");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_StartJournaling == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_StopJournaling = (PLibMCDriver_BuRDriver_BuR_StopJournalingPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_stopjournaling");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_StopJournaling = (PLibMCDriver_BuRDriver_BuR_StopJournalingPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_stopjournaling");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_StopJournaling == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_RefreshJournal = (PLibMCDriver_BuRDriver_BuR_RefreshJournalPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_refreshjournal");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_RefreshJournal = (PLibMCDriver_BuRDriver_BuR_RefreshJournalPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_refreshjournal");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_RefreshJournal == nullptr)
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -755,18 +897,6 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_BuRResult eLookupError = LIBMCDRIVER_BUR_SUCCESS;
-		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setintegerparameter", (void**)&(pWrapperTable->m_PLCCommand_SetIntegerParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr) )
-			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setboolparameter", (void**)&(pWrapperTable->m_PLCCommand_SetBoolParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr) )
-			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setdoubleparameter", (void**)&(pWrapperTable->m_PLCCommand_SetDoubleParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr) )
-			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -791,12 +921,68 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setintegerparameter", (void**)&(pWrapperTable->m_PLCCommand_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setboolparameter", (void**)&(pWrapperTable->m_PLCCommand_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommand_setdoubleparameter", (void**)&(pWrapperTable->m_PLCCommand_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_addcommand", (void**)&(pWrapperTable->m_PLCCommandList_AddCommand));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_AddCommand == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_finishlist", (void**)&(pWrapperTable->m_PLCCommandList_FinishList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_FinishList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_executelist", (void**)&(pWrapperTable->m_PLCCommandList_ExecuteList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ExecuteList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_waitforlist", (void**)&(pWrapperTable->m_PLCCommandList_WaitForList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_WaitForList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_pauselist", (void**)&(pWrapperTable->m_PLCCommandList_PauseList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_PauseList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_resumelist", (void**)&(pWrapperTable->m_PLCCommandList_ResumeList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ResumeList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_connect", (void**)&(pWrapperTable->m_Driver_BuR_Connect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_Connect == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_disconnect", (void**)&(pWrapperTable->m_Driver_BuR_Disconnect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_Disconnect == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_createcommandlist", (void**)&(pWrapperTable->m_Driver_BuR_CreateCommandList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_CreateCommandList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_createcommand", (void**)&(pWrapperTable->m_Driver_BuR_CreateCommand));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_CreateCommand == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_startjournaling", (void**)&(pWrapperTable->m_Driver_BuR_StartJournaling));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_StartJournaling == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_stopjournaling", (void**)&(pWrapperTable->m_Driver_BuR_StopJournaling));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_StopJournaling == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_refreshjournal", (void**)&(pWrapperTable->m_Driver_BuR_RefreshJournal));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_RefreshJournal == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -835,40 +1021,6 @@ public:
 	/**
 	 * Method definitions for class CBase
 	 */
-	
-	/**
-	 * Method definitions for class CPLCCommand
-	 */
-	
-	/**
-	* CPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] nValue - Parameter Value
-	*/
-	void CPLCCommand::SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int32 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
-	}
-	
-	/**
-	* CPLCCommand::SetBoolParameter - Sets a bool parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] bValue - Parameter Value
-	*/
-	void CPLCCommand::SetBoolParameter(const std::string & sParameterName, const bool bValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
-	}
-	
-	/**
-	* CPLCCommand::SetDoubleParameter - Sets a double parameter of the command
-	* @param[in] sParameterName - Parameter Value
-	* @param[in] dValue - Parameter Value
-	*/
-	void CPLCCommand::SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
-	}
 	
 	/**
 	 * Method definitions for class CDriver
@@ -958,6 +1110,100 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CPLCCommand
+	 */
+	
+	/**
+	* CPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] nValue - Parameter Value
+	*/
+	void CPLCCommand::SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_BuR_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
+	}
+	
+	/**
+	* CPLCCommand::SetBoolParameter - Sets a bool parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] bValue - Parameter Value
+	*/
+	void CPLCCommand::SetBoolParameter(const std::string & sParameterName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CPLCCommand::SetDoubleParameter - Sets a double parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] dValue - Parameter Value
+	*/
+	void CPLCCommand::SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_BuR_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
+	}
+	
+	/**
+	 * Method definitions for class CPLCCommandList
+	 */
+	
+	/**
+	* CPLCCommandList::AddCommand - Adds a command to the list. List must not be executed before.
+	* @param[in] pCommandInstance - Add a command instance.
+	*/
+	void CPLCCommandList::AddCommand(classParam<CPLCCommand> pCommandInstance)
+	{
+		LibMCDriver_BuRHandle hCommandInstance = pCommandInstance.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_AddCommand(m_pHandle, hCommandInstance));
+	}
+	
+	/**
+	* CPLCCommandList::FinishList - Finish command list.
+	*/
+	void CPLCCommandList::FinishList()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_FinishList(m_pHandle));
+	}
+	
+	/**
+	* CPLCCommandList::ExecuteList - Execute command list.
+	*/
+	void CPLCCommandList::ExecuteList()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_ExecuteList(m_pHandle));
+	}
+	
+	/**
+	* CPLCCommandList::WaitForList - Wait for command list to finish executing
+	* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+	* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+	* @return Returns true if the command was finished successfully.
+	*/
+	bool CPLCCommandList::WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS)
+	{
+		bool resultCommandSuccess = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_WaitForList(m_pHandle, nReactionTimeInMS, nWaitForTimeInMS, &resultCommandSuccess));
+		
+		return resultCommandSuccess;
+	}
+	
+	/**
+	* CPLCCommandList::PauseList - Pause command list. Must be executed or resumed before.
+	*/
+	void CPLCCommandList::PauseList()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_PauseList(m_pHandle));
+	}
+	
+	/**
+	* CPLCCommandList::ResumeList - Resume command list. Must be paused before.
+	*/
+	void CPLCCommandList::ResumeList()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommandList_ResumeList(m_pHandle));
+	}
+	
+	/**
 	 * Method definitions for class CDriver_BuR
 	 */
 	
@@ -978,6 +1224,61 @@ public:
 	void CDriver_BuR::Disconnect()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* CDriver_BuR::CreateCommandList - Create Command
+	* @return Command list instance
+	*/
+	PPLCCommandList CDriver_BuR::CreateCommandList()
+	{
+		LibMCDriver_BuRHandle hListInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_CreateCommandList(m_pHandle, &hListInstance));
+		
+		if (!hListInstance) {
+			CheckError(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPLCCommandList>(m_pWrapper, hListInstance);
+	}
+	
+	/**
+	* CDriver_BuR::CreateCommand - Creates a command instance.
+	* @param[in] sCommandName - Command Name.
+	* @return Returns a command instance.
+	*/
+	PPLCCommand CDriver_BuR::CreateCommand(const std::string & sCommandName)
+	{
+		LibMCDriver_BuRHandle hCommandInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_CreateCommand(m_pHandle, sCommandName.c_str(), &hCommandInstance));
+		
+		if (!hCommandInstance) {
+			CheckError(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CPLCCommand>(m_pWrapper, hCommandInstance);
+	}
+	
+	/**
+	* CDriver_BuR::StartJournaling - Start Journaling.
+	*/
+	void CDriver_BuR::StartJournaling()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_StartJournaling(m_pHandle));
+	}
+	
+	/**
+	* CDriver_BuR::StopJournaling - Stop Journaling.
+	*/
+	void CDriver_BuR::StopJournaling()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_StopJournaling(m_pHandle));
+	}
+	
+	/**
+	* CDriver_BuR::RefreshJournal - Refresh Journal.
+	*/
+	void CDriver_BuR::RefreshJournal()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_RefreshJournal(m_pHandle));
 	}
 
 } // namespace LibMCDriver_BuR
