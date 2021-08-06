@@ -367,6 +367,10 @@ public:
 	{
 	}
 	
+	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_S7Net_int32 nValue);
+	inline void SetStringParameter(const std::string & sParameterName, const std::string & sValue);
+	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_S7Net_double dValue);
 };
 	
 /*************************************************************************************************************************
@@ -517,6 +521,10 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = nullptr;
+		pWrapperTable->m_PLCCommand_SetStringParameter = nullptr;
+		pWrapperTable->m_PLCCommand_SetBoolParameter = nullptr;
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = nullptr;
 		pWrapperTable->m_Driver_S7Net_Connect = nullptr;
 		pWrapperTable->m_Driver_S7Net_Disconnect = nullptr;
 		pWrapperTable->m_Driver_S7Net_CreateCommand = nullptr;
@@ -629,6 +637,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_S7NetPLCCommand_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdriver_s7net_plccommand_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetIntegerParameter = (PLibMCDriver_S7NetPLCCommand_SetIntegerParameterPtr) dlsym(hLibrary, "libmcdriver_s7net_plccommand_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr)
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetStringParameter = (PLibMCDriver_S7NetPLCCommand_SetStringParameterPtr) GetProcAddress(hLibrary, "libmcdriver_s7net_plccommand_setstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetStringParameter = (PLibMCDriver_S7NetPLCCommand_SetStringParameterPtr) dlsym(hLibrary, "libmcdriver_s7net_plccommand_setstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetStringParameter == nullptr)
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_S7NetPLCCommand_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcdriver_s7net_plccommand_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetBoolParameter = (PLibMCDriver_S7NetPLCCommand_SetBoolParameterPtr) dlsym(hLibrary, "libmcdriver_s7net_plccommand_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr)
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_S7NetPLCCommand_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdriver_s7net_plccommand_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_PLCCommand_SetDoubleParameter = (PLibMCDriver_S7NetPLCCommand_SetDoubleParameterPtr) dlsym(hLibrary, "libmcdriver_s7net_plccommand_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr)
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -779,6 +823,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_s7net_plccommand_setintegerparameter", (void**)&(pWrapperTable->m_PLCCommand_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetIntegerParameter == nullptr) )
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_s7net_plccommand_setstringparameter", (void**)&(pWrapperTable->m_PLCCommand_SetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetStringParameter == nullptr) )
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_s7net_plccommand_setboolparameter", (void**)&(pWrapperTable->m_PLCCommand_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetBoolParameter == nullptr) )
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_s7net_plccommand_setdoubleparameter", (void**)&(pWrapperTable->m_PLCCommand_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommand_SetDoubleParameter == nullptr) )
+			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_s7net_driver_s7net_connect", (void**)&(pWrapperTable->m_Driver_S7Net_Connect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_S7Net_Connect == nullptr) )
 			return LIBMCDRIVER_S7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -926,6 +986,46 @@ public:
 	/**
 	 * Method definitions for class CPLCCommand
 	 */
+	
+	/**
+	* CPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] nValue - Parameter Value
+	*/
+	void CPLCCommand::SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_S7Net_int32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
+	}
+	
+	/**
+	* CPLCCommand::SetStringParameter - Sets a string parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] sValue - Parameter Value
+	*/
+	void CPLCCommand::SetStringParameter(const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetStringParameter(m_pHandle, sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CPLCCommand::SetBoolParameter - Sets a bool parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] bValue - Parameter Value
+	*/
+	void CPLCCommand::SetBoolParameter(const std::string & sParameterName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CPLCCommand::SetDoubleParameter - Sets a double parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] dValue - Parameter Value
+	*/
+	void CPLCCommand::SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_S7Net_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_PLCCommand_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
+	}
 	
 	/**
 	 * Method definitions for class CDriver_S7Net

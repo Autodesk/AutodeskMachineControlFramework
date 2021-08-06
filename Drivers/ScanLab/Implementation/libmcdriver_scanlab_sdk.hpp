@@ -87,6 +87,10 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_8bit_port) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_io_port_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_8bit_port_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_1_list) (uint32_t nCardNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_2_list) (uint32_t nCardNo, uint32_t nValue);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_jump_abs) (uint32_t nCardNo, int32_t nX, int32_t nY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_mark_abs) (uint32_t nCardNo, int32_t nX, int32_t nY);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_jump_abs_3d) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nZ);
@@ -97,7 +101,13 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_delays) (uint32_t nCardNo, int32_t nLaserOnDelay, uint32_t nLaserOffDelay);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_start_list_pos) (uint32_t nCardNo, uint32_t nListNo, uint32_t nListPos);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_defocus_list) (uint32_t nCardNo, int32_t nShift);
-
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_head_status) (uint32_t nCardNo, uint32_t nHeadNo);
+		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_value) (uint32_t nCardNo, uint32_t nSignalNo);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_get_dll_version) ();
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_hex_version) (uint32_t nCardNo);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_bios_version) (uint32_t nCardNo);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_rtc_version) (uint32_t nCardNo);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_card_type) (uint32_t nCardNo);
 
 		class CScanLabSDK {
 		private:
@@ -143,6 +153,10 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_write_8bit_port n_write_8bit_port = nullptr;
 			PScanLabPtr_n_write_da_1 n_write_da_1 = nullptr;
 			PScanLabPtr_n_write_da_2 n_write_da_2 = nullptr;
+			PScanLabPtr_n_write_io_port n_write_io_port_list = nullptr;
+			PScanLabPtr_n_write_8bit_port n_write_8bit_port_list = nullptr;
+			PScanLabPtr_n_write_da_1 n_write_da_1_list = nullptr;
+			PScanLabPtr_n_write_da_2 n_write_da_2_list = nullptr;
 			PScanLabPtr_n_jump_abs n_jump_abs = nullptr;
 			PScanLabPtr_n_mark_abs n_mark_abs = nullptr;
 			PScanLabPtr_n_jump_abs_3d n_jump_abs_3d = nullptr;
@@ -153,6 +167,13 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_set_laser_delays n_set_laser_delays = nullptr;
 			PScanLabPtr_n_set_start_list_pos n_set_start_list_pos = nullptr;		
 			PScanLabPtr_n_set_defocus_list n_set_defocus_list = nullptr;
+			PScanLabPtr_n_get_head_status n_get_head_status = nullptr;
+			PScanLabPtr_n_get_value n_get_value = nullptr;
+			PScanLabPtr_get_dll_version get_dll_version = nullptr;
+			PScanLabPtr_n_get_hex_version n_get_hex_version = nullptr;
+			PScanLabPtr_n_get_bios_version n_get_bios_version = nullptr;
+			PScanLabPtr_n_get_rtc_version n_get_rtc_version = nullptr;
+			PScanLabPtr_n_get_card_type n_get_card_type = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

@@ -336,8 +336,34 @@
 		<error name="INVALIDEVENTCONTEXT" code="327" description="Invalid event sender" />
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
 		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
-		<error name="PROFILENOTFOUND" code="330" description="Profile not found." />		
+		<error name="PROFILENOTFOUND" code="330" description="Profile not found." />				
+		<error name="INVALIDSERVICEHANDLER" code="331" description="Invalid service handler." />				
+		<error name="INVALIDMAXTHREADCOUNT" code="332" description="Invalid max thread count." />
+		<error name="INVALIDTOOLPATHSTREAMUUID" code="333" description="Invalid toolpath stream uuid" />		
+		<error name="MISSINGSECTIONHEIGHT" code="334" description="Missing section height" />
+		<error name="INVALIDSECTIONHEIGHT" code="335" description="Invalid section height" />		
+		<error name="MISSINGSECTIONWIDTH" code="336" description="Missing section width" />
+		<error name="INVALIDSECTIONWIDTH" code="337" description="Invalid section width" />		
+		<error name="TOOLPATHMETADATANOTFOUND" code="338" description="Toolpath metadata not found" />		
 		
+		<error name="BUILDITEMHASNOUUID" code="339" description="Build item has no uuid" />		
+		<error name="OBJECTHASNOUUID" code="340" description="Object has no uuid" />		
+		
+		<error name="COULDNOTPARSEEVENTPARAMETERS" code="341" description="Could not parse event parameters" />		
+		<error name="INVALIDEVENTPARAMETERS" code="342" description="Invalid event parameters" />		
+		<error name="INVALIDFORMVALUES" code="343" description="Invalid form values" />		
+		<error name="FORMNAMEMISSING" code="344" description="Form name is missing" />		
+		<error name="FORMENTITYNAMEMISSING" code="345" description="Form entity name is missing" />		
+		<error name="FORMNOTFOUND" code="346" description="Form not found" />		
+		<error name="FORMENTITYNOTFOUND" code="347" description="Form entity not found" />		
+		<error name="DUPLICATEENTITYNAME" code="348" description="Duplicate form entity name" />				
+		<error name="COULDNOTFINDEVENTSENDERPAGE" code="349" description="Could not find event sender page" />		
+		<error name="COULDNOTFINDEVENTSENDER" code="350" description="Could not find event sender" />
+		<error name="DUPLICATEFORMNAME" code="351" description="Duplicate form name" />
+		<error name="EVENTNOTFOUND" code="352" description="Event not found" />
+		
+		
+			
 	</errors>
 	
 	

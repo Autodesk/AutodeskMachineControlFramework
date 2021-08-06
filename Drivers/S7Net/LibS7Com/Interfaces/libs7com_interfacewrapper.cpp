@@ -81,9 +81,232 @@ LibS7ComResult handleUnhandledException(IBase * pIBaseClass)
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class implementation for CommandParameters
+**************************************************************************************************************************/
+LibS7ComResult libs7com_commandparameters_writestring(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint32 nMaxLength, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
+		std::string sValue(pValue);
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteString(nAddress, nMaxLength, sValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writebool(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint32 nBit, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteBool(nAddress, nBit, bValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writebyte(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint8 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteByte(nAddress, nValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writeint16(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_int16 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteInt16(nAddress, nValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writeuint16(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint16 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteUint16(nAddress, nValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writeint32(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_int32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteInt32(nAddress, nValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writeuint32(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteUint32(nAddress, nValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writereal(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteReal(nAddress, dValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_commandparameters_writelreal(LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pCommandParameters;
+
+	try {
+		ICommandParameters* pICommandParameters = dynamic_cast<ICommandParameters*>(pIBaseClass);
+		if (!pICommandParameters)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pICommandParameters->WriteLReal(nAddress, dValue);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for PLCCommunication
 **************************************************************************************************************************/
-LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo)
+LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersion, LibS7Com_uint32 nMinorVersion, LibS7Com_uint32 nPatchVersion, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo, LibS7Com_uint32 nAMCtoPLC_Size)
 {
 	IBase* pIBaseClass = (IBase *)pPLCCommunication;
 
@@ -92,7 +315,55 @@ LibS7ComResult libs7com_plccommunication_setprotocolconfiguration(LibS7Com_PLCCo
 		if (!pIPLCCommunication)
 			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
 		
-		pIPLCCommunication->SetProtocolConfiguration(nPLCtoAMC_DBNo, nPLCtoAMC_Size, nAMCtoPLC_DBNo);
+		pIPLCCommunication->SetProtocolConfiguration(nMajorVersion, nMinorVersion, nPatchVersion, nPLCtoAMC_DBNo, nPLCtoAMC_Size, nAMCtoPLC_DBNo, nAMCtoPLC_Size);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_plccommunication_setamctoplcoffsets(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nCommandSequenceAddress, LibS7Com_uint32 nCommandIDAddress, LibS7Com_uint32 nCommandChecksumAddress)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommunication;
+
+	try {
+		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
+		if (!pIPLCCommunication)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pIPLCCommunication->SetAMCTOPLCOffsets(nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nCommandSequenceAddress, nCommandIDAddress, nCommandChecksumAddress);
+
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_plccommunication_setplctoamcoffsets(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nSequenceRunningAddress, LibS7Com_uint32 nSequenceFinishedAddress, LibS7Com_uint32 nSequenceStatusAddress, LibS7Com_uint32 nSequenceErrorAddress)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommunication;
+
+	try {
+		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
+		if (!pIPLCCommunication)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pIPLCCommunication->SetPLCToAMCOffsets(nMajorVersionAddress, nMinorVersionAddress, nPatchVersionAddress, nBuildVersionAddress, nSequenceRunningAddress, nSequenceFinishedAddress, nSequenceStatusAddress, nSequenceErrorAddress);
 
 		return LIBS7COM_SUCCESS;
 	}
@@ -184,18 +455,51 @@ LibS7ComResult libs7com_plccommunication_stopcommunication(LibS7Com_PLCCommunica
 	}
 }
 
-LibS7ComResult libs7com_plccommunication_executecommand(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID)
+LibS7ComResult libs7com_plccommunication_prepareparameters(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_CommandParameters * pInstance)
+{
+	IBase* pIBaseClass = (IBase *)pPLCCommunication;
+
+	try {
+		if (pInstance == nullptr)
+			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
+		IBase* pBaseInstance(nullptr);
+		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
+		if (!pIPLCCommunication)
+			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
+		
+		pBaseInstance = pIPLCCommunication->PrepareParameters();
+
+		*pInstance = (IBase*)(pBaseInstance);
+		return LIBS7COM_SUCCESS;
+	}
+	catch (ELibS7ComInterfaceException & Exception) {
+		return handleLibS7ComException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibS7ComResult libs7com_plccommunication_executecommand(LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_CommandParameters pParametersInstance, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID)
 {
 	IBase* pIBaseClass = (IBase *)pPLCCommunication;
 
 	try {
 		if (pSequenceID == nullptr)
 			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassParametersInstance = (IBase *)pParametersInstance;
+		ICommandParameters* pIParametersInstance = dynamic_cast<ICommandParameters*>(pIBaseClassParametersInstance);
+		if (!pIParametersInstance)
+			throw ELibS7ComInterfaceException (LIBS7COM_ERROR_INVALIDCAST);
+		
 		IPLCCommunication* pIPLCCommunication = dynamic_cast<IPLCCommunication*>(pIBaseClass);
 		if (!pIPLCCommunication)
 			throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
 		
-		*pSequenceID = pIPLCCommunication->ExecuteCommand(nCommandID);
+		*pSequenceID = pIPLCCommunication->ExecuteCommand(pIParametersInstance, nCommandID);
 
 		return LIBS7COM_SUCCESS;
 	}
@@ -511,14 +815,38 @@ LibS7ComResult LibS7Com::Impl::LibS7Com_GetProcAddress (const char * pProcName, 
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libs7com_commandparameters_writestring") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writestring;
+	if (sProcName == "libs7com_commandparameters_writebool") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writebool;
+	if (sProcName == "libs7com_commandparameters_writebyte") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writebyte;
+	if (sProcName == "libs7com_commandparameters_writeint16") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writeint16;
+	if (sProcName == "libs7com_commandparameters_writeuint16") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writeuint16;
+	if (sProcName == "libs7com_commandparameters_writeint32") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writeint32;
+	if (sProcName == "libs7com_commandparameters_writeuint32") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writeuint32;
+	if (sProcName == "libs7com_commandparameters_writereal") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writereal;
+	if (sProcName == "libs7com_commandparameters_writelreal") 
+		*ppProcAddress = (void*) &libs7com_commandparameters_writelreal;
 	if (sProcName == "libs7com_plccommunication_setprotocolconfiguration") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_setprotocolconfiguration;
+	if (sProcName == "libs7com_plccommunication_setamctoplcoffsets") 
+		*ppProcAddress = (void*) &libs7com_plccommunication_setamctoplcoffsets;
+	if (sProcName == "libs7com_plccommunication_setplctoamcoffsets") 
+		*ppProcAddress = (void*) &libs7com_plccommunication_setplctoamcoffsets;
 	if (sProcName == "libs7com_plccommunication_startcommunication") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_startcommunication;
 	if (sProcName == "libs7com_plccommunication_retrievestatus") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_retrievestatus;
 	if (sProcName == "libs7com_plccommunication_stopcommunication") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_stopcommunication;
+	if (sProcName == "libs7com_plccommunication_prepareparameters") 
+		*ppProcAddress = (void*) &libs7com_plccommunication_prepareparameters;
 	if (sProcName == "libs7com_plccommunication_executecommand") 
 		*ppProcAddress = (void*) &libs7com_plccommunication_executecommand;
 	if (sProcName == "libs7com_plccommunication_checkcommandexecution") 

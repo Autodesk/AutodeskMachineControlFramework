@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_utils.hpp"
 #include "common_chrono.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include <map>
 #include <thread>
 #include <iostream>
@@ -55,8 +55,7 @@ namespace AMC {
 		CStateJournalImplVariable(CStateJournalStream* pStream, const uint32_t nID, const std::string& sName)
 			: m_pStream(pStream), m_nID (nID), m_sName (sName)
 		{
-			if (pStream == nullptr)
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			LibMCAssertNotNull(pStream);
 		}
 
 		uint32_t getID()
@@ -167,9 +166,9 @@ namespace AMC {
 		void setUnits(const double dUnits)
 		{
 			if ((dUnits < STATEJOURNAL_VARIABLE_MINUNITS) || (dUnits > STATEJOURNAL_VARIABLE_MAXUNITS))
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLEUNITS);
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDVARIABLEUNITS, m_sName);
 			if (m_bHasUnits)
-				throw ELibMCInterfaceException(LIBMC_ERROR_UNITSHAVEALREADYBEENSET);
+				throw ELibMCCustomException(LIBMC_ERROR_UNITSHAVEALREADYBEENSET, m_sName);
 
 			m_dUnits = dUnits;
 			m_bHasUnits = true;
@@ -179,7 +178,7 @@ namespace AMC {
 		void setValue(const double dValue, const uint64_t nAbsoluteTimeStamp)
 		{
 			if (!m_bHasUnits)
-				throw ELibMCInterfaceException(LIBMC_ERROR_UNITSHAVENOTBEENSET);
+				throw ELibMCCustomException(LIBMC_ERROR_UNITSHAVENOTBEENSET, m_sName);
 
 			int64_t nValueInUnits = (int64_t) (dValue / m_dUnits);
 			if (m_nCurrentValueInUnits != nValueInUnits) {
@@ -195,7 +194,7 @@ namespace AMC {
 		void defineVariableInStream() override
 		{
 			if (!m_bHasUnits)
-				throw ELibMCInterfaceException(LIBMC_ERROR_UNITSHAVENOTBEENSET);
+				throw ELibMCCustomException(LIBMC_ERROR_UNITSHAVENOTBEENSET, m_sName);
 
 			m_pStream->writeNameDefinition(m_nID, m_sName);
 			m_pStream->writeUnits(m_nID, m_dUnits);
@@ -284,8 +283,7 @@ namespace AMC {
 		m_pStream (pStream)
 
 	{
-		if (pStream.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pStream.get());
 
 		// Create a new stream chunk
 		m_pStream->startNewChunk();
@@ -298,10 +296,10 @@ namespace AMC {
 	{
 
 		if (m_JournalMode != eStateJournalMode::sjmInitialising)
-			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTINITIALISING);
+			throw ELibMCCustomException(LIBMC_ERROR_JOURNALISNOTINITIALISING, sName);
 
 		if (m_nVariableCount >= STATEJOURNAL_MAXVARIABLECOUNT)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYJOURNALVARIABLES);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYJOURNALVARIABLES, sName);
 
 		PStateJournalImplVariable pVariable;
 
@@ -323,7 +321,7 @@ namespace AMC {
 			break;
 
 		default:
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDVARIABLETYPE);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDVARIABLETYPE, sName);
 		}
 		
 		m_VariableIDMap.insert (std::make_pair (pVariable->getID (), pVariable));

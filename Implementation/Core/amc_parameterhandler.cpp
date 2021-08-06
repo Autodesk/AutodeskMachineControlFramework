@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_parameterhandler.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #define AMC_MAXPARAMETERGROUPCOUNT (1024 * 1024)
 
@@ -39,7 +39,6 @@ namespace AMC {
 	CParameterHandler::CParameterHandler(std::string sDescription)
 		: m_sDescription (sDescription)
 	{
-		m_DataStore = std::make_shared <CParameterGroup>();
 	}
 
 	CParameterHandler::~CParameterHandler()
@@ -58,16 +57,14 @@ namespace AMC {
 	void CParameterHandler::addGroup(PParameterGroup pGroup)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
-
-		if (pGroup.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pGroup.get());
 
 		auto sName = pGroup->getName();
 		if (m_Groups.find(sName) != m_Groups.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME, m_sDescription + "/" + sName);
 
 		if (m_GroupList.size() >= AMC_MAXPARAMETERGROUPCOUNT)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS, m_sDescription + "/" + sName);
 
 		m_Groups.insert(std::make_pair(sName, pGroup));
 		m_GroupList.push_back(pGroup);
@@ -94,7 +91,7 @@ namespace AMC {
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		if (nIndex >= m_GroupList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDescription);
 
 		return m_GroupList[nIndex];
 	}
@@ -108,16 +105,11 @@ namespace AMC {
 			return iter->second;
 
 		if (bFailIfNotExisting)
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERGROUPNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERGROUPNOTFOUND, sName);
 
 		return nullptr;	
 	}
 
-
-	CParameterGroup* CParameterHandler::getDataStore()
-	{
-		return m_DataStore.get();
-	}
 
 
 	std::string CParameterHandler::getDescription()
@@ -134,16 +126,16 @@ namespace AMC {
 
 	}
 
-	void CParameterHandler::setInstanceStateName(const std::string& sInstanceState)
-	{
-		std::lock_guard <std::mutex> lockGuard(m_Mutex);
-		m_sInstanceState = sInstanceState;
-	}
 
-	std::string CParameterHandler::getInstanceStateName()
+	PParameterHandler CParameterHandler::duplicate()
 	{
-		std::lock_guard <std::mutex> lockGuard(m_Mutex);
-		return m_sInstanceState;
+		auto pResult = std::make_shared<CParameterHandler>(m_sDescription);
+		for (auto pGroup : m_GroupList) {
+			auto pNewGroup = pResult->addGroup(pGroup->getName(), pGroup->getDescription());
+			pNewGroup->addDuplicatesFromGroup(pGroup.get());
+		}		
+
+		return pResult;
 	}
 
 

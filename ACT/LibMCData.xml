@@ -489,6 +489,11 @@
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
 			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data. If given initially, MUST be identical." />
 		</method>	
+
+		<method name="FinishPartialStreamBlockwiseSHA256" description="Finishes storing a stream with a 64k-Blockwise calculated Checksum.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
+			<param name="BlockwiseSHA2" type="string" pass="in" description="64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical." />
+		</method>	
 		
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
 			<param name="MaxStreamSize" type="uint64" pass="return" description="Maximum Stream Size in Bytes." />	

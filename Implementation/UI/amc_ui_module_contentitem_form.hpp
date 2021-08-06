@@ -52,30 +52,50 @@ namespace AMC {
 	class CUIModule_ContentFormEntity {
 	protected:
 
+		std::string m_sName;
 		std::string m_sUUID;
 		std::string m_sCaption;
-
+		std::string m_sDefaultValue;
+		std::string m_sValue;
+		bool m_bDisabled;
+		bool m_bReadOnly;
 	public:
 
-		CUIModule_ContentFormEntity(const std::string& sCaption);
+		CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 
 		virtual ~CUIModule_ContentFormEntity();
+
+		std::string getName();
 
 		std::string getUUID();
 
 		std::string getCaption();
 
+		std::string getDefaultValue ();
+
+		std::string getValue ();
+
+		bool getDisabled ();
+
+		bool getReadOnly ();
+
+		void setValue (const std::string & sValue);
+
+		void setDisabled(bool bDisabled);
+
+		void setReadOnly(bool bReadOnly);
+
 		virtual std::string getTypeString() = 0;
 
 	};
-	
-	
+
+		
 	class CUIModule_ContentFormEdit : public CUIModule_ContentFormEntity {
 	protected:
 
 	public:
 
-		CUIModule_ContentFormEdit(const std::string& sCaption);
+		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 
 		virtual ~CUIModule_ContentFormEdit();
 
@@ -89,7 +109,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormSwitch(const std::string& sCaption);
+		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 
 		virtual ~CUIModule_ContentFormSwitch();
 
@@ -102,7 +122,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormMemo(const std::string& sCaption);
+		CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 
 		virtual ~CUIModule_ContentFormMemo();
 
@@ -115,7 +135,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormCombobox(const std::string& sCaption);
+		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 
 		virtual ~CUIModule_ContentFormCombobox();
 
@@ -126,21 +146,39 @@ namespace AMC {
 	class CUIModule_ContentForm : public CUIModule_ContentItem {
 	protected:		
 		std::list<PUIModule_ContentFormEntity> m_Entities;
+		std::map<std::string, PUIModule_ContentFormEntity> m_EntityNameMap;
+		std::map<std::string, PUIModule_ContentFormEntity> m_EntityUUIDMap;
+		std::string m_sName;
+
+		void addEntityEx(PUIModule_ContentFormEntity pEntity);
 
 	public:
 
-		CUIModule_ContentForm();
+		CUIModule_ContentForm(const std::string & sName);
 
 		virtual ~CUIModule_ContentForm();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
-		void addEdit(const std::string& sCaption);
-		void addSwitch(const std::string& sCaption);
-		void addMemo(const std::string& sCaption);
-		void addCombobox(const std::string& sCaption);
+		PUIModule_ContentFormEntity addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		PUIModule_ContentFormEntity addSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		PUIModule_ContentFormEntity addMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		PUIModule_ContentFormEntity addCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		
+		std::string getName();
+
+		bool hasEntityWithName(const std::string& sName);
+		PUIModule_ContentFormEntity findEntityByName(const std::string& sName);
+		PUIModule_ContentFormEntity findEntityByUUID(const std::string& sUUID);
+
+		std::list<PUIModule_ContentFormEntity> getEntities ();
+
+		// Returns all UUIDs that could be contained in this Item
+		virtual std::list <std::string> getReferenceUUIDs() override;
 
 	};
+
+
 
 
 }

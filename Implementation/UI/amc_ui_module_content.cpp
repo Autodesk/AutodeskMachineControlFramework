@@ -47,27 +47,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
-CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
 
-	if (pParameterInstances.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pResourcePackage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pBuildJobHandler.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (getTypeFromXML(xmlNode) != getStaticType())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
 
 	auto headlineAttrib = xmlNode.attribute("headline");
 	if (!headlineAttrib.empty ())
 		m_sHeadLine = headlineAttrib.as_string();
 
+	auto captionAttrib = xmlNode.attribute("caption");
+	if (!captionAttrib.empty())
+		m_sCaption = captionAttrib.as_string();
+	
 	auto titleAttrib = xmlNode.attribute("title");
 	if (!titleAttrib.empty())
 		m_sTitle = titleAttrib.as_string();
@@ -86,7 +85,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 
 		if (sChildName == "image") {
 			auto resourceAttrib = childNode.attribute("resource");
-			auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+			auto pResourceEntry = pUIModuleEnvironment->resourcePackage()->findEntryByName(resourceAttrib.as_string(), true);
 			double dLogoAspectRatio = 1.0;
 			auto aspectratioAttrib = childNode.attribute("aspectratio");
 			if (!aspectratioAttrib.empty()) {
@@ -133,7 +132,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 			}
 
-			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pParameterInstances);
+			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pUIModuleEnvironment->stateMachineData());
 			addItem (pParameterList);
 
 			pParameterList->loadFromXML(childNode);
@@ -141,7 +140,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 
 		if (sChildName == "buttongroup") {
 
-			auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>();
+			auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->formRegistry());
 			addItem(pButtonGroup);
 
 			auto buttonsNodes = childNode.children("button");
@@ -149,7 +148,8 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				auto captionAttrib = buttonNode.attribute("caption");
 				auto targetpageAttrib = buttonNode.attribute("targetpage");
 				auto eventAttrib = buttonNode.attribute("event");
-				pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string());
+				auto formvaluesAttrib = buttonNode.attribute("formvalues");
+				auto pButton = pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string(), formvaluesAttrib.as_string ());
 			}
 
 		}
@@ -157,30 +157,53 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 
 		if (sChildName == "form") {
 
-			auto pForm = std::make_shared <CUIModule_ContentForm>();
+			auto formNameAttrib = childNode.attribute("name");
+			if (formNameAttrib.empty ())
+				throw ELibMCCustomException(LIBMC_ERROR_FORMNAMEMISSING, getName());
+
+			auto pForm = std::make_shared <CUIModule_ContentForm>(formNameAttrib.as_string ());
 			addItem(pForm);
+
+			pUIModuleEnvironment->formRegistry()->registerFormName(pForm->getUUID(), pForm->getName ());
 
 			auto formNodes = childNode.children();
 			for (auto formNode : formNodes) {
 
 				std::string sNodeName = formNode.name();
 				auto captionAttrib = formNode.attribute("caption");
+				auto nameAttrib = formNode.attribute("name");
+				auto valueAttrib = formNode.attribute("value");
+
+				if (nameAttrib.empty ())
+					throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNAMEMISSING, pForm->getName ());
+
+				PUIModule_ContentFormEntity pEntity;
 
 				if (sNodeName == "edit") {
-					pForm->addEdit(captionAttrib.as_string());
+					pEntity = pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string(), valueAttrib.as_string ());
 				}
 
 				if (sNodeName == "switch") {
-					pForm->addSwitch(captionAttrib.as_string());
+					pEntity = pForm->addSwitch(nameAttrib.as_string(), captionAttrib.as_string(), valueAttrib.as_string());
 				}
 
 				if (sNodeName == "memo") {
-					pForm->addMemo(captionAttrib.as_string());
+					pEntity = pForm->addMemo(nameAttrib.as_string(), captionAttrib.as_string(), valueAttrib.as_string());
 				}
 
 				if (sNodeName == "combobox") {
-					pForm->addCombobox(captionAttrib.as_string());
+					pEntity = pForm->addCombobox(nameAttrib.as_string(), captionAttrib.as_string(), valueAttrib.as_string());
 				}
+
+				auto disabledAttrib = formNode.attribute("disabled");
+				if (!disabledAttrib.empty())
+					pEntity->setDisabled(disabledAttrib.as_bool());
+
+				auto readonlyAttrib = formNode.attribute("readonly");
+				if (!readonlyAttrib.empty())
+					pEntity->setReadOnly(readonlyAttrib.as_bool());
+
+
 			}
 
 		}
@@ -205,13 +228,12 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 			}
 
-			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pBuildJobHandler);
+			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pUIModuleEnvironment->buildJobHandler());
 			addItem(pBuildList);
 			
 		}
 
 	}
-
 
 }
 
@@ -237,6 +259,12 @@ std::string CUIModule_Content::getHeadLine()
 	return m_sHeadLine;
 }
 
+std::string CUIModule_Content::getCaption()
+{
+	return m_sCaption;
+}
+
+
 std::string CUIModule_Content::getTitle()
 {
 	return m_sTitle;
@@ -251,9 +279,11 @@ void CUIModule_Content::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
+	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_HEADLINE, m_sHeadLine);
 	moduleObject.addString(AMC_API_KEY_UI_TITLE, m_sTitle);
 	moduleObject.addString(AMC_API_KEY_UI_SUBTITLE, m_sSubtitle);
+	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
 
 	CJSONWriterArray itemsNode(writer);
 	for (auto item : m_Items) {
@@ -276,11 +306,30 @@ PUIModuleItem CUIModule_Content::findItem(const std::string& sUUID)
 
 void CUIModule_Content::addItem(PUIModule_ContentItem pItem)
 {
-	if (pItem.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pItem.get());
 
 	m_Items.push_back(pItem);
-	m_ItemMap.insert(std::make_pair (pItem->getUUID (), pItem));
 
+	auto referenceList = pItem->getReferenceUUIDs();
+	for (auto sUUID : referenceList)
+		m_ItemMap.insert(std::make_pair (sUUID, pItem));
+
+}
+
+
+void CUIModule_Content::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
+{
+	for (auto item : m_Items) {
+		auto referenceList = item->getReferenceUUIDs();
+		for (auto sUUID : referenceList)
+			itemMap.insert(std::make_pair(sUUID, item));
+
+	}
+}
+
+void CUIModule_Content::configurePostLoading()
+{
+	for (auto item : m_Items)
+		item->configurePostLoading();
 }
 

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
-#include "amc_parameterinstances.hpp"
+
 
 #include "libmcdata_dynamic.hpp"
 
@@ -70,5 +70,10 @@ void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObj
 
 }
 
+std::list <std::string> CUIModule_ContentItem::getReferenceUUIDs()
+{
+	std::list <std::string> resultList;
+	resultList.push_back(m_sUUID);
 
-
+	return resultList;
+}

@@ -59,6 +59,7 @@ namespace AMC {
 		std::string getRawString(const std::string& sKeyName, uint32_t nErrorCode);
 
 		std::string getUUID (const std::string & sKeyName, uint32_t nErrorCode);
+		std::string getJSONObjectString (const std::string& sKeyName, uint32_t nErrorCode);
 		std::string getNameString(const std::string& sKeyName, uint32_t nErrorCode);
 		uint64_t getUint64 (const std::string& sKeyName, const uint64_t nMinValue, const uint64_t nMaxValue, uint32_t nErrorCode);
 		std::string getSHA256(const std::string& sKeyName, uint32_t nErrorCode);

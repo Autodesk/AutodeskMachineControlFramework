@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_toolpathlayer.hpp"
+#include "libmcenv_toolpathpart.hpp"
 #include "libmcenv_interfaceexception.hpp"
 
 // Include custom headers here.
@@ -76,4 +77,48 @@ LibMCEnv_double CToolpathAccessor::GetUnits()
 {
 	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 	return pToolpathEntity->getUnits();
+}
+
+
+bool CToolpathAccessor::HasMetaData(const std::string& sNameSpace, const std::string& sName)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	return pToolpathEntity->hasMetaData(sNameSpace, sName);
+}
+
+std::string CToolpathAccessor::GetMetaDataValue(const std::string& sNameSpace, const std::string& sName)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	return pToolpathEntity->getMetaDataValue(sNameSpace, sName);
+}
+
+std::string CToolpathAccessor::GetMetaDataType(const std::string& sNameSpace, const std::string& sName)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	return pToolpathEntity->getMetaDataType(sNameSpace, sName);
+}
+
+LibMCEnv_uint32 CToolpathAccessor::GetPartCount()
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	return pToolpathEntity->getPartCount();
+}
+
+IToolpathPart* CToolpathAccessor::GetPart(const LibMCEnv_uint32 nPartIndex)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	auto pPart = pToolpathEntity->getPart(nPartIndex);
+
+	return new CToolpathPart(pPart);
+}
+
+IToolpathPart* CToolpathAccessor::FindPartByUUID(const std::string& sPartUUID)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	auto pPart = pToolpathEntity->findPartByUUID(sPartUUID);
+	if (pPart.get() != nullptr)
+		return new CToolpathPart(pPart);
+
+	return nullptr;
+
 }

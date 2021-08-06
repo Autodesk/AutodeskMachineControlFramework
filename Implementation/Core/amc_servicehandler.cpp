@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_servicehandler.hpp"
 #include "common_utils.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 
 namespace AMC {
@@ -40,8 +40,7 @@ namespace AMC {
 	CServiceHandler::CServiceHandler(PLogger pLogger)
 		:  m_nMaxThreadCount(SERVICETHREADCOUNT_DEFAULT), m_pLogger (pLogger)
 	{
-		if (pLogger == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pLogger.get());
 	}
 
 	CServiceHandler::~CServiceHandler()
@@ -51,10 +50,9 @@ namespace AMC {
 
 	void CServiceHandler::addServiceToQueue(PService pService)
 	{
-		if (pService.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pService.get());
 		if (pService->getServiceHandler() != this)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSERVICEHANDLER);
 
 		{
 			// lock guard only for the push
@@ -119,7 +117,7 @@ namespace AMC {
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 		if (nMaxThreadCount == 0)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMAXTHREADCOUNT);
 
 		m_nMaxThreadCount = nMaxThreadCount;
 	}

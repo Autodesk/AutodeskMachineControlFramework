@@ -79,6 +79,8 @@ public:
 
 	IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) override;
 
+    IWorkingFile* StoreCustomString(const std::string& sFileName, const std::string& sDataString) override;
+
 	bool CleanUp() override;
 
 	IWorkingFile* AddManagedFile(const std::string& sFileName) override;

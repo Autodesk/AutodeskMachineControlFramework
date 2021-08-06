@@ -316,6 +316,34 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 class IPLCCommand : public virtual IBase {
 public:
+	/**
+	* IPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] nValue - Parameter Value
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_S7Net_int32 nValue) = 0;
+
+	/**
+	* IPLCCommand::SetStringParameter - Sets a string parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] sValue - Parameter Value
+	*/
+	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IPLCCommand::SetBoolParameter - Sets a bool parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] bValue - Parameter Value
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IPLCCommand::SetDoubleParameter - Sets a double parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] dValue - Parameter Value
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_S7Net_double dValue) = 0;
+
 };
 
 typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;

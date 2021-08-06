@@ -49,6 +49,102 @@ Interface version: 3.1.3
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for CommandParameters
+**************************************************************************************************************************/
+
+/**
+* Writes string value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of String Variable.
+* @param[in] nMaxLength - Maximum length.
+* @param[in] pValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteStringPtr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint32 nMaxLength, const char * pValue);
+
+/**
+* Writes bool value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Bit Variable.
+* @param[in] nBit - Bit of the variable (0-7)
+* @param[in] bValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteBoolPtr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint32 nBit, bool bValue);
+
+/**
+* Writes byte value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Bit Variable.
+* @param[in] nValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteBytePtr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint8 nValue);
+
+/**
+* Writes Int16 value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Int16 Variable.
+* @param[in] nValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteInt16Ptr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_int16 nValue);
+
+/**
+* Writes Uint16 value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Int16 Variable.
+* @param[in] nValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteUint16Ptr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint16 nValue);
+
+/**
+* Writes Int32 value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Int32 Variable.
+* @param[in] nValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteInt32Ptr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_int32 nValue);
+
+/**
+* Writes Uint32 value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Int32 Variable.
+* @param[in] nValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteUint32Ptr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_uint32 nValue);
+
+/**
+* Writes Real value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Real Variable.
+* @param[in] dValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteRealPtr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_double dValue);
+
+/**
+* Writes LReal value.
+*
+* @param[in] pCommandParameters - CommandParameters instance.
+* @param[in] nAddress - Address of Real Variable.
+* @param[in] dValue - Value of variable.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComCommandParameters_WriteLRealPtr) (LibS7Com_CommandParameters pCommandParameters, LibS7Com_uint32 nAddress, LibS7Com_double dValue);
+
+/*************************************************************************************************************************
  Class definition for PLCCommunication
 **************************************************************************************************************************/
 
@@ -56,12 +152,47 @@ Interface version: 3.1.3
 * Configures the protocol
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nMajorVersion - Major Protocol Version
+* @param[in] nMinorVersion - Minor Protocol Version
+* @param[in] nPatchVersion - Patch Protocol Version
 * @param[in] nPLCtoAMC_DBNo - DB Number of PLC to AMC connection
 * @param[in] nPLCtoAMC_Size - Size of PLC to AMC protocol buffer.
 * @param[in] nAMCtoPLC_DBNo - DB Number of AMC to PLC connection
+* @param[in] nAMCtoPLC_Size - Size of AMC to PLC protocol buffer.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_SetProtocolConfigurationPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_SetProtocolConfigurationPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersion, LibS7Com_uint32 nMinorVersion, LibS7Com_uint32 nPatchVersion, LibS7Com_uint32 nPLCtoAMC_DBNo, LibS7Com_uint32 nPLCtoAMC_Size, LibS7Com_uint32 nAMCtoPLC_DBNo, LibS7Com_uint32 nAMCtoPLC_Size);
+
+/**
+* Configures the command offsets
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nMajorVersionAddress - Major Protocol Version Address
+* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+* @param[in] nBuildVersionAddress - Build Protocol Version Address
+* @param[in] nCommandSequenceAddress - Command Sequence Address
+* @param[in] nCommandIDAddress - Command ID Address
+* @param[in] nCommandChecksumAddress - Command Checksum Address
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_SetAMCTOPLCOffsetsPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nCommandSequenceAddress, LibS7Com_uint32 nCommandIDAddress, LibS7Com_uint32 nCommandChecksumAddress);
+
+/**
+* Configures the command offsets
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] nMajorVersionAddress - Major Protocol Version Address
+* @param[in] nMinorVersionAddress - Minor Protocol Version Address
+* @param[in] nPatchVersionAddress - Patch Protocol Version Address
+* @param[in] nBuildVersionAddress - Build Protocol Version Address
+* @param[in] nSequenceRunningAddress - Sequence Running Address
+* @param[in] nSequenceFinishedAddress - Sequence Finished Address
+* @param[in] nSequenceStatusAddress - Sequence Status Address
+* @param[in] nSequenceErrorAddress - Sequence Error Address
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_SetPLCToAMCOffsetsPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nMajorVersionAddress, LibS7Com_uint32 nMinorVersionAddress, LibS7Com_uint32 nPatchVersionAddress, LibS7Com_uint32 nBuildVersionAddress, LibS7Com_uint32 nSequenceRunningAddress, LibS7Com_uint32 nSequenceFinishedAddress, LibS7Com_uint32 nSequenceStatusAddress, LibS7Com_uint32 nSequenceErrorAddress);
 
 /**
 * Starts communication with the S7 PLC Instance
@@ -89,14 +220,24 @@ typedef LibS7ComResult (*PLibS7ComPLCCommunication_RetrieveStatusPtr) (LibS7Com_
 typedef LibS7ComResult (*PLibS7ComPLCCommunication_StopCommunicationPtr) (LibS7Com_PLCCommunication pPLCCommunication);
 
 /**
+* Prepares Command Parameters
+*
+* @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[out] pInstance - Instance of the parameters class.
+* @return error code or 0 (success)
+*/
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_PrepareParametersPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_CommandParameters * pInstance);
+
+/**
 * Executes a command
 *
 * @param[in] pPLCCommunication - PLCCommunication instance.
+* @param[in] pParametersInstance - Instance of the parameters class.
 * @param[in] nCommandID - ID of command to be triggered.
 * @param[out] pSequenceID - Sequence ID of the executed command.
 * @return error code or 0 (success)
 */
-typedef LibS7ComResult (*PLibS7ComPLCCommunication_ExecuteCommandPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID);
+typedef LibS7ComResult (*PLibS7ComPLCCommunication_ExecuteCommandPtr) (LibS7Com_PLCCommunication pPLCCommunication, LibS7Com_CommandParameters pParametersInstance, LibS7Com_uint32 nCommandID, LibS7Com_uint32 * pSequenceID);
 
 /**
 * Checks the command execution state.
@@ -277,10 +418,22 @@ typedef LibS7ComResult (*PLibS7ComCreatePLCCommunicationPtr) (LibS7Com_PLCCommun
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibS7ComCommandParameters_WriteStringPtr m_CommandParameters_WriteString;
+	PLibS7ComCommandParameters_WriteBoolPtr m_CommandParameters_WriteBool;
+	PLibS7ComCommandParameters_WriteBytePtr m_CommandParameters_WriteByte;
+	PLibS7ComCommandParameters_WriteInt16Ptr m_CommandParameters_WriteInt16;
+	PLibS7ComCommandParameters_WriteUint16Ptr m_CommandParameters_WriteUint16;
+	PLibS7ComCommandParameters_WriteInt32Ptr m_CommandParameters_WriteInt32;
+	PLibS7ComCommandParameters_WriteUint32Ptr m_CommandParameters_WriteUint32;
+	PLibS7ComCommandParameters_WriteRealPtr m_CommandParameters_WriteReal;
+	PLibS7ComCommandParameters_WriteLRealPtr m_CommandParameters_WriteLReal;
 	PLibS7ComPLCCommunication_SetProtocolConfigurationPtr m_PLCCommunication_SetProtocolConfiguration;
+	PLibS7ComPLCCommunication_SetAMCTOPLCOffsetsPtr m_PLCCommunication_SetAMCTOPLCOffsets;
+	PLibS7ComPLCCommunication_SetPLCToAMCOffsetsPtr m_PLCCommunication_SetPLCToAMCOffsets;
 	PLibS7ComPLCCommunication_StartCommunicationPtr m_PLCCommunication_StartCommunication;
 	PLibS7ComPLCCommunication_RetrieveStatusPtr m_PLCCommunication_RetrieveStatus;
 	PLibS7ComPLCCommunication_StopCommunicationPtr m_PLCCommunication_StopCommunication;
+	PLibS7ComPLCCommunication_PrepareParametersPtr m_PLCCommunication_PrepareParameters;
 	PLibS7ComPLCCommunication_ExecuteCommandPtr m_PLCCommunication_ExecuteCommand;
 	PLibS7ComPLCCommunication_CheckCommandExecutionPtr m_PLCCommunication_CheckCommandExecution;
 	PLibS7ComPLCCommunication_ReadVariableStringPtr m_PLCCommunication_ReadVariableString;

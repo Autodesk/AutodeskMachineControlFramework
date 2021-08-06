@@ -22,4 +22,7 @@ add_subdirectory(Marlin)
 add_subdirectory(Camera)
 add_subdirectory(S7Net)
 add_subdirectory(Duet)
+add_subdirectory(MQTT)
+add_subdirectory(Ximc)
+add_subdirectory(BuR)
 

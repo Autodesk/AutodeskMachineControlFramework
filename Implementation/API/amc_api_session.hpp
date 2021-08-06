@@ -44,7 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CAPISession, PAPISession);
-	
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+
 	class CAPISession {
 	private:
 	
@@ -55,11 +56,13 @@ namespace AMC {
 		std::string m_sUserName;
 		std::string m_sHashedPassword;
 		std::string m_sToken;
+		PParameterHandler m_pClientVariableHandler;
+
 		bool m_bAuthenticated;		
 					
 	public:
 
-		CAPISession();
+		CAPISession(CParameterHandler * pDefaultClientParameterHandler);
 		virtual ~CAPISession();
 
 		std::string getUUID ();		
@@ -70,6 +73,8 @@ namespace AMC {
 		
 		void authorizeSessionByPassword(const std::string & sSaltedPasswordHash, const std::string & sClientKey);
 		void setUserDetails(const std::string& sUserName, const std::string & sHashedPassword);
+
+		PParameterHandler getClientVariableHandler();
 								
 	};
 

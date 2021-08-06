@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_servicehandler.hpp"
 
 #include "common_utils.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include "amc_systemstate.hpp"
 #include "amc_toolpathentity.hpp"
@@ -45,10 +45,8 @@ namespace AMC {
 	CService_BuildFileParsing::CService_BuildFileParsing(CServiceHandler* pServiceHandler, LibMCData::PBuildJob pBuildJob, Lib3MF::PWrapper p3MFWrapper, const std::string& sUserID)
 		: CService (pServiceHandler), m_pBuildJob (pBuildJob), m_p3MFWrapper (p3MFWrapper), m_sUserID (sUserID)
 	{
-		if (pBuildJob.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (p3MFWrapper.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pBuildJob.get());
+		LibMCAssertNotNull(p3MFWrapper.get());
 
 	}
 	
@@ -65,7 +63,7 @@ namespace AMC {
 		auto pStorageStream = m_pBuildJob->GetStorageStream();
 		
 		// TODO: Check Toolpath Entity Integrity
-		CToolpathEntity toolpathEntity (pStorageStream, m_p3MFWrapper);		
+		CToolpathEntity toolpathEntity (pStorageStream, m_p3MFWrapper, m_pBuildJob->GetName ());		
 		m_pBuildJob->FinishValidating (toolpathEntity.getLayerCount ());
 		m_pBuildJob->AddJobData(pStorageStream->GetName(), pStorageStream, LibMCData::eBuildJobDataType::Toolpath, m_sUserID);
 		

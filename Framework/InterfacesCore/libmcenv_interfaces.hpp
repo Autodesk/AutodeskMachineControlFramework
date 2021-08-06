@@ -56,6 +56,7 @@ namespace Impl {
 */
 class IBase;
 class IIterator;
+class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
 class IBuild;
@@ -290,6 +291,41 @@ typedef IBaseSharedPtr<IIterator> PIIterator;
 
 
 /*************************************************************************************************************************
+ Class interface for ToolpathPart 
+**************************************************************************************************************************/
+
+class IToolpathPart : public virtual IBase {
+public:
+	/**
+	* IToolpathPart::GetName - Returns Part Name.
+	* @return Returns toolpath part name.
+	*/
+	virtual std::string GetName() = 0;
+
+	/**
+	* IToolpathPart::GetUUID - Returns Part UUID.
+	* @return Returns toolpath part uuid.
+	*/
+	virtual std::string GetUUID() = 0;
+
+	/**
+	* IToolpathPart::GetMeshUUID - Returns Mesh UUID of the part.
+	* @return Returns toolpath part mesh uuid.
+	*/
+	virtual std::string GetMeshUUID() = 0;
+
+	/**
+	* IToolpathPart::GetTransform - Returns Mesh Transform of the part.
+	* @return Returns the mesh transform of the toolpath.
+	*/
+	virtual LibMCEnv::sToolpathPartTransform GetTransform() = 0;
+
+};
+
+typedef IBaseSharedPtr<IToolpathPart> PIToolpathPart;
+
+
+/*************************************************************************************************************************
  Class interface for ToolpathLayer 
 **************************************************************************************************************************/
 
@@ -401,6 +437,50 @@ public:
 	* @return Toolpath units.
 	*/
 	virtual LibMCEnv_double GetUnits() = 0;
+
+	/**
+	* IToolpathAccessor::HasMetaData - Checks if a metadata value exists for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns if metadata exists.
+	*/
+	virtual bool HasMetaData(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataValue - Returns the value of a metadata for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns the value
+	*/
+	virtual std::string GetMetaDataValue(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetMetaDataType - Returns the type of a metadata for this toolpath model.
+	* @param[in] sNameSpace - Namespace of metadata.
+	* @param[in] sName - Name of metadata.
+	* @return Returns the type
+	*/
+	virtual std::string GetMetaDataType(const std::string & sNameSpace, const std::string & sName) = 0;
+
+	/**
+	* IToolpathAccessor::GetPartCount - Retrieves the number of parts in the toolpath.
+	* @return Number of parts.
+	*/
+	virtual LibMCEnv_uint32 GetPartCount() = 0;
+
+	/**
+	* IToolpathAccessor::GetPart - Retrieves the part information of a toolpath.
+	* @param[in] nPartIndex - Index of part. MUST be between 0 and PartCount-1
+	* @return Part Instance
+	*/
+	virtual IToolpathPart * GetPart(const LibMCEnv_uint32 nPartIndex) = 0;
+
+	/**
+	* IToolpathAccessor::FindPartByUUID - Finds the part information of a toolpath.
+	* @param[in] sPartUUID - UUID of part.
+	* @return Part Instance. Returns null if part does not exist.
+	*/
+	virtual IToolpathPart * FindPartByUUID(const std::string & sPartUUID) = 0;
 
 };
 
@@ -603,6 +683,14 @@ public:
 	* @return working file instance.
 	*/
 	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomString(const std::string & sFileName, const std::string & sDataString) = 0;
 
 	/**
 	* IWorkingDirectory::StoreDriverData - Stores attached driver data in a temporary file.
@@ -996,6 +1084,13 @@ typedef IBaseSharedPtr<ISignalHandler> PISignalHandler;
 class IStateEnvironment : public virtual IBase {
 public:
 	/**
+	* IStateEnvironment::GetMachineState - Retrieves the machine state
+	* @param[in] sMachineInstance - State machine instance name
+	* @return Name of current state
+	*/
+	virtual std::string GetMachineState(const std::string & sMachineInstance) = 0;
+
+	/**
 	* IStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
@@ -1229,49 +1324,177 @@ public:
 	virtual void LogInfo(const std::string & sLogString) = 0;
 
 	/**
-	* IUIEnvironment::GetStringParameter - returns a string parameter
+	* IUIEnvironment::GetMachineStringParameter - returns a string parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	virtual std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual std::string GetMachineStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetUUIDParameter - returns a uuid parameter
+	* IUIEnvironment::GetMachineUUIDParameter - returns a uuid parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	virtual std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual std::string GetMachineUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetDoubleParameter - returns a double parameter
+	* IUIEnvironment::GetMachineDoubleParameter - returns a double parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	virtual LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual LibMCEnv_double GetMachineDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetIntegerParameter - returns an int parameter
+	* IUIEnvironment::GetMachineIntegerParameter - returns an int parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	virtual LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual LibMCEnv_int64 GetMachineIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetBoolParameter - returns a bool parameter
+	* IUIEnvironment::GetMachineBoolParameter - returns a bool parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	virtual bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual bool GetMachineBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientStringVariable - returns a string variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual std::string GetClientStringVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientUUIDVariable - returns a uuid variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual std::string GetClientUUIDVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientDoubleVariable - returns a double variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual LibMCEnv_double GetClientDoubleVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientIntegerVariable - returns an int variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual LibMCEnv_int64 GetClientIntegerVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::GetClientBoolVariable - returns a bool variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @return Current Parameter Value
+	*/
+	virtual bool GetClientBoolVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+
+	/**
+	* IUIEnvironment::SetClientStringVariable - sets a string variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetClientStringVariable(const std::string & sVariableGroup, const std::string & sVariableName, const std::string & sValue) = 0;
+
+	/**
+	* IUIEnvironment::SetClientUUIDVariable - returns a uuid variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetClientUUIDVariable(const std::string & sVariableGroup, const std::string & sVariableName, const std::string & sValue) = 0;
+
+	/**
+	* IUIEnvironment::SetClientDoubleVariable - returns a double variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @param[in] dValue - Value to set
+	*/
+	virtual void SetClientDoubleVariable(const std::string & sVariableGroup, const std::string & sVariableName, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IUIEnvironment::SetClientIntegerVariable - returns an int variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @param[in] nValue - Value to set
+	*/
+	virtual void SetClientIntegerVariable(const std::string & sVariableGroup, const std::string & sVariableName, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IUIEnvironment::SetClientBoolVariable - returns a bool variable of the client
+	* @param[in] sVariableGroup - Variable Group
+	* @param[in] sVariableName - Variable Name
+	* @param[in] bValue - Value to set
+	*/
+	virtual void SetClientBoolVariable(const std::string & sVariableGroup, const std::string & sVariableName, const bool bValue) = 0;
+
+	/**
+	* IUIEnvironment::HasFormValue - returns if a form value has been passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value has been passed
+	*/
+	virtual bool HasFormValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::GetFormStringValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	virtual std::string GetFormStringValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::GetFormUUIDValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	virtual std::string GetFormUUIDValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::GetFormDoubleValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	virtual LibMCEnv_double GetFormDoubleValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::GetFormIntegerValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	virtual LibMCEnv_int64 GetFormIntegerValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
+
+	/**
+	* IUIEnvironment::GetFormBoolValue - returns a passed form value from the client. Fails if value is not passed.
+	* @param[in] sFormIdentifier - Identifier of the form.
+	* @param[in] sValueIdentifier - Identifier of the form value.
+	* @return Form Value
+	*/
+	virtual bool GetFormBoolValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
 
 	/**
 	* IUIEnvironment::GetEventContext - returns the event context uuid as string
