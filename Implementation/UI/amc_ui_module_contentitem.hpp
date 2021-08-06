@@ -38,17 +38,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error this header is protected and should only be included in the corresponding implementation CPP files.
 #endif
 
-#include "Core/amc_jsonwriter.hpp"
+#include "amc_jsonwriter.hpp"
+#include "amc_ui_module_item.hpp"
+
+#define AMC_CONTENT_MAXENTRYCOUNT (1024 * 1024)
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
-	amcDeclareDependingClass(CUIModule_ContentParagraph, PUIModule_ContentParagraph);
-	amcDeclareDependingClass(CUIModule_ContentImage, PUIModule_ContentImage);
-	amcDeclareDependingClass(CUIModule_ContentUpload, PUIModule_ContentUpload);
 
-	class CUIModule_ContentItem {
+	class CUIModule_ContentItem : public CUIModuleItem {
 	protected:		
 
 		std::string m_sUUID;
@@ -59,58 +60,18 @@ namespace AMC {
 		
 		virtual ~CUIModule_ContentItem();
 
-		std::string getUUID ();
+		virtual std::string getUUID () override;
 
-		virtual void addToJSON (CJSONWriter & writer, CJSONWriterObject & object) = 0;
-		
-	};
+		virtual void addDefinitionToJSON (CJSONWriter & writer, CJSONWriterObject & object);
 
-	class CUIModule_ContentParagraph : public CUIModule_ContentItem {
-	protected:		
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
-		std::string m_sText;
-
-	public:
-
-		CUIModule_ContentParagraph(const std::string & sText);
-		
-		virtual ~CUIModule_ContentParagraph();
-
-		std::string getText ();
-
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		// Returns all UUIDs that could be contained in this Item
+		virtual std::list <std::string> getReferenceUUIDs();
 
 	};
 
 
-	class CUIModule_ContentImage : public CUIModule_ContentItem {
-	protected:		
-
-	public:
-
-		CUIModule_ContentImage(const std::string & sUUID);
-		
-		virtual ~CUIModule_ContentImage();
-
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
-
-	};
-
-	class CUIModule_ContentUpload : public CUIModule_ContentItem {
-	protected:
-		std::string m_sUploadClass;
-		std::string m_sUploadCaption;
-
-	public:
-
-		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption);
-
-		virtual ~CUIModule_ContentUpload();
-
-		void addToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
-
-	};
-	
 }
 
 

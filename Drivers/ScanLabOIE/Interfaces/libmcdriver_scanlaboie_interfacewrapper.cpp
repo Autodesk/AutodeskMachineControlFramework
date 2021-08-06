@@ -83,6 +83,33 @@ LibMCDriver_ScanLabOIEResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_configure(LibMCDriver_ScanLabOIE_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_getname(LibMCDriver_ScanLabOIE_Driver pDriver, const LibMCDriver_ScanLabOIE_uint32 nNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -293,6 +320,30 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_getheaderinformation(
 	}
 }
 
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_queryparameters(LibMCDriver_ScanLabOIE_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_ScanLab_OIE
@@ -312,6 +363,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_scanlaboie_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_configure;
 	if (sProcName == "libmcdriver_scanlaboie_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_getname;
 	if (sProcName == "libmcdriver_scanlaboie_driver_gettype") 
@@ -320,6 +373,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_getversion;
 	if (sProcName == "libmcdriver_scanlaboie_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_scanlaboie_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_driver_queryparameters;
 	if (sProcName == "libmcdriver_scanlaboie_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_getversion;
 	if (sProcName == "libmcdriver_scanlaboie_getlasterror") 
@@ -469,11 +524,11 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_injectcomponent(const char *
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -514,7 +569,7 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_getsymbollookupmethod(LibMCD
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_ScanLabOIE_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -527,8 +582,8 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_createdriver(const char * pN
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
 		

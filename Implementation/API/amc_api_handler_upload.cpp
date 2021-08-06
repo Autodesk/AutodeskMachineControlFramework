@@ -70,6 +70,13 @@ APIHandler_UploadType CAPIHandler_Upload::parseRequest(const std::string& sURI, 
 	// Leave away base URI
 	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(10));
 	uploadUUID = "";
+	if (requestType == eAPIRequestType::rtPut) {
+		if ((sParameterString.substr(0, 1) == "/") && (sParameterString.length() == 37)) {
+			uploadUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(1));
+			return utStreamUpload;
+		}
+	}
+
 
 	if (requestType == eAPIRequestType::rtPost) {
 		if ((sParameterString == "") || (sParameterString == "/")) {
@@ -156,8 +163,7 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	auto sContext = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_CONTEXT, LIBMC_ERROR_INVALIDCONTEXTUUID);
 	auto sName = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_NAME, LIBMC_ERROR_INVALIDUPLOADNAME);
 	auto sMimeType = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_MIMETYPE, LIBMC_ERROR_INVALIDMIMETYPE);
-	auto nSize = jsonRequest.getSize(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize(), LIBMC_ERROR_INVALIDSTREAMSIZE);
-	auto sSHA256 = jsonRequest.getSHA256(AMC_API_KEY_UPLOAD_SHA256, LIBMC_ERROR_INVALIDSHA256SUM);
+	auto nSize = jsonRequest.getUint64(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize(), LIBMC_ERROR_INVALIDSTREAMSIZE);
 
 	std::string sContextUUID;
 
@@ -174,7 +180,7 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	if (!pAuth->contextUUIDIsAuthorized(sContextUUID))
 		throw ELibMCInterfaceException(LIBMC_ERROR_CONTEXTUUIDNOTACCEPTED);
 
-	pStorage->BeginPartialStream (sUUID, sContextUUID, sName, sMimeType, nSize, sSHA256, pAuth->getUserName ());
+	pStorage->BeginPartialStream (sUUID, sContextUUID, sName, sMimeType, nSize, pAuth->getUserName ());
 
 	writer.addString(AMC_API_KEY_UPLOAD_STREAMUUID, sUUID);
 	writer.addString(AMC_API_KEY_UPLOAD_CONTEXTUUID, sContextUUID);
@@ -193,7 +199,28 @@ void CAPIHandler_Upload::handleFinishUploadRequest(CJSONWriter& writer, const ui
 	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
 
 	auto sUUID = jsonRequest.getUUID(AMC_API_KEY_UPLOAD_STREAMUUID, LIBMC_ERROR_INVALIDSTREAMUUID);
-	pStorage->FinishPartialStream(sUUID);
+
+	if (jsonRequest.hasValue(AMC_API_KEY_UPLOAD_SHA256)) {
+		auto sSHA256 = jsonRequest.getSHA256(AMC_API_KEY_UPLOAD_SHA256, LIBMC_ERROR_INVALIDSHA256SUM);
+		pStorage->FinishPartialStream(sUUID, sSHA256);
+	}
+	else if (jsonRequest.hasValue(AMC_API_KEY_UPLOAD_SHA256BLOCK64K)) {
+		auto sSHA256Block64k = jsonRequest.getSHA256(AMC_API_KEY_UPLOAD_SHA256BLOCK64K, LIBMC_ERROR_INVALIDSHA256SUM);
+		pStorage->FinishPartialStreamBlockwiseSHA256(sUUID, sSHA256Block64k);
+	}
+	else
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSHA256SUM);
+
+
+	auto pStreamObject = pStorage->RetrieveStream (sUUID);
+	writer.addString(AMC_API_KEY_UPLOAD_UUID, pStreamObject->GetUUID());
+	writer.addString(AMC_API_KEY_UPLOAD_NAME, pStreamObject->GetName());
+	writer.addString(AMC_API_KEY_UPLOAD_SHA256, pStreamObject->GetSHA2 ());
+	writer.addString(AMC_API_KEY_UPLOAD_MIMETYPE, pStreamObject->GetMIMEType());
+	writer.addInteger(AMC_API_KEY_UPLOAD_SIZE, pStreamObject->GetSize());
+	writer.addString(AMC_API_KEY_UPLOAD_TIMESTAMP, pStreamObject->GetTimeStamp());
+
+
 
 
 }
@@ -223,7 +250,7 @@ PAPIResponse CAPIHandler_Upload::handleRequest(const std::string& sURI, const eA
 {
 
 
-	if (requestType == eAPIRequestType::rtPost) {
+	if ((requestType == eAPIRequestType::rtPost) || (requestType == eAPIRequestType::rtPut)) {
 
 		std::string sUploadUUID;
 		auto uploadType = parseRequest(sURI, requestType, sUploadUUID);

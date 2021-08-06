@@ -122,6 +122,21 @@ IBuildJobIterator* CBuildJobHandler::ListJobsByStatus(const LibMCData::eBuildJob
 }
 
 
+IBuildJob* CBuildJobHandler::FindJobOfData(const std::string& sDataUUID)
+{
+
+    std::string sQuery = "SELECT jobuuid FROM buildjobdata WHERE uuid=?";
+    auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+    pStatement->setString(1, sDataUUID);
+    if (!pStatement->nextRow())
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_BUILDJOBDATANOTFOUND);
+
+    auto sJobUUID = pStatement->getColumnString(1);
+
+    return RetrieveJob(sJobUUID);
+
+}
+
 
 std::string CBuildJobHandler::ConvertBuildStatusToString(const LibMCData::eBuildJobStatus eStatus)
 {

@@ -42,7 +42,7 @@ Interface version: 1.0.0
 #include "libmcdriver_marlin_types.hpp"
 #include "libmcdriver_marlin_dynamic.h"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -241,12 +241,12 @@ public:
 	inline void AcquireInstance(classParam<CBase> pInstance);
 	inline void InjectComponent(const std::string & sNameSpace, const LibMCDriver_Marlin_pvoid pSymbolAddressMethod);
 	inline LibMCDriver_Marlin_pvoid GetSymbolLookupMethod();
-	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment);
+	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment);
 
 private:
 	sLibMCDriver_MarlinDynamicWrapperTable m_WrapperTable;
 	// Injected Components
-	LibMCDriverEnv::PWrapper m_pLibMCDriverEnvWrapper;
+	LibMCEnv::PWrapper m_pLibMCEnvWrapper;
 
 	
 	LibMCDriver_MarlinResult checkBinaryVersion()
@@ -340,10 +340,12 @@ public:
 	{
 	}
 	
+	inline void Configure(const std::string & sConfigurationString);
 	inline std::string GetName();
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_Marlin_uint32 & nMajor, LibMCDriver_Marlin_uint32 & nMinor, LibMCDriver_Marlin_uint32 & nMicro, std::string & sBuild);
 	inline void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName);
+	inline void QueryParameters();
 };
 	
 /*************************************************************************************************************************
@@ -360,7 +362,7 @@ public:
 	{
 	}
 	
-	inline void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout);
+	inline void Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout);
 	inline void Disconnect();
 	inline void SetAbsolutePositioning(const bool bAbsolute);
 	inline void SetHeatedBedTargetTemperature(const LibMCDriver_Marlin_double dTemperatureInDegreeCelcius, const bool bWaitForTemp);
@@ -455,11 +457,11 @@ public:
 		CheckError(nullptr,m_WrapperTable.m_InjectComponent(sNameSpace.c_str(), pSymbolAddressMethod));
 		
 		bool bNameSpaceFound = false;
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (m_pLibMCDriverEnvWrapper != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (m_pLibMCEnvWrapper != nullptr) {
 				throw ELibMCDriver_MarlinException(LIBMCDRIVER_MARLIN_ERROR_COULDNOTLOADLIBRARY, "Library with namespace " + sNameSpace + " is already registered.");
 			}
-			m_pLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			m_pLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		if (!bNameSpaceFound)
@@ -485,9 +487,9 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment)
+	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment)
 	{
-		LibMCDriverEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
+		LibMCEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
 		LibMCDriver_MarlinHandle hInstance = nullptr;
 		CheckError(nullptr,m_WrapperTable.m_CreateDriver(sName.c_str(), sType.c_str(), hDriverEnvironment, &hInstance));
 		
@@ -515,10 +517,12 @@ public:
 			return LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
+		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_Marlin_Connect = nullptr;
 		pWrapperTable->m_Driver_Marlin_Disconnect = nullptr;
 		pWrapperTable->m_Driver_Marlin_SetAbsolutePositioning = nullptr;
@@ -607,6 +611,15 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_MarlinDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_configure");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_MarlinDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_configure");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Configure == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_MarlinDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_getname");
 		#else // _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_MarlinDriver_GetNamePtr) dlsym(hLibrary, "libmcdriver_marlin_driver_getname");
@@ -640,6 +653,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_GetHeaderInformation == nullptr)
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_MarlinDriver_QueryParametersPtr) GetProcAddress(hLibrary, "libmcdriver_marlin_driver_queryparameters");
+		#else // _WIN32
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_MarlinDriver_QueryParametersPtr) dlsym(hLibrary, "libmcdriver_marlin_driver_queryparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1009,6 +1031,10 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_MarlinResult eLookupError = LIBMCDRIVER_MARLIN_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_getname", (void**)&(pWrapperTable->m_Driver_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetName == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1023,6 +1049,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_getheaderinformation", (void**)&(pWrapperTable->m_Driver_GetHeaderInformation));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetHeaderInformation == nullptr) )
+			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_marlin_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_MARLIN_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_marlin_driver_marlin_connect", (void**)&(pWrapperTable->m_Driver_Marlin_Connect));
@@ -1195,6 +1225,15 @@ public:
 	 */
 	
 	/**
+	* CDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	void CDriver::Configure(const std::string & sConfigurationString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Configure(m_pHandle, sConfigurationString.c_str()));
+	}
+	
+	/**
 	* CDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/
@@ -1261,6 +1300,14 @@ public:
 	}
 	
 	/**
+	* CDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	void CDriver::QueryParameters()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParameters(m_pHandle));
+	}
+	
+	/**
 	 * Method definitions for class CDriver_Marlin
 	 */
 	
@@ -1268,12 +1315,12 @@ public:
 	* CDriver_Marlin::Connect - Creates and initializes a new Marlin Connector.
 	* @param[in] sCOMPort - Device Port to connect to
 	* @param[in] nBaudrate - Baudrate to use
-	* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+	* @param[in] nStatusUpdateInterval - Timer interval [ms] for updating status
 	* @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 	*/
-	void CDriver_Marlin::Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_double dStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
+	void CDriver_Marlin::Connect(const std::string & sCOMPort, const LibMCDriver_Marlin_uint32 nBaudrate, const LibMCDriver_Marlin_uint32 nStatusUpdateInterval, const LibMCDriver_Marlin_uint32 nConnectTimeout)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_Connect(m_pHandle, sCOMPort.c_str(), nBaudrate, dStatusUpdateInterval, nConnectTimeout));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Marlin_Connect(m_pHandle, sCOMPort.c_str(), nBaudrate, nStatusUpdateInterval, nConnectTimeout));
 	}
 	
 	/**

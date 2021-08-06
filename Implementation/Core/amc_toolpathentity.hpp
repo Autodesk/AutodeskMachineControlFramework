@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mutex>
 
 #include "amc_toolpathlayerdata.hpp"
+#include "amc_toolpathpart.hpp"
 #include "lib3mf/lib3mf_dynamic.hpp"
 #include "libmcdata_dynamic.hpp"
 
@@ -59,9 +60,14 @@ namespace AMC {
 		Lib3MF::PReader m_p3MFReader;
 		Lib3MF::PToolpath m_pToolpath;
 
+		std::map<std::string, PToolpathPart> m_PartMap;
+		std::vector<PToolpathPart> m_PartList;
+
+		std::string m_sDebugName;
+
 	public:
 
-		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper);
+		CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string & sDebugName);
 		virtual ~CToolpathEntity();		
 
 		void IncRef();
@@ -72,6 +78,16 @@ namespace AMC {
 		PToolpathLayerData readLayer(uint32_t nLayerIndex);
 
 		double getUnits();
+
+		std::string getDebugName ();
+		
+		std::string getMetaDataValue (const std::string & sNameSpace, const std::string & sName);
+		std::string getMetaDataType (const std::string& sNameSpace, const std::string& sName);
+		bool hasMetaData (const std::string& sNameSpace, const std::string& sName);
+
+		uint32_t getPartCount();
+		PToolpathPart getPart(uint32_t nIndex);
+		PToolpathPart findPartByUUID(const std::string & sUUID);
 
 	};
 

@@ -30,8 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_statemachineinstance.hpp"
+#include "amc_statemachinedata.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include "libmcenv_abi.hpp"
 #include "libmcplugin_exceptiontranslator.hpp"
@@ -43,15 +44,15 @@ typedef LibMCPlugin::ETranslator_StateFactory<ELibMCInterfaceException, LibMCRes
 
 namespace AMC {
 
-	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState)
-		: m_sName(sName), m_sDescription (sDescription), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState)
+	CStateMachineInstance::CStateMachineInstance(const std::string& sName, const std::string& sDescription, LibMCEnv::PLibMCEnvWrapper pEnvironmentWrapper, AMC::PSystemState pSystemState, AMC::PStateJournal pStateJournal)
+		: m_sName(sName), m_pEnvironmentWrapper(pEnvironmentWrapper), m_pSystemState(pSystemState), m_pStateJournal (pStateJournal)
 	{
-		if (pEnvironmentWrapper.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pSystemState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pEnvironmentWrapper.get());
+		LibMCAssertNotNull(pSystemState.get());
+		LibMCAssertNotNull(pStateJournal.get());
 
-		m_ParameterHandler = std::make_shared<CParameterHandler>();
+		m_ParameterHandler = std::make_shared<CParameterHandler>(sDescription);
+		m_pSystemState->stateMachineData()->registerParameterHandler (sName, m_ParameterHandler);
 
 	}
 
@@ -66,13 +67,13 @@ namespace AMC {
 	{
 		// Only accessible if thread is not running
 		if (threadIsRunning())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName);
 
 
 		if (findStateInternal(sStateName, false).get() != nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATESTATENAME);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATESTATENAME, m_sName + "/" + sStateName);
 		if (sStateName.length() == 0)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATENAME);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSTATENAME, m_sName);
 
 		auto pResult = std::make_shared<CStateMachineState>(m_sName, sStateName, nRepeatDelayInMS, m_pEnvironmentWrapper, m_pSystemState->getGlobalChronoInstance());
 
@@ -90,7 +91,7 @@ namespace AMC {
 		if (iter == m_States.end()) {
 
 			if (bFailIfNotExisting)
-				throw ELibMCInterfaceException(LIBMC_ERROR_STATENOTFOUND);
+				throw ELibMCCustomException(LIBMC_ERROR_STATENOTFOUND, m_sName + "/" + sStateName);
 
 			return nullptr;
 		}
@@ -102,7 +103,7 @@ namespace AMC {
 	{
 		// Only accessible if thread is not running
 		if (threadIsRunning ())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName + "/" + sStateName);
 
 		return findStateInternal(sStateName, bFailIfNotExisting);
 	}
@@ -111,11 +112,11 @@ namespace AMC {
 	{
 		// Only accessible if thread is not running
 		if (threadIsRunning())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName + "/" + sStateName);
 
 		auto iter = m_States.find(sStateName);
 		if (iter == m_States.end()) {
-			throw ELibMCInterfaceException(LIBMC_ERROR_INITSTATENOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_INITSTATENOTFOUND, m_sName + "/" + sStateName);
 		}
 
 		m_pInitState = iter->second;
@@ -126,11 +127,11 @@ namespace AMC {
 	{
 		// Only accessible if thread is not running
 		if (threadIsRunning())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName + "/" + sStateName);
 
 		auto iter = m_States.find(sStateName);
 		if (iter == m_States.end()) {
-			throw ELibMCInterfaceException(LIBMC_ERROR_FAILEDSTATENOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_FAILEDSTATENOTFOUND, m_sName + "/" + sStateName);
 		}
 
 		m_pFailedState = iter->second;
@@ -141,16 +142,12 @@ namespace AMC {
 	void CStateMachineInstance::setCurrentStateInternal(PStateMachineState pCurrentState)
 	{
 		m_pCurrentState = pCurrentState;
-
-		m_Mutex_CurrentStateName.lock();
-		if (pCurrentState.get()) {
-			m_sCurrentStateName = std::string(pCurrentState->getName().c_str());
+		if (pCurrentState.get() != nullptr) {
+			m_pSystemState->stateMachineData()->setInstanceStateName(m_sName, m_pCurrentState->getName());
 		}
 		else {
-			m_sCurrentStateName = "";
+			m_pSystemState->stateMachineData()->setInstanceStateName(m_sName, "");
 		}
-		m_Mutex_CurrentStateName.unlock();
-
 
 	}
 
@@ -167,13 +164,12 @@ namespace AMC {
 	{
 		// Only accessible if thread is not running
 		if (threadIsRunning())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName);
 
-		if (pStateFactory.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pStateFactory.get());
 
 		if (threadIsRunning ())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName);
 
 		m_pStateFactory = pStateFactory;
 
@@ -181,7 +177,8 @@ namespace AMC {
 		for (auto pStateIter : m_States) {
 
 			auto pState = pStateIter.second;
-			auto pPluginState = tryMCPlugin_StateFactory(pStateFactory, LIBMC_ERROR_COULDNOTCREATESTATE).CreateState(pState->getName());
+			std::string sStateName = pState->getName();
+			auto pPluginState = tryMCPlugin_StateFactory(pStateFactory, LIBMC_ERROR_COULDNOTCREATESTATE, sStateName).CreateState(sStateName);
 
 			pState->setPluginState(pPluginState);
 		}
@@ -192,9 +189,9 @@ namespace AMC {
 	void CStateMachineInstance::executeStep()
 	{
 		if (!hasCurrentStateInternal ())
-			throw ELibMCInterfaceException(LIBMC_ERROR_NOCURRENTSTATE);
+			throw ELibMCCustomException(LIBMC_ERROR_NOCURRENTSTATE, m_sName);
 		if (m_pFailedState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_NOFAILEDSTATE);
+			throw ELibMCCustomException(LIBMC_ERROR_NOFAILEDSTATE, m_sName);
 
 		try {
 
@@ -203,9 +200,9 @@ namespace AMC {
 			m_pCurrentState->execute(sNextState, m_pSystemState, m_ParameterHandler);
 
 			if (sNextState.empty())
-				throw ELibMCInterfaceException(LIBMC_ERROR_NOOUTSTATEGIVEN);
+				throw ELibMCCustomException(LIBMC_ERROR_NOOUTSTATEGIVEN, m_sName + "/" + sCurrentState);
 			if (!m_pCurrentState->hasOutState(sNextState) && (sNextState != m_pFailedState->getName()))
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDOUTSTATEGIVEN);
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDOUTSTATEGIVEN, m_sName + "/" + sCurrentState);
 
 			// Set new current state		
 			if (sCurrentState != sNextState)
@@ -240,12 +237,12 @@ namespace AMC {
 		m_pSystemState->logger()->logMessage("starting instance thread", m_sName, eLogLevel::Message);
 
 		if (m_pInitState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_NOINITSTATE);
+			throw ELibMCCustomException(LIBMC_ERROR_NOINITSTATE, m_sName);
 		if (m_pFailedState.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_NOFAILEDSTATE);
+			throw ELibMCCustomException(LIBMC_ERROR_NOFAILEDSTATE, m_sName);
 
 		if (threadIsRunning())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName);
 
 		// Initialise signals
 		setCurrentStateInternal(m_pInitState);
@@ -263,7 +260,7 @@ namespace AMC {
 		m_pSystemState->logger()->logMessage("terminating instance thread ", m_sName, eLogLevel::Message);
 
 		if (!threadIsRunning())
-			throw ELibMCInterfaceException(LIBMC_ERROR_THREADISNOTRUNNING);
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISNOTRUNNING, m_sName);
 
 		// Set termination flag
 		m_TerminateSignal.set_value();
@@ -298,21 +295,11 @@ namespace AMC {
 	}
 
 	std::string CStateMachineInstance::getDescription() const
-	{
-		// Return thread safe copy of instance description
-		return std::string(m_sDescription.c_str());
+	{		
+		return m_ParameterHandler->getDescription ();
 	}
 
 
-	std::string CStateMachineInstance::getCurrentStateName()
-	{
-		m_Mutex_CurrentStateName.lock();
-		//Thread safe copy of state name
-		std::string sCopiedString = std::string(m_sCurrentStateName.c_str());
-		m_Mutex_CurrentStateName.unlock();
-
-		return sCopiedString;
-	}
 
 	uint32_t CStateMachineInstance::getStateCount() const
 	{
@@ -323,7 +310,7 @@ namespace AMC {
 	std::string CStateMachineInstance::getNameOfState(uint32_t nStateIndex) const
 	{
 		if (nStateIndex >= m_StateList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 		auto pState = m_StateList[nStateIndex];
 		return pState->getName();
 	}
@@ -331,7 +318,7 @@ namespace AMC {
 	uint32_t CStateMachineInstance::getOutstateCountOfState(uint32_t nStateIndex) const
 	{
 		if (nStateIndex >= m_StateList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 		auto pState = m_StateList[nStateIndex];
 		return pState->getOutstateCount();
 	}
@@ -339,7 +326,7 @@ namespace AMC {
 	std::string CStateMachineInstance::getOutstateNameOfState(uint32_t nStateIndex, uint32_t nOutstateIndex) const
 	{
 		if (nStateIndex >= m_StateList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 		auto pState = m_StateList[nStateIndex];
 		return pState->getOutstateName(nOutstateIndex);
 

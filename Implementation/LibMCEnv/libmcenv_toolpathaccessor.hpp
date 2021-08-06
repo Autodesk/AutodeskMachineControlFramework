@@ -60,6 +60,7 @@ protected:
 
 	std::string m_sStorageUUID;
 	AMC::PToolpathHandler m_pToolpathHandler;
+	double m_dDefaultJumpSpeed;
 
 
 public:
@@ -73,6 +74,18 @@ public:
 	IToolpathLayer * LoadLayer(const LibMCEnv_uint32 nLayerIndex) override;
 
 	LibMCEnv_double GetUnits() override;
+
+	bool HasMetaData(const std::string& sNameSpace, const std::string& sName) override;
+
+	std::string GetMetaDataValue(const std::string& sNameSpace, const std::string& sName) override;
+
+	std::string GetMetaDataType(const std::string& sNameSpace, const std::string& sName) override;
+
+	LibMCEnv_uint32 GetPartCount() override;
+
+	IToolpathPart* GetPart(const LibMCEnv_uint32 nPartIndex) override;
+
+	IToolpathPart* FindPartByUUID(const std::string& sPartUUID) override;
 
 };
 

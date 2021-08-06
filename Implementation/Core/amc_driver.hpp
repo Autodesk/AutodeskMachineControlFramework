@@ -40,8 +40,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #error Never include amc_driver.hpp from outside of amc_driver.cpp and amc_driverhandler.cpp
 #endif
 
-
+#include "amc_parametergroup.hpp"
 #include "libmcdriver_dynamic.hpp" 
+#include "amc_resourcepackage.hpp"
+
+#include "Common/common_importstream_native.hpp"
+
+
+namespace LibMCEnv {
+	namespace Impl {
+		class CDriverEnvironment;
+		typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
+	}
+}
 
 namespace AMC {
 
@@ -52,19 +63,28 @@ namespace AMC {
 	protected:
 		std::string m_sName;
 		std::string m_sType;
-		std::string m_sLibrary;	
+		std::string m_sLibraryPath;	
 
 		// If not empty, a state instance has reserved the use of this driver
 		std::string m_sReservationInstance;
 
 		LibMCDriver::PWrapper m_pDriverWrapper;
 		LibMCDriver::PDriver m_pDriverInstance;
+
+		LibMCEnv::PWrapper m_pMCEnvWrapper;
+		LibMCEnv::Impl::PDriverEnvironment m_pDriverEnvironment;
+
+		PResourcePackage m_pDriverResourcePackage;
+
+		PParameterGroup m_pParameterGroup;
 		
 	public:
 
-		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibrary, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibraryPath, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment);
 
 		virtual ~CDriver();
+
+		void configureDriver(const std::string & sConfigurationData);
 
 		std::string getName();
 		std::string getType();
@@ -73,6 +93,8 @@ namespace AMC {
 
 		HDriverHandle acquireDriverHandle(const std::string & sInstanceName);
 		void releaseDriverHandle(const std::string& sInstanceName);
+
+		PParameterGroup getParameterGroup();
 				
 	};
 	

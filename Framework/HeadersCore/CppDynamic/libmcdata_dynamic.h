@@ -250,11 +250,10 @@ typedef LibMCDataResult (*PLibMCDataStorage_StoreNewStreamPtr) (LibMCData_Storag
 * @param[in] pName - Name of the stream.
 * @param[in] pMimeType - Mime type of the content. MUST NOT be empty.
 * @param[in] nSize - Final size of the stream. MUST NOT be 0.
-* @param[in] pSHA2 - SHA256 of the uploaded data.
 * @param[in] pUserID - Currently authenticated user
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataStorage_BeginPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pSHA2, const char * pUserID);
+typedef LibMCDataResult (*PLibMCDataStorage_BeginPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pContextUUID, const char * pName, const char * pMimeType, LibMCData_uint64 nSize, const char * pUserID);
 
 /**
 * stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -273,9 +272,20 @@ typedef LibMCDataResult (*PLibMCDataStorage_StorePartialStreamPtr) (LibMCData_St
 *
 * @param[in] pStorage - Storage instance.
 * @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @param[in] pSHA2 - SHA256 of the uploaded data. If given initially, MUST be identical.
 * @return error code or 0 (success)
 */
-typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID);
+typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2);
+
+/**
+* Finishes storing a stream with a 64k-Blockwise calculated Checksum.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @param[in] pBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr) (LibMCData_Storage pStorage, const char * pUUID, const char * pBlockwiseSHA2);
 
 /**
 * Returns the maximum stream size that the data model allows.
@@ -311,7 +321,29 @@ typedef LibMCDataResult (*PLibMCDataStorage_StreamIsImagePtr) (LibMCData_Storage
 **************************************************************************************************************************/
 
 /**
-* returns the name of a build job.
+* returns the uuid of a build job data.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobData_GetDataUUIDPtr) (LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the uuid of the parent build job.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of UUID String, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobData_GetJobUUIDPtr) (LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nUUIDBufferSize, LibMCData_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* returns the name of a build job uuid.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
 * @param[in] nNameBufferSize - size of the buffer (including trailing 0)
@@ -342,6 +374,26 @@ typedef LibMCDataResult (*PLibMCDataBuildJobData_GetTimeStampPtr) (LibMCData_Bui
 typedef LibMCDataResult (*PLibMCDataBuildJobData_GetStorageStreamPtr) (LibMCData_BuildJobData pBuildJobData, LibMCData_StorageStream * pStreamInstance);
 
 /**
+* returns the checksum of the storage stream of the build.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of SHA256 of the storage stream., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobData_GetStorageStreamSHA2Ptr) (LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nSHA2BufferSize, LibMCData_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* returns the size of the storage stream of the build.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[out] pSize - size of the storage stream in bytes.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobData_GetStorageStreamSizePtr) (LibMCData_BuildJobData pBuildJobData, LibMCData_uint64 * pSize);
+
+/**
 * returns the data type of the job data.
 *
 * @param[in] pBuildJobData - BuildJobData instance.
@@ -349,6 +401,17 @@ typedef LibMCDataResult (*PLibMCDataBuildJobData_GetStorageStreamPtr) (LibMCData
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataBuildJobData_GetDataTypePtr) (LibMCData_BuildJobData pBuildJobData, LibMCData::eBuildJobDataType * pDataType);
+
+/**
+* returns the data type of the job data as string.
+*
+* @param[in] pBuildJobData - BuildJobData instance.
+* @param[in] nDataTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDataTypeBuffer -  buffer of Data type of the job data, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobData_GetDataTypeAsStringPtr) (LibMCData_BuildJobData pBuildJobData, const LibMCData_uint32 nDataTypeBufferSize, LibMCData_uint32* pDataTypeNeededChars, char * pDataTypeBuffer);
 
 /**
 * returns the mime type of a storage stream.
@@ -539,6 +602,16 @@ typedef LibMCDataResult (*PLibMCDataBuildJob_ListJobDataByTypePtr) (LibMCData_Bu
 */
 typedef LibMCDataResult (*PLibMCDataBuildJob_ListJobDataPtr) (LibMCData_BuildJob pBuildJob, LibMCData_BuildJobDataIterator * pIteratorInstance);
 
+/**
+* Retrieves a build job data instance by its uuid.
+*
+* @param[in] pBuildJob - BuildJob instance.
+* @param[in] pDataUUID - Job Data UUID.
+* @param[out] pBuildJobData - Build Job Data Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJob_RetrieveJobDataPtr) (LibMCData_BuildJob pBuildJob, const char * pDataUUID, LibMCData_BuildJobData * pBuildJobData);
+
 /*************************************************************************************************************************
  Class definition for BuildJobIterator
 **************************************************************************************************************************/
@@ -578,6 +651,16 @@ typedef LibMCDataResult (*PLibMCDataBuildJobHandler_CreateJobPtr) (LibMCData_Bui
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataBuildJobHandler_RetrieveJobPtr) (LibMCData_BuildJobHandler pBuildJobHandler, const char * pJobUUID, LibMCData_BuildJob * pJobInstance);
+
+/**
+* Finds the parent build job of a given data uuid. Fails if data does not exist.
+*
+* @param[in] pBuildJobHandler - BuildJobHandler instance.
+* @param[in] pDataUUID - Job Data UUID.
+* @param[out] pBuildJobData - Build Job Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataBuildJobHandler_FindJobOfDataPtr) (LibMCData_BuildJobHandler pBuildJobHandler, const char * pDataUUID, LibMCData_BuildJob * pBuildJobData);
 
 /**
 * Retrieves a list of build jobs, filtered by status.
@@ -798,13 +881,19 @@ typedef struct {
 	PLibMCDataStorage_BeginPartialStreamPtr m_Storage_BeginPartialStream;
 	PLibMCDataStorage_StorePartialStreamPtr m_Storage_StorePartialStream;
 	PLibMCDataStorage_FinishPartialStreamPtr m_Storage_FinishPartialStream;
+	PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr m_Storage_FinishPartialStreamBlockwiseSHA256;
 	PLibMCDataStorage_GetMaxStreamSizePtr m_Storage_GetMaxStreamSize;
 	PLibMCDataStorage_ContentTypeIsAcceptedPtr m_Storage_ContentTypeIsAccepted;
 	PLibMCDataStorage_StreamIsImagePtr m_Storage_StreamIsImage;
+	PLibMCDataBuildJobData_GetDataUUIDPtr m_BuildJobData_GetDataUUID;
+	PLibMCDataBuildJobData_GetJobUUIDPtr m_BuildJobData_GetJobUUID;
 	PLibMCDataBuildJobData_GetNamePtr m_BuildJobData_GetName;
 	PLibMCDataBuildJobData_GetTimeStampPtr m_BuildJobData_GetTimeStamp;
 	PLibMCDataBuildJobData_GetStorageStreamPtr m_BuildJobData_GetStorageStream;
+	PLibMCDataBuildJobData_GetStorageStreamSHA2Ptr m_BuildJobData_GetStorageStreamSHA2;
+	PLibMCDataBuildJobData_GetStorageStreamSizePtr m_BuildJobData_GetStorageStreamSize;
 	PLibMCDataBuildJobData_GetDataTypePtr m_BuildJobData_GetDataType;
+	PLibMCDataBuildJobData_GetDataTypeAsStringPtr m_BuildJobData_GetDataTypeAsString;
 	PLibMCDataBuildJobData_GetMIMETypePtr m_BuildJobData_GetMIMEType;
 	PLibMCDataBuildJobDataIterator_GetCurrentJobDataPtr m_BuildJobDataIterator_GetCurrentJobData;
 	PLibMCDataBuildJob_GetUUIDPtr m_BuildJob_GetUUID;
@@ -824,9 +913,11 @@ typedef struct {
 	PLibMCDataBuildJob_AddJobDataPtr m_BuildJob_AddJobData;
 	PLibMCDataBuildJob_ListJobDataByTypePtr m_BuildJob_ListJobDataByType;
 	PLibMCDataBuildJob_ListJobDataPtr m_BuildJob_ListJobData;
+	PLibMCDataBuildJob_RetrieveJobDataPtr m_BuildJob_RetrieveJobData;
 	PLibMCDataBuildJobIterator_GetCurrentJobPtr m_BuildJobIterator_GetCurrentJob;
 	PLibMCDataBuildJobHandler_CreateJobPtr m_BuildJobHandler_CreateJob;
 	PLibMCDataBuildJobHandler_RetrieveJobPtr m_BuildJobHandler_RetrieveJob;
+	PLibMCDataBuildJobHandler_FindJobOfDataPtr m_BuildJobHandler_FindJobOfData;
 	PLibMCDataBuildJobHandler_ListJobsByStatusPtr m_BuildJobHandler_ListJobsByStatus;
 	PLibMCDataBuildJobHandler_ConvertBuildStatusToStringPtr m_BuildJobHandler_ConvertBuildStatusToString;
 	PLibMCDataBuildJobHandler_ConvertStringToBuildStatusPtr m_BuildJobHandler_ConvertStringToBuildStatus;

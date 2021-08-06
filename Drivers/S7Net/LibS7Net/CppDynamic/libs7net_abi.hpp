@@ -214,12 +214,21 @@ LIBS7NET_DECLSPEC LibS7NetResult libs7net_acquireinstance(LibS7Net_Base pInstanc
 LIBS7NET_DECLSPEC LibS7NetResult libs7net_releaseinstance(LibS7Net_Base pInstance);
 
 /**
-* Returns a PLC instance
+* Returns the address of the SymbolLookupMethod
 *
-* @param[out] pValue - PLC Instance
+* @param[out] pSymbolLookupMethod - Address of the SymbolAddressMethod
 * @return error code or 0 (success)
 */
-LIBS7NET_DECLSPEC LibS7NetResult libs7net_createplc(LibS7Net_PLC * pValue);
+LIBS7NET_DECLSPEC LibS7NetResult libs7net_getsymbollookupmethod(LibS7Net_pvoid * pSymbolLookupMethod);
+
+/**
+* Returns a PLC instance
+*
+* @param[in] pCOMHost - Path to COM Host
+* @param[out] pPLCInstance - PLC Instance
+* @return error code or 0 (success)
+*/
+LIBS7NET_DECLSPEC LibS7NetResult libs7net_createplc(const char * pCOMHost, LibS7Net_PLC * pPLCInstance);
 
 #ifdef __cplusplus
 }

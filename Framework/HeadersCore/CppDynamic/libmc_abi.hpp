@@ -154,9 +154,19 @@ LIBMC_DECLSPEC LibMCResult libmc_apirequesthandler_getresultdata(LibMC_APIReques
 * @param[in] pMCContext - MCContext instance.
 * @param[in] pLibraryName - Library Name.
 * @param[in] pLibraryPath - Path to the shared library.
+* @param[in] pLibraryResource - Path to the library resource file.
 * @return error code or 0 (success)
 */
-LIBMC_DECLSPEC LibMCResult libmc_mccontext_registerlibrarypath(LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath);
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_registerlibrarypath(LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResource);
+
+/**
+* sets the base path for temporary files.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pTempBasePath - Base path for temporary files.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_settempbasepath(LibMC_MCContext pMCContext, const char * pTempBasePath);
 
 /**
 * parses and initialises the state machines from a configuration XML.
@@ -187,11 +197,10 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_terminateallthreads(LibMC_MCContext p
 * load a client package to serve the client website.
 *
 * @param[in] pMCContext - MCContext instance.
-* @param[in] nZIPStreamBufferSize - Number of elements in buffer
-* @param[in] pZIPStreamBuffer - uint8 buffer of client package ZIP stream.
+* @param[in] pResourcePath - Path to the resource package.
 * @return error code or 0 (success)
 */
-LIBMC_DECLSPEC LibMCResult libmc_mccontext_loadclientpackage(LibMC_MCContext pMCContext, LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8 * pZIPStreamBuffer);
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_loadclientpackage(LibMC_MCContext pMCContext, const char * pResourcePath);
 
 /**
 * log message with a certain log level.

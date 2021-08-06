@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCData {
 
 
-	CStorageWriter::CStorageWriter(const std::string& sUUID, const std::string& sPath, uint64_t nSize, const std::string& sNeededSHA256)	
-		: m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sPath (sPath), m_sNeededSHA256 (sNeededSHA256)
+	CStorageWriter::CStorageWriter(const std::string& sUUID, const std::string& sPath, uint64_t nSize)	
+		: m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sPath (sPath)
 	{
 		m_pExportStream = std::make_shared<AMCCommon::CExportStream_Native>(sPath);
 	}
@@ -74,7 +74,7 @@ namespace AMCData {
 
 	}
 
-	void CStorageWriter::finalize()
+	void CStorageWriter::finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string & sCalculatedSHA256, std::string & sCalculatedBlockSHA256)
 	{
 		if (m_pExportStream.get() == nullptr) 
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
@@ -89,17 +89,27 @@ namespace AMCData {
 			// Free ExportStream and close file
 			m_pExportStream = nullptr;
 
-			auto sSHA256 = AMCCommon::CUtils::calculateSHA256FromFile(m_sPath);
-			if (sSHA256 != m_sNeededSHA256)
-				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH);
+			sCalculatedSHA256 = AMCCommon::CUtils::calculateSHA256FromFile(m_sPath);
+			sCalculatedBlockSHA256 = AMCCommon::CUtils::calculateBlockwiseSHA256FromFile(m_sPath, 65536);
+
+			if (!sNeededSHA256.empty()) {
+				auto sNeededSHA256Normalized = AMCCommon::CUtils::normalizeSHA256String(sNeededSHA256);
+				if (sCalculatedSHA256 != sNeededSHA256Normalized)
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH);
+			}
+
+			if (!sNeededBlockSHA256.empty()) {
+				auto sNeededBlockSHA256Normalized = AMCCommon::CUtils::normalizeSHA256String(sNeededBlockSHA256);
+				if (sCalculatedBlockSHA256 != sNeededBlockSHA256Normalized)
+					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH);
+			}
+
 		}
-		catch (ELibMCDataInterfaceException & EDataException) {
+		catch (...) {
+			m_pExportStream = nullptr;
+
 			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
-			throw EDataException;
-		}
-		catch (std::exception& StdException) {
-			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
-			throw StdException;
+			throw;
 		}
 	}
 

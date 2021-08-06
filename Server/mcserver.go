@@ -50,6 +50,7 @@ import (
 // Global Handles
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 var GlobalContext libmc.MCContext;
+var DevMode bool;
 
 const XMLNS_SERVERCONFIG = "http://schemas.autodesk.com/amc/2020/06"
 const XMLNS_PACKAGECONFIG = "http://schemas.autodesk.com/amcpackage/2020/06"
@@ -58,6 +59,7 @@ type ServerPackageXMLLibrary struct {
 	XMLName xml.Name `xml:"library"`	
 	Name string `xml:"name,attr"`
 	Import string `xml:"import,attr"`
+	Resources string `xml:"resources,attr"`
 }
 
 
@@ -108,6 +110,11 @@ type ServerConfigXMLRoot struct {
 	DefaultPackage ServerConfigXMLDefaultPackage `xml:"defaultpackage"`
 }
 
+type ServerConfigPackageLibraryInfo struct {
+	Path string
+	ResourcePath string
+}
+
 
 type ServerConfig struct {
 	HostName string
@@ -118,7 +125,7 @@ type ServerConfig struct {
 	PackageName string
 	PackageCoreClient string
 	PackageConfig string
-	PackageLibraries  map[string]string
+	PackageLibraries  map[string]ServerConfigPackageLibraryInfo
 	
 }
 
@@ -300,7 +307,7 @@ func LoadServerConfigXML (FileName string) (ServerConfig, error) {
 	}
 	
 	
-	config.PackageLibraries = make(map[string]string);
+	config.PackageLibraries = make(map[string]ServerConfigPackageLibraryInfo);
 	for _, library := range packageToUse.Libraries {
 		if (len (library.Name) == 0) {
 			err = errors.New ("Empty library name!");
@@ -316,6 +323,17 @@ func LoadServerConfigXML (FileName string) (ServerConfig, error) {
 		if (err != nil) {
 			return config, err
 		}	
+				
+		importResourcePath := "";
+		if (len (library.Resources) != 0) {
+			importResourcePath, err = filepath.Abs (library.Resources);
+			if (err != nil) {
+				return config, err
+			}	
+			
+		
+		}
+		
 		
 		/* for development, we are in lazy mode and do not care if the dlls exist.
 				
@@ -325,17 +343,21 @@ func LoadServerConfigXML (FileName string) (ServerConfig, error) {
 			return config, err
 		}		 */
 		
-		config.PackageLibraries [library.Name] = importPath;
+		var libraryInfo ServerConfigPackageLibraryInfo;
+		libraryInfo.Path = importPath;
+		libraryInfo.ResourcePath = importResourcePath;
+		
+		config.PackageLibraries [library.Name] = libraryInfo;
 		
 	}
 	
 	
-	if (len (config.PackageLibraries ["core"]) == 0) {
+	if (len (config.PackageLibraries ["core"].Path) == 0) {
 		err = errors.New ("Package core library not given!");
 		return config, err
 	}	
 
-	if (len (config.PackageLibraries ["datamodel"]) == 0) {
+	if (len (config.PackageLibraries ["datamodel"].Path) == 0) {
 		err = errors.New ("Package datamodel library not given!");
 		return config, err
 	}	
@@ -357,8 +379,11 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 	var dataBytes []byte;
 	bodyBytes := make ([]byte, 1);
 	
-	w.Header().Set("Access-Control-Allow-Headers", "*");	
-	w.Header().Set("Access-Control-Allow-Origin", "*");	
+	if (DevMode) {
+		w.Header().Set("Access-Control-Allow-Headers", "*");	
+		w.Header().Set("Access-Control-Allow-Origin", "*");	
+	}
+	
 	w.Header().Set("Cache-Control", "no-cache");
 	
 	if (r.Method == "OPTIONS") { // CORS handler	
@@ -392,24 +417,18 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 				
 					fieldName, isFile, isMandatory, err := requestHandler.GetFormDataDetails (fieldIndex);
 					if (err == nil) {
-		
-						fmt.Println ("field name: ", fieldName);
-		
-		
+				
 						if (isFile) {
 		
 							formFile, _, err := r.FormFile(fieldName);
-							fmt.Println ("err: ", err);
-							
+						
 							if (err == nil) {
 
 							
 								defer formFile.Close ();
 					
 								byteArray, err := ioutil.ReadAll(formFile);
-								if (err == nil) {
-									fmt.Println ("bytearray len: ", len (byteArray));
-									
+								if (err == nil) {									
 									err = requestHandler.SetFormDataField (fieldName, byteArray);							
 								}													
 								
@@ -426,7 +445,6 @@ func RESTHandler (w http.ResponseWriter, r *http.Request) {
 						
 								formValue := r.FormValue (fieldName);
 								if (formValue != "") {																
-									fmt.Println ("formvalue: " + formValue);														
 									err = requestHandler.SetFormStringField (fieldName, formValue);							
 								}
 								
@@ -503,6 +521,25 @@ func main() {
 
 	var err error;
 	
+	// Check command line parameters
+	DevMode = false;
+	argsWithProg := os.Args;
+	if (len (argsWithProg) >= 2) {
+		argsWithoutProg := argsWithProg[1:];
+		
+		for _, arg := range argsWithoutProg {
+			if arg == "--develop" {
+				DevMode = true;
+			}
+		}	
+	
+	}
+	
+	if (DevMode) {
+		fmt.Println("Starting in Development mode!");
+	}
+	
+	
 	serverConfigFileName, err := filepath.Abs ("amc_server.xml");
 	if (err != nil) {
 		log.Fatal(err)
@@ -517,8 +554,8 @@ func main() {
 	//
 	// Creating data model
 	//
-	fmt.Println("Executing " + serverConfig.PackageLibraries["datamodel"]);
-	datawrapper, err := libmcdata.LoadLibrary (serverConfig.PackageLibraries["datamodel"]);
+	fmt.Println("Executing " + serverConfig.PackageLibraries["datamodel"].Path);
+	datawrapper, err := libmcdata.LoadLibrary (serverConfig.PackageLibraries["datamodel"].Path);
 	if (err != nil) {
 		log.Fatal(err)
 	}
@@ -548,8 +585,8 @@ func main() {
 	//
 	// Creating Context
 	//
-	fmt.Println("Executing " + serverConfig.PackageLibraries["core"]);
-	wrapper, err := libmc.LoadLibrary(serverConfig.PackageLibraries["core"]);
+	fmt.Println("Executing " + serverConfig.PackageLibraries["core"].Path);
+	wrapper, err := libmc.LoadLibrary(serverConfig.PackageLibraries["core"].Path);
 	if (err != nil) {
 		log.Fatal(err)
 	}
@@ -572,8 +609,8 @@ func main() {
 		log.Fatal(err)
 	}
 		
-	for libraryName, libraryPath := range serverConfig.PackageLibraries {
-		context.RegisterLibraryPath (libraryName, libraryPath);
+	for libraryName, libraryInfo := range serverConfig.PackageLibraries {
+		context.RegisterLibraryPath (libraryName, libraryInfo.Path, libraryInfo.ResourcePath);
 	}	
 	
 				
@@ -590,21 +627,8 @@ func main() {
     }	
 
 	context.Log ("Loading " + serverConfig.PackageCoreClient + "..", libmc.LogSubSystem_System, libmc.LogLevel_Message);
-	
-	clientPackage, err := os.Open(serverConfig.PackageCoreClient);
-	if (err != nil) {
-        log.Fatal(err)
-	}
-	
-	defer clientPackage.Close();
-
-	clientPackageBytes, err := ioutil.ReadAll (clientPackage);
-	if (err != nil) {
-        log.Fatal(err)
-	}
-
-	
-	err = context.LoadClientPackage (clientPackageBytes);
+			
+	err = context.LoadClientPackage (serverConfig.PackageCoreClient);
     if err != nil {
         log.Fatal(err)
     }	

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_sessionhandler.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "amc_logger.hpp"
 
 
 #include "common_utils.hpp"
@@ -120,6 +121,8 @@ eAPIRequestType CAPI::getRequestTypeFromString(const std::string& sRequestType)
 		return AMC::eAPIRequestType::rtGet;
 	if (sLowerCaseType == "post")
 		return AMC::eAPIRequestType::rtPost;
+	if (sLowerCaseType == "put")
+		return AMC::eAPIRequestType::rtPut;
 
 	throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAPIREQUESTTYPE);
 }
@@ -143,7 +146,7 @@ void CAPI::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType
 
 
 
-PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth)
+PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t* pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth, CLogger* pLogger)
 {
 	auto pHandler = getURIMatch(sURI);
 	if (pHandler.get() == nullptr)
@@ -167,9 +170,13 @@ PAPIResponse CAPI::handleRequest(const std::string& sURI, const eAPIRequestType 
 		return pResponse;		
 	}
 	catch (ELibMCInterfaceException& IntfException) {
+		if (pLogger != nullptr)
+			pLogger->logMessage(IntfException.what(), "api", eLogLevel::Message);
 		return makeError(AMC_API_HTTP_BADREQUEST, IntfException.getErrorCode(), IntfException.what());
 	}
 	catch (std::exception& StdException) {
+		if (pLogger != nullptr)
+			pLogger->logMessage(StdException.what(), "api", eLogLevel::Message);
 		return makeError(AMC_API_HTTP_BADREQUEST, LIBMC_ERROR_GENERICBADREQUEST, StdException.what());
 	}
 }

@@ -30,15 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_parameterhandler.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #define AMC_MAXPARAMETERGROUPCOUNT (1024 * 1024)
 
 namespace AMC {
 
-	CParameterHandler::CParameterHandler()
+	CParameterHandler::CParameterHandler(std::string sDescription)
+		: m_sDescription (sDescription)
 	{
-		m_DataStore = std::make_shared <CParameterGroup>();
 	}
 
 	CParameterHandler::~CParameterHandler()
@@ -57,16 +57,14 @@ namespace AMC {
 	void CParameterHandler::addGroup(PParameterGroup pGroup)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
-
-		if (pGroup.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pGroup.get());
 
 		auto sName = pGroup->getName();
 		if (m_Groups.find(sName) != m_Groups.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME, m_sDescription + "/" + sName);
 
 		if (m_GroupList.size() >= AMC_MAXPARAMETERGROUPCOUNT)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS, m_sDescription + "/" + sName);
 
 		m_Groups.insert(std::make_pair(sName, pGroup));
 		m_GroupList.push_back(pGroup);
@@ -88,37 +86,57 @@ namespace AMC {
 
 	}
 
-	CParameterGroup* CParameterHandler::getGroup(const uint32_t nIndex)
+	PParameterGroup CParameterHandler::getGroup(const uint32_t nIndex)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		if (nIndex >= m_GroupList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDescription);
 
-		return m_GroupList[nIndex].get();
+		return m_GroupList[nIndex];
 	}
 
-	CParameterGroup* CParameterHandler::findGroup(const std::string& sName, const bool bFailIfNotExisting)
+	PParameterGroup CParameterHandler::findGroup(const std::string& sName, const bool bFailIfNotExisting)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		auto iter = m_Groups.find(sName);
 		if (iter != m_Groups.end())
-			return iter->second.get();
+			return iter->second;
 
 		if (bFailIfNotExisting)
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERGROUPNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERGROUPNOTFOUND, sName);
 
 		return nullptr;	
 	}
 
 
-	CParameterGroup* CParameterHandler::getDataStore()
+
+	std::string CParameterHandler::getDescription()
 	{
-		return m_DataStore.get();
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		// Return thread safe copy of instance description
+		return std::string(m_sDescription.c_str());
+	}
+
+	void CParameterHandler::setDescription(const std::string& sDescription)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		m_sDescription = sDescription.c_str();
+
 	}
 
 
+	PParameterHandler CParameterHandler::duplicate()
+	{
+		auto pResult = std::make_shared<CParameterHandler>(m_sDescription);
+		for (auto pGroup : m_GroupList) {
+			auto pNewGroup = pResult->addGroup(pGroup->getName(), pGroup->getDescription());
+			pNewGroup->addDuplicatesFromGroup(pGroup.get());
+		}		
+
+		return pResult;
+	}
 
 
 }

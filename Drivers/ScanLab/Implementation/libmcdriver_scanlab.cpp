@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_interfaces.hpp"
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
-#include "libmcdriver_scanlab_driver_scanlab_rtc5.hpp"
+#include "libmcdriver_scanlab_driver_scanlab_rtc6.hpp"
 
 using namespace LibMCDriver_ScanLab;
 using namespace LibMCDriver_ScanLab::Impl;
 
 // Injected Components
-LibMCDriverEnv::PWrapper CWrapper::sPLibMCDriverEnvWrapper;
+LibMCEnv::PWrapper CWrapper::sPLibMCEnvWrapper;
 
 void CWrapper::GetVersion(LibMCDriver_ScanLab_uint32 & nMajor, LibMCDriver_ScanLab_uint32 & nMinor, LibMCDriver_ScanLab_uint32 & nMicro)
 {
@@ -66,10 +66,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 	IBase::AcquireBaseClassInterface(pInstance);
 }
 
-IDriver* CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
+IDriver* CWrapper::CreateDriver(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (sType == "scanlab-rtc5")
-		return new CDriver_ScanLab_RTC5(sName, sType);
+	if (sType == "scanlab-rtc6")
+		return new CDriver_ScanLab_RTC6(sName, sType, pDriverEnvironment);
 
 	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DRIVERERROR);
 }

@@ -47,7 +47,7 @@ Interface version: 1.0.0
 #include "libmcdriver_s7net_types.hpp"
 
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 namespace LibMCDriver_S7Net {
 namespace Impl {
@@ -57,6 +57,7 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IPLCCommand;
 class IDriver_S7Net;
 
 
@@ -266,6 +267,12 @@ typedef IBaseSharedPtr<IBase> PIBase;
 class IDriver : public virtual IBase {
 public:
 	/**
+	* IDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	virtual void Configure(const std::string & sConfigurationString) = 0;
+
+	/**
 	* IDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/
@@ -293,9 +300,53 @@ public:
 	*/
 	virtual void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) = 0;
 
+	/**
+	* IDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	virtual void QueryParameters() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver> PIDriver;
+
+
+/*************************************************************************************************************************
+ Class interface for PLCCommand 
+**************************************************************************************************************************/
+
+class IPLCCommand : public virtual IBase {
+public:
+	/**
+	* IPLCCommand::SetIntegerParameter - Sets an integer parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] nValue - Parameter Value
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCDriver_S7Net_int32 nValue) = 0;
+
+	/**
+	* IPLCCommand::SetStringParameter - Sets a string parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] sValue - Parameter Value
+	*/
+	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IPLCCommand::SetBoolParameter - Sets a bool parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] bValue - Parameter Value
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IPLCCommand::SetDoubleParameter - Sets a double parameter of the command
+	* @param[in] sParameterName - Parameter Value
+	* @param[in] dValue - Parameter Value
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCDriver_S7Net_double dValue) = 0;
+
+};
+
+typedef IBaseSharedPtr<IPLCCommand> PIPLCCommand;
 
 
 /*************************************************************************************************************************
@@ -306,13 +357,39 @@ class IDriver_S7Net : public virtual IDriver {
 public:
 	/**
 	* IDriver_S7Net::Connect - Creates and initializes a new S7 PLC.
+	* @param[in] eCPUType - S7 CPU Type
+	* @param[in] sIPAddress - PLC IP Address
+	* @param[in] nRack - Rack Number
+	* @param[in] nSlot - Slot Number
 	*/
-	virtual void Connect() = 0;
+	virtual void Connect(const LibMCDriver_S7Net::eS7CPUType eCPUType, const std::string & sIPAddress, const LibMCDriver_S7Net_uint32 nRack, const LibMCDriver_S7Net_uint32 nSlot) = 0;
 
 	/**
 	* IDriver_S7Net::Disconnect - Disconnects from the S7 PLC.
 	*/
 	virtual void Disconnect() = 0;
+
+	/**
+	* IDriver_S7Net::CreateCommand - Create Command
+	* @param[in] sCommand - Command to execute
+	* @return Command instance
+	*/
+	virtual IPLCCommand * CreateCommand(const std::string & sCommand) = 0;
+
+	/**
+	* IDriver_S7Net::ExecuteCommand - Execute Command
+	* @param[in] pPLCCommand - Command instance
+	*/
+	virtual void ExecuteCommand(IPLCCommand* pPLCCommand) = 0;
+
+	/**
+	* IDriver_S7Net::WaitForCommand - Wait for Command to finish executing
+	* @param[in] pPLCCommand - Command instance
+	* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+	* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+	* @return Returns true if the command was finished successfully.
+	*/
+	virtual bool WaitForCommand(IPLCCommand* pPLCCommand, const LibMCDriver_S7Net_uint32 nReactionTimeInMS, const LibMCDriver_S7Net_uint32 nWaitForTimeInMS) = 0;
 
 };
 
@@ -325,7 +402,7 @@ typedef IBaseSharedPtr<IDriver_S7Net> PIDriver_S7Net;
 class CWrapper {
 public:
 	// Injected Components
-	static LibMCDriverEnv::PWrapper sPLibMCDriverEnvWrapper;
+	static LibMCEnv::PWrapper sPLibMCEnvWrapper;
 
 	/**
 	* Ilibmcdriver_s7net::GetVersion - retrieves the binary version of this library.
@@ -362,7 +439,7 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment);
+	static IDriver * CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 };
 

@@ -365,9 +365,10 @@ public:
 
 	/**
 	* Ilibs7net::CreatePLC - Returns a PLC instance
+	* @param[in] sCOMHost - Path to COM Host
 	* @return PLC Instance
 	*/
-	static IPLC * CreatePLC();
+	static IPLC * CreatePLC(const std::string & sCOMHost);
 
 };
 

@@ -51,7 +51,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_marlin_types.hpp"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +64,15 @@ extern "C" {
 /*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
+
+/**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_configure(LibMCDriver_Marlin_Driver pDriver, const char * pConfigurationString);
 
 /**
 * returns the name identifier of the driver
@@ -115,6 +124,14 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_g
 */
 LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_getheaderinformation(LibMCDriver_Marlin_Driver pDriver, const LibMCDriver_Marlin_uint32 nNameSpaceBufferSize, LibMCDriver_Marlin_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_Marlin_uint32 nBaseNameBufferSize, LibMCDriver_Marlin_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_Marlin_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for Driver_Marlin
 **************************************************************************************************************************/
@@ -125,11 +142,11 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_g
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] pCOMPort - Device Port to connect to
 * @param[in] nBaudrate - Baudrate to use
-* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+* @param[in] nStatusUpdateInterval - Timer interval [ms] for updating status
 * @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_uint32 nStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
 
 /**
 * Disconnects from the Marlin board.
@@ -496,7 +513,7 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_getsymbo
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance);
 
 #ifdef __cplusplus
 }

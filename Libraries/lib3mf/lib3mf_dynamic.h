@@ -594,6 +594,17 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataCountPtr) (Lib3MF_MetaDat
 typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 nIndex, Lib3MF_MetaData * pMetaData);
 
 /**
+* returns if a metadata value exists within this metadatagroup
+*
+* @param[in] pMetaDataGroup - MetaDataGroup instance.
+* @param[in] pNameSpace - the namespace of the metadata
+* @param[in] pName - the name of the Metadata
+* @param[out] pMetaDataExists - returns true if metadata exists
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFMetaDataGroup_HasMetaDataPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, const char * pNameSpace, const char * pName, bool * pMetaDataExists);
+
+/**
 * returns a metadata value within this metadatagroup
 *
 * @param[in] pMetaDataGroup - MetaDataGroup instance.
@@ -2206,40 +2217,38 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_GetUUIDPtr) (Lib3MF_ToolpathProfil
 typedef Lib3MFResult (*PLib3MFToolpathProfile_GetNamePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
-* Retrieves the profile's laser power
+* Checks if a parameter value exists.
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserPower - Returns the laser power.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[out] pValueExists - Returns if a value exists.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetLaserPowerPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double * pLaserPower);
+typedef Lib3MFResult (*PLib3MFToolpathProfile_HasParameterValuePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, bool * pValueExists);
 
 /**
-* Retrieves the profile's laser speed
+* Retrieves a profile's parameter value. Fails if value does not exist.
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserSpeed - Returns the laser speed.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[out] pValue - Returns the value of the field.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetLaserSpeedPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double * pLaserSpeed);
+typedef Lib3MFResult (*PLib3MFToolpathProfile_GetParameterDoubleValuePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double * pValue);
 
 /**
-* Retrieves the profile's laser focus
+* Retrieves a profile's parameter value
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserFocus - Returns the laser focus.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[in] dDefaultValue - Default value if value does not exist.
+* @param[out] pValue - Returns the value of the field.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetLaserFocusPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double * pLaserFocus);
-
-/**
-* Retrieves the profile's laser index
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[out] pLaserIndex - Returns the laser index.
-* @return error code or 0 (success)
-*/
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetLaserIndexPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 * pLaserIndex);
+typedef Lib3MFResult (*PLib3MFToolpathProfile_GetParameterDoubleValueDefPtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dDefaultValue, Lib3MF_double * pValue);
 
 /**
 * Sets the profile's name
@@ -2251,40 +2260,15 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_GetLaserIndexPtr) (Lib3MF_Toolpath
 typedef Lib3MFResult (*PLib3MFToolpathProfile_SetNamePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pName);
 
 /**
-* Sets the profile's laser power
+* Sets a profile's parameter value.
 *
 * @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] dLaserPower - Returns the laser power.
+* @param[in] pNameSpaceName - Name of the Parameter Namespace.
+* @param[in] pValueName - Value key string.
+* @param[in] dValue - Double value of the parameter.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_SetLaserPowerPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double dLaserPower);
-
-/**
-* Sets the profile's laser speed
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] dLaserSpeed - Returns the laser speed.
-* @return error code or 0 (success)
-*/
-typedef Lib3MFResult (*PLib3MFToolpathProfile_SetLaserSpeedPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double dLaserSpeed);
-
-/**
-* Sets the profile's laser focus
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] dLaserFocus - Returns the laser focus.
-* @return error code or 0 (success)
-*/
-typedef Lib3MFResult (*PLib3MFToolpathProfile_SetLaserFocusPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_double dLaserFocus);
-
-/**
-* Sets the profile's laser index
-*
-* @param[in] pToolpathProfile - ToolpathProfile instance.
-* @param[in] nLaserIndex - Returns the laser index.
-* @return error code or 0 (success)
-*/
-typedef Lib3MFResult (*PLib3MFToolpathProfile_SetLaserIndexPtr) (Lib3MF_ToolpathProfile pToolpathProfile, Lib3MF_uint32 nLaserIndex);
+typedef Lib3MFResult (*PLib3MFToolpathProfile_SetParameterDoubleValuePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dValue);
 
 /*************************************************************************************************************************
  Class definition for ToolpathLayerReader
@@ -2348,10 +2332,10 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentProfileUUIDPtr) (Lib
 *
 * @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 * @param[in] nIndex - Index. Must be between 0 and Count - 1.
-* @param[out] pProfile - Segment Profile
+* @param[out] pBuildItem - Segment Build Item
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_ToolpathProfile * pProfile);
+typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_BuildItem * pBuildItem);
 
 /**
 * Retrieves the assigned segment part uuid.
@@ -2403,14 +2387,14 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_GetLayerDataUUIDPtr) (Lib3MF_Too
 typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterProfilePtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_ToolpathProfile pProfile, Lib3MF_uint32 * pProfileID);
 
 /**
-* Registers a Model Object
+* Registers a Model Build Item
 *
 * @param[in] pToolpathLayerData - ToolpathLayerData instance.
-* @param[in] pPart - The model object to use.
+* @param[in] pBuildItem - The model build item to use.
 * @param[out] pPartID - returns the local part ID for the layer.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterPartPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_Object pPart, Lib3MF_uint32 * pPartID);
+typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterBuildItemPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_BuildItem pBuildItem, Lib3MF_uint32 * pPartID);
 
 /**
 * writes hatch data to the layer.
@@ -2556,14 +2540,10 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetLayerZPtr) (Lib3MF_Toolpath pToolpath,
 *
 * @param[in] pToolpath - Toolpath instance.
 * @param[in] pName - the name.
-* @param[in] dLaserPower - the laser power.
-* @param[in] dLaserSpeed - the laser speed.
-* @param[in] dLaserFocus - the laser focus.
-* @param[in] nLaserIndex - the laser index.
 * @param[out] pProfile - Returns the profile.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_AddProfilePtr) (Lib3MF_Toolpath pToolpath, const char * pName, Lib3MF_double dLaserPower, Lib3MF_double dLaserSpeed, Lib3MF_double dLaserFocus, Lib3MF_uint32 nLaserIndex, Lib3MF_ToolpathProfile * pProfile);
+typedef Lib3MFResult (*PLib3MFToolpath_AddProfilePtr) (Lib3MF_Toolpath pToolpath, const char * pName, Lib3MF_ToolpathProfile * pProfile);
 
 /**
 * Returns a profile of the toolpath.
@@ -3487,6 +3467,7 @@ typedef struct {
 	PLib3MFMetaData_SetValuePtr m_MetaData_SetValue;
 	PLib3MFMetaDataGroup_GetMetaDataCountPtr m_MetaDataGroup_GetMetaDataCount;
 	PLib3MFMetaDataGroup_GetMetaDataPtr m_MetaDataGroup_GetMetaData;
+	PLib3MFMetaDataGroup_HasMetaDataPtr m_MetaDataGroup_HasMetaData;
 	PLib3MFMetaDataGroup_GetMetaDataByKeyPtr m_MetaDataGroup_GetMetaDataByKey;
 	PLib3MFMetaDataGroup_RemoveMetaDataByIndexPtr m_MetaDataGroup_RemoveMetaDataByIndex;
 	PLib3MFMetaDataGroup_RemoveMetaDataPtr m_MetaDataGroup_RemoveMetaData;
@@ -3645,15 +3626,11 @@ typedef struct {
 	PLib3MFSlice_GetZTopPtr m_Slice_GetZTop;
 	PLib3MFToolpathProfile_GetUUIDPtr m_ToolpathProfile_GetUUID;
 	PLib3MFToolpathProfile_GetNamePtr m_ToolpathProfile_GetName;
-	PLib3MFToolpathProfile_GetLaserPowerPtr m_ToolpathProfile_GetLaserPower;
-	PLib3MFToolpathProfile_GetLaserSpeedPtr m_ToolpathProfile_GetLaserSpeed;
-	PLib3MFToolpathProfile_GetLaserFocusPtr m_ToolpathProfile_GetLaserFocus;
-	PLib3MFToolpathProfile_GetLaserIndexPtr m_ToolpathProfile_GetLaserIndex;
+	PLib3MFToolpathProfile_HasParameterValuePtr m_ToolpathProfile_HasParameterValue;
+	PLib3MFToolpathProfile_GetParameterDoubleValuePtr m_ToolpathProfile_GetParameterDoubleValue;
+	PLib3MFToolpathProfile_GetParameterDoubleValueDefPtr m_ToolpathProfile_GetParameterDoubleValueDef;
 	PLib3MFToolpathProfile_SetNamePtr m_ToolpathProfile_SetName;
-	PLib3MFToolpathProfile_SetLaserPowerPtr m_ToolpathProfile_SetLaserPower;
-	PLib3MFToolpathProfile_SetLaserSpeedPtr m_ToolpathProfile_SetLaserSpeed;
-	PLib3MFToolpathProfile_SetLaserFocusPtr m_ToolpathProfile_SetLaserFocus;
-	PLib3MFToolpathProfile_SetLaserIndexPtr m_ToolpathProfile_SetLaserIndex;
+	PLib3MFToolpathProfile_SetParameterDoubleValuePtr m_ToolpathProfile_SetParameterDoubleValue;
 	PLib3MFToolpathLayerReader_GetLayerDataUUIDPtr m_ToolpathLayerReader_GetLayerDataUUID;
 	PLib3MFToolpathLayerReader_GetSegmentCountPtr m_ToolpathLayerReader_GetSegmentCount;
 	PLib3MFToolpathLayerReader_GetSegmentInfoPtr m_ToolpathLayerReader_GetSegmentInfo;
@@ -3664,7 +3641,7 @@ typedef struct {
 	PLib3MFToolpathLayerReader_GetSegmentPointDataPtr m_ToolpathLayerReader_GetSegmentPointData;
 	PLib3MFToolpathLayerData_GetLayerDataUUIDPtr m_ToolpathLayerData_GetLayerDataUUID;
 	PLib3MFToolpathLayerData_RegisterProfilePtr m_ToolpathLayerData_RegisterProfile;
-	PLib3MFToolpathLayerData_RegisterPartPtr m_ToolpathLayerData_RegisterPart;
+	PLib3MFToolpathLayerData_RegisterBuildItemPtr m_ToolpathLayerData_RegisterBuildItem;
 	PLib3MFToolpathLayerData_WriteHatchDataPtr m_ToolpathLayerData_WriteHatchData;
 	PLib3MFToolpathLayerData_WriteLoopPtr m_ToolpathLayerData_WriteLoop;
 	PLib3MFToolpathLayerData_WritePolylinePtr m_ToolpathLayerData_WritePolyline;

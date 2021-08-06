@@ -41,7 +41,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_marlin_types.hpp"
 
-#include "libmcdriverenv_types.hpp"
+#include "libmcenv_types.hpp"
 
 
 /*************************************************************************************************************************
@@ -51,6 +51,15 @@ Interface version: 1.0.0
 /*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
+
+/**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_ConfigurePtr) (LibMCDriver_Marlin_Driver pDriver, const char * pConfigurationString);
 
 /**
 * returns the name identifier of the driver
@@ -102,6 +111,14 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetVersionPtr) (Lib
 */
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetHeaderInformationPtr) (LibMCDriver_Marlin_Driver pDriver, const LibMCDriver_Marlin_uint32 nNameSpaceBufferSize, LibMCDriver_Marlin_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_Marlin_uint32 nBaseNameBufferSize, LibMCDriver_Marlin_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_QueryParametersPtr) (LibMCDriver_Marlin_Driver pDriver);
+
 /*************************************************************************************************************************
  Class definition for Driver_Marlin
 **************************************************************************************************************************/
@@ -112,11 +129,11 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetHeaderInformatio
 * @param[in] pDriver_Marlin - Driver_Marlin instance.
 * @param[in] pCOMPort - Device Port to connect to
 * @param[in] nBaudrate - Baudrate to use
-* @param[in] dStatusUpdateInterval - Timer interval [ms] for updating status
+* @param[in] nStatusUpdateInterval - Timer interval [ms] for updating status
 * @param[in] nConnectTimeout - Timeout [ms] for connecting printer
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_ConnectPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_Marlin_ConnectPtr) (LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_uint32 nStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout);
 
 /**
 * Disconnects from the Marlin board.
@@ -483,7 +500,7 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinGetSymbolLookupMethodPtr) 
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinCreateDriverPtr) (const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinCreateDriverPtr) (const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance);
 
 /*************************************************************************************************************************
  Function Table Structure
@@ -491,10 +508,12 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinCreateDriverPtr) (const ch
 
 typedef struct {
 	void * m_LibraryHandle;
+	PLibMCDriver_MarlinDriver_ConfigurePtr m_Driver_Configure;
 	PLibMCDriver_MarlinDriver_GetNamePtr m_Driver_GetName;
 	PLibMCDriver_MarlinDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_MarlinDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_MarlinDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
+	PLibMCDriver_MarlinDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_MarlinDriver_Marlin_ConnectPtr m_Driver_Marlin_Connect;
 	PLibMCDriver_MarlinDriver_Marlin_DisconnectPtr m_Driver_Marlin_Disconnect;
 	PLibMCDriver_MarlinDriver_Marlin_SetAbsolutePositioningPtr m_Driver_Marlin_SetAbsolutePositioning;

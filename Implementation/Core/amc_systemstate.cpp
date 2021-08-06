@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_systemstate.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_parameterhandler.hpp"
@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_toolpathhandler.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -50,14 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper)
 	{
-		if (pLogger.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pDataModel.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (pDriverEnvWrapper.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pLogger.get());
+		LibMCAssertNotNull(pDataModel.get());
+		LibMCAssertNotNull(pEnvWrapper.get());
 
 		m_pGlobalChrono = std::make_shared<AMCCommon::CChrono>();
 
@@ -72,11 +70,13 @@ namespace AMC {
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
 
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pDriverEnvWrapper);
-		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler);
+		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
-		m_pUIHandler = std::make_shared<CUIHandler>();
+		m_pStateMachineData = std::make_shared<CStateMachineData>();
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger);
+
 	}
 
 	CSystemState::~CSystemState()
@@ -114,6 +114,13 @@ namespace AMC {
 		return m_pUIHandler.get();
 	}
 
+	CStateMachineData* CSystemState::stateMachineData()
+	{
+		return m_pStateMachineData.get();
+
+	}
+
+
 
 	PLogger CSystemState::getLoggerInstance()
 	{
@@ -135,9 +142,20 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
+	PStateMachineData CSystemState::getStateMachineData()
+	{
+		return m_pStateMachineData;
+	}
+
+
 	LibMCData::PLoginHandler CSystemState::getLoginHandlerInstance()
 	{
 		return m_pLoginHandler;
+	}
+
+	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()
+	{
+		return m_pBuildJobHandler;
 	}
 
 	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()
@@ -166,9 +184,9 @@ namespace AMC {
 		return m_pGlobalChrono.get();
 	}
 
-	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath)
+	void CSystemState::addLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResourcePath)
 	{
-		m_LibraryPathes.insert(std::make_pair(sLibraryName, sLibraryPath));
+		m_LibraryPathes.insert(std::make_pair(sLibraryName, std::make_pair (sLibraryPath, sLibraryResourcePath)));
 		m_pToolpathHandler->setLibraryPath(sLibraryName, sLibraryPath);
 	}
 
@@ -176,9 +194,19 @@ namespace AMC {
 	{
 		auto iIter = m_LibraryPathes.find(sLibraryName);
 		if (iIter == m_LibraryPathes.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_LIBRARYPATHNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_LIBRARYPATHNOTFOUND, sLibraryName);
 
-		return iIter->second;
+		return iIter->second.first;
+	}
+
+	std::string CSystemState::getLibraryResourcePath(const std::string& sLibraryName)
+	{
+		auto iIter = m_LibraryPathes.find(sLibraryName);
+		if (iIter == m_LibraryPathes.end())
+			throw ELibMCCustomException(LIBMC_ERROR_LIBRARYPATHNOTFOUND, sLibraryName);
+
+		return iIter->second.second;
+
 	}
 
 	std::string CSystemState::getSystemUserID()
@@ -202,5 +230,6 @@ namespace AMC {
 	{
 		return __STRINGIZE_VALUE_OF(__GITHASH);
 	}
+
 
 }

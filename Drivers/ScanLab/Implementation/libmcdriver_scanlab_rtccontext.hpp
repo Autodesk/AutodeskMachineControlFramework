@@ -39,19 +39,23 @@ protected:
 	PScanLabSDK m_pScanLabSDK;
 	uint32_t m_CardNo;
 	double m_dCorrectionFactor;
+	double m_dZCorrectionFactor;
 	eLaserPort m_LaserPort;
+	bool m_bIsNetwork;
+
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 	void writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower);
 
 public:
 
-	CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo);
+	CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	~CRTCContext();
 
-	void LoadProgramFromPath(const std::string & sPath) override;
+	void LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource);
 
-	void LoadCorrectionFile(const std::string & sFileName, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension) override;
+	void LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
 
 	void SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) override;
 
@@ -59,7 +63,9 @@ public:
 
 	void SetLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode, const LibMCDriver_ScanLab::eLaserPort eLaserPort) override;
 
-	void SetLaserControl(const bool bEnableLaser) override;
+	void DisableAutoLaserControl() override;
+
+	void SetLaserControlParameters(const bool DisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive) override;
 
 	void SetLaserPulsesInBits(const LibMCDriver_ScanLab_uint32 nHalfPeriod, const LibMCDriver_ScanLab_uint32 nPulseLength) override;
 
@@ -85,9 +91,9 @@ public:
 
 	void SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOnDelay, const LibMCDriver_ScanLab_uint32 nLaserOffDelay) override;
 
-	void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower) override;
+	void DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) override;
 
-	void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower) override;
+	void DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue) override;
 
 	void AddCustomDelay(const LibMCDriver_ScanLab_uint32 nDelay) override;
 
@@ -95,7 +101,14 @@ public:
 
 	void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition) override;
 
+	void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool& bPositionXisOK, bool& bPositionYisOK, bool& bTemperatureisOK, bool& bPowerisOK) override;
+
 	LibMCDriver_ScanLab_uint32 GetInputPointer() override;
+
+	void GetRTCVersion(LibMCDriver_ScanLab_uint32& nRTCVersion, LibMCDriver_ScanLab_uint32& nRTCType, LibMCDriver_ScanLab_uint32& nDLLVersion, LibMCDriver_ScanLab_uint32& nHEXVersion, LibMCDriver_ScanLab_uint32& nBIOSVersion) override;
+
+	void GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_uint32& nPositionX, LibMCDriver_ScanLab_uint32& nPositionY, LibMCDriver_ScanLab_uint32& nPositionZ, LibMCDriver_ScanLab_uint32& nCorrectedPositionX, LibMCDriver_ScanLab_uint32& nCorrectedPositionY, LibMCDriver_ScanLab_uint32& nCorrectedPositionZ, LibMCDriver_ScanLab_uint32& nFocusShift, LibMCDriver_ScanLab_uint32& nMarkSpeed) override;
+
 
 };
 

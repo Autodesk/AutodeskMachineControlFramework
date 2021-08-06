@@ -61,6 +61,101 @@ extern "C" {
 **************************************************************************************************************************/
 
 /*************************************************************************************************************************
+ Class definition for Iterator
+**************************************************************************************************************************/
+
+/**
+* Iterates to the next object in the list.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pHasNext - Iterates to the next object in the list.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_movenext(LibMCEnv_Iterator pIterator, bool * pHasNext);
+
+/**
+* Iterates to the previous object in the list.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pHasPrevious - Iterates to the previous object in the list.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_moveprevious(LibMCEnv_Iterator pIterator, bool * pHasPrevious);
+
+/**
+* Returns the object the iterator points at.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pInstance - returns the object instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_getcurrent(LibMCEnv_Iterator pIterator, LibMCEnv_Base * pInstance);
+
+/**
+* Creates a new object iterator with the same object list.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pOutIterator - returns the cloned Iterator instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_clone(LibMCEnv_Iterator pIterator, LibMCEnv_Iterator * pOutIterator);
+
+/**
+* Returns the number of resoucres the iterator captures.
+*
+* @param[in] pIterator - Iterator instance.
+* @param[out] pCount - returns the number of objects the iterator captures.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_count(LibMCEnv_Iterator pIterator, LibMCEnv_uint64 * pCount);
+
+/*************************************************************************************************************************
+ Class definition for ToolpathPart
+**************************************************************************************************************************/
+
+/**
+* Returns Part Name.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns toolpath part name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getname(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns Part UUID.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pUUIDBuffer -  buffer of Returns toolpath part uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nUUIDBufferSize, LibMCEnv_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+
+/**
+* Returns Mesh UUID of the part.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[in] nMeshUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMeshUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMeshUUIDBuffer -  buffer of Returns toolpath part mesh uuid., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_getmeshuuid(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nMeshUUIDBufferSize, LibMCEnv_uint32* pMeshUUIDNeededChars, char * pMeshUUIDBuffer);
+
+/**
+* Returns Mesh Transform of the part.
+*
+* @param[in] pToolpathPart - ToolpathPart instance.
+* @param[out] pMeshUUID - Returns the mesh transform of the toolpath.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathpart_gettransform(LibMCEnv_ToolpathPart pToolpathPart, LibMCEnv::sToolpathPartTransform * pMeshUUID);
+
+/*************************************************************************************************************************
  Class definition for ToolpathLayer
 **************************************************************************************************************************/
 
@@ -111,23 +206,25 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofileuuid(Li
 * Retrieves an assigned profile custom value.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] pValueName - Value Name to query for.
 * @param[in] nValueBufferSize - size of the buffer (including trailing 0)
 * @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pValueBuffer -  buffer of String Value., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofilevalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const char * pValueName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * Retrieves an assigned profile value of a standard type.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 * @param[in] eValueType - Enum to query for. MUST NOT be custom.
 * @param[out] pValue - Double Value
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofiletypedvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathProfileValueType eValueType, LibMCEnv_double * pValue);
 
 /**
 * Retrieves the assigned segment part uuid.
@@ -213,6 +310,72 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_loadlayer(LibMCEnv_To
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pUnits);
+
+/**
+* Checks if a metadata value exists for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[out] pExists - Returns if metadata exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_hasmetadata(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, bool * pExists);
+
+/**
+* Returns the value of a metadata for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[in] nMetaDataValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMetaDataValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMetaDataValueBuffer -  buffer of Returns the value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatavalue(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataValueBufferSize, LibMCEnv_uint32* pMetaDataValueNeededChars, char * pMetaDataValueBuffer);
+
+/**
+* Returns the type of a metadata for this toolpath model.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pNameSpace - Namespace of metadata.
+* @param[in] pName - Name of metadata.
+* @param[in] nMetaDataTypeBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMetaDataTypeNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMetaDataTypeBuffer -  buffer of Returns the type, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getmetadatatype(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pNameSpace, const char * pName, const LibMCEnv_uint32 nMetaDataTypeBufferSize, LibMCEnv_uint32* pMetaDataTypeNeededChars, char * pMetaDataTypeBuffer);
+
+/**
+* Retrieves the number of parts in the toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pPartCount - Number of parts.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getpartcount(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 * pPartCount);
+
+/**
+* Retrieves the part information of a toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nPartIndex - Index of part. MUST be between 0 and PartCount-1
+* @param[out] pPart - Part Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getpart(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nPartIndex, LibMCEnv_ToolpathPart * pPart);
+
+/**
+* Finds the part information of a toolpath.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] pPartUUID - UUID of part.
+* @param[out] pPart - Part Instance. Returns null if part does not exist.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_findpartbyuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPartUUID, LibMCEnv_ToolpathPart * pPart);
 
 /*************************************************************************************************************************
  Class definition for Build
@@ -319,6 +482,392 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_createtoolpathaccessor(LibMCEnv_
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_addbinarydata(LibMCEnv_Build pBuild, const char * pName, const char * pMIMEType, LibMCEnv_uint64 nContentBufferSize, const LibMCEnv_uint8 * pContentBuffer, const LibMCEnv_uint32 nDataUUIDBufferSize, LibMCEnv_uint32* pDataUUIDNeededChars, char * pDataUUIDBuffer);
+
+/*************************************************************************************************************************
+ Class definition for WorkingFileExecution
+**************************************************************************************************************************/
+
+/**
+* Returns the execution status
+*
+* @param[in] pWorkingFileExecution - WorkingFileExecution instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfileexecution_getstatus(LibMCEnv_WorkingFileExecution pWorkingFileExecution);
+
+/**
+* Returns the output of the executable as string buffer
+*
+* @param[in] pWorkingFileExecution - WorkingFileExecution instance.
+* @param[in] nStringBufferBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStringBufferNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStringBufferBuffer -  buffer of stdout buffer, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfileexecution_returnstdout(LibMCEnv_WorkingFileExecution pWorkingFileExecution, const LibMCEnv_uint32 nStringBufferBufferSize, LibMCEnv_uint32* pStringBufferNeededChars, char * pStringBufferBuffer);
+
+/*************************************************************************************************************************
+ Class definition for WorkingFile
+**************************************************************************************************************************/
+
+/**
+* Retrieves absolute file name of the working file
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[in] nFileNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pFileNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pFileNameBuffer -  buffer of global path of the file, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_getabsolutefilename(LibMCEnv_WorkingFile pWorkingFile, const LibMCEnv_uint32 nFileNameBufferSize, LibMCEnv_uint32* pFileNameNeededChars, char * pFileNameBuffer);
+
+/**
+* Returns the size of temporary file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pFileSize - file size
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_getsize(LibMCEnv_WorkingFile pWorkingFile, LibMCEnv_uint64 * pFileSize);
+
+/**
+* Calculates the SHA256 checksum of the file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[in] nSHA2BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA2NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA2Buffer -  buffer of sha256 checksum, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_calculatesha2(LibMCEnv_WorkingFile pWorkingFile, const LibMCEnv_uint32 nSHA2BufferSize, LibMCEnv_uint32* pSHA2NeededChars, char * pSHA2Buffer);
+
+/**
+* Executes the temporary file, if it is an executable.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pExecution - execution object
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_executefile(LibMCEnv_WorkingFile pWorkingFile, LibMCEnv_WorkingFileExecution * pExecution);
+
+/**
+* Returns if the file is managed.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pFileIsManaged - returns if the file is managed.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_ismanaged(LibMCEnv_WorkingFile pWorkingFile, bool * pFileIsManaged);
+
+/**
+* Makes the file managed if it is not managed yet.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_makemanaged(LibMCEnv_WorkingFile pWorkingFile);
+
+/**
+* Returns if the file exists on disk.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pFileDoesExist - returns if the file exists.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_fileexists(LibMCEnv_WorkingFile pWorkingFile, bool * pFileDoesExist);
+
+/**
+* Deletes the temporary file.
+*
+* @param[in] pWorkingFile - WorkingFile instance.
+* @param[out] pSuccess - returns if deletion was successful or file did not exist in the first place.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfile_deletefromdisk(LibMCEnv_WorkingFile pWorkingFile, bool * pSuccess);
+
+/*************************************************************************************************************************
+ Class definition for WorkingFileIterator
+**************************************************************************************************************************/
+
+/**
+* Returns the working file the iterator points at.
+*
+* @param[in] pWorkingFileIterator - WorkingFileIterator instance.
+* @param[out] pWorkingFile - returns the WorkingFile instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingfileiterator_getcurrentfile(LibMCEnv_WorkingFileIterator pWorkingFileIterator, LibMCEnv_WorkingFile * pWorkingFile);
+
+/*************************************************************************************************************************
+ Class definition for WorkingDirectory
+**************************************************************************************************************************/
+
+/**
+* Working directory is active.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIsActive - returns true if files can be read and written to the directory.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_isactive(LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pIsActive);
+
+/**
+* Retrieves absolute file path.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] nFilePathBufferSize - size of the buffer (including trailing 0)
+* @param[out] pFilePathNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pFilePathBuffer -  buffer of global path of the directory, including path delimiter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_getabsolutefilepath(LibMCEnv_WorkingDirectory pWorkingDirectory, const LibMCEnv_uint32 nFilePathBufferSize, LibMCEnv_uint32* pFilePathNeededChars, char * pFilePathBuffer);
+
+/**
+* Stores a data buffer in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[in] pDataBufferBuffer - uint8 buffer of file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomdata(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores a string in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] pDataString - file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomstring(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores attached driver data in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storedriverdata(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pSuccess - returns if deletion was successful.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_cleanup(LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pSuccess);
+
+/**
+* Adds a managed filename in the directory (i.e. this file will be deleted at CleanUp). Subdirectories are not allowed.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pFileName - Filename to manage. The file does not need to exist yet.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_addmanagedfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Returns if the working directory has unmanaged files. A clean implementation will never deal with unmanaged files.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pHasUnmanagedFiles - returns if there are unmanaged files.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_hasunmanagedfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pHasUnmanagedFiles);
+
+/**
+* Returns a list of unmanaged files.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIteratorInstance - working file iterator instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveunmanagedfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
+
+/**
+* Returns a list of managed files.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIteratorInstance - working file iterator instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrievemanagedfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
+
+/**
+* Returns a list of all files in the directory.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[out] pIteratorInstance - working file iterator instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
+
+/*************************************************************************************************************************
+ Class definition for DriverEnvironment
+**************************************************************************************************************************/
+
+/**
+* creates a temporary working directory.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pWorkingDirectory - creates a working directory
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_WorkingDirectory * pWorkingDirectory);
+
+/**
+* retrieves attached driver data into a memory buffer.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[out] pDataBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pStreamUUID - UUID of the stream.
+* @param[out] pToolpathInstance - Toolpath instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
+* registers a string parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] pDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registerstringparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue);
+
+/**
+* registers a uuid parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] pDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registeruuidparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, const char * pDefaultValue);
+
+/**
+* registers a double parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] dDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registerdoubleparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_double dDefaultValue);
+
+/**
+* registers an int parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] nDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registerintegerparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, LibMCEnv_int64 nDefaultValue);
+
+/**
+* registers a bool parameter. Must only be called during driver creation.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pDescription - Parameter Description
+* @param[in] bDefaultValue - default value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_registerboolparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pDescription, bool bDefaultValue);
+
+/**
+* sets a string parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setstringparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
+
+/**
+* sets a uuid parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setuuidparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, const char * pValue);
+
+/**
+* sets a double parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setdoubleparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_double dValue);
+
+/**
+* sets an int parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setintegerparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, LibMCEnv_int64 nValue);
+
+/**
+* sets a bool parameter
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_setboolparameter(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool bValue);
+
+/**
+* Puts the current instance to sleep for a definite amount of time. MUST be used instead of a blocking sleep call.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] nDelay - Milliseconds to sleeps
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_sleep(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nDelay);
+
+/**
+* Returns the global timer in milliseconds.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
 
 /*************************************************************************************************************************
  Class definition for SignalTrigger
@@ -631,6 +1180,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_signalhandler_setboolresult(LibMCEnv_S
 **************************************************************************************************************************/
 
 /**
+* Retrieves the machine state
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStateNameBuffer -  buffer of Name of current state, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getmachinestate(LibMCEnv_StateEnvironment pStateEnvironment, const char * pMachineInstance, const LibMCEnv_uint32 nStateNameBufferSize, LibMCEnv_uint32* pStateNameNeededChars, char * pStateNameBuffer);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -749,56 +1310,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_sleep(LibMCEnv_StateE
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_checkfortermination(LibMCEnv_StateEnvironment pStateEnvironment, bool * pShallTerminate);
 
 /**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a uuid in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storeuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const char * pValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storeinteger(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 nValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] dValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storedouble(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double dValue);
-
-/**
-* stores a string in the current state machine
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] bValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storebool(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool bValue);
-
-/**
 * stores a signal handler in the current state machine
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -807,60 +1318,6 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storebool(LibMCEnv_St
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_storesignal(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_SignalHandler pHandler);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a uuid from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
-* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pValueBuffer -  buffer of Value, may be NULL
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrieveuuid(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrieveinteger(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_int64 * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievedouble(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, LibMCEnv_double * pValue);
-
-/**
-* retrieves a string from the current state machine. Fails if value has not been stored before.
-*
-* @param[in] pStateEnvironment - StateEnvironment instance.
-* @param[in] pName - Name
-* @param[out] pValue - Value
-* @return error code or 0 (success)
-*/
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_retrievebool(LibMCEnv_StateEnvironment pStateEnvironment, const char * pName, bool * pValue);
 
 /**
 * retrieves a signal handler from the current state machine. Fails if value has not been stored before or signal has been already handled.
@@ -994,6 +1451,331 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getintegerparameter(L
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibMCEnv_StateEnvironment pStateEnvironment, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* loads a plugin resource file into memory.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - Number of elements in buffer
+* @param[out] pResourceDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
+/*************************************************************************************************************************
+ Class definition for UIEnvironment
+**************************************************************************************************************************/
+
+/**
+* prepares a signal object to trigger later.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pSignalName - Name Of signal channel.
+* @param[out] pSignalInstance - Signal trigger object.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_preparesignal(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance);
+
+/**
+* Retrieves the machine state
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStateNameBuffer -  buffer of Name of current state, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachinestate(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const LibMCEnv_uint32 nStateNameBufferSize, LibMCEnv_uint32* pStateNameNeededChars, char * pStateNameBuffer);
+
+/**
+* logs a string as message
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_logmessage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pLogString);
+
+/**
+* logs a string as warning
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_logwarning(LibMCEnv_UIEnvironment pUIEnvironment, const char * pLogString);
+
+/**
+* logs a string as info
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loginfo(LibMCEnv_UIEnvironment pUIEnvironment, const char * pLogString);
+
+/**
+* returns a string parameter of a state machine
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachinestringparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a uuid parameter of a state machine
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineuuidparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a double parameter of a state machine
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Current Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachinedoubleparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_double * pValue);
+
+/**
+* returns an int parameter of a state machine
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Current Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineintegerparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_int64 * pValue);
+
+/**
+* returns a bool parameter of a state machine
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pMachineInstance - State machine instance name
+* @param[in] pParameterGroup - Parameter Group
+* @param[in] pParameterName - Parameter Name
+* @param[out] pValue - Current Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getmachineboolparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue);
+
+/**
+* returns a string variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getclientstringvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a uuid variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Current Parameter Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getclientuuidvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a double variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[out] pValue - Current Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getclientdoublevariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_double * pValue);
+
+/**
+* returns an int variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[out] pValue - Current Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getclientintegervariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_int64 * pValue);
+
+/**
+* returns a bool variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[out] pValue - Current Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getclientboolvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, bool * pValue);
+
+/**
+* sets a string variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setclientstringvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const char * pValue);
+
+/**
+* returns a uuid variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setclientuuidvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const char * pValue);
+
+/**
+* returns a double variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setclientdoublevariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_double dValue);
+
+/**
+* returns an int variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setclientintegervariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_int64 nValue);
+
+/**
+* returns a bool variable of the client
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pVariableGroup - Variable Group
+* @param[in] pVariableName - Variable Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_setclientboolvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, bool bValue);
+
+/**
+* returns if a form value has been passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValuePassed - Form Value has been passed
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_hasformvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, bool * pValuePassed);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Form Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformstringvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Form Value, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformuuidvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformdoublevalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, LibMCEnv_double * pValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformintegervalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, LibMCEnv_int64 * pValue);
+
+/**
+* returns a passed form value from the client. Fails if value is not passed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pFormIdentifier - Identifier of the form.
+* @param[in] pValueIdentifier - Identifier of the form value.
+* @param[out] pValue - Form Value
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getformboolvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, bool * pValue);
+
+/**
+* returns the event context uuid as string
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nContextUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pContextUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pContextUUIDBuffer -  buffer of Context UUID, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_geteventcontext(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nContextUUIDBufferSize, LibMCEnv_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer);
 
 /*************************************************************************************************************************
  Global functions

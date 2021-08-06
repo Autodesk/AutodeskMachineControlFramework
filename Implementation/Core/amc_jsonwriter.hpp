@@ -60,6 +60,8 @@ namespace AMC {
 
 		void addInteger(const std::string& sName, int64_t nValue);
 
+		void addBool(const std::string& sName, bool bValue);
+
 		void addDouble(const std::string& sName, double dValue);
 
 		void addObject(const std::string& sName, CJSONWriterObject & object);

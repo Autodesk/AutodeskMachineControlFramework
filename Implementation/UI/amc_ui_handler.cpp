@@ -38,21 +38,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
-#include "amc_ui_modulefactory.hpp"
+#include "amc_ui_module_contentitem_form.hpp"
+#include "amc_parameterhandler.hpp"
 
+#include "amc_ui_module.hpp"
+#include "amc_ui_modulefactory.hpp"
+#include "amc_statemachinedata.hpp"
 #include "amc_jsonwriter.hpp"
+#include "amc_ui_module_item.hpp"
+#include "amc_logger.hpp"
+#include "amc_statesignalhandler.hpp"
 
 #include "amc_api_constants.hpp"
 
 #include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
+
+#include "libmcenv_uienvironment.hpp"
+
+#include "libmcui_dynamic.hpp"
 
 #include "PugiXML/pugixml.hpp"
 
 using namespace AMC;
 
-CUIHandler::CUIHandler()
-    : m_dLogoAspectRatio (1.0)
+CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
+    : m_dLogoAspectRatio (1.0), 
+    m_pStateMachineData(pStateMachineData),
+    m_pEnvironmentWrapper (pEnvironmentWrapper),
+    m_pSignalHandler (pSignalHandler),
+    m_pLogger(pLogger)
 {
+    if (pStateMachineData.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pEnvironmentWrapper.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pSignalHandler.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    if (pLogger.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
 
@@ -163,17 +187,35 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
     if (iIterator != m_Pages.end())
         throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPAGE);
 
-    auto pPage = std::make_shared<CUIPage> (sName);
+    auto pPage = std::make_shared<CUIPage> (sName, this);
     m_Pages.insert (std::make_pair (sName, pPage));
 
     return pPage;
 }
 
 
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
 {
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
     m_sAppName = "";
     m_sCopyrightString = "";
+    m_pCoreResourcePackage = pResourcePackage;
+
+    try {
+        auto pUIPluginWrapper = LibMCUI::CWrapper::loadLibrary(sUILibraryPath);
+        auto pUIEventHandler = pUIPluginWrapper->CreateEventHandler();
+
+        pUIPluginWrapper->InjectComponent ("LibMCEnv", m_pEnvironmentWrapper->GetSymbolLookupMethod ());
+
+        m_pUIPluginWrapper = pUIPluginWrapper;
+        m_pUIEventHandler = pUIEventHandler;
+    }
+    catch (std::exception& E) {
+        throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTLOADUILIBRARY, E.what ());
+    }
+
     m_ToolbarItems.clear();
     m_MenuItems.clear();
 
@@ -195,8 +237,12 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
     auto logoNode = xmlNode.child("logo");
     if (!logoNode.empty()) {
 
-        auto uuidAttrib = logoNode.attribute("uuid");
-        m_sLogoUUID = uuidAttrib.as_string();
+        auto resourceAttrib = logoNode.attribute("resource");
+        if (resourceAttrib.empty ())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGLOGORESOURCE);
+
+        auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+        m_sLogoUUID = pResourceEntry->getUUID ();
 
         auto aspectratioAttrib = logoNode.attribute("aspectratio");
         if (!aspectratioAttrib.empty()) {
@@ -205,6 +251,9 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
         else {
             m_dLogoAspectRatio = 1.0;
         }
+
+        if ((m_dLogoAspectRatio < AMC_UI_IMAGE_MINASPECTRATIO) || (m_dLogoAspectRatio > AMC_UI_IMAGE_MAXASPECTRATIO))
+            throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDASPECTRATIO, std::to_string(m_dLogoAspectRatio));
     }
 
     auto pageNodes = xmlNode.children("page");
@@ -220,7 +269,8 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModule = CUIModuleFactory::createModule(pageChild);
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
+            auto pModule = CUIModuleFactory::createModule(pageChild, pModuleEnvironment);
             pPage->addModule(pModule);
 
         }
@@ -279,6 +329,146 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode)
     }
 
     m_pMainPage = findPage (sMainPage);
+
+    // Update all cross-references!
+    for (auto pPage : m_Pages)
+        pPage.second->configurePostLoading();
+
+}
+
+PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
+{
+    for (auto pPage : m_Pages) {
+        auto pModuleItem = pPage.second->findModuleItemByUUID(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pModuleItem;
+    }
+
+    return nullptr;
+}
+
+PUIPage CUIHandler::findPageOfModuleItem(const std::string& sUUID)
+{
+    for (auto pPage : m_Pages) {
+        auto pModuleItem = pPage.second->findModuleItemByUUID(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pPage.second;
+    }
+
+    return nullptr;
+}
+
+PResourcePackage CUIHandler::getCoreResourcePackage()
+{
+    if (m_pCoreResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
+
+    return m_pCoreResourcePackage;
+
+}
+
+template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
+{
+    if (pWrapper.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+    auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
+    pImplInstance->IncRefCount();
+    return pExternalInstance;
+}
+
+
+void CUIHandler::ensureUIEventExists(const std::string& sEventName)
+{
+    std::string sSenderUUID = AMCCommon::CUtils::createUUID();
+    std::string sContextUUID = AMCCommon::CUtils::createUUID();
+
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sContextUUID, nullptr);
+    auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
+
+    // Create event to see if it exists.
+    try {
+        auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+        pEvent = nullptr;
+    }
+    catch (LibMCUI::ELibMCUIException& E) {
+        throw ELibMCCustomException(LIBMC_ERROR_EVENTNOTFOUND, sEventName + "/" + E.what ());
+    }
+    catch (...) {
+        throw;
+    }
+
+}
+
+
+void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
+{
+
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sContextUUID, pClientVariableHandler);
+    auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
+
+    auto pPage = findPageOfModuleItem(sSenderUUID);
+    if (pPage.get() == nullptr)
+        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
+
+    auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
+    if (pModuleItem.get() == nullptr)
+        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+
+    auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+
+    if (!sFormValueJSON.empty()) {
+
+        rapidjson::Document document;
+        document.Parse(sFormValueJSON.c_str());
+        if (!document.IsObject())
+            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
+
+
+        for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin();
+            itr != document.MemberEnd(); ++itr)
+        {
+            if (!itr->name.IsString())
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+            std::string sEntityUUID = itr->name.GetString();
+            std::string sFormValue;
+
+            if (itr->value.IsString()) {
+                sFormValue = itr->value.GetString();
+            }
+            else if (itr->value.IsInt64()) {
+                sFormValue = std::to_string (itr->value.GetInt64());
+            }
+            else if (itr->value.IsBool()) {
+                sFormValue = std::to_string(itr->value.GetBool());
+            }
+            else if (itr->value.IsDouble()) {
+                sFormValue = std::to_string(itr->value.GetDouble());
+            }
+            else
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+
+            
+
+            auto pFormItem = pPage->findModuleItemByUUID(sEntityUUID);
+            auto pForm = std::dynamic_pointer_cast<CUIModule_ContentForm> (pFormItem);
+            if (pForm.get() != nullptr) {
+
+                auto pFormEntity = pForm->findEntityByUUID(sEntityUUID);
+                if (pFormEntity.get() == nullptr) 
+                    throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNOTFOUND, sEventName + "/" + sEntityUUID);
+
+                pInternalUIEnvironment->addFormValue(pForm->getName (), pFormEntity->getName (), sFormValue);
+                
+            }
+                        
+
+        }
+
+    }
+
+    pEvent->Handle(pExternalEnvironment);
+
 }
 
 

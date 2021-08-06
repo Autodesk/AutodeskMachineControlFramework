@@ -24,16 +24,17 @@ namespace LibMCPlugin {
 	private:
 		CStateFactory* m_pParent;
 		ErrorType m_nErrorCode;
+		std::string m_sContextString;
 	public:
-		ETranslator_StateFactory(CStateFactory* pParent, ErrorType nErrorCode)
-			: m_pParent(pParent), m_nErrorCode(nErrorCode)
+		ETranslator_StateFactory(CStateFactory* pParent, ErrorType nErrorCode, const std::string & sContextString)
+			: m_pParent(pParent), m_nErrorCode(nErrorCode), m_sContextString (sContextString)
 		{
 			if (pParent == nullptr)
 				throw ExceptionType(InvalidParamError);
 		}
 
-		ETranslator_StateFactory(PStateFactory pParent, ErrorType nErrorCode)
-			: m_pParent(pParent.get()), m_nErrorCode(nErrorCode)
+		ETranslator_StateFactory(PStateFactory pParent, ErrorType nErrorCode, const std::string& sContextString)
+			: m_pParent(pParent.get()), m_nErrorCode(nErrorCode), m_sContextString(sContextString)
 		{
 			if (pParent.get() == nullptr)
 				throw ExceptionType(InvalidParamError);
@@ -45,7 +46,7 @@ namespace LibMCPlugin {
 				return m_pParent->CreateState(sStateName);
 			}
 			catch (std::exception & E) {
-				throw ExceptionType(m_nErrorCode, E.what());
+				throw ExceptionType(m_nErrorCode, m_sContextString + ": " + E.what());
 			}
 		}
 	};

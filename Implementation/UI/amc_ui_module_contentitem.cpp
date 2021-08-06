@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
+#include "amc_parameterhandler.hpp"
+
+
+#include "libmcdata_dynamic.hpp"
 
 using namespace AMC;
 
@@ -56,69 +60,20 @@ std::string CUIModule_ContentItem::getUUID()
 	return m_sUUID;
 }
 
-
-
-CUIModule_ContentParagraph::CUIModule_ContentParagraph(const std::string& sText)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID ()), m_sText (sText)
+void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
 
 }
 
-CUIModule_ContentParagraph::~CUIModule_ContentParagraph()
+void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
 
 }
 
-std::string CUIModule_ContentParagraph::getText()
+std::list <std::string> CUIModule_ContentItem::getReferenceUUIDs()
 {
-	return m_sText;
+	std::list <std::string> resultList;
+	resultList.push_back(m_sUUID);
+
+	return resultList;
 }
-
-void CUIModule_ContentParagraph::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "paragraph");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_ITEMTEXT, m_sText);
-}
-
-
-
-CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID)
-	: CUIModule_ContentItem (sUUID)
-{
-
-}
-
-CUIModule_ContentImage::~CUIModule_ContentImage()
-{
-
-}
-
-
-void CUIModule_ContentImage::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
-	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-}
-
-CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption)
-{
-
-}
-
-CUIModule_ContentUpload::~CUIModule_ContentUpload()
-{
-
-}
-
-void CUIModule_ContentUpload::addToJSON(CJSONWriter& writer, CJSONWriterObject& object)
-{
-	object.addString(AMC_API_KEY_UI_ITEMTYPE, "upload");
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADCLASS, m_sUploadClass);
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADCAPTION, m_sUploadCaption);
-	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISINITIAL, 1);
-	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISSAVING, 0);
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADFILENAME, "");
-}
-

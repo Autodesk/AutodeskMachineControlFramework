@@ -49,7 +49,7 @@ namespace LibS7Net {
 	public class CWrapper : IWrapper
 	{
 
-	 IPLC IWrapper.CreatePLC()
+	 IPLC IWrapper.CreatePLC(String COMHostName)
      {
 		return new CPLC();
      }

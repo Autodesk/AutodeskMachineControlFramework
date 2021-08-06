@@ -51,7 +51,7 @@ Interface version: 1.0.0
 
 #include "libmcdriver_s7net_types.hpp"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,6 +64,15 @@ extern "C" {
 /*************************************************************************************************************************
  Class definition for Driver
 **************************************************************************************************************************/
+
+/**
+* Configures a driver with its specific configuration data.
+*
+* @param[in] pDriver - Driver instance.
+* @param[in] pConfigurationString - Configuration data of driver.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_configure(LibMCDriver_S7Net_Driver pDriver, const char * pConfigurationString);
 
 /**
 * returns the name identifier of the driver
@@ -115,6 +124,58 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_getv
 */
 LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_getheaderinformation(LibMCDriver_S7Net_Driver pDriver, const LibMCDriver_S7Net_uint32 nNameSpaceBufferSize, LibMCDriver_S7Net_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_S7Net_uint32 nBaseNameBufferSize, LibMCDriver_S7Net_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
 
+/**
+* Stores the driver parameters in the driver environment.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_queryparameters(LibMCDriver_S7Net_Driver pDriver);
+
+/*************************************************************************************************************************
+ Class definition for PLCCommand
+**************************************************************************************************************************/
+
+/**
+* Sets an integer parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] nValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setintegerparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_S7Net_int32 nValue);
+
+/**
+* Sets a string parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] pValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setstringparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, const char * pValue);
+
+/**
+* Sets a bool parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] bValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setboolparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
+
+/**
+* Sets a double parameter of the command
+*
+* @param[in] pPLCCommand - PLCCommand instance.
+* @param[in] pParameterName - Parameter Value
+* @param[in] dValue - Parameter Value
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_plccommand_setdoubleparameter(LibMCDriver_S7Net_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_S7Net_double dValue);
+
 /*************************************************************************************************************************
  Class definition for Driver_S7Net
 **************************************************************************************************************************/
@@ -123,9 +184,13 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_geth
 * Creates and initializes a new S7 PLC.
 *
 * @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] eCPUType - S7 CPU Type
+* @param[in] pIPAddress - PLC IP Address
+* @param[in] nRack - Rack Number
+* @param[in] nSlot - Slot Number
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_connect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net::eS7CPUType eCPUType, const char * pIPAddress, LibMCDriver_S7Net_uint32 nRack, LibMCDriver_S7Net_uint32 nSlot);
 
 /**
 * Disconnects from the S7 PLC.
@@ -134,6 +199,37 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7ne
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_disconnect(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net);
+
+/**
+* Create Command
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pCommand - Command to execute
+* @param[out] pPLCCommand - Command instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_createcommand(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, const char * pCommand, LibMCDriver_S7Net_PLCCommand * pPLCCommand);
+
+/**
+* Execute Command
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pPLCCommand - Command instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_executecommand(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net_PLCCommand pPLCCommand);
+
+/**
+* Wait for Command to finish executing
+*
+* @param[in] pDriver_S7Net - Driver_S7Net instance.
+* @param[in] pPLCCommand - Command instance
+* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
+* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
+* @param[out] pCommandSuccess - Returns true if the command was finished successfully.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_driver_s7net_waitforcommand(LibMCDriver_S7Net_Driver_S7Net pDriver_S7Net, LibMCDriver_S7Net_PLCCommand pPLCCommand, LibMCDriver_S7Net_uint32 nReactionTimeInMS, LibMCDriver_S7Net_uint32 nWaitForTimeInMS, bool * pCommandSuccess);
 
 /*************************************************************************************************************************
  Global functions
@@ -203,7 +299,7 @@ LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_getsymbollo
 * @param[out] pInstance - New Driver instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance);
+LIBMCDRIVER_S7NET_DECLSPEC LibMCDriver_S7NetResult libmcdriver_s7net_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_S7Net_Driver * pInstance);
 
 #ifdef __cplusplus
 }

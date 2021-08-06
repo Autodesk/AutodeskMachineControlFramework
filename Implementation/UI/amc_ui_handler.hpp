@@ -34,11 +34,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
+#include "amc_resourcepackage.hpp"
+#include "amc_ui_interfaces.hpp"
 
 #include <memory>
 #include <vector>
 #include <string>
 #include <mutex>
+
+namespace LibMCUI {
+	amcDeclareDependingClass(CWrapper, PWrapper);
+	amcDeclareDependingClass(CEventHandler, PEventHandler);
+}
+
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
+
+namespace LibMCEnv {
+	amcDeclareDependingClass(CWrapper, PWrapper);
+
+	namespace Impl {
+		amcDeclareDependingClass(CUIEnvironment, PUIEnvironment);
+	}
+}
 
 namespace AMC {
 
@@ -46,9 +66,15 @@ namespace AMC {
 	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
 	amcDeclareDependingClass(CUIPage, PUIPage);
+	amcDeclareDependingClass(CLogger, PLogger);
+	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
 	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);	
+	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
-	class CUIHandler {
+	class CUIHandler : public CUIModule_UIEventHandler {
 	protected:
 
 		std::mutex m_Mutex;
@@ -58,11 +84,20 @@ namespace AMC {
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
 
+		PStateMachineData m_pStateMachineData;
+		PStateSignalHandler m_pSignalHandler;
+		PResourcePackage m_pCoreResourcePackage;
+		PLogger m_pLogger;
+
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
 
 		std::map <std::string, PUIPage> m_Pages;
 		PUIPage m_pMainPage;
+
+		LibMCUI::PWrapper m_pUIPluginWrapper;
+		LibMCUI::PEventHandler m_pUIEventHandler;
+		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
 		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
@@ -72,7 +107,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler();
+		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
 		
 		virtual ~CUIHandler();
 		
@@ -82,7 +117,17 @@ namespace AMC {
 		void writeConfigurationToJSON (CJSONWriter & writer);
 		void writeStateToJSON(CJSONWriter& writer);
 
-		void loadFromXML (pugi::xml_node & xmlNode);
+		void loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pCoreResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
+
+		PResourcePackage getCoreResourcePackage ();
+
+		PUIModuleItem findModuleItem(const std::string & sUUID);
+		
+		PUIPage findPageOfModuleItem(const std::string& sUUID);
+
+		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
+
+		virtual void ensureUIEventExists(const std::string& sEventName) override;
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

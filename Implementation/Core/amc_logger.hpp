@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_loggerentry.hpp"
 
 #define LOG_SUBSYSTEM_SYSTEM "system"
+#define LOG_SUBSYSTEM_WORKINGDIRECTORIES "workdir"
 #define LOG_SUBSYSTEM_NETWORK "network"
 #define LOG_SUBSYSTEM_UNKNOWN "unknown"
 

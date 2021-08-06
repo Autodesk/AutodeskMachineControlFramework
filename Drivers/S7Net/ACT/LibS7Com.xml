@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="S7Net Communication Protocol" namespace="LibS7Com" copyright="Autodesk Inc." year="2020" basename="libs7com"
+	version="3.1.3">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	<errors>
+			
+		<error name="NOTIMPLEMENTED" code="1001" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="1002" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="1003" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="1004" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="1005" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="1006" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="1007" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="1008" description="the version of the binary interface does not match the bindings interface" />
+		<error name="NOTCONNECTED" code="1009" description="PLC is not connected" />
+		<error name="COMNOTINITIALIZED" code="1010" description="COM is not initialized" />
+		<error name="COULDNOTINITIALIZECOM" code="1011" description="Could not initialize COM" />			
+				
+		<error name="WRONGCPUTYPE" code="1" description="Wrong type of CPU." />
+		<error name="CONNECTIONERROR" code="2" description="Connection error." />
+		<error name="IPADDRESSNOTAVAILABLE" code="3" description="IP Address not available." />
+		<error name="WRONGVARFORMAT" code="10" description="Wrong format of the variable." />
+		<error name="WRONGNUMBERRECEIVEDBYTES" code="11" description="Wrong number of received bytes." />
+		<error name="SENDDATA" code="20" description="Error on send data." />
+		<error name="READDATA" code="30" description="Error on read data." />
+		<error name="WRITEDATA" code="50" description="Error on write data." />
+		<error name="INVALIDREADADDRESS" code="60" description="Invalid address." />
+		<error name="INVALIDMAJORVERSION" code="61" description="Invalid Major PLC version." />
+		<error name="INVALIDMINORVERSION" code="62" description="Invalid Minor PLC version." />
+		
+				
+	</errors>
+	
+	
+	<importcomponent uri="LibS7Net.xml" namespace="LibS7Net"/>	
+	  		
+	<class name="Base">
+	</class>
+	
+	<class name="CommandParameters" parent="Base">
+	
+		<method name="WriteString" description="Writes string value.">
+			<param name="Address" type="uint32" pass="in" description="Address of String Variable." />
+			<param name="MaxLength" type="uint32" pass="in" description="Maximum length." />
+			<param name="Value" type="string" pass="in" description="Value of variable." />
+		</method>
+						
+		<method name="WriteBool" description="Writes bool value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Bit" type="uint32" pass="in" description="Bit of the variable (0-7)" />
+			<param name="Value" type="bool" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteByte" description="Writes byte value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Value" type="uint8" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteInt16" description="Writes Int16 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="int16" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteUint16" description="Writes Uint16 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="uint16" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteInt32" description="Writes Int32 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="int32" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteUint32" description="Writes Uint32 value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="uint32" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteReal" description="Writes Real value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="in" description="Value of variable." />
+		</method>
+
+		<method name="WriteLReal" description="Writes LReal value.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="in" description="Value of variable." />
+		</method>
+	</class>
+	
+	
+	<class name="PLCCommunication" parent="Base">
+
+		<method name="SetProtocolConfiguration" description="Configures the protocol">
+			<param name="MajorVersion" type="uint32" pass="in" description="Major Protocol Version" />
+			<param name="MinorVersion" type="uint32" pass="in" description="Minor Protocol Version" />
+			<param name="PatchVersion" type="uint32" pass="in" description="Patch Protocol Version" />
+			<param name="PLCtoAMC_DBNo" type="uint32" pass="in" description="DB Number of PLC to AMC connection" />
+			<param name="PLCtoAMC_Size" type="uint32" pass="in" description="Size of PLC to AMC protocol buffer." />
+			<param name="AMCtoPLC_DBNo" type="uint32" pass="in" description="DB Number of AMC to PLC connection" />
+			<param name="AMCtoPLC_Size" type="uint32" pass="in" description="Size of AMC to PLC protocol buffer." />
+		</method>
+
+		<method name="SetAMCTOPLCOffsets" description="Configures the command offsets">
+			<param name="MajorVersionAddress" type="uint32" pass="in" description="Major Protocol Version Address" />
+			<param name="MinorVersionAddress" type="uint32" pass="in" description="Minor Protocol Version Address" />
+			<param name="PatchVersionAddress" type="uint32" pass="in" description="Patch Protocol Version Address" />
+			<param name="BuildVersionAddress" type="uint32" pass="in" description="Build Protocol Version Address" />
+			<param name="CommandSequenceAddress" type="uint32" pass="in" description="Command Sequence Address" />
+			<param name="CommandIDAddress" type="uint32" pass="in" description="Command ID Address" />
+			<param name="CommandChecksumAddress" type="uint32" pass="in" description="Command Checksum Address" />
+		</method>
+		
+		<method name="SetPLCToAMCOffsets" description="Configures the command offsets">
+			<param name="MajorVersionAddress" type="uint32" pass="in" description="Major Protocol Version Address" />
+			<param name="MinorVersionAddress" type="uint32" pass="in" description="Minor Protocol Version Address" />
+			<param name="PatchVersionAddress" type="uint32" pass="in" description="Patch Protocol Version Address" />
+			<param name="BuildVersionAddress" type="uint32" pass="in" description="Build Protocol Version Address" />
+			<param name="SequenceRunningAddress" type="uint32" pass="in" description="Sequence Running Address" />
+			<param name="SequenceFinishedAddress" type="uint32" pass="in" description="Sequence Finished Address" />
+			<param name="SequenceStatusAddress" type="uint32" pass="in" description="Sequence Status Address" />
+			<param name="SequenceErrorAddress" type="uint32" pass="in" description="Sequence Error Address" />
+		</method>
+
+		<method name="StartCommunication" description="Starts communication with the S7 PLC Instance">
+			<param name="PLC" type="class" class="LibS7Net:PLC" pass="in" description="PLC Instance" />
+		</method>
+		
+		<method name="RetrieveStatus" description="Retrieves the status of the PLC">
+		</method>
+		
+		<method name="StopCommunication" description="Stops communication with the S7 PLC Instance">
+		</method>
+
+		<method name="PrepareParameters" description="Prepares Command Parameters">
+			<param name="Instance" type="class" class="CommandParameters" pass="return" description="Instance of the parameters class." />
+		</method>
+		
+		<method name="ExecuteCommand" description="Executes a command">
+			<param name="ParametersInstance" type="class" class="CommandParameters" pass="in" description="Instance of the parameters class." />
+			<param name="CommandID" type="uint32" pass="in" description="ID of command to be triggered." />
+			<param name="SequenceID" type="uint32" pass="return" description="Sequence ID of the executed command." />
+		</method>
+
+		<method name="CheckCommandExecution" description="Checks the command execution state.">
+			<param name="SequenceID" type="uint32" pass="in" description="Sequence ID of the executed command." />
+			<param name="SequenceIsActive" type="bool" pass="out" description="Returns if the sequence is active." />
+			<param name="SequenceIsFinished" type="bool" pass="out" description="Returns if the sequence is finished." />
+			<param name="ErrorCode" type="uint32" pass="out" description="Current error code if sequence is active and not yet finished." />
+		</method>
+
+
+		<method name="ReadVariableString" description="Returns value of string variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of String Variable." />
+			<param name="MaxLength" type="uint32" pass="in" description="Maximum length." />
+			<param name="Value" type="string" pass="return" description="Value of variable." />
+		</method>
+						
+		<method name="ReadVariableBool" description="Returns value of bool variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Bit" type="uint32" pass="in" description="Bit of the variable (0-7)" />
+			<param name="Value" type="bool" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableByte" description="Returns value of byte variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Bit Variable." />
+			<param name="Value" type="uint8" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableInt16" description="Returns value of Int16 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="int16" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableUint16" description="Returns value of Uint16 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int16 Variable." />
+			<param name="Value" type="uint16" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableInt32" description="Returns value of Int32 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="int32" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableUint32" description="Returns value of Uint32 variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Int32 Variable." />
+			<param name="Value" type="uint32" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableReal" description="Returns value of single precision variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="return" description="Value of variable." />
+		</method>
+
+		<method name="ReadVariableLReal" description="Returns value of double precision variable.">
+			<param name="Address" type="uint32" pass="in" description="Address of Real Variable." />
+			<param name="Value" type="double" pass="return" description="Value of variable." />
+		</method>
+		
+	</class>
+	
+	
+	<global baseclassname="Base" stringoutclassname="Base" acquiremethod="AcquireInstance"
+		releasemethod="ReleaseInstance" versionmethod="GetVersion" errormethod="GetLastError"
+		injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod"		
+		>
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="AcquireInstance" description="Acquire shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>				
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>	
+		<method name="CreatePLCCommunication" description="Returns a PLC Communication instance">
+			<param name="PLCCommunication" type="class" class="PLCCommunication" pass="return" description="PLC Communication Instance" />
+		</method>
+
+	</global>
+</component>

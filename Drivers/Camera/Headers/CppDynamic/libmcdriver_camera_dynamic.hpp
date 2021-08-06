@@ -42,7 +42,7 @@ Interface version: 1.0.0
 #include "libmcdriver_camera_types.hpp"
 #include "libmcdriver_camera_dynamic.h"
 
-#include "libmcdriverenv_dynamic.hpp"
+#include "libmcenv_dynamic.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -261,12 +261,12 @@ public:
 	inline void AcquireInstance(classParam<CBase> pInstance);
 	inline void InjectComponent(const std::string & sNameSpace, const LibMCDriver_Camera_pvoid pSymbolAddressMethod);
 	inline LibMCDriver_Camera_pvoid GetSymbolLookupMethod();
-	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment);
+	inline PDriver CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment);
 
 private:
 	sLibMCDriver_CameraDynamicWrapperTable m_WrapperTable;
 	// Injected Components
-	LibMCDriverEnv::PWrapper m_pLibMCDriverEnvWrapper;
+	LibMCEnv::PWrapper m_pLibMCEnvWrapper;
 
 	
 	LibMCDriver_CameraResult checkBinaryVersion()
@@ -365,10 +365,12 @@ public:
 	{
 	}
 	
+	inline void Configure(const std::string & sConfigurationString);
 	inline std::string GetName();
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_Camera_uint32 & nMajor, LibMCDriver_Camera_uint32 & nMinor, LibMCDriver_Camera_uint32 & nMicro, std::string & sBuild);
 	inline void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName);
+	inline void QueryParameters();
 };
 	
 /*************************************************************************************************************************
@@ -543,11 +545,11 @@ public:
 		CheckError(nullptr,m_WrapperTable.m_InjectComponent(sNameSpace.c_str(), pSymbolAddressMethod));
 		
 		bool bNameSpaceFound = false;
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (m_pLibMCDriverEnvWrapper != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (m_pLibMCEnvWrapper != nullptr) {
 				throw ELibMCDriver_CameraException(LIBMCDRIVER_CAMERA_ERROR_COULDNOTLOADLIBRARY, "Library with namespace " + sNameSpace + " is already registered.");
 			}
-			m_pLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			m_pLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		if (!bNameSpaceFound)
@@ -573,9 +575,9 @@ public:
 	* @param[in] pDriverEnvironment - Environment of this driver.
 	* @return New Driver instance
 	*/
-	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCDriverEnv::CDriverEnvironment> pDriverEnvironment)
+	inline PDriver CWrapper::CreateDriver(const std::string & sName, const std::string & sType, classParam<LibMCEnv::CDriverEnvironment> pDriverEnvironment)
 	{
-		LibMCDriverEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
+		LibMCEnvHandle hDriverEnvironment = pDriverEnvironment.GetHandle();
 		LibMCDriver_CameraHandle hInstance = nullptr;
 		CheckError(nullptr,m_WrapperTable.m_CreateDriver(sName.c_str(), sType.c_str(), hDriverEnvironment, &hInstance));
 		
@@ -603,10 +605,12 @@ public:
 			return LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM;
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
+		pWrapperTable->m_Driver_Configure = nullptr;
 		pWrapperTable->m_Driver_GetName = nullptr;
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
+		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Iterator_MoveNext = nullptr;
 		pWrapperTable->m_Iterator_MovePrevious = nullptr;
 		pWrapperTable->m_Iterator_GetCurrent = nullptr;
@@ -678,6 +682,15 @@ public:
 		#endif // _WIN32
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_CameraDriver_ConfigurePtr) GetProcAddress(hLibrary, "libmcdriver_camera_driver_configure");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Configure = (PLibMCDriver_CameraDriver_ConfigurePtr) dlsym(hLibrary, "libmcdriver_camera_driver_configure");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Configure == nullptr)
+			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_CameraDriver_GetNamePtr) GetProcAddress(hLibrary, "libmcdriver_camera_driver_getname");
 		#else // _WIN32
 		pWrapperTable->m_Driver_GetName = (PLibMCDriver_CameraDriver_GetNamePtr) dlsym(hLibrary, "libmcdriver_camera_driver_getname");
@@ -711,6 +724,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_GetHeaderInformation == nullptr)
+			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_CameraDriver_QueryParametersPtr) GetProcAddress(hLibrary, "libmcdriver_camera_driver_queryparameters");
+		#else // _WIN32
+		pWrapperTable->m_Driver_QueryParameters = (PLibMCDriver_CameraDriver_QueryParametersPtr) dlsym(hLibrary, "libmcdriver_camera_driver_queryparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -927,6 +949,10 @@ public:
 		SymbolLookupType pLookup = (SymbolLookupType)pSymbolLookupMethod;
 		
 		LibMCDriver_CameraResult eLookupError = LIBMCDRIVER_CAMERA_SUCCESS;
+		eLookupError = (*pLookup)("libmcdriver_camera_driver_configure", (void**)&(pWrapperTable->m_Driver_Configure));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Configure == nullptr) )
+			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_camera_driver_getname", (void**)&(pWrapperTable->m_Driver_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetName == nullptr) )
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -941,6 +967,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_camera_driver_getheaderinformation", (void**)&(pWrapperTable->m_Driver_GetHeaderInformation));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_GetHeaderInformation == nullptr) )
+			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_camera_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_CAMERA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_camera_iterator_movenext", (void**)&(pWrapperTable->m_Iterator_MoveNext));
@@ -1045,6 +1075,15 @@ public:
 	 */
 	
 	/**
+	* CDriver::Configure - Configures a driver with its specific configuration data.
+	* @param[in] sConfigurationString - Configuration data of driver.
+	*/
+	void CDriver::Configure(const std::string & sConfigurationString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Configure(m_pHandle, sConfigurationString.c_str()));
+	}
+	
+	/**
 	* CDriver::GetName - returns the name identifier of the driver
 	* @return Name of the driver.
 	*/
@@ -1108,6 +1147,14 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_GetHeaderInformation(m_pHandle, bytesNeededNameSpace, &bytesWrittenNameSpace, &bufferNameSpace[0], bytesNeededBaseName, &bytesWrittenBaseName, &bufferBaseName[0]));
 		sNameSpace = std::string(&bufferNameSpace[0]);
 		sBaseName = std::string(&bufferBaseName[0]);
+	}
+	
+	/**
+	* CDriver::QueryParameters - Stores the driver parameters in the driver environment.
+	*/
+	void CDriver::QueryParameters()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParameters(m_pHandle));
 	}
 	
 	/**

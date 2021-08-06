@@ -330,7 +330,7 @@ LibMCResult libmc_apirequesthandler_getresultdata(LibMC_APIRequestHandler pAPIRe
 /*************************************************************************************************************************
  Class implementation for MCContext
 **************************************************************************************************************************/
-LibMCResult libmc_mccontext_registerlibrarypath(LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath)
+LibMCResult libmc_mccontext_registerlibrarypath(LibMC_MCContext pMCContext, const char * pLibraryName, const char * pLibraryPath, const char * pLibraryResource)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
 
@@ -339,13 +339,43 @@ LibMCResult libmc_mccontext_registerlibrarypath(LibMC_MCContext pMCContext, cons
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		if (pLibraryPath == nullptr)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pLibraryResource == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
 		std::string sLibraryName(pLibraryName);
 		std::string sLibraryPath(pLibraryPath);
+		std::string sLibraryResource(pLibraryResource);
 		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
 		if (!pIMCContext)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
-		pIMCContext->RegisterLibraryPath(sLibraryName, sLibraryPath);
+		pIMCContext->RegisterLibraryPath(sLibraryName, sLibraryPath, sLibraryResource);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_mccontext_settempbasepath(LibMC_MCContext pMCContext, const char * pTempBasePath)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pTempBasePath == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sTempBasePath(pTempBasePath);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIMCContext->SetTempBasePath(sTempBasePath);
 
 		return LIBMC_SUCCESS;
 	}
@@ -435,18 +465,19 @@ LibMCResult libmc_mccontext_terminateallthreads(LibMC_MCContext pMCContext)
 	}
 }
 
-LibMCResult libmc_mccontext_loadclientpackage(LibMC_MCContext pMCContext, LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8 * pZIPStreamBuffer)
+LibMCResult libmc_mccontext_loadclientpackage(LibMC_MCContext pMCContext, const char * pResourcePath)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
 
 	try {
-		if ( (!pZIPStreamBuffer) && (nZIPStreamBufferSize>0))
+		if (pResourcePath == nullptr)
 			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sResourcePath(pResourcePath);
 		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
 		if (!pIMCContext)
 			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
 		
-		pIMCContext->LoadClientPackage(nZIPStreamBufferSize, pZIPStreamBuffer);
+		pIMCContext->LoadClientPackage(sResourcePath);
 
 		return LIBMC_SUCCESS;
 	}
@@ -556,6 +587,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_apirequesthandler_getresultdata;
 	if (sProcName == "libmc_mccontext_registerlibrarypath") 
 		*ppProcAddress = (void*) &libmc_mccontext_registerlibrarypath;
+	if (sProcName == "libmc_mccontext_settempbasepath") 
+		*ppProcAddress = (void*) &libmc_mccontext_settempbasepath;
 	if (sProcName == "libmc_mccontext_parseconfiguration") 
 		*ppProcAddress = (void*) &libmc_mccontext_parseconfiguration;
 	if (sProcName == "libmc_mccontext_startallthreads") 

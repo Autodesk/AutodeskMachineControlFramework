@@ -71,6 +71,8 @@ public:
 
 	CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParameterHandler pParameterHandler, std::string sInstanceName);
 
+	std::string GetMachineState(const std::string& sMachineInstance);
+
 	ISignalTrigger* PrepareSignal(const std::string& sMachineInstance, const std::string& sSignalName) override;
 
 	bool WaitForSignal(const std::string& sSignalName, const LibMCEnv_uint32 nTimeOut, ISignalHandler*& pHandlerInstance) override;
@@ -97,27 +99,7 @@ public:
 
 	bool CheckForTermination() override;
 
-	void StoreString(const std::string& sName, const std::string& sValue) override;
-
-	void StoreUUID(const std::string& sName, const std::string& sValue) override;
-
-	void StoreInteger(const std::string& sName, const LibMCEnv_int64 nValue) override;
-
-	void StoreDouble(const std::string& sName, const LibMCEnv_double dValue) override;
-
-	void StoreBool(const std::string& sName, const bool bValue) override;
-
 	void StoreSignal(const std::string& sName, ISignalHandler* pHandler) override;
-
-	std::string RetrieveString(const std::string& sName) override;
-
-	std::string RetrieveUUID(const std::string& sName) override;
-
-	LibMCEnv_int64 RetrieveInteger(const std::string& sName) override;
-
-	LibMCEnv_double RetrieveDouble(const std::string& sName) override;
-
-	bool RetrieveBool(const std::string& sName) override;
 
 	ISignalHandler* RetrieveSignal(const std::string& sName) override;
 
@@ -142,6 +124,8 @@ public:
 	LibMCEnv_int64 GetIntegerParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
 
 	bool GetBoolParameter(const std::string& sParameterGroup, const std::string& sParameterName) override;
+
+	void LoadResourceData(const std::string& sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8* pResourceDataBuffer) override;
 
 };
 

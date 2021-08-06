@@ -409,10 +409,9 @@ public:
 	* @param[in] sName - Name of the stream.
 	* @param[in] sMimeType - Mime type of the content. MUST NOT be empty.
 	* @param[in] nSize - Final size of the stream. MUST NOT be 0.
-	* @param[in] sSHA2 - SHA256 of the uploaded data.
 	* @param[in] sUserID - Currently authenticated user
 	*/
-	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sSHA2, const std::string & sUserID) = 0;
+	virtual void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID) = 0;
 
 	/**
 	* IStorage::StorePartialStream - stores data in a stream with partial uploads. Uploads should be sequential for optimal performance, but may be in arbitrary order.
@@ -426,8 +425,16 @@ public:
 	/**
 	* IStorage::FinishPartialStream - Finishes storing a stream.
 	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	* @param[in] sSHA2 - SHA256 of the uploaded data. If given initially, MUST be identical.
 	*/
-	virtual void FinishPartialStream(const std::string & sUUID) = 0;
+	virtual void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2) = 0;
+
+	/**
+	* IStorage::FinishPartialStreamBlockwiseSHA256 - Finishes storing a stream with a 64k-Blockwise calculated Checksum.
+	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+	* @param[in] sBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
+	*/
+	virtual void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2) = 0;
 
 	/**
 	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
@@ -461,7 +468,19 @@ typedef IBaseSharedPtr<IStorage> PIStorage;
 class IBuildJobData : public virtual IBase {
 public:
 	/**
-	* IBuildJobData::GetName - returns the name of a build job.
+	* IBuildJobData::GetDataUUID - returns the uuid of a build job data.
+	* @return UUID String
+	*/
+	virtual std::string GetDataUUID() = 0;
+
+	/**
+	* IBuildJobData::GetJobUUID - returns the uuid of the parent build job.
+	* @return UUID String
+	*/
+	virtual std::string GetJobUUID() = 0;
+
+	/**
+	* IBuildJobData::GetName - returns the name of a build job uuid.
 	* @return Name String
 	*/
 	virtual std::string GetName() = 0;
@@ -479,10 +498,28 @@ public:
 	virtual IStorageStream * GetStorageStream() = 0;
 
 	/**
+	* IBuildJobData::GetStorageStreamSHA2 - returns the checksum of the storage stream of the build.
+	* @return SHA256 of the storage stream.
+	*/
+	virtual std::string GetStorageStreamSHA2() = 0;
+
+	/**
+	* IBuildJobData::GetStorageStreamSize - returns the size of the storage stream of the build.
+	* @return size of the storage stream in bytes.
+	*/
+	virtual LibMCData_uint64 GetStorageStreamSize() = 0;
+
+	/**
 	* IBuildJobData::GetDataType - returns the data type of the job data.
 	* @return Data type of the job data
 	*/
 	virtual LibMCData::eBuildJobDataType GetDataType() = 0;
+
+	/**
+	* IBuildJobData::GetDataTypeAsString - returns the data type of the job data as string.
+	* @return Data type of the job data
+	*/
+	virtual std::string GetDataTypeAsString() = 0;
 
 	/**
 	* IBuildJobData::GetMIMEType - returns the mime type of a storage stream.
@@ -620,6 +657,13 @@ public:
 	*/
 	virtual IBuildJobDataIterator * ListJobData() = 0;
 
+	/**
+	* IBuildJob::RetrieveJobData - Retrieves a build job data instance by its uuid.
+	* @param[in] sDataUUID - Job Data UUID.
+	* @return Build Job Data Instance.
+	*/
+	virtual IBuildJobData * RetrieveJobData(const std::string & sDataUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IBuildJob> PIBuildJob;
@@ -664,6 +708,13 @@ public:
 	* @return Build Job Instance.
 	*/
 	virtual IBuildJob * RetrieveJob(const std::string & sJobUUID) = 0;
+
+	/**
+	* IBuildJobHandler::FindJobOfData - Finds the parent build job of a given data uuid. Fails if data does not exist.
+	* @param[in] sDataUUID - Job Data UUID.
+	* @return Build Job Instance.
+	*/
+	virtual IBuildJob * FindJobOfData(const std::string & sDataUUID) = 0;
 
 	/**
 	* IBuildJobHandler::ListJobsByStatus - Retrieves a list of build jobs, filtered by status.

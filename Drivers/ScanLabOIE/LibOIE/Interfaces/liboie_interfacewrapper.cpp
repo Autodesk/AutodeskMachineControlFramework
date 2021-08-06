@@ -1322,7 +1322,7 @@ LibOIEResult liboie_server_listconnections(LibOIE_Server pServer, LibOIE_Connect
 	}
 }
 
-LibOIEResult liboie_server_setconnectionacceptedcallback(LibOIE_Server pServer, LibOIEConnectionAcceptedCallback pCallback)
+LibOIEResult liboie_server_setconnectionacceptedcallback(LibOIE_Server pServer, LibOIEConnectionAcceptedCallback pCallback, LibOIE_pvoid pUserData)
 {
 	IBase* pIBaseClass = (IBase *)pServer;
 
@@ -1331,7 +1331,7 @@ LibOIEResult liboie_server_setconnectionacceptedcallback(LibOIE_Server pServer, 
 		if (!pIServer)
 			throw ELibOIEInterfaceException(LIBOIE_ERROR_INVALIDCAST);
 		
-		pIServer->SetConnectionAcceptedCallback(pCallback);
+		pIServer->SetConnectionAcceptedCallback(pCallback, pUserData);
 
 		return LIBOIE_SUCCESS;
 	}
@@ -1346,7 +1346,7 @@ LibOIEResult liboie_server_setconnectionacceptedcallback(LibOIE_Server pServer, 
 	}
 }
 
-LibOIEResult liboie_server_setconnectionrejectedcallback(LibOIE_Server pServer, LibOIEConnectionRejectedCallback pCallback)
+LibOIEResult liboie_server_setconnectionrejectedcallback(LibOIE_Server pServer, LibOIEConnectionRejectedCallback pCallback, LibOIE_pvoid pUserData)
 {
 	IBase* pIBaseClass = (IBase *)pServer;
 
@@ -1355,7 +1355,7 @@ LibOIEResult liboie_server_setconnectionrejectedcallback(LibOIE_Server pServer, 
 		if (!pIServer)
 			throw ELibOIEInterfaceException(LIBOIE_ERROR_INVALIDCAST);
 		
-		pIServer->SetConnectionRejectedCallback(pCallback);
+		pIServer->SetConnectionRejectedCallback(pCallback, pUserData);
 
 		return LIBOIE_SUCCESS;
 	}

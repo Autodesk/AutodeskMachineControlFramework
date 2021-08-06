@@ -18,9 +18,6 @@
 
 #define LIBS7NET_MAXBYTEBUFFERSIZE (1024 * 1024)
 
-#define __STRINGIZE(x) #x
-#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
-
 interface IBase : public IUnknown
 {
 };
@@ -63,10 +60,12 @@ interface IPLC : public IBase
 
 };
 
+
 interface IWrapper : public IUnknown
 {
-    virtual HRESULT __stdcall CreatePLC(IPLC** ppCalculator) = 0;
+    virtual HRESULT __stdcall CreatePLC(BSTR pCOMHostName, IPLC** ppPLC) = 0;
 };
+
 
 
 class __declspec(uuid("{1C0B49DC-9BE4-4157-97B4-79225AAD7907}")) _CLSID_IBase;
@@ -75,9 +74,11 @@ class __declspec(uuid("{0CDEECF2-4252-4A1A-AE01-C98A9B02C78F}")) _CLSID_IPLC;
 class __declspec(uuid("{C7ADB662-C099-41C1-831D-0F11BAA29640}")) _IID_IPLC;
 class __declspec(uuid("{CB767BA1-E821-4849-8B81-9852F5053384}")) _CLSID_IPLCReadData;
 class __declspec(uuid("{1C670D16-177D-44B2-B9E5-B264520178D6}")) _IID_IPLCReadData;
+class __declspec(uuid("{D4E2B6BD-5043-40BA-AD96-530531E80456}")) _CLSID_IEnvironment;
+class __declspec(uuid("{72AD9C82-DA99-45BF-A13F-6C501F20E466}")) _IID_IEnvironment;
 class __declspec(uuid("{EB056EA7-29D5-480E-A351-C95A544DCC95}")) _CLSID_IWrapper;
 class __declspec(uuid("{10C868F6-6FCA-47FB-B7AA-0160193BA204}")) _IID_IWrapper;
-   
+
 #define CLSID_IBase __uuidof (_CLSID_IBase)
 #define IID_IBase __uuidof (_IID_IBase)
 #define CLSID_IPLC __uuidof (_CLSID_IPLC)
@@ -88,13 +89,17 @@ class __declspec(uuid("{10C868F6-6FCA-47FB-B7AA-0160193BA204}")) _IID_IWrapper;
 #define IID_IWrapper __uuidof (_IID_IWrapper)
 
 
+class CComWrapper;
+typedef std::shared_ptr<CComWrapper> PCOMWrapper;
+
 class CCOMObject {
 private:
     IBase* m_pIBase;
-    std::auto_ptr<std::string> m_pLastError;
+    std::unique_ptr<std::string> m_pLastError;
+    PCOMWrapper m_pCOMWrapper;
 public:
-    CCOMObject(IBase* pIBase)
-        : m_pIBase(pIBase)
+    CCOMObject(IBase* pIBase, PCOMWrapper pCOMWrapper)
+        : m_pIBase(pIBase), m_pCOMWrapper (pCOMWrapper)
     {        
     }
 
@@ -183,6 +188,12 @@ public:
         }
     }
 
+
+    PCOMWrapper getCOMWrapper()
+    {
+        return m_pCOMWrapper;
+    }
+
 };
 
 
@@ -191,6 +202,8 @@ class CComWrapper {
 private:
     std::mutex m_Mutex;
     IWrapper* m_pWrapper;
+
+    std::string m_sCOMHostName;
 
     void _releaseModule()
     {
@@ -204,9 +217,8 @@ private:
         _releaseModule();
 
         CoInitialize(nullptr);
-		
-		std::string sCOMHost = std::string (__STRINGIZE_VALUE_OF(__GITHASH)) + "_libs7net_managed.comhost.dll";
-		std::wstring sCOMHostW (sCOMHost.begin(), sCOMHost.end());
+				
+		std::wstring sCOMHostW (m_sCOMHostName.begin(), m_sCOMHostName.end());
 
         HMODULE hModule = LoadLibraryW (sCOMHostW.c_str ());
         if (hModule != nullptr) {
@@ -239,8 +251,8 @@ private:
 public:
 
 
-    CComWrapper()
-        : m_pWrapper(nullptr)
+    CComWrapper(const std::string & sCOMHostName)
+        : m_pWrapper(nullptr), m_sCOMHostName (sCOMHostName)
     {
     }
 
@@ -261,8 +273,6 @@ public:
 
 };
 
-
-CComWrapper GlobalWrapper;
 
 extern "C" {
 
@@ -532,8 +542,9 @@ extern "C" {
             return LIBS7NET_ERROR_INVALIDPARAM;
         if (pReadData == nullptr)
             return LIBS7NET_ERROR_INVALIDPARAM;
-
-        IPLC* iPLC = ((CCOMObject*)pPLC)->castToPLC();
+        
+        auto comPLC = (CCOMObject*)pPLC;
+        IPLC* iPLC = comPLC->castToPLC();
         if (iPLC == nullptr)
             return LIBS7NET_ERROR_INVALIDCAST;
 
@@ -542,7 +553,7 @@ extern "C" {
         if ((iPLCReadData == nullptr) || (hResult != S_OK))
             return LIBS7NET_ERROR_GENERICEXCEPTION;
 
-        *pReadData = new CCOMObject(iPLCReadData);
+        *pReadData = new CCOMObject(iPLCReadData, comPLC->getCOMWrapper ());
 
         return LIBS7NET_SUCCESS;
     }
@@ -624,28 +635,100 @@ extern "C" {
     }
 
 
-    LIBS7NET_DECLSPEC LibS7NetResult libs7net_createplc(LibS7Net_PLC* pVálue)
+    LIBS7NET_DECLSPEC LibS7NetResult libs7net_createplc(const char* pCOMHost, LibS7Net_PLC* pPLCInstance)
     {
-        if (pVálue == nullptr)
+        if (pCOMHost == nullptr)
+            return LIBS7NET_ERROR_INVALIDPARAM;
+        if (pPLCInstance == nullptr)
             return LIBS7NET_ERROR_INVALIDPARAM;
 
-        IWrapper* iWrapper = GlobalWrapper.getWrapper ();
+        auto pCOMWrapper = std::make_shared<CComWrapper>(pCOMHost);
+
+        IWrapper* iWrapper = pCOMWrapper->getWrapper ();
         if (iWrapper == nullptr)
             return LIBS7NET_ERROR_GENERICEXCEPTION;
-        
+
+        std::string sString = pCOMHost;
+        std::wstring sWideString(sString.begin(), sString.end());
+        BSTR oleString = SysAllocString(sWideString.c_str());
+
         IPLC* iPLC = nullptr;
-        HRESULT hResult = iWrapper->CreatePLC (&iPLC);
+        HRESULT hResult = iWrapper->CreatePLC (oleString, &iPLC);
+
+        SysFreeString(oleString);
+
         if ((iPLC == nullptr) || (hResult != S_OK))
             return LIBS7NET_ERROR_GENERICEXCEPTION;
 
-        *pVálue = new CCOMObject(iPLC);
+        *pPLCInstance = new CCOMObject(iPLC, pCOMWrapper);
 
         return LIBS7NET_SUCCESS;
 
     }
 
+    LibS7NetResult LibS7Net_GetProcAddress(const char* pProcName, void** ppProcAddress)
+    {
+        if (pProcName == nullptr)
+            return LIBS7NET_ERROR_INVALIDPARAM;
+        if (ppProcAddress == nullptr)
+            return LIBS7NET_ERROR_INVALIDPARAM;
+        *ppProcAddress = nullptr;
+        std::string sProcName(pProcName);
+
+        
+        if (sProcName == "libs7net_plcreaddata_getdata")
+            *ppProcAddress = (void*)&libs7net_plcreaddata_getdata;
+        if (sProcName == "libs7net_plc_connect")
+            *ppProcAddress = (void*)&libs7net_plc_connect;
+        if (sProcName == "libs7net_plc_isconnected")
+            *ppProcAddress = (void*)&libs7net_plc_isconnected;
+        if (sProcName == "libs7net_plc_isavailable")
+            *ppProcAddress = (void*)&libs7net_plc_isavailable;
+        if (sProcName == "libs7net_plc_getslot")
+            *ppProcAddress = (void*)&libs7net_plc_getslot;
+        if (sProcName == "libs7net_plc_getrack")
+            *ppProcAddress = (void*)&libs7net_plc_getrack;
+        if (sProcName == "libs7net_plc_getcputype")
+            *ppProcAddress = (void*)&libs7net_plc_getcputype;
+        if (sProcName == "libs7net_plc_getipaddress")
+            *ppProcAddress = (void*)&libs7net_plc_getipaddress;
+        if (sProcName == "libs7net_plc_writebytes")
+            *ppProcAddress = (void*)&libs7net_plc_writebytes;
+        if (sProcName == "libs7net_plc_readbytes")
+            *ppProcAddress = (void*)&libs7net_plc_readbytes;
+        if (sProcName == "libs7net_getversion")
+            *ppProcAddress = (void*)&libs7net_getversion;
+        if (sProcName == "libs7net_getlasterror")
+            *ppProcAddress = (void*)&libs7net_getlasterror;
+        if (sProcName == "libs7net_acquireinstance")
+            *ppProcAddress = (void*)&libs7net_acquireinstance;
+        if (sProcName == "libs7net_releaseinstance")
+            *ppProcAddress = (void*)&libs7net_releaseinstance;
+        if (sProcName == "libs7net_getsymbollookupmethod")
+            *ppProcAddress = (void*)&libs7net_getsymbollookupmethod;
+        if (sProcName == "libs7net_createplc")
+            *ppProcAddress = (void*)&libs7net_createplc;
+
+        if (*ppProcAddress == nullptr)
+            return LIBS7NET_ERROR_COULDNOTFINDLIBRARYEXPORT;
+        return LIBS7NET_SUCCESS;
+    }
+
+   
+
+    LIBS7NET_DECLSPEC LibS7NetResult libs7net_getsymbollookupmethod(LibS7Net_pvoid* pSymbolLookupMethod)
+    {
+        if (pSymbolLookupMethod == nullptr)
+            return LIBS7NET_ERROR_INVALIDPARAM;
+
+        *pSymbolLookupMethod = (void*)&LibS7Net_GetProcAddress;
+
+        return LIBS7NET_SUCCESS;
+    }
 
 }
+
+
 
 
 

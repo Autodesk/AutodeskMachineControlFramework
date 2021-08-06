@@ -32,10 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
 #include <thread>
+#include <iostream>
 
-#ifdef __linux__
-#include <math.h>
-#endif
+#include <cmath>
 
 #define MARLINDRIVER_MINSPEED 0.0001
 
@@ -48,7 +47,7 @@ namespace AMC {
 		m_bIsConnected(false),
 		m_bDoQueryFirmwareInfo(bDoQueryFirmwareInfo),
 		m_bDisableHoming(bDisableHoming),
-		m_dStatusUpdateTimerInterval(100),
+		m_nStatusUpdateTimerInterval(100),
 		m_sAckSymbol("ok"),
 		m_nLineNumber(1),
 		m_bDebug(bDebug),
@@ -82,9 +81,9 @@ namespace AMC {
 			m_bIsHomed = true;
 	}
 
-	void CSerialController_Marlin::setStatusUpdateTimerInterval(const double dStatusUpdateTimerInterval)
+	void CSerialController_Marlin::setStatusUpdateTimerInterval(const uint32_t nStatusUpdateTimerInterval)
 	{
-		m_dStatusUpdateTimerInterval = dStatusUpdateTimerInterval;
+		m_nStatusUpdateTimerInterval = nStatusUpdateTimerInterval;
 	}
 
 
@@ -175,7 +174,7 @@ namespace AMC {
 
 		// reset line number
 		std::stringstream sCommand;
-		sCommand << "M110 " << m_nLineNumber;
+		sCommand << "M110 N" << m_nLineNumber;
 		sendCommand(sCommand.str());
 
 		m_nCurrentBufferSpace = 0;
@@ -391,13 +390,7 @@ namespace AMC {
 	{
 		if ((nExtruderIndex >= 0) && (nExtruderIndex < m_iExtruderCount))
 		{
-			// TODO XXXXXXXXXXXXXXXXXXXXXX to reduce output on cmd line switch debug off temporarily
-			bool bResetDebug = m_bDebug;
-			if (m_bDebug) {
-				m_bDebug = false;
-			}
 			auto sStream = sendCommand("M105 T" + std::to_string(nExtruderIndex));
-			m_bDebug = bResetDebug;
 			
 			auto sLine = sStream.str();
 			auto nPosition = sLine.find("T:");
@@ -578,13 +571,7 @@ namespace AMC {
 
 	void CSerialController_Marlin::queryPositionState()
 	{
-		// TODO XXXXXXXXXXXXXXXXXXXXXX to reduce output on cmd line switch debug off temporarily
-		bool bResetDebug = m_bDebug;
-		if (m_bDebug) {
-			m_bDebug = false;
-		}
 		auto sStream = sendCommand("M114");
-		m_bDebug = bResetDebug;
 		
 		auto sLine = sStream.str();
 
@@ -757,8 +744,8 @@ namespace AMC {
 		if (bInE && !bFastMove) {
 			// E given => add E+value to command str
 			// TODO XXXXXXXXXXXXXXXX remove to activate Extrusion
-			//sCommand << " E" << dE;
-			std::cout << "CALCULATED E = " << dE << std::endl;
+			sCommand << " E" << dE;
+			//std::cout << "CALCULATED E = " << dE << std::endl;
 		}
 		if (dSpeedInMMperSecond > 0) {
 			if (fabs(m_dCurrentSpeedInMMperSecond - dSpeedInMMperSecond) > MARLINDRIVER_MINSPEED) {
@@ -880,8 +867,8 @@ namespace AMC {
 			sCommand << " F" << (int)(dSpeedInMMperSecond * 60.0);
 		}
 		// TODO XXXXXXXXXXXXXXXX activate to do extrusion
-		//sendCommand(sCommand.str());
-		std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
+		sendCommand(sCommand.str());
+		//std::cout << "EXTRUDEDOEXTRUDE:  " << sCommand.str() <<  std::endl;
 	}
 
 

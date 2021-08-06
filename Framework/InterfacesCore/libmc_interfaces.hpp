@@ -313,8 +313,15 @@ public:
 	* IMCContext::RegisterLibraryPath - registers a library for a given name.
 	* @param[in] sLibraryName - Library Name.
 	* @param[in] sLibraryPath - Path to the shared library.
+	* @param[in] sLibraryResource - Path to the library resource file.
 	*/
-	virtual void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath) = 0;
+	virtual void RegisterLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string & sLibraryResource) = 0;
+
+	/**
+	* IMCContext::SetTempBasePath - sets the base path for temporary files.
+	* @param[in] sTempBasePath - Base path for temporary files.
+	*/
+	virtual void SetTempBasePath(const std::string & sTempBasePath) = 0;
 
 	/**
 	* IMCContext::ParseConfiguration - parses and initialises the state machines from a configuration XML.
@@ -334,10 +341,9 @@ public:
 
 	/**
 	* IMCContext::LoadClientPackage - load a client package to serve the client website.
-	* @param[in] nZIPStreamBufferSize - Number of elements in buffer
-	* @param[in] pZIPStreamBuffer - client package ZIP stream.
+	* @param[in] sResourcePath - Path to the resource package.
 	*/
-	virtual void LoadClientPackage(const LibMC_uint64 nZIPStreamBufferSize, const LibMC_uint8 * pZIPStreamBuffer) = 0;
+	virtual void LoadClientPackage(const std::string & sResourcePath) = 0;
 
 	/**
 	* IMCContext::Log - log message with a certain log level.

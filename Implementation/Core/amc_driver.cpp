@@ -31,18 +31,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define _AMC_DRIVER_HEADERPROTECTION
 #include "amc_driver.hpp"
-#include "libmc_interfaceexception.hpp"
-
+#include "libmc_exceptiontypes.hpp"
+#include "libmcenv_driverenvironment.hpp"
+#include "Common/common_importstream_native.hpp"
 
 using namespace AMC;
 
-CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibrary, LibMCDriverEnv::PDriverEnvironment pDriverEnvironment)
-	: m_sName (sName), m_sType (sType), m_sLibrary (sLibrary)
-{
 
-	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibrary);
-	m_pDriverWrapper->InjectComponent("LibMCDriverEnv", pDriverEnvironment->wrapper()->GetSymbolLookupMethod());
-	m_pDriverInstance = m_pDriverWrapper->CreateDriver (sName, sType, pDriverEnvironment.get());
+template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
+{
+	LibMCAssertNotNull (pWrapper.get());
+
+	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
+	pImplInstance->IncRefCount();
+	return pExternalInstance;
+}
+
+
+CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment)
+	: m_sName(sName), m_sType(sType), m_sLibraryPath(sLibraryPath), m_pDriverResourcePackage (pDriverResourcePackage), m_pParameterGroup(pParameterGroup)
+{
+	LibMCAssertNotNull(pParameterGroup.get());
+	LibMCAssertNotNull(pDriverEnvironment.get());
+	LibMCAssertNotNull(pMCEnvWrapper.get());
+	LibMCAssertNotNull(pDriverResourcePackage.get());
+
+	m_pDriverEnvironment = pDriverEnvironment;
+	m_pMCEnvWrapper = pMCEnvWrapper;
+
+	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibraryPath);
+	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCEnv::CDriverEnvironment>(pDriverEnvironment, m_pMCEnvWrapper);
+
+	m_pDriverWrapper->InjectComponent("LibMCEnv", m_pMCEnvWrapper->GetSymbolLookupMethod());
+	m_pDriverInstance = m_pDriverWrapper->CreateDriver (sName, sType, pExternalEnvironment.get());
 }
 
 CDriver::~CDriver()
@@ -52,10 +73,15 @@ CDriver::~CDriver()
 }
 
 
+void CDriver::configureDriver(const std::string& sConfigurationData)
+{
+	m_pDriverInstance->Configure(sConfigurationData);
+}
+
 HDriverHandle CDriver::acquireDriverHandle(const std::string& sInstanceName)
 {		
 	if (!m_sReservationInstance.empty())
-		throw ELibMCInterfaceException(LIBMC_ERROR_DRIVERALREADYRESERVED);
+		throw ELibMCCustomException(LIBMC_ERROR_DRIVERALREADYRESERVED, m_sName);
 
 	m_sReservationInstance = sInstanceName;
 	m_pDriverWrapper->AcquireInstance(m_pDriverInstance.get());
@@ -79,6 +105,10 @@ std::string CDriver::getType()
 	return m_sType;
 }
 
+PParameterGroup CDriver::getParameterGroup()
+{
+	return m_pParameterGroup;
+}
 
 HSymbolLookupHandle CDriver::getSymbolLookup()
 {

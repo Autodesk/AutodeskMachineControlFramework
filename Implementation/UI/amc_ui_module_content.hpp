@@ -39,31 +39,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
+#include "amc_ui_module_contentitem_form.hpp"
+#include "amc_ui_interfaces.hpp"
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
+
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
-	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
+	amcDeclareDependingClass(CUIModule_ContentForm, PUIModule_ContentForm);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CUIModule_ContentFormRegistry, PUIModule_ContentFormRegistry);
+	
 
 	class CUIModule_Content : public CUIModule {
 	protected:		
 
 		std::string m_sHeadLine;
+		std::string m_sCaption;
 		std::string m_sTitle;
 		std::string m_sSubtitle;
 
+		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
 		std::vector<PUIModule_ContentItem> m_Items;
-		std::vector<PUIModule_ContentButton> m_Buttons;
+
+		void addItem(PUIModule_ContentItem pItem);
 
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode);
+		CUIModule_Content(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_Content();
 
 		virtual std::string getType() override;
+
+		virtual std::string getCaption() override;
 
 		static std::string getStaticType();
 
@@ -71,7 +87,14 @@ namespace AMC {
 		std::string getTitle ();
 		std::string getSubtitle ();
 
-		virtual void writeToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+
+		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
+
+
+		virtual PUIModuleItem findItem(const std::string& sUUID) override;
+
+		void configurePostLoading() override;
 
 	};
 

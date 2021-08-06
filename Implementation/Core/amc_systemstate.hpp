@@ -48,16 +48,16 @@ namespace LibMCData {
 	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
 }
 
-namespace LibMCDriverEnv {
-	class CWrapper;
-	typedef std::shared_ptr<CWrapper> PWrapper;
-}
 
 namespace AMCCommon {
 	class CChrono;
 	typedef std::shared_ptr<CChrono> PChrono;
 }
 
+namespace LibMCEnv {
+	class CWrapper;
+	typedef std::shared_ptr<CWrapper> PWrapper;
+}
 
 namespace AMC {
 
@@ -67,6 +67,8 @@ namespace AMC {
 	class CToolpathHandler;
 	class CServiceHandler;
 	class CUIHandler;
+	class CParameterHandler;
+	class CStateMachineData;
 
 	typedef std::shared_ptr<CLogger> PLogger;
 	typedef std::shared_ptr<CStateSignalHandler> PStateSignalHandler;
@@ -74,6 +76,8 @@ namespace AMC {
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 	typedef std::shared_ptr<CServiceHandler> PServiceHandler;
 	typedef std::shared_ptr<CUIHandler> PUIHandler;
+	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
 
 	class CSystemState {
 	private:
@@ -83,7 +87,8 @@ namespace AMC {
 		AMC::PToolpathHandler m_pToolpathHandler;
 		AMC::PServiceHandler m_pServiceHandler;
 		AMC::PUIHandler m_pUIHandler;
-		
+		AMC::PStateMachineData m_pStateMachineData;
+
 		AMCCommon::PChrono m_pGlobalChrono;
 
 		LibMCData::PDataModel m_pDataModel;
@@ -91,13 +96,14 @@ namespace AMC {
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		LibMCData::PLoginHandler m_pLoginHandler;
 
-		std::map <std::string, std::string> m_LibraryPathes;
+		std::map <std::string, std::pair <std::string, std::string>> m_LibraryPathes;
 
 		std::string m_sInstallationUUID;
-		std::string m_sInstallationSecret;
+		std::string m_sInstallationSecret;		
+
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCDriverEnv::PWrapper pDriverEnvWrapper);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper);
 
 		virtual ~CSystemState();
 
@@ -107,6 +113,7 @@ namespace AMC {
 		CToolpathHandler* toolpathHandler();
 		CServiceHandler* serviceHandler();
 		CUIHandler* uiHandler();
+		CStateMachineData* stateMachineData();
 
 		LibMCData::CStorage * storage();
 		LibMCData::CBuildJobHandler * buildJobHandler();
@@ -118,16 +125,21 @@ namespace AMC {
 		PStateSignalHandler getStateSignalHandlerInstance();
 		PDriverHandler getDriverHandlerInstance();
 		PToolpathHandler getToolpathHandlerInstance();
+		PStateMachineData getStateMachineData ();
+
 		LibMCData::PLoginHandler getLoginHandlerInstance();
+		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
 		AMCCommon::PChrono getGlobalChronoInstance();
 
-		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath);
+		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);
 		std::string getLibraryPath(const std::string& sLibraryName);
+		std::string getLibraryResourcePath(const std::string& sLibraryName);
 
 		std::string getSystemUserID();
 		std::string getInstallationUUID(); // Returns a unique UUID of the installation
 		std::string getInstallationSecret(); // Returns a unique Secret SHA256 String of the installation. MUST NOT be shared externally.
 		std::string getGitHash();
+
 
 
 	};

@@ -39,19 +39,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
+#include "amc_ui_interfaces.hpp"
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+
 
 	class CUIModuleFactory {
 	protected:
 		
 	public:
 	
-		static PUIModule createModule (pugi::xml_node & xmlNode);
+		static PUIModule createModule (pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 										
 	};
 

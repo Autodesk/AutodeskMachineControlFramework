@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_scanlab_interfaceexception.hpp"
 
 // Include custom headers here.
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
+
 
 
 using namespace LibMCDriver_ScanLab::Impl;
@@ -40,3 +43,16 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CDriver 
 **************************************************************************************************************************/
 
+void CDriver::GetVersion(LibMCDriver_ScanLab_uint32& nMajor, LibMCDriver_ScanLab_uint32& nMinor, LibMCDriver_ScanLab_uint32& nMicro, std::string& sBuild)
+{
+	nMajor = LIBMCDRIVER_SCANLAB_VERSION_MAJOR;
+	nMinor = LIBMCDRIVER_SCANLAB_VERSION_MINOR;
+	nMicro = LIBMCDRIVER_SCANLAB_VERSION_MICRO;
+	sBuild = __STRINGIZE_VALUE_OF (__GITHASH);
+}
+
+void CDriver::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
+{
+	sNameSpace = "LibMCDriver_ScanLab";
+	sBaseName = "libmcdriver_scanlab";
+}

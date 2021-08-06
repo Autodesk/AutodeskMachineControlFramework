@@ -40,7 +40,10 @@ namespace AMC {
 
 	class CAPIAuth;
 	typedef std::shared_ptr<CAPIAuth> PAPIAuth;
-	
+
+	class CParameterHandler;
+	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+
 
 	class CAPIAuth {
 	private:
@@ -50,11 +53,13 @@ namespace AMC {
 		std::string m_sUserName;
 		bool m_bIsAuthorized;
 
+		PParameterHandler m_pClientVariableHandler;
+
 	protected:
 
 	public:
 
-		CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string & sUserName, bool bIsAuthorized);
+		CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string & sUserName, bool bIsAuthorized, PParameterHandler pClientVariableHandler);
 
 		virtual ~CAPIAuth();
 		
@@ -67,6 +72,8 @@ namespace AMC {
 		bool userIsAuthorized();
 
 		bool contextUUIDIsAuthorized(std::string & sContextUUID);
+
+		PParameterHandler getClientVariableHandler ();
 								
 	};
 

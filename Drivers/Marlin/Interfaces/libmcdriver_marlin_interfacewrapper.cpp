@@ -83,6 +83,33 @@ LibMCDriver_MarlinResult handleUnhandledException(IBase * pIBaseClass)
 /*************************************************************************************************************************
  Class implementation for Driver
 **************************************************************************************************************************/
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_configure(LibMCDriver_Marlin_Driver pDriver, const char * pConfigurationString)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		if (pConfigurationString == nullptr)
+			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
+		std::string sConfigurationString(pConfigurationString);
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver->Configure(sConfigurationString);
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_MarlinResult libmcdriver_marlin_driver_getname(LibMCDriver_Marlin_Driver pDriver, const LibMCDriver_Marlin_uint32 nNameBufferSize, LibMCDriver_Marlin_uint32* pNameNeededChars, char * pNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
@@ -293,11 +320,35 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_getheaderinformation(LibMCDri
 	}
 }
 
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_Marlin_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_MARLIN_SUCCESS;
+	}
+	catch (ELibMCDriver_MarlinInterfaceException & Exception) {
+		return handleLibMCDriver_MarlinException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_Marlin
 **************************************************************************************************************************/
-LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_double dStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout)
+LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Marlin_Driver_Marlin pDriver_Marlin, const char * pCOMPort, LibMCDriver_Marlin_uint32 nBaudrate, LibMCDriver_Marlin_uint32 nStatusUpdateInterval, LibMCDriver_Marlin_uint32 nConnectTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Marlin;
 
@@ -309,7 +360,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_driver_marlin_connect(LibMCDriver_Ma
 		if (!pIDriver_Marlin)
 			throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		
-		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, dStatusUpdateInterval, nConnectTimeout);
+		pIDriver_Marlin->Connect(sCOMPort, nBaudrate, nStatusUpdateInterval, nConnectTimeout);
 
 		return LIBMCDRIVER_MARLIN_SUCCESS;
 	}
@@ -1122,6 +1173,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 	*ppProcAddress = nullptr;
 	std::string sProcName (pProcName);
 	
+	if (sProcName == "libmcdriver_marlin_driver_configure") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_configure;
 	if (sProcName == "libmcdriver_marlin_driver_getname") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getname;
 	if (sProcName == "libmcdriver_marlin_driver_gettype") 
@@ -1130,6 +1183,8 @@ LibMCDriver_MarlinResult LibMCDriver_Marlin::Impl::LibMCDriver_Marlin_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getversion;
 	if (sProcName == "libmcdriver_marlin_driver_getheaderinformation") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_getheaderinformation;
+	if (sProcName == "libmcdriver_marlin_driver_queryparameters") 
+		*ppProcAddress = (void*) &libmcdriver_marlin_driver_queryparameters;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_connect") 
 		*ppProcAddress = (void*) &libmcdriver_marlin_driver_marlin_connect;
 	if (sProcName == "libmcdriver_marlin_driver_marlin_disconnect") 
@@ -1343,11 +1398,11 @@ LibMCDriver_MarlinResult libmcdriver_marlin_injectcomponent(const char * pNameSp
 		
 		bool bNameSpaceFound = false;
 		
-		if (sNameSpace == "LibMCDriverEnv") {
-			if (CWrapper::sPLibMCDriverEnvWrapper.get() != nullptr) {
+		if (sNameSpace == "LibMCEnv") {
+			if (CWrapper::sPLibMCEnvWrapper.get() != nullptr) {
 				throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_COULDNOTLOADLIBRARY);
 			}
-			CWrapper::sPLibMCDriverEnvWrapper = LibMCDriverEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
+			CWrapper::sPLibMCEnvWrapper = LibMCEnv::CWrapper::loadLibraryFromSymbolLookupMethod(pSymbolAddressMethod);
 			bNameSpaceFound = true;
 		}
 		
@@ -1388,7 +1443,7 @@ LibMCDriver_MarlinResult libmcdriver_marlin_getsymbollookupmethod(LibMCDriver_Ma
 	}
 }
 
-LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCDriverEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance)
+LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, const char * pType, LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCDriver_Marlin_Driver * pInstance)
 {
 	IBase* pIBaseClass = nullptr;
 
@@ -1401,8 +1456,8 @@ LibMCDriver_MarlinResult libmcdriver_marlin_createdriver(const char * pName, con
 			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sType(pType);
-		LibMCDriverEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCDriverEnv::CDriverEnvironment>(CWrapper::sPLibMCDriverEnvWrapper.get(), pDriverEnvironment);
-		CWrapper::sPLibMCDriverEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
+		LibMCEnv::PDriverEnvironment pIDriverEnvironment = std::make_shared<LibMCEnv::CDriverEnvironment>(CWrapper::sPLibMCEnvWrapper.get(), pDriverEnvironment);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIDriverEnvironment.get());
 		if (!pIDriverEnvironment)
 			throw ELibMCDriver_MarlinInterfaceException (LIBMCDRIVER_MARLIN_ERROR_INVALIDCAST);
 		

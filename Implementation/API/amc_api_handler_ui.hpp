@@ -44,7 +44,9 @@ namespace AMC {
 		utUnknown = 0,
 		utConfiguration = 1,
 		utState = 2,
-		utImage = 3
+		utImage = 3,
+		utContentItem = 4,
+		utEvent = 5
 	};
 
 	class CAPIHandler_UI : public CAPIHandler {
@@ -56,7 +58,9 @@ namespace AMC {
 
 		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
 		void handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth);
-		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);
+		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);		
+		void handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth);
+		void handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:
 
@@ -67,6 +71,8 @@ namespace AMC {
 		virtual void checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) override;
 
 		virtual std::string getBaseURI () override;
+
+		virtual bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType) override;
 
 		virtual PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth) override;
 

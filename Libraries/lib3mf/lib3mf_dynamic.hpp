@@ -805,6 +805,7 @@ public:
 	
 	inline Lib3MF_uint32 GetMetaDataCount();
 	inline PMetaData GetMetaData(const Lib3MF_uint32 nIndex);
+	inline bool HasMetaData(const std::string & sNameSpace, const std::string & sName);
 	inline PMetaData GetMetaDataByKey(const std::string & sNameSpace, const std::string & sName);
 	inline void RemoveMetaDataByIndex(const Lib3MF_uint32 nIndex);
 	inline void RemoveMetaData(CMetaData * pTheMetaData);
@@ -1235,15 +1236,11 @@ public:
 	
 	inline std::string GetUUID();
 	inline std::string GetName();
-	inline Lib3MF_double GetLaserPower();
-	inline Lib3MF_double GetLaserSpeed();
-	inline Lib3MF_double GetLaserFocus();
-	inline Lib3MF_uint32 GetLaserIndex();
+	inline bool HasParameterValue(const std::string & sNameSpaceName, const std::string & sValueName);
+	inline Lib3MF_double GetParameterDoubleValue(const std::string & sNameSpaceName, const std::string & sValueName);
+	inline Lib3MF_double GetParameterDoubleValueDef(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF_double dDefaultValue);
 	inline void SetName(const std::string & sName);
-	inline void SetLaserPower(const Lib3MF_double dLaserPower);
-	inline void SetLaserSpeed(const Lib3MF_double dLaserSpeed);
-	inline void SetLaserFocus(const Lib3MF_double dLaserFocus);
-	inline void SetLaserIndex(const Lib3MF_uint32 nLaserIndex);
+	inline void SetParameterDoubleValue(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF_double dValue);
 };
 	
 /*************************************************************************************************************************
@@ -1265,7 +1262,7 @@ public:
 	inline void GetSegmentInfo(const Lib3MF_uint32 nIndex, eToolpathSegmentType & eType, Lib3MF_uint32 & nPointCount);
 	inline PToolpathProfile GetSegmentProfile(const Lib3MF_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const Lib3MF_uint32 nIndex);
-	inline PToolpathProfile GetSegmentPart(const Lib3MF_uint32 nIndex);
+	inline PBuildItem GetSegmentPart(const Lib3MF_uint32 nIndex);
 	inline std::string GetSegmentPartUUID(const Lib3MF_uint32 nIndex);
 	inline void GetSegmentPointData(const Lib3MF_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 };
@@ -1286,7 +1283,7 @@ public:
 	
 	inline std::string GetLayerDataUUID();
 	inline Lib3MF_uint32 RegisterProfile(CToolpathProfile * pProfile);
-	inline Lib3MF_uint32 RegisterPart(CObject * pPart);
+	inline Lib3MF_uint32 RegisterBuildItem(CBuildItem * pBuildItem);
 	inline void WriteHatchData(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
 	inline void WriteLoop(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
 	inline void WritePolyline(const Lib3MF_uint32 nProfileID, const Lib3MF_uint32 nPartID, const CInputVector<sPosition2D> & PointDataBuffer);
@@ -1316,7 +1313,7 @@ public:
 	inline std::string GetLayerPath(const Lib3MF_uint32 nIndex);
 	inline Lib3MF_uint32 GetLayerZMax(const Lib3MF_uint32 nIndex);
 	inline Lib3MF_uint32 GetLayerZ(const Lib3MF_uint32 nLayerIndex);
-	inline PToolpathProfile AddProfile(const std::string & sName, const Lib3MF_double dLaserPower, const Lib3MF_double dLaserSpeed, const Lib3MF_double dLaserFocus, const Lib3MF_uint32 nLaserIndex);
+	inline PToolpathProfile AddProfile(const std::string & sName);
 	inline PToolpathProfile GetProfile(const Lib3MF_uint32 nProfileIndex);
 	inline PToolpathProfile GetProfileUUID(const std::string & sProfileUUID);
 };
@@ -1766,6 +1763,7 @@ public:
 		pWrapperTable->m_MetaData_SetValue = nullptr;
 		pWrapperTable->m_MetaDataGroup_GetMetaDataCount = nullptr;
 		pWrapperTable->m_MetaDataGroup_GetMetaData = nullptr;
+		pWrapperTable->m_MetaDataGroup_HasMetaData = nullptr;
 		pWrapperTable->m_MetaDataGroup_GetMetaDataByKey = nullptr;
 		pWrapperTable->m_MetaDataGroup_RemoveMetaDataByIndex = nullptr;
 		pWrapperTable->m_MetaDataGroup_RemoveMetaData = nullptr;
@@ -1924,15 +1922,11 @@ public:
 		pWrapperTable->m_Slice_GetZTop = nullptr;
 		pWrapperTable->m_ToolpathProfile_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathProfile_GetName = nullptr;
-		pWrapperTable->m_ToolpathProfile_GetLaserPower = nullptr;
-		pWrapperTable->m_ToolpathProfile_GetLaserSpeed = nullptr;
-		pWrapperTable->m_ToolpathProfile_GetLaserFocus = nullptr;
-		pWrapperTable->m_ToolpathProfile_GetLaserIndex = nullptr;
+		pWrapperTable->m_ToolpathProfile_HasParameterValue = nullptr;
+		pWrapperTable->m_ToolpathProfile_GetParameterDoubleValue = nullptr;
+		pWrapperTable->m_ToolpathProfile_GetParameterDoubleValueDef = nullptr;
 		pWrapperTable->m_ToolpathProfile_SetName = nullptr;
-		pWrapperTable->m_ToolpathProfile_SetLaserPower = nullptr;
-		pWrapperTable->m_ToolpathProfile_SetLaserSpeed = nullptr;
-		pWrapperTable->m_ToolpathProfile_SetLaserFocus = nullptr;
-		pWrapperTable->m_ToolpathProfile_SetLaserIndex = nullptr;
+		pWrapperTable->m_ToolpathProfile_SetParameterDoubleValue = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentInfo = nullptr;
@@ -1943,7 +1937,7 @@ public:
 		pWrapperTable->m_ToolpathLayerReader_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayerData_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayerData_RegisterProfile = nullptr;
-		pWrapperTable->m_ToolpathLayerData_RegisterPart = nullptr;
+		pWrapperTable->m_ToolpathLayerData_RegisterBuildItem = nullptr;
 		pWrapperTable->m_ToolpathLayerData_WriteHatchData = nullptr;
 		pWrapperTable->m_ToolpathLayerData_WriteLoop = nullptr;
 		pWrapperTable->m_ToolpathLayerData_WritePolyline = nullptr;
@@ -2542,6 +2536,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_MetaDataGroup_GetMetaData == nullptr)
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MetaDataGroup_HasMetaData = (PLib3MFMetaDataGroup_HasMetaDataPtr) GetProcAddress(hLibrary, "lib3mf_metadatagroup_hasmetadata");
+		#else // _WIN32
+		pWrapperTable->m_MetaDataGroup_HasMetaData = (PLib3MFMetaDataGroup_HasMetaDataPtr) dlsym(hLibrary, "lib3mf_metadatagroup_hasmetadata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MetaDataGroup_HasMetaData == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3967,39 +3970,30 @@ public:
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserPower = (PLib3MFToolpathProfile_GetLaserPowerPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getlaserpower");
+		pWrapperTable->m_ToolpathProfile_HasParameterValue = (PLib3MFToolpathProfile_HasParameterValuePtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_hasparametervalue");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserPower = (PLib3MFToolpathProfile_GetLaserPowerPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getlaserpower");
+		pWrapperTable->m_ToolpathProfile_HasParameterValue = (PLib3MFToolpathProfile_HasParameterValuePtr) dlsym(hLibrary, "lib3mf_toolpathprofile_hasparametervalue");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_GetLaserPower == nullptr)
+		if (pWrapperTable->m_ToolpathProfile_HasParameterValue == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserSpeed = (PLib3MFToolpathProfile_GetLaserSpeedPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getlaserspeed");
+		pWrapperTable->m_ToolpathProfile_GetParameterDoubleValue = (PLib3MFToolpathProfile_GetParameterDoubleValuePtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getparameterdoublevalue");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserSpeed = (PLib3MFToolpathProfile_GetLaserSpeedPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getlaserspeed");
+		pWrapperTable->m_ToolpathProfile_GetParameterDoubleValue = (PLib3MFToolpathProfile_GetParameterDoubleValuePtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getparameterdoublevalue");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_GetLaserSpeed == nullptr)
+		if (pWrapperTable->m_ToolpathProfile_GetParameterDoubleValue == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserFocus = (PLib3MFToolpathProfile_GetLaserFocusPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getlaserfocus");
+		pWrapperTable->m_ToolpathProfile_GetParameterDoubleValueDef = (PLib3MFToolpathProfile_GetParameterDoubleValueDefPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getparameterdoublevaluedef");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserFocus = (PLib3MFToolpathProfile_GetLaserFocusPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getlaserfocus");
+		pWrapperTable->m_ToolpathProfile_GetParameterDoubleValueDef = (PLib3MFToolpathProfile_GetParameterDoubleValueDefPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getparameterdoublevaluedef");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_GetLaserFocus == nullptr)
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserIndex = (PLib3MFToolpathProfile_GetLaserIndexPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_getlaserindex");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_GetLaserIndex = (PLib3MFToolpathProfile_GetLaserIndexPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_getlaserindex");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_GetLaserIndex == nullptr)
+		if (pWrapperTable->m_ToolpathProfile_GetParameterDoubleValueDef == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4012,39 +4006,12 @@ public:
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserPower = (PLib3MFToolpathProfile_SetLaserPowerPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_setlaserpower");
+		pWrapperTable->m_ToolpathProfile_SetParameterDoubleValue = (PLib3MFToolpathProfile_SetParameterDoubleValuePtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_setparameterdoublevalue");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserPower = (PLib3MFToolpathProfile_SetLaserPowerPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_setlaserpower");
+		pWrapperTable->m_ToolpathProfile_SetParameterDoubleValue = (PLib3MFToolpathProfile_SetParameterDoubleValuePtr) dlsym(hLibrary, "lib3mf_toolpathprofile_setparameterdoublevalue");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_SetLaserPower == nullptr)
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserSpeed = (PLib3MFToolpathProfile_SetLaserSpeedPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_setlaserspeed");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserSpeed = (PLib3MFToolpathProfile_SetLaserSpeedPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_setlaserspeed");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_SetLaserSpeed == nullptr)
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserFocus = (PLib3MFToolpathProfile_SetLaserFocusPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_setlaserfocus");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserFocus = (PLib3MFToolpathProfile_SetLaserFocusPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_setlaserfocus");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_SetLaserFocus == nullptr)
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserIndex = (PLib3MFToolpathProfile_SetLaserIndexPtr) GetProcAddress(hLibrary, "lib3mf_toolpathprofile_setlaserindex");
-		#else // _WIN32
-		pWrapperTable->m_ToolpathProfile_SetLaserIndex = (PLib3MFToolpathProfile_SetLaserIndexPtr) dlsym(hLibrary, "lib3mf_toolpathprofile_setlaserindex");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathProfile_SetLaserIndex == nullptr)
+		if (pWrapperTable->m_ToolpathProfile_SetParameterDoubleValue == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4138,12 +4105,12 @@ public:
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_ToolpathLayerData_RegisterPart = (PLib3MFToolpathLayerData_RegisterPartPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_registerpart");
+		pWrapperTable->m_ToolpathLayerData_RegisterBuildItem = (PLib3MFToolpathLayerData_RegisterBuildItemPtr) GetProcAddress(hLibrary, "lib3mf_toolpathlayerdata_registerbuilditem");
 		#else // _WIN32
-		pWrapperTable->m_ToolpathLayerData_RegisterPart = (PLib3MFToolpathLayerData_RegisterPartPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_registerpart");
+		pWrapperTable->m_ToolpathLayerData_RegisterBuildItem = (PLib3MFToolpathLayerData_RegisterBuildItemPtr) dlsym(hLibrary, "lib3mf_toolpathlayerdata_registerbuilditem");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_ToolpathLayerData_RegisterPart == nullptr)
+		if (pWrapperTable->m_ToolpathLayerData_RegisterBuildItem == nullptr)
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -5280,6 +5247,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_MetaDataGroup_GetMetaData == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("lib3mf_metadatagroup_hasmetadata", (void**)&(pWrapperTable->m_MetaDataGroup_HasMetaData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MetaDataGroup_HasMetaData == nullptr) )
+			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("lib3mf_metadatagroup_getmetadatabykey", (void**)&(pWrapperTable->m_MetaDataGroup_GetMetaDataByKey));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MetaDataGroup_GetMetaDataByKey == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -5912,40 +5883,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_GetName == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_getlaserpower", (void**)&(pWrapperTable->m_ToolpathProfile_GetLaserPower));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_GetLaserPower == nullptr) )
+		eLookupError = (*pLookup)("lib3mf_toolpathprofile_hasparametervalue", (void**)&(pWrapperTable->m_ToolpathProfile_HasParameterValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_HasParameterValue == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_getlaserspeed", (void**)&(pWrapperTable->m_ToolpathProfile_GetLaserSpeed));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_GetLaserSpeed == nullptr) )
+		eLookupError = (*pLookup)("lib3mf_toolpathprofile_getparameterdoublevalue", (void**)&(pWrapperTable->m_ToolpathProfile_GetParameterDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_GetParameterDoubleValue == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_getlaserfocus", (void**)&(pWrapperTable->m_ToolpathProfile_GetLaserFocus));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_GetLaserFocus == nullptr) )
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_getlaserindex", (void**)&(pWrapperTable->m_ToolpathProfile_GetLaserIndex));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_GetLaserIndex == nullptr) )
+		eLookupError = (*pLookup)("lib3mf_toolpathprofile_getparameterdoublevaluedef", (void**)&(pWrapperTable->m_ToolpathProfile_GetParameterDoubleValueDef));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_GetParameterDoubleValueDef == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("lib3mf_toolpathprofile_setname", (void**)&(pWrapperTable->m_ToolpathProfile_SetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_SetName == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_setlaserpower", (void**)&(pWrapperTable->m_ToolpathProfile_SetLaserPower));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_SetLaserPower == nullptr) )
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_setlaserspeed", (void**)&(pWrapperTable->m_ToolpathProfile_SetLaserSpeed));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_SetLaserSpeed == nullptr) )
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_setlaserfocus", (void**)&(pWrapperTable->m_ToolpathProfile_SetLaserFocus));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_SetLaserFocus == nullptr) )
-			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("lib3mf_toolpathprofile_setlaserindex", (void**)&(pWrapperTable->m_ToolpathProfile_SetLaserIndex));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_SetLaserIndex == nullptr) )
+		eLookupError = (*pLookup)("lib3mf_toolpathprofile_setparameterdoublevalue", (void**)&(pWrapperTable->m_ToolpathProfile_SetParameterDoubleValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathProfile_SetParameterDoubleValue == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("lib3mf_toolpathlayerreader_getlayerdatauuid", (void**)&(pWrapperTable->m_ToolpathLayerReader_GetLayerDataUUID));
@@ -5988,8 +5943,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerData_RegisterProfile == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("lib3mf_toolpathlayerdata_registerpart", (void**)&(pWrapperTable->m_ToolpathLayerData_RegisterPart));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerData_RegisterPart == nullptr) )
+		eLookupError = (*pLookup)("lib3mf_toolpathlayerdata_registerbuilditem", (void**)&(pWrapperTable->m_ToolpathLayerData_RegisterBuildItem));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayerData_RegisterBuildItem == nullptr) )
 			return LIB3MF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("lib3mf_toolpathlayerdata_writehatchdata", (void**)&(pWrapperTable->m_ToolpathLayerData_WriteHatchData));
@@ -7111,6 +7066,20 @@ public:
 			CheckError(LIB3MF_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CMetaData>(m_pWrapper, hMetaData);
+	}
+	
+	/**
+	* CMetaDataGroup::HasMetaData - returns if a metadata value exists within this metadatagroup
+	* @param[in] sNameSpace - the namespace of the metadata
+	* @param[in] sName - the name of the Metadata
+	* @return returns true if metadata exists
+	*/
+	bool CMetaDataGroup::HasMetaData(const std::string & sNameSpace, const std::string & sName)
+	{
+		bool resultMetaDataExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MetaDataGroup_HasMetaData(m_pHandle, sNameSpace.c_str(), sName.c_str(), &resultMetaDataExists));
+		
+		return resultMetaDataExists;
 	}
 	
 	/**
@@ -9096,51 +9065,46 @@ public:
 	}
 	
 	/**
-	* CToolpathProfile::GetLaserPower - Retrieves the profile's laser power
-	* @return Returns the laser power.
+	* CToolpathProfile::HasParameterValue - Checks if a parameter value exists.
+	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
+	* @param[in] sValueName - Value key string.
+	* @return Returns if a value exists.
 	*/
-	Lib3MF_double CToolpathProfile::GetLaserPower()
+	bool CToolpathProfile::HasParameterValue(const std::string & sNameSpaceName, const std::string & sValueName)
 	{
-		Lib3MF_double resultLaserPower = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_GetLaserPower(m_pHandle, &resultLaserPower));
+		bool resultValueExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_HasParameterValue(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), &resultValueExists));
 		
-		return resultLaserPower;
+		return resultValueExists;
 	}
 	
 	/**
-	* CToolpathProfile::GetLaserSpeed - Retrieves the profile's laser speed
-	* @return Returns the laser speed.
+	* CToolpathProfile::GetParameterDoubleValue - Retrieves a profile's parameter value. Fails if value does not exist.
+	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
+	* @param[in] sValueName - Value key string.
+	* @return Returns the value of the field.
 	*/
-	Lib3MF_double CToolpathProfile::GetLaserSpeed()
+	Lib3MF_double CToolpathProfile::GetParameterDoubleValue(const std::string & sNameSpaceName, const std::string & sValueName)
 	{
-		Lib3MF_double resultLaserSpeed = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_GetLaserSpeed(m_pHandle, &resultLaserSpeed));
+		Lib3MF_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_GetParameterDoubleValue(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), &resultValue));
 		
-		return resultLaserSpeed;
+		return resultValue;
 	}
 	
 	/**
-	* CToolpathProfile::GetLaserFocus - Retrieves the profile's laser focus
-	* @return Returns the laser focus.
+	* CToolpathProfile::GetParameterDoubleValueDef - Retrieves a profile's parameter value
+	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
+	* @param[in] sValueName - Value key string.
+	* @param[in] dDefaultValue - Default value if value does not exist.
+	* @return Returns the value of the field.
 	*/
-	Lib3MF_double CToolpathProfile::GetLaserFocus()
+	Lib3MF_double CToolpathProfile::GetParameterDoubleValueDef(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF_double dDefaultValue)
 	{
-		Lib3MF_double resultLaserFocus = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_GetLaserFocus(m_pHandle, &resultLaserFocus));
+		Lib3MF_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_GetParameterDoubleValueDef(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), dDefaultValue, &resultValue));
 		
-		return resultLaserFocus;
-	}
-	
-	/**
-	* CToolpathProfile::GetLaserIndex - Retrieves the profile's laser index
-	* @return Returns the laser index.
-	*/
-	Lib3MF_uint32 CToolpathProfile::GetLaserIndex()
-	{
-		Lib3MF_uint32 resultLaserIndex = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_GetLaserIndex(m_pHandle, &resultLaserIndex));
-		
-		return resultLaserIndex;
+		return resultValue;
 	}
 	
 	/**
@@ -9153,39 +9117,14 @@ public:
 	}
 	
 	/**
-	* CToolpathProfile::SetLaserPower - Sets the profile's laser power
-	* @param[in] dLaserPower - Returns the laser power.
+	* CToolpathProfile::SetParameterDoubleValue - Sets a profile's parameter value.
+	* @param[in] sNameSpaceName - Name of the Parameter Namespace.
+	* @param[in] sValueName - Value key string.
+	* @param[in] dValue - Double value of the parameter.
 	*/
-	void CToolpathProfile::SetLaserPower(const Lib3MF_double dLaserPower)
+	void CToolpathProfile::SetParameterDoubleValue(const std::string & sNameSpaceName, const std::string & sValueName, const Lib3MF_double dValue)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_SetLaserPower(m_pHandle, dLaserPower));
-	}
-	
-	/**
-	* CToolpathProfile::SetLaserSpeed - Sets the profile's laser speed
-	* @param[in] dLaserSpeed - Returns the laser speed.
-	*/
-	void CToolpathProfile::SetLaserSpeed(const Lib3MF_double dLaserSpeed)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_SetLaserSpeed(m_pHandle, dLaserSpeed));
-	}
-	
-	/**
-	* CToolpathProfile::SetLaserFocus - Sets the profile's laser focus
-	* @param[in] dLaserFocus - Returns the laser focus.
-	*/
-	void CToolpathProfile::SetLaserFocus(const Lib3MF_double dLaserFocus)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_SetLaserFocus(m_pHandle, dLaserFocus));
-	}
-	
-	/**
-	* CToolpathProfile::SetLaserIndex - Sets the profile's laser index
-	* @param[in] nLaserIndex - Returns the laser index.
-	*/
-	void CToolpathProfile::SetLaserIndex(const Lib3MF_uint32 nLaserIndex)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_SetLaserIndex(m_pHandle, nLaserIndex));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathProfile_SetParameterDoubleValue(m_pHandle, sNameSpaceName.c_str(), sValueName.c_str(), dValue));
 	}
 	
 	/**
@@ -9265,17 +9204,17 @@ public:
 	/**
 	* CToolpathLayerReader::GetSegmentPart - Retrieves the assigned segment profile.
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
-	* @return Segment Profile
+	* @return Segment Build Item
 	*/
-	PToolpathProfile CToolpathLayerReader::GetSegmentPart(const Lib3MF_uint32 nIndex)
+	PBuildItem CToolpathLayerReader::GetSegmentPart(const Lib3MF_uint32 nIndex)
 	{
-		Lib3MFHandle hProfile = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetSegmentPart(m_pHandle, nIndex, &hProfile));
+		Lib3MFHandle hBuildItem = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerReader_GetSegmentPart(m_pHandle, nIndex, &hBuildItem));
 		
-		if (!hProfile) {
+		if (!hBuildItem) {
 			CheckError(LIB3MF_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CToolpathProfile>(m_pWrapper, hProfile);
+		return std::make_shared<CBuildItem>(m_pWrapper, hBuildItem);
 	}
 	
 	/**
@@ -9345,18 +9284,18 @@ public:
 	}
 	
 	/**
-	* CToolpathLayerData::RegisterPart - Registers a Model Object
-	* @param[in] pPart - The model object to use.
+	* CToolpathLayerData::RegisterBuildItem - Registers a Model Build Item
+	* @param[in] pBuildItem - The model build item to use.
 	* @return returns the local part ID for the layer.
 	*/
-	Lib3MF_uint32 CToolpathLayerData::RegisterPart(CObject * pPart)
+	Lib3MF_uint32 CToolpathLayerData::RegisterBuildItem(CBuildItem * pBuildItem)
 	{
-		Lib3MFHandle hPart = nullptr;
-		if (pPart != nullptr) {
-			hPart = pPart->GetHandle();
+		Lib3MFHandle hBuildItem = nullptr;
+		if (pBuildItem != nullptr) {
+			hBuildItem = pBuildItem->GetHandle();
 		};
 		Lib3MF_uint32 resultPartID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerData_RegisterPart(m_pHandle, hPart, &resultPartID));
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayerData_RegisterBuildItem(m_pHandle, hBuildItem, &resultPartID));
 		
 		return resultPartID;
 	}
@@ -9541,16 +9480,12 @@ public:
 	/**
 	* CToolpath::AddProfile - Adds a new profile to the toolpath.
 	* @param[in] sName - the name.
-	* @param[in] dLaserPower - the laser power.
-	* @param[in] dLaserSpeed - the laser speed.
-	* @param[in] dLaserFocus - the laser focus.
-	* @param[in] nLaserIndex - the laser index.
 	* @return Returns the profile.
 	*/
-	PToolpathProfile CToolpath::AddProfile(const std::string & sName, const Lib3MF_double dLaserPower, const Lib3MF_double dLaserSpeed, const Lib3MF_double dLaserFocus, const Lib3MF_uint32 nLaserIndex)
+	PToolpathProfile CToolpath::AddProfile(const std::string & sName)
 	{
 		Lib3MFHandle hProfile = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Toolpath_AddProfile(m_pHandle, sName.c_str(), dLaserPower, dLaserSpeed, dLaserFocus, nLaserIndex, &hProfile));
+		CheckError(m_pWrapper->m_WrapperTable.m_Toolpath_AddProfile(m_pHandle, sName.c_str(), &hProfile));
 		
 		if (!hProfile) {
 			CheckError(LIB3MF_ERROR_INVALIDPARAM);

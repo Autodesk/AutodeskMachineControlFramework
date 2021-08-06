@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Include custom headers here.
 #include <math.h>
+#include <iostream>
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -40,14 +41,22 @@ using namespace LibMCDriver_ScanLab::Impl;
  Class definition of CRTCContext 
 **************************************************************************************************************************/
 
-CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo)
-	: m_pScanLabSDK (pScanLabSDK), m_CardNo (nCardNo), m_dCorrectionFactor(10000.0), m_LaserPort(eLaserPort::Port12BitAnalog1)
+CRTCContext::CRTCContext(PScanLabSDK pScanLabSDK, uint32_t nCardNo, bool bIsNetwork, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_pScanLabSDK (pScanLabSDK), 
+	m_CardNo (nCardNo), 
+	m_dCorrectionFactor(10000.0), 
+	m_dZCorrectionFactor(10000.0),
+	m_LaserPort(eLaserPort::Port12BitAnalog1), 
+	m_pDriverEnvironment (pDriverEnvironment),
+	m_bIsNetwork (bIsNetwork)
 {
-	if (pScanLabSDK.get() != nullptr)
+	if (pScanLabSDK.get() == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-
+	if (pDriverEnvironment.get () == nullptr)
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 	if (nCardNo == 0)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+
 }
 
 CRTCContext::~CRTCContext()
@@ -59,23 +68,56 @@ CRTCContext::~CRTCContext()
 }
 
 
-void CRTCContext::LoadProgramFromPath(const std::string & sPath)
+
+void CRTCContext::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
 {
+
+	auto pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+
+	std::string sFirmwareName;
+	if (m_bIsNetwork) {
+		sFirmwareName = "RTC6ETH.out";
+	}
+	else {
+		sFirmwareName = "RTC6OUT.out";
+	}
+
+	auto pFirmwareFile = pWorkingDirectory->StoreDriverData (sFirmwareName, sFirmwareResource);
+	auto pFPGAFile = pWorkingDirectory->StoreDriverData ("RTC6RBF.rbf", sFPGAResource);
+	auto pAuxiliaryFile = pWorkingDirectory->StoreDriverData("RTC6DAT.dat", sAuxiliaryResource);
+
 	// TODO: Convert to ANSI
-	uint32_t nErrorCode = m_pScanLabSDK->n_load_program_file(m_CardNo, sPath.c_str());
+	uint32_t nErrorCode = m_pScanLabSDK->n_load_program_file (m_CardNo, pWorkingDirectory->GetAbsoluteFilePath().c_str ());
 
-	// TODO: Detailed Error codes
+	pFirmwareFile = nullptr;
+	pFPGAFile = nullptr;
+	pAuxiliaryFile = nullptr;
+
+	pWorkingDirectory->CleanUp();
+
 	if (nErrorCode != 0)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE);
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADPROGRAMFILE, "could not load program file: #" + std::to_string (nErrorCode));
+
 }
 
-void CRTCContext::LoadCorrectionFile(const std::string & sFileName, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
+void CRTCContext::LoadCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension)
 {
-	uint32_t nErrorCode = m_pScanLabSDK->n_load_correction_file(m_CardNo, sFileName.c_str(), nTableNumber, nDimension);
-	// TODO: Detailed Error codes
+
+	auto pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+
+	auto pCorrectionFile = pWorkingDirectory->StoreCustomData("cor.ct5", LibMCEnv::CInputVector<uint8_t>(pCorrectionFileBuffer, nCorrectionFileBufferSize));
+
+	// TODO: Convert to ANSI
+	uint32_t nErrorCode = m_pScanLabSDK->n_load_correction_file(m_CardNo, pCorrectionFile->GetAbsoluteFileName ().c_str(), nTableNumber, nDimension);
+
+	pCorrectionFile = nullptr;
+	pWorkingDirectory->CleanUp();
+
 	if (nErrorCode != 0)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADCORRECTIONFILE);
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTLOADCORRECTIONFILE, "Could not load correction file #" + std::to_string (nErrorCode));
+
 }
+
 
 void CRTCContext::SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB)
 {
@@ -84,9 +126,12 @@ void CRTCContext::SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableN
 
 	double dCorrectionFactor = m_pScanLabSDK->n_get_table_para(m_CardNo, nTableNumberHeadA, 1);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
-
-	if (dCorrectionFactor > 0.0)
+	if (dCorrectionFactor > 0.0) {
+		// For RTC6 both correction factors are equal, for RTC 5, there is a factor of 16
 		m_dCorrectionFactor = dCorrectionFactor;
+		m_dZCorrectionFactor = dCorrectionFactor;
+	}
+
 }
 
 void CRTCContext::ConfigureLists(const LibMCDriver_ScanLab_uint32 nSizeListA, const LibMCDriver_ScanLab_uint32 nSizeListB)
@@ -103,11 +148,30 @@ void CRTCContext::SetLaserMode(const LibMCDriver_ScanLab::eLaserMode eLaserMode,
 	m_LaserPort = eLaserPort;
 }
 
-void CRTCContext::SetLaserControl(const bool bEnableLaser)
+void CRTCContext::DisableAutoLaserControl()
+{
+	m_pScanLabSDK->n_set_auto_laser_control(m_CardNo, 0, 0, 0, 0, 0);
+	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
+}
+
+void CRTCContext::SetLaserControlParameters(const bool DisableLaser, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive)
 {
 	uint32_t bitmode = 0;
-	if (!bEnableLaser)
+	if (bFinishLaserPulseAfterOn)
+		bitmode |= (1UL << 0);
+	if (bPhaseShiftOfLaserSignal)
+		bitmode |= (1UL << 1);
+	if (DisableLaser)
 		bitmode |= (1UL << 2);
+	if (bLaserOnSignalLowActive)
+		bitmode |= (1UL << 3);
+	if (bLaserHalfSignalsLowActive)
+		bitmode |= (1UL << 4);
+	if (bSetDigitalInOneHighActive)
+		bitmode |= (1UL << 5);
+	if (bOutputSynchronizationActive)
+		bitmode |= (1UL << 6);
 
 	m_pScanLabSDK->n_set_laser_control(m_CardNo, bitmode);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
@@ -115,7 +179,7 @@ void CRTCContext::SetLaserControl(const bool bEnableLaser)
 
 void CRTCContext::SetLaserPulsesInBits(const LibMCDriver_ScanLab_uint32 nHalfPeriod, const LibMCDriver_ScanLab_uint32 nPulseLength)
 {
-	m_pScanLabSDK->n_set_laser_pulses_ctrl(m_CardNo, nHalfPeriod, nPulseLength);
+	m_pScanLabSDK->n_set_laser_pulses(m_CardNo, nHalfPeriod, nPulseLength);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
 
@@ -152,7 +216,7 @@ void CRTCContext::SetStandbyInMicroSeconds(const LibMCDriver_ScanLab_double dHal
 	if (PulseLengthBits > 2 * HalfPeriodBits)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
 
-	SetLaserPulsesInBits((uint32_t)HalfPeriodBits, (uint32_t)PulseLengthBits);
+	SetStandbyInBits((uint32_t)HalfPeriodBits, (uint32_t)PulseLengthBits);
 }
 
 LibMCDriver_ScanLab_uint32 CRTCContext::GetSerialNumber()
@@ -169,12 +233,14 @@ void CRTCContext::SetStartList(const LibMCDriver_ScanLab_uint32 nListIndex, cons
 
 void CRTCContext::SetEndOfList()
 {
+	//std::cout << "setendoflist" << std::endl;
 	m_pScanLabSDK->n_set_end_of_list(m_CardNo);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
 
 void CRTCContext::ExecuteList(const LibMCDriver_ScanLab_uint32 nListIndex, const LibMCDriver_ScanLab_uint32 nPosition)
 {
+	//std::cout << "executelist: " << nListIndex << " - " << nPosition  << std::endl;
 	m_pScanLabSDK->n_execute_list_pos(m_CardNo, nListIndex, nPosition);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 }
@@ -208,9 +274,9 @@ void CRTCContext::SetLaserDelaysInMicroseconds(const LibMCDriver_ScanLab_double 
 	double LaserOffDelayBits = round(dLaserOffDelay * 64.0);
 
 	if ((LaserOnDelayBits < 1) || (LaserOnDelayBits >= (double)(1UL << 31)))
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
 	if ((LaserOffDelayBits < 1) || (LaserOffDelayBits >= (double)(1UL << 31)))
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY);
 
 	SetLaserDelaysInBits((uint32_t)LaserOnDelayBits, (uint32_t)LaserOffDelayBits);
 }
@@ -223,42 +289,57 @@ void CRTCContext::SetLaserDelaysInBits(const LibMCDriver_ScanLab_uint32 nLaserOn
 
 void CRTCContext::writeSpeeds(const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
 {
+
 	double dBitsPerMM = m_dCorrectionFactor;
 
 	double dMarkSpeedInMMPerMilliSecond = (double)fMarkSpeed / 1000.0;
-	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInMMPerMilliSecond * dBitsPerMM);
+	double dMarkSpeedInBits = dMarkSpeedInMMPerMilliSecond * dBitsPerMM;
+	//std::cout << "n_set_mark_speed: " << dMarkSpeedInBits << std::endl;
+	m_pScanLabSDK->n_set_mark_speed(m_CardNo, dMarkSpeedInBits);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	double dJumpSpeedInMMPerMilliSecond = (double)fJumpSpeed / 1000.0;
-	m_pScanLabSDK->n_set_jump_speed(m_CardNo, dJumpSpeedInMMPerMilliSecond * dBitsPerMM);
+	double dJumpSpeedInBits = dJumpSpeedInMMPerMilliSecond * dBitsPerMM;
+	//std::cout << "n_set_jump_speed: " << dJumpSpeedInBits << std::endl;
+	m_pScanLabSDK->n_set_jump_speed(m_CardNo, dJumpSpeedInBits);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
 	// TODO: Brennt die maschine ab?
-	float fClippedPowerFactor = fPower / 100.0f;
+	double fClippedPowerFactor = fPower / 100.0f;
 	if (fClippedPowerFactor > 1.0f)
 		fClippedPowerFactor = 1.0f;
 	if (fClippedPowerFactor < 0.0f)
 		fClippedPowerFactor = 0.0f;
 
+	int digitalPowerValue;
+
 	switch (m_LaserPort) {
 	case eLaserPort::Port16bitDigital:
-		m_pScanLabSDK->n_write_io_port(m_CardNo, (int)round(fClippedPowerFactor * 65535.0f));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 65535.0);
+		//std::cout << "n_write_io_port: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_io_port_list(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port8bitDigital:
-		m_pScanLabSDK->n_write_8bit_port(m_CardNo, (int)round(fClippedPowerFactor * 255.0f));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 255.0);
+		//std::cout << "n_write_8bit_port: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_8bit_port_list(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port12BitAnalog1:
-		m_pScanLabSDK->n_write_da_1(m_CardNo, (int)round(fClippedPowerFactor * 4095.0f));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+		//std::cout << "n_write_da_1: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_da_1_list(m_CardNo, digitalPowerValue);
 		break;
 	case eLaserPort::Port12BitAnalog2:
-		m_pScanLabSDK->n_write_da_2(m_CardNo, (int)round(fClippedPowerFactor * 4095.0f));
+		digitalPowerValue = (int)round(fClippedPowerFactor * 4095.0);
+		//std::cout << "n_write_da_2: " << digitalPowerValue << std::endl;
+		m_pScanLabSDK->n_write_da_2_list(m_CardNo, digitalPowerValue);
 		break;
 
 	}
 
 }
 
-void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSize, const LibMCDriver_ScanLab::sPoint2D * pPointsBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
 	if (!pPointsBuffer)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -268,14 +349,20 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower);
 
+	// Z Plane
+	double defocusZ = round(fZValue * m_dZCorrectionFactor);
+	int intDefocusZ = (int)defocusZ;
+	//std::cout << "setting z defocus: " << intDefocusZ << std::endl;
+	m_pScanLabSDK->n_set_defocus_list (m_CardNo, intDefocusZ);
+
 	const sPoint2D* pPoint = pPointsBuffer;
 	double dX = round(pPoint->m_X * m_dCorrectionFactor);
 	double dY = round(pPoint->m_Y * m_dCorrectionFactor);
 	pPoint++;
-	// TODO: Brennt die maschine ab?
 
 	int intX = (int)dX;
 	int intY = (int)dY;
+	//std::cout << "n_jump_abs: " << intX << "/" << intY << std::endl;
 	m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 	m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -287,12 +374,14 @@ void CRTCContext::DrawPolyline(const LibMCDriver_ScanLab_uint64 nPointsBufferSiz
 
 		intX = (int)dX;
 		intY = (int)dY;
+		//std::cout << "n_mark_abs: " << intX << "/" << intY << std::endl;
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
+
 	}
 }
 
-void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower)
+void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSize, const LibMCDriver_ScanLab::sHatch2D * pHatchesBuffer, const LibMCDriver_ScanLab_single fMarkSpeed, const LibMCDriver_ScanLab_single fJumpSpeed, const LibMCDriver_ScanLab_single fPower, const LibMCDriver_ScanLab_single fZValue)
 {
 	if (!pHatchesBuffer)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
@@ -301,6 +390,12 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 		return;
 
 	writeSpeeds(fMarkSpeed, fJumpSpeed, fPower);
+
+	// Z Plane
+	double defocusZ = round(fZValue * m_dZCorrectionFactor);
+	int intDefocusZ = (int)defocusZ;
+	//std::cout << "setting z defocus: " << intDefocusZ << std::endl;
+	m_pScanLabSDK->n_set_defocus_list(m_CardNo, intDefocusZ);
 
 	const sHatch2D* pHatch = pHatchesBuffer;
 
@@ -311,6 +406,7 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 
 		int intX = (int)dX;
 		int intY = (int)dY;
+		//std::cout << "n_jump_abs: " << intX << "/" << intY << std::endl;
 		m_pScanLabSDK->n_jump_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -320,6 +416,7 @@ void CRTCContext::DrawHatches(const LibMCDriver_ScanLab_uint64 nHatchesBufferSiz
 
 		intX = (int)dX;
 		intY = (int)dY;
+		//std::cout << "n_mark_abs: " << intX << "/" << intY << std::endl;
 		m_pScanLabSDK->n_mark_abs(m_CardNo, intX, intY);
 		m_pScanLabSDK->checkError(m_pScanLabSDK->n_get_last_error(m_CardNo));
 
@@ -355,6 +452,16 @@ void CRTCContext::GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition
 	nPosition = Pos;
 }
 
+void CRTCContext::GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool& bPositionXisOK, bool& bPositionYisOK, bool& bTemperatureisOK, bool& bPowerisOK)
+{
+	uint32_t Status = m_pScanLabSDK->n_get_head_status(m_CardNo, nHeadNo);
+	bPositionXisOK = (Status & (1UL << 3)) != 0;
+	bPositionYisOK = (Status & (1UL << 4)) != 0;
+	bTemperatureisOK = (Status & (1UL << 6)) != 0;
+	bPowerisOK = (Status & (1UL << 7)) != 0;
+}
+
+
 LibMCDriver_ScanLab_uint32 CRTCContext::GetInputPointer()
 {
 	uint32_t Pos = m_pScanLabSDK->n_get_input_pointer(m_CardNo);
@@ -362,3 +469,24 @@ LibMCDriver_ScanLab_uint32 CRTCContext::GetInputPointer()
 	return Pos;
 }
 
+void CRTCContext::GetRTCVersion(LibMCDriver_ScanLab_uint32& nRTCVersion, LibMCDriver_ScanLab_uint32& nRTCType, LibMCDriver_ScanLab_uint32& nDLLVersion, LibMCDriver_ScanLab_uint32& nHEXVersion, LibMCDriver_ScanLab_uint32& nBIOSVersion) 
+{
+	nDLLVersion = m_pScanLabSDK->get_dll_version();
+	nRTCVersion = m_pScanLabSDK->n_get_rtc_version(m_CardNo);
+	nRTCType = m_pScanLabSDK->n_get_card_type(m_CardNo);
+	nBIOSVersion = m_pScanLabSDK->n_get_bios_version(m_CardNo);
+	nHEXVersion = m_pScanLabSDK->n_get_hex_version(m_CardNo);
+}
+
+void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_uint32& nPositionX, LibMCDriver_ScanLab_uint32& nPositionY, LibMCDriver_ScanLab_uint32& nPositionZ, LibMCDriver_ScanLab_uint32& nCorrectedPositionX, LibMCDriver_ScanLab_uint32& nCorrectedPositionY, LibMCDriver_ScanLab_uint32& nCorrectedPositionZ, LibMCDriver_ScanLab_uint32& nFocusShift, LibMCDriver_ScanLab_uint32& nMarkSpeed)
+{
+	bLaserIsOn = m_pScanLabSDK->n_get_value(m_CardNo, 0); // LASERON
+	nPositionX = m_pScanLabSDK->n_get_value(m_CardNo, 7); // SampleX
+	nPositionY = m_pScanLabSDK->n_get_value(m_CardNo, 8); // SampleY
+	nPositionZ = m_pScanLabSDK->n_get_value(m_CardNo, 9); // SampleZ
+	nCorrectedPositionX = m_pScanLabSDK->n_get_value(m_CardNo, 10); // SampleXCorr
+	nCorrectedPositionY = m_pScanLabSDK->n_get_value(m_CardNo, 11); // SampleYCorr
+	nCorrectedPositionZ = m_pScanLabSDK->n_get_value(m_CardNo, 12); // SampleZCorr
+	nFocusShift = m_pScanLabSDK->n_get_value(m_CardNo, 32); // Focus shift
+	nMarkSpeed = m_pScanLabSDK->n_get_value(m_CardNo, 45); // Mark Speed
+}

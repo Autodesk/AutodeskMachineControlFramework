@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"fmt"
+	"runtime"
 	"io/ioutil"
 	"strings"
 	"path/filepath"
@@ -16,7 +17,7 @@ import (
 
 type DistXMLEntry struct {
 	XMLName xml.Name `xml:"entry"`
-	URL string `xml:"url,attr"`
+	Name string `xml:"name,attr"`
 	FileName string `xml:"filename,attr"`
 	Size uint32 `xml:"size,attr"`
 	ContentType string `xml:"contenttype,attr"`
@@ -24,7 +25,7 @@ type DistXMLEntry struct {
 
 
 type DistXMLRoot struct {
-	XMLName xml.Name `xml:"serve"`
+	XMLName xml.Name `xml:"package"`
 	XMLNs string `xml:"xmlns,attr"`
 	Entries []DistXMLEntry `xml:"entry"`
 }
@@ -34,7 +35,7 @@ type DistXMLRoot struct {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-func createMCServerTemplate (outputDir string, packageName string, clientName string, libraryName string, configName string, gitHash string) (error) {
+func createMCServerTemplate (outputDir string, packageName string, clientName string, libraryName string, configName string, gitHash string, dllExtension string, coreResourcesName string) (error) {
 
 	pkgfile, err := os.Create(outputDir + gitHash + "_package.xml");
 	if (err != nil) {
@@ -46,18 +47,26 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
 	fmt.Fprintf(pkgfile, "<amcpackage xmlns=\"http://schemas.autodesk.com/amcpackage/2020/06\">\n");
 	fmt.Fprintf(pkgfile, "  <build name=\"%s\" configuration=\"%s\" coreclient=\"%s\">\n", packageName, configName, clientName);
-
-	fmt.Fprintf(pkgfile, "    <library name=\"core\" import=\"%s\" />\n", libraryName);
-	fmt.Fprintf(pkgfile, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"plugin_printerconnection\" import=\"%s_plugin_printerconnection.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_camera\" import=\"%s_driver_camera.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.dll\" />\n", gitHash);
-	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.dll\" />\n", gitHash);
+	
+	fmt.Fprintf(pkgfile, "    <library name=\"core\" import=\"%s\" resources=\"%s\" />\n", libraryName, coreResourcesName);
+	fmt.Fprintf(pkgfile, "    <library name=\"datamodel\" import=\"%s_core_libmcdata.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"lib3mf\" import=\"%s_core_lib3mf.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_main\" import=\"%s_plugin_main.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_demo\" import=\"%s_plugin_demo.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_mechanics\" import=\"%s_plugin_mechanics.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_plc\" import=\"%s_plugin_plc.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_printerconnection\" import=\"%s_plugin_printerconnection.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_userinterface\" import=\"%s_plugin_userinterface.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.%s\" resources=\"%s_driver_marlin.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlab\" import=\"%s_driver_scanlab.%s\" resources=\"%s_driver_scanlab.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_camera\" import=\"%s_driver_camera.%s\" resources=\"%s_driver_camera.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.%s\" resources=\"%s_driver_scanlaboie.data\" />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.%s\" resources=\"%s_driver_s7net.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_mqtt\" import=\"%s_driver_mqtt.%s\" resources=\"%s_driver_mqtt.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_ximc\" import=\"%s_driver_ximc.%s\" resources=\"%s_driver_ximc.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_bur\" import=\"%s_driver_bur.%s\" resources=\"%s_driver_bur.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "  </build>\n");
 	fmt.Fprintf(pkgfile, "</amcpackage>\n");
 	
@@ -73,7 +82,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	
 	fmt.Fprintf(file, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
 	fmt.Fprintf(file, "<amc xmlns=\"http://schemas.autodesk.com/amc/2020/06\">\n");
-	fmt.Fprintf(file, "  <server hostname=\"127.0.0.1\" port=\"8869\" />\n");
+	fmt.Fprintf(file, "  <server hostname=\"0.0.0.0\" port=\"8869\" />\n");
 	fmt.Fprintf(file, "  <data directory=\"data/\" database=\"sqlite\" sqlitedb=\"storage.db\" />\n");
 	fmt.Fprintf(file, "  <defaultpackage name=\"%s_package.xml\" githash=\"%s\" sha256=\"%s\" />\n", gitHash, gitHash, "");	
 	fmt.Fprintf(file, "</amc>\n");
@@ -86,7 +95,15 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 func main() {
 
 	var Root DistXMLRoot;
-	Root.XMLNs = "http://schemas.autodesk.com/amc/clientdistribution/2020/07";
+	Root.XMLNs = "http://schemas.autodesk.com/amc/resourcepackage/2020/07";
+	
+	var dllExtension string
+	if runtime.GOOS == "windows" {
+		dllExtension = "dll";
+	} else {
+		dllExtension = "so";
+	}
+	
 		
 	argsWithProg := os.Args;
 	if (len (argsWithProg) < 3) {
@@ -97,12 +114,13 @@ func main() {
 	OutputDir := filepath.Clean (argsWithProg[1]) + "/";
 	hexSum := argsWithProg[2];
 	
-	
-	ClientZIPName := hexSum + "_core_client.zip";
-	LibraryName := hexSum + "_core_libmc.dll";
+		
+	ClientZIPName := hexSum + "_core.client";
+	CoreResourcesName := hexSum + "_core.data";
+	LibraryName := hexSum + "_core_libmc." + dllExtension;
 	ConfigName := hexSum + "_config.xml";
 	
-	DistXMLName := "dist.xml";
+	DistXMLName := "package.xml";
 	
 	packageName := "Build " + hexSum;
 	
@@ -149,7 +167,7 @@ func main() {
 				if (fileext!=".map") {
 				
 					var entry DistXMLEntry;
-					entry.URL = url;
+					entry.Name = url;
 					entry.FileName = file;
 					entry.Size = uint32 (info.Size());
 					entry.ContentType = contenttype;
@@ -225,7 +243,7 @@ func main() {
 	
 	fmt.Printf("creating server config in %s\n", OutputDir);
 	
-	err = createMCServerTemplate (OutputDir, packageName, ClientZIPName, LibraryName, ConfigName, hexSum);
+	err = createMCServerTemplate (OutputDir, packageName, ClientZIPName, LibraryName, ConfigName, hexSum, dllExtension, CoreResourcesName);
 	if err != nil {
 		log.Fatal(err)
 	}
