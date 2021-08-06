@@ -77,6 +77,8 @@ public:
 
 	bool Success() override;
 
+    void EnsureSuccess() override;
+
     std::string GetErrorMessage() override;
 
 };

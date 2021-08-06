@@ -34,37 +34,51 @@ Abstract: This is a stub class definition of CDataStream
 #include "libamcf_datastream.hpp"
 #include "libamcf_interfaceexception.hpp"
 
-// Include custom headers here.
-
-
 using namespace LibAMCF::Impl;
 
 /*************************************************************************************************************************
  Class definition of CDataStream 
 **************************************************************************************************************************/
 
+CDataStream::CDataStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const std::string& sSHA256, uint64_t nSize, const std::string& sTimestamp)
+    : m_sUUID (sUUID), m_sContextUUID (sContextUUID), m_sName (sName), m_sMimeType (sMimeType), m_sSHA256 (sSHA256), m_nSize (nSize), m_sTimestamp (sTimestamp)
+{
+
+}
+
+
 std::string CDataStream::GetUUID()
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+    return m_sUUID;
 }
 
 std::string CDataStream::GetContextUUID()
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+    return m_sContextUUID;
 }
 
 std::string CDataStream::GetName()
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+    return m_sName;
 }
 
 std::string CDataStream::GetMimeType()
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+    return m_sMimeType;
+}
+
+std::string CDataStream::GetSHA256()
+{
+    return m_sSHA256;
 }
 
 LibAMCF_uint64 CDataStream::GetSize()
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+    return m_nSize;
+}
+
+std::string CDataStream::GetTimestamp()
+{
+    return m_sTimestamp;
 }
 

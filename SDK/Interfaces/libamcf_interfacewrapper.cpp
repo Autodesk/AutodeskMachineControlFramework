@@ -109,6 +109,30 @@ LibAMCFResult libamcf_operationresult_waitfor(LibAMCF_OperationResult pOperation
 	}
 }
 
+LibAMCFResult libamcf_operationresult_ensuresuccess(LibAMCF_OperationResult pOperationResult)
+{
+	IBase* pIBaseClass = (IBase *)pOperationResult;
+
+	try {
+		IOperationResult* pIOperationResult = dynamic_cast<IOperationResult*>(pIBaseClass);
+		if (!pIOperationResult)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+		
+		pIOperationResult->EnsureSuccess();
+
+		return LIBAMCF_SUCCESS;
+	}
+	catch (ELibAMCFInterfaceException & Exception) {
+		return handleLibAMCFException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibAMCFResult libamcf_operationresult_inprogress(LibAMCF_OperationResult pOperationResult, bool * pOperationIsInProgress)
 {
 	IBase* pIBaseClass = (IBase *)pOperationResult;
@@ -405,6 +429,54 @@ LibAMCFResult libamcf_datastream_getmimetype(LibAMCF_DataStream pDataStream, con
 	}
 }
 
+LibAMCFResult libamcf_datastream_getsha256(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nSHA256BufferSize, LibAMCF_uint32* pSHA256NeededChars, char * pSHA256Buffer)
+{
+	IBase* pIBaseClass = (IBase *)pDataStream;
+
+	try {
+		if ( (!pSHA256Buffer) && !(pSHA256NeededChars) )
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		std::string sSHA256("");
+		IDataStream* pIDataStream = dynamic_cast<IDataStream*>(pIBaseClass);
+		if (!pIDataStream)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSHA256Buffer == nullptr);
+		if (isCacheCall) {
+			sSHA256 = pIDataStream->GetSHA256();
+
+			pIDataStream->_setCache (new ParameterCache_1<std::string> (sSHA256));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataStream->_getCache ());
+			if (cache == nullptr)
+				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+			cache->retrieveData (sSHA256);
+			pIDataStream->_setCache (nullptr);
+		}
+		
+		if (pSHA256NeededChars)
+			*pSHA256NeededChars = (LibAMCF_uint32) (sSHA256.size()+1);
+		if (pSHA256Buffer) {
+			if (sSHA256.size() >= nSHA256BufferSize)
+				throw ELibAMCFInterfaceException (LIBAMCF_ERROR_BUFFERTOOSMALL);
+			for (size_t iSHA256 = 0; iSHA256 < sSHA256.size(); iSHA256++)
+				pSHA256Buffer[iSHA256] = sSHA256[iSHA256];
+			pSHA256Buffer[sSHA256.size()] = 0;
+		}
+		return LIBAMCF_SUCCESS;
+	}
+	catch (ELibAMCFInterfaceException & Exception) {
+		return handleLibAMCFException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibAMCFResult libamcf_datastream_getsize(LibAMCF_DataStream pDataStream, LibAMCF_uint64 * pStreamSize)
 {
 	IBase* pIBaseClass = (IBase *)pDataStream;
@@ -418,6 +490,54 @@ LibAMCFResult libamcf_datastream_getsize(LibAMCF_DataStream pDataStream, LibAMCF
 		
 		*pStreamSize = pIDataStream->GetSize();
 
+		return LIBAMCF_SUCCESS;
+	}
+	catch (ELibAMCFInterfaceException & Exception) {
+		return handleLibAMCFException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibAMCFResult libamcf_datastream_gettimestamp(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nTimestampBufferSize, LibAMCF_uint32* pTimestampNeededChars, char * pTimestampBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDataStream;
+
+	try {
+		if ( (!pTimestampBuffer) && !(pTimestampNeededChars) )
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		std::string sTimestamp("");
+		IDataStream* pIDataStream = dynamic_cast<IDataStream*>(pIBaseClass);
+		if (!pIDataStream)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTimestampBuffer == nullptr);
+		if (isCacheCall) {
+			sTimestamp = pIDataStream->GetTimestamp();
+
+			pIDataStream->_setCache (new ParameterCache_1<std::string> (sTimestamp));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataStream->_getCache ());
+			if (cache == nullptr)
+				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+			cache->retrieveData (sTimestamp);
+			pIDataStream->_setCache (nullptr);
+		}
+		
+		if (pTimestampNeededChars)
+			*pTimestampNeededChars = (LibAMCF_uint32) (sTimestamp.size()+1);
+		if (pTimestampBuffer) {
+			if (sTimestamp.size() >= nTimestampBufferSize)
+				throw ELibAMCFInterfaceException (LIBAMCF_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestamp = 0; iTimestamp < sTimestamp.size(); iTimestamp++)
+				pTimestampBuffer[iTimestamp] = sTimestamp[iTimestamp];
+			pTimestampBuffer[sTimestamp.size()] = 0;
+		}
 		return LIBAMCF_SUCCESS;
 	}
 	catch (ELibAMCFInterfaceException & Exception) {
@@ -726,14 +846,16 @@ LibAMCFResult libamcf_streamupload_finishchunking(LibAMCF_StreamUpload pStreamUp
 	}
 }
 
-LibAMCFResult libamcf_streamupload_getstatus(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pUploadedBytes, bool * pFinished)
+LibAMCFResult libamcf_streamupload_getstatus(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pFinishedSize, LibAMCF_uint64 * pInProgressSize, bool * pFinished)
 {
 	IBase* pIBaseClass = (IBase *)pStreamUpload;
 
 	try {
 		if (!pUploadSize)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
-		if (!pUploadedBytes)
+		if (!pFinishedSize)
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		if (!pInProgressSize)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
 		if (!pFinished)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
@@ -741,7 +863,7 @@ LibAMCFResult libamcf_streamupload_getstatus(LibAMCF_StreamUpload pStreamUpload,
 		if (!pIStreamUpload)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		pIStreamUpload->GetStatus(*pUploadSize, *pUploadedBytes, *pFinished);
+		pIStreamUpload->GetStatus(*pUploadSize, *pFinishedSize, *pInProgressSize, *pFinished);
 
 		return LIBAMCF_SUCCESS;
 	}
@@ -1130,6 +1252,8 @@ LibAMCFResult LibAMCF::Impl::LibAMCF_GetProcAddress (const char * pProcName, voi
 	
 	if (sProcName == "libamcf_operationresult_waitfor") 
 		*ppProcAddress = (void*) &libamcf_operationresult_waitfor;
+	if (sProcName == "libamcf_operationresult_ensuresuccess") 
+		*ppProcAddress = (void*) &libamcf_operationresult_ensuresuccess;
 	if (sProcName == "libamcf_operationresult_inprogress") 
 		*ppProcAddress = (void*) &libamcf_operationresult_inprogress;
 	if (sProcName == "libamcf_operationresult_success") 
@@ -1144,8 +1268,12 @@ LibAMCFResult LibAMCF::Impl::LibAMCF_GetProcAddress (const char * pProcName, voi
 		*ppProcAddress = (void*) &libamcf_datastream_getname;
 	if (sProcName == "libamcf_datastream_getmimetype") 
 		*ppProcAddress = (void*) &libamcf_datastream_getmimetype;
+	if (sProcName == "libamcf_datastream_getsha256") 
+		*ppProcAddress = (void*) &libamcf_datastream_getsha256;
 	if (sProcName == "libamcf_datastream_getsize") 
 		*ppProcAddress = (void*) &libamcf_datastream_getsize;
+	if (sProcName == "libamcf_datastream_gettimestamp") 
+		*ppProcAddress = (void*) &libamcf_datastream_gettimestamp;
 	if (sProcName == "libamcf_streamupload_getname") 
 		*ppProcAddress = (void*) &libamcf_streamupload_getname;
 	if (sProcName == "libamcf_streamupload_getmimetype") 

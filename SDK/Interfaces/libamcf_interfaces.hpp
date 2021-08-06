@@ -122,6 +122,27 @@ template <class T1, class T2, class T3> class ParameterCache_3 : public Paramete
 		}
 };
 
+template <class T1, class T2, class T3, class T4> class ParameterCache_4 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+	public:
+		ParameterCache_4 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+		}
+};
+
 
 /*************************************************************************************************************************
  Class interface for Base 
@@ -253,6 +274,11 @@ public:
 	virtual bool WaitFor(const LibAMCF_uint32 nTimeOut) = 0;
 
 	/**
+	* IOperationResult::EnsureSuccess - Waits for operation to be successfully finished. Throws an error if not successful.
+	*/
+	virtual void EnsureSuccess() = 0;
+
+	/**
 	* IOperationResult::InProgress - Checks if operation is in progress.
 	* @return Flag if operation is in progress.
 	*/
@@ -306,10 +332,22 @@ public:
 	virtual std::string GetMimeType() = 0;
 
 	/**
+	* IDataStream::GetSHA256 - Returns the sha256 checksum of the stream.
+	* @return SHA256 string.
+	*/
+	virtual std::string GetSHA256() = 0;
+
+	/**
 	* IDataStream::GetSize - Returns the stream size.
 	* @return Stream size.
 	*/
 	virtual LibAMCF_uint64 GetSize() = 0;
+
+	/**
+	* IDataStream::GetTimestamp - Returns the timestamp of the stream.
+	* @return Timestamp string.
+	*/
+	virtual std::string GetTimestamp() = 0;
 
 };
 
@@ -380,11 +418,12 @@ public:
 
 	/**
 	* IStreamUpload::GetStatus - Retrieves current upload status.
-	* @param[out] nUploadSize - Total size of the upload.
-	* @param[out] nUploadedBytes - Current uploaded data.
-	* @param[out] bFinished - Upload has been finished.
+	* @param[out] nUploadSize - Total target size of the upload. 0 if no upload has been started.
+	* @param[out] nFinishedSize - Current bytes that have been successfully uploaded.
+	* @param[out] nInProgressSize - Current bytes that have been uploaded or are currently in progress.
+	* @param[out] bFinished - Flag if upload has successfully finished.
 	*/
-	virtual void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished) = 0;
+	virtual void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nFinishedSize, LibAMCF_uint64 & nInProgressSize, bool & bFinished) = 0;
 
 	/**
 	* IStreamUpload::GetDataStream - Retrieves the uploaded data stream object. Upload must have finished successfully.

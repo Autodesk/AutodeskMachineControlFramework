@@ -84,6 +84,15 @@ LibAMCFResult CCall_libamcf_operationresult_waitfor(LibAMCFHandle libraryHandle,
 }
 
 
+LibAMCFResult CCall_libamcf_operationresult_ensuresuccess(LibAMCFHandle libraryHandle, LibAMCF_OperationResult pOperationResult)
+{
+	if (libraryHandle == 0) 
+		return LIBAMCF_ERROR_INVALIDCAST;
+	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_OperationResult_EnsureSuccess (pOperationResult);
+}
+
+
 LibAMCFResult CCall_libamcf_operationresult_inprogress(LibAMCFHandle libraryHandle, LibAMCF_OperationResult pOperationResult, bool * pOperationIsInProgress)
 {
 	if (libraryHandle == 0) 
@@ -147,12 +156,30 @@ LibAMCFResult CCall_libamcf_datastream_getmimetype(LibAMCFHandle libraryHandle, 
 }
 
 
+LibAMCFResult CCall_libamcf_datastream_getsha256(LibAMCFHandle libraryHandle, LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nSHA256BufferSize, LibAMCF_uint32* pSHA256NeededChars, char * pSHA256Buffer)
+{
+	if (libraryHandle == 0) 
+		return LIBAMCF_ERROR_INVALIDCAST;
+	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_DataStream_GetSHA256 (pDataStream, nSHA256BufferSize, pSHA256NeededChars, pSHA256Buffer);
+}
+
+
 LibAMCFResult CCall_libamcf_datastream_getsize(LibAMCFHandle libraryHandle, LibAMCF_DataStream pDataStream, LibAMCF_uint64 * pStreamSize)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
 	return wrapperTable->m_DataStream_GetSize (pDataStream, pStreamSize);
+}
+
+
+LibAMCFResult CCall_libamcf_datastream_gettimestamp(LibAMCFHandle libraryHandle, LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nTimestampBufferSize, LibAMCF_uint32* pTimestampNeededChars, char * pTimestampBuffer)
+{
+	if (libraryHandle == 0) 
+		return LIBAMCF_ERROR_INVALIDCAST;
+	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_DataStream_GetTimestamp (pDataStream, nTimestampBufferSize, pTimestampNeededChars, pTimestampBuffer);
 }
 
 
@@ -228,12 +255,12 @@ LibAMCFResult CCall_libamcf_streamupload_finishchunking(LibAMCFHandle libraryHan
 }
 
 
-LibAMCFResult CCall_libamcf_streamupload_getstatus(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pUploadedBytes, bool * pFinished)
+LibAMCFResult CCall_libamcf_streamupload_getstatus(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pFinishedSize, LibAMCF_uint64 * pInProgressSize, bool * pFinished)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_StreamUpload_GetStatus (pStreamUpload, pUploadSize, pUploadedBytes, pFinished);
+	return wrapperTable->m_StreamUpload_GetStatus (pStreamUpload, pUploadSize, pFinishedSize, pInProgressSize, pFinished);
 }
 
 
@@ -437,6 +464,16 @@ const LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED = 24;
 const LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED = 25;
 const LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE = 26;
 const LIBAMCF_ERROR_BEGINCHUNKINGFAILED = 27;
+const LIBAMCF_ERROR_DIDNOTUPLOADFULLDATA = 28;
+const LIBAMCF_ERROR_UPLOADISALREADYFINISHED = 29;
+const LIBAMCF_ERROR_INVALIDHASHBLOCKINDEX = 30;
+const LIBAMCF_ERROR_CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE = 31;
+const LIBAMCF_ERROR_CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE = 32;
+const LIBAMCF_ERROR_INVALIDHASHBLOCKSIZE = 33;
+const LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING = 34;
+const LIBAMCF_ERROR_OPERATIONERROR = 35;
+const LIBAMCF_ERROR_OPERATIONTIMEOUT = 36;
+const LIBAMCF_ERROR_UPLOADDIDNOTFINISH = 37;
 
 // WrappedError is an error that wraps a LibAMCF error.
 type WrappedError struct {
@@ -504,6 +541,26 @@ func errorMessage(errorcode uint32) string {
 		return "Upload exceeds total size";
 	case LIBAMCF_ERROR_BEGINCHUNKINGFAILED:
 		return "Begin chunking failed";
+	case LIBAMCF_ERROR_DIDNOTUPLOADFULLDATA:
+		return "Did not upload full data";
+	case LIBAMCF_ERROR_UPLOADISALREADYFINISHED:
+		return "Upload is already finished.";
+	case LIBAMCF_ERROR_INVALIDHASHBLOCKINDEX:
+		return "Invalid hash block index.";
+	case LIBAMCF_ERROR_CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE:
+		return "Chunk size must be a multiple of hash block size.";
+	case LIBAMCF_ERROR_CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE:
+		return "Chunk start must be a multiple of hash block size.";
+	case LIBAMCF_ERROR_INVALIDHASHBLOCKSIZE:
+		return "Invalid hash block size.";
+	case LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING:
+		return "Checksum of block missing.";
+	case LIBAMCF_ERROR_OPERATIONERROR:
+		return "Operation Error.";
+	case LIBAMCF_ERROR_OPERATIONTIMEOUT:
+		return "Operation Timeout.";
+	case LIBAMCF_ERROR_UPLOADDIDNOTFINISH:
+		return "Upload did not finish.";
 	default:
 		return "unknown";
 	}
@@ -566,6 +623,15 @@ func (inst OperationResult) WaitFor(timeOut uint32) (bool, error) {
 		return false, makeError(uint32(returnValue))
 	}
 	return bool(operationFinished), nil
+}
+
+// EnsureSuccess waits for operation to be successfully finished. Throws an error if not successful.
+func (inst OperationResult) EnsureSuccess() error {
+	returnValue := C.CCall_libamcf_operationresult_ensuresuccess(inst.wrapperRef.LibraryHandle, inst.Ref)
+	if returnValue != 0 {
+		return makeError(uint32(returnValue))
+	}
+	return nil
 }
 
 // InProgress checks if operation is in progress.
@@ -683,6 +749,23 @@ func (inst DataStream) GetMimeType() (string, error) {
 	return string(buffermimeType[:(filledinmimeType-1)]), nil
 }
 
+// GetSHA256 returns the sha256 checksum of the stream.
+func (inst DataStream) GetSHA256() (string, error) {
+	var neededforsHA256 C.uint32_t
+	var filledinsHA256 C.uint32_t
+	returnValue := C.CCall_libamcf_datastream_getsha256(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededforsHA256, nil)
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	bufferSizesHA256 := neededforsHA256
+	buffersHA256 := make([]byte, bufferSizesHA256)
+	returnValue = C.CCall_libamcf_datastream_getsha256(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizesHA256, &filledinsHA256, (*C.char)(unsafe.Pointer(&buffersHA256[0])))
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	return string(buffersHA256[:(filledinsHA256-1)]), nil
+}
+
 // GetSize returns the stream size.
 func (inst DataStream) GetSize() (uint64, error) {
 	var streamSize C.uint64_t
@@ -691,6 +774,23 @@ func (inst DataStream) GetSize() (uint64, error) {
 		return 0, makeError(uint32(returnValue))
 	}
 	return uint64(streamSize), nil
+}
+
+// GetTimestamp returns the timestamp of the stream.
+func (inst DataStream) GetTimestamp() (string, error) {
+	var neededfortimestamp C.uint32_t
+	var filledintimestamp C.uint32_t
+	returnValue := C.CCall_libamcf_datastream_gettimestamp(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededfortimestamp, nil)
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	bufferSizetimestamp := neededfortimestamp
+	buffertimestamp := make([]byte, bufferSizetimestamp)
+	returnValue = C.CCall_libamcf_datastream_gettimestamp(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizetimestamp, &filledintimestamp, (*C.char)(unsafe.Pointer(&buffertimestamp[0])))
+	if returnValue != 0 {
+		return "", makeError(uint32(returnValue))
+	}
+	return string(buffertimestamp[:(filledintimestamp-1)]), nil
 }
 
 
@@ -805,15 +905,16 @@ func (inst StreamUpload) FinishChunking() (OperationResult, error) {
 }
 
 // GetStatus retrieves current upload status.
-func (inst StreamUpload) GetStatus() (uint64, uint64, bool, error) {
+func (inst StreamUpload) GetStatus() (uint64, uint64, uint64, bool, error) {
 	var uploadSize C.uint64_t
-	var uploadedBytes C.uint64_t
+	var finishedSize C.uint64_t
+	var inProgressSize C.uint64_t
 	var finished C.bool
-	returnValue := C.CCall_libamcf_streamupload_getstatus(inst.wrapperRef.LibraryHandle, inst.Ref, &uploadSize, &uploadedBytes, &finished)
+	returnValue := C.CCall_libamcf_streamupload_getstatus(inst.wrapperRef.LibraryHandle, inst.Ref, &uploadSize, &finishedSize, &inProgressSize, &finished)
 	if returnValue != 0 {
-		return 0, 0, false, makeError(uint32(returnValue))
+		return 0, 0, 0, false, makeError(uint32(returnValue))
 	}
-	return uint64(uploadSize), uint64(uploadedBytes), bool(finished), nil
+	return uint64(uploadSize), uint64(finishedSize), uint64(inProgressSize), bool(finished), nil
 }
 
 // GetDataStream retrieves the uploaded data stream object. Upload must have finished successfully.

@@ -97,6 +97,7 @@ private:
 	static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static v8::Persistent<v8::Function> constructor;
 	static void WaitFor(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void EnsureSuccess(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void InProgress(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void Success(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetErrorMessage(const v8::FunctionCallbackInfo<v8::Value>& args);
@@ -121,7 +122,9 @@ private:
 	static void GetContextUUID(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetName(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetMimeType(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetSHA256(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetSize(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetTimestamp(const v8::FunctionCallbackInfo<v8::Value>& args);
 
 public:
 	CLibAMCFDataStream();

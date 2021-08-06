@@ -62,6 +62,14 @@ Interface version: 1.0.0
 typedef LibAMCFResult (*PLibAMCFOperationResult_WaitForPtr) (LibAMCF_OperationResult pOperationResult, LibAMCF_uint32 nTimeOut, bool * pOperationFinished);
 
 /**
+* Waits for operation to be successfully finished. Throws an error if not successful.
+*
+* @param[in] pOperationResult - OperationResult instance.
+* @return error code or 0 (success)
+*/
+typedef LibAMCFResult (*PLibAMCFOperationResult_EnsureSuccessPtr) (LibAMCF_OperationResult pOperationResult);
+
+/**
 * Checks if operation is in progress.
 *
 * @param[in] pOperationResult - OperationResult instance.
@@ -139,6 +147,17 @@ typedef LibAMCFResult (*PLibAMCFDataStream_GetNamePtr) (LibAMCF_DataStream pData
 typedef LibAMCFResult (*PLibAMCFDataStream_GetMimeTypePtr) (LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nMimeTypeBufferSize, LibAMCF_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer);
 
 /**
+* Returns the sha256 checksum of the stream.
+*
+* @param[in] pDataStream - DataStream instance.
+* @param[in] nSHA256BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA256NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA256Buffer -  buffer of SHA256 string., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibAMCFResult (*PLibAMCFDataStream_GetSHA256Ptr) (LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nSHA256BufferSize, LibAMCF_uint32* pSHA256NeededChars, char * pSHA256Buffer);
+
+/**
 * Returns the stream size.
 *
 * @param[in] pDataStream - DataStream instance.
@@ -146,6 +165,17 @@ typedef LibAMCFResult (*PLibAMCFDataStream_GetMimeTypePtr) (LibAMCF_DataStream p
 * @return error code or 0 (success)
 */
 typedef LibAMCFResult (*PLibAMCFDataStream_GetSizePtr) (LibAMCF_DataStream pDataStream, LibAMCF_uint64 * pStreamSize);
+
+/**
+* Returns the timestamp of the stream.
+*
+* @param[in] pDataStream - DataStream instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp string., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibAMCFResult (*PLibAMCFDataStream_GetTimestampPtr) (LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nTimestampBufferSize, LibAMCF_uint32* pTimestampNeededChars, char * pTimestampBuffer);
 
 /*************************************************************************************************************************
  Class definition for StreamUpload
@@ -241,12 +271,13 @@ typedef LibAMCFResult (*PLibAMCFStreamUpload_FinishChunkingPtr) (LibAMCF_StreamU
 * Retrieves current upload status.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
-* @param[out] pUploadSize - Total size of the upload.
-* @param[out] pUploadedBytes - Current uploaded data.
-* @param[out] pFinished - Upload has been finished.
+* @param[out] pUploadSize - Total target size of the upload. 0 if no upload has been started.
+* @param[out] pFinishedSize - Current bytes that have been successfully uploaded.
+* @param[out] pInProgressSize - Current bytes that have been uploaded or are currently in progress.
+* @param[out] pFinished - Flag if upload has successfully finished.
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFStreamUpload_GetStatusPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pUploadedBytes, bool * pFinished);
+typedef LibAMCFResult (*PLibAMCFStreamUpload_GetStatusPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pFinishedSize, LibAMCF_uint64 * pInProgressSize, bool * pFinished);
 
 /**
 * Retrieves the uploaded data stream object. Upload must have finished successfully.
@@ -436,6 +467,7 @@ typedef LibAMCFResult (*PLibAMCFCreateConnectionPtr) (const char * pBaseURL, Lib
 typedef struct {
 	void * m_LibraryHandle;
 	PLibAMCFOperationResult_WaitForPtr m_OperationResult_WaitFor;
+	PLibAMCFOperationResult_EnsureSuccessPtr m_OperationResult_EnsureSuccess;
 	PLibAMCFOperationResult_InProgressPtr m_OperationResult_InProgress;
 	PLibAMCFOperationResult_SuccessPtr m_OperationResult_Success;
 	PLibAMCFOperationResult_GetErrorMessagePtr m_OperationResult_GetErrorMessage;
@@ -443,7 +475,9 @@ typedef struct {
 	PLibAMCFDataStream_GetContextUUIDPtr m_DataStream_GetContextUUID;
 	PLibAMCFDataStream_GetNamePtr m_DataStream_GetName;
 	PLibAMCFDataStream_GetMimeTypePtr m_DataStream_GetMimeType;
+	PLibAMCFDataStream_GetSHA256Ptr m_DataStream_GetSHA256;
 	PLibAMCFDataStream_GetSizePtr m_DataStream_GetSize;
+	PLibAMCFDataStream_GetTimestampPtr m_DataStream_GetTimestamp;
 	PLibAMCFStreamUpload_GetNamePtr m_StreamUpload_GetName;
 	PLibAMCFStreamUpload_GetMimeTypePtr m_StreamUpload_GetMimeType;
 	PLibAMCFStreamUpload_GetUsageContextPtr m_StreamUpload_GetUsageContext;

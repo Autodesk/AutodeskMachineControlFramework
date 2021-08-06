@@ -67,7 +67,9 @@ namespace AMCCommon {
 
 		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
 		static std::string calculateSHA256FromString(const std::string& sString);
+		static std::string calculateSHA256FromData(const uint8_t * pData, uint64_t nDataSize);
 		static std::string calculateRandomSHA256String(const uint32_t nIterations);
+		static std::string calculateBlockwiseSHA256FromFile(const std::string& sFileNameUTF8, uint32_t nBlockSize);
 
 		static std::string encodeBase64 (const std::string& sString, eBase64Type eType);
 		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);

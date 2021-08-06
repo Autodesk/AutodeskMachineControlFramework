@@ -60,9 +60,9 @@ class CStreamUpload : public virtual IStreamUpload, public virtual CBase {
 private:
     std::string m_sStreamUUID;
     std::string m_sContextUUID;
+    std::string m_sCalculatedSHA256;
+    std::string m_sUploadTimestamp;
 
-
-protected:
     std::string m_sName;
     std::string m_sMimeType;
     std::string m_sUsageContext;
@@ -71,6 +71,14 @@ protected:
 
     uint64_t m_nTotalUploadSize;
     uint64_t m_nCurrentUploadSize;
+
+    std::mutex m_UploadResultMutex;
+    uint64_t m_nFinishedBytes;
+
+    uint64_t m_nHashBlockSize;
+    std::vector<std::string> m_HashBlockSHA256Sums;
+
+    bool m_bUploadFinished;
 
 public:
 
@@ -92,7 +100,7 @@ public:
 
 	IOperationResult * FinishChunking() override;
 
-	void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished) override;
+    void GetStatus(LibAMCF_uint64& nUploadSize, LibAMCF_uint64& nFinishedSize, LibAMCF_uint64& nInProgressSize, bool& bFinished) override;
 
 	IDataStream * GetDataStream() override;
 

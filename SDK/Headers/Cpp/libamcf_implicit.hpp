@@ -323,6 +323,7 @@ public:
 	}
 	
 	inline bool WaitFor(const LibAMCF_uint32 nTimeOut);
+	inline void EnsureSuccess();
 	inline bool InProgress();
 	inline bool Success();
 	inline std::string GetErrorMessage();
@@ -346,7 +347,9 @@ public:
 	inline std::string GetContextUUID();
 	inline std::string GetName();
 	inline std::string GetMimeType();
+	inline std::string GetSHA256();
 	inline LibAMCF_uint64 GetSize();
+	inline std::string GetTimestamp();
 };
 	
 /*************************************************************************************************************************
@@ -371,7 +374,7 @@ public:
 	inline POperationResult BeginChunking(const LibAMCF_uint64 nDataSize);
 	inline POperationResult UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer);
 	inline POperationResult FinishChunking();
-	inline void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished);
+	inline void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nFinishedSize, LibAMCF_uint64 & nInProgressSize, bool & bFinished);
 	inline PDataStream GetDataStream();
 };
 	
@@ -529,6 +532,14 @@ public:
 	}
 	
 	/**
+	* COperationResult::EnsureSuccess - Waits for operation to be successfully finished. Throws an error if not successful.
+	*/
+	void COperationResult::EnsureSuccess()
+	{
+		CheckError(libamcf_operationresult_ensuresuccess(m_pHandle));
+	}
+	
+	/**
 	* COperationResult::InProgress - Checks if operation is in progress.
 	* @return Flag if operation is in progress.
 	*/
@@ -632,6 +643,21 @@ public:
 	}
 	
 	/**
+	* CDataStream::GetSHA256 - Returns the sha256 checksum of the stream.
+	* @return SHA256 string.
+	*/
+	std::string CDataStream::GetSHA256()
+	{
+		LibAMCF_uint32 bytesNeededSHA256 = 0;
+		LibAMCF_uint32 bytesWrittenSHA256 = 0;
+		CheckError(libamcf_datastream_getsha256(m_pHandle, 0, &bytesNeededSHA256, nullptr));
+		std::vector<char> bufferSHA256(bytesNeededSHA256);
+		CheckError(libamcf_datastream_getsha256(m_pHandle, bytesNeededSHA256, &bytesWrittenSHA256, &bufferSHA256[0]));
+		
+		return std::string(&bufferSHA256[0]);
+	}
+	
+	/**
 	* CDataStream::GetSize - Returns the stream size.
 	* @return Stream size.
 	*/
@@ -641,6 +667,21 @@ public:
 		CheckError(libamcf_datastream_getsize(m_pHandle, &resultStreamSize));
 		
 		return resultStreamSize;
+	}
+	
+	/**
+	* CDataStream::GetTimestamp - Returns the timestamp of the stream.
+	* @return Timestamp string.
+	*/
+	std::string CDataStream::GetTimestamp()
+	{
+		LibAMCF_uint32 bytesNeededTimestamp = 0;
+		LibAMCF_uint32 bytesWrittenTimestamp = 0;
+		CheckError(libamcf_datastream_gettimestamp(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(libamcf_datastream_gettimestamp(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
 	}
 	
 	/**
@@ -775,13 +816,14 @@ public:
 	
 	/**
 	* CStreamUpload::GetStatus - Retrieves current upload status.
-	* @param[out] nUploadSize - Total size of the upload.
-	* @param[out] nUploadedBytes - Current uploaded data.
-	* @param[out] bFinished - Upload has been finished.
+	* @param[out] nUploadSize - Total target size of the upload. 0 if no upload has been started.
+	* @param[out] nFinishedSize - Current bytes that have been successfully uploaded.
+	* @param[out] nInProgressSize - Current bytes that have been uploaded or are currently in progress.
+	* @param[out] bFinished - Flag if upload has successfully finished.
 	*/
-	void CStreamUpload::GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished)
+	void CStreamUpload::GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nFinishedSize, LibAMCF_uint64 & nInProgressSize, bool & bFinished)
 	{
-		CheckError(libamcf_streamupload_getstatus(m_pHandle, &nUploadSize, &nUploadedBytes, &bFinished));
+		CheckError(libamcf_streamupload_getstatus(m_pHandle, &nUploadSize, &nFinishedSize, &nInProgressSize, &bFinished));
 	}
 	
 	/**

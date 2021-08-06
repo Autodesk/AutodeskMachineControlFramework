@@ -75,6 +75,14 @@ extern "C" {
 LIBAMCF_DECLSPEC LibAMCFResult libamcf_operationresult_waitfor(LibAMCF_OperationResult pOperationResult, LibAMCF_uint32 nTimeOut, bool * pOperationFinished);
 
 /**
+* Waits for operation to be successfully finished. Throws an error if not successful.
+*
+* @param[in] pOperationResult - OperationResult instance.
+* @return error code or 0 (success)
+*/
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_operationresult_ensuresuccess(LibAMCF_OperationResult pOperationResult);
+
+/**
 * Checks if operation is in progress.
 *
 * @param[in] pOperationResult - OperationResult instance.
@@ -152,6 +160,17 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getname(LibAMCF_DataStream pDa
 LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getmimetype(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nMimeTypeBufferSize, LibAMCF_uint32* pMimeTypeNeededChars, char * pMimeTypeBuffer);
 
 /**
+* Returns the sha256 checksum of the stream.
+*
+* @param[in] pDataStream - DataStream instance.
+* @param[in] nSHA256BufferSize - size of the buffer (including trailing 0)
+* @param[out] pSHA256NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSHA256Buffer -  buffer of SHA256 string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getsha256(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nSHA256BufferSize, LibAMCF_uint32* pSHA256NeededChars, char * pSHA256Buffer);
+
+/**
 * Returns the stream size.
 *
 * @param[in] pDataStream - DataStream instance.
@@ -159,6 +178,17 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getmimetype(LibAMCF_DataStream
 * @return error code or 0 (success)
 */
 LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getsize(LibAMCF_DataStream pDataStream, LibAMCF_uint64 * pStreamSize);
+
+/**
+* Returns the timestamp of the stream.
+*
+* @param[in] pDataStream - DataStream instance.
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_gettimestamp(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nTimestampBufferSize, LibAMCF_uint32* pTimestampNeededChars, char * pTimestampBuffer);
 
 /*************************************************************************************************************************
  Class definition for StreamUpload
@@ -254,12 +284,13 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_finishchunking(LibAMCF_Strea
 * Retrieves current upload status.
 *
 * @param[in] pStreamUpload - StreamUpload instance.
-* @param[out] pUploadSize - Total size of the upload.
-* @param[out] pUploadedBytes - Current uploaded data.
-* @param[out] pFinished - Upload has been finished.
+* @param[out] pUploadSize - Total target size of the upload. 0 if no upload has been started.
+* @param[out] pFinishedSize - Current bytes that have been successfully uploaded.
+* @param[out] pInProgressSize - Current bytes that have been uploaded or are currently in progress.
+* @param[out] pFinished - Flag if upload has successfully finished.
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getstatus(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pUploadedBytes, bool * pFinished);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getstatus(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 * pUploadSize, LibAMCF_uint64 * pFinishedSize, LibAMCF_uint64 * pInProgressSize, bool * pFinished);
 
 /**
 * Retrieves the uploaded data stream object. Upload must have finished successfully.

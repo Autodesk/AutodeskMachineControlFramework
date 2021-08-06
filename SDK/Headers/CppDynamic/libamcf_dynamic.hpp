@@ -347,6 +347,7 @@ public:
 	}
 	
 	inline bool WaitFor(const LibAMCF_uint32 nTimeOut);
+	inline void EnsureSuccess();
 	inline bool InProgress();
 	inline bool Success();
 	inline std::string GetErrorMessage();
@@ -370,7 +371,9 @@ public:
 	inline std::string GetContextUUID();
 	inline std::string GetName();
 	inline std::string GetMimeType();
+	inline std::string GetSHA256();
 	inline LibAMCF_uint64 GetSize();
+	inline std::string GetTimestamp();
 };
 	
 /*************************************************************************************************************************
@@ -395,7 +398,7 @@ public:
 	inline POperationResult BeginChunking(const LibAMCF_uint64 nDataSize);
 	inline POperationResult UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer);
 	inline POperationResult FinishChunking();
-	inline void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished);
+	inline void GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nFinishedSize, LibAMCF_uint64 & nInProgressSize, bool & bFinished);
 	inline PDataStream GetDataStream();
 };
 	
@@ -537,6 +540,7 @@ public:
 		
 		pWrapperTable->m_LibraryHandle = nullptr;
 		pWrapperTable->m_OperationResult_WaitFor = nullptr;
+		pWrapperTable->m_OperationResult_EnsureSuccess = nullptr;
 		pWrapperTable->m_OperationResult_InProgress = nullptr;
 		pWrapperTable->m_OperationResult_Success = nullptr;
 		pWrapperTable->m_OperationResult_GetErrorMessage = nullptr;
@@ -544,7 +548,9 @@ public:
 		pWrapperTable->m_DataStream_GetContextUUID = nullptr;
 		pWrapperTable->m_DataStream_GetName = nullptr;
 		pWrapperTable->m_DataStream_GetMimeType = nullptr;
+		pWrapperTable->m_DataStream_GetSHA256 = nullptr;
 		pWrapperTable->m_DataStream_GetSize = nullptr;
+		pWrapperTable->m_DataStream_GetTimestamp = nullptr;
 		pWrapperTable->m_StreamUpload_GetName = nullptr;
 		pWrapperTable->m_StreamUpload_GetMimeType = nullptr;
 		pWrapperTable->m_StreamUpload_GetUsageContext = nullptr;
@@ -630,6 +636,15 @@ public:
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_OperationResult_EnsureSuccess = (PLibAMCFOperationResult_EnsureSuccessPtr) GetProcAddress(hLibrary, "libamcf_operationresult_ensuresuccess");
+		#else // _WIN32
+		pWrapperTable->m_OperationResult_EnsureSuccess = (PLibAMCFOperationResult_EnsureSuccessPtr) dlsym(hLibrary, "libamcf_operationresult_ensuresuccess");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OperationResult_EnsureSuccess == nullptr)
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_OperationResult_InProgress = (PLibAMCFOperationResult_InProgressPtr) GetProcAddress(hLibrary, "libamcf_operationresult_inprogress");
 		#else // _WIN32
 		pWrapperTable->m_OperationResult_InProgress = (PLibAMCFOperationResult_InProgressPtr) dlsym(hLibrary, "libamcf_operationresult_inprogress");
@@ -693,12 +708,30 @@ public:
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataStream_GetSHA256 = (PLibAMCFDataStream_GetSHA256Ptr) GetProcAddress(hLibrary, "libamcf_datastream_getsha256");
+		#else // _WIN32
+		pWrapperTable->m_DataStream_GetSHA256 = (PLibAMCFDataStream_GetSHA256Ptr) dlsym(hLibrary, "libamcf_datastream_getsha256");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataStream_GetSHA256 == nullptr)
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DataStream_GetSize = (PLibAMCFDataStream_GetSizePtr) GetProcAddress(hLibrary, "libamcf_datastream_getsize");
 		#else // _WIN32
 		pWrapperTable->m_DataStream_GetSize = (PLibAMCFDataStream_GetSizePtr) dlsym(hLibrary, "libamcf_datastream_getsize");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataStream_GetSize == nullptr)
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataStream_GetTimestamp = (PLibAMCFDataStream_GetTimestampPtr) GetProcAddress(hLibrary, "libamcf_datastream_gettimestamp");
+		#else // _WIN32
+		pWrapperTable->m_DataStream_GetTimestamp = (PLibAMCFDataStream_GetTimestampPtr) dlsym(hLibrary, "libamcf_datastream_gettimestamp");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataStream_GetTimestamp == nullptr)
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -964,6 +997,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OperationResult_WaitFor == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libamcf_operationresult_ensuresuccess", (void**)&(pWrapperTable->m_OperationResult_EnsureSuccess));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OperationResult_EnsureSuccess == nullptr) )
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libamcf_operationresult_inprogress", (void**)&(pWrapperTable->m_OperationResult_InProgress));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OperationResult_InProgress == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -992,8 +1029,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetMimeType == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libamcf_datastream_getsha256", (void**)&(pWrapperTable->m_DataStream_GetSHA256));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetSHA256 == nullptr) )
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libamcf_datastream_getsize", (void**)&(pWrapperTable->m_DataStream_GetSize));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetSize == nullptr) )
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libamcf_datastream_gettimestamp", (void**)&(pWrapperTable->m_DataStream_GetTimestamp));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetTimestamp == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libamcf_streamupload_getname", (void**)&(pWrapperTable->m_StreamUpload_GetName));
@@ -1131,6 +1176,14 @@ public:
 	}
 	
 	/**
+	* COperationResult::EnsureSuccess - Waits for operation to be successfully finished. Throws an error if not successful.
+	*/
+	void COperationResult::EnsureSuccess()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_OperationResult_EnsureSuccess(m_pHandle));
+	}
+	
+	/**
 	* COperationResult::InProgress - Checks if operation is in progress.
 	* @return Flag if operation is in progress.
 	*/
@@ -1234,6 +1287,21 @@ public:
 	}
 	
 	/**
+	* CDataStream::GetSHA256 - Returns the sha256 checksum of the stream.
+	* @return SHA256 string.
+	*/
+	std::string CDataStream::GetSHA256()
+	{
+		LibAMCF_uint32 bytesNeededSHA256 = 0;
+		LibAMCF_uint32 bytesWrittenSHA256 = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetSHA256(m_pHandle, 0, &bytesNeededSHA256, nullptr));
+		std::vector<char> bufferSHA256(bytesNeededSHA256);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetSHA256(m_pHandle, bytesNeededSHA256, &bytesWrittenSHA256, &bufferSHA256[0]));
+		
+		return std::string(&bufferSHA256[0]);
+	}
+	
+	/**
 	* CDataStream::GetSize - Returns the stream size.
 	* @return Stream size.
 	*/
@@ -1243,6 +1311,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetSize(m_pHandle, &resultStreamSize));
 		
 		return resultStreamSize;
+	}
+	
+	/**
+	* CDataStream::GetTimestamp - Returns the timestamp of the stream.
+	* @return Timestamp string.
+	*/
+	std::string CDataStream::GetTimestamp()
+	{
+		LibAMCF_uint32 bytesNeededTimestamp = 0;
+		LibAMCF_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetTimestamp(m_pHandle, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetTimestamp(m_pHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		
+		return std::string(&bufferTimestamp[0]);
 	}
 	
 	/**
@@ -1377,13 +1460,14 @@ public:
 	
 	/**
 	* CStreamUpload::GetStatus - Retrieves current upload status.
-	* @param[out] nUploadSize - Total size of the upload.
-	* @param[out] nUploadedBytes - Current uploaded data.
-	* @param[out] bFinished - Upload has been finished.
+	* @param[out] nUploadSize - Total target size of the upload. 0 if no upload has been started.
+	* @param[out] nFinishedSize - Current bytes that have been successfully uploaded.
+	* @param[out] nInProgressSize - Current bytes that have been uploaded or are currently in progress.
+	* @param[out] bFinished - Flag if upload has successfully finished.
 	*/
-	void CStreamUpload::GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished)
+	void CStreamUpload::GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nFinishedSize, LibAMCF_uint64 & nInProgressSize, bool & bFinished)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetStatus(m_pHandle, &nUploadSize, &nUploadedBytes, &bFinished));
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetStatus(m_pHandle, &nUploadSize, &nFinishedSize, &nInProgressSize, &bFinished));
 	}
 	
 	/**

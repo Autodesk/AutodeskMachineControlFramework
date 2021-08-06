@@ -91,3 +91,11 @@ std::string COperationResult::GetErrorMessage()
 
 
 }
+
+
+void COperationResult::EnsureSuccess()
+{
+    if (!Success()) {
+        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_OPERATIONERROR, "Operation Error: " + GetErrorMessage());
+    }
+}

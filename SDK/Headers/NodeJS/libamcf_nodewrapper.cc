@@ -189,6 +189,7 @@ void CLibAMCFOperationResult::Init()
 
 		// Prototype
 		NODE_SET_PROTOTYPE_METHOD(tpl, "WaitFor", WaitFor);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "EnsureSuccess", EnsureSuccess);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "InProgress", InProgress);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "Success", Success);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetErrorMessage", GetErrorMessage);
@@ -244,6 +245,26 @@ void CLibAMCFOperationResult::WaitFor(const FunctionCallbackInfo<Value>& args)
         LibAMCFResult errorCode = wrapperTable->m_OperationResult_WaitFor(instanceHandle, nTimeOut, &bReturnOperationFinished);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         args.GetReturnValue().Set(Boolean::New(isolate, bReturnOperationFinished));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLibAMCFOperationResult::EnsureSuccess(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method EnsureSuccess.");
+        if (wrapperTable->m_OperationResult_EnsureSuccess == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method OperationResult::EnsureSuccess.");
+        LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
+        LibAMCFResult errorCode = wrapperTable->m_OperationResult_EnsureSuccess(instanceHandle);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -348,7 +369,9 @@ void CLibAMCFDataStream::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetContextUUID", GetContextUUID);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetName", GetName);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetMimeType", GetMimeType);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSHA256", GetSHA256);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSize", GetSize);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetTimestamp", GetTimestamp);
 		constructor.Reset(isolate, tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 
 }
@@ -490,6 +513,33 @@ void CLibAMCFDataStream::GetMimeType(const FunctionCallbackInfo<Value>& args)
 }
 
 
+void CLibAMCFDataStream::GetSHA256(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        unsigned int bytesNeededSHA256 = 0;
+        unsigned int bytesWrittenSHA256 = 0;
+        sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetSHA256.");
+        if (wrapperTable->m_DataStream_GetSHA256 == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method DataStream::GetSHA256.");
+        LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
+        LibAMCFResult initErrorCode = wrapperTable->m_DataStream_GetSHA256(instanceHandle, 0, &bytesNeededSHA256, nullptr);
+        CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
+        std::vector<char> bufferSHA256;
+        bufferSHA256.resize(bytesNeededSHA256);
+        LibAMCFResult errorCode = wrapperTable->m_DataStream_GetSHA256(instanceHandle, bytesNeededSHA256, &bytesWrittenSHA256, &bufferSHA256[0]);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(String::NewFromUtf8(isolate, &bufferSHA256[0]));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
 void CLibAMCFDataStream::GetSize(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
@@ -505,6 +555,33 @@ void CLibAMCFDataStream::GetSize(const FunctionCallbackInfo<Value>& args)
         LibAMCFResult errorCode = wrapperTable->m_DataStream_GetSize(instanceHandle, &nReturnStreamSize);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         args.GetReturnValue().Set(String::NewFromUtf8(isolate, std::to_string(nReturnStreamSize).c_str()));
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLibAMCFDataStream::GetTimestamp(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        unsigned int bytesNeededTimestamp = 0;
+        unsigned int bytesWrittenTimestamp = 0;
+        sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetTimestamp.");
+        if (wrapperTable->m_DataStream_GetTimestamp == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method DataStream::GetTimestamp.");
+        LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
+        LibAMCFResult initErrorCode = wrapperTable->m_DataStream_GetTimestamp(instanceHandle, 0, &bytesNeededTimestamp, nullptr);
+        CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
+        std::vector<char> bufferTimestamp;
+        bufferTimestamp.resize(bytesNeededTimestamp);
+        LibAMCFResult errorCode = wrapperTable->m_DataStream_GetTimestamp(instanceHandle, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        args.GetReturnValue().Set(String::NewFromUtf8(isolate, &bufferTimestamp[0]));
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -799,7 +876,8 @@ void CLibAMCFStreamUpload::GetStatus(const FunctionCallbackInfo<Value>& args)
 		try {
         Local<Object> outObject = Object::New(isolate);
         uint64_t nReturnUploadSize = 0;
-        uint64_t nReturnUploadedBytes = 0;
+        uint64_t nReturnFinishedSize = 0;
+        uint64_t nReturnInProgressSize = 0;
         bool bReturnFinished = false;
         sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
@@ -807,10 +885,11 @@ void CLibAMCFStreamUpload::GetStatus(const FunctionCallbackInfo<Value>& args)
         if (wrapperTable->m_StreamUpload_GetStatus == nullptr)
             throw std::runtime_error("Could not call LibAMCF method StreamUpload::GetStatus.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_GetStatus(instanceHandle, &nReturnUploadSize, &nReturnUploadedBytes, &bReturnFinished);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_GetStatus(instanceHandle, &nReturnUploadSize, &nReturnFinishedSize, &nReturnInProgressSize, &bReturnFinished);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "UploadSize"), String::NewFromUtf8(isolate, std::to_string(nReturnUploadSize).c_str()));
-        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "UploadedBytes"), String::NewFromUtf8(isolate, std::to_string(nReturnUploadedBytes).c_str()));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "FinishedSize"), String::NewFromUtf8(isolate, std::to_string(nReturnFinishedSize).c_str()));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "InProgressSize"), String::NewFromUtf8(isolate, std::to_string(nReturnInProgressSize).c_str()));
         outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "Finished"), Boolean::New(isolate, bReturnFinished));
         args.GetReturnValue().Set(outObject);
 

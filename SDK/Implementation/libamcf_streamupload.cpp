@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CStreamUpload
 #include "libamcf_resthandler.hpp"
 #include "libamcf_interfaceexception.hpp"
 #include "libamcf_operationresult.hpp"
+#include "libamcf_datastream.hpp"
 
 #include <sstream>
 #include "../Implementation/Common/common_utils.hpp"
@@ -42,6 +43,8 @@ Abstract: This is a stub class definition of CStreamUpload
 // Include custom headers here.
 #define AMCF_MINUPLOADCHUNKSIZE (64 * 1024)
 #define AMCF_MAXUPLOADCHUNKSIZE (64 * 1024 * 1024)
+
+#define AMCF_HASHBLOCKSIZE 65536
 
 using namespace LibAMCF::Impl;
 
@@ -86,14 +89,37 @@ public:
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_COULDNOTBEGINSTREAMUPLOAD);
 	}
 
-	void sendUploadChunk_Blocking(std::string sStreamUUID, uint64_t nStartOffset, std::vector<uint8_t> & ChunkToUpload)
+	void sendUploadChunk_Blocking(std::string sStreamUUID, uint64_t nStartOffset, std::vector<uint8_t> & ChunkToUpload, uint64_t nHashBlockSize, std::map<uint64_t, std::string> & HashMap)
 	{
+		if (nHashBlockSize == 0)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
 		if (ChunkToUpload.size () > AMCF_MAXUPLOADCHUNKSIZE)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
 		if (ChunkToUpload.size() == 0)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA);
 
+		// Calculate block hashes!
+		if ((nStartOffset % nHashBlockSize) != 0)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE);
+		uint64_t nBlockStart = nStartOffset / nHashBlockSize;
+		uint64_t nBlockCount = (ChunkToUpload.size() + nHashBlockSize - 1) / nHashBlockSize;
 
+		for (uint64_t nBlockIndex = 0; nBlockIndex < nBlockCount; nBlockIndex++) {
+
+			auto nStartByte = nBlockIndex * nHashBlockSize;
+			if (nStartByte >= ChunkToUpload.size())
+				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDHASHBLOCKSIZE);
+
+			uint64_t nByteCount = (ChunkToUpload.size() - nStartByte);
+			if (nByteCount > nHashBlockSize)
+				nByteCount = nHashBlockSize;
+
+			std::string sBlockHash = AMCCommon::CUtils::calculateSHA256FromData(&ChunkToUpload[nStartByte], nByteCount);
+			HashMap.insert(std::make_pair (nBlockStart + nBlockIndex, sBlockHash));
+		}
+		
+
+		// Assemble MultipartForm Stream
 		std::string sBoundary = "-----------------------------------------------------------" + AMCCommon::CUtils::calculateRandomSHA256String(16);;
 
 		std::stringstream MultiPartFormStream;
@@ -118,6 +144,19 @@ public:
 		chunkRequest.sendRawRequest(sStreamString, "multipart/form-data; boundary=" + sBoundary);
 
 	}
+
+	void sendFinishChunking_Blocking(std::string& sStreamUUID, std::string& sBlockChecksum, std::string & sCalculatedSHA256, std::string& sTimestamp)
+	{
+		CRestHandler_JSONPost sessionRequest("finishchunking", m_sBaseURL + "api/upload/finish", m_sAuthToken, m_nTimeout, m_nRetryCount);
+		sessionRequest.addValue("streamuuid", sStreamUUID);
+		sessionRequest.addValue("sha256block64k", sBlockChecksum);
+		sessionRequest.sendRequest();
+
+		sCalculatedSHA256 = sessionRequest.getResultValue("sha256");
+		sTimestamp = sessionRequest.getResultValue("timestamp");
+		
+	}
+	
 
 };
 
@@ -178,6 +217,34 @@ public:
 
 };
 
+class CAsyncUploadChunkData : public CAsyncSuccess {
+private:
+	std::map <uint64_t, std::string> m_HashMap;
+
+public:
+
+	CAsyncUploadChunkData()
+	{
+
+	}
+
+	void storeBlockChecksums(std::vector<std::string>& HashSums)
+	{
+		for (auto iIter : m_HashMap) {
+			if (iIter.first >= HashSums.size())
+				ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDHASHBLOCKINDEX);
+
+			HashSums[iIter.first] = iIter.second;
+		}
+	}
+
+	std::map <uint64_t, std::string>& getHashMap()
+	{
+		return m_HashMap;
+	}
+
+};
+
 
 class CAsyncUploadChunkRequest : public CAsyncRequest, public CStreamUploadHandler
 {
@@ -186,12 +253,13 @@ private:
 	std::string m_sStreamUUID;
 	uint64_t m_nStartOffset;
 	std::vector<uint8_t> m_Data;
+	uint64_t m_nHashBlockSize;
 
 public:
 
-	CAsyncUploadChunkRequest(PConnectionState pConnectionState, std::string sStreamUUID, uint64_t nStartOffset, uint64_t nChunkSize, const uint8_t * pData)
+	CAsyncUploadChunkRequest(PConnectionState pConnectionState, std::string sStreamUUID, uint64_t nStartOffset, uint64_t nChunkSize, const uint8_t * pData, uint64_t nHashBlockSize)
 		: CAsyncRequest(), CStreamUploadHandler(pConnectionState),
-		m_sStreamUUID (sStreamUUID), m_nStartOffset (nStartOffset)
+		m_sStreamUUID (sStreamUUID), m_nStartOffset (nStartOffset), m_nHashBlockSize (nHashBlockSize)
 	{
 		if (pData == nullptr)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
@@ -207,16 +275,75 @@ public:
 	}
 
 	PAsyncResult onExecute() override {
-		sendUploadChunk_Blocking(m_sStreamUUID, m_nStartOffset, m_Data);
+		auto pUploadChunkData = std::make_shared<CAsyncUploadChunkData>();
 
-		return std::make_shared<CAsyncSuccess>();
+		sendUploadChunk_Blocking(m_sStreamUUID, m_nStartOffset, m_Data, m_nHashBlockSize, pUploadChunkData->getHashMap ());
+
+		return pUploadChunkData;
 	}
 
 };
 
 
+class CAsyncFinishChunkingData : public CAsyncSuccess {
+private:
+	std::string m_sCalculatedSHA256;
+	std::string m_sTimestamp;
+
+public:
+	CAsyncFinishChunkingData(const std::string& sCalculatedSHA256, const std::string & sTimestamp)
+		: m_sCalculatedSHA256(sCalculatedSHA256), m_sTimestamp (sTimestamp)
+	{
+
+	}
+
+	std::string getSHA256() 
+	{
+		return m_sCalculatedSHA256;
+	}
+
+	std::string getTimestamp()
+	{
+		return m_sTimestamp;
+	}
+};
+
+
+class CAsyncFinishChunkingRequest : public CAsyncRequest, public CStreamUploadHandler
+{
+
+private:
+	std::string m_sStreamUUID;
+	std::string m_sBlockChecksum;
+
+public:
+
+	CAsyncFinishChunkingRequest(PConnectionState pConnectionState, const std::string & sStreamUUID, const std::string & sBlockChecksum)
+		: CAsyncRequest(), CStreamUploadHandler(pConnectionState),
+		m_sStreamUUID(sStreamUUID), m_sBlockChecksum(sBlockChecksum)
+	{
+	}
+
+	PAsyncResult onExecute() override {
+		std::string sCalculatedSHA256;
+		std::string sTimeStamp;
+		sendFinishChunking_Blocking(m_sStreamUUID, m_sBlockChecksum, sCalculatedSHA256, sTimeStamp);
+
+		return std::make_shared<CAsyncFinishChunkingData>(sCalculatedSHA256, sTimeStamp);
+	}
+
+};
+
 CStreamUpload::CStreamUpload(PConnectionState pConnectionState, const std::string& sName, const std::string& sMimeType, const std::string& sUsageContext)
-    : m_pConnectionState (pConnectionState), m_sName (sName), m_sMimeType (sMimeType), m_sUsageContext (sUsageContext), m_nTotalUploadSize (0), m_nCurrentUploadSize (0)
+    : m_pConnectionState (pConnectionState), 
+	  m_sName (sName), 
+	  m_sMimeType (sMimeType), 
+	  m_sUsageContext (sUsageContext), 
+	  m_nTotalUploadSize (0), 
+	  m_nCurrentUploadSize (0),
+	  m_nFinishedBytes (0),
+	  m_bUploadFinished (false),
+	  m_nHashBlockSize (AMCF_HASHBLOCKSIZE)
 {
     if (pConnectionState.get() == nullptr)
         throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
@@ -272,8 +399,17 @@ IOperationResult* CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
     if (m_nTotalUploadSize > 0)
         throw ELibAMCFInterfaceException(LIBAMCF_ERROR_BEGINCHUNKINGALREADYCALLED);
 
-    m_nTotalUploadSize = nDataSize;
-	m_nCurrentUploadSize = 0;
+	{
+		std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
+		m_nTotalUploadSize = nDataSize;
+		m_nCurrentUploadSize = 0;
+		m_nFinishedBytes = 0;
+		m_bUploadFinished = false;
+
+		uint64_t nHashBlockCount = (m_nTotalUploadSize + m_nHashBlockSize - 1) / m_nHashBlockSize;
+		m_HashBlockSHA256Sums.resize(nHashBlockCount);
+	}
+
 
 	auto pRequest = std::make_shared<CAsyncBeginChunkingRequest>(m_pConnectionState, m_sName, m_nTotalUploadSize, m_sMimeType, m_sUsageContext);
 	auto pRequestHandler = m_pConnectionState->getRequestHandler();
@@ -281,6 +417,7 @@ IOperationResult* CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
 
 		auto pBeginChunkingData = dynamic_cast<CAsyncBeginChunkData*> (pResult);
 		if (pBeginChunkingData != nullptr) {
+			std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
 			m_sStreamUUID = pBeginChunkingData->getStreamUUID();
 			m_sContextUUID = pBeginChunkingData->getContextUUID();
 		} 
@@ -291,6 +428,9 @@ IOperationResult* CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
 
 IOperationResult * CStreamUpload::UploadChunk(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer)
 {
+	std::string sStreamUUID;
+	uint64_t nStartOffset = 0;
+
     if (nDataBufferSize == 0)
         throw ELibAMCFInterfaceException(LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA);
     if (nDataBufferSize > AMCF_MAXUPLOADCHUNKSIZE)
@@ -298,25 +438,38 @@ IOperationResult * CStreamUpload::UploadChunk(const LibAMCF_uint64 nDataBufferSi
     if (pDataBuffer == nullptr)
         throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
 
-	if (m_nTotalUploadSize == 0)
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED);
+	{
+		std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
 
-	if (m_nCurrentUploadSize + nDataBufferSize > m_nTotalUploadSize)
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE);
+		if (m_nTotalUploadSize == 0)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED);
+		if (m_sStreamUUID.empty())
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_BEGINCHUNKINGFAILED);
+		if (m_nCurrentUploadSize + nDataBufferSize > m_nTotalUploadSize)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE);
 
-	if (m_sStreamUUID.empty ())
-		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_BEGINCHUNKINGFAILED);
+		nStartOffset = m_nCurrentUploadSize;
+
+		bool bIsLastChunk = (nStartOffset + nDataBufferSize == m_nTotalUploadSize);
+		if ((!bIsLastChunk) && ((nDataBufferSize % m_nHashBlockSize) != 0) )
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE);
+
+		m_nCurrentUploadSize += nDataBufferSize;
+		sStreamUUID = m_sStreamUUID;
+	}
 
 
-	auto pRequest = std::make_shared<CAsyncUploadChunkRequest>(m_pConnectionState, m_sStreamUUID, m_nCurrentUploadSize, nDataBufferSize, pDataBuffer);
+	auto pRequest = std::make_shared<CAsyncUploadChunkRequest>(m_pConnectionState, sStreamUUID, nStartOffset, nDataBufferSize, pDataBuffer, m_nHashBlockSize);
 	auto pRequestHandler = m_pConnectionState->getRequestHandler();
-	pRequestHandler->executeRequest(pRequest, [this](CAsyncResult* pResult) {
+	pRequestHandler->executeRequest(pRequest, [this, nDataBufferSize](CAsyncResult* pResult) {
 
-		/*auto pBeginChunkingData = dynamic_cast<CAsyncBeginChunkData*> (pResult);
-		if (pBeginChunkingData != nullptr) {
-			m_sStreamUUID = pBeginChunkingData->getStreamUUID();
-			m_sContextUUID = pBeginChunkingData->getContextUUID();
-		} */
+		auto pUploadChunkData = dynamic_cast<CAsyncUploadChunkData*> (pResult);
+		if (pUploadChunkData != nullptr) {
+			std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
+			m_nFinishedBytes += nDataBufferSize;
+
+			pUploadChunkData->storeBlockChecksums(m_HashBlockSHA256Sums);
+		}
 	});
 
 	return new COperationResult(pRequest->getFuture());
@@ -325,16 +478,73 @@ IOperationResult * CStreamUpload::UploadChunk(const LibAMCF_uint64 nDataBufferSi
 
 IOperationResult * CStreamUpload::FinishChunking()
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+
+	std::string sStreamUUID;
+	std::string sBlockChecksum;
+	{
+		std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
+		if (m_nTotalUploadSize == 0)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED);
+
+		if (m_nCurrentUploadSize != m_nTotalUploadSize)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_DIDNOTUPLOADFULLDATA);
+
+		if (m_bUploadFinished)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_UPLOADISALREADYFINISHED);
+
+		if (m_sStreamUUID.empty())
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_BEGINCHUNKINGFAILED);
+
+		sStreamUUID = m_sStreamUUID;
+
+		std::stringstream sConcatenatedChecksums;
+		for (auto sSubChecksum : m_HashBlockSHA256Sums) {
+			if (sSubChecksum.empty ())
+				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING);
+
+			sConcatenatedChecksums << sSubChecksum;
+		}
+
+
+		sBlockChecksum = AMCCommon::CUtils::calculateSHA256FromString(sConcatenatedChecksums.str ());
+	}
+
+
+	auto pRequest = std::make_shared<CAsyncFinishChunkingRequest>(m_pConnectionState, sStreamUUID, sBlockChecksum);
+	auto pRequestHandler = m_pConnectionState->getRequestHandler();
+	pRequestHandler->executeRequest(pRequest, [this](CAsyncResult* pResult) {
+
+		auto pFinishChunkingData = dynamic_cast<CAsyncFinishChunkingData*> (pResult);
+		if (pFinishChunkingData != nullptr) {
+			std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
+			m_bUploadFinished = true;
+			m_sCalculatedSHA256 = pFinishChunkingData->getSHA256();
+			m_sUploadTimestamp = pFinishChunkingData->getTimestamp();
+		}
+	});
+
+	return new COperationResult(pRequest->getFuture());
+
+
+
 }
 
-void CStreamUpload::GetStatus(LibAMCF_uint64 & nUploadSize, LibAMCF_uint64 & nUploadedBytes, bool & bFinished)
+void CStreamUpload::GetStatus(LibAMCF_uint64& nUploadSize, LibAMCF_uint64& nFinishedSize, LibAMCF_uint64& nInProgressSize, bool& bFinished) 
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+	std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
+	nUploadSize = m_nTotalUploadSize;
+	nFinishedSize = m_nFinishedBytes;
+	nInProgressSize = m_nCurrentUploadSize;
+	bFinished = m_bUploadFinished;
+
 }
 
 IDataStream * CStreamUpload::GetDataStream()
 {
-	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+	std::lock_guard<std::mutex> lockGuard(m_UploadResultMutex);
+	if (!m_bUploadFinished)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_UPLOADDIDNOTFINISH);
+
+	return new CDataStream (m_sStreamUUID, m_sContextUUID, m_sName, m_sMimeType, m_sCalculatedSHA256, m_nTotalUploadSize, m_sUploadTimestamp);
 }
 

@@ -52,6 +52,7 @@ LibAMCFResult InitLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	
 	pWrapperTable->m_LibraryHandle = NULL;
 	pWrapperTable->m_OperationResult_WaitFor = NULL;
+	pWrapperTable->m_OperationResult_EnsureSuccess = NULL;
 	pWrapperTable->m_OperationResult_InProgress = NULL;
 	pWrapperTable->m_OperationResult_Success = NULL;
 	pWrapperTable->m_OperationResult_GetErrorMessage = NULL;
@@ -59,7 +60,9 @@ LibAMCFResult InitLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	pWrapperTable->m_DataStream_GetContextUUID = NULL;
 	pWrapperTable->m_DataStream_GetName = NULL;
 	pWrapperTable->m_DataStream_GetMimeType = NULL;
+	pWrapperTable->m_DataStream_GetSHA256 = NULL;
 	pWrapperTable->m_DataStream_GetSize = NULL;
+	pWrapperTable->m_DataStream_GetTimestamp = NULL;
 	pWrapperTable->m_StreamUpload_GetName = NULL;
 	pWrapperTable->m_StreamUpload_GetMimeType = NULL;
 	pWrapperTable->m_StreamUpload_GetUsageContext = NULL;
@@ -149,6 +152,15 @@ LibAMCFResult LoadLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_OperationResult_EnsureSuccess = (PLibAMCFOperationResult_EnsureSuccessPtr) GetProcAddress(hLibrary, "libamcf_operationresult_ensuresuccess");
+	#else // _WIN32
+	pWrapperTable->m_OperationResult_EnsureSuccess = (PLibAMCFOperationResult_EnsureSuccessPtr) dlsym(hLibrary, "libamcf_operationresult_ensuresuccess");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_OperationResult_EnsureSuccess == NULL)
+		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_OperationResult_InProgress = (PLibAMCFOperationResult_InProgressPtr) GetProcAddress(hLibrary, "libamcf_operationresult_inprogress");
 	#else // _WIN32
 	pWrapperTable->m_OperationResult_InProgress = (PLibAMCFOperationResult_InProgressPtr) dlsym(hLibrary, "libamcf_operationresult_inprogress");
@@ -212,12 +224,30 @@ LibAMCFResult LoadLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
+	pWrapperTable->m_DataStream_GetSHA256 = (PLibAMCFDataStream_GetSHA256Ptr) GetProcAddress(hLibrary, "libamcf_datastream_getsha256");
+	#else // _WIN32
+	pWrapperTable->m_DataStream_GetSHA256 = (PLibAMCFDataStream_GetSHA256Ptr) dlsym(hLibrary, "libamcf_datastream_getsha256");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_DataStream_GetSHA256 == NULL)
+		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
 	pWrapperTable->m_DataStream_GetSize = (PLibAMCFDataStream_GetSizePtr) GetProcAddress(hLibrary, "libamcf_datastream_getsize");
 	#else // _WIN32
 	pWrapperTable->m_DataStream_GetSize = (PLibAMCFDataStream_GetSizePtr) dlsym(hLibrary, "libamcf_datastream_getsize");
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_DataStream_GetSize == NULL)
+		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_DataStream_GetTimestamp = (PLibAMCFDataStream_GetTimestampPtr) GetProcAddress(hLibrary, "libamcf_datastream_gettimestamp");
+	#else // _WIN32
+	pWrapperTable->m_DataStream_GetTimestamp = (PLibAMCFDataStream_GetTimestampPtr) dlsym(hLibrary, "libamcf_datastream_gettimestamp");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_DataStream_GetTimestamp == NULL)
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32

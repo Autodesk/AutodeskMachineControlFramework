@@ -124,6 +124,16 @@ typedef void * LibAMCF_pvoid;
 #define LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED 25
 #define LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE 26
 #define LIBAMCF_ERROR_BEGINCHUNKINGFAILED 27
+#define LIBAMCF_ERROR_DIDNOTUPLOADFULLDATA 28
+#define LIBAMCF_ERROR_UPLOADISALREADYFINISHED 29
+#define LIBAMCF_ERROR_INVALIDHASHBLOCKINDEX 30
+#define LIBAMCF_ERROR_CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE 31
+#define LIBAMCF_ERROR_CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE 32
+#define LIBAMCF_ERROR_INVALIDHASHBLOCKSIZE 33
+#define LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING 34
+#define LIBAMCF_ERROR_OPERATIONERROR 35
+#define LIBAMCF_ERROR_OPERATIONTIMEOUT 36
+#define LIBAMCF_ERROR_UPLOADDIDNOTFINISH 37
 
 /*************************************************************************************************************************
  Error strings for LibAMCF
@@ -159,6 +169,16 @@ inline const char * LIBAMCF_GETERRORSTRING (LibAMCFResult nErrorCode) {
     case LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED: return "Begin chunking not called";
     case LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE: return "Upload exceeds total size";
     case LIBAMCF_ERROR_BEGINCHUNKINGFAILED: return "Begin chunking failed";
+    case LIBAMCF_ERROR_DIDNOTUPLOADFULLDATA: return "Did not upload full data";
+    case LIBAMCF_ERROR_UPLOADISALREADYFINISHED: return "Upload is already finished.";
+    case LIBAMCF_ERROR_INVALIDHASHBLOCKINDEX: return "Invalid hash block index.";
+    case LIBAMCF_ERROR_CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE: return "Chunk size must be a multiple of hash block size.";
+    case LIBAMCF_ERROR_CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE: return "Chunk start must be a multiple of hash block size.";
+    case LIBAMCF_ERROR_INVALIDHASHBLOCKSIZE: return "Invalid hash block size.";
+    case LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING: return "Checksum of block missing.";
+    case LIBAMCF_ERROR_OPERATIONERROR: return "Operation Error.";
+    case LIBAMCF_ERROR_OPERATIONTIMEOUT: return "Operation Timeout.";
+    case LIBAMCF_ERROR_UPLOADDIDNOTFINISH: return "Upload did not finish.";
     default: return "unknown error";
   }
 }

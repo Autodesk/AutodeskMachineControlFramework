@@ -58,7 +58,7 @@ public:
 	
 	void writeChunkAsync (const uint8_t * pChunkData, const uint64_t nChunkSize, const uint64_t nOffset);
 
-    void finalize(const std::string& sNeededSHA256);
+    void finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string& sCalculatedSHA256, std::string& sCalculatedBlockSHA256);
 
 };
 

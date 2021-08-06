@@ -15,6 +15,7 @@
 ../Implementation/libamcf_asyncrequest.cpp 
 ../Implementation/libamcf_base.cpp 
 ../Implementation/libamcf_connection.cpp 
+../Implementation/libamcf_connectionstate.cpp 
 ../Implementation/libamcf_datastream.cpp 
 ../Implementation/libamcf_operationresult.cpp 
 ../Implementation/libamcf_resthandler.cpp 

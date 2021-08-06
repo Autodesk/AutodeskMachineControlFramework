@@ -199,8 +199,28 @@ void CAPIHandler_Upload::handleFinishUploadRequest(CJSONWriter& writer, const ui
 	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
 
 	auto sUUID = jsonRequest.getUUID(AMC_API_KEY_UPLOAD_STREAMUUID, LIBMC_ERROR_INVALIDSTREAMUUID);
-	auto sSHA256 = jsonRequest.getSHA256(AMC_API_KEY_UPLOAD_SHA256, LIBMC_ERROR_INVALIDSHA256SUM);
-	pStorage->FinishPartialStream(sUUID, sSHA256);
+
+	if (jsonRequest.hasValue(AMC_API_KEY_UPLOAD_SHA256)) {
+		auto sSHA256 = jsonRequest.getSHA256(AMC_API_KEY_UPLOAD_SHA256, LIBMC_ERROR_INVALIDSHA256SUM);
+		pStorage->FinishPartialStream(sUUID, sSHA256);
+	}
+	else if (jsonRequest.hasValue(AMC_API_KEY_UPLOAD_SHA256BLOCK64K)) {
+		auto sSHA256Block64k = jsonRequest.getSHA256(AMC_API_KEY_UPLOAD_SHA256BLOCK64K, LIBMC_ERROR_INVALIDSHA256SUM);
+		pStorage->FinishPartialStreamBlockwiseSHA256(sUUID, sSHA256Block64k);
+	}
+	else
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSHA256SUM);
+
+
+	auto pStreamObject = pStorage->RetrieveStream (sUUID);
+	writer.addString(AMC_API_KEY_UPLOAD_UUID, pStreamObject->GetUUID());
+	writer.addString(AMC_API_KEY_UPLOAD_NAME, pStreamObject->GetName());
+	writer.addString(AMC_API_KEY_UPLOAD_SHA256, pStreamObject->GetSHA2 ());
+	writer.addString(AMC_API_KEY_UPLOAD_MIMETYPE, pStreamObject->GetMIMEType());
+	writer.addInteger(AMC_API_KEY_UPLOAD_SIZE, pStreamObject->GetSize());
+	writer.addString(AMC_API_KEY_UPLOAD_TIMESTAMP, pStreamObject->GetTimeStamp());
+
+
 
 
 }

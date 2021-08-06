@@ -58,26 +58,20 @@ namespace Impl {
 class CDataStream : public virtual IDataStream, public virtual CBase {
 private:
 
-	/**
-	* Put private members here.
-	*/
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+    std::string m_sUUID;
+    std::string m_sContextUUID;
+    std::string m_sName;
+    std::string m_sMimeType;
+    std::string m_sTimestamp;
+    std::string m_sSHA256;
+    uint64_t m_nSize;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+    CDataStream (const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const std::string & sSHA256, uint64_t nSize, const std::string & sTimestamp);
 
 	std::string GetUUID() override;
 
@@ -87,7 +81,11 @@ public:
 
 	std::string GetMimeType() override;
 
+    std::string GetSHA256() override;
+
 	LibAMCF_uint64 GetSize() override;
+
+    std::string GetTimestamp() override;
 
 };
 

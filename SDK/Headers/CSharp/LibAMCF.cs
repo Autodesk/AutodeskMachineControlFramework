@@ -13,6 +13,9 @@ namespace LibAMCF {
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_operationresult_waitfor", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 OperationResult_WaitFor (IntPtr Handle, UInt32 ATimeOut, out Byte AOperationFinished);
 
+			[DllImport("libamcf.dll", EntryPoint = "libamcf_operationresult_ensuresuccess", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 OperationResult_EnsureSuccess (IntPtr Handle);
+
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_operationresult_inprogress", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 OperationResult_InProgress (IntPtr Handle, out Byte AOperationIsInProgress);
 
@@ -34,8 +37,14 @@ namespace LibAMCF {
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_getmimetype", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 DataStream_GetMimeType (IntPtr Handle, UInt32 sizeMimeType, out UInt32 neededMimeType, IntPtr dataMimeType);
 
+			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_getsha256", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 DataStream_GetSHA256 (IntPtr Handle, UInt32 sizeSHA256, out UInt32 neededSHA256, IntPtr dataSHA256);
+
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_getsize", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 DataStream_GetSize (IntPtr Handle, out UInt64 AStreamSize);
+
+			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_gettimestamp", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 DataStream_GetTimestamp (IntPtr Handle, UInt32 sizeTimestamp, out UInt32 neededTimestamp, IntPtr dataTimestamp);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_getname", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 StreamUpload_GetName (IntPtr Handle, UInt32 sizeName, out UInt32 neededName, IntPtr dataName);
@@ -62,7 +71,7 @@ namespace LibAMCF {
 			public unsafe extern static Int32 StreamUpload_FinishChunking (IntPtr Handle, out IntPtr ASuccess);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_getstatus", CallingConvention=CallingConvention.Cdecl)]
-			public unsafe extern static Int32 StreamUpload_GetStatus (IntPtr Handle, out UInt64 AUploadSize, out UInt64 AUploadedBytes, out Byte AFinished);
+			public unsafe extern static Int32 StreamUpload_GetStatus (IntPtr Handle, out UInt64 AUploadSize, out UInt64 AFinishedSize, out UInt64 AInProgressSize, out Byte AFinished);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_getdatastream", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 StreamUpload_GetDataStream (IntPtr Handle, out IntPtr ADataStream);
@@ -192,6 +201,12 @@ namespace LibAMCF {
 			return (resultOperationFinished != 0);
 		}
 
+		public void EnsureSuccess ()
+		{
+
+			CheckError(Internal.LibAMCFWrapper.OperationResult_EnsureSuccess (Handle));
+		}
+
 		public bool InProgress ()
 		{
 			Byte resultOperationIsInProgress = 0;
@@ -286,12 +301,40 @@ namespace LibAMCF {
 			return Encoding.UTF8.GetString(bytesMimeType).TrimEnd(char.MinValue);
 		}
 
+		public String GetSHA256 ()
+		{
+			UInt32 sizeSHA256 = 0;
+			UInt32 neededSHA256 = 0;
+			CheckError(Internal.LibAMCFWrapper.DataStream_GetSHA256 (Handle, sizeSHA256, out neededSHA256, IntPtr.Zero));
+			sizeSHA256 = neededSHA256;
+			byte[] bytesSHA256 = new byte[sizeSHA256];
+			GCHandle dataSHA256 = GCHandle.Alloc(bytesSHA256, GCHandleType.Pinned);
+
+			CheckError(Internal.LibAMCFWrapper.DataStream_GetSHA256 (Handle, sizeSHA256, out neededSHA256, dataSHA256.AddrOfPinnedObject()));
+			dataSHA256.Free();
+			return Encoding.UTF8.GetString(bytesSHA256).TrimEnd(char.MinValue);
+		}
+
 		public UInt64 GetSize ()
 		{
 			UInt64 resultStreamSize = 0;
 
 			CheckError(Internal.LibAMCFWrapper.DataStream_GetSize (Handle, out resultStreamSize));
 			return resultStreamSize;
+		}
+
+		public String GetTimestamp ()
+		{
+			UInt32 sizeTimestamp = 0;
+			UInt32 neededTimestamp = 0;
+			CheckError(Internal.LibAMCFWrapper.DataStream_GetTimestamp (Handle, sizeTimestamp, out neededTimestamp, IntPtr.Zero));
+			sizeTimestamp = neededTimestamp;
+			byte[] bytesTimestamp = new byte[sizeTimestamp];
+			GCHandle dataTimestamp = GCHandle.Alloc(bytesTimestamp, GCHandleType.Pinned);
+
+			CheckError(Internal.LibAMCFWrapper.DataStream_GetTimestamp (Handle, sizeTimestamp, out neededTimestamp, dataTimestamp.AddrOfPinnedObject()));
+			dataTimestamp.Free();
+			return Encoding.UTF8.GetString(bytesTimestamp).TrimEnd(char.MinValue);
 		}
 
 	}
@@ -389,11 +432,11 @@ namespace LibAMCF {
 			return new COperationResult (newSuccess );
 		}
 
-		public void GetStatus (out UInt64 AUploadSize, out UInt64 AUploadedBytes, out bool AFinished)
+		public void GetStatus (out UInt64 AUploadSize, out UInt64 AFinishedSize, out UInt64 AInProgressSize, out bool AFinished)
 		{
 			Byte resultFinished = 0;
 
-			CheckError(Internal.LibAMCFWrapper.StreamUpload_GetStatus (Handle, out AUploadSize, out AUploadedBytes, out resultFinished));
+			CheckError(Internal.LibAMCFWrapper.StreamUpload_GetStatus (Handle, out AUploadSize, out AFinishedSize, out AInProgressSize, out resultFinished));
 			AFinished = (resultFinished != 0);
 		}
 

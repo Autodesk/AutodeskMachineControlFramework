@@ -94,6 +94,16 @@ class ErrorCodes(enum.IntEnum):
 	BEGINCHUNKINGNOTCALLED = 25
 	UPLOADDATAEXCEEDSTOTALSIZE = 26
 	BEGINCHUNKINGFAILED = 27
+	DIDNOTUPLOADFULLDATA = 28
+	UPLOADISALREADYFINISHED = 29
+	INVALIDHASHBLOCKINDEX = 30
+	CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE = 31
+	CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE = 32
+	INVALIDHASHBLOCKSIZE = 33
+	CHECKSUMOFBLOCKMISSING = 34
+	OPERATIONERROR = 35
+	OPERATIONTIMEOUT = 36
+	UPLOADDIDNOTFINISH = 37
 
 '''Definition of Function Table
 '''
@@ -106,6 +116,7 @@ class FunctionTable:
 	libamcf_getsymbollookupmethod = None
 	libamcf_createconnection = None
 	libamcf_operationresult_waitfor = None
+	libamcf_operationresult_ensuresuccess = None
 	libamcf_operationresult_inprogress = None
 	libamcf_operationresult_success = None
 	libamcf_operationresult_geterrormessage = None
@@ -113,7 +124,9 @@ class FunctionTable:
 	libamcf_datastream_getcontextuuid = None
 	libamcf_datastream_getname = None
 	libamcf_datastream_getmimetype = None
+	libamcf_datastream_getsha256 = None
 	libamcf_datastream_getsize = None
+	libamcf_datastream_gettimestamp = None
 	libamcf_streamupload_getname = None
 	libamcf_streamupload_getmimetype = None
 	libamcf_streamupload_getusagecontext = None
@@ -225,6 +238,12 @@ class Wrapper:
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_bool))
 			self.lib.libamcf_operationresult_waitfor = methodType(int(methodAddress.value))
 			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_operationresult_ensuresuccess")), methodAddress)
+			if err != 0:
+				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p)
+			self.lib.libamcf_operationresult_ensuresuccess = methodType(int(methodAddress.value))
+			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_operationresult_inprogress")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
@@ -267,11 +286,23 @@ class Wrapper:
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
 			self.lib.libamcf_datastream_getmimetype = methodType(int(methodAddress.value))
 			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_datastream_getsha256")), methodAddress)
+			if err != 0:
+				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
+			self.lib.libamcf_datastream_getsha256 = methodType(int(methodAddress.value))
+			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_datastream_getsize")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64))
 			self.lib.libamcf_datastream_getsize = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_datastream_gettimestamp")), methodAddress)
+			if err != 0:
+				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
+			self.lib.libamcf_datastream_gettimestamp = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getname")), methodAddress)
 			if err != 0:
@@ -324,7 +355,7 @@ class Wrapper:
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getstatus")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_bool))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_bool))
 			self.lib.libamcf_streamupload_getstatus = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getdatastream")), methodAddress)
@@ -422,6 +453,9 @@ class Wrapper:
 			self.lib.libamcf_operationresult_waitfor.restype = ctypes.c_int32
 			self.lib.libamcf_operationresult_waitfor.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_bool)]
 			
+			self.lib.libamcf_operationresult_ensuresuccess.restype = ctypes.c_int32
+			self.lib.libamcf_operationresult_ensuresuccess.argtypes = [ctypes.c_void_p]
+			
 			self.lib.libamcf_operationresult_inprogress.restype = ctypes.c_int32
 			self.lib.libamcf_operationresult_inprogress.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_bool)]
 			
@@ -443,8 +477,14 @@ class Wrapper:
 			self.lib.libamcf_datastream_getmimetype.restype = ctypes.c_int32
 			self.lib.libamcf_datastream_getmimetype.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
 			
+			self.lib.libamcf_datastream_getsha256.restype = ctypes.c_int32
+			self.lib.libamcf_datastream_getsha256.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
+			
 			self.lib.libamcf_datastream_getsize.restype = ctypes.c_int32
 			self.lib.libamcf_datastream_getsize.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64)]
+			
+			self.lib.libamcf_datastream_gettimestamp.restype = ctypes.c_int32
+			self.lib.libamcf_datastream_gettimestamp.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
 			
 			self.lib.libamcf_streamupload_getname.restype = ctypes.c_int32
 			self.lib.libamcf_streamupload_getname.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
@@ -471,7 +511,7 @@ class Wrapper:
 			self.lib.libamcf_streamupload_finishchunking.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
 			
 			self.lib.libamcf_streamupload_getstatus.restype = ctypes.c_int32
-			self.lib.libamcf_streamupload_getstatus.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_bool)]
+			self.lib.libamcf_streamupload_getstatus.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_uint64), ctypes.POINTER(ctypes.c_bool)]
 			
 			self.lib.libamcf_streamupload_getdatastream.restype = ctypes.c_int32
 			self.lib.libamcf_streamupload_getdatastream.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
@@ -619,6 +659,10 @@ class OperationResult(Base):
 		
 		return pOperationFinished.value
 	
+	def EnsureSuccess(self):
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_operationresult_ensuresuccess(self._handle))
+		
+	
 	def InProgress(self):
 		pOperationIsInProgress = ctypes.c_bool()
 		self._wrapper.checkError(self, self._wrapper.lib.libamcf_operationresult_inprogress(self._handle, pOperationIsInProgress))
@@ -693,11 +737,33 @@ class DataStream(Base):
 		
 		return pMimeTypeBuffer.value.decode()
 	
+	def GetSHA256(self):
+		nSHA256BufferSize = ctypes.c_uint64(0)
+		nSHA256NeededChars = ctypes.c_uint64(0)
+		pSHA256Buffer = ctypes.c_char_p(None)
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_getsha256(self._handle, nSHA256BufferSize, nSHA256NeededChars, pSHA256Buffer))
+		nSHA256BufferSize = ctypes.c_uint64(nSHA256NeededChars.value)
+		pSHA256Buffer = (ctypes.c_char * (nSHA256NeededChars.value))()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_getsha256(self._handle, nSHA256BufferSize, nSHA256NeededChars, pSHA256Buffer))
+		
+		return pSHA256Buffer.value.decode()
+	
 	def GetSize(self):
 		pStreamSize = ctypes.c_uint64()
 		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_getsize(self._handle, pStreamSize))
 		
 		return pStreamSize.value
+	
+	def GetTimestamp(self):
+		nTimestampBufferSize = ctypes.c_uint64(0)
+		nTimestampNeededChars = ctypes.c_uint64(0)
+		pTimestampBuffer = ctypes.c_char_p(None)
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_gettimestamp(self._handle, nTimestampBufferSize, nTimestampNeededChars, pTimestampBuffer))
+		nTimestampBufferSize = ctypes.c_uint64(nTimestampNeededChars.value)
+		pTimestampBuffer = (ctypes.c_char * (nTimestampNeededChars.value))()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_gettimestamp(self._handle, nTimestampBufferSize, nTimestampNeededChars, pTimestampBuffer))
+		
+		return pTimestampBuffer.value.decode()
 	
 
 
@@ -799,11 +865,12 @@ class StreamUpload(Base):
 	
 	def GetStatus(self):
 		pUploadSize = ctypes.c_uint64()
-		pUploadedBytes = ctypes.c_uint64()
+		pFinishedSize = ctypes.c_uint64()
+		pInProgressSize = ctypes.c_uint64()
 		pFinished = ctypes.c_bool()
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getstatus(self._handle, pUploadSize, pUploadedBytes, pFinished))
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getstatus(self._handle, pUploadSize, pFinishedSize, pInProgressSize, pFinished))
 		
-		return pUploadSize.value, pUploadedBytes.value, pFinished.value
+		return pUploadSize.value, pFinishedSize.value, pInProgressSize.value, pFinished.value
 	
 	def GetDataStream(self):
 		DataStreamHandle = ctypes.c_void_p()

@@ -107,6 +107,16 @@ const
 	LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED = 25;
 	LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE = 26;
 	LIBAMCF_ERROR_BEGINCHUNKINGFAILED = 27;
+	LIBAMCF_ERROR_DIDNOTUPLOADFULLDATA = 28;
+	LIBAMCF_ERROR_UPLOADISALREADYFINISHED = 29;
+	LIBAMCF_ERROR_INVALIDHASHBLOCKINDEX = 30;
+	LIBAMCF_ERROR_CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE = 31;
+	LIBAMCF_ERROR_CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE = 32;
+	LIBAMCF_ERROR_INVALIDHASHBLOCKSIZE = 33;
+	LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING = 34;
+	LIBAMCF_ERROR_OPERATIONERROR = 35;
+	LIBAMCF_ERROR_OPERATIONTIMEOUT = 36;
+	LIBAMCF_ERROR_UPLOADDIDNOTFINISH = 37;
 
 
 (*************************************************************************************************************************
@@ -140,6 +150,14 @@ type
 	* @return error code or 0 (success)
 	*)
 	TLibAMCFOperationResult_WaitForFunc = function(pOperationResult: TLibAMCFHandle; const nTimeOut: Cardinal; out pOperationFinished: Byte): TLibAMCFResult; cdecl;
+	
+	(**
+	* Waits for operation to be successfully finished. Throws an error if not successful.
+	*
+	* @param[in] pOperationResult - OperationResult instance.
+	* @return error code or 0 (success)
+	*)
+	TLibAMCFOperationResult_EnsureSuccessFunc = function(pOperationResult: TLibAMCFHandle): TLibAMCFResult; cdecl;
 	
 	(**
 	* Checks if operation is in progress.
@@ -220,6 +238,17 @@ type
 	TLibAMCFDataStream_GetMimeTypeFunc = function(pDataStream: TLibAMCFHandle; const nMimeTypeBufferSize: Cardinal; out pMimeTypeNeededChars: Cardinal; pMimeTypeBuffer: PAnsiChar): TLibAMCFResult; cdecl;
 	
 	(**
+	* Returns the sha256 checksum of the stream.
+	*
+	* @param[in] pDataStream - DataStream instance.
+	* @param[in] nSHA256BufferSize - size of the buffer (including trailing 0)
+	* @param[out] pSHA256NeededChars - will be filled with the count of the written bytes, or needed buffer size.
+	* @param[out] pSHA256Buffer -  buffer of SHA256 string., may be NULL
+	* @return error code or 0 (success)
+	*)
+	TLibAMCFDataStream_GetSHA256Func = function(pDataStream: TLibAMCFHandle; const nSHA256BufferSize: Cardinal; out pSHA256NeededChars: Cardinal; pSHA256Buffer: PAnsiChar): TLibAMCFResult; cdecl;
+	
+	(**
 	* Returns the stream size.
 	*
 	* @param[in] pDataStream - DataStream instance.
@@ -227,6 +256,17 @@ type
 	* @return error code or 0 (success)
 	*)
 	TLibAMCFDataStream_GetSizeFunc = function(pDataStream: TLibAMCFHandle; out pStreamSize: QWord): TLibAMCFResult; cdecl;
+	
+	(**
+	* Returns the timestamp of the stream.
+	*
+	* @param[in] pDataStream - DataStream instance.
+	* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+	* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+	* @param[out] pTimestampBuffer -  buffer of Timestamp string., may be NULL
+	* @return error code or 0 (success)
+	*)
+	TLibAMCFDataStream_GetTimestampFunc = function(pDataStream: TLibAMCFHandle; const nTimestampBufferSize: Cardinal; out pTimestampNeededChars: Cardinal; pTimestampBuffer: PAnsiChar): TLibAMCFResult; cdecl;
 	
 
 (*************************************************************************************************************************
@@ -323,12 +363,13 @@ type
 	* Retrieves current upload status.
 	*
 	* @param[in] pStreamUpload - StreamUpload instance.
-	* @param[out] pUploadSize - Total size of the upload.
-	* @param[out] pUploadedBytes - Current uploaded data.
-	* @param[out] pFinished - Upload has been finished.
+	* @param[out] pUploadSize - Total target size of the upload. 0 if no upload has been started.
+	* @param[out] pFinishedSize - Current bytes that have been successfully uploaded.
+	* @param[out] pInProgressSize - Current bytes that have been uploaded or are currently in progress.
+	* @param[out] pFinished - Flag if upload has successfully finished.
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFStreamUpload_GetStatusFunc = function(pStreamUpload: TLibAMCFHandle; out pUploadSize: QWord; out pUploadedBytes: QWord; out pFinished: Byte): TLibAMCFResult; cdecl;
+	TLibAMCFStreamUpload_GetStatusFunc = function(pStreamUpload: TLibAMCFHandle; out pUploadSize: QWord; out pFinishedSize: QWord; out pInProgressSize: QWord; out pFinished: Byte): TLibAMCFResult; cdecl;
 	
 	(**
 	* Retrieves the uploaded data stream object. Upload must have finished successfully.
@@ -558,6 +599,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		constructor Create(AWrapper: TLibAMCFWrapper; AHandle: TLibAMCFHandle);
 		destructor Destroy; override;
 		function WaitFor(const ATimeOut: Cardinal): Boolean;
+		procedure EnsureSuccess();
 		function InProgress(): Boolean;
 		function Success(): Boolean;
 		function GetErrorMessage(): String;
@@ -576,7 +618,9 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		function GetContextUUID(): String;
 		function GetName(): String;
 		function GetMimeType(): String;
+		function GetSHA256(): String;
 		function GetSize(): QWord;
+		function GetTimestamp(): String;
 	end;
 
 
@@ -596,7 +640,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		function BeginChunking(const ADataSize: QWord): TLibAMCFOperationResult;
 		function UploadChunk(const AData: TByteDynArray): TLibAMCFOperationResult;
 		function FinishChunking(): TLibAMCFOperationResult;
-		procedure GetStatus(out AUploadSize: QWord; out AUploadedBytes: QWord; out AFinished: Boolean);
+		procedure GetStatus(out AUploadSize: QWord; out AFinishedSize: QWord; out AInProgressSize: QWord; out AFinished: Boolean);
 		function GetDataStream(): TLibAMCFDataStream;
 	end;
 
@@ -629,6 +673,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 	private
 		FModule: HMODULE;
 		FLibAMCFOperationResult_WaitForFunc: TLibAMCFOperationResult_WaitForFunc;
+		FLibAMCFOperationResult_EnsureSuccessFunc: TLibAMCFOperationResult_EnsureSuccessFunc;
 		FLibAMCFOperationResult_InProgressFunc: TLibAMCFOperationResult_InProgressFunc;
 		FLibAMCFOperationResult_SuccessFunc: TLibAMCFOperationResult_SuccessFunc;
 		FLibAMCFOperationResult_GetErrorMessageFunc: TLibAMCFOperationResult_GetErrorMessageFunc;
@@ -636,7 +681,9 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		FLibAMCFDataStream_GetContextUUIDFunc: TLibAMCFDataStream_GetContextUUIDFunc;
 		FLibAMCFDataStream_GetNameFunc: TLibAMCFDataStream_GetNameFunc;
 		FLibAMCFDataStream_GetMimeTypeFunc: TLibAMCFDataStream_GetMimeTypeFunc;
+		FLibAMCFDataStream_GetSHA256Func: TLibAMCFDataStream_GetSHA256Func;
 		FLibAMCFDataStream_GetSizeFunc: TLibAMCFDataStream_GetSizeFunc;
+		FLibAMCFDataStream_GetTimestampFunc: TLibAMCFDataStream_GetTimestampFunc;
 		FLibAMCFStreamUpload_GetNameFunc: TLibAMCFStreamUpload_GetNameFunc;
 		FLibAMCFStreamUpload_GetMimeTypeFunc: TLibAMCFStreamUpload_GetMimeTypeFunc;
 		FLibAMCFStreamUpload_GetUsageContextFunc: TLibAMCFStreamUpload_GetUsageContextFunc;
@@ -675,6 +722,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 
 	protected
 		property LibAMCFOperationResult_WaitForFunc: TLibAMCFOperationResult_WaitForFunc read FLibAMCFOperationResult_WaitForFunc;
+		property LibAMCFOperationResult_EnsureSuccessFunc: TLibAMCFOperationResult_EnsureSuccessFunc read FLibAMCFOperationResult_EnsureSuccessFunc;
 		property LibAMCFOperationResult_InProgressFunc: TLibAMCFOperationResult_InProgressFunc read FLibAMCFOperationResult_InProgressFunc;
 		property LibAMCFOperationResult_SuccessFunc: TLibAMCFOperationResult_SuccessFunc read FLibAMCFOperationResult_SuccessFunc;
 		property LibAMCFOperationResult_GetErrorMessageFunc: TLibAMCFOperationResult_GetErrorMessageFunc read FLibAMCFOperationResult_GetErrorMessageFunc;
@@ -682,7 +730,9 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		property LibAMCFDataStream_GetContextUUIDFunc: TLibAMCFDataStream_GetContextUUIDFunc read FLibAMCFDataStream_GetContextUUIDFunc;
 		property LibAMCFDataStream_GetNameFunc: TLibAMCFDataStream_GetNameFunc read FLibAMCFDataStream_GetNameFunc;
 		property LibAMCFDataStream_GetMimeTypeFunc: TLibAMCFDataStream_GetMimeTypeFunc read FLibAMCFDataStream_GetMimeTypeFunc;
+		property LibAMCFDataStream_GetSHA256Func: TLibAMCFDataStream_GetSHA256Func read FLibAMCFDataStream_GetSHA256Func;
 		property LibAMCFDataStream_GetSizeFunc: TLibAMCFDataStream_GetSizeFunc read FLibAMCFDataStream_GetSizeFunc;
+		property LibAMCFDataStream_GetTimestampFunc: TLibAMCFDataStream_GetTimestampFunc read FLibAMCFDataStream_GetTimestampFunc;
 		property LibAMCFStreamUpload_GetNameFunc: TLibAMCFStreamUpload_GetNameFunc read FLibAMCFStreamUpload_GetNameFunc;
 		property LibAMCFStreamUpload_GetMimeTypeFunc: TLibAMCFStreamUpload_GetMimeTypeFunc read FLibAMCFStreamUpload_GetMimeTypeFunc;
 		property LibAMCFStreamUpload_GetUsageContextFunc: TLibAMCFStreamUpload_GetUsageContextFunc read FLibAMCFStreamUpload_GetUsageContextFunc;
@@ -765,6 +815,16 @@ implementation
 			LIBAMCF_ERROR_BEGINCHUNKINGNOTCALLED: ADescription := 'Begin chunking not called';
 			LIBAMCF_ERROR_UPLOADDATAEXCEEDSTOTALSIZE: ADescription := 'Upload exceeds total size';
 			LIBAMCF_ERROR_BEGINCHUNKINGFAILED: ADescription := 'Begin chunking failed';
+			LIBAMCF_ERROR_DIDNOTUPLOADFULLDATA: ADescription := 'Did not upload full data';
+			LIBAMCF_ERROR_UPLOADISALREADYFINISHED: ADescription := 'Upload is already finished.';
+			LIBAMCF_ERROR_INVALIDHASHBLOCKINDEX: ADescription := 'Invalid hash block index.';
+			LIBAMCF_ERROR_CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE: ADescription := 'Chunk size must be a multiple of hash block size.';
+			LIBAMCF_ERROR_CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE: ADescription := 'Chunk start must be a multiple of hash block size.';
+			LIBAMCF_ERROR_INVALIDHASHBLOCKSIZE: ADescription := 'Invalid hash block size.';
+			LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING: ADescription := 'Checksum of block missing.';
+			LIBAMCF_ERROR_OPERATIONERROR: ADescription := 'Operation Error.';
+			LIBAMCF_ERROR_OPERATIONTIMEOUT: ADescription := 'Operation Timeout.';
+			LIBAMCF_ERROR_UPLOADDIDNOTFINISH: ADescription := 'Upload did not finish.';
 			else
 				ADescription := 'unknown';
 		end;
@@ -822,6 +882,11 @@ implementation
 		ResultOperationFinished := 0;
 		FWrapper.CheckError(Self, FWrapper.LibAMCFOperationResult_WaitForFunc(FHandle, ATimeOut, ResultOperationFinished));
 		Result := (ResultOperationFinished <> 0);
+	end;
+
+	procedure TLibAMCFOperationResult.EnsureSuccess();
+	begin
+		FWrapper.CheckError(Self, FWrapper.LibAMCFOperationResult_EnsureSuccessFunc(FHandle));
 	end;
 
 	function TLibAMCFOperationResult.InProgress(): Boolean;
@@ -926,9 +991,37 @@ implementation
 		Result := StrPas(@bufferMimeType[0]);
 	end;
 
+	function TLibAMCFDataStream.GetSHA256(): String;
+	var
+		bytesNeededSHA256: Cardinal;
+		bytesWrittenSHA256: Cardinal;
+		bufferSHA256: array of Char;
+	begin
+		bytesNeededSHA256:= 0;
+		bytesWrittenSHA256:= 0;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetSHA256Func(FHandle, 0, bytesNeededSHA256, nil));
+		SetLength(bufferSHA256, bytesNeededSHA256);
+		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetSHA256Func(FHandle, bytesNeededSHA256, bytesWrittenSHA256, @bufferSHA256[0]));
+		Result := StrPas(@bufferSHA256[0]);
+	end;
+
 	function TLibAMCFDataStream.GetSize(): QWord;
 	begin
 		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetSizeFunc(FHandle, Result));
+	end;
+
+	function TLibAMCFDataStream.GetTimestamp(): String;
+	var
+		bytesNeededTimestamp: Cardinal;
+		bytesWrittenTimestamp: Cardinal;
+		bufferTimestamp: array of Char;
+	begin
+		bytesNeededTimestamp:= 0;
+		bytesWrittenTimestamp:= 0;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetTimestampFunc(FHandle, 0, bytesNeededTimestamp, nil));
+		SetLength(bufferTimestamp, bytesNeededTimestamp);
+		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetTimestampFunc(FHandle, bytesNeededTimestamp, bytesWrittenTimestamp, @bufferTimestamp[0]));
+		Result := StrPas(@bufferTimestamp[0]);
 	end;
 
 (*************************************************************************************************************************
@@ -1062,12 +1155,12 @@ implementation
 			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
 
-	procedure TLibAMCFStreamUpload.GetStatus(out AUploadSize: QWord; out AUploadedBytes: QWord; out AFinished: Boolean);
+	procedure TLibAMCFStreamUpload.GetStatus(out AUploadSize: QWord; out AFinishedSize: QWord; out AInProgressSize: QWord; out AFinished: Boolean);
 	var
 		ResultFinished: Byte;
 	begin
 		ResultFinished := 0;
-		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetStatusFunc(FHandle, AUploadSize, AUploadedBytes, ResultFinished));
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetStatusFunc(FHandle, AUploadSize, AFinishedSize, AInProgressSize, ResultFinished));
 		AFinished := ResultFinished <> 0;
 	end;
 
@@ -1215,6 +1308,7 @@ implementation
 			raise ELibAMCFException.Create(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 
 		FLibAMCFOperationResult_WaitForFunc := LoadFunction('libamcf_operationresult_waitfor');
+		FLibAMCFOperationResult_EnsureSuccessFunc := LoadFunction('libamcf_operationresult_ensuresuccess');
 		FLibAMCFOperationResult_InProgressFunc := LoadFunction('libamcf_operationresult_inprogress');
 		FLibAMCFOperationResult_SuccessFunc := LoadFunction('libamcf_operationresult_success');
 		FLibAMCFOperationResult_GetErrorMessageFunc := LoadFunction('libamcf_operationresult_geterrormessage');
@@ -1222,7 +1316,9 @@ implementation
 		FLibAMCFDataStream_GetContextUUIDFunc := LoadFunction('libamcf_datastream_getcontextuuid');
 		FLibAMCFDataStream_GetNameFunc := LoadFunction('libamcf_datastream_getname');
 		FLibAMCFDataStream_GetMimeTypeFunc := LoadFunction('libamcf_datastream_getmimetype');
+		FLibAMCFDataStream_GetSHA256Func := LoadFunction('libamcf_datastream_getsha256');
 		FLibAMCFDataStream_GetSizeFunc := LoadFunction('libamcf_datastream_getsize');
+		FLibAMCFDataStream_GetTimestampFunc := LoadFunction('libamcf_datastream_gettimestamp');
 		FLibAMCFStreamUpload_GetNameFunc := LoadFunction('libamcf_streamupload_getname');
 		FLibAMCFStreamUpload_GetMimeTypeFunc := LoadFunction('libamcf_streamupload_getmimetype');
 		FLibAMCFStreamUpload_GetUsageContextFunc := LoadFunction('libamcf_streamupload_getusagecontext');
@@ -1264,6 +1360,9 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('libamcf_operationresult_waitfor'), @FLibAMCFOperationResult_WaitForFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('libamcf_operationresult_ensuresuccess'), @FLibAMCFOperationResult_EnsureSuccessFunc);
+		if AResult <> LIBAMCF_SUCCESS then
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_operationresult_inprogress'), @FLibAMCFOperationResult_InProgressFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
@@ -1285,7 +1384,13 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getmimetype'), @FLibAMCFDataStream_GetMimeTypeFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getsha256'), @FLibAMCFDataStream_GetSHA256Func);
+		if AResult <> LIBAMCF_SUCCESS then
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getsize'), @FLibAMCFDataStream_GetSizeFunc);
+		if AResult <> LIBAMCF_SUCCESS then
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_gettimestamp'), @FLibAMCFDataStream_GetTimestampFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_getname'), @FLibAMCFStreamUpload_GetNameFunc);
