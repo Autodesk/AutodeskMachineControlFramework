@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 #include <string>
+#include <vector>
+#include <mutex>
 #include <map>
 
 class CRestHandler {
@@ -60,11 +62,20 @@ public:
 
 class CRestHandler_RawPost : public CRestHandler {
 protected:
+    std::mutex m_Mutex;
+    uint32_t m_ResponseCode;
+    std::string m_ResponseBody;
 
 public:
     CRestHandler_RawPost(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount);
 
     void sendRawRequest(const std::string& sRequestBody, const std::string & sContentType);
+
+    void postSucceeded(const char * pData, size_t nDataSize);
+    void postFailed (uint32_t nResponseCode);
+
+    uint32_t getResponseCode ();
+    std::string getResponseBody();
 
 };
 

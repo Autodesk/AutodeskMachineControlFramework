@@ -149,6 +149,25 @@ class CConnection extends CBase
 						
 		return new COperationResult (this.Wrapper, resultHandle);
 	}
+	
+	AuthenticateWithPassword (UserName, Password) 
+	{
+		var resultHandle = 0;
+		var resultptrHandle = this.Wrapper._allocHandle ();		
+		var errorCode = this.Wrapper.Module.ccall (
+				'libamcf_connection_authenticatewithpassword',	
+				'number',
+				['number', 'string', 'string', 'number'],	
+				[this.Handle, UserName, Password, resultptrHandle]	
+			);		
+			
+		resultHandle = this.Wrapper._readHandle (resultptrHandle);
+		this.Wrapper._dealloc(resultptrHandle);
+						
+		this.Wrapper._handleErrorCode (this, errorCode);
+						
+		return new COperationResult (this.Wrapper, resultHandle);
+	}
 
 }
 
