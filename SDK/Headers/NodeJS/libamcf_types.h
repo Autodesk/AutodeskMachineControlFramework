@@ -134,6 +134,7 @@ typedef void * LibAMCF_pvoid;
 #define LIBAMCF_ERROR_OPERATIONERROR 35
 #define LIBAMCF_ERROR_OPERATIONTIMEOUT 36
 #define LIBAMCF_ERROR_UPLOADDIDNOTFINISH 37
+#define LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE 38
 
 /*************************************************************************************************************************
  Error strings for LibAMCF
@@ -179,6 +180,7 @@ inline const char * LIBAMCF_GETERRORSTRING (LibAMCFResult nErrorCode) {
     case LIBAMCF_ERROR_OPERATIONERROR: return "Operation Error.";
     case LIBAMCF_ERROR_OPERATIONTIMEOUT: return "Operation Timeout.";
     case LIBAMCF_ERROR_UPLOADDIDNOTFINISH: return "Upload did not finish.";
+    case LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE: return "Invalid stream context type.";
     default: return "unknown error";
   }
 }
@@ -192,6 +194,24 @@ typedef LibAMCFHandle LibAMCF_OperationResult;
 typedef LibAMCFHandle LibAMCF_DataStream;
 typedef LibAMCFHandle LibAMCF_StreamUpload;
 typedef LibAMCFHandle LibAMCF_Connection;
+
+/*************************************************************************************************************************
+ Declaration of enums
+**************************************************************************************************************************/
+
+typedef enum eLibAMCFStreamContextType {
+  eStreamContextTypeUnknown = 0,
+  eStreamContextTypeNewBuildJob = 1
+} eLibAMCFStreamContextType;
+
+/*************************************************************************************************************************
+ Declaration of enum members for 4 byte struct alignment
+**************************************************************************************************************************/
+
+typedef union {
+  eLibAMCFStreamContextType m_enum;
+  int m_code;
+} structEnumLibAMCFStreamContextType;
 
 
 #endif // __LIBAMCF_TYPES_HEADER

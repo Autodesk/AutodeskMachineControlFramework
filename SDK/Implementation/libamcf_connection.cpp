@@ -161,6 +161,43 @@ public:
 
 
 
+class CAsyncPrepareBuildRequest : public CAsyncRequest
+{
+
+private:
+	std::string m_sBaseURL;
+	std::string m_sContextUUID;
+	std::string m_sAuthToken;
+	uint32_t m_nTimeout;
+	uint32_t m_nRetryCount;
+
+public:
+
+	CAsyncPrepareBuildRequest(PConnectionState pConnectionState, const std::string& sContextUUID)
+		: CAsyncRequest(), m_sContextUUID(sContextUUID)
+	{
+		if (pConnectionState.get() == nullptr)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
+
+		m_sBaseURL = pConnectionState->getBaseURL();
+		m_nTimeout = pConnectionState->getTimeOut();
+		m_nRetryCount = pConnectionState->getRetryCount();
+		m_sAuthToken = pConnectionState->getAuthToken();
+	}
+
+	PAsyncResult onExecute() override {
+
+		CRestHandler_JSONPost sessionRequest("preparebuild", m_sBaseURL + "api/build/prepare", m_sAuthToken, m_nTimeout, m_nRetryCount);
+		sessionRequest.addValue("builduuid", m_sContextUUID);
+		sessionRequest.sendRequest();
+
+		return std::make_shared<CAsyncSuccess>();
+
+	}
+
+};
+
+
 IOperationResult * CConnection::AuthenticateWithPassword(const std::string & sUserName, const std::string & sPassword)
 {
 
@@ -202,10 +239,34 @@ std::string CConnection::GetAuthToken()
 }
 
 
-IStreamUpload * CConnection::CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext)
+IStreamUpload* CConnection::CreateUpload(const std::string& sName, const std::string& sMimeType, const LibAMCF::eStreamContextType eContextType)
 {
-	return new CStreamUpload(m_pConnectionState, sName, sMimeType, sUsageContext);
+	return new CStreamUpload(m_pConnectionState, sName, sMimeType, eContextType);
+
 }
 
+IOperationResult* CConnection::PrepareBuild(IDataStream* pDataStream)
+{
+	if (pDataStream == nullptr)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
+
+	eStreamContextType eContextType = eStreamContextType::Unknown;
+	std::string sContextUUID;
+	pDataStream->GetContext(eContextType, sContextUUID);
+
+	if (eContextType != eStreamContextType::NewBuildJob)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE);
+
+	auto pRequest = std::make_shared<CAsyncPrepareBuildRequest>(m_pConnectionState, sContextUUID);
+	auto pRequestHandler = m_pConnectionState->getRequestHandler();
+	pRequestHandler->executeRequest(pRequest, [this](CAsyncResult* pResult) {
+
+		auto pSuccessData = dynamic_cast<CAsyncSuccess*> (pResult);
+		if (pSuccessData != nullptr) {
+		}
+	});
+
+	return new COperationResult(pRequest->getFuture());
+}
 
 

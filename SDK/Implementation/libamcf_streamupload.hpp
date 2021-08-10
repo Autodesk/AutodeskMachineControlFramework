@@ -65,7 +65,7 @@ private:
 
     std::string m_sName;
     std::string m_sMimeType;
-    std::string m_sUsageContext;
+    LibAMCF::eStreamContextType m_StreamContext;
 
     PConnectionState m_pConnectionState;
 
@@ -82,17 +82,17 @@ private:
 
 public:
 
-    CStreamUpload(PConnectionState pConnectionState, const std::string& sName, const std::string& sMimeType, const std::string& sUsageContext);
+    CStreamUpload(PConnectionState pConnectionState, const std::string& sName, const std::string& sMimeType, const LibAMCF::eStreamContextType StreamContext);
 
 	std::string GetName() override;
 
 	std::string GetMimeType() override;
 
-	std::string GetUsageContext() override;
+    LibAMCF::eStreamContextType GetContextType() override;
 
-	IOperationResult * UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, const LibAMCF_uint32 nChunkSize) override;
+    IOperationResult* UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8* pDataBuffer, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount) override;
 
-	IOperationResult * UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize) override;
+    IOperationResult* UploadFile(const std::string& sFileName, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount) override;
 
     IOperationResult* BeginChunking(const LibAMCF_uint64 nDataSize) override;
 

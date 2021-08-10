@@ -285,40 +285,42 @@ LibAMCFResult libamcf_datastream_getuuid(LibAMCF_DataStream pDataStream, const L
 	}
 }
 
-LibAMCFResult libamcf_datastream_getcontextuuid(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nContextUUIDBufferSize, LibAMCF_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer)
+LibAMCFResult libamcf_datastream_getcontext(LibAMCF_DataStream pDataStream, eLibAMCFStreamContextType * pContextType, const LibAMCF_uint32 nOwnerUUIDBufferSize, LibAMCF_uint32* pOwnerUUIDNeededChars, char * pOwnerUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDataStream;
 
 	try {
-		if ( (!pContextUUIDBuffer) && !(pContextUUIDNeededChars) )
+		if (!pContextType)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
-		std::string sContextUUID("");
+		if ( (!pOwnerUUIDBuffer) && !(pOwnerUUIDNeededChars) )
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		std::string sOwnerUUID("");
 		IDataStream* pIDataStream = dynamic_cast<IDataStream*>(pIBaseClass);
 		if (!pIDataStream)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pContextUUIDBuffer == nullptr);
+		bool isCacheCall = (pOwnerUUIDBuffer == nullptr);
 		if (isCacheCall) {
-			sContextUUID = pIDataStream->GetContextUUID();
+			pIDataStream->GetContext(*pContextType, sOwnerUUID);
 
-			pIDataStream->_setCache (new ParameterCache_1<std::string> (sContextUUID));
+			pIDataStream->_setCache (new ParameterCache_2<LibAMCF::eStreamContextType, std::string> (*pContextType, sOwnerUUID));
 		}
 		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataStream->_getCache ());
+			auto cache = dynamic_cast<ParameterCache_2<LibAMCF::eStreamContextType, std::string>*> (pIDataStream->_getCache ());
 			if (cache == nullptr)
 				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
-			cache->retrieveData (sContextUUID);
+			cache->retrieveData (*pContextType, sOwnerUUID);
 			pIDataStream->_setCache (nullptr);
 		}
 		
-		if (pContextUUIDNeededChars)
-			*pContextUUIDNeededChars = (LibAMCF_uint32) (sContextUUID.size()+1);
-		if (pContextUUIDBuffer) {
-			if (sContextUUID.size() >= nContextUUIDBufferSize)
+		if (pOwnerUUIDNeededChars)
+			*pOwnerUUIDNeededChars = (LibAMCF_uint32) (sOwnerUUID.size()+1);
+		if (pOwnerUUIDBuffer) {
+			if (sOwnerUUID.size() >= nOwnerUUIDBufferSize)
 				throw ELibAMCFInterfaceException (LIBAMCF_ERROR_BUFFERTOOSMALL);
-			for (size_t iContextUUID = 0; iContextUUID < sContextUUID.size(); iContextUUID++)
-				pContextUUIDBuffer[iContextUUID] = sContextUUID[iContextUUID];
-			pContextUUIDBuffer[sContextUUID.size()] = 0;
+			for (size_t iOwnerUUID = 0; iOwnerUUID < sOwnerUUID.size(); iOwnerUUID++)
+				pOwnerUUIDBuffer[iOwnerUUID] = sOwnerUUID[iOwnerUUID];
+			pOwnerUUIDBuffer[sOwnerUUID.size()] = 0;
 		}
 		return LIBAMCF_SUCCESS;
 	}
@@ -651,41 +653,19 @@ LibAMCFResult libamcf_streamupload_getmimetype(LibAMCF_StreamUpload pStreamUploa
 	}
 }
 
-LibAMCFResult libamcf_streamupload_getusagecontext(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer)
+LibAMCFResult libamcf_streamupload_getcontexttype(LibAMCF_StreamUpload pStreamUpload, eLibAMCFStreamContextType * pContextType)
 {
 	IBase* pIBaseClass = (IBase *)pStreamUpload;
 
 	try {
-		if ( (!pUsageContextBuffer) && !(pUsageContextNeededChars) )
+		if (pContextType == nullptr)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
-		std::string sUsageContext("");
 		IStreamUpload* pIStreamUpload = dynamic_cast<IStreamUpload*>(pIBaseClass);
 		if (!pIStreamUpload)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		bool isCacheCall = (pUsageContextBuffer == nullptr);
-		if (isCacheCall) {
-			sUsageContext = pIStreamUpload->GetUsageContext();
+		*pContextType = pIStreamUpload->GetContextType();
 
-			pIStreamUpload->_setCache (new ParameterCache_1<std::string> (sUsageContext));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStreamUpload->_getCache ());
-			if (cache == nullptr)
-				throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
-			cache->retrieveData (sUsageContext);
-			pIStreamUpload->_setCache (nullptr);
-		}
-		
-		if (pUsageContextNeededChars)
-			*pUsageContextNeededChars = (LibAMCF_uint32) (sUsageContext.size()+1);
-		if (pUsageContextBuffer) {
-			if (sUsageContext.size() >= nUsageContextBufferSize)
-				throw ELibAMCFInterfaceException (LIBAMCF_ERROR_BUFFERTOOSMALL);
-			for (size_t iUsageContext = 0; iUsageContext < sUsageContext.size(); iUsageContext++)
-				pUsageContextBuffer[iUsageContext] = sUsageContext[iUsageContext];
-			pUsageContextBuffer[sUsageContext.size()] = 0;
-		}
 		return LIBAMCF_SUCCESS;
 	}
 	catch (ELibAMCFInterfaceException & Exception) {
@@ -699,7 +679,7 @@ LibAMCFResult libamcf_streamupload_getusagecontext(LibAMCF_StreamUpload pStreamU
 	}
 }
 
-LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess)
+LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pStreamUpload;
 
@@ -713,7 +693,7 @@ LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpload pStreamUpload
 		if (!pIStreamUpload)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		pBaseSuccess = pIStreamUpload->UploadData(nDataBufferSize, pDataBuffer, nChunkSize);
+		pBaseSuccess = pIStreamUpload->UploadData(nDataBufferSize, pDataBuffer, nChunkSize, nThreadCount);
 
 		*pSuccess = (IBase*)(pBaseSuccess);
 		return LIBAMCF_SUCCESS;
@@ -729,7 +709,7 @@ LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpload pStreamUpload
 	}
 }
 
-LibAMCFResult libamcf_streamupload_uploadfile(LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess)
+LibAMCFResult libamcf_streamupload_uploadfile(LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pStreamUpload;
 
@@ -744,7 +724,7 @@ LibAMCFResult libamcf_streamupload_uploadfile(LibAMCF_StreamUpload pStreamUpload
 		if (!pIStreamUpload)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		pBaseSuccess = pIStreamUpload->UploadFile(sFileName, nChunkSize);
+		pBaseSuccess = pIStreamUpload->UploadFile(sFileName, nChunkSize, nThreadCount);
 
 		*pSuccess = (IBase*)(pBaseSuccess);
 		return LIBAMCF_SUCCESS;
@@ -1198,7 +1178,7 @@ LibAMCFResult libamcf_connection_getauthtoken(LibAMCF_Connection pConnection, co
 	}
 }
 
-LibAMCFResult libamcf_connection_createupload(LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, const char * pUsageContext, LibAMCF_StreamUpload * pInstance)
+LibAMCFResult libamcf_connection_createupload(LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, eLibAMCFStreamContextType eContextType, LibAMCF_StreamUpload * pInstance)
 {
 	IBase* pIBaseClass = (IBase *)pConnection;
 
@@ -1207,21 +1187,51 @@ LibAMCFResult libamcf_connection_createupload(LibAMCF_Connection pConnection, co
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
 		if (pMimeType == nullptr)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
-		if (pUsageContext == nullptr)
-			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
 		if (pInstance == nullptr)
 			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
 		std::string sName(pName);
 		std::string sMimeType(pMimeType);
-		std::string sUsageContext(pUsageContext);
 		IBase* pBaseInstance(nullptr);
 		IConnection* pIConnection = dynamic_cast<IConnection*>(pIBaseClass);
 		if (!pIConnection)
 			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
 		
-		pBaseInstance = pIConnection->CreateUpload(sName, sMimeType, sUsageContext);
+		pBaseInstance = pIConnection->CreateUpload(sName, sMimeType, eContextType);
 
 		*pInstance = (IBase*)(pBaseInstance);
+		return LIBAMCF_SUCCESS;
+	}
+	catch (ELibAMCFInterfaceException & Exception) {
+		return handleLibAMCFException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibAMCFResult libamcf_connection_preparebuild(LibAMCF_Connection pConnection, LibAMCF_DataStream pDataStream, LibAMCF_OperationResult * pSuccess)
+{
+	IBase* pIBaseClass = (IBase *)pConnection;
+
+	try {
+		if (pSuccess == nullptr)
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDPARAM);
+		IBase* pIBaseClassDataStream = (IBase *)pDataStream;
+		IDataStream* pIDataStream = dynamic_cast<IDataStream*>(pIBaseClassDataStream);
+		if (!pIDataStream)
+			throw ELibAMCFInterfaceException (LIBAMCF_ERROR_INVALIDCAST);
+		
+		IBase* pBaseSuccess(nullptr);
+		IConnection* pIConnection = dynamic_cast<IConnection*>(pIBaseClass);
+		if (!pIConnection)
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDCAST);
+		
+		pBaseSuccess = pIConnection->PrepareBuild(pIDataStream);
+
+		*pSuccess = (IBase*)(pBaseSuccess);
 		return LIBAMCF_SUCCESS;
 	}
 	catch (ELibAMCFInterfaceException & Exception) {
@@ -1262,8 +1272,8 @@ LibAMCFResult LibAMCF::Impl::LibAMCF_GetProcAddress (const char * pProcName, voi
 		*ppProcAddress = (void*) &libamcf_operationresult_geterrormessage;
 	if (sProcName == "libamcf_datastream_getuuid") 
 		*ppProcAddress = (void*) &libamcf_datastream_getuuid;
-	if (sProcName == "libamcf_datastream_getcontextuuid") 
-		*ppProcAddress = (void*) &libamcf_datastream_getcontextuuid;
+	if (sProcName == "libamcf_datastream_getcontext") 
+		*ppProcAddress = (void*) &libamcf_datastream_getcontext;
 	if (sProcName == "libamcf_datastream_getname") 
 		*ppProcAddress = (void*) &libamcf_datastream_getname;
 	if (sProcName == "libamcf_datastream_getmimetype") 
@@ -1278,8 +1288,8 @@ LibAMCFResult LibAMCF::Impl::LibAMCF_GetProcAddress (const char * pProcName, voi
 		*ppProcAddress = (void*) &libamcf_streamupload_getname;
 	if (sProcName == "libamcf_streamupload_getmimetype") 
 		*ppProcAddress = (void*) &libamcf_streamupload_getmimetype;
-	if (sProcName == "libamcf_streamupload_getusagecontext") 
-		*ppProcAddress = (void*) &libamcf_streamupload_getusagecontext;
+	if (sProcName == "libamcf_streamupload_getcontexttype") 
+		*ppProcAddress = (void*) &libamcf_streamupload_getcontexttype;
 	if (sProcName == "libamcf_streamupload_uploaddata") 
 		*ppProcAddress = (void*) &libamcf_streamupload_uploaddata;
 	if (sProcName == "libamcf_streamupload_uploadfile") 
@@ -1314,6 +1324,8 @@ LibAMCFResult LibAMCF::Impl::LibAMCF_GetProcAddress (const char * pProcName, voi
 		*ppProcAddress = (void*) &libamcf_connection_getauthtoken;
 	if (sProcName == "libamcf_connection_createupload") 
 		*ppProcAddress = (void*) &libamcf_connection_createupload;
+	if (sProcName == "libamcf_connection_preparebuild") 
+		*ppProcAddress = (void*) &libamcf_connection_preparebuild;
 	if (sProcName == "libamcf_getversion") 
 		*ppProcAddress = (void*) &libamcf_getversion;
 	if (sProcName == "libamcf_getlasterror") 
