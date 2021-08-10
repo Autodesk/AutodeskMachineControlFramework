@@ -133,6 +133,7 @@ typedef void * LibAMCF_pvoid;
 #define LIBAMCF_ERROR_OPERATIONERROR 35
 #define LIBAMCF_ERROR_OPERATIONTIMEOUT 36
 #define LIBAMCF_ERROR_UPLOADDIDNOTFINISH 37
+#define LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE 38
 
 /*************************************************************************************************************************
  Error strings for LibAMCF
@@ -178,6 +179,7 @@ inline const char * LIBAMCF_GETERRORSTRING (LibAMCFResult nErrorCode) {
     case LIBAMCF_ERROR_OPERATIONERROR: return "Operation Error.";
     case LIBAMCF_ERROR_OPERATIONTIMEOUT: return "Operation Timeout.";
     case LIBAMCF_ERROR_UPLOADDIDNOTFINISH: return "Upload did not finish.";
+    case LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE: return "Invalid stream context type.";
     default: return "unknown error";
   }
 }
@@ -194,8 +196,18 @@ typedef LibAMCFHandle LibAMCF_Connection;
 
 namespace LibAMCF {
 
+  /*************************************************************************************************************************
+   Declaration of enums
+  **************************************************************************************************************************/
+  
+  enum class eStreamContextType : LibAMCF_int32 {
+    Unknown = 0,
+    NewBuildJob = 1
+  };
+  
 } // namespace LibAMCF;
 
 // define legacy C-names for enums, structs and function types
+typedef LibAMCF::eStreamContextType eLibAMCFStreamContextType;
 
 #endif // __LIBAMCF_TYPES_HEADER_CPP

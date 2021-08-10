@@ -83,8 +83,15 @@
 		<error name="OPERATIONERROR" code="35" description="Operation Error." />
 		<error name="OPERATIONTIMEOUT" code="36" description="Operation Timeout." />
 		<error name="UPLOADDIDNOTFINISH" code="37" description="Upload did not finish." />
+		<error name="INVALIDSTREAMCONTEXTTYPE" code="38" description="Invalid stream context type." />				
 
 	</errors>
+
+
+	<enum name="StreamContextType">
+		<option name="Unknown" value="0" description="Unknown stream type. Should not be used." />
+		<option name="NewBuildJob" value="1" description="Stream is owned and to be used for a new build job."/>
+	</enum>
 
 	
 	<class name="Base">
@@ -124,8 +131,9 @@
 			<param name="UUID" type="string" pass="return" description="Stream UUID String." />
 		</method>
 
-		<method name="GetContextUUID" description="Returns the stream's context UUID.">
-			<param name="ContextUUID" type="string" pass="return" description="Stream Context UUID String." />
+		<method name="GetContext" description="Returns the stream's context type and owner UUID.">
+			<param name="ContextType" type="enum" class="StreamContextType" pass="out" description="Stream Context Type." />
+			<param name="OwnerUUID" type="string" pass="out" description="Stream Context UUID String." />
 		</method>
 
 		<method name="GetName" description="Returns the stream name.">
@@ -161,19 +169,21 @@
 			<param name="MimeType" type="string" pass="return" description="MimeType String." />
 		</method>
 
-		<method name="GetUsageContext" description="returns the usage context of the stream upload">
-			<param name="UsageContext" type="string" pass="return" description="UsageContext String." />
+		<method name="GetContextType" description="returns the usage context of the stream upload">
+			<param name="ContextType" type="enum" class="StreamContextType" pass="return" description="Stream Context Type." />
 		</method>
 		
 		<method name="UploadData" description="uploads the passed data to the server. MUST only be called once.">
 			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to be uploaded." />
 			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB." />
+			<param name="ThreadCount" type="uint32" pass="in" description="How many concurrent threads shall be maximally used." />
 			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
 		</method>
 		
 		<method name="UploadFile" description="uploads a file to the server. MUST only be called once.">
 			<param name="FileName" type="string" class="string" pass="in" description="File to be uploaded." />
 			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB." />
+			<param name="ThreadCount" type="uint32" pass="in" description="How many concurrent threads shall be maximally used." />
 			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
 		</method>
 
@@ -249,8 +259,13 @@
 		<method name="CreateUpload" description="Creates a file upload instance. Must be authenticated to make it work.">
 			<param name="Name" type="string" pass="in" description="Name of the file to be uploaded." />
 			<param name="MimeType" type="string" pass="in" description="Mimetype of the file to be uploaded." />
-			<param name="UsageContext" type="string" pass="in" description="Context string for the usage type of the file." />
+			<param name="ContextType" type="enum" class="StreamContextType" pass="in" description="Stream Context Type." />
 			<param name="Instance" type="class" class="StreamUpload" pass="return" description="File upload instance." />
+		</method>
+
+		<method name="PrepareBuild" description="Prepares a build from an uploaded data stream. Must be authenticated to make it work.">
+			<param name="DataStream" type="class" class="DataStream" pass="in" description="Data stream MUST have been created as build job context type." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if build preparation was successful." />
 		</method>
 		
 	</class>

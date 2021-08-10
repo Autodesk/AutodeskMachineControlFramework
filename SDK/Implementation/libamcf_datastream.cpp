@@ -40,8 +40,8 @@ using namespace LibAMCF::Impl;
  Class definition of CDataStream 
 **************************************************************************************************************************/
 
-CDataStream::CDataStream(const std::string& sUUID, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const std::string& sSHA256, uint64_t nSize, const std::string& sTimestamp)
-    : m_sUUID (sUUID), m_sContextUUID (sContextUUID), m_sName (sName), m_sMimeType (sMimeType), m_sSHA256 (sSHA256), m_nSize (nSize), m_sTimestamp (sTimestamp)
+CDataStream::CDataStream(const std::string& sUUID, const eStreamContextType ContextType, const std::string& sContextUUID, const std::string& sName, const std::string& sMimeType, const std::string& sSHA256, uint64_t nSize, const std::string& sTimestamp)
+    : m_sUUID (sUUID), m_ContextType (ContextType), m_sContextUUID (sContextUUID), m_sName (sName), m_sMimeType (sMimeType), m_sSHA256 (sSHA256), m_nSize (nSize), m_sTimestamp (sTimestamp)
 {
 
 }
@@ -52,9 +52,10 @@ std::string CDataStream::GetUUID()
     return m_sUUID;
 }
 
-std::string CDataStream::GetContextUUID()
+void CDataStream::GetContext(LibAMCF::eStreamContextType& eContextType, std::string& sOwnerUUID)
 {
-    return m_sContextUUID;
+    eContextType = m_ContextType;
+    sOwnerUUID = m_sContextUUID;
 }
 
 std::string CDataStream::GetName()

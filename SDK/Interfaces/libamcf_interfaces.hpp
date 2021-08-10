@@ -314,10 +314,11 @@ public:
 	virtual std::string GetUUID() = 0;
 
 	/**
-	* IDataStream::GetContextUUID - Returns the stream's context UUID.
-	* @return Stream Context UUID String.
+	* IDataStream::GetContext - Returns the stream's context type and owner UUID.
+	* @param[out] eContextType - Stream Context Type.
+	* @param[out] sOwnerUUID - Stream Context UUID String.
 	*/
-	virtual std::string GetContextUUID() = 0;
+	virtual void GetContext(LibAMCF::eStreamContextType & eContextType, std::string & sOwnerUUID) = 0;
 
 	/**
 	* IDataStream::GetName - Returns the stream name.
@@ -373,27 +374,29 @@ public:
 	virtual std::string GetMimeType() = 0;
 
 	/**
-	* IStreamUpload::GetUsageContext - returns the usage context of the stream upload
-	* @return UsageContext String.
+	* IStreamUpload::GetContextType - returns the usage context of the stream upload
+	* @return Stream Context Type.
 	*/
-	virtual std::string GetUsageContext() = 0;
+	virtual LibAMCF::eStreamContextType GetContextType() = 0;
 
 	/**
 	* IStreamUpload::UploadData - uploads the passed data to the server. MUST only be called once.
 	* @param[in] nDataBufferSize - Number of elements in buffer
 	* @param[in] pDataBuffer - Data to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @return Returns if upload was successful.
 	*/
-	virtual IOperationResult * UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, const LibAMCF_uint32 nChunkSize) = 0;
+	virtual IOperationResult * UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount) = 0;
 
 	/**
 	* IStreamUpload::UploadFile - uploads a file to the server. MUST only be called once.
 	* @param[in] sFileName - File to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @return Returns if upload was successful.
 	*/
-	virtual IOperationResult * UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize) = 0;
+	virtual IOperationResult * UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount) = 0;
 
 	/**
 	* IStreamUpload::BeginChunking - Starts a chunked upload. MUST not be used together with uploadData or uploadFile
@@ -503,10 +506,17 @@ public:
 	* IConnection::CreateUpload - Creates a file upload instance. Must be authenticated to make it work.
 	* @param[in] sName - Name of the file to be uploaded.
 	* @param[in] sMimeType - Mimetype of the file to be uploaded.
-	* @param[in] sUsageContext - Context string for the usage type of the file.
+	* @param[in] eContextType - Stream Context Type.
 	* @return File upload instance.
 	*/
-	virtual IStreamUpload * CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext) = 0;
+	virtual IStreamUpload * CreateUpload(const std::string & sName, const std::string & sMimeType, const LibAMCF::eStreamContextType eContextType) = 0;
+
+	/**
+	* IConnection::PrepareBuild - Prepares a build from an uploaded data stream. Must be authenticated to make it work.
+	* @param[in] pDataStream - Data stream MUST have been created as build job context type.
+	* @return Returns if build preparation was successful.
+	*/
+	virtual IOperationResult * PrepareBuild(IDataStream* pDataStream) = 0;
 
 };
 

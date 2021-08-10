@@ -104,6 +104,7 @@ class ErrorCodes(enum.IntEnum):
 	OPERATIONERROR = 35
 	OPERATIONTIMEOUT = 36
 	UPLOADDIDNOTFINISH = 37
+	INVALIDSTREAMCONTEXTTYPE = 38
 
 '''Definition of Function Table
 '''
@@ -121,7 +122,7 @@ class FunctionTable:
 	libamcf_operationresult_success = None
 	libamcf_operationresult_geterrormessage = None
 	libamcf_datastream_getuuid = None
-	libamcf_datastream_getcontextuuid = None
+	libamcf_datastream_getcontext = None
 	libamcf_datastream_getname = None
 	libamcf_datastream_getmimetype = None
 	libamcf_datastream_getsha256 = None
@@ -129,7 +130,7 @@ class FunctionTable:
 	libamcf_datastream_gettimestamp = None
 	libamcf_streamupload_getname = None
 	libamcf_streamupload_getmimetype = None
-	libamcf_streamupload_getusagecontext = None
+	libamcf_streamupload_getcontexttype = None
 	libamcf_streamupload_uploaddata = None
 	libamcf_streamupload_uploadfile = None
 	libamcf_streamupload_beginchunking = None
@@ -147,6 +148,22 @@ class FunctionTable:
 	libamcf_connection_ping = None
 	libamcf_connection_getauthtoken = None
 	libamcf_connection_createupload = None
+	libamcf_connection_preparebuild = None
+
+'''Definition of Enumerations
+'''
+
+'''Definition of base enumeration for ctypes
+'''
+class CTypesEnum(enum.IntEnum):
+	def from_param(obj):
+		return int(obj)
+
+'''Definition of StreamContextType
+'''
+class StreamContextType(CTypesEnum):
+	Unknown = 0
+	NewBuildJob = 1
 
 
 '''Wrapper Class Implementation
@@ -268,11 +285,11 @@ class Wrapper:
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
 			self.lib.libamcf_datastream_getuuid = methodType(int(methodAddress.value))
 			
-			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_datastream_getcontextuuid")), methodAddress)
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_datastream_getcontext")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
-			self.lib.libamcf_datastream_getcontextuuid = methodType(int(methodAddress.value))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(ctypes.c_int32), ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
+			self.lib.libamcf_datastream_getcontext = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_datastream_getname")), methodAddress)
 			if err != 0:
@@ -316,22 +333,22 @@ class Wrapper:
 			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
 			self.lib.libamcf_streamupload_getmimetype = methodType(int(methodAddress.value))
 			
-			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getusagecontext")), methodAddress)
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_getcontexttype")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p)
-			self.lib.libamcf_streamupload_getusagecontext = methodType(int(methodAddress.value))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.POINTER(ctypes.c_int32))
+			self.lib.libamcf_streamupload_getcontexttype = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_uploaddata")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p))
 			self.lib.libamcf_streamupload_uploaddata = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_uploadfile")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p))
 			self.lib.libamcf_streamupload_uploadfile = methodType(int(methodAddress.value))
 			
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_streamupload_beginchunking")), methodAddress)
@@ -421,8 +438,14 @@ class Wrapper:
 			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_connection_createupload")), methodAddress)
 			if err != 0:
 				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
-			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_void_p))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, StreamContextType, ctypes.POINTER(ctypes.c_void_p))
 			self.lib.libamcf_connection_createupload = methodType(int(methodAddress.value))
+			
+			err = symbolLookupMethod(ctypes.c_char_p(str.encode("libamcf_connection_preparebuild")), methodAddress)
+			if err != 0:
+				raise ELibAMCFException(ErrorCodes.COULDNOTLOADLIBRARY, str(err))
+			methodType = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p))
+			self.lib.libamcf_connection_preparebuild = methodType(int(methodAddress.value))
 			
 		except AttributeError as ae:
 			raise ELibAMCFException(ErrorCodes.COULDNOTFINDLIBRARYEXPORT, ae.args[0])
@@ -468,8 +491,8 @@ class Wrapper:
 			self.lib.libamcf_datastream_getuuid.restype = ctypes.c_int32
 			self.lib.libamcf_datastream_getuuid.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
 			
-			self.lib.libamcf_datastream_getcontextuuid.restype = ctypes.c_int32
-			self.lib.libamcf_datastream_getcontextuuid.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
+			self.lib.libamcf_datastream_getcontext.restype = ctypes.c_int32
+			self.lib.libamcf_datastream_getcontext.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int32), ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
 			
 			self.lib.libamcf_datastream_getname.restype = ctypes.c_int32
 			self.lib.libamcf_datastream_getname.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
@@ -492,14 +515,14 @@ class Wrapper:
 			self.lib.libamcf_streamupload_getmimetype.restype = ctypes.c_int32
 			self.lib.libamcf_streamupload_getmimetype.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
 			
-			self.lib.libamcf_streamupload_getusagecontext.restype = ctypes.c_int32
-			self.lib.libamcf_streamupload_getusagecontext.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
+			self.lib.libamcf_streamupload_getcontexttype.restype = ctypes.c_int32
+			self.lib.libamcf_streamupload_getcontexttype.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int32)]
 			
 			self.lib.libamcf_streamupload_uploaddata.restype = ctypes.c_int32
-			self.lib.libamcf_streamupload_uploaddata.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p)]
+			self.lib.libamcf_streamupload_uploaddata.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint8), ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p)]
 			
 			self.lib.libamcf_streamupload_uploadfile.restype = ctypes.c_int32
-			self.lib.libamcf_streamupload_uploadfile.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p)]
+			self.lib.libamcf_streamupload_uploadfile.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_void_p)]
 			
 			self.lib.libamcf_streamupload_beginchunking.restype = ctypes.c_int32
 			self.lib.libamcf_streamupload_beginchunking.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_void_p)]
@@ -544,7 +567,10 @@ class Wrapper:
 			self.lib.libamcf_connection_getauthtoken.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.POINTER(ctypes.c_uint64), ctypes.c_char_p]
 			
 			self.lib.libamcf_connection_createupload.restype = ctypes.c_int32
-			self.lib.libamcf_connection_createupload.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_void_p)]
+			self.lib.libamcf_connection_createupload.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p, StreamContextType, ctypes.POINTER(ctypes.c_void_p)]
+			
+			self.lib.libamcf_connection_preparebuild.restype = ctypes.c_int32
+			self.lib.libamcf_connection_preparebuild.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
 			
 		except AttributeError as ae:
 			raise ELibAMCFException(ErrorCodes.COULDNOTFINDLIBRARYEXPORT, ae.args[0])
@@ -704,16 +730,17 @@ class DataStream(Base):
 		
 		return pUUIDBuffer.value.decode()
 	
-	def GetContextUUID(self):
-		nContextUUIDBufferSize = ctypes.c_uint64(0)
-		nContextUUIDNeededChars = ctypes.c_uint64(0)
-		pContextUUIDBuffer = ctypes.c_char_p(None)
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_getcontextuuid(self._handle, nContextUUIDBufferSize, nContextUUIDNeededChars, pContextUUIDBuffer))
-		nContextUUIDBufferSize = ctypes.c_uint64(nContextUUIDNeededChars.value)
-		pContextUUIDBuffer = (ctypes.c_char * (nContextUUIDNeededChars.value))()
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_getcontextuuid(self._handle, nContextUUIDBufferSize, nContextUUIDNeededChars, pContextUUIDBuffer))
+	def GetContext(self):
+		pContextType = ctypes.c_int32()
+		nOwnerUUIDBufferSize = ctypes.c_uint64(0)
+		nOwnerUUIDNeededChars = ctypes.c_uint64(0)
+		pOwnerUUIDBuffer = ctypes.c_char_p(None)
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_getcontext(self._handle, pContextType, nOwnerUUIDBufferSize, nOwnerUUIDNeededChars, pOwnerUUIDBuffer))
+		nOwnerUUIDBufferSize = ctypes.c_uint64(nOwnerUUIDNeededChars.value)
+		pOwnerUUIDBuffer = (ctypes.c_char * (nOwnerUUIDNeededChars.value))()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_datastream_getcontext(self._handle, pContextType, nOwnerUUIDBufferSize, nOwnerUUIDNeededChars, pOwnerUUIDBuffer))
 		
-		return pContextUUIDBuffer.value.decode()
+		return StreamContextType(pContextType.value), pOwnerUUIDBuffer.value.decode()
 	
 	def GetName(self):
 		nNameBufferSize = ctypes.c_uint64(0)
@@ -794,23 +821,19 @@ class StreamUpload(Base):
 		
 		return pMimeTypeBuffer.value.decode()
 	
-	def GetUsageContext(self):
-		nUsageContextBufferSize = ctypes.c_uint64(0)
-		nUsageContextNeededChars = ctypes.c_uint64(0)
-		pUsageContextBuffer = ctypes.c_char_p(None)
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getusagecontext(self._handle, nUsageContextBufferSize, nUsageContextNeededChars, pUsageContextBuffer))
-		nUsageContextBufferSize = ctypes.c_uint64(nUsageContextNeededChars.value)
-		pUsageContextBuffer = (ctypes.c_char * (nUsageContextNeededChars.value))()
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getusagecontext(self._handle, nUsageContextBufferSize, nUsageContextNeededChars, pUsageContextBuffer))
+	def GetContextType(self):
+		pContextType = ctypes.c_int32()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_getcontexttype(self._handle, pContextType))
 		
-		return pUsageContextBuffer.value.decode()
+		return StreamContextType(pContextType.value)
 	
-	def UploadData(self, Data, ChunkSize):
+	def UploadData(self, Data, ChunkSize, ThreadCount):
 		nDataCount = ctypes.c_uint64(len(Data))
 		pDataBuffer = (ctypes.c_uint8*len(Data))(*Data)
 		nChunkSize = ctypes.c_uint32(ChunkSize)
+		nThreadCount = ctypes.c_uint32(ThreadCount)
 		SuccessHandle = ctypes.c_void_p()
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_uploaddata(self._handle, nDataCount, pDataBuffer, nChunkSize, SuccessHandle))
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_uploaddata(self._handle, nDataCount, pDataBuffer, nChunkSize, nThreadCount, SuccessHandle))
 		if SuccessHandle:
 			SuccessObject = OperationResult(SuccessHandle, self._wrapper)
 		else:
@@ -818,11 +841,12 @@ class StreamUpload(Base):
 		
 		return SuccessObject
 	
-	def UploadFile(self, FileName, ChunkSize):
+	def UploadFile(self, FileName, ChunkSize, ThreadCount):
 		pFileName = ctypes.c_char_p(str.encode(FileName))
 		nChunkSize = ctypes.c_uint32(ChunkSize)
+		nThreadCount = ctypes.c_uint32(ThreadCount)
 		SuccessHandle = ctypes.c_void_p()
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_uploadfile(self._handle, pFileName, nChunkSize, SuccessHandle))
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_streamupload_uploadfile(self._handle, pFileName, nChunkSize, nThreadCount, SuccessHandle))
 		if SuccessHandle:
 			SuccessObject = OperationResult(SuccessHandle, self._wrapper)
 		else:
@@ -967,17 +991,31 @@ class Connection(Base):
 		
 		return pTokenBuffer.value.decode()
 	
-	def CreateUpload(self, Name, MimeType, UsageContext):
+	def CreateUpload(self, Name, MimeType, ContextType):
 		pName = ctypes.c_char_p(str.encode(Name))
 		pMimeType = ctypes.c_char_p(str.encode(MimeType))
-		pUsageContext = ctypes.c_char_p(str.encode(UsageContext))
 		InstanceHandle = ctypes.c_void_p()
-		self._wrapper.checkError(self, self._wrapper.lib.libamcf_connection_createupload(self._handle, pName, pMimeType, pUsageContext, InstanceHandle))
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_connection_createupload(self._handle, pName, pMimeType, ContextType, InstanceHandle))
 		if InstanceHandle:
 			InstanceObject = StreamUpload(InstanceHandle, self._wrapper)
 		else:
 			raise ELibAMCFException(ErrorCodes.INVALIDCAST, 'Invalid return/output value')
 		
 		return InstanceObject
+	
+	def PrepareBuild(self, DataStreamObject):
+		DataStreamHandle = None
+		if DataStreamObject:
+			DataStreamHandle = DataStreamObject._handle
+		else:
+			raise ELibAMCFException(ErrorCodes.INVALIDPARAM, 'Invalid return/output value')
+		SuccessHandle = ctypes.c_void_p()
+		self._wrapper.checkError(self, self._wrapper.lib.libamcf_connection_preparebuild(self._handle, DataStreamHandle, SuccessHandle))
+		if SuccessHandle:
+			SuccessObject = OperationResult(SuccessHandle, self._wrapper)
+		else:
+			raise ELibAMCFException(ErrorCodes.INVALIDCAST, 'Invalid return/output value')
+		
+		return SuccessObject
 	
 		

@@ -114,15 +114,16 @@ typedef LibAMCFResult (*PLibAMCFOperationResult_GetErrorMessagePtr) (LibAMCF_Ope
 typedef LibAMCFResult (*PLibAMCFDataStream_GetUUIDPtr) (LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nUUIDBufferSize, LibAMCF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
-* Returns the stream's context UUID.
+* Returns the stream's context type and owner UUID.
 *
 * @param[in] pDataStream - DataStream instance.
-* @param[in] nContextUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pContextUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pContextUUIDBuffer -  buffer of Stream Context UUID String., may be NULL
+* @param[out] pContextType - Stream Context Type.
+* @param[in] nOwnerUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pOwnerUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pOwnerUUIDBuffer -  buffer of Stream Context UUID String., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFDataStream_GetContextUUIDPtr) (LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nContextUUIDBufferSize, LibAMCF_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer);
+typedef LibAMCFResult (*PLibAMCFDataStream_GetContextPtr) (LibAMCF_DataStream pDataStream, eLibAMCFStreamContextType * pContextType, const LibAMCF_uint32 nOwnerUUIDBufferSize, LibAMCF_uint32* pOwnerUUIDNeededChars, char * pOwnerUUIDBuffer);
 
 /**
 * Returns the stream name.
@@ -207,12 +208,10 @@ typedef LibAMCFResult (*PLibAMCFStreamUpload_GetMimeTypePtr) (LibAMCF_StreamUplo
 * returns the usage context of the stream upload
 *
 * @param[in] pStreamUpload - StreamUpload instance.
-* @param[in] nUsageContextBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUsageContextNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUsageContextBuffer -  buffer of UsageContext String., may be NULL
+* @param[out] pContextType - Stream Context Type.
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFStreamUpload_GetUsageContextPtr) (LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer);
+typedef LibAMCFResult (*PLibAMCFStreamUpload_GetContextTypePtr) (LibAMCF_StreamUpload pStreamUpload, eLibAMCFStreamContextType * pContextType);
 
 /**
 * uploads the passed data to the server. MUST only be called once.
@@ -221,10 +220,11 @@ typedef LibAMCFResult (*PLibAMCFStreamUpload_GetUsageContextPtr) (LibAMCF_Stream
 * @param[in] nDataBufferSize - Number of elements in buffer
 * @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
 * @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadDataPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess);
+typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadDataPtr) (LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess);
 
 /**
 * uploads a file to the server. MUST only be called once.
@@ -232,10 +232,11 @@ typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadDataPtr) (LibAMCF_StreamUploa
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] pFileName - File to be uploaded.
 * @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadFilePtr) (LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess);
+typedef LibAMCFResult (*PLibAMCFStreamUpload_UploadFilePtr) (LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess);
 
 /**
 * Starts a chunked upload. MUST not be used together with uploadData or uploadFile
@@ -386,11 +387,21 @@ typedef LibAMCFResult (*PLibAMCFConnection_GetAuthTokenPtr) (LibAMCF_Connection 
 * @param[in] pConnection - Connection instance.
 * @param[in] pName - Name of the file to be uploaded.
 * @param[in] pMimeType - Mimetype of the file to be uploaded.
-* @param[in] pUsageContext - Context string for the usage type of the file.
+* @param[in] eContextType - Stream Context Type.
 * @param[out] pInstance - File upload instance.
 * @return error code or 0 (success)
 */
-typedef LibAMCFResult (*PLibAMCFConnection_CreateUploadPtr) (LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, const char * pUsageContext, LibAMCF_StreamUpload * pInstance);
+typedef LibAMCFResult (*PLibAMCFConnection_CreateUploadPtr) (LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, eLibAMCFStreamContextType eContextType, LibAMCF_StreamUpload * pInstance);
+
+/**
+* Prepares a build from an uploaded data stream. Must be authenticated to make it work.
+*
+* @param[in] pConnection - Connection instance.
+* @param[in] pDataStream - Data stream MUST have been created as build job context type.
+* @param[out] pSuccess - Returns if build preparation was successful.
+* @return error code or 0 (success)
+*/
+typedef LibAMCFResult (*PLibAMCFConnection_PrepareBuildPtr) (LibAMCF_Connection pConnection, LibAMCF_DataStream pDataStream, LibAMCF_OperationResult * pSuccess);
 
 /*************************************************************************************************************************
  Global functions
@@ -472,7 +483,7 @@ typedef struct {
 	PLibAMCFOperationResult_SuccessPtr m_OperationResult_Success;
 	PLibAMCFOperationResult_GetErrorMessagePtr m_OperationResult_GetErrorMessage;
 	PLibAMCFDataStream_GetUUIDPtr m_DataStream_GetUUID;
-	PLibAMCFDataStream_GetContextUUIDPtr m_DataStream_GetContextUUID;
+	PLibAMCFDataStream_GetContextPtr m_DataStream_GetContext;
 	PLibAMCFDataStream_GetNamePtr m_DataStream_GetName;
 	PLibAMCFDataStream_GetMimeTypePtr m_DataStream_GetMimeType;
 	PLibAMCFDataStream_GetSHA256Ptr m_DataStream_GetSHA256;
@@ -480,7 +491,7 @@ typedef struct {
 	PLibAMCFDataStream_GetTimestampPtr m_DataStream_GetTimestamp;
 	PLibAMCFStreamUpload_GetNamePtr m_StreamUpload_GetName;
 	PLibAMCFStreamUpload_GetMimeTypePtr m_StreamUpload_GetMimeType;
-	PLibAMCFStreamUpload_GetUsageContextPtr m_StreamUpload_GetUsageContext;
+	PLibAMCFStreamUpload_GetContextTypePtr m_StreamUpload_GetContextType;
 	PLibAMCFStreamUpload_UploadDataPtr m_StreamUpload_UploadData;
 	PLibAMCFStreamUpload_UploadFilePtr m_StreamUpload_UploadFile;
 	PLibAMCFStreamUpload_BeginChunkingPtr m_StreamUpload_BeginChunking;
@@ -498,6 +509,7 @@ typedef struct {
 	PLibAMCFConnection_PingPtr m_Connection_Ping;
 	PLibAMCFConnection_GetAuthTokenPtr m_Connection_GetAuthToken;
 	PLibAMCFConnection_CreateUploadPtr m_Connection_CreateUpload;
+	PLibAMCFConnection_PrepareBuildPtr m_Connection_PrepareBuild;
 	PLibAMCFGetVersionPtr m_GetVersion;
 	PLibAMCFGetLastErrorPtr m_GetLastError;
 	PLibAMCFReleaseInstancePtr m_ReleaseInstance;

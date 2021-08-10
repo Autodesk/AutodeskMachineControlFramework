@@ -119,7 +119,7 @@ private:
 	static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static v8::Persistent<v8::Function> constructor;
 	static void GetUUID(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void GetContextUUID(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetContext(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetName(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetMimeType(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetSHA256(const v8::FunctionCallbackInfo<v8::Value>& args);
@@ -144,7 +144,7 @@ private:
 	static v8::Persistent<v8::Function> constructor;
 	static void GetName(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetMimeType(const v8::FunctionCallbackInfo<v8::Value>& args);
-	static void GetUsageContext(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void GetContextType(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void UploadData(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void UploadFile(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void BeginChunking(const v8::FunctionCallbackInfo<v8::Value>& args);
@@ -179,6 +179,7 @@ private:
 	static void Ping(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void GetAuthToken(const v8::FunctionCallbackInfo<v8::Value>& args);
 	static void CreateUpload(const v8::FunctionCallbackInfo<v8::Value>& args);
+	static void PrepareBuild(const v8::FunctionCallbackInfo<v8::Value>& args);
 
 public:
 	CLibAMCFConnection();

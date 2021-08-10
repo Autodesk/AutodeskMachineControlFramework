@@ -129,12 +129,12 @@ LibAMCFResult CCall_libamcf_datastream_getuuid(LibAMCFHandle libraryHandle, LibA
 }
 
 
-LibAMCFResult CCall_libamcf_datastream_getcontextuuid(LibAMCFHandle libraryHandle, LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nContextUUIDBufferSize, LibAMCF_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer)
+LibAMCFResult CCall_libamcf_datastream_getcontext(LibAMCFHandle libraryHandle, LibAMCF_DataStream pDataStream, eLibAMCFStreamContextType * pContextType, const LibAMCF_uint32 nOwnerUUIDBufferSize, LibAMCF_uint32* pOwnerUUIDNeededChars, char * pOwnerUUIDBuffer)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_DataStream_GetContextUUID (pDataStream, nContextUUIDBufferSize, pContextUUIDNeededChars, pContextUUIDBuffer);
+	return wrapperTable->m_DataStream_GetContext (pDataStream, pContextType, nOwnerUUIDBufferSize, pOwnerUUIDNeededChars, pOwnerUUIDBuffer);
 }
 
 
@@ -201,30 +201,30 @@ LibAMCFResult CCall_libamcf_streamupload_getmimetype(LibAMCFHandle libraryHandle
 }
 
 
-LibAMCFResult CCall_libamcf_streamupload_getusagecontext(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer)
+LibAMCFResult CCall_libamcf_streamupload_getcontexttype(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, eLibAMCFStreamContextType * pContextType)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_StreamUpload_GetUsageContext (pStreamUpload, nUsageContextBufferSize, pUsageContextNeededChars, pUsageContextBuffer);
+	return wrapperTable->m_StreamUpload_GetContextType (pStreamUpload, pContextType);
 }
 
 
-LibAMCFResult CCall_libamcf_streamupload_uploaddata(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess)
+LibAMCFResult CCall_libamcf_streamupload_uploaddata(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_StreamUpload_UploadData (pStreamUpload, nDataBufferSize, pDataBuffer, nChunkSize, pSuccess);
+	return wrapperTable->m_StreamUpload_UploadData (pStreamUpload, nDataBufferSize, pDataBuffer, nChunkSize, nThreadCount, pSuccess);
 }
 
 
-LibAMCFResult CCall_libamcf_streamupload_uploadfile(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess)
+LibAMCFResult CCall_libamcf_streamupload_uploadfile(LibAMCFHandle libraryHandle, LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_StreamUpload_UploadFile (pStreamUpload, pFileName, nChunkSize, pSuccess);
+	return wrapperTable->m_StreamUpload_UploadFile (pStreamUpload, pFileName, nChunkSize, nThreadCount, pSuccess);
 }
 
 
@@ -354,12 +354,21 @@ LibAMCFResult CCall_libamcf_connection_getauthtoken(LibAMCFHandle libraryHandle,
 }
 
 
-LibAMCFResult CCall_libamcf_connection_createupload(LibAMCFHandle libraryHandle, LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, const char * pUsageContext, LibAMCF_StreamUpload * pInstance)
+LibAMCFResult CCall_libamcf_connection_createupload(LibAMCFHandle libraryHandle, LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, eLibAMCFStreamContextType eContextType, LibAMCF_StreamUpload * pInstance)
 {
 	if (libraryHandle == 0) 
 		return LIBAMCF_ERROR_INVALIDCAST;
 	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
-	return wrapperTable->m_Connection_CreateUpload (pConnection, pName, pMimeType, pUsageContext, pInstance);
+	return wrapperTable->m_Connection_CreateUpload (pConnection, pName, pMimeType, eContextType, pInstance);
+}
+
+
+LibAMCFResult CCall_libamcf_connection_preparebuild(LibAMCFHandle libraryHandle, LibAMCF_Connection pConnection, LibAMCF_DataStream pDataStream, LibAMCF_OperationResult * pSuccess)
+{
+	if (libraryHandle == 0) 
+		return LIBAMCF_ERROR_INVALIDCAST;
+	sLibAMCFDynamicWrapperTable * wrapperTable = (sLibAMCFDynamicWrapperTable *) libraryHandle;
+	return wrapperTable->m_Connection_PrepareBuild (pConnection, pDataStream, pSuccess);
 }
 
 
@@ -436,6 +445,15 @@ import (
 
 type ref = C.LibAMCFHandle
 
+
+// StreamContextType represents a LibAMCF enum.
+type StreamContextType int
+
+const (
+	StreamContextType_Unknown = 0
+	StreamContextType_NewBuildJob = 1
+)
+
 // Error constants for LibAMCF.
 const LIBAMCF_ERROR_NOTIMPLEMENTED = 1;
 const LIBAMCF_ERROR_INVALIDPARAM = 2;
@@ -474,6 +492,7 @@ const LIBAMCF_ERROR_CHECKSUMOFBLOCKMISSING = 34;
 const LIBAMCF_ERROR_OPERATIONERROR = 35;
 const LIBAMCF_ERROR_OPERATIONTIMEOUT = 36;
 const LIBAMCF_ERROR_UPLOADDIDNOTFINISH = 37;
+const LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE = 38;
 
 // WrappedError is an error that wraps a LibAMCF error.
 type WrappedError struct {
@@ -561,6 +580,8 @@ func errorMessage(errorcode uint32) string {
 		return "Operation Timeout.";
 	case LIBAMCF_ERROR_UPLOADDIDNOTFINISH:
 		return "Upload did not finish.";
+	case LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE:
+		return "Invalid stream context type.";
 	default:
 		return "unknown";
 	}
@@ -698,21 +719,22 @@ func (inst DataStream) GetUUID() (string, error) {
 	return string(bufferuUID[:(filledinuUID-1)]), nil
 }
 
-// GetContextUUID returns the stream's context UUID.
-func (inst DataStream) GetContextUUID() (string, error) {
-	var neededforcontextUUID C.uint32_t
-	var filledincontextUUID C.uint32_t
-	returnValue := C.CCall_libamcf_datastream_getcontextuuid(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededforcontextUUID, nil)
+// GetContext returns the stream's context type and owner UUID.
+func (inst DataStream) GetContext() (StreamContextType, string, error) {
+	var contextType C.eLibAMCFStreamContextType
+	var neededforownerUUID C.uint32_t
+	var filledinownerUUID C.uint32_t
+	returnValue := C.CCall_libamcf_datastream_getcontext(inst.wrapperRef.LibraryHandle, inst.Ref, &contextType, 0, &neededforownerUUID, nil)
 	if returnValue != 0 {
-		return "", makeError(uint32(returnValue))
+		return 0, "", makeError(uint32(returnValue))
 	}
-	bufferSizecontextUUID := neededforcontextUUID
-	buffercontextUUID := make([]byte, bufferSizecontextUUID)
-	returnValue = C.CCall_libamcf_datastream_getcontextuuid(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizecontextUUID, &filledincontextUUID, (*C.char)(unsafe.Pointer(&buffercontextUUID[0])))
+	bufferSizeownerUUID := neededforownerUUID
+	bufferownerUUID := make([]byte, bufferSizeownerUUID)
+	returnValue = C.CCall_libamcf_datastream_getcontext(inst.wrapperRef.LibraryHandle, inst.Ref, &contextType, bufferSizeownerUUID, &filledinownerUUID, (*C.char)(unsafe.Pointer(&bufferownerUUID[0])))
 	if returnValue != 0 {
-		return "", makeError(uint32(returnValue))
+		return 0, "", makeError(uint32(returnValue))
 	}
-	return string(buffercontextUUID[:(filledincontextUUID-1)]), nil
+	return StreamContextType(contextType), string(bufferownerUUID[:(filledinownerUUID-1)]), nil
 }
 
 // GetName returns the stream name.
@@ -837,27 +859,20 @@ func (inst StreamUpload) GetMimeType() (string, error) {
 	return string(buffermimeType[:(filledinmimeType-1)]), nil
 }
 
-// GetUsageContext returns the usage context of the stream upload.
-func (inst StreamUpload) GetUsageContext() (string, error) {
-	var neededforusageContext C.uint32_t
-	var filledinusageContext C.uint32_t
-	returnValue := C.CCall_libamcf_streamupload_getusagecontext(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededforusageContext, nil)
+// GetContextType returns the usage context of the stream upload.
+func (inst StreamUpload) GetContextType() (StreamContextType, error) {
+	var contextType C.eLibAMCFStreamContextType
+	returnValue := C.CCall_libamcf_streamupload_getcontexttype(inst.wrapperRef.LibraryHandle, inst.Ref, &contextType)
 	if returnValue != 0 {
-		return "", makeError(uint32(returnValue))
+		return 0, makeError(uint32(returnValue))
 	}
-	bufferSizeusageContext := neededforusageContext
-	bufferusageContext := make([]byte, bufferSizeusageContext)
-	returnValue = C.CCall_libamcf_streamupload_getusagecontext(inst.wrapperRef.LibraryHandle, inst.Ref, bufferSizeusageContext, &filledinusageContext, (*C.char)(unsafe.Pointer(&bufferusageContext[0])))
-	if returnValue != 0 {
-		return "", makeError(uint32(returnValue))
-	}
-	return string(bufferusageContext[:(filledinusageContext-1)]), nil
+	return StreamContextType(contextType), nil
 }
 
 // UploadData uploads the passed data to the server. MUST only be called once.
-func (inst StreamUpload) UploadData(data []uint8, chunkSize uint32) (OperationResult, error) {
+func (inst StreamUpload) UploadData(data []uint8, chunkSize uint32, threadCount uint32) (OperationResult, error) {
 	var success ref
-	returnValue := C.CCall_libamcf_streamupload_uploaddata(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(len(data)), (*C.uint8_t)(unsafe.Pointer(&data[0])), C.uint32_t(chunkSize), &success)
+	returnValue := C.CCall_libamcf_streamupload_uploaddata(inst.wrapperRef.LibraryHandle, inst.Ref, C.uint64_t(len(data)), (*C.uint8_t)(unsafe.Pointer(&data[0])), C.uint32_t(chunkSize), C.uint32_t(threadCount), &success)
 	if returnValue != 0 {
 		return OperationResult{}, makeError(uint32(returnValue))
 	}
@@ -865,9 +880,9 @@ func (inst StreamUpload) UploadData(data []uint8, chunkSize uint32) (OperationRe
 }
 
 // UploadFile uploads a file to the server. MUST only be called once.
-func (inst StreamUpload) UploadFile(fileName string, chunkSize uint32) (OperationResult, error) {
+func (inst StreamUpload) UploadFile(fileName string, chunkSize uint32, threadCount uint32) (OperationResult, error) {
 	var success ref
-	returnValue := C.CCall_libamcf_streamupload_uploadfile(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(fileName), C.uint32_t(chunkSize), &success)
+	returnValue := C.CCall_libamcf_streamupload_uploadfile(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(fileName), C.uint32_t(chunkSize), C.uint32_t(threadCount), &success)
 	if returnValue != 0 {
 		return OperationResult{}, makeError(uint32(returnValue))
 	}
@@ -1041,13 +1056,23 @@ func (inst Connection) GetAuthToken() (string, error) {
 }
 
 // CreateUpload creates a file upload instance. Must be authenticated to make it work.
-func (inst Connection) CreateUpload(name string, mimeType string, usageContext string) (StreamUpload, error) {
+func (inst Connection) CreateUpload(name string, mimeType string, contextType StreamContextType) (StreamUpload, error) {
 	var instance ref
-	returnValue := C.CCall_libamcf_connection_createupload(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(name), C.CString(mimeType), C.CString(usageContext), &instance)
+	returnValue := C.CCall_libamcf_connection_createupload(inst.wrapperRef.LibraryHandle, inst.Ref, C.CString(name), C.CString(mimeType), C.eLibAMCFStreamContextType(contextType), &instance)
 	if returnValue != 0 {
 		return StreamUpload{}, makeError(uint32(returnValue))
 	}
 	return inst.wrapperRef.NewStreamUpload(instance), nil
+}
+
+// PrepareBuild prepares a build from an uploaded data stream. Must be authenticated to make it work.
+func (inst Connection) PrepareBuild(dataStream DataStream) (OperationResult, error) {
+	var success ref
+	returnValue := C.CCall_libamcf_connection_preparebuild(inst.wrapperRef.LibraryHandle, inst.Ref, dataStream.Ref, &success)
+	if returnValue != 0 {
+		return OperationResult{}, makeError(uint32(returnValue))
+	}
+	return inst.wrapperRef.NewOperationResult(success), nil
 }
 
 
