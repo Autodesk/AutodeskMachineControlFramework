@@ -34,10 +34,14 @@
 				log ("Connection Timeout: " + Connection.GetTimeout ());
 				log ("Connection Retry Count: " + Connection.GetRetryCount ());
 				
-				var OperationResult = Connection.Ping ();
-				OperationResult.release ();
+				var AuthenticationResult = Connection.AuthenticateWithPassword ("test", "test");
+				AuthenticationResult.release ();
+				
+				
+				//var OperationResult = Connection.Ping ();
+				//OperationResult.release ();
 							
-				Connection.release ();
+				//Connection.release ();
 			}
 		
 		</script> 
