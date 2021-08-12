@@ -377,6 +377,13 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_COULDNOTFINDEVENTSENDER 350
 #define LIBMC_ERROR_DUPLICATEFORMNAME 351
 #define LIBMC_ERROR_EVENTNOTFOUND 352
+#define LIBMC_ERROR_MISSINGCOLORNAME 353
+#define LIBMC_ERROR_MISSINGCOLORREDCHANNEL 354
+#define LIBMC_ERROR_MISSINGCOLORGREENCHANNEL 355
+#define LIBMC_ERROR_MISSINGCOLORBLUECHANNEL 356
+#define LIBMC_ERROR_INVALIDCOLORREDCHANNEL 357
+#define LIBMC_ERROR_INVALIDCOLORGREENCHANNEL 358
+#define LIBMC_ERROR_INVALIDCOLORBLUECHANNEL 359
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -666,6 +673,13 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_COULDNOTFINDEVENTSENDER: return "Could not find event sender";
     case LIBMC_ERROR_DUPLICATEFORMNAME: return "Duplicate form name";
     case LIBMC_ERROR_EVENTNOTFOUND: return "Event not found";
+    case LIBMC_ERROR_MISSINGCOLORNAME: return "Missing color name";
+    case LIBMC_ERROR_MISSINGCOLORREDCHANNEL: return "Missing red color channel";
+    case LIBMC_ERROR_MISSINGCOLORGREENCHANNEL: return "Missing green color channel";
+    case LIBMC_ERROR_MISSINGCOLORBLUECHANNEL: return "Missing blue color channel";
+    case LIBMC_ERROR_INVALIDCOLORREDCHANNEL: return "Invalid red color channel";
+    case LIBMC_ERROR_INVALIDCOLORGREENCHANNEL: return "Invalid green color channel";
+    case LIBMC_ERROR_INVALIDCOLORBLUECHANNEL: return "Invalid blue color channel";
     default: return "unknown error";
   }
 }

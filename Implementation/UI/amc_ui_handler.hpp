@@ -78,6 +78,7 @@ namespace AMC {
 	protected:
 
 		std::mutex m_Mutex;
+		std::map<std::string, uint32_t> m_Colors;
 
 		std::string m_sAppName;
 		std::string m_sCopyrightString;

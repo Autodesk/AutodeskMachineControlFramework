@@ -114,7 +114,8 @@
 			}
 			
 			this.Application = new AMCApplication (baseURL);
-			this.Application.retrieveConfiguration();
+			this.Application.retrieveConfiguration(this.$vuetify.theme.themes);
+						
 		},
 		
 
