@@ -2,29 +2,9 @@
 <machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02">
 
   <services threadcount="32" />
-
-
-  <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
   
     <statemachine name="demo" description="Demo System" initstate="init" failedstate="fatalerror" library="plugin_demo">
-  	 	  		  
-  	  <parametergroup name="jobinfo" description="Job Information">
-  		<parameter name="jobname" description="Job Name" default="Job Name" type="string" />
-  		<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string" />
-  		<parameter name="layercount" description="Layer Count" default="0" type="int" />
-  		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
-  		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
-  		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
-  	  </parametergroup>
-
-	  
-  	  <signaldefinition name="signal_startjob">
-  		<parameter name="jobuuid" type="string" />
-   		<parameter name="jobname" type="string" />
-  		<result name="success" type="bool" />		
-  	  </signaldefinition>	 	  	  	     
-    
-
+  	 	  		  	      
   	  <state name="init" repeatdelay="100">
   			<outstate target="idle" />
   	  </state>
@@ -32,28 +12,8 @@
   
   	  <state name="idle" repeatdelay="50">
   			<outstate target="idle" />
-  			<outstate target="startprocess" />
   	  </state>
-  
-  	  <state name="startprocess" repeatdelay="100">	  
-  			<outstate target="drawlayer" />
-  	  </state>
-  	  
-  	  <state name="drawlayer" repeatdelay="100">
-  			<outstate target="nextlayer" />
-  	  </state>
-  	  
-  
-  	  <state name="nextlayer" repeatdelay="2000">
-  			<outstate target="drawlayer" />
-  			<outstate target="finishprocess" />
-  	  </state>
-  
-  
-  	  <state name="finishprocess" repeatdelay="100">	  
-  			<outstate target="idle" />
-  	  </state>
-  		
+    		
   	  <state name="fatalerror" repeatdelay="5000">	  
   			<outstate target="init" />
   			<outstate target="fatalerror" />
@@ -62,7 +22,7 @@
   	  
     </statemachine>
   
-  	<userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main" library="plugin_userinterface">
+  	<userinterface appname="3MF Example Toolpath Viewer" copyright="2020 Autodesk Inc." mainpage="main" library="plugin_userinterface">
   
 		<logo resource="ui_logo" aspectratio="2.5" />
 
@@ -75,33 +35,10 @@
 		
 		<page name="main">
 
-			<content name="infobox" title="Welcome to AMdroid" headline="Autodesk Machine Control Framework" subtitle="Make Additive Manufacturing accessible">
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_logo" aspectratio="4.5" />
-				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
+			<content name="infobox" title="3MF Toolpath Extension Viewer">
 				
 				<upload class="build" caption="Select 3MF files to upload" successpage="buildinfo" />
-				
-			
-				<buttongroup>
-					<button caption="Build Library" targetpage="buildlist" />
-					<button caption="System Status" targetpage="systemstatus" />
-				</buttongroup>
-				
-			</content>		
-
-		</page>
-
-		<page name="buildlist">
-		
-			<content name="buildlibrary" title="Build Library" subtitle="Make Additive Manufacturing accessible">
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
-				
-				<upload class="build" caption="Drag 3MF files here to upload" successpage="buildinfo" />
-				
-				<buildlist loadingtext="Loading builds" entriesperpage="20" detailpage="buildinfo" />
-				
+										
 			</content>		
 
 		</page>
@@ -111,75 +48,21 @@
 		
 			<content name="buildinformation" title="Build Information" subtitle="Detailed information">
 				<paragraph text="Here you find more information about your build." />
-
-				<buttongroup>
-					<button caption="Start Build" event="startbuild" targetpage="systemstatus" />
-				</buttongroup>
-				
 				
 				<layerview>				
-				</layerview>
-
-	
+				</layerview>	
 				
 			</content>		
 
 		</page>
 
-		<page name="systemstatus">
-			<content name="currentbuild" title="Current System Status" >
-			
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
-				<paragraph text="This is the current machine state." />						
-				
-				<parameterlist loadingtext="Loading parameters">
-					<entry statemachine="demo" group="jobinfo" />
-				</parameterlist>	
-			</content>					
-			
-		</page>
-
-		<page name="manualcontrol">
-
-		</page>
-
-
-		<page name="settings">
-		
-			<content name="machinesettings" title="Machine Settings" >
-
-				<form name="form1">
-					<edit caption="Machine name" text="" />
-					<switch caption="Switch 1" value="1" />
-					<switch caption="Switch 2" value="0" />
-					<switch caption="Switch 3" value="0" />
-					<memo caption="Machine description" text="" />
-					<combobox caption="Combobox" value="0" />
-				</form>
-				
-				<buttongroup>
-					<button caption="Save" />
-					<button caption="Cancel" />
-				</buttongroup>
-						
-			</content>					
-
-		</page>
-
 		<menu>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="build" icon="mdi-factory" caption="Build Library" targetpage="buildlist"/>
-			<item id="systemstatus" icon="mdi-apps" caption="System Status" targetpage="systemstatus"/>
-			<item id="settings" icon="mdi-settings" caption="Manual Control" targetpage="manualcontrol"/>
-			<item id="settings" icon="mdi-settings" caption="Settings" targetpage="settings"/>
-
 		</menu>
 
 		<toolbar>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
-
+			
 		</toolbar>
 
 
