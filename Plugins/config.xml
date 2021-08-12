@@ -65,6 +65,13 @@
   	<userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main" library="plugin_userinterface">
   
 		<logo resource="ui_logo" aspectratio="2.5" />
+
+      <colors>
+        <color name="primary" red="0.024" green="0.588" blue="0.843" />
+        <color name="secondary" red="0.529" green="0.737" blue="0.251" />
+        <color name="accent" red="0.400" green="0.400" blue="0.400" />
+        <color name="error" red="0.867" green="0.133" blue="0.133" />
+      </colors>
 		
 		<page name="main">
 
