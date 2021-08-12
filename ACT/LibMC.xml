@@ -362,6 +362,14 @@
 		<error name="DUPLICATEFORMNAME" code="351" description="Duplicate form name" />
 		<error name="EVENTNOTFOUND" code="352" description="Event not found" />
 		
+		<error name="MISSINGCOLORNAME" code="353" description="Missing color name" />
+		<error name="MISSINGCOLORREDCHANNEL" code="354" description="Missing red color channel" />
+		<error name="MISSINGCOLORGREENCHANNEL" code="355" description="Missing green color channel" />
+		<error name="MISSINGCOLORBLUECHANNEL" code="356" description="Missing blue color channel" />
+		<error name="INVALIDCOLORREDCHANNEL" code="357" description="Invalid red color channel" />
+		<error name="INVALIDCOLORGREENCHANNEL" code="358" description="Invalid green color channel" />
+		<error name="INVALIDCOLORBLUECHANNEL" code="359" description="Invalid blue color channel" />
+		
 		
 			
 	</errors>

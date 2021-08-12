@@ -29,7 +29,8 @@ export default class AMCApplication {
             TextCopyRight: "",
             MainPage: "",
 			LogoUUID: "",
-			LogoAspectRatio: 1.0
+			LogoAspectRatio: 1.0,
+			Colors: {}
         }
 		
 		this.AppContent = {
@@ -107,7 +108,7 @@ export default class AMCApplication {
 	}		
 
 				
-	retrieveConfiguration () 
+	retrieveConfiguration (vuetifythemes) 
 	{
 		this.axiosGetRequest ("/ui/config")
 			.then(resultJSON => {
@@ -116,9 +117,26 @@ export default class AMCApplication {
 				this.AppDefinition.MainPage = resultJSON.data.mainpage;
 				this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
 				this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;			
+				if (resultJSON.data.colors) {
+					this.AppDefinition.Colors = resultJSON.data.colors;
+				} else {
+					this.AppDefinition.Colors = {};
+				}
 				this.setStatus ("login");
-					
+									
 				document.title = this.AppDefinition.TextApplicationName;
+				
+				if (vuetifythemes) {
+					if (this.AppDefinition.Colors.primary)
+						vuetifythemes.light.primary = this.AppDefinition.Colors.primary;
+					if (this.AppDefinition.Colors.secondary)
+						vuetifythemes.light.secondary = this.AppDefinition.Colors.secondary;
+					if (this.AppDefinition.Colors.accent)
+						vuetifythemes.light.accent = this.AppDefinition.Colors.accent;
+					if (this.AppDefinition.Colors.error)
+						vuetifythemes.light.error = this.AppDefinition.Colors.error;
+				}
+				
 				
 				this.changePage (this.AppDefinition.MainPage);
 			})
