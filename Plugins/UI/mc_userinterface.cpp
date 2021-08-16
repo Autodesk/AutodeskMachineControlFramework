@@ -62,7 +62,6 @@ public:
 		auto sJobUUID = pUIEnvironment->GetEventContext();
 		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startjob");
 		pSignal->SetString("jobuuid", sJobUUID);
-		pSignal->SetString("jobname", "testjob");
 		pSignal->Trigger();
 
 		if (!pSignal->WaitForHandling(2000))
