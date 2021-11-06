@@ -150,12 +150,12 @@
 			<content name="machinesettings" title="Machine Settings" >
 
 				<form name="form1">
-					<edit caption="Machine name" text="" />
-					<switch caption="Switch 1" value="1" />
-					<switch caption="Switch 2" value="0" />
-					<switch caption="Switch 3" value="0" />
-					<memo caption="Machine description" text="" />
-					<combobox caption="Combobox" value="0" />
+					<edit name="machinename" caption="Machine name" text="" />
+					<switch name="switch1" caption="Switch 1" value="1" />
+					<switch name="switch2" caption="Switch 2" value="0" />
+					<switch name="switch3" caption="Switch 3" value="0" />
+					<memo name="description" caption="Machine description" text="" />
+					<combobox name="dropdown" caption="Combobox" value="0" />
 				</form>
 				
 				<buttongroup>
