@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@babylonjs/core": "^4.2.0",
+    "@babylonjs/loaders": "^4.2.0",
     "@mdi/font": "^3.6.95",
     "asmcrypto-lite": "^1.1.0",
     "axios": "^0.24.0",
