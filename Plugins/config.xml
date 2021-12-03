@@ -141,7 +141,37 @@
 		</page>
 
 		<page name="manualcontrol">
-
+			<grid name="maingrid">
+				<column width="1" unit="free" />
+				<column width="1" unit="free" />
+				<column width="1" unit="free" />
+				
+				<row height="1" unit="free" />
+				<row height="1" unit="free" />
+				<row height="200" unit="px" />				
+				
+				<content name="manualcontrol1" title="" columnstart="1" rowstart="1" columnend="3" rowend="2">
+					
+					<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
+					<paragraph text="This is the current machine state." />						
+				
+				</content>
+				
+				<content name="manualcontrol2" title="" columnstart="1" rowstart="3" columnend="1" rowend="3">
+					
+					<paragraph text="BLABLABLABLA." />	
+					<parameterlist loadingtext="Loading parameters">
+						<entry statemachine="demo" group="jobinfo" />
+					</parameterlist>						
+				
+				</content>
+				
+				<content name="manualcontrol3" title="" columnstart="2" rowstart="3" columnend="3" rowend="3">
+					
+					<paragraph text="BLABLABLABLAX." />						
+				
+				</content>
+			</grid>
 		</page>
 
 
