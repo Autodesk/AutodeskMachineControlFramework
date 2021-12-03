@@ -28,41 +28,73 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#define __AMCIMPL_UI_MODULE
+#define __AMCIMPL_API_CONSTANTS
 
-#ifndef __AMC_UI_MODULEFACTORY
-#define __AMC_UI_MODULEFACTORY
+#include "amc_ui_module.hpp"
+#include "amc_ui_modulefactory.hpp"
 
-#include "header_protection.hpp"
+#include "amc_ui_module_glscene.hpp"
 
-#ifndef __AMCIMPL_UI_MODULE
-#error this header is protected and should only be included in the corresponding implementation CPP files.
-#endif
+#include "amc_api_constants.hpp"
+#include "amc_resourcepackage.hpp"
 
-#include "Libraries/PugiXML/pugixml.hpp"
-#include "amc_ui_interfaces.hpp"
+#include "libmc_exceptiontypes.hpp"
 
-
-namespace AMC {
-
-	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
-	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+using namespace AMC;
 
 
-	class CUIModuleFactory {
-	protected:
-		
-	public:
-	
-		static PUIModule createModule (pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 
-		static bool moduleTypeIsRegistered (const std::string & sType);
-										
-	};
+CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
+: CUIModule (getNameFromXML(xmlNode))
+{
 
-	
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
+	if (getTypeFromXML(xmlNode) != getStaticType())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
+
 }
 
 
-#endif //__AMC_UI_MODULEFACTORY
+CUIModule_GLScene::~CUIModule_GLScene()
+{
+}
 
+
+
+std::string CUIModule_GLScene::getStaticType()
+{
+	return "glscene";
+}
+
+std::string CUIModule_GLScene::getType()
+{
+	return getStaticType();
+}
+
+std::string CUIModule_GLScene::getCaption()
+{
+	return m_sCaption;
+}
+
+
+void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
+{
+	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
+	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
+	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
+
+}
+
+PUIModuleItem CUIModule_GLScene::findItem(const std::string& sUUID)
+{
+	return nullptr;
+}
+
+void CUIModule_GLScene::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
+{
+}
+
+void CUIModule_GLScene::configurePostLoading()
+{
+}

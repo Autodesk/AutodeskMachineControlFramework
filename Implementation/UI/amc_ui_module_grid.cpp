@@ -143,7 +143,7 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 				throw ELibMCCustomException(LIBMC_ERROR_MISSINGCOLUMNUNIT, m_sName);
 			std::string sUnit = unitAttrib.as_string();
 
-			m_Columns.push_back(std::make_shared<CUIModule_GridColumn> (columnWidth, sUnit));
+			m_Columns.push_back(std::make_shared<CUIModule_GridColumn> ((float) columnWidth, sUnit));
 		}
 
 		if (sChildName == "row") {
@@ -160,7 +160,7 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 				throw ELibMCCustomException(LIBMC_ERROR_MISSINGROWHEIGHT, m_sName);
 			std::string sUnit = unitAttrib.as_string();
 
-			m_Rows.push_back(std::make_shared<CUIModule_GridRow>(rowHeight, sUnit));
+			m_Rows.push_back(std::make_shared<CUIModule_GridRow>((float) rowHeight, sUnit));
 		}
 
 	}
@@ -168,7 +168,7 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 	for (auto childNode : children) {
 
 		std::string sChildName = childNode.name();
-		if (sChildName == "content") {
+		if (CUIModuleFactory::moduleTypeIsRegistered (sChildName)) {
 
 			auto columnStartAttrib = childNode.attribute("columnstart");
 			if (columnStartAttrib.empty())

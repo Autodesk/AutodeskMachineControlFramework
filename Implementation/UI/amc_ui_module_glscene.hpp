@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULEFACTORY
-#define __AMC_UI_MODULEFACTORY
+#ifndef __AMC_UI_MODULE_GLSCENE
+#define __AMC_UI_MODULE_GLSCENE
 
 #include "header_protection.hpp"
 
@@ -39,30 +39,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
-#include "amc_ui_interfaces.hpp"
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
-	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+	amcDeclareDependingClass(CUIModule_GLScene, PUIModule_GLScene);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
-
-	class CUIModuleFactory {
-	protected:
-		
-	public:
 	
-		static PUIModule createModule (pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 
-		static bool moduleTypeIsRegistered (const std::string & sType);
-										
+	class CUIModule_GLScene : public CUIModule {
+	protected:		
+
+		std::string m_sCaption;
+
+	public:
+
+		CUIModule_GLScene(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+		
+		virtual ~CUIModule_GLScene();
+
+		virtual std::string getType() override;
+
+		static std::string getStaticType();
+
+		std::string getCaption () override;
+
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+
+		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
+
+		virtual PUIModuleItem findItem(const std::string& sUUID) override;
+
+		void configurePostLoading() override;
+
 	};
 
 	
 }
 
 
-#endif //__AMC_UI_MODULEFACTORY
+#endif //__AMC_UI_MODULE_GLSCENE
 
