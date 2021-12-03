@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_statesignal.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include "common_utils.hpp"
 
@@ -56,12 +56,12 @@ namespace AMC {
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		if (sSignalName.length() == 0)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSIGNALNAME);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDSIGNALNAME, sInstanceName);
 
 
 		auto iter = m_SignalMap.find(std::make_pair (sInstanceName, sSignalName));
 		if (iter != m_SignalMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATESIGNAL);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATESIGNAL, sInstanceName + "/" + sSignalName);
 
 		auto pSignal = std::make_shared<CStateSignal>(sInstanceName, sSignalName, Parameters, Results);
 		m_SignalMap.insert(std::make_pair(std::make_pair (sInstanceName, sSignalName), pSignal));
@@ -73,7 +73,7 @@ namespace AMC {
 
 		auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
 		if (iter == m_SignalMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sInstanceName + "/" + sSignalName);
 
 
 		if (iter->second->triggerSignalInternal(sParameterData, sSignalUUID)) {
@@ -100,7 +100,7 @@ namespace AMC {
 
 		auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
 		if (iter == m_SignalMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sInstanceName + "/" + sSignalName);
 
 		return iter->second->checkSignalInternal(sCurrentSignalUUID);
 	}
@@ -112,7 +112,7 @@ namespace AMC {
 
 		auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
 		if (iter == m_SignalMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sInstanceName + "/" + sSignalName);
 
 		return iter->second->canTriggerInternal();
 	}
@@ -124,7 +124,7 @@ namespace AMC {
 
 		auto iter = m_SignalUUIDLookupMap.find(sSignalUUID);
 		if (iter == m_SignalUUIDLookupMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sSignalUUID);
 
 		iter->second->markSignalAsHandledInternal(sResultData);
 	}
@@ -135,7 +135,7 @@ namespace AMC {
 
 		auto iter = m_SignalUUIDLookupMap.find(sSignalUUID);
 		if (iter == m_SignalUUIDLookupMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sSignalUUID);
 
 		PStateSignal pSignal = iter->second;
 		bool bHasBeendHandled = pSignal->signalHasBeenHandledInternal(sSignalUUID, clearAllResults, sResultData);
@@ -175,12 +175,11 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
-		if (pParameterGroup == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterGroup);
 
 		auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
 		if (iter == m_SignalMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sInstanceName + "/" + sSignalName);
 
 		iter->second->populateParameterGroup(pParameterGroup);
 	}
@@ -189,12 +188,11 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
-		if (pResultGroup == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pResultGroup);
 
 		auto iter = m_SignalMap.find(std::make_pair(sInstanceName, sSignalName));
 		if (iter == m_SignalMap.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_SIGNALNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_SIGNALNOTFOUND, sInstanceName + "/" + sSignalName);
 
 		iter->second->populateResultGroup(pResultGroup);
 	}

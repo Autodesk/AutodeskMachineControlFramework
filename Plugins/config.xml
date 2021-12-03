@@ -145,6 +145,13 @@
 				mainpage="main" library="plugin_userinterface">
   
 		<logo resource="ui_logo" aspectratio="2.5" />
+
+      <colors>
+        <color name="primary" red="0.024" green="0.588" blue="0.843" />
+        <color name="secondary" red="0.529" green="0.737" blue="0.251" />
+        <color name="accent" red="0.400" green="0.400" blue="0.400" />
+        <color name="error" red="0.867" green="0.133" blue="0.133" />
+      </colors>
 		
 		<page name="main">
 
@@ -228,7 +235,41 @@
 		</page>
 
 		<page name="manualcontrol">
-
+			<grid name="maingrid">
+				<column width="1" unit="free" />
+				<column width="1" unit="free" />
+				<column width="1" unit="free" />
+				
+				<row height="1" unit="free" />
+				<row height="1" unit="free" />
+				<row height="200" unit="px" />				
+				
+				<content name="manualcontrol1" title="" columnstart="2" rowstart="3" columnend="2" rowend="3">
+					
+					<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
+					<paragraph text="This is the current machine state." />						
+				
+				</content>
+				
+				<content name="manualcontrol2" title="" columnstart="1" rowstart="3" columnend="1" rowend="3">
+					
+					<paragraph text="BLABLABLABLA." />	
+					<parameterlist loadingtext="Loading parameters">
+						<entry statemachine="demo" group="jobinfo" />
+					</parameterlist>						
+				
+				</content>
+				
+				<content name="manualcontrol3" title="" columnstart="3" rowstart="3" columnend="3" rowend="3">
+					
+					<paragraph text="BLABLABLABLAX." />						
+				
+				</content>
+				
+				<glscene name="manualcontrol4" title="" columnstart="1" rowstart="1" columnend="3" rowend="2">
+									
+				</glscene>
+			</grid>
 		</page>
 
 
@@ -237,12 +278,12 @@
 			<content name="machinesettings" title="Machine Settings" >
 
 				<form name="form1">
-					<edit caption="Machine name" text="" />
-					<switch caption="Switch 1" value="1" />
-					<switch caption="Switch 2" value="0" />
-					<switch caption="Switch 3" value="0" />
-					<memo caption="Machine description" text="" />
-					<combobox caption="Combobox" value="0" />
+					<edit name="machinename" caption="Machine name" text="" />
+					<switch name="switch1" caption="Switch 1" value="1" />
+					<switch name="switch2" caption="Switch 2" value="0" />
+					<switch name="switch3" caption="Switch 3" value="0" />
+					<memo name="description" caption="Machine description" text="" />
+					<combobox name="dropdown" caption="Combobox" value="0" />
 				</form>
 				
 				<buttongroup>

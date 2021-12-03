@@ -65,6 +65,8 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.%s\" resources=\"%s_driver_scanlaboie.data\" />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.%s\" resources=\"%s_driver_s7net.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_mqtt\" import=\"%s_driver_mqtt.%s\" resources=\"%s_driver_mqtt.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_ximc\" import=\"%s_driver_ximc.%s\" resources=\"%s_driver_ximc.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_bur\" import=\"%s_driver_bur.%s\" resources=\"%s_driver_bur.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "  </build>\n");
 	fmt.Fprintf(pkgfile, "</amcpackage>\n");
 	

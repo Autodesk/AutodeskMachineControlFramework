@@ -33,17 +33,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_page.hpp"
 #include "amc_ui_module.hpp"
-#include "libmc_interfaceexception.hpp"
-
+#include "libmc_exceptiontypes.hpp"
+#include "common_utils.hpp"
+#include "amc_ui_module_contentitem_form.hpp"
 
 using namespace AMC;
 
 
-CUIPage::CUIPage(const std::string& sName)
-	:  m_sName(sName)
+CUIPage::CUIPage(const std::string& sName, CUIModule_UIEventHandler* pUIEventHandler)
+	:  m_sName(sName), m_pUIEventHandler (pUIEventHandler)
 {
 	if (sName.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pUIEventHandler);
 
 
 }
@@ -74,6 +76,15 @@ void CUIPage::addModule(PUIModule pModule)
 	m_Modules.push_back(pModule);
 	m_ModuleMap.insert(std::make_pair (sName, pModule));
 
+	pModule->populateItemMap(m_ItemMapOfPage);
+	
+
+}
+
+void CUIPage::configurePostLoading()
+{
+	for (auto pModule : m_Modules)
+		pModule->configurePostLoading();
 }
 
 
@@ -109,14 +120,39 @@ void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleAr
 	}
 }
 
-PUIModuleItem CUIPage::findModuleItem(const std::string& sUUID)
+PUIModuleItem CUIPage::findModuleItemByUUID(const std::string& sUUID)
 {
-	for (auto module : m_Modules) {
-		auto pItem = module->findItem(sUUID);
-		if (pItem.get() != nullptr)
-			return pItem;
-	}
+	auto iIter = m_ItemMapOfPage.find (sUUID);
+	if (iIter != m_ItemMapOfPage.end())
+		return iIter->second;
 
 	return nullptr;
 
 }
+
+void CUIPage::registerFormName(const std::string& sFormUUID, const std::string& sFormName)
+{
+	auto sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sFormUUID);
+
+	auto iIter = m_FormNameMap.find(sFormName);
+	if (iIter != m_FormNameMap.end())
+		throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEFORMNAME, sFormName);
+
+	m_FormNameMap.insert(std::make_pair(sFormName, sNormalizedUUID));
+
+}
+
+std::string CUIPage::findFormUUIDByName(const std::string& sFormName)
+{
+	auto iIter = m_FormNameMap.find(sFormName);
+	if (iIter != m_FormNameMap.end()) {
+		return iIter->second;
+	}
+	return "";
+}
+
+void CUIPage::ensureUIEventExists(const std::string& sEventName)
+{
+	m_pUIEventHandler->ensureUIEventExists(sEventName);
+}
+

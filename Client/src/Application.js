@@ -13,7 +13,8 @@ export default class AMCApplication {
 	{
 		this.API = {
 			baseURL : apiBaseURL,
-			authToken: nullToken			
+			authToken: nullToken,
+			unsuccessfulUpdateCounter: 0
 		}
 
 		this.AppState = {
@@ -28,14 +29,16 @@ export default class AMCApplication {
             TextCopyRight: "",
             MainPage: "",
 			LogoUUID: "",
-			LogoAspectRatio: 1.0
+			LogoAspectRatio: 1.0,
+			Colors: {}
         }
 		
 		this.AppContent = {
             MenuItems: [],
             ToolbarItems: [],
 			ContentItems: [],					
-			Pages: []
+			Pages: [],
+			FormEntities: []
 		}
 
 		
@@ -105,7 +108,7 @@ export default class AMCApplication {
 	}		
 
 				
-	retrieveConfiguration () 
+	retrieveConfiguration (vuetifythemes) 
 	{
 		this.axiosGetRequest ("/ui/config")
 			.then(resultJSON => {
@@ -114,16 +117,40 @@ export default class AMCApplication {
 				this.AppDefinition.MainPage = resultJSON.data.mainpage;
 				this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
 				this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;			
+				if (resultJSON.data.colors) {
+					this.AppDefinition.Colors = resultJSON.data.colors;
+				} else {
+					this.AppDefinition.Colors = {};
+				}
 				this.setStatus ("login");
-					
+									
 				document.title = this.AppDefinition.TextApplicationName;
+				
+				if (vuetifythemes) {
+					if (this.AppDefinition.Colors.primary)
+						vuetifythemes.light.primary = this.AppDefinition.Colors.primary;
+					if (this.AppDefinition.Colors.secondary)
+						vuetifythemes.light.secondary = this.AppDefinition.Colors.secondary;
+					if (this.AppDefinition.Colors.accent)
+						vuetifythemes.light.accent = this.AppDefinition.Colors.accent;
+					if (this.AppDefinition.Colors.error)
+						vuetifythemes.light.error = this.AppDefinition.Colors.error;
+				}
+				
 				
 				this.changePage (this.AppDefinition.MainPage);
 			})
 			.catch(err => {
 				this.setStatusToError (err.response.data.message);
 			});
-	}				
+	}			
+
+
+	performLogout ()
+	{
+		this.authToken = nullToken;		
+		this.unsuccessfulUpdateCounter = 0;
+	}
 	
 	requestLogin (userName, userPassword) 
 	{
@@ -169,6 +196,160 @@ export default class AMCApplication {
 	}
 	
 	
+	prepareModuleItem (item) 
+	{
+		if (item.type === "parameterlist") {
+		
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			item.entries = this.AppContent.ContentItems[item.uuid].entries;
+			
+		}
+
+		if (item.type === "buildlist") {
+		
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			item.entries = this.AppContent.ContentItems[item.uuid].entries;
+			
+		}
+		
+		if (item.type === "upload") {
+			item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
+		
+		}
+		
+		if (item.type === "form") {
+			
+			for (var entity of item.entities) {
+				
+				this.AppContent.FormEntities[entity.uuid] = 
+					{ uuid: entity.uuid, 
+					  value: entity.defaultvalue, 
+					  remotevalue: entity.defaultvalue, 
+					  disabled: entity.disabled, 
+					  readonly: entity.readonly
+					  };
+				entity.dataObject = this.AppContent.FormEntities[entity.uuid];
+			}
+			
+		
+			
+		}
+		
+	}
+	
+
+	prepareModule (module) 
+	{
+		var item, tab, section;
+		
+		if (module.type === "content") {
+			for (item of module.items) {
+				this.prepareModuleItem (item)
+			}
+			
+		}
+
+		if (module.type === "tabs") {
+			for (tab of module.tabs) {
+				this.prepareModule (tab)
+			}			
+		}
+
+		if (module.type === "grid") {
+						
+			module.cssstyle = "display: grid; width:100%; height:100%;";
+			
+			var columnString = "";
+			var rowString = "";
+			var areaString = "";
+			
+			if (module.columns) {
+				if (module.rows) {
+					var columnCount = module.columns.length;
+					var rowCount = module.rows.length;
+			
+					var row, column;
+					var gridMap = new Array(rowCount);
+					for (row = 0; row < rowCount; row++) {
+						gridMap[row] = new Array(columnCount);
+						
+						for (column = 0; column < columnCount; column++) {
+							var templatename = "_grid_" + module.name + "_" + column + "_" + row;
+							gridMap[row][column] = templatename;							
+						}
+					} 
+					
+					for (section of module.sections) {
+						
+						var columnstart = section.columnstart;
+						var columnend = section.columnend;
+						var rowstart = section.rowstart;
+						var rowend = section.rowend;						
+												
+						if ((columnstart <= columnend) && (rowstart <= rowend) && (columnstart > 0) && (rowstart > 0) &&
+						   (columnend <= columnCount) && (rowend <= rowCount)) {
+						
+							for (row = rowstart - 1; row < rowend; row++) {						
+								for (column = columnstart - 1; column < columnend; column++) {
+									gridMap[row][column] = section.name;
+								}
+							}
+						}
+					}
+					
+					for (row = 0; row < rowCount; row++) {
+						var rowObject = module.rows[row];
+											
+						if (rowObject.unit === "px") {
+							rowString = rowString + rowObject.height + "px ";
+						} else if (rowObject.unit === "free") {
+							rowString = rowString + rowObject.height + "fr ";
+						} else {
+							rowString = rowString + "auto ";
+						}
+					}
+
+					for (column = 0; column < columnCount; column++) {
+						var columnObject = module.columns[column];
+											
+						if (columnObject.unit === "px") {
+							columnString = columnString + columnObject.width + "px ";
+						} else if (columnObject.unit === "free") {
+							columnString = columnString + columnObject.width + "fr ";
+						} else {
+							columnString = columnString + "auto ";
+						}
+							
+					}
+					
+					for (row = 0; row < rowCount; row++) {						
+						areaString = areaString + "\"";
+						for (column = 0; column < columnCount; column++) {
+							if (column > 0) {
+								areaString = areaString + " ";
+							}
+							areaString = areaString + gridMap[row][column];
+						}
+						areaString = areaString + "\" ";
+					}
+					
+			
+				}
+			} 		
+									
+			module.cssstyle = module.cssstyle + "grid-template-columns: " + columnString + ";";
+			module.cssstyle = module.cssstyle + "grid-template-rows: "+ rowString + ";";			
+			module.cssstyle = module.cssstyle + "grid-template-areas: " + areaString;
+						
+			for (section of module.sections) {
+								
+				this.prepareModule (section)
+			}
+		}
+
+	}
+
+	
 	retrieveStateUpdate () {
 		
 		this.axiosGetRequest ("/ui/state")		
@@ -177,32 +358,10 @@ export default class AMCApplication {
                     this.AppContent.MenuItems = resultJSON.data.menuitems;
                     this.AppContent.ToolbarItems = resultJSON.data.toolbaritems;
 					
-					var page, module, item;
+					var page, module;
 					for (page of resultJSON.data.pages) {
 						for (module of page.modules) {
-							if (module.type === "content") {
-								for (item of module.items) {
-									if (item.type === "parameterlist") {
-									
-										this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-										item.entries = this.AppContent.ContentItems[item.uuid].entries;
-										
-									}
-
-									if (item.type === "buildlist") {
-									
-										this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-										item.entries = this.AppContent.ContentItems[item.uuid].entries;
-										
-									}
-									
-									if (item.type === "upload") {
-										item.state = { uploadid: 0, chosenFile: null, idcounter: 0, messages: [] }
-									
-									}
-								}
-								
-							}
+							this.prepareModule (module)
 						}						
 					
 					}
@@ -219,13 +378,22 @@ export default class AMCApplication {
 		updateContentItem (uuid) {
 		
 			this.AppContent.ContentItems[uuid].refresh = false;
+
+			var headers = {}
+			var authToken = this.API.authToken; 
+		
+			if (authToken != nullToken)
+				headers.Authorization = "Bearer " + authToken;
 		
             var url = this.API.baseURL + "/ui/contentitem/" + uuid;
             Axios({
                     method: "GET",
+					"headers": headers,
                     url: url
                 })
                 .then(resultJSON => {					
+				
+					this.unsuccessfulUpdateCounter = 0;
 
 					var oldentrycount = this.AppContent.ContentItems[uuid].entries.length;					
 					for (var i = 0; i < oldentrycount; i++) {
@@ -238,8 +406,14 @@ export default class AMCApplication {
 					this.AppContent.ContentItems[uuid].refresh = true;
                 })
                 .catch(err => {
-					err;
-                    this.AppContent.ContentItems[uuid].refresh = true;                    
+					
+					this.unsuccessfulUpdateCounter = this.unsuccessfulUpdateCounter + 1;
+					if (this.unsuccessfulUpdateCounter > 5) {
+						this.setStatusToError (err.message);
+					} else {
+						this.AppContent.ContentItems[uuid].refresh = true;
+					}
+					
                 });
 				
 		}
@@ -383,12 +557,13 @@ export default class AMCApplication {
 		}
 		
 		
-		triggerUIEvent (eventname, senderuuid, contextuuid) {
+		triggerUIEvent (eventname, senderuuid, contextuuid, formvalues) {
 			
             this.axiosPostRequest("/ui/event", {
 				"eventname": eventname,
 				"senderuuid": senderuuid,
-				"contextuuid": contextuuid						
+				"contextuuid": contextuuid,
+				"formvalues": formvalues
 			})
 				.then(resultHandleEvent => {
 					resultHandleEvent;
@@ -397,6 +572,20 @@ export default class AMCApplication {
                 .catch(err => {
 					alert (err);
                 });				
+		}
+		
+		
+		assembleFormValues (formValueUUIDList)
+		{
+			var resultObject = {}
+			
+			for (var entityuuid of formValueUUIDList) {
+				var formValue = this.AppContent.FormEntities[entityuuid].value;
+				resultObject[entityuuid] = formValue;				
+			}
+			
+			return resultObject;
+			
 		}
 
 }

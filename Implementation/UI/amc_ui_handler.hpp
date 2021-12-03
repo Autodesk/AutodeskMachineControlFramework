@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_ui_interfaces.hpp"
 
 #include <memory>
 #include <vector>
@@ -70,19 +71,21 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);	
 	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
-	class CUIHandler {
+	class CUIHandler : public CUIModule_UIEventHandler {
 	protected:
 
 		std::mutex m_Mutex;
+		std::map<std::string, uint32_t> m_Colors;
 
 		std::string m_sAppName;
 		std::string m_sCopyrightString;
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
 
-		PParameterInstances m_pParameterInstances;
+		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
 		PResourcePackage m_pCoreResourcePackage;
 		PLogger m_pLogger;
@@ -105,7 +108,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PParameterInstances pParameterInstances, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
+		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
 		
 		virtual ~CUIHandler();
 		
@@ -120,8 +123,12 @@ namespace AMC {
 		PResourcePackage getCoreResourcePackage ();
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
+		
+		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID);
+		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
+
+		virtual void ensureUIEventExists(const std::string& sEventName) override;
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

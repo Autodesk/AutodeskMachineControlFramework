@@ -47,7 +47,7 @@ namespace LibMCData {
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentBuildList, PUIModule_ContentBuildList);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 
 	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
 	protected:
@@ -60,8 +60,6 @@ namespace AMC {
 		std::string m_sDetailPage;
 
 		uint32_t m_nEntriesPerPage;
-
-		PParameterInstances m_pParameterInstances;
 
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 

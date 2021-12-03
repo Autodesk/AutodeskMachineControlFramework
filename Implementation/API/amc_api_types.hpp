@@ -38,7 +38,8 @@ namespace AMC {
 	enum class eAPIRequestType : uint32_t {
 		rtUnknown = 0,
 		rtGet = 1,
-		rtPost = 2
+		rtPost = 2,
+		rtPut = 3
 	};
 
 

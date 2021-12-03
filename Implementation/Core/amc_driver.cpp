@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define _AMC_DRIVER_HEADERPROTECTION
 #include "amc_driver.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include "libmcenv_driverenvironment.hpp"
 #include "Common/common_importstream_native.hpp"
 
@@ -40,8 +40,7 @@ using namespace AMC;
 
 template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
 {
-	if (pWrapper.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull (pWrapper.get());
 
 	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*) (pImplInstance.get()));
 	pImplInstance->IncRefCount();
@@ -52,14 +51,10 @@ template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_p
 CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment)
 	: m_sName(sName), m_sType(sType), m_sLibraryPath(sLibraryPath), m_pDriverResourcePackage (pDriverResourcePackage), m_pParameterGroup(pParameterGroup)
 {
-	if (pParameterGroup.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pDriverEnvironment.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pMCEnvWrapper.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pDriverResourcePackage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pParameterGroup.get());
+	LibMCAssertNotNull(pDriverEnvironment.get());
+	LibMCAssertNotNull(pMCEnvWrapper.get());
+	LibMCAssertNotNull(pDriverResourcePackage.get());
 
 	m_pDriverEnvironment = pDriverEnvironment;
 	m_pMCEnvWrapper = pMCEnvWrapper;
@@ -86,7 +81,7 @@ void CDriver::configureDriver(const std::string& sConfigurationData)
 HDriverHandle CDriver::acquireDriverHandle(const std::string& sInstanceName)
 {		
 	if (!m_sReservationInstance.empty())
-		throw ELibMCInterfaceException(LIBMC_ERROR_DRIVERALREADYRESERVED);
+		throw ELibMCCustomException(LIBMC_ERROR_DRIVERALREADYRESERVED, m_sName);
 
 	m_sReservationInstance = sInstanceName;
 	m_pDriverWrapper->AcquireInstance(m_pDriverInstance.get());
@@ -114,7 +109,6 @@ PParameterGroup CDriver::getParameterGroup()
 {
 	return m_pParameterGroup;
 }
-
 
 HSymbolLookupHandle CDriver::getSymbolLookup()
 {

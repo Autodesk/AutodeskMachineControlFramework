@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="Autodesk Machine Control Framework SDK" namespace="LibAMCF" copyright="Autodesk Inc." year="2021" basename="libamcf"
+	version="1.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="C" indentation="tabs"/>
+		<binding language="CDynamic" indentation="tabs"/>
+		<binding language="Cpp" indentation="tabs"/>
+		<binding language="CppDynamic" indentation="tabs"/>
+		<binding language="Pascal" indentation="tabs"/>
+		<binding language="Python" indentation="tabs"/>
+		<binding language="Node" indentation="tabs"/>
+		<binding language="Go" indentation="tabs"/>
+		<binding language="CSharp" indentation="tabs"/>
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		<error name="INVALIDTIMEOUT" code="9" description="invalid timeout" />
+		<error name="INVALIDRETRYCOUNT" code="10" description="invalid retry count" />
+		<error name="INVALIDBASEURL" code="11" description="invalid base url" />
+		<error name="INVALIDKEYNAME" code="12" description="invalid key name" />
+		<error name="RESTRESPONSEISNOOBJECT" code="13" description="REST response is no object" />
+		<error name="COULDNOTPARSERESTRESPONSE" code="14" description="Could not parse REST response" />
+		<error name="RESTRESPONSETIMEOUT" code="15" description="REST response timeout" />
+		<error name="INVALIDRESTRESPONSE" code="16" description="Invalid REST response" />
+		<error name="COULDNOTCREATESESSION" code="17" description="Could not create session" />
+		<error name="COULDNOTRECEIVETOKEN" code="18" description="Could not retrieve token" />
+		<error name="OPERATIONRESULTNOTREADY" code="19" description="Operation result is not ready" />
+		<error name="RESTERROR" code="20" description="REST error:" />
+		<error name="INVALIDUPLOADCHUNKSIZE" code="21" description="Invalid upload chunk size" />
+		<error name="CANNOTUPLOADEMPTYDATA" code="22" description="Can not upload empty data" />
+		<error name="COULDNOTBEGINSTREAMUPLOAD" code="23" description="Could not begin stream upload" />
+		<error name="BEGINCHUNKINGALREADYCALLED" code="24" description="Begin chunking already called" />
+		<error name="BEGINCHUNKINGNOTCALLED" code="25" description="Begin chunking not called" />
+		<error name="UPLOADDATAEXCEEDSTOTALSIZE" code="26" description="Upload exceeds total size" />
+		<error name="BEGINCHUNKINGFAILED" code="27" description="Begin chunking failed" />		
+		<error name="DIDNOTUPLOADFULLDATA" code="28" description="Did not upload full data" />		
+		<error name="UPLOADISALREADYFINISHED" code="29" description="Upload is already finished." />
+		<error name="INVALIDHASHBLOCKINDEX" code="30" description="Invalid hash block index." />
+		<error name="CHUNKSIZEMUSTBEAMULTIPLEOFHASHBLOCKSIZE" code="31" description="Chunk size must be a multiple of hash block size." />
+		<error name="CHUNKSTARTMUSTBEAMULTIPLEOFHASHBLOCKSIZE" code="32" description="Chunk start must be a multiple of hash block size." />
+		<error name="INVALIDHASHBLOCKSIZE" code="33" description="Invalid hash block size." />
+		<error name="CHECKSUMOFBLOCKMISSING" code="34" description="Checksum of block missing." />
+		<error name="OPERATIONERROR" code="35" description="Operation Error." />
+		<error name="OPERATIONTIMEOUT" code="36" description="Operation Timeout." />
+		<error name="UPLOADDIDNOTFINISH" code="37" description="Upload did not finish." />
+		<error name="INVALIDSTREAMCONTEXTTYPE" code="38" description="Invalid stream context type." />				
+
+	</errors>
+
+
+	<enum name="StreamContextType">
+		<option name="Unknown" value="0" description="Unknown stream type. Should not be used." />
+		<option name="NewBuildJob" value="1" description="Stream is owned and to be used for a new build job."/>
+	</enum>
+
+	
+	<class name="Base">
+
+
+	</class>
+
+
+	<class name="OperationResult" parent="Base" description="Class for handling async operations.">
+
+		<method name="WaitFor" description="Waits for operation to be finished.">
+			<param name="TimeOut" type="uint32" pass="in" description="Timeout value in Milliseconds. 0 means forever." />
+			<param name="OperationFinished" type="bool" pass="return" description="Returns if operation has been finished." />
+		</method>
+
+		<method name="EnsureSuccess" description="Waits for operation to be successfully finished. Throws an error if not successful.">
+		</method>
+
+		<method name="InProgress" description="Checks if operation is in progress.">
+			<param name="OperationIsInProgress" type="bool" pass="return" description="Flag if operation is in progress." />
+		</method>
+
+		<method name="Success" description="Checks if operation has been finished successfully. Waits for operation to finish.">
+			<param name="OperationSuccess" type="bool" pass="return" description="Flag if operation has been finished successful." />
+		</method>
+		
+		<method name="GetErrorMessage" description="Returns the error message, if the operation has not been successful. Fails if operation is in progress.">
+			<param name="ErrorMessage" type="string" pass="return" description="Returns error message of failed operation." />
+		</method>
+
+	</class>
+
+
+	<class name="DataStream" parent="Base" description="Class for handling data on the AMCF server.">
+
+		<method name="GetUUID" description="Returns the stream UUID.">
+			<param name="UUID" type="string" pass="return" description="Stream UUID String." />
+		</method>
+
+		<method name="GetContext" description="Returns the stream's context type and owner UUID.">
+			<param name="ContextType" type="enum" class="StreamContextType" pass="out" description="Stream Context Type." />
+			<param name="OwnerUUID" type="string" pass="out" description="Stream Context UUID String." />
+		</method>
+
+		<method name="GetName" description="Returns the stream name.">
+			<param name="Name" type="string" pass="return" description="Stream Name." />
+		</method>
+
+		<method name="GetMimeType" description="Returns the stream's mime type.">
+			<param name="MimeType" type="string" pass="return" description="Mime Type string." />
+		</method>
+
+		<method name="GetSHA256" description="Returns the sha256 checksum of the stream.">
+			<param name="SHA256" type="string" pass="return" description="SHA256 string." />
+		</method>
+
+		<method name="GetSize" description="Returns the stream size.">
+			<param name="StreamSize" type="uint64" pass="return" description="Stream size." />
+		</method>
+
+		<method name="GetTimestamp" description="Returns the timestamp of the stream.">
+			<param name="Timestamp" type="string" pass="return" description="Timestamp string." />
+		</method>
+
+	</class>
+	
+
+	<class name="StreamUpload" parent="Base" description="Class for uploading data to an AMCF Connection.">
+
+		<method name="GetName" description="returns the name of the stream upload">
+			<param name="Name" type="string" pass="return" description="Name String." />
+		</method>
+
+		<method name="GetMimeType" description="returns the mimetype of the stream upload">
+			<param name="MimeType" type="string" pass="return" description="MimeType String." />
+		</method>
+
+		<method name="GetContextType" description="returns the usage context of the stream upload">
+			<param name="ContextType" type="enum" class="StreamContextType" pass="return" description="Stream Context Type." />
+		</method>
+		
+		<method name="UploadData" description="uploads the passed data to the server. MUST only be called once.">
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to be uploaded." />
+			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB." />
+			<param name="ThreadCount" type="uint32" pass="in" description="How many concurrent threads shall be maximally used." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
+		</method>
+		
+		<method name="UploadFile" description="uploads a file to the server. MUST only be called once.">
+			<param name="FileName" type="string" class="string" pass="in" description="File to be uploaded." />
+			<param name="ChunkSize" type="uint32" pass="in" description="Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB." />
+			<param name="ThreadCount" type="uint32" pass="in" description="How many concurrent threads shall be maximally used." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if upload was successful." />
+		</method>
+
+		<method name="BeginChunking" description="Starts a chunked upload. MUST not be used together with uploadData or uploadFile">
+			<param name="DataSize" type="uint64" pass="in" description="Full data size to be uploaded." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if request was successful." />
+		</method>
+
+		<method name="UploadChunk" description="Uploads another chunk to the server. Chunks are added sequentially together.">
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Data to be uploaded. Any chunk that is not the last chunk MUST have the size of a multiple of 64kB. A chunk MUST be less than 64MB." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if request was successful." />
+		</method>
+
+		<method name="FinishChunking" description="MUST only be called after all chunks have been uploaded.">
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if request was successful." />
+		</method>
+
+		<method name="GetStatus" description="Retrieves current upload status.">
+			<param name="UploadSize" type="uint64" pass="out" description="Total target size of the upload. 0 if no upload has been started." />
+			<param name="FinishedSize" type="uint64" pass="out" description="Current bytes that have been successfully uploaded." />
+			<param name="InProgressSize" type="uint64" pass="out" description="Current bytes that have been uploaded or are currently in progress." />
+			<param name="Finished" type="bool" pass="out" description="Flag if upload has successfully finished." />
+		</method>
+
+		<method name="GetDataStream" description="Retrieves the uploaded data stream object. Upload must have finished successfully.">
+			<param name="DataStream" type="class" class="DataStream" pass="return" description="Data stream instance." />
+		</method>
+		
+	</class>
+
+	
+	<class name="Connection" parent="Base" description="An Connector to an AMCF machine instance">
+
+		<method name="GetBaseURL" description="returns the base url of the AMCF instance">
+			<param name="BaseURL" type="string" pass="return" description="Base URL of the AMCF instance." />
+		</method>
+
+		<method name="SetTimeouts" description="sets the timeout behaviour of the connection.">
+			<param name="Timeout" type="uint32" pass="in" description="Request timeout in milliseconds. Default is 1000." />
+			<param name="RetryCount" type="uint32" pass="in" description="How many retries should be done in an error case. Default is 3." />
+		</method>
+
+		<method name="GetTimeout" description="gets the timeout behaviour of the connection.">
+			<param name="Timeout" type="uint32" pass="return" description="Request timeout in milliseconds" />
+		</method>
+
+		<method name="GetRetryCount" description="gets the timeout behaviour of the connection.">
+			<param name="RetryCount" type="uint32" pass="return" description="How many retries should be done in an error case." />
+		</method>
+	
+		<method name="AuthenticateWithPassword" description="Authenticates with the remote instance with username and password.">
+			<param name="UserName" type="string" pass="in" description="User name for authentication." />
+			<param name="Password" type="string" pass="in" description="Password for authentication." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if authentication was successful." />
+		</method>
+	
+		<method name="IsAuthenticated" description="Authenticates with the remote instance with username and password">
+			<param name="IsAuthenticated" type="bool" pass="return" description="Returns if connection is authenticated." />
+		</method>
+
+		<method name="RefreshAuthentication" description="Refreshes authentication with server.">
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if authentication refresh was successful." />
+		</method>
+
+		<method name="Ping" description="Detects if server is still reachable. Non-Blocking.">
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if server is still reachable." />
+		</method>
+
+		<method name="GetAuthToken" description="Returns the authentication token of the current connection.">
+			<param name="Token" type="string" pass="return" description="Token string." />
+		</method>
+
+		<method name="CreateUpload" description="Creates a file upload instance. Must be authenticated to make it work.">
+			<param name="Name" type="string" pass="in" description="Name of the file to be uploaded." />
+			<param name="MimeType" type="string" pass="in" description="Mimetype of the file to be uploaded." />
+			<param name="ContextType" type="enum" class="StreamContextType" pass="in" description="Stream Context Type." />
+			<param name="Instance" type="class" class="StreamUpload" pass="return" description="File upload instance." />
+		</method>
+
+		<method name="PrepareBuild" description="Prepares a build from an uploaded data stream. Must be authenticated to make it work.">
+			<param name="DataStream" type="class" class="DataStream" pass="in" description="Data stream MUST have been created as build job context type." />
+			<param name="Success" type="class" class="OperationResult" pass="return" description="Returns if build preparation was successful." />
+		</method>
+		
+	</class>
+
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateConnection" description="Creates a AMCF connection instance.">
+			<param name="BaseURL" type="string" pass="in" description="Base URL of the AMCF Instance." />			
+			<param name="Instance" type="class" class="Connection" pass="return" description="New Connection instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 #include <vector>
+#include <list>
 #include <set>
 
 namespace AMCCommon {
@@ -62,10 +63,13 @@ namespace AMCCommon {
 		static bool UTF8StringIsValid (const std::string & sString);
 		static std::string trimString (const std::string& sString);
 		static std::string toLowerString(const std::string& sString);
+		static void splitString (const std::string& sString, const std::string & sDelimiter, std::vector<std::string> & stringVector);
 
 		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
 		static std::string calculateSHA256FromString(const std::string& sString);
+		static std::string calculateSHA256FromData(const uint8_t * pData, uint64_t nDataSize);
 		static std::string calculateRandomSHA256String(const uint32_t nIterations);
+		static std::string calculateBlockwiseSHA256FromFile(const std::string& sFileNameUTF8, uint32_t nBlockSize);
 
 		static std::string encodeBase64 (const std::string& sString, eBase64Type eType);
 		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);

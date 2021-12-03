@@ -355,6 +355,49 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDLAYERINDEX 328
 #define LIBMC_ERROR_TEMPBASEPATHEMPTY 329
 #define LIBMC_ERROR_PROFILENOTFOUND 330
+#define LIBMC_ERROR_INVALIDSERVICEHANDLER 331
+#define LIBMC_ERROR_INVALIDMAXTHREADCOUNT 332
+#define LIBMC_ERROR_INVALIDTOOLPATHSTREAMUUID 333
+#define LIBMC_ERROR_MISSINGSECTIONHEIGHT 334
+#define LIBMC_ERROR_INVALIDSECTIONHEIGHT 335
+#define LIBMC_ERROR_MISSINGSECTIONWIDTH 336
+#define LIBMC_ERROR_INVALIDSECTIONWIDTH 337
+#define LIBMC_ERROR_TOOLPATHMETADATANOTFOUND 338
+#define LIBMC_ERROR_BUILDITEMHASNOUUID 339
+#define LIBMC_ERROR_OBJECTHASNOUUID 340
+#define LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS 341
+#define LIBMC_ERROR_INVALIDEVENTPARAMETERS 342
+#define LIBMC_ERROR_INVALIDFORMVALUES 343
+#define LIBMC_ERROR_FORMNAMEMISSING 344
+#define LIBMC_ERROR_FORMENTITYNAMEMISSING 345
+#define LIBMC_ERROR_FORMNOTFOUND 346
+#define LIBMC_ERROR_FORMENTITYNOTFOUND 347
+#define LIBMC_ERROR_DUPLICATEENTITYNAME 348
+#define LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE 349
+#define LIBMC_ERROR_COULDNOTFINDEVENTSENDER 350
+#define LIBMC_ERROR_DUPLICATEFORMNAME 351
+#define LIBMC_ERROR_EVENTNOTFOUND 352
+#define LIBMC_ERROR_MISSINGCOLORNAME 353
+#define LIBMC_ERROR_MISSINGCOLORREDCHANNEL 354
+#define LIBMC_ERROR_MISSINGCOLORGREENCHANNEL 355
+#define LIBMC_ERROR_MISSINGCOLORBLUECHANNEL 356
+#define LIBMC_ERROR_INVALIDCOLORREDCHANNEL 357
+#define LIBMC_ERROR_INVALIDCOLORGREENCHANNEL 358
+#define LIBMC_ERROR_INVALIDCOLORBLUECHANNEL 359
+#define LIBMC_ERROR_MISSINGCOLUMNWIDTH 360
+#define LIBMC_ERROR_INVALIDCOLUMNWIDTH 361
+#define LIBMC_ERROR_MISSINGCOLUMNUNIT 362
+#define LIBMC_ERROR_MISSINGROWHEIGHT 363
+#define LIBMC_ERROR_INVALIDROWHEIGHT 364
+#define LIBMC_ERROR_MISSINGROWUNIT 365
+#define LIBMC_ERROR_MISSINGCOLUMNSTARTATTRIB 366
+#define LIBMC_ERROR_MISSINGCOLUMNENDATTRIB 367
+#define LIBMC_ERROR_MISSINGROWSTARTATTRIB 368
+#define LIBMC_ERROR_MISSINGROWENDATTRIB 369
+#define LIBMC_ERROR_INVALIDCOLUMNSTARTATTRIB 370
+#define LIBMC_ERROR_INVALIDCOLUMNENDATTRIB 371
+#define LIBMC_ERROR_INVALIDROWSTARTATTRIB 372
+#define LIBMC_ERROR_INVALIDROWENDATTRIB 373
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -622,6 +665,49 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
     case LIBMC_ERROR_TEMPBASEPATHEMPTY: return "Empty base path for temporary files";
     case LIBMC_ERROR_PROFILENOTFOUND: return "Profile not found.";
+    case LIBMC_ERROR_INVALIDSERVICEHANDLER: return "Invalid service handler.";
+    case LIBMC_ERROR_INVALIDMAXTHREADCOUNT: return "Invalid max thread count.";
+    case LIBMC_ERROR_INVALIDTOOLPATHSTREAMUUID: return "Invalid toolpath stream uuid";
+    case LIBMC_ERROR_MISSINGSECTIONHEIGHT: return "Missing section height";
+    case LIBMC_ERROR_INVALIDSECTIONHEIGHT: return "Invalid section height";
+    case LIBMC_ERROR_MISSINGSECTIONWIDTH: return "Missing section width";
+    case LIBMC_ERROR_INVALIDSECTIONWIDTH: return "Invalid section width";
+    case LIBMC_ERROR_TOOLPATHMETADATANOTFOUND: return "Toolpath metadata not found";
+    case LIBMC_ERROR_BUILDITEMHASNOUUID: return "Build item has no uuid";
+    case LIBMC_ERROR_OBJECTHASNOUUID: return "Object has no uuid";
+    case LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS: return "Could not parse event parameters";
+    case LIBMC_ERROR_INVALIDEVENTPARAMETERS: return "Invalid event parameters";
+    case LIBMC_ERROR_INVALIDFORMVALUES: return "Invalid form values";
+    case LIBMC_ERROR_FORMNAMEMISSING: return "Form name is missing";
+    case LIBMC_ERROR_FORMENTITYNAMEMISSING: return "Form entity name is missing";
+    case LIBMC_ERROR_FORMNOTFOUND: return "Form not found";
+    case LIBMC_ERROR_FORMENTITYNOTFOUND: return "Form entity not found";
+    case LIBMC_ERROR_DUPLICATEENTITYNAME: return "Duplicate form entity name";
+    case LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE: return "Could not find event sender page";
+    case LIBMC_ERROR_COULDNOTFINDEVENTSENDER: return "Could not find event sender";
+    case LIBMC_ERROR_DUPLICATEFORMNAME: return "Duplicate form name";
+    case LIBMC_ERROR_EVENTNOTFOUND: return "Event not found";
+    case LIBMC_ERROR_MISSINGCOLORNAME: return "Missing color name";
+    case LIBMC_ERROR_MISSINGCOLORREDCHANNEL: return "Missing red color channel";
+    case LIBMC_ERROR_MISSINGCOLORGREENCHANNEL: return "Missing green color channel";
+    case LIBMC_ERROR_MISSINGCOLORBLUECHANNEL: return "Missing blue color channel";
+    case LIBMC_ERROR_INVALIDCOLORREDCHANNEL: return "Invalid red color channel";
+    case LIBMC_ERROR_INVALIDCOLORGREENCHANNEL: return "Invalid green color channel";
+    case LIBMC_ERROR_INVALIDCOLORBLUECHANNEL: return "Invalid blue color channel";
+    case LIBMC_ERROR_MISSINGCOLUMNWIDTH: return "Missing column width";
+    case LIBMC_ERROR_INVALIDCOLUMNWIDTH: return "Invalid column width";
+    case LIBMC_ERROR_MISSINGCOLUMNUNIT: return "Missing column unit";
+    case LIBMC_ERROR_MISSINGROWHEIGHT: return "Missing row height";
+    case LIBMC_ERROR_INVALIDROWHEIGHT: return "Invalid row height";
+    case LIBMC_ERROR_MISSINGROWUNIT: return "Missing row unit";
+    case LIBMC_ERROR_MISSINGCOLUMNSTARTATTRIB: return "Missing column start attrib";
+    case LIBMC_ERROR_MISSINGCOLUMNENDATTRIB: return "Missing column end attrib";
+    case LIBMC_ERROR_MISSINGROWSTARTATTRIB: return "Missing row start attrib";
+    case LIBMC_ERROR_MISSINGROWENDATTRIB: return "Missing row end attrib";
+    case LIBMC_ERROR_INVALIDCOLUMNSTARTATTRIB: return "Invalid column start attrib";
+    case LIBMC_ERROR_INVALIDCOLUMNENDATTRIB: return "Invalid column end attrib";
+    case LIBMC_ERROR_INVALIDROWSTARTATTRIB: return "Invalid row start attrib";
+    case LIBMC_ERROR_INVALIDROWENDATTRIB: return "Invalid row end attrib";
     default: return "unknown error";
   }
 }

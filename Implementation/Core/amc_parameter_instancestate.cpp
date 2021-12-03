@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _PARAMETER_HEADERPROTECTION
 
 #include "amc_parameter_instancestate.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
 
@@ -73,7 +73,7 @@ namespace AMC {
 
 	void CParameter_InstanceState::setStringValue(const std::string& sValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 
@@ -84,7 +84,7 @@ namespace AMC {
 
 	void CParameter_InstanceState::setDoubleValue(const double dValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 	int64_t CParameter_InstanceState::getIntValue() const
@@ -94,7 +94,7 @@ namespace AMC {
 
 	void CParameter_InstanceState::setIntValue(const int64_t nValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 	bool CParameter_InstanceState::getBoolValue() const
@@ -104,7 +104,7 @@ namespace AMC {
 
 	void CParameter_InstanceState::setBoolValue(const bool bValue)
 	{
-		throw ELibMCInterfaceException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY);
+		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
 	}
 
 

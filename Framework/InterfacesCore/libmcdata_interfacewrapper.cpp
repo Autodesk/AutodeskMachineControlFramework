@@ -783,6 +783,36 @@ LibMCDataResult libmcdata_storage_finishpartialstream(LibMCData_Storage pStorage
 	}
 }
 
+LibMCDataResult libmcdata_storage_finishpartialstreamblockwisesha256(LibMCData_Storage pStorage, const char * pUUID, const char * pBlockwiseSHA2)
+{
+	IBase* pIBaseClass = (IBase *)pStorage;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pBlockwiseSHA2 == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sBlockwiseSHA2(pBlockwiseSHA2);
+		IStorage* pIStorage = dynamic_cast<IStorage*>(pIBaseClass);
+		if (!pIStorage)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIStorage->FinishPartialStreamBlockwiseSHA256(sUUID, sBlockwiseSHA2);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDataResult libmcdata_storage_getmaxstreamsize(LibMCData_Storage pStorage, LibMCData_uint64 * pMaxStreamSize)
 {
 	IBase* pIBaseClass = (IBase *)pStorage;
@@ -2517,6 +2547,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_storage_storepartialstream;
 	if (sProcName == "libmcdata_storage_finishpartialstream") 
 		*ppProcAddress = (void*) &libmcdata_storage_finishpartialstream;
+	if (sProcName == "libmcdata_storage_finishpartialstreamblockwisesha256") 
+		*ppProcAddress = (void*) &libmcdata_storage_finishpartialstreamblockwisesha256;
 	if (sProcName == "libmcdata_storage_getmaxstreamsize") 
 		*ppProcAddress = (void*) &libmcdata_storage_getmaxstreamsize;
 	if (sProcName == "libmcdata_storage_contenttypeisaccepted") 

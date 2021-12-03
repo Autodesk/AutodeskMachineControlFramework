@@ -28,34 +28,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_PARAMETERINSTANCES
-#define __AMC_PARAMETERINSTANCES
 
-#include "amc_parameterhandler.hpp"
+#ifndef __AMC_UI_MODULE_TAB
+#define __AMC_UI_MODULE_TAB
 
-#include <memory>
-#include <vector>
-#include <map>
-#include <string>
-#include <mutex>
+#include "header_protection.hpp"
+
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
+
+#include "Libraries/PugiXML/pugixml.hpp"
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
+
 
 namespace AMC {
 
-	class CParameterInstances;
-	typedef std::shared_ptr<CParameterInstances> PParameterInstances;
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModule_Tab, PUIModule_Tab);
 
-	class CParameterInstances {
-	private:
+	class CUIModule_Tab {
+	protected:		
 
-		std::map <std::string, PParameterHandler> m_StateMachineParameters;
-		
+		std::string m_sName;
+		std::string m_sCaption;
+
+		PUIModule m_pModule;
+
 	public:
-	
-		CParameterInstances ();
-		virtual ~CParameterInstances ();
 
-		void registerParameterHandler (const std::string & sInstanceName, PParameterHandler pParameterHandler);
-		PParameterHandler getParameterHandler (const std::string& sInstanceName);
+		CUIModule_Tab(pugi::xml_node & xmlNode, PUIModuleEnvironment pModuleEnvironment);
+		
+		virtual ~CUIModule_Tab();
+
+		virtual std::string getName();
+
+		virtual std::string getCaption();
+
+		CUIModule * getModule ();
+
 
 	};
 
@@ -63,5 +77,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_PARAMETERHANDLER
+#endif //__AMC_UI_MODULE_TABS
 

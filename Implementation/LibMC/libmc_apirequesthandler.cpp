@@ -36,7 +36,7 @@ Abstract: This is a stub class definition of CAPIRequestHandler
 #include "libmc_apirequesthandler.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "amc_api_constants.hpp"
-
+#include "amc_api_response.hpp"
 // Include custom headers here.
 
 
@@ -46,12 +46,12 @@ using namespace LibMC::Impl;
  Class definition of CAPIRequestHandler 
 **************************************************************************************************************************/
 
-CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth)
-    : m_RequestType(eRequestType), m_pAPI (pAPI), m_pAuth (pAuth)
+CAPIRequestHandler::CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth, AMC::PLogger pLogger)
+    : m_RequestType(eRequestType), m_pAPI (pAPI), m_pAuth (pAuth), m_pLogger (pLogger)
 {
     if (pAPI.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-    if (pAuth.get() == nullptr)
+    if (pLogger.get() == nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
     m_sURIWithoutLeadingSlash = pAPI->removeLeadingSlashFromURI(sURI);
@@ -115,17 +115,24 @@ void CAPIRequestHandler::SetFormStringField(const std::string& sName, const std:
 void CAPIRequestHandler::Handle(const LibMC_uint64 nRawBodyBufferSize, const LibMC_uint8* pRawBodyBuffer, std::string& sContentType, LibMC_uint32& nHTTPCode)
 {
 
-    if (m_pResponse.get() != nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_APIREQUESTALREADYHANDLED);
+    if (m_pAuth.get() != nullptr) {
 
-    m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields, m_pAuth);
+        if (m_pResponse.get() != nullptr)
+            throw ELibMCInterfaceException(LIBMC_ERROR_APIREQUESTALREADYHANDLED);
 
-    if (m_pResponse.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
+        m_pResponse = m_pAPI->handleRequest(m_sURIWithoutLeadingSlash, m_RequestType, pRawBodyBuffer, nRawBodyBufferSize, m_FormFields, m_pAuth, m_pLogger.get());
+
+        if (m_pResponse.get() == nullptr)
+            throw ELibMCInterfaceException(LIBMC_ERROR_INTERNALERROR);
+
+    }
+    else {
+
+        m_pResponse = AMC::CAPI::makeError (AMC_API_HTTP_FORBIDDEN, LIBMC_ERROR_INVALIDAUTHORIZATION, "Invalid Authorization.");
+    }
 
     sContentType = m_pResponse->getContentType();
-
-    nHTTPCode = m_pResponse->getHTTPCode ();
+    nHTTPCode = m_pResponse->getHTTPCode();
 }
 
 void CAPIRequestHandler::GetResultData(LibMC_uint64 nDataBufferSize, LibMC_uint64* pDataNeededCount, LibMC_uint8 * pDataBuffer)

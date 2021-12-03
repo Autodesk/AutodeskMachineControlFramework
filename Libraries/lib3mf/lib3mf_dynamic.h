@@ -594,6 +594,17 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataCountPtr) (Lib3MF_MetaDat
 typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 nIndex, Lib3MF_MetaData * pMetaData);
 
 /**
+* returns if a metadata value exists within this metadatagroup
+*
+* @param[in] pMetaDataGroup - MetaDataGroup instance.
+* @param[in] pNameSpace - the namespace of the metadata
+* @param[in] pName - the name of the Metadata
+* @param[out] pMetaDataExists - returns true if metadata exists
+* @return error code or 0 (success)
+*/
+typedef Lib3MFResult (*PLib3MFMetaDataGroup_HasMetaDataPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, const char * pNameSpace, const char * pName, bool * pMetaDataExists);
+
+/**
 * returns a metadata value within this metadatagroup
 *
 * @param[in] pMetaDataGroup - MetaDataGroup instance.
@@ -2321,10 +2332,10 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentProfileUUIDPtr) (Lib
 *
 * @param[in] pToolpathLayerReader - ToolpathLayerReader instance.
 * @param[in] nIndex - Index. Must be between 0 and Count - 1.
-* @param[out] pProfile - Segment Profile
+* @param[out] pBuildItem - Segment Build Item
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_ToolpathProfile * pProfile);
+typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_BuildItem * pBuildItem);
 
 /**
 * Retrieves the assigned segment part uuid.
@@ -2376,14 +2387,14 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_GetLayerDataUUIDPtr) (Lib3MF_Too
 typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterProfilePtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_ToolpathProfile pProfile, Lib3MF_uint32 * pProfileID);
 
 /**
-* Registers a Model Object
+* Registers a Model Build Item
 *
 * @param[in] pToolpathLayerData - ToolpathLayerData instance.
-* @param[in] pPart - The model object to use.
+* @param[in] pBuildItem - The model build item to use.
 * @param[out] pPartID - returns the local part ID for the layer.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterPartPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_Object pPart, Lib3MF_uint32 * pPartID);
+typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterBuildItemPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_BuildItem pBuildItem, Lib3MF_uint32 * pPartID);
 
 /**
 * writes hatch data to the layer.
@@ -3456,6 +3467,7 @@ typedef struct {
 	PLib3MFMetaData_SetValuePtr m_MetaData_SetValue;
 	PLib3MFMetaDataGroup_GetMetaDataCountPtr m_MetaDataGroup_GetMetaDataCount;
 	PLib3MFMetaDataGroup_GetMetaDataPtr m_MetaDataGroup_GetMetaData;
+	PLib3MFMetaDataGroup_HasMetaDataPtr m_MetaDataGroup_HasMetaData;
 	PLib3MFMetaDataGroup_GetMetaDataByKeyPtr m_MetaDataGroup_GetMetaDataByKey;
 	PLib3MFMetaDataGroup_RemoveMetaDataByIndexPtr m_MetaDataGroup_RemoveMetaDataByIndex;
 	PLib3MFMetaDataGroup_RemoveMetaDataPtr m_MetaDataGroup_RemoveMetaData;
@@ -3629,7 +3641,7 @@ typedef struct {
 	PLib3MFToolpathLayerReader_GetSegmentPointDataPtr m_ToolpathLayerReader_GetSegmentPointData;
 	PLib3MFToolpathLayerData_GetLayerDataUUIDPtr m_ToolpathLayerData_GetLayerDataUUID;
 	PLib3MFToolpathLayerData_RegisterProfilePtr m_ToolpathLayerData_RegisterProfile;
-	PLib3MFToolpathLayerData_RegisterPartPtr m_ToolpathLayerData_RegisterPart;
+	PLib3MFToolpathLayerData_RegisterBuildItemPtr m_ToolpathLayerData_RegisterBuildItem;
 	PLib3MFToolpathLayerData_WriteHatchDataPtr m_ToolpathLayerData_WriteHatchData;
 	PLib3MFToolpathLayerData_WriteLoopPtr m_ToolpathLayerData_WriteLoop;
 	PLib3MFToolpathLayerData_WritePolylinePtr m_ToolpathLayerData_WritePolyline;

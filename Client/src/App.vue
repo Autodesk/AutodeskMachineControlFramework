@@ -68,23 +68,18 @@
 			<Dialog_Error :Application="Application" />
         </v-container>		
 
-        <v-container fluid v-if="appIsReady">
-			
-				<template v-for="uiPage in Application.AppContent.Pages">
-
-					<v-row align="start" justify="center" :key="uiPage.name" v-if="(Application.AppState.activePage == uiPage.name)">
-					
-						<template v-for="uiModule in uiPage.modules">
-																
-							<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
-							
-						</template>										
-
-					</v-row>
-				</template>
-
+		<template v-for="uiPage in Application.AppContent.Pages">
+			<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:100%; display:block">
 								
-        </v-container>		
+				<template v-for="uiModule in uiPage.modules">
+					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
+					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
+					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
+					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
+				</template>										
+						
+			</v-container>		
+		</template>
         
     </v-main>
 
@@ -102,9 +97,12 @@
 	
 	import Dialog_Login from "./Dialog_Login.vue";
 	import Dialog_Error from "./Dialog_Error.vue";
-	import Module_Content from "./Module_Content.vue";
 	
-
+	import Module_Content from "./Module_Content.vue";
+	import Module_Tabs from "./Module_Tabs.vue";
+	import Module_Grid from "./Module_Grid.vue";
+	import Module_GLScene from "./Module_GLScene.vue";
+	
 	export default {
 
 		created() {
@@ -116,7 +114,8 @@
 			}
 			
 			this.Application = new AMCApplication (baseURL);
-			this.Application.retrieveConfiguration();
+			this.Application.retrieveConfiguration(this.$vuetify.theme.themes);
+						
 		},
 		
 
@@ -179,9 +178,12 @@
 		},
 		
 		components: {
-			Module_Content,
 			Dialog_Login,
-			Dialog_Error
+			Dialog_Error,
+			Module_Content,
+			Module_Tabs,
+			Module_GLScene,
+			Module_Grid
 		},	
 
 		methods: {

@@ -278,6 +278,16 @@ typedef LibMCDataResult (*PLibMCDataStorage_StorePartialStreamPtr) (LibMCData_St
 typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2);
 
 /**
+* Finishes storing a stream with a 64k-Blockwise calculated Checksum.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @param[in] pBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr) (LibMCData_Storage pStorage, const char * pUUID, const char * pBlockwiseSHA2);
+
+/**
 * Returns the maximum stream size that the data model allows.
 *
 * @param[in] pStorage - Storage instance.
@@ -871,6 +881,7 @@ typedef struct {
 	PLibMCDataStorage_BeginPartialStreamPtr m_Storage_BeginPartialStream;
 	PLibMCDataStorage_StorePartialStreamPtr m_Storage_StorePartialStream;
 	PLibMCDataStorage_FinishPartialStreamPtr m_Storage_FinishPartialStream;
+	PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr m_Storage_FinishPartialStreamBlockwiseSHA256;
 	PLibMCDataStorage_GetMaxStreamSizePtr m_Storage_GetMaxStreamSize;
 	PLibMCDataStorage_ContentTypeIsAcceptedPtr m_Storage_ContentTypeIsAccepted;
 	PLibMCDataStorage_StreamIsImagePtr m_Storage_StreamIsImage;

@@ -1,7 +1,6 @@
 <template>
 
-	<v-card width="99%" v-if="(module.type == 'content')">
-		<v-card-text>
+	<div width="99%" flat v-if="(module.type == 'content')">
 			<div v-if="module.title != ''"> {{ module.headline }}</div>
 			<p v-if="module.title != ''" class="display-1 text--primary">
 				{{ module.title }}
@@ -33,10 +32,8 @@
 			</div>
 			
 												
-		</v-card-text>
 
-
-	</v-card>
+	</div>
 
 </template>
 
