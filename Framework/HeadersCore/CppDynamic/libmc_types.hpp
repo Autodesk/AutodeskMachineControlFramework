@@ -384,6 +384,20 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDCOLORREDCHANNEL 357
 #define LIBMC_ERROR_INVALIDCOLORGREENCHANNEL 358
 #define LIBMC_ERROR_INVALIDCOLORBLUECHANNEL 359
+#define LIBMC_ERROR_MISSINGCOLUMNWIDTH 360
+#define LIBMC_ERROR_INVALIDCOLUMNWIDTH 361
+#define LIBMC_ERROR_MISSINGCOLUMNUNIT 362
+#define LIBMC_ERROR_MISSINGROWHEIGHT 363
+#define LIBMC_ERROR_INVALIDROWHEIGHT 364
+#define LIBMC_ERROR_MISSINGROWUNIT 365
+#define LIBMC_ERROR_MISSINGCOLUMNSTARTATTRIB 366
+#define LIBMC_ERROR_MISSINGCOLUMNENDATTRIB 367
+#define LIBMC_ERROR_MISSINGROWSTARTATTRIB 368
+#define LIBMC_ERROR_MISSINGROWENDATTRIB 369
+#define LIBMC_ERROR_INVALIDCOLUMNSTARTATTRIB 370
+#define LIBMC_ERROR_INVALIDCOLUMNENDATTRIB 371
+#define LIBMC_ERROR_INVALIDROWSTARTATTRIB 372
+#define LIBMC_ERROR_INVALIDROWENDATTRIB 373
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -680,6 +694,20 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDCOLORREDCHANNEL: return "Invalid red color channel";
     case LIBMC_ERROR_INVALIDCOLORGREENCHANNEL: return "Invalid green color channel";
     case LIBMC_ERROR_INVALIDCOLORBLUECHANNEL: return "Invalid blue color channel";
+    case LIBMC_ERROR_MISSINGCOLUMNWIDTH: return "Missing column width";
+    case LIBMC_ERROR_INVALIDCOLUMNWIDTH: return "Invalid column width";
+    case LIBMC_ERROR_MISSINGCOLUMNUNIT: return "Missing column unit";
+    case LIBMC_ERROR_MISSINGROWHEIGHT: return "Missing row height";
+    case LIBMC_ERROR_INVALIDROWHEIGHT: return "Invalid row height";
+    case LIBMC_ERROR_MISSINGROWUNIT: return "Missing row unit";
+    case LIBMC_ERROR_MISSINGCOLUMNSTARTATTRIB: return "Missing column start attrib";
+    case LIBMC_ERROR_MISSINGCOLUMNENDATTRIB: return "Missing column end attrib";
+    case LIBMC_ERROR_MISSINGROWSTARTATTRIB: return "Missing row start attrib";
+    case LIBMC_ERROR_MISSINGROWENDATTRIB: return "Missing row end attrib";
+    case LIBMC_ERROR_INVALIDCOLUMNSTARTATTRIB: return "Invalid column start attrib";
+    case LIBMC_ERROR_INVALIDCOLUMNENDATTRIB: return "Invalid column end attrib";
+    case LIBMC_ERROR_INVALIDROWSTARTATTRIB: return "Invalid row start attrib";
+    case LIBMC_ERROR_INVALIDROWENDATTRIB: return "Invalid row end attrib";
     default: return "unknown error";
   }
 }

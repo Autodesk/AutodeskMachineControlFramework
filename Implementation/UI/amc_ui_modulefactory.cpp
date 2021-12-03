@@ -37,8 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_content.hpp"
 #include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_verticalsplit.hpp"
-#include "amc_ui_module_horizontalsplit.hpp"
+#include "amc_ui_module_grid.hpp"
 
 using namespace AMC;
 
@@ -54,11 +53,8 @@ PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PUIModuleEnvir
 	if (sType == CUIModule_Tabs::getStaticType())
 		return std::make_shared<CUIModule_Tabs>(xmlNode, pUIModuleEnvironment);
 
-	if (sType == CUIModule_VerticalSplit::getStaticType())
-		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pUIModuleEnvironment);
-
-	if (sType == CUIModule_HorizontalSplit::getStaticType())
-		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pUIModuleEnvironment);
+	if (sType == CUIModule_Grid::getStaticType())
+		return std::make_shared<CUIModule_Grid>(xmlNode, pUIModuleEnvironment);
 
 	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 

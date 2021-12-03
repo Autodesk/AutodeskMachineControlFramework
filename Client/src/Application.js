@@ -255,17 +255,98 @@ export default class AMCApplication {
 			}			
 		}
 
-		if (module.type === "verticalsplit") {
+		if (module.type === "grid") {
+						
+			module.cssstyle = "display: grid; width:100%; height:100%;";
+			
+			var columnString = "";
+			var rowString = "";
+			var areaString = "";
+			
+			if (module.columns) {
+				if (module.rows) {
+					var columnCount = module.columns.length;
+					var rowCount = module.rows.length;
+			
+					var row, column;
+					var gridMap = new Array(rowCount);
+					for (row = 0; row < rowCount; row++) {
+						gridMap[row] = new Array(columnCount);
+						
+						for (column = 0; column < columnCount; column++) {
+							var templatename = "_grid_" + module.name + "_" + column + "_" + row;
+							gridMap[row][column] = templatename;							
+						}
+					} 
+					
+					for (section of module.sections) {
+						
+						var columnstart = section.columnstart;
+						var columnend = section.columnend;
+						var rowstart = section.rowstart;
+						var rowend = section.rowend;						
+												
+						if ((columnstart <= columnend) && (rowstart <= rowend) && (columnstart > 0) && (rowstart > 0) &&
+						   (columnend <= columnCount) && (rowend <= rowCount)) {
+						
+							for (row = rowstart - 1; row < rowend; row++) {						
+								for (column = columnstart - 1; column < columnend; column++) {
+									gridMap[row][column] = section.name;
+								}
+							}
+						}
+					}
+					
+					for (row = 0; row < rowCount; row++) {
+						var rowObject = module.rows[row];
+											
+						if (rowObject.unit === "px") {
+							rowString = rowString + rowObject.height + "px ";
+						} else if (rowObject.unit === "free") {
+							rowString = rowString + rowObject.height + "fr ";
+						} else {
+							rowString = rowString + "auto ";
+						}
+					}
+
+					for (column = 0; column < columnCount; column++) {
+						var columnObject = module.columns[column];
+											
+						if (columnObject.unit === "px") {
+							columnString = columnString + columnObject.width + "px ";
+						} else if (columnObject.unit === "free") {
+							columnString = columnString + columnObject.width + "fr ";
+						} else {
+							columnString = columnString + "auto ";
+						}
+							
+					}
+					
+					for (row = 0; row < rowCount; row++) {						
+						areaString = areaString + "\"";
+						for (column = 0; column < columnCount; column++) {
+							if (column > 0) {
+								areaString = areaString + " ";
+							}
+							areaString = areaString + gridMap[row][column];
+						}
+						areaString = areaString + "\" ";
+					}
+					
+			
+				}
+			} 		
+									
+			module.cssstyle = module.cssstyle + "grid-template-columns: " + columnString + ";";
+			module.cssstyle = module.cssstyle + "grid-template-rows: "+ rowString + ";";			
+			module.cssstyle = module.cssstyle + "grid-template-areas: " + areaString;
+						
 			for (section of module.sections) {
+								
 				this.prepareModule (section)
-			}			
+			}
 		}
 
-		if (module.type === "horizontalsplit") {
-			for (section of module.sections) {
-				this.prepareModule (section)
-			}			
-		}
 	}
 
 	
