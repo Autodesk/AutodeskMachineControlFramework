@@ -56,7 +56,6 @@ namespace AMC {
 		std::string m_sUUID;
 		std::string m_sCaption;
 		std::string m_sDefaultValue;
-		std::string m_sValue;
 		bool m_bDisabled;
 		bool m_bReadOnly;
 	public:
@@ -73,13 +72,9 @@ namespace AMC {
 
 		std::string getDefaultValue ();
 
-		std::string getValue ();
-
 		bool getDisabled ();
 
 		bool getReadOnly ();
-
-		void setValue (const std::string & sValue);
 
 		void setDisabled(bool bDisabled);
 
@@ -87,19 +82,32 @@ namespace AMC {
 
 		virtual std::string getTypeString() = 0;
 
+		virtual void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
 	};
 
 		
 	class CUIModule_ContentFormEdit : public CUIModule_ContentFormEntity {
 	protected:
+		std::string m_sPrefix;
+		std::string m_sSuffix;
+		std::string m_sParameterInstanceName;
+		std::string m_sParameterGroupName;
+		std::string m_sParameterName;
 
 	public:
 
-		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string & sPrefix, const std::string & sSuffix, const std::string & sParameterMapping);
 
 		virtual ~CUIModule_ContentFormEdit();
 
 		virtual std::string getTypeString() override;
+
+		virtual void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 
@@ -160,7 +168,9 @@ namespace AMC {
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
-		PUIModule_ContentFormEntity addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		PUIModule_ContentFormEntity addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string & sPrefix, const std::string& sSuffix, const std::string& sParameterMapping);
 		PUIModule_ContentFormEntity addSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 		PUIModule_ContentFormEntity addMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 		PUIModule_ContentFormEntity addCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);

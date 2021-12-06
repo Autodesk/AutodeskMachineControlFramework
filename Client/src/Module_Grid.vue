@@ -4,7 +4,7 @@
 		
 			<template v-for="moduleSection in module.sections">
 
-				<div :key="moduleSection.uuid" tile flat v-bind:style="'overflow:auto; grid-area:' + moduleSection.name">
+				<div :key="moduleSection.uuid" tile flat v-bind:style="'overflow:auto; margin: 0 0; grid-area:' + moduleSection.name">
 					<Module_Content :key="moduleSection.name" v-if="(moduleSection.type == 'content')" :module="moduleSection" :Application="Application" />
 					<Module_Tabs :key="moduleSection.name" v-if="(moduleSection.type == 'tabs')" :module="moduleSection" :Application="Application" />
 					<Module_GLScene :key="moduleSection.name" v-if="(moduleSection.type == 'glscene')" :module="moduleSection" :Application="Application" />

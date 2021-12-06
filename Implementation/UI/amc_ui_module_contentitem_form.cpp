@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module_contentitem_form.hpp"
+#include "amc_ui_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
 
 #include "amc_api_constants.hpp"
@@ -41,7 +42,7 @@ using namespace AMC;
 
 
 CUIModule_ContentFormEntity::CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, const std::string & sDefaultValue)
-	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption), m_sName (sName), m_sDefaultValue (sDefaultValue), m_sValue (sDefaultValue), m_bDisabled (false), m_bReadOnly (false)
+	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption), m_sName (sName), m_sDefaultValue (sDefaultValue), m_bDisabled (false), m_bReadOnly (false)
 {
 	if (sName == "")
 		throw ELibMCInterfaceException(LIBMC_ERROR_FORMENTITYNAMEMISSING);
@@ -74,10 +75,6 @@ std::string CUIModule_ContentFormEntity::getDefaultValue()
 	return m_sDefaultValue;
 }
 
-std::string CUIModule_ContentFormEntity::getValue()
-{
-	return m_sValue;
-}
 
 bool CUIModule_ContentFormEntity::getDisabled()
 {
@@ -89,10 +86,6 @@ bool CUIModule_ContentFormEntity::getReadOnly()
 	return m_bReadOnly;
 }
 
-void CUIModule_ContentFormEntity::setValue(const std::string& sValue)
-{
-	m_sValue = sValue;
-}
 
 void CUIModule_ContentFormEntity::setDisabled(bool bDisabled)
 {
@@ -104,11 +97,37 @@ void CUIModule_ContentFormEntity::setReadOnly(bool bReadOnly)
 	m_bReadOnly = bReadOnly;
 }
 
-
-CUIModule_ContentFormEdit::CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
-	: CUIModule_ContentFormEntity (sName, sCaption, sDefaultValue)
+void CUIModule_ContentFormEntity::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
+	object.addString(AMC_API_KEY_UI_FORMUUID, getUUID());
+	object.addString(AMC_API_KEY_UI_FORMCAPTION, getCaption());
+	object.addString(AMC_API_KEY_UI_FORMTYPE, getTypeString());
+	object.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, getDefaultValue());
+	object.addBool(AMC_API_KEY_UI_FORMDISABLED, getDisabled());
+	object.addBool(AMC_API_KEY_UI_FORMREADONLY, getReadOnly());
 
+}
+
+
+void CUIModule_ContentFormEntity::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_FORMUUID, getUUID());
+	object.addString(AMC_API_KEY_UI_FORMCAPTION, getCaption());
+	object.addString(AMC_API_KEY_UI_FORMTYPE, getTypeString());
+	object.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, getDefaultValue());
+	object.addBool(AMC_API_KEY_UI_FORMDISABLED, getDisabled());
+	object.addBool(AMC_API_KEY_UI_FORMREADONLY, getReadOnly());
+
+}
+
+
+
+CUIModule_ContentFormEdit::CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string& sPrefix, const std::string& sSuffix, const std::string& sParameterMapping)
+	: CUIModule_ContentFormEntity (sName, sCaption, sDefaultValue), m_sPrefix (sPrefix), m_sSuffix (sSuffix)
+{
+	if (!sParameterMapping.empty()) {
+		CUIUtils::extractParameterDetailsFromDotString(sParameterMapping, m_sParameterInstanceName, m_sParameterGroupName, m_sParameterName);
+	}
 }
 
 CUIModule_ContentFormEdit::~CUIModule_ContentFormEdit()
@@ -120,6 +139,23 @@ std::string CUIModule_ContentFormEdit::getTypeString()
 {
 	return "edit";
 }
+
+void CUIModule_ContentFormEdit::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	CUIModule_ContentFormEntity::addDefinitionToJSON(writer, object);
+
+	object.addString(AMC_API_KEY_UI_FORMPREFIX, m_sPrefix);
+	object.addString(AMC_API_KEY_UI_FORMSUFFIX, m_sSuffix);
+}
+
+void CUIModule_ContentFormEdit::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	CUIModule_ContentFormEntity::addContentToJSON(writer, object);
+
+	object.addString(AMC_API_KEY_UI_FORMPREFIX, m_sPrefix);
+	object.addString(AMC_API_KEY_UI_FORMSUFFIX, m_sSuffix);
+}
+
 
 
 CUIModule_ContentFormSwitch::CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
@@ -194,12 +230,7 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 
 	for (auto pEntity : m_Entities) {
 		CJSONWriterObject entityObject(writer);
-		entityObject.addString(AMC_API_KEY_UI_FORMUUID, pEntity->getUUID ());
-		entityObject.addString(AMC_API_KEY_UI_FORMCAPTION, pEntity->getCaption ());
-		entityObject.addString(AMC_API_KEY_UI_FORMTYPE, pEntity->getTypeString ());
-		entityObject.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, pEntity->getDefaultValue ());
-		entityObject.addBool(AMC_API_KEY_UI_FORMDISABLED, pEntity->getDisabled());
-		entityObject.addBool(AMC_API_KEY_UI_FORMREADONLY, pEntity->getReadOnly());
+		pEntity->addDefinitionToJSON(writer, entityObject);
 		entityArray.addObject(entityObject);
 	}
 
@@ -209,9 +240,22 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 }
 
 
-PUIModule_ContentFormEntity CUIModule_ContentForm::addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
+void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	CJSONWriterObject entityArray(writer);
+	for (auto pEntity : m_Entities) {
+		CJSONWriterObject entityObject(writer);
+		pEntity->addContentToJSON(writer, entityObject);
+		entityArray.addObject(pEntity->getUUID(), entityObject);
+	}
+
+	object.addObject(AMC_API_KEY_UI_ITEMENTRIES, entityArray);
+}
+
+
+PUIModule_ContentFormEntity CUIModule_ContentForm::addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string& sPrefix, const std::string& sSuffix, const std::string& sParameterMapping)
 {	
-	auto pEntity = std::make_shared<CUIModule_ContentFormEdit>(sName, sCaption, sDefaultValue);
+	auto pEntity = std::make_shared<CUIModule_ContentFormEdit>(sName, sCaption, sDefaultValue, sPrefix, sSuffix, sParameterMapping);
 	addEntityEx(pEntity);
 	return pEntity;
 }

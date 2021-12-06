@@ -82,6 +82,9 @@ namespace AMCCommon {
 
 		static std::string findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string & sExtension, const uint32_t nMaxIterations);
 		static std::set<std::string> findContentOfDirectory(const std::string & sDirectory, bool bReturnFiles, bool bReturnDirectories);
+
+		static bool CUtils::stringIsValidAlphanumericNameString(const std::string& sString);
+
 	};
 
 	
