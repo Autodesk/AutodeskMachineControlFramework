@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcplugin_interfaceexception.hpp"
 #include "libmcplugin_state.hpp"
 
-#include "libmcdriver_marlin_dynamic.hpp"
+#include "libmcdriver_bur_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
 using namespace LibMCPlugin::Impl;
@@ -46,41 +46,41 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-typedef LibMCDriver_Marlin::PDriver_Marlin PDriver_Marlin;
-typedef LibMCEnv::CDriverCast <LibMCDriver_Marlin::CDriver_Marlin, LibMCDriver_Marlin::CWrapper> PDriverCast_Marlin;
+typedef LibMCDriver_BuR::PDriver_BuR PDriver_BuR;
+typedef LibMCEnv::CDriverCast <LibMCDriver_BuR::CDriver_BuR, LibMCDriver_BuR::CWrapper> PDriverCast_BuR;
 
 
 /*************************************************************************************************************************
- Class definition of CMechanicsData
+ Class definition of CPLCData
 **************************************************************************************************************************/
-class CMechanicsData : public virtual CPluginData {
+class CPLCData : public virtual CPluginData {
 protected:
 	// We need to globally store driver wrappers in the plugin
-	PDriverCast_Marlin m_DriverCast_Marlin;
+	PDriverCast_BuR m_DriverCast_BuR;
 
 public:
 
-	PDriver_Marlin acquireMarlinDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	PDriver_BuR acquireBuRDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		return m_DriverCast_Marlin.acquireDriver(pStateEnvironment, "marlin");
+		return m_DriverCast_BuR.acquireDriver(pStateEnvironment, "bur");
 	}
 
 };
 
 /*************************************************************************************************************************
- Class definition of CMechanicsData
+ Class definition of CPLCData
 **************************************************************************************************************************/
-typedef CState<CMechanicsData> CMechanicsState;
+typedef CState<CPLCData> CPLCState;
 
 
 /*************************************************************************************************************************
- Class definition of CMechanicsState_Init
+ Class definition of CPLCState_Init
 **************************************************************************************************************************/
-class CMechanicsState_Init : public virtual CMechanicsState {
+class CPLCState_Init : public virtual CPLCState {
 public:
 
-	CMechanicsState_Init(const std::string& sStateName, PPluginData pPluginData)
-		: CMechanicsState(getStateName(), sStateName, pPluginData)
+	CPLCState_Init(const std::string& sStateName, PPluginData pPluginData)
+		: CPLCState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
@@ -96,13 +96,46 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		std::string sCOMPort = pStateEnvironment->GetStringParameter("connectionsettings", "comport");
-		auto nBaudRate = pStateEnvironment->GetIntegerParameter("connectionsettings", "baudrate");
-		auto nStatusUpdateInterval = pStateEnvironment->GetIntegerParameter("connectionsettings", "statusupdateinterval");
-		auto nConnectTimeout = pStateEnvironment->GetIntegerParameter("connectionsettings", "connecttimeout");
+		std::string sIPAddress = pStateEnvironment->GetStringParameter("plcconfig", "ipaddress");
+		auto nPort = pStateEnvironment->GetIntegerParameter("plcconfig", "port");
+		auto nTimeout = pStateEnvironment->GetIntegerParameter("plcconfig", "timeout");
 
-		auto pDriver = m_pPluginData->acquireMarlinDriver(pStateEnvironment);
-		pDriver->Connect(sCOMPort, nBaudRate, nStatusUpdateInterval, nConnectTimeout);
+		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
+
+		pStateEnvironment->LogMessage("Connecting to PLC...");
+		pDriver->Connect(sIPAddress, nPort, nTimeout);
+		pStateEnvironment->LogMessage("successful...");
+
+		auto pPLCCommandList = pDriver->CreateCommandList();
+
+		pStateEnvironment->LogMessage("Turning on printer..");
+
+		auto pPLCCommand_TurnOn = pDriver->CreateCommand("turnon");
+		pPLCCommandList->AddCommand(pPLCCommand_TurnOn);
+
+		auto pPLCCommand_Home = pDriver->CreateCommand("home");
+		pPLCCommandList->AddCommand(pPLCCommand_Home);
+
+		/*auto pPLCCommand1 = pDriver->CreateCommand("moverecoater");
+		pPLCCommand1->SetIntegerParameter("recoater", 40000);
+		pPLCCommand1->SetIntegerParameter("velocityrecoater", 2000);
+		pPLCCommandList->AddCommand(pPLCCommand1);
+
+		auto pPLCCommand2 = pDriver->CreateCommand("moverecoater");
+		pPLCCommand2->SetIntegerParameter("recoater", 0);
+		pPLCCommand2->SetIntegerParameter("velocityrecoater", 10000);
+		pPLCCommandList->AddCommand(pPLCCommand2);  */
+
+		pPLCCommandList->FinishList();
+		pPLCCommandList->ExecuteList();
+
+
+		if (pPLCCommandList->WaitForList(300, 100000)) {
+			pStateEnvironment->LogMessage("Printer turned on");
+		}
+		else {
+			pStateEnvironment->LogMessage("Timeout while turning on printer!");
+		}
 
 		pStateEnvironment->SetNextState("idle");
 	}
@@ -111,13 +144,13 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMechanicsState_Idle
+ Class definition of CPLCState_Idle
 **************************************************************************************************************************/
-class CMechanicsState_Idle : public virtual CMechanicsState {
+class CPLCState_Idle : public virtual CPLCState {
 public:
 
-	CMechanicsState_Idle(const std::string& sStateName, PPluginData pPluginData)
-		: CMechanicsState(getStateName(), sStateName, pPluginData)
+	CPLCState_Idle(const std::string& sStateName, PPluginData pPluginData)
+		: CPLCState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
@@ -134,7 +167,8 @@ public:
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
-		if (pStateEnvironment->WaitForSignal("signal_recoatlayer", 0, pHandlerInstance)) {
+		if (pStateEnvironment->WaitForSignal("signal_recoatlayer", 0, pHandlerInstance)) {			
+
 			pStateEnvironment->StoreSignal ("recoatsignal", pHandlerInstance);
 
 			pStateEnvironment->SetNextState("recoating");
@@ -149,13 +183,13 @@ public:
 };
 
 /*************************************************************************************************************************
- Class definition of CMechanicsState_Recoating
+ Class definition of CPLCState_Recoating
 **************************************************************************************************************************/
-class CMechanicsState_Recoating : public virtual CMechanicsState {
+class CPLCState_Recoating : public virtual CPLCState {
 public:
 
-	CMechanicsState_Recoating(const std::string& sStateName, PPluginData pPluginData)
-		: CMechanicsState(getStateName(), sStateName, pPluginData)
+	CPLCState_Recoating(const std::string& sStateName, PPluginData pPluginData)
+		: CPLCState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
@@ -168,25 +202,35 @@ public:
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
 		pStateEnvironment->LogMessage("Recoating...");
-		auto pDriver = m_pPluginData->acquireMarlinDriver(pStateEnvironment);
+		
+		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
+		
+	auto pPLCCommandList = pDriver->CreateCommandList();
 
-		if (!pDriver->CanExecuteMovement())
-			throw std::runtime_error("could not execute movement");
+		auto pPLCCommand1 = pDriver->CreateCommand("moverecoater");
+		pPLCCommand1->SetIntegerParameter("recoater", 40000);
+		pPLCCommand1->SetIntegerParameter("velocityrecoater", 2000);
+		pPLCCommandList->AddCommand(pPLCCommand1);
 
-		pDriver->MoveToXY(100.0, 0.0, 0, 100.0);
+		auto pPLCCommand2 = pDriver->CreateCommand("moverecoater");
+		pPLCCommand2->SetIntegerParameter("recoater", 0);
+		pPLCCommand2->SetIntegerParameter("velocityrecoater", 10000);
+		pPLCCommandList->AddCommand(pPLCCommand2);  
 
-		if (!pDriver->CanExecuteMovement())
-			throw std::runtime_error("could not execute movement");
+		pPLCCommandList->FinishList();
+		pPLCCommandList->ExecuteList();
 
-		pDriver->MoveToXY(0.0, 0.0, 0, 100.0);
 
+		if (pPLCCommandList->WaitForList(300, 100000)) {
+			pStateEnvironment->LogMessage("Printer turned on");
+		}
+		else {
+			pStateEnvironment->LogMessage("Timeout while turning on printer!");
+		}
 		auto pSignalHandler = pStateEnvironment->RetrieveSignal("recoatsignal");
 		pSignalHandler->SetBoolResult("success", true);
-		pSignalHandler->SignalHandled();
+		pSignalHandler->SignalHandled(); 
 
 		pStateEnvironment->SetNextState("idle");
 	}
@@ -197,11 +241,11 @@ public:
 /*************************************************************************************************************************
  Class definition of CMainState_FatalError
 **************************************************************************************************************************/
-class CMechanicsState_FatalError : public virtual CMechanicsState {
+class CPLCState_FatalError : public virtual CPLCState {
 public:
 
-	CMechanicsState_FatalError(const std::string& sStateName, PPluginData pPluginData)
-		: CMechanicsState(getStateName(), sStateName, pPluginData)
+	CPLCState_FatalError(const std::string& sStateName, PPluginData pPluginData)
+		: CPLCState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
@@ -229,7 +273,7 @@ public:
 
 CStateFactory::CStateFactory(const std::string& sInstanceName)
 {
-	m_pPluginData = std::make_shared<CMechanicsData>();
+	m_pPluginData = std::make_shared<CPLCData>();
 }
 
 IState* CStateFactory::CreateState(const std::string& sStateName)
@@ -237,16 +281,16 @@ IState* CStateFactory::CreateState(const std::string& sStateName)
 
 	IState* pStateInstance = nullptr;
 
-	if (createStateInstanceByName<CMechanicsState_Init>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPLCState_Init>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMechanicsState_Idle>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPLCState_Idle>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMechanicsState_Recoating>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPLCState_Recoating>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMechanicsState_FatalError>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CPLCState_FatalError>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDSTATENAME);

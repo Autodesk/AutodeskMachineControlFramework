@@ -80,9 +80,6 @@ public:
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
 		pStateEnvironment->LogMessage("Initializing...");
 
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", 0);
@@ -100,7 +97,6 @@ public:
 /*************************************************************************************************************************
  Class definition of CMainState_Idle
 **************************************************************************************************************************/
-
 class CMainState_Idle : public virtual CMainState {
 public:
 
@@ -117,49 +113,27 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
+		LibMCEnv::PSignalHandler pSignalHandler;
 
-		LibMCEnv::PSignalHandler pHandlerInstance;
-		if (pStateEnvironment->GetBoolParameter("jobinfo", "autostart")) {
-			pStateEnvironment->SetNextState("startprocess");
+		double targetO2 = pStateEnvironment->GetDoubleParameter("processsettings", "targeto2");
+		pStateEnvironment->SetDoubleParameter("processsettings", "targeto2", targetO2 + 1.0);
+
+		pStateEnvironment->LogMessage ("Waiting for user input...");
+		if (pStateEnvironment->WaitForSignal("signal_preparebuildjob", 100, pSignalHandler)) {
+			auto sJobUUID = pSignalHandler->GetUUID("jobuuid");
+			pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", sJobUUID);
+			pSignalHandler->SignalHandled();
+
+			pStateEnvironment->LogMessage("Preparing job " + sJobUUID);
+
+			pStateEnvironment->SetNextState("preparebuild");
 
 		}
 		else {
-			if (pStateEnvironment->WaitForSignal("signal_startjob", 0, pHandlerInstance)) {
 
-				pStateEnvironment->LogMessage("Starting job..");
-				try {
-					auto sJobName = pHandlerInstance->GetString("jobname");
-					auto sJobUUID = pHandlerInstance->GetString("jobuuid");
+			pStateEnvironment->SetNextState("idle");
 
-					if (sJobName == "")
-						throw std::runtime_error ("empty job name!");
-					if (sJobName.length () > 64)
-						throw std::runtime_error("invalid job name: " + sJobName);
-
-					// Check if build job exists
-					pStateEnvironment->GetBuildJob(sJobUUID);
-
-					pStateEnvironment->SetStringParameter("jobinfo", "jobname", sJobName);
-					pStateEnvironment->SetUUIDParameter("jobinfo", "jobuuid", sJobUUID);
-					pHandlerInstance->SetBoolResult("success", true);
-
-					pStateEnvironment->SetNextState("startprocess");
-				}
-				catch (std::exception& E) {
-					pStateEnvironment->LogWarning(std::string ("Could not start job: ") + E.what ());
-					pHandlerInstance->SetBoolResult("success", false);
-					pStateEnvironment->SetNextState("idle");
-				}
-
-				pHandlerInstance->SignalHandled();
-
-			}
-			else {
-				pStateEnvironment->SetNextState("idle");
-			}
 		}
 
 	}
@@ -168,109 +142,196 @@ public:
 
 
 
-/*************************************************************************************************************************
- Class definition of CMainState_StartProcess
-**************************************************************************************************************************/
 
-class CMainState_StartProcess : public virtual CMainState {
+/*************************************************************************************************************************
+ Class definition of CMainState_PrepareBuild
+**************************************************************************************************************************/
+class CMainState_PrepareBuild : public virtual CMainState {
 public:
 
-	CMainState_StartProcess(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_PrepareBuild(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "startprocess";
+		return "preparebuild";
 	}
 
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+		pStateEnvironment->LogMessage("Waiting for build preparation...");
+		LibMCEnv::PSignalHandler pSignalHandler;
+		if (pStateEnvironment->WaitForSignal("signal_cancelbuildpreparation", 100, pSignalHandler)) {
+			pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", "00000000-0000-0000-0000-000000000000");
+			pSignalHandler->SignalHandled();
+			pStateEnvironment->SetNextState("idle");
 
-		pStateEnvironment->LogMessage("Starting process...");
+		}
+		else if (pStateEnvironment->WaitForSignal("signal_startbuild", 100, pSignalHandler)) {
+			pSignalHandler->SignalHandled();
+			pStateEnvironment->SetNextState("initbuild");
 
-		// Load Toolpath into memory
-		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
-		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
+		}
+		else {
+			pStateEnvironment->SetNextState("preparebuild");
+		}
+	}
+
+};
+
+
+
+/*************************************************************************************************************************
+ Class definition of CMainState_InitBuild
+**************************************************************************************************************************/
+class CMainState_InitBuild : public virtual CMainState {
+public:
+
+	CMainState_InitBuild(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "initbuild";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Initializing build...");
+		auto sJobUUID = pStateEnvironment->GetUUIDParameter("jobinfo", "jobuuid");
+
+		pStateEnvironment->LogMessage("Loading Toolpath...");
+		auto pBuildJob = pStateEnvironment->GetBuildJob (sJobUUID);
 		pBuildJob->LoadToolpath();
 
-		// Find out layer count
+		auto sJobName = pBuildJob->GetName();
 		auto nLayerCount = pBuildJob->GetLayerCount();
+
+		pStateEnvironment->LogMessage("Job Name: " + sJobName);
+		pStateEnvironment->LogMessage("Layer Count: " + std::to_string (nLayerCount));
 
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
-		pStateEnvironment->SetBoolParameter("jobinfo", "autostart", false);
-		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", true);
 
-		pStateEnvironment->SetNextState("drawlayer");
+		pStateEnvironment->Sleep(1000);
+		pStateEnvironment->LogMessage("Waiting for atmosphere...");
+		pStateEnvironment->Sleep(3000);
+
+		pStateEnvironment->SetNextState("beginlayer");
 	}
 
 };
 
 
 /*************************************************************************************************************************
- Class definition of CMainState_FinishProcess
+ Class definition of CMainState_BeginLayer
 **************************************************************************************************************************/
-
-class CMainState_FinishProcess : public virtual CMainState {
+class CMainState_BeginLayer : public virtual CMainState {
 public:
 
-	CMainState_FinishProcess(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_BeginLayer(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "finishprocess";
+		return "beginlayer";
 	}
 
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+		auto nLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
+		pStateEnvironment->LogMessage("Starting layer " + std::to_string (nLayer));
 
-		pStateEnvironment->LogMessage("Process finished");
 
-		// Unload Toolpath from memory
-		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
-		pStateEnvironment->GetBuildJob(sJobUUID)->UnloadToolpath ();
-
-		pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
-		pStateEnvironment->SetNextState("idle");
-
+		pStateEnvironment->SetNextState("recoatlayer");
 	}
 
 };
 
 
-/*************************************************************************************************************************
- Class definition of CMainState_DrawLayer
-**************************************************************************************************************************/
 
-class CMainState_DrawLayer : public virtual CMainState {
+/*************************************************************************************************************************
+ Class definition of CMainState_BeginLayer
+**************************************************************************************************************************/
+class CMainState_RecoatLayer : public virtual CMainState {
 public:
 
-	CMainState_DrawLayer(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_RecoatLayer(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "drawlayer";
+		return "recoatlayer";
 	}
 
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+		pStateEnvironment->LogMessage("Recoating layer...");
+		
+		auto nRecoatingTimeOut = pStateEnvironment->GetIntegerParameter("jobinfo", "recoatingtimeout");
+
+		auto pSignal = pStateEnvironment->PrepareSignal("plc", "signal_recoatlayer");
+		pSignal->Trigger();
+
+		if (pSignal->WaitForHandling((uint32_t)nRecoatingTimeOut)) {
+
+			if (pSignal->GetBoolResult("success")) {
+
+				pStateEnvironment->LogMessage("Recoating successful...");
+				pStateEnvironment->SetNextState("exposelayer");
+			}
+			else {
+				pStateEnvironment->LogMessage("Recoating failed...");
+				pStateEnvironment->SetNextState("fatalerror");
+
+			}
+
+		}
+		else {
+			pStateEnvironment->LogMessage("Recoating timeout...");
+			pStateEnvironment->SetNextState("fatalerror");
+		}
+
+
+		
+	}
+
+};
+
+
+
+/*************************************************************************************************************************
+ Class definition of CMainState_ExposeLayer
+**************************************************************************************************************************/
+class CMainState_ExposeLayer : public virtual CMainState {
+public:
+
+	CMainState_ExposeLayer(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "exposelayer";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Exposing layer...");
 
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
@@ -283,74 +344,115 @@ public:
 		pSignal->Trigger();
 
 		if (pSignal->WaitForHandling((uint32_t)nExposureTimeOut)) {
-
-			pStateEnvironment->SetNextState("nextlayer");
+			pStateEnvironment->LogMessage("Layer successfully exposed...");
+			pStateEnvironment->SetNextState("finishlayer");
 
 		}
 		else {
-
+			pStateEnvironment->LogMessage("Layer exposure failed...");
 			pStateEnvironment->SetNextState("fatalerror");
 		}
 
 	}
+
 };
 
 
-/*************************************************************************************************************************
- Class definition of CMainState_NextLayer
-**************************************************************************************************************************/
 
-class CMainState_NextLayer : public virtual CMainState {
+/*************************************************************************************************************************
+ Class definition of CMainState_FinishLayer
+**************************************************************************************************************************/
+class CMainState_FinishLayer : public virtual CMainState {
 public:
 
-	CMainState_NextLayer(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_FinishLayer(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "nextlayer";
+		return "finishlayer";
 	}
 
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
-		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
-		auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
+		auto nLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
-		auto nRecoatingTimeOut = pStateEnvironment->GetIntegerParameter("jobinfo", "recoatingtimeout");
 
-		auto pSignal = pStateEnvironment->PrepareSignal("mechanics", "signal_recoatlayer");
-		pSignal->Trigger();
+		pStateEnvironment->LogMessage("Finished layer " + std::to_string (nLayer));
 
-		if (pSignal->WaitForHandling((uint32_t) nRecoatingTimeOut)) {
+		nLayer++;
+		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nLayer);
 
-			pStateEnvironment->LogMessage("Advancing to layer #" + std::to_string(nCurrentLayer + 1) + "...");
-			pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nCurrentLayer + 1);
-
-			if (nCurrentLayer + 1 < nLayerCount) {
-				pStateEnvironment->SetNextState("drawlayer");
-			}
-			else {
-				pStateEnvironment->SetNextState("finishprocess");
-			}
-
+		if (nLayer < nLayerCount) {
+			pStateEnvironment->SetNextState("beginlayer");
 		}
 		else {
-
-			pStateEnvironment->SetNextState("fatalerror");
+			pStateEnvironment->SetNextState("finishbuild");
 		}
-		
+
 	}
 
 };
 
 
+/*************************************************************************************************************************
+ Class definition of CMainState_FinishBuild
+**************************************************************************************************************************/
+class CMainState_FinishBuild : public virtual CMainState {
+public:
 
+	CMainState_FinishBuild(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "finishbuild";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Finishing Build...");
+		pStateEnvironment->LogMessage("Turning laser off...");
+		pStateEnvironment->Sleep(1000);
+
+		pStateEnvironment->SetNextState("idle");
+	}
+
+};
+
+
+/*************************************************************************************************************************
+ Class definition of CMainState_PauseBuild
+**************************************************************************************************************************/
+class CMainState_PauseBuild : public virtual CMainState {
+public:
+
+	CMainState_PauseBuild(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "pausebuild";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Build paused");
+		pStateEnvironment->Sleep(3000);
+
+		pStateEnvironment->SetNextState("pausebuild");
+	}
+
+};
 
 
 /*************************************************************************************************************************
@@ -372,13 +474,40 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
 		// Unload all toolpathes that might be in memory
 		pStateEnvironment->UnloadAllToolpathes();
 
 		pStateEnvironment->SetNextState("fatalerror");
+	}
+
+};
+
+
+/*************************************************************************************************************************
+ Class definition of CMainState_CancelBuild
+**************************************************************************************************************************/
+class CMainState_CancelBuild : public virtual CMainState {
+public:
+
+	CMainState_CancelBuild(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "cancelbuild";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Canceling Build...");
+		pStateEnvironment->LogMessage("Turning laser off...");
+		pStateEnvironment->Sleep(1000);
+
+		pStateEnvironment->SetNextState("idle");
 	}
 
 };
@@ -408,16 +537,31 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 	if (createStateInstanceByName<CMainState_FatalError>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_StartProcess>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_PrepareBuild>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_FinishProcess>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_InitBuild>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_DrawLayer>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_BeginLayer>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_NextLayer>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_RecoatLayer>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_ExposeLayer>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_FinishLayer>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_FinishBuild>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_PauseBuild>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_CancelBuild>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDSTATENAME);

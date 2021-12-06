@@ -91,27 +91,59 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
 		pStateEnvironment->LogMessage("Initialising ScanLab Driver");
 
 		auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
 		pDriver->LoadSDK("rtc6dllx64");
 
-		auto sIP = pStateEnvironment->GetStringParameter ("cardconfig", "ipaddress");
+		auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
 		auto sNetmask = pStateEnvironment->GetStringParameter("cardconfig", "netmask");
 		auto nTimeout = pStateEnvironment->GetIntegerParameter("cardconfig", "timeout");
 		auto nSerial = pStateEnvironment->GetIntegerParameter("cardconfig", "serial");
+		auto dMaxLaserPower = pStateEnvironment->GetDoubleParameter("cardconfig", "maxlaserpower");
+		auto dLaserOnDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "laserondelay");
+		auto dLaserOffDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "laseroffdelay");
+		auto dMarkDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "markdelay");
+		auto dJumpDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "jumpdelay");
+		auto dPolygonDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "polygondelay");
 
-		pStateEnvironment->LogMessage("Acquiring ethernet card #" + std::to_string(nSerial));
+		auto sCorrectionResourceName = pStateEnvironment->GetStringParameter("correction", "resourcename");
+		auto nTableIndex = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tableindex");
+		auto nDimension = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "dimension");
+		auto nTableNumberHeadA = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tablenumbera");
+		auto nTableNumberHeadB = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tablenumberb");
+
+		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
 		pDriver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
-		
+
+		std::string sFirmwareResource;
+		if (sIP.empty()) {
+			pStateEnvironment->LogMessage("Loading RTC PCI firmware...");
+			sFirmwareResource = "rtc6out";
+		}
+		else {
+			pStateEnvironment->LogMessage("Loading RTC Ethernet firmware...");
+			sFirmwareResource = "rtc6eth";
+		}
+
+		pDriver->LoadFirmware(sFirmwareResource, "rtc6rbf", "rtc6dat");
+
+		std::vector<uint8_t> CorrectionFileBuffer;
+		pStateEnvironment->LogMessage("Loading correction file...");
+		pStateEnvironment->LoadResourceData(sCorrectionResourceName, CorrectionFileBuffer);
+
+		pDriver->SetCorrectionFile(CorrectionFileBuffer, nTableIndex, nDimension, nTableNumberHeadA, nTableNumberHeadB);
+
+		pStateEnvironment->LogMessage("Configuring laser...");
+		pDriver->ConfigureLaserMode(LibMCDriver_ScanLab::eLaserMode::YAG1, LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1, dMaxLaserPower, false, false, true, true, false, false);
+
+		pStateEnvironment->LogMessage("Configuring delays...");
+		pDriver->ConfigureDelays(dLaserOnDelay, dLaserOffDelay, dMarkDelay, dJumpDelay, dPolygonDelay);
 		pStateEnvironment->LogMessage("Initialising done..");
 
 		pStateEnvironment->SetNextState("idle");
 
+	
 	}
 
 };
@@ -136,10 +168,9 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
+		auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
+		pDriver->QueryParameters();
+		
 		LibMCEnv::PSignalHandler pHandlerInstance;
 		if (pStateEnvironment->WaitForSignal("signal_exposure", 0, pHandlerInstance)) {
 			pStateEnvironment->StoreSignal("exposuresignal", pHandlerInstance);
@@ -176,13 +207,16 @@ public:
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+		auto pSignalHandler = pStateEnvironment->RetrieveSignal("exposuresignal");
 
 		pStateEnvironment->LogMessage("Exposure...");
-		pStateEnvironment->Sleep(1000);
+		auto pBuildJob = pStateEnvironment->GetBuildJob(pSignalHandler->GetString("jobuuid"));
+		auto nLayerIndex = (uint32_t)pSignalHandler->GetInteger("layerindex");
 
-		auto pSignalHandler = pStateEnvironment->RetrieveSignal("exposuresignal");
+		auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
+
+		pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+
 		pSignalHandler->SetBoolResult("success", true);
 		pSignalHandler->SignalHandled();
 
