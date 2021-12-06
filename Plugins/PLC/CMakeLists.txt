@@ -1,7 +1,7 @@
 ##########################################################################################
 ### Change the next line for making new plugins
 ##########################################################################################
-set (PLUGINPROJECT Main)
+set (PLUGINPROJECT PLC)
 
 include (../CMakePluginCommon.txt)
 
