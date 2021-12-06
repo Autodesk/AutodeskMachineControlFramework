@@ -1,222 +1,309 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02">
+	<services threadcount="32"/>
 
-  <services threadcount="32" />
+	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol" />
+	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
+  
+	<statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
+
+		<parametergroup name="jobinfo" description="Job Information">
+			<parameter name="jobname" description="Job Name" default="Job Name" type="string"/>
+			<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string"/>
+			<parameter name="layercount" description="Layer Count" default="0" type="int"/>
+			<parameter name="currentlayer" description="Current Layer" default="0" type="int"/>
+			<parameter name="autostart" description="Automatically start job after init" default="0" type="bool"/>
+			<parameter name="printinprogress" description="Print is in progress" default="0" type="bool"/>
+			<parameter name="recoatingtimeout" description="Recoating Timeout" default="60000" type="int"/>
+			<parameter name="exposuretimeout" description="Exposure Timeout" default="300000" type="int"/>
+		</parametergroup>
+
+		<parametergroup name="processsettings" description="Process Settings">
+			<parameter name="targeto2" description="Target O2 PPM" default="3" type="double"/>
+			<parameter name="recoaterspeed" description="Recoater speed (in mm/s)" default="80" type="double"/>
+			<parameter name="gasflowspeed" description="Gas flow speed (in m/s)" default="2" type="double"/>
+		</parametergroup>
 
 
-  <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
-  
-    <statemachine name="demo" description="Demo System" initstate="init" failedstate="fatalerror" library="plugin_demo">
-  	 	  		  
-  	  <parametergroup name="jobinfo" description="Job Information">
-  		<parameter name="jobname" description="Job Name" default="Job Name" type="string" />
-  		<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string" />
-  		<parameter name="layercount" description="Layer Count" default="0" type="int" />
-  		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
-  		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
-  		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
-  	  </parametergroup>
+		<signaldefinition name="signal_preparebuildjob">
+			<parameter name="jobuuid" type="string"/>
+			<parameter name="jobname" type="string"/>
+		</signaldefinition>
 
-	  
-  	  <signaldefinition name="signal_startjob">
-  		<parameter name="jobuuid" type="string" />
-   		<parameter name="jobname" type="string" />
-  		<result name="success" type="bool" />		
-  	  </signaldefinition>	 	  	  	     
-    
+		<signaldefinition name="signal_cancelbuildpreparation">
+		</signaldefinition>
 
-  	  <state name="init" repeatdelay="100">
-  			<outstate target="idle" />
-  	  </state>
-  
-  
-  	  <state name="idle" repeatdelay="50">
-  			<outstate target="idle" />
-  			<outstate target="startprocess" />
-  	  </state>
-  
-  	  <state name="startprocess" repeatdelay="100">	  
-  			<outstate target="drawlayer" />
-  	  </state>
-  	  
-  	  <state name="drawlayer" repeatdelay="100">
-  			<outstate target="nextlayer" />
-  	  </state>
-  	  
-  
-  	  <state name="nextlayer" repeatdelay="2000">
-  			<outstate target="drawlayer" />
-  			<outstate target="finishprocess" />
-  	  </state>
-  
-  
-  	  <state name="finishprocess" repeatdelay="100">	  
-  			<outstate target="idle" />
-  	  </state>
-  		
-  	  <state name="fatalerror" repeatdelay="5000">	  
-  			<outstate target="init" />
-  			<outstate target="fatalerror" />
-  	  </state>
-    
-  	  
-    </statemachine>
-  
-  	<userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main" library="plugin_userinterface">
-  
-		<logo resource="ui_logo" aspectratio="2.5" />
+		<signaldefinition name="signal_startbuild">
+		</signaldefinition>
 
-      <colors>
-        <color name="primary" red="0.024" green="0.588" blue="0.843" />
-        <color name="secondary" red="0.529" green="0.737" blue="0.251" />
-        <color name="accent" red="0.400" green="0.400" blue="0.400" />
-        <color name="error" red="0.867" green="0.133" blue="0.133" />
-      </colors>
+
+		<state name="init" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="idle" repeatdelay="1000">
+			<outstate target="idle"/>
+			<outstate target="preparebuild"/>
+			<acceptedsignal name="signal_preparebuildjob"/>
+		</state>
+
+		<state name="preparebuild" repeatdelay="100">
+			<outstate target="initbuild"/>
+			<outstate target="preparebuild"/>
+			<outstate target="idle"/>
+		</state>
+
+		<state name="initbuild" repeatdelay="100">
+			<outstate target="beginlayer"/>
+		</state>
+
+		<state name="beginlayer" repeatdelay="1000">
+			<outstate target="recoatlayer"/>
+			<outstate target="exposelayer"/>
+		</state>
+
+		<state name="recoatlayer" repeatdelay="100">
+			<outstate target="exposelayer"/>
+		</state>
+
+		<state name="exposelayer" repeatdelay="100">
+			<outstate target="finishlayer"/>
+		</state>
+
+		<state name="finishlayer" repeatdelay="100">
+			<outstate target="beginlayer"/>
+			<outstate target="finishbuild"/>
+		</state>
+
+		<state name="finishbuild" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="pausebuild" repeatdelay="100">
+			<outstate target="beginlayer"/>
+			<outstate target="cancelbuild"/>
+		</state>
+
+		<state name="cancelbuild" repeatdelay="100">
+			<outstate target="idle"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">
+			<outstate target="init"/>
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+
+  <statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
+
+    <parametergroup name="cardconfig" description="Scanlab Card Config">
+      <parameter name="serial" description="Serial" default="1000" type="int" />
+      <parameter name="ipaddress" description="Scanlab Ethernet Address" default="" type="string" />
+      <parameter name="netmask" description="Scanlab Netmask" default="" type="string" />
+      <parameter name="timeout" description="Connection timeout" default="1000" type="int" />
+      <parameter name="maxlaserpower" description="Max. laser power (W)" default="400" type="double" />
+      <parameter name="laserondelay" description="Laser On Delay in microseconds" default="100" type="double" />
+      <parameter name="laseroffdelay" description="Laser Off Delay in microseconds" default="100" type="double" />
+      <parameter name="markdelay" description="Mark Delay in microseconds" default="570" type="double" />
+      <parameter name="jumpdelay" description="Jump Delay in microseconds" default="1400" type="double" />
+      <parameter name="polygondelay" description="Polygon Delay in microseconds" default="280" type="double" />
+    </parametergroup>
+
+    <parametergroup name="correction" description="Scanlab Correction Data">
+      <parameter name="resourcename" description="Correction resource name" default="d2_1386" type="string" />
+      <parameter name="tableindex" description="Correction table index" default="1" type="int" />
+      <parameter name="dimension" description="Correction file dimension" default="3" type="int" />
+      <parameter name="tablenumbera" description="Table number head A" default="1" type="int" />
+      <parameter name="tablenumberb" description="Table number head B" default="0" type="int" />
+    </parametergroup>
+
+    <driverparametergroup name="sdkstate" description="Scanlab SDK State" driver="scanlab" />
+
+    <signaldefinition name="signal_exposure">
+      <parameter name="jobuuid" type="string" />
+      <parameter name="layerindex" type="int" />
+      <parameter name="timeout" type="int" />
+      <result name="success" type="bool" />
+    </signaldefinition>
+
+    <state name="init" repeatdelay="100">
+      <outstate target="idle" />
+    </state>
+
+    <state name="idle" repeatdelay="50">
+      <outstate target="idle" />
+      <outstate target="exposure" />
+    </state>
+
+    <state name="exposure" repeatdelay="50">
+      <outstate target="idle" />
+    </state>
+
+    <state name="fatalerror" repeatdelay="5000">
+      <outstate target="init" />
+      <outstate target="fatalerror" />
+    </state>
+
+  </statemachine>
+
+
+
+
+	<statemachine name="plc" description="PLC System" initstate="init" failedstate="fatalerror" library="plugin_plc">
+
+		<parametergroup name="plcconfig" description="PLC Config">
+			<parameter name="ipaddress" description="PLC Ethernet Address" default="127.0.0.1" type="string" />
+			<parameter name="port" description="PLC Port" default="12000" type="int" />
+			<parameter name="timeout" description="Connection timeout" default="1000" type="int" />
+		</parametergroup>
+
+		<driverparametergroup name="plcstate" description="BuR State" driver="bur" />
 		
+		<signaldefinition name="signal_recoatlayer">
+			<result name="success" type="bool" />
+		</signaldefinition>
+		
+		<state name="init" repeatdelay="100">
+			<outstate target="idle" />
+		</state>
+
+		<state name="idle" repeatdelay="50">
+			<outstate target="idle" />
+			<outstate target="recoating" />
+		</state>
+
+		<state name="recoating" repeatdelay="50">
+			<outstate target="idle" />
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">
+			<outstate target="init" />
+			<outstate target="fatalerror" />
+		</state>
+
+	</statemachine>
+
+
+	<userinterface appname="SLM Demo System" copyright="2021 Autodesk" mainpage="main" library="plugin_userinterface">
+
+		<logo resource="ui_logo" aspectratio="2.5"/>
+		
+		<colors>
+			<color name="primary" red="0.024" green="0.588" blue="0.843" />
+			<color name="secondary" red="0.529" green="0.737" blue="0.251" />
+			<color name="accent" red="0.400" green="0.400" blue="0.400" />
+			<color name="error" red="0.867" green="0.133" blue="0.133" />
+		</colors>		
+
 		<page name="main">
-
-			<content name="infobox" title="Welcome to AMdroid" headline="Autodesk Machine Control Framework" subtitle="Make Additive Manufacturing accessible">
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_logo" aspectratio="4.5" />
-				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
-				
-				<upload class="build" caption="Select 3MF files to upload" successpage="buildinfo" />
-				
-			
-				<buttongroup>
-					<button caption="Build Library" targetpage="buildlist" />
-					<button caption="System Status" targetpage="systemstatus" />
-				</buttongroup>
-				
-			</content>		
-
+			<content name="infobox" title="SLM Demo System" headline="">
+				<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
+				<paragraph text="This sample configuration serves as Laser Powderbed Fusion demo implementation."/>
+				<upload class="build" caption="Select 3MF files to upload" successpage="previewbuild"/>
+			</content>
 		</page>
 
 		<page name="buildlist">
-		
-			<content name="buildlibrary" title="Build Library" subtitle="Make Additive Manufacturing accessible">
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
-				
-				<upload class="build" caption="Drag 3MF files here to upload" successpage="buildinfo" />
-				
-				<buildlist loadingtext="Loading builds" entriesperpage="20" detailpage="buildinfo" />
-				
-			</content>		
-
+			<content name="buildlibrary" title="Build Library">
+				<upload class="build" caption="Select 3MF files to upload" successpage="buildinfo"/>
+				<buildlist loadingtext="Loading builds" entriesperpage="20" detailpage="previewbuild"/>
+			</content>
 		</page>
 
-
-		<page name="buildinfo" onload="loadbuildinfo">
-		
+		<page name="previewbuild" onload="loadbuildinfo">
 			<content name="buildinformation" title="Build Information" subtitle="Detailed information">
-				<paragraph text="Here you find more information about your build." />
-
+				<paragraph text="Here you find more information about your build."/>
+				<layerview/>
 				<buttongroup>
-					<button caption="Start Build" event="startbuild" targetpage="systemstatus" />
+					<button caption="Prepare Build" targetpage="preparebuild" event="startbuildpreparation"/>
 				</buttongroup>
-				
-				
-				<layerview>				
-				</layerview>
+			</content>
+		</page>
 
-	
+		<page name="preparebuild" onload="loadbuildinfo">
+		
+			<grid name="maingrid">
+				<column width="300" unit="pt" />
+				<column width="3" unit="free" />
 				
-			</content>		
+				<row height="3" unit="free" />
+				<row height="80" unit="pt" />
+				
+				<content name="manualcontrol1" title="" columnstart="1" rowstart="1" columnend="1" rowend="1">
+					
+						<form name="processparameters">
+							<edit name="o2_value" caption="Target Oxygen Value" parameter="main.processsettings.targeto2" suffix="ppm" readonly="1" />
+							<edit name="velocity_recoater" caption="Recoater Speed" value="80" suffix="mm/s" readonly="1" />
+							<edit name="gas_velocity" caption="Gas flow speed" value="2" suffix="m/s" readonly="1" />
+						</form>
+						<buttongroup>
+							<button caption="Change values" />
+						</buttongroup>
+				
+				</content>
+				
+				<content name="manualcontrol2" title="" columnstart="1" rowstart="2" columnend="1" rowend="2">
+					
+						<buttongroup>
+							<button caption="Move to home" />
+							<button caption="Start inertisation" />
+						</buttongroup>				
+				</content>
+				
+				<glscene name="manualcontrol3" title="" columnstart="2" rowstart="1" columnend="2" rowend="1">
+									
+				</glscene>
+				
+				<content name="manualcontrol4" title="" columnstart="2" rowstart="2" columnend="2" rowend="2">
+					
+					<buttongroup>
+							<button caption="Start Job" targetpage="buildstatus" event="startbuild"/>
+							<button caption="Cancel Preparation" targetpage="main" event="cancelbuildpreparation"/>
+						</buttongroup>				
+				
+				</content>
+			</grid>		
+		
+		</page>
+
+		<page name="buildstatus" onload="">
+		</page>
+
+		<page name="buildreport">
+
+			<content name="currentbuild" title="Build Report">
+			</content>
 
 		</page>
 
 		<page name="systemstatus">
-			<content name="currentbuild" title="Current System Status" >
-			
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
-				<paragraph text="This is the current machine state." />						
-				
+
+			<content name="currentbuild" title="Current System Status">
 				<parameterlist loadingtext="Loading parameters">
-					<entry statemachine="demo" group="jobinfo" />
-				</parameterlist>	
-			</content>					
-			
-		</page>
-
-		<page name="manualcontrol">
-			<grid name="maingrid">
-				<column width="1" unit="free" />
-				<column width="1" unit="free" />
-				<column width="1" unit="free" />
-				
-				<row height="1" unit="free" />
-				<row height="1" unit="free" />
-				<row height="200" unit="px" />				
-				
-				<content name="manualcontrol1" title="" columnstart="2" rowstart="3" columnend="2" rowend="3">
-					
-					<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
-					<paragraph text="This is the current machine state." />						
-				
-				</content>
-				
-				<content name="manualcontrol2" title="" columnstart="1" rowstart="3" columnend="1" rowend="3">
-					
-					<paragraph text="BLABLABLABLA." />	
-					<parameterlist loadingtext="Loading parameters">
-						<entry statemachine="demo" group="jobinfo" />
-					</parameterlist>						
-				
-				</content>
-				
-				<content name="manualcontrol3" title="" columnstart="3" rowstart="3" columnend="3" rowend="3">
-					
-					<paragraph text="BLABLABLABLAX." />						
-				
-				</content>
-				
-				<glscene name="manualcontrol4" title="" columnstart="1" rowstart="1" columnend="3" rowend="2">
-									
-				</glscene>
-			</grid>
-		</page>
-
-
-		<page name="settings">
-		
-			<content name="machinesettings" title="Machine Settings" >
-
-				<form name="form1">
-					<edit name="machinename" caption="Machine name" text="" />
-					<switch name="switch1" caption="Switch 1" value="1" />
-					<switch name="switch2" caption="Switch 2" value="0" />
-					<switch name="switch3" caption="Switch 3" value="0" />
-					<memo name="description" caption="Machine description" text="" />
-					<combobox name="dropdown" caption="Combobox" value="0" />
-				</form>
-				
-				<buttongroup>
-					<button caption="Save" />
-					<button caption="Cancel" />
-				</buttongroup>
-						
-			</content>					
+					<entry statemachine="main" group="processsettings"/>
+					<entry statemachine="main" group="jobinfo"/>
+          <entry statemachine="laser" group="sdkstate"/>          
+        </parameterlist>
+			</content>
 
 		</page>
 
 		<menu>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="build" icon="mdi-factory" caption="Build Library" targetpage="buildlist"/>
+			<item id="buildlist" icon="mdi-apps" caption="Build Library" targetpage="buildlist"/>
+			<item id="preparebuild" icon="mdi-apps" caption="Prepare Build" targetpage="preparebuild"/>
+			<item id="buildstatus" icon="mdi-apps" caption="Build Status" targetpage="buildstatus"/>
+			<item id="buildreport" icon="mdi-apps" caption="Build Report" targetpage="buildreport"/>
 			<item id="systemstatus" icon="mdi-apps" caption="System Status" targetpage="systemstatus"/>
-			<item id="settings" icon="mdi-settings" caption="Manual Control" targetpage="manualcontrol"/>
-			<item id="settings" icon="mdi-settings" caption="Settings" targetpage="settings"/>
-
 		</menu>
+
 
 		<toolbar>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
-
 		</toolbar>
 
 
 	</userinterface>
-
 </machinedefinition>
