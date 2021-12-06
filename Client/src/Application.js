@@ -228,7 +228,10 @@ export default class AMCApplication {
 					  disabled: entity.disabled, 
 					  readonly: entity.readonly
 					  };
+					  
+					  
 				entity.dataObject = this.AppContent.FormEntities[entity.uuid];
+							
 			}
 			
 		
@@ -304,6 +307,8 @@ export default class AMCApplication {
 							rowString = rowString + rowObject.height + "px ";
 						} else if (rowObject.unit === "free") {
 							rowString = rowString + rowObject.height + "fr ";
+						} else if (rowObject.unit === "pt") {
+							rowString = rowString + rowObject.height + "pt ";
 						} else {
 							rowString = rowString + "auto ";
 						}
@@ -316,6 +321,8 @@ export default class AMCApplication {
 							columnString = columnString + columnObject.width + "px ";
 						} else if (columnObject.unit === "free") {
 							columnString = columnString + columnObject.width + "fr ";
+						} else if (columnObject.unit === "pt") {
+							columnString = columnString + columnObject.width + "pt ";
 						} else {
 							columnString = columnString + "auto ";
 						}

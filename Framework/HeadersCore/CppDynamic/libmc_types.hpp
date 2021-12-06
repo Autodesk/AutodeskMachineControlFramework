@@ -398,6 +398,11 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDCOLUMNENDATTRIB 371
 #define LIBMC_ERROR_INVALIDROWSTARTATTRIB 372
 #define LIBMC_ERROR_INVALIDROWENDATTRIB 373
+#define LIBMC_ERROR_INVALIDPARAMETERPATH 374
+#define LIBMC_ERROR_INVALIDPARAMETERINSTANCE 375
+#define LIBMC_ERROR_INVALIDPARAMETERGROUP 376
+#define LIBMC_ERROR_INVALIDPARAMETERNAME 377
+#define LIBMC_ERROR_INVALIDSTATEMACHINENAME 378
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -708,6 +713,11 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDCOLUMNENDATTRIB: return "Invalid column end attrib";
     case LIBMC_ERROR_INVALIDROWSTARTATTRIB: return "Invalid row start attrib";
     case LIBMC_ERROR_INVALIDROWENDATTRIB: return "Invalid row end attrib";
+    case LIBMC_ERROR_INVALIDPARAMETERPATH: return "Invalid parameter path";
+    case LIBMC_ERROR_INVALIDPARAMETERINSTANCE: return "Invalid parameter instance";
+    case LIBMC_ERROR_INVALIDPARAMETERGROUP: return "Invalid parameter group";
+    case LIBMC_ERROR_INVALIDPARAMETERNAME: return "Invalid parameter name";
+    case LIBMC_ERROR_INVALIDSTATEMACHINENAME: return "Invalid state machine name";
     default: return "unknown error";
   }
 }
