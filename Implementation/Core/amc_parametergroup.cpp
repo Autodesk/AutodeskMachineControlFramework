@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statejournal.hpp"
 
 #include "amc_jsonwriter.hpp"
+#include "common_utils.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 #include "RapidJSON/document.h"
@@ -90,6 +91,10 @@ namespace AMC {
 		auto sName = pParameter->getName();
 		if (m_Parameters.find(sName) != m_Parameters.end())
 			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERNAME, sName);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERNAME, sName);
+
 
 		if (m_ParameterList.size() >= AMC_MAXPARAMETERCOUNT)
 			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERS, sName);

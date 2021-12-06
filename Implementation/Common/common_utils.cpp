@@ -456,6 +456,27 @@ namespace AMCCommon {
 			);
 	}
 
+
+	bool CUtils::stringIsValidAlphanumericNameString(const std::string& sString)
+	{
+		if (sString.empty())
+			return false;
+
+		if (sString.at(0) == '_')
+			return false;
+
+		for (const char& cChar : sString) {
+			if (!(((cChar >= '0') && (cChar <= '9'))
+				|| ((cChar >= 'a') && (cChar <= 'z'))
+				|| ((cChar >= 'A') && (cChar <= 'Z'))
+				|| (cChar == '_')
+				))
+				return false;
+		}
+
+		return true;
+	}
+
 	std::string CUtils::normalizeUUIDString(std::string sRawString)
 	{
 		

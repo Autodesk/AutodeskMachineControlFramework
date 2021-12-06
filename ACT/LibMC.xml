@@ -387,6 +387,13 @@
 		<error name="INVALIDROWSTARTATTRIB" code="372" description="Invalid row start attrib" />
 		<error name="INVALIDROWENDATTRIB" code="373" description="Invalid row end attrib" />
 		
+		<error name="INVALIDPARAMETERPATH" code="374" description="Invalid parameter path" />
+		<error name="INVALIDPARAMETERINSTANCE" code="375" description="Invalid parameter instance" />
+		<error name="INVALIDPARAMETERGROUP" code="376" description="Invalid parameter group" />
+		<error name="INVALIDPARAMETERNAME" code="377" description="Invalid parameter name" />
+		
+		<error name="INVALIDSTATEMACHINENAME" code="378" description="Invalid state machine name" />
+		
 			
 	</errors>
 	
