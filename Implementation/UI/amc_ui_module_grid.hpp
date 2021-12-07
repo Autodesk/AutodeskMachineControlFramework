@@ -57,6 +57,13 @@ namespace AMC {
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
 
+	enum class eUIModule_GridColumnPosition {
+		gcpUnknown, gcpFull, gcpLeft, gcpCentered, gcpRight
+	};
+
+	enum class eUIModule_GridRowPosition {
+		crpUnknown, grpFull, grpTop, grpCentered, grpBottom
+	};
 
 	class CUIModule_GridColumn {
 	private:
@@ -67,6 +74,9 @@ namespace AMC {
 
 		float getWidth();
 		std::string getWidthUnitString();
+
+		static std::string gridPositionToString(eUIModule_GridColumnPosition ePosition);
+		static eUIModule_GridColumnPosition stringToGridPosition(const std::string& sString);
 	};
 
 	class CUIModule_GridRow {
@@ -79,14 +89,20 @@ namespace AMC {
 		float getHeight();
 		std::string getHeightUnitString();
 
+		static std::string gridPositionToString(eUIModule_GridRowPosition ePosition);
+		static eUIModule_GridRowPosition stringToGridPosition(const std::string& sString);
+
 	};
 
 	class CUIModule_GridSection {
 	private:
 		PUIModule m_pModule;
 		int m_nColumnStart, m_nColumnEnd, m_nRowStart, m_nRowEnd;
+		eUIModule_GridColumnPosition m_ColumnPosition;
+		eUIModule_GridRowPosition m_RowPosition;
+
 	public:
-		CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd);
+		CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
 
 		CUIModule * getModule();
 
@@ -94,6 +110,12 @@ namespace AMC {
 		int getColumnEnd();
 		int getRowStart();
 		int getRowEnd ();
+
+		eUIModule_GridColumnPosition getColumnPosition ();
+		std::string getColumnPositionString();
+		eUIModule_GridRowPosition getRowPosition ();
+		std::string getRowPositionString();
+
 	};
 
 
@@ -109,7 +131,7 @@ namespace AMC {
 		std::vector<PUIModule_GridRow> m_Rows;
 		std::vector<PUIModule_GridColumn> m_Columns;
 
-		void addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd);
+		void addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
 
 	public:
 

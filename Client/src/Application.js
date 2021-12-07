@@ -218,6 +218,8 @@ export default class AMCApplication {
 		}
 		
 		if (item.type === "form") {
+
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
 			
 			for (var entity of item.entities) {
 				
@@ -259,6 +261,7 @@ export default class AMCApplication {
 		}
 
 		if (module.type === "grid") {
+						
 						
 			module.cssstyle = "display: grid; width:100%; height:100%;";
 			
@@ -350,6 +353,25 @@ export default class AMCApplication {
 						
 			for (section of module.sections) {
 								
+				var marginx = "margin-left: 0; margin-right: 0;";
+				var marginy = "margin-top: 0; margin-bottom: 0;";
+				
+				if (section.columnposition) {
+					if (section.columnposition == "centered")
+						marginx = "margin-left: auto; margin-right: auto;";
+					if (section.columnposition == "right")
+						marginx = "margin-left: auto; margin-right: 0;"
+				}
+
+				if (section.rowposition) {
+					if (section.rowposition == "centered")
+						marginy = "margin-top: auto; margin-bottom: auto;";
+					if (section.rowposition == "bottom")
+						marginy = "margin-top: auto; margin-bottom: 0;";
+				} 
+				
+				section.cssstyle = "overflow:auto; grid-area:" + section.name + ";" + marginx + marginy;				
+												
 				this.prepareModule (section)
 			}
 		}

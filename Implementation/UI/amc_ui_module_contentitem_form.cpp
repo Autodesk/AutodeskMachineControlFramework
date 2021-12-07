@@ -113,7 +113,6 @@ void CUIModule_ContentFormEntity::addContentToJSON(CJSONWriter& writer, CJSONWri
 {
 	object.addString(AMC_API_KEY_UI_FORMUUID, getUUID());
 	object.addString(AMC_API_KEY_UI_FORMCAPTION, getCaption());
-	object.addString(AMC_API_KEY_UI_FORMTYPE, getTypeString());
 	object.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, getDefaultValue());
 	object.addBool(AMC_API_KEY_UI_FORMDISABLED, getDisabled());
 	object.addBool(AMC_API_KEY_UI_FORMREADONLY, getReadOnly());
@@ -242,14 +241,14 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 
 void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
-	CJSONWriterObject entityArray(writer);
+	CJSONWriterArray entityArray(writer);
 	for (auto pEntity : m_Entities) {
 		CJSONWriterObject entityObject(writer);
 		pEntity->addContentToJSON(writer, entityObject);
-		entityArray.addObject(pEntity->getUUID(), entityObject);
+		entityArray.addObject(entityObject);
 	}
 
-	object.addObject(AMC_API_KEY_UI_ITEMENTRIES, entityArray);
+	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entityArray);
 }
 
 
