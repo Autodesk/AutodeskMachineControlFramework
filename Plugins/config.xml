@@ -231,7 +231,7 @@
 				<row height="3" unit="free" />
 				<row height="80" unit="pt" />
 				
-				<content name="manualcontrol1" title="" columnstart="1" rowstart="1" columnend="1" rowend="1">
+				<content name="manualcontrol1" title="" columnstart="1" rowstart="1" columnend="1" rowend="1" columnposition="left" rowposition="top">
 					
 						<form name="processparameters">
 							<edit name="o2_value" caption="Target Oxygen Value" parameter="main.processsettings.targeto2" suffix="ppm" readonly="1" />
@@ -244,7 +244,7 @@
 				
 				</content>
 				
-				<content name="manualcontrol2" title="" columnstart="1" rowstart="2" columnend="1" rowend="2">
+				<content name="manualcontrol2" title="" columnstart="1" rowstart="2" columnend="1" rowend="2" columnposition="left" rowposition="centered">
 					
 						<buttongroup>
 							<button caption="Move to home" />
@@ -256,7 +256,7 @@
 									
 				</glscene>
 				
-				<content name="manualcontrol4" title="" columnstart="2" rowstart="2" columnend="2" rowend="2">
+				<content name="manualcontrol4" title="" columnstart="2" rowstart="2" columnend="2" rowend="2" columnposition="right" rowposition="centered">
 					
 					<buttongroup>
 							<button caption="Start Job" targetpage="buildstatus" event="startbuild"/>
