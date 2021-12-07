@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_resourcepackage.hpp"
 
 #include "libmc_exceptiontypes.hpp"
+#include "common_utils.hpp"
 
 using namespace AMC;
 
@@ -62,12 +63,39 @@ std::string CUIModule_GridColumn::getWidthUnitString()
 }
 
 
+std::string CUIModule_GridColumn::gridPositionToString(eUIModule_GridColumnPosition ePosition)
+{
+	switch (ePosition) {
+	case eUIModule_GridColumnPosition::gcpCentered: return "centered";
+	case eUIModule_GridColumnPosition::gcpFull: return "full";
+	case eUIModule_GridColumnPosition::gcpLeft: return "left";
+	case eUIModule_GridColumnPosition::gcpRight: return "right";
+	default:
+		return "";
+	}
+}
+
+eUIModule_GridColumnPosition CUIModule_GridColumn::stringToGridPosition(const std::string& sString)
+{
+	std::string sTrimmedString = AMCCommon::CUtils::toLowerString (AMCCommon::CUtils::trimString(sString));
+	if (sTrimmedString == "centered") 
+		return eUIModule_GridColumnPosition::gcpCentered;
+	if (sTrimmedString == "full")
+		return eUIModule_GridColumnPosition::gcpFull;
+	if (sTrimmedString == "left")
+		return eUIModule_GridColumnPosition::gcpLeft;
+	if (sTrimmedString == "right")
+		return eUIModule_GridColumnPosition::gcpRight;
+
+	throw ELibMCCustomException(LIBMC_ERROR_INVALIDGRIDPOSITION, sString);
+}
+
+
 CUIModule_GridRow::CUIModule_GridRow(float fHeight, const std::string& sUnit)
 	: m_Height (fHeight), m_sUnit (sUnit)
 {
 	
 }
-
 
 float CUIModule_GridRow::getHeight()
 {
@@ -79,14 +107,44 @@ std::string CUIModule_GridRow::getHeightUnitString()
 	return m_sUnit;
 }
 
+std::string CUIModule_GridRow::gridPositionToString(eUIModule_GridRowPosition ePosition)
+{
+	switch (ePosition) {
+	case eUIModule_GridRowPosition::grpCentered: return "centered";
+	case eUIModule_GridRowPosition::grpFull: return "full";
+	case eUIModule_GridRowPosition::grpTop: return "top";
+	case eUIModule_GridRowPosition::grpBottom: return "bottom";
+	default:
+		return "";
+	}
+
+}
+
+eUIModule_GridRowPosition CUIModule_GridRow::stringToGridPosition(const std::string& sString)
+{
+	std::string sTrimmedString = AMCCommon::CUtils::toLowerString(AMCCommon::CUtils::trimString(sString));
+	if (sTrimmedString == "centered")
+		return eUIModule_GridRowPosition::grpCentered;
+	if (sTrimmedString == "full")
+		return eUIModule_GridRowPosition::grpFull;
+	if (sTrimmedString == "top")
+		return eUIModule_GridRowPosition::grpTop;
+	if (sTrimmedString == "bottom")
+		return eUIModule_GridRowPosition::grpBottom;
+
+	throw ELibMCCustomException(LIBMC_ERROR_INVALIDGRIDPOSITION, sString);
+
+}
 
 
-CUIModule_GridSection::CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd)
+CUIModule_GridSection::CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition)
 	: m_pModule (pModule),
 	m_nColumnStart (nColumnStart),
 	m_nColumnEnd (nColumnEnd),
 	m_nRowStart (nRowStart),
-	m_nRowEnd (nRowEnd)
+	m_nRowEnd (nRowEnd),
+	m_ColumnPosition (columnPosition),
+	m_RowPosition (rowPosition)
 {
 	LibMCAssertNotNull(pModule.get ());
 }
@@ -117,6 +175,26 @@ int CUIModule_GridSection::CUIModule_GridSection::getRowEnd()
 }
 
 
+eUIModule_GridColumnPosition CUIModule_GridSection::getColumnPosition()
+{
+	return m_ColumnPosition;
+}
+
+std::string CUIModule_GridSection::getColumnPositionString()
+{
+	return CUIModule_GridColumn::gridPositionToString(m_ColumnPosition);
+}
+
+eUIModule_GridRowPosition CUIModule_GridSection::getRowPosition()
+{
+	return m_RowPosition;
+}
+
+std::string CUIModule_GridSection::getRowPositionString()
+{
+	return CUIModule_GridRow::gridPositionToString(m_RowPosition);
+}
+
 CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
@@ -142,6 +220,7 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 			if (unitAttrib.empty())
 				throw ELibMCCustomException(LIBMC_ERROR_MISSINGCOLUMNUNIT, m_sName);
 			std::string sUnit = unitAttrib.as_string();
+
 
 			m_Columns.push_back(std::make_shared<CUIModule_GridColumn> ((float) columnWidth, sUnit));
 		}
@@ -200,8 +279,18 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 			if (nRowEnd < nRowStart)
 				throw ELibMCCustomException(LIBMC_ERROR_INVALIDROWENDATTRIB, m_sName); 
 
+			eUIModule_GridColumnPosition eColumnPosition = eUIModule_GridColumnPosition::gcpFull;
+			std::string sColumnPosition = childNode.attribute("columnposition").as_string();
+			if (!sColumnPosition.empty())
+				eColumnPosition = CUIModule_GridColumn::stringToGridPosition(sColumnPosition);
+
+			eUIModule_GridRowPosition eRowPosition = eUIModule_GridRowPosition::grpFull;
+			std::string sRowPosition = childNode.attribute("rowposition").as_string();
+			if (!sRowPosition.empty())
+				eRowPosition = CUIModule_GridRow::stringToGridPosition(sRowPosition);
+
 			auto pSection = CUIModuleFactory::createModule(childNode, pUIModuleEnvironment);
-			addSection (pSection, nColumnStart, nColumnEnd, nRowStart, nRowEnd); 
+			addSection (pSection, nColumnStart, nColumnEnd, nRowStart, nRowEnd, eColumnPosition, eRowPosition); 
 
 		}
 
@@ -266,6 +355,8 @@ void CUIModule_Grid::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObjec
 		sectionObject.addInteger(AMC_API_KEY_UI_COLUMNEND, section->getColumnEnd ());
 		sectionObject.addInteger(AMC_API_KEY_UI_ROWSTART, section->getRowStart());
 		sectionObject.addInteger(AMC_API_KEY_UI_ROWEND, section->getRowEnd());
+		sectionObject.addString(AMC_API_KEY_UI_COLUMNPOSITION, CUIModule_GridColumn::gridPositionToString(section->getColumnPosition()));
+		sectionObject.addString(AMC_API_KEY_UI_ROWPOSITION, CUIModule_GridRow::gridPositionToString(section->getRowPosition()));
 		sectionsNode.addObject(sectionObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_SECTIONS, sectionsNode);
@@ -290,10 +381,10 @@ PUIModule_GridSection CUIModule_Grid::findSection(const std::string& sUUID)
 	return nullptr;
 }
 
-void CUIModule_Grid::addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd)
+void CUIModule_Grid::addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition)
 {
 	LibMCAssertNotNull(pModule.get());
-	auto pSection = std::make_shared<CUIModule_GridSection>(pModule, nColumnStart, nColumnEnd, nRowStart, nRowEnd);
+	auto pSection = std::make_shared<CUIModule_GridSection>(pModule, nColumnStart, nColumnEnd, nRowStart, nRowEnd, columnPosition, rowPosition);
 
 	m_SectionList.push_back(pSection);
 	m_SectionMap.insert(std::make_pair (pSection->getModule ()->getUUID (), pSection));

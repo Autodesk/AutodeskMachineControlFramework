@@ -403,6 +403,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDPARAMETERGROUP 376
 #define LIBMC_ERROR_INVALIDPARAMETERNAME 377
 #define LIBMC_ERROR_INVALIDSTATEMACHINENAME 378
+#define LIBMC_ERROR_INVALIDGRIDPOSITION 379
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -718,6 +719,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDPARAMETERGROUP: return "Invalid parameter group";
     case LIBMC_ERROR_INVALIDPARAMETERNAME: return "Invalid parameter name";
     case LIBMC_ERROR_INVALIDSTATEMACHINENAME: return "Invalid state machine name";
+    case LIBMC_ERROR_INVALIDGRIDPOSITION: return "Invalid grid position";
     default: return "unknown error";
   }
 }

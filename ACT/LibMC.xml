@@ -393,6 +393,7 @@
 		<error name="INVALIDPARAMETERNAME" code="377" description="Invalid parameter name" />
 		
 		<error name="INVALIDSTATEMACHINENAME" code="378" description="Invalid state machine name" />
+		<error name="INVALIDGRIDPOSITION" code="379" description="Invalid grid position" />
 		
 			
 	</errors>
