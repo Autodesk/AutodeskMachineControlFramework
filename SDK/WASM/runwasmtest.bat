@@ -1,1 +1,1 @@
-python -m http.server --directory .
+python runwasmtest.py

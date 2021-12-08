@@ -1,6 +1,10 @@
 -s MODULARIZE=1 
 -s EXPORT_NAME="'createLibAMCF'" 
 -s WASM=1
+-s ASYNCIFY
+-s FETCH
+-s USE_PTHREADS=1 
+-s PTHREAD_POOL_SIZE=4
 -s NO_EXIT_RUNTIME=1
 -s "EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap', 'UTF8ToString', 'stringToUTF8', 'malloc', 'free', 'getValue']"
 -s EXPORTED_FUNCTIONS="['_libamcf_createconnection', '_libamcf_acquireinstance', '_libamcf_releaseinstance', '_libamcf_getlasterror', '_libamcf_getversion', '_libamcf_connection_getbaseurl', '_libamcf_connection_settimeouts', '_libamcf_connection_gettimeout', '_libamcf_connection_getretrycount', '_libamcf_connection_authenticatewithpassword', '_libamcf_connection_isauthenticated', '_libamcf_connection_refreshauthentication', '_libamcf_connection_ping', '_libamcf_connection_getauthtoken', '_libamcf_connection_createupload']" 
@@ -9,6 +13,7 @@
 -I../Implementation/
 -I../Interfaces/
 -I../../Libraries
+-pthread
 -D_WASM
 -O3
 ../Implementation/libamcf.cpp 

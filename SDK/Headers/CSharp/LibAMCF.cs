@@ -4,6 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace LibAMCF {
 
+	public enum eStreamContextType {
+		Unknown = 0,
+		NewBuildJob = 1
+	};
+
 
 	namespace Internal {
 
@@ -28,8 +33,8 @@ namespace LibAMCF {
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_getuuid", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 DataStream_GetUUID (IntPtr Handle, UInt32 sizeUUID, out UInt32 neededUUID, IntPtr dataUUID);
 
-			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_getcontextuuid", CallingConvention=CallingConvention.Cdecl)]
-			public unsafe extern static Int32 DataStream_GetContextUUID (IntPtr Handle, UInt32 sizeContextUUID, out UInt32 neededContextUUID, IntPtr dataContextUUID);
+			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_getcontext", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 DataStream_GetContext (IntPtr Handle, out Int32 AContextType, UInt32 sizeOwnerUUID, out UInt32 neededOwnerUUID, IntPtr dataOwnerUUID);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_datastream_getname", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 DataStream_GetName (IntPtr Handle, UInt32 sizeName, out UInt32 neededName, IntPtr dataName);
@@ -52,14 +57,14 @@ namespace LibAMCF {
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_getmimetype", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 StreamUpload_GetMimeType (IntPtr Handle, UInt32 sizeMimeType, out UInt32 neededMimeType, IntPtr dataMimeType);
 
-			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_getusagecontext", CallingConvention=CallingConvention.Cdecl)]
-			public unsafe extern static Int32 StreamUpload_GetUsageContext (IntPtr Handle, UInt32 sizeUsageContext, out UInt32 neededUsageContext, IntPtr dataUsageContext);
+			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_getcontexttype", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 StreamUpload_GetContextType (IntPtr Handle, out Int32 AContextType);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_uploaddata", CallingConvention=CallingConvention.Cdecl)]
-			public unsafe extern static Int32 StreamUpload_UploadData (IntPtr Handle, UInt64 sizeData, IntPtr dataData, UInt32 AChunkSize, out IntPtr ASuccess);
+			public unsafe extern static Int32 StreamUpload_UploadData (IntPtr Handle, UInt64 sizeData, IntPtr dataData, UInt32 AChunkSize, UInt32 AThreadCount, out IntPtr ASuccess);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_uploadfile", CallingConvention=CallingConvention.Cdecl)]
-			public unsafe extern static Int32 StreamUpload_UploadFile (IntPtr Handle, byte[] AFileName, UInt32 AChunkSize, out IntPtr ASuccess);
+			public unsafe extern static Int32 StreamUpload_UploadFile (IntPtr Handle, byte[] AFileName, UInt32 AChunkSize, UInt32 AThreadCount, out IntPtr ASuccess);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_streamupload_beginchunking", CallingConvention=CallingConvention.Cdecl)]
 			public unsafe extern static Int32 StreamUpload_BeginChunking (IntPtr Handle, UInt64 ADataSize, out IntPtr ASuccess);
@@ -104,7 +109,10 @@ namespace LibAMCF {
 			public unsafe extern static Int32 Connection_GetAuthToken (IntPtr Handle, UInt32 sizeToken, out UInt32 neededToken, IntPtr dataToken);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_connection_createupload", CallingConvention=CallingConvention.Cdecl)]
-			public unsafe extern static Int32 Connection_CreateUpload (IntPtr Handle, byte[] AName, byte[] AMimeType, byte[] AUsageContext, out IntPtr AInstance);
+			public unsafe extern static Int32 Connection_CreateUpload (IntPtr Handle, byte[] AName, byte[] AMimeType, Int32 AContextType, out IntPtr AInstance);
+
+			[DllImport("libamcf.dll", EntryPoint = "libamcf_connection_preparebuild", CallingConvention=CallingConvention.Cdecl)]
+			public unsafe extern static Int32 Connection_PrepareBuild (IntPtr Handle, IntPtr ADataStream, out IntPtr ASuccess);
 
 			[DllImport("libamcf.dll", EntryPoint = "libamcf_getversion", CharSet = CharSet.Ansi, CallingConvention=CallingConvention.Cdecl)]
 			public extern static Int32 GetVersion (out UInt32 AMajor, out UInt32 AMinor, out UInt32 AMicro);
@@ -259,18 +267,20 @@ namespace LibAMCF {
 			return Encoding.UTF8.GetString(bytesUUID).TrimEnd(char.MinValue);
 		}
 
-		public String GetContextUUID ()
+		public void GetContext (out eStreamContextType AContextType, out String AOwnerUUID)
 		{
-			UInt32 sizeContextUUID = 0;
-			UInt32 neededContextUUID = 0;
-			CheckError(Internal.LibAMCFWrapper.DataStream_GetContextUUID (Handle, sizeContextUUID, out neededContextUUID, IntPtr.Zero));
-			sizeContextUUID = neededContextUUID;
-			byte[] bytesContextUUID = new byte[sizeContextUUID];
-			GCHandle dataContextUUID = GCHandle.Alloc(bytesContextUUID, GCHandleType.Pinned);
+			Int32 resultContextType = 0;
+			UInt32 sizeOwnerUUID = 0;
+			UInt32 neededOwnerUUID = 0;
+			CheckError(Internal.LibAMCFWrapper.DataStream_GetContext (Handle, out resultContextType, sizeOwnerUUID, out neededOwnerUUID, IntPtr.Zero));
+			sizeOwnerUUID = neededOwnerUUID;
+			byte[] bytesOwnerUUID = new byte[sizeOwnerUUID];
+			GCHandle dataOwnerUUID = GCHandle.Alloc(bytesOwnerUUID, GCHandleType.Pinned);
 
-			CheckError(Internal.LibAMCFWrapper.DataStream_GetContextUUID (Handle, sizeContextUUID, out neededContextUUID, dataContextUUID.AddrOfPinnedObject()));
-			dataContextUUID.Free();
-			return Encoding.UTF8.GetString(bytesContextUUID).TrimEnd(char.MinValue);
+			CheckError(Internal.LibAMCFWrapper.DataStream_GetContext (Handle, out resultContextType, sizeOwnerUUID, out neededOwnerUUID, dataOwnerUUID.AddrOfPinnedObject()));
+			AContextType = (eStreamContextType) (resultContextType);
+			dataOwnerUUID.Free();
+			AOwnerUUID = Encoding.UTF8.GetString(bytesOwnerUUID).TrimEnd(char.MinValue);
 		}
 
 		public String GetName ()
@@ -373,36 +383,30 @@ namespace LibAMCF {
 			return Encoding.UTF8.GetString(bytesMimeType).TrimEnd(char.MinValue);
 		}
 
-		public String GetUsageContext ()
+		public eStreamContextType GetContextType ()
 		{
-			UInt32 sizeUsageContext = 0;
-			UInt32 neededUsageContext = 0;
-			CheckError(Internal.LibAMCFWrapper.StreamUpload_GetUsageContext (Handle, sizeUsageContext, out neededUsageContext, IntPtr.Zero));
-			sizeUsageContext = neededUsageContext;
-			byte[] bytesUsageContext = new byte[sizeUsageContext];
-			GCHandle dataUsageContext = GCHandle.Alloc(bytesUsageContext, GCHandleType.Pinned);
+			Int32 resultContextType = 0;
 
-			CheckError(Internal.LibAMCFWrapper.StreamUpload_GetUsageContext (Handle, sizeUsageContext, out neededUsageContext, dataUsageContext.AddrOfPinnedObject()));
-			dataUsageContext.Free();
-			return Encoding.UTF8.GetString(bytesUsageContext).TrimEnd(char.MinValue);
+			CheckError(Internal.LibAMCFWrapper.StreamUpload_GetContextType (Handle, out resultContextType));
+			return (eStreamContextType) (resultContextType);
 		}
 
-		public COperationResult UploadData (Byte[] AData, UInt32 AChunkSize)
+		public COperationResult UploadData (Byte[] AData, UInt32 AChunkSize, UInt32 AThreadCount)
 		{
 			GCHandle dataData = GCHandle.Alloc(AData, GCHandleType.Pinned);
 			IntPtr newSuccess = IntPtr.Zero;
 
-			CheckError(Internal.LibAMCFWrapper.StreamUpload_UploadData (Handle, (UInt64) AData.Length, dataData.AddrOfPinnedObject(), AChunkSize, out newSuccess));
+			CheckError(Internal.LibAMCFWrapper.StreamUpload_UploadData (Handle, (UInt64) AData.Length, dataData.AddrOfPinnedObject(), AChunkSize, AThreadCount, out newSuccess));
 			dataData.Free ();
 			return new COperationResult (newSuccess );
 		}
 
-		public COperationResult UploadFile (String AFileName, UInt32 AChunkSize)
+		public COperationResult UploadFile (String AFileName, UInt32 AChunkSize, UInt32 AThreadCount)
 		{
 			byte[] byteFileName = Encoding.UTF8.GetBytes(AFileName + char.MinValue);
 			IntPtr newSuccess = IntPtr.Zero;
 
-			CheckError(Internal.LibAMCFWrapper.StreamUpload_UploadFile (Handle, byteFileName, AChunkSize, out newSuccess));
+			CheckError(Internal.LibAMCFWrapper.StreamUpload_UploadFile (Handle, byteFileName, AChunkSize, AThreadCount, out newSuccess));
 			return new COperationResult (newSuccess );
 		}
 
@@ -540,15 +544,23 @@ namespace LibAMCF {
 			return Encoding.UTF8.GetString(bytesToken).TrimEnd(char.MinValue);
 		}
 
-		public CStreamUpload CreateUpload (String AName, String AMimeType, String AUsageContext)
+		public CStreamUpload CreateUpload (String AName, String AMimeType, eStreamContextType AContextType)
 		{
 			byte[] byteName = Encoding.UTF8.GetBytes(AName + char.MinValue);
 			byte[] byteMimeType = Encoding.UTF8.GetBytes(AMimeType + char.MinValue);
-			byte[] byteUsageContext = Encoding.UTF8.GetBytes(AUsageContext + char.MinValue);
+			Int32 enumContextType = (Int32) AContextType;
 			IntPtr newInstance = IntPtr.Zero;
 
-			CheckError(Internal.LibAMCFWrapper.Connection_CreateUpload (Handle, byteName, byteMimeType, byteUsageContext, out newInstance));
+			CheckError(Internal.LibAMCFWrapper.Connection_CreateUpload (Handle, byteName, byteMimeType, enumContextType, out newInstance));
 			return new CStreamUpload (newInstance );
+		}
+
+		public COperationResult PrepareBuild (CDataStream ADataStream)
+		{
+			IntPtr newSuccess = IntPtr.Zero;
+
+			CheckError(Internal.LibAMCFWrapper.Connection_PrepareBuild (Handle, ADataStream.GetHandle(), out newSuccess));
+			return new COperationResult (newSuccess );
 		}
 
 	}

@@ -55,6 +55,8 @@ namespace AMC {
 	public:
 	
 		static PUIModule createModule (pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+
+		static bool moduleTypeIsRegistered (const std::string & sType);
 										
 	};
 

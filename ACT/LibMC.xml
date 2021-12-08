@@ -362,6 +362,38 @@
 		<error name="DUPLICATEFORMNAME" code="351" description="Duplicate form name" />
 		<error name="EVENTNOTFOUND" code="352" description="Event not found" />
 		
+		<error name="MISSINGCOLORNAME" code="353" description="Missing color name" />
+		<error name="MISSINGCOLORREDCHANNEL" code="354" description="Missing red color channel" />
+		<error name="MISSINGCOLORGREENCHANNEL" code="355" description="Missing green color channel" />
+		<error name="MISSINGCOLORBLUECHANNEL" code="356" description="Missing blue color channel" />
+		<error name="INVALIDCOLORREDCHANNEL" code="357" description="Invalid red color channel" />
+		<error name="INVALIDCOLORGREENCHANNEL" code="358" description="Invalid green color channel" />
+		<error name="INVALIDCOLORBLUECHANNEL" code="359" description="Invalid blue color channel" />
+		
+		<error name="MISSINGCOLUMNWIDTH" code="360" description="Missing column width" />
+		<error name="INVALIDCOLUMNWIDTH" code="361" description="Invalid column width" />
+		<error name="MISSINGCOLUMNUNIT" code="362" description="Missing column unit" />
+		<error name="MISSINGROWHEIGHT" code="363" description="Missing row height" />
+		<error name="INVALIDROWHEIGHT" code="364" description="Invalid row height" />
+		<error name="MISSINGROWUNIT" code="365" description="Missing row unit" />
+		
+		<error name="MISSINGCOLUMNSTARTATTRIB" code="366" description="Missing column start attrib" />
+		<error name="MISSINGCOLUMNENDATTRIB" code="367" description="Missing column end attrib" />
+		<error name="MISSINGROWSTARTATTRIB" code="368" description="Missing row start attrib" />
+		<error name="MISSINGROWENDATTRIB" code="369" description="Missing row end attrib" />
+		
+		<error name="INVALIDCOLUMNSTARTATTRIB" code="370" description="Invalid column start attrib" />
+		<error name="INVALIDCOLUMNENDATTRIB" code="371" description="Invalid column end attrib" />
+		<error name="INVALIDROWSTARTATTRIB" code="372" description="Invalid row start attrib" />
+		<error name="INVALIDROWENDATTRIB" code="373" description="Invalid row end attrib" />
+		
+		<error name="INVALIDPARAMETERPATH" code="374" description="Invalid parameter path" />
+		<error name="INVALIDPARAMETERINSTANCE" code="375" description="Invalid parameter instance" />
+		<error name="INVALIDPARAMETERGROUP" code="376" description="Invalid parameter group" />
+		<error name="INVALIDPARAMETERNAME" code="377" description="Invalid parameter name" />
+		
+		<error name="INVALIDSTATEMACHINENAME" code="378" description="Invalid state machine name" />
+		<error name="INVALIDGRIDPOSITION" code="379" description="Invalid grid position" />
 		
 			
 	</errors>

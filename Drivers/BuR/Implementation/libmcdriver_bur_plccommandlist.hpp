@@ -50,6 +50,7 @@ Abstract: This is the class declaration of CPLCCommandList
 #include <vector>
 #include <set>
 #include <mutex>
+#include <future>
 
 namespace LibMCDriver_BuR {
 namespace Impl {
@@ -74,7 +75,8 @@ private:
 
     uint32_t m_ListIdentifier;
 
-
+    std::list<std::promise<uint8_t>> m_receivedListStatus;
+    std::future<uint8_t> receiveListStatus();
 
 protected:
 

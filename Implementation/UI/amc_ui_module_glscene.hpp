@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_VERTICALSPLIT
-#define __AMC_UI_MODULE_VERTICALSPLIT
+#ifndef __AMC_UI_MODULE_GLSCENE
+#define __AMC_UI_MODULE_GLSCENE
 
 #include "header_protection.hpp"
 
@@ -40,48 +40,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Libraries/PugiXML/pugixml.hpp"
 
-namespace LibMCData {
-	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
-}
-
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_VerticalSplit, PUIModule_VerticalSplit);
-	amcDeclareDependingClass(CUIModule_VerticalSection, PUIModule_VerticalSection);
+	amcDeclareDependingClass(CUIModule_GLScene, PUIModule_GLScene);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
-	class CUIModule_VerticalSection {
-	private:
-		PUIModule m_pModule;
-		double m_fixedHeightInPercentiles;
-	public:
-		CUIModule_VerticalSection(PUIModule pModule, double fixedHeightInPercentiles);
+	
 
-		CUIModule * getModule();
-		double getFixedHeightInPercentiles();
-	};
-
-
-	class CUIModule_VerticalSplit : public CUIModule {
+	class CUIModule_GLScene : public CUIModule {
 	protected:		
-
-		std::map<std::string, PUIModuleItem> m_ItemMap;
-		std::map<std::string, PUIModule_VerticalSection> m_SectionMap;
-		std::vector<PUIModule_VerticalSection> m_SectionList;
 
 		std::string m_sCaption;
 
-		void addSection(PUIModule pModule, double fixedHeightInPercentiles);
-
 	public:
 
-		CUIModule_VerticalSplit(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_GLScene(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 		
-		virtual ~CUIModule_VerticalSplit();
+		virtual ~CUIModule_GLScene();
 
 		virtual std::string getType() override;
 
@@ -94,7 +73,6 @@ namespace AMC {
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
-		PUIModule_VerticalSection findSection(const std::string& sUUID);
 
 		void configurePostLoading() override;
 
@@ -104,5 +82,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE_VERTICALSPLIT
+#endif //__AMC_UI_MODULE_GLSCENE
 

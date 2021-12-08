@@ -127,15 +127,16 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_operationresult_geterrormessage(LibAMCF_O
 LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getuuid(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nUUIDBufferSize, LibAMCF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
-* Returns the stream's context UUID.
+* Returns the stream's context type and owner UUID.
 *
 * @param[in] pDataStream - DataStream instance.
-* @param[in] nContextUUIDBufferSize - size of the buffer (including trailing 0)
-* @param[out] pContextUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pContextUUIDBuffer -  buffer of Stream Context UUID String., may be NULL
+* @param[out] pContextType - Stream Context Type.
+* @param[in] nOwnerUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pOwnerUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pOwnerUUIDBuffer -  buffer of Stream Context UUID String., may be NULL
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getcontextuuid(LibAMCF_DataStream pDataStream, const LibAMCF_uint32 nContextUUIDBufferSize, LibAMCF_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_datastream_getcontext(LibAMCF_DataStream pDataStream, eLibAMCFStreamContextType * pContextType, const LibAMCF_uint32 nOwnerUUIDBufferSize, LibAMCF_uint32* pOwnerUUIDNeededChars, char * pOwnerUUIDBuffer);
 
 /**
 * Returns the stream name.
@@ -220,12 +221,10 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getmimetype(LibAMCF_StreamUp
 * returns the usage context of the stream upload
 *
 * @param[in] pStreamUpload - StreamUpload instance.
-* @param[in] nUsageContextBufferSize - size of the buffer (including trailing 0)
-* @param[out] pUsageContextNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pUsageContextBuffer -  buffer of UsageContext String., may be NULL
+* @param[out] pContextType - Stream Context Type.
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getusagecontext(LibAMCF_StreamUpload pStreamUpload, const LibAMCF_uint32 nUsageContextBufferSize, LibAMCF_uint32* pUsageContextNeededChars, char * pUsageContextBuffer);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getcontexttype(LibAMCF_StreamUpload pStreamUpload, eLibAMCFStreamContextType * pContextType);
 
 /**
 * uploads the passed data to the server. MUST only be called once.
@@ -234,10 +233,11 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_getusagecontext(LibAMCF_Stre
 * @param[in] nDataBufferSize - Number of elements in buffer
 * @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
 * @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpload pStreamUpload, LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess);
 
 /**
 * uploads a file to the server. MUST only be called once.
@@ -245,10 +245,11 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploaddata(LibAMCF_StreamUpl
 * @param[in] pStreamUpload - StreamUpload instance.
 * @param[in] pFileName - File to be uploaded.
 * @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 * @param[out] pSuccess - Returns if upload was successful.
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploadfile(LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_OperationResult * pSuccess);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_streamupload_uploadfile(LibAMCF_StreamUpload pStreamUpload, const char * pFileName, LibAMCF_uint32 nChunkSize, LibAMCF_uint32 nThreadCount, LibAMCF_OperationResult * pSuccess);
 
 /**
 * Starts a chunked upload. MUST not be used together with uploadData or uploadFile
@@ -399,11 +400,21 @@ LIBAMCF_DECLSPEC LibAMCFResult libamcf_connection_getauthtoken(LibAMCF_Connectio
 * @param[in] pConnection - Connection instance.
 * @param[in] pName - Name of the file to be uploaded.
 * @param[in] pMimeType - Mimetype of the file to be uploaded.
-* @param[in] pUsageContext - Context string for the usage type of the file.
+* @param[in] eContextType - Stream Context Type.
 * @param[out] pInstance - File upload instance.
 * @return error code or 0 (success)
 */
-LIBAMCF_DECLSPEC LibAMCFResult libamcf_connection_createupload(LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, const char * pUsageContext, LibAMCF_StreamUpload * pInstance);
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_connection_createupload(LibAMCF_Connection pConnection, const char * pName, const char * pMimeType, eLibAMCFStreamContextType eContextType, LibAMCF_StreamUpload * pInstance);
+
+/**
+* Prepares a build from an uploaded data stream. Must be authenticated to make it work.
+*
+* @param[in] pConnection - Connection instance.
+* @param[in] pDataStream - Data stream MUST have been created as build job context type.
+* @param[out] pSuccess - Returns if build preparation was successful.
+* @return error code or 0 (success)
+*/
+LIBAMCF_DECLSPEC LibAMCFResult libamcf_connection_preparebuild(LibAMCF_Connection pConnection, LibAMCF_DataStream pDataStream, LibAMCF_OperationResult * pSuccess);
 
 /*************************************************************************************************************************
  Global functions

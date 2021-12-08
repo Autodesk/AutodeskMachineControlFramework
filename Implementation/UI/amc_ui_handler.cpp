@@ -60,6 +60,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PugiXML/pugixml.hpp"
 
+#include <sstream>
+
 using namespace AMC;
 
 CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
@@ -133,6 +135,21 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
     writer.addString(AMC_API_KEY_UI_MAINPAGE, m_pMainPage->getName());
     writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
     writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
+
+    CJSONWriterObject colorsObject(writer);
+    for (auto color : m_Colors) {
+
+        std::stringstream sColorStream;
+        uint32_t nRed = color.second & 0xff;
+        uint32_t nGreen = (color.second >> 8) & 0xff;
+        uint32_t nBlue = (color.second >> 16) & 0xff;
+
+        sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << nGreen << nBlue;
+
+        colorsObject.addString(color.first, sColorStream.str());
+    }
+
+    writer.addObject(AMC_API_KEY_UI_COLORS, colorsObject);
 
 }
 
@@ -233,6 +250,55 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
     if (mainpageAttrib.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
     std::string sMainPage(mainpageAttrib.as_string());
+
+    auto colorsNode = xmlNode.child("colors");
+    if (!colorsNode.empty()) {
+
+        auto colorNodes = colorsNode.children("color");
+        for (pugi::xml_node colorNode : colorNodes) {
+            auto nameColorAttrib = colorNode.attribute("name");
+            auto redColorAttrib = colorNode.attribute("red");
+            auto greenColorAttrib = colorNode.attribute("green");
+            auto blueColorAttrib = colorNode.attribute("blue");
+
+            std::string sColorName = nameColorAttrib.as_string();
+            if (sColorName.empty ())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORNAME);
+            if (redColorAttrib.empty())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORREDCHANNEL);
+            if (greenColorAttrib.empty())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORGREENCHANNEL);
+            if (blueColorAttrib.empty())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORBLUECHANNEL);
+
+
+            double dRed = redColorAttrib.as_double(-1.0);
+            double dGreen = greenColorAttrib.as_double(-1.0);
+            double dBlue = blueColorAttrib.as_double(-1.0);
+            if ((dRed < 0.0) || (dRed > 1.0))
+                throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCOLORREDCHANNEL);
+            if ((dGreen < 0.0) || (dGreen > 1.0))
+                throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCOLORGREENCHANNEL);
+            if ((dBlue < 0.0) || (dBlue > 1.0))
+                throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCOLORBLUECHANNEL);
+
+            int32_t nRed = (int32_t)(dRed * 255.0f);
+            int32_t nGreen = (int32_t)(dGreen * 255.0f);
+            int32_t nBlue = (int32_t)(dBlue * 255.0f);
+            if (nRed < 0) nRed = 0;
+            if (nGreen < 0) nGreen = 0;
+            if (nBlue < 0) nBlue = 0;
+            if (nRed > 255) nRed = 255;
+            if (nGreen > 255) nGreen = 255;
+            if (nBlue > 255) nBlue = 255;
+
+            uint32_t nColor = (nRed + nGreen * 256 + nBlue * 65536);
+            m_Colors.insert(std::make_pair (sColorName, nColor));
+
+        }
+
+    }
+
 
     auto logoNode = xmlNode.child("logo");
     if (!logoNode.empty()) {

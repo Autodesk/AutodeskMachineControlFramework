@@ -344,7 +344,7 @@ public:
 	}
 	
 	inline std::string GetUUID();
-	inline std::string GetContextUUID();
+	inline void GetContext(eStreamContextType & eContextType, std::string & sOwnerUUID);
 	inline std::string GetName();
 	inline std::string GetMimeType();
 	inline std::string GetSHA256();
@@ -368,9 +368,9 @@ public:
 	
 	inline std::string GetName();
 	inline std::string GetMimeType();
-	inline std::string GetUsageContext();
-	inline POperationResult UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize);
-	inline POperationResult UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize);
+	inline eStreamContextType GetContextType();
+	inline POperationResult UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount);
+	inline POperationResult UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount);
 	inline POperationResult BeginChunking(const LibAMCF_uint64 nDataSize);
 	inline POperationResult UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer);
 	inline POperationResult FinishChunking();
@@ -401,7 +401,8 @@ public:
 	inline POperationResult RefreshAuthentication();
 	inline POperationResult Ping();
 	inline std::string GetAuthToken();
-	inline PStreamUpload CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext);
+	inline PStreamUpload CreateUpload(const std::string & sName, const std::string & sMimeType, const eStreamContextType eContextType);
+	inline POperationResult PrepareBuild(classParam<CDataStream> pDataStream);
 };
 	
 	/**
@@ -598,18 +599,18 @@ public:
 	}
 	
 	/**
-	* CDataStream::GetContextUUID - Returns the stream's context UUID.
-	* @return Stream Context UUID String.
+	* CDataStream::GetContext - Returns the stream's context type and owner UUID.
+	* @param[out] eContextType - Stream Context Type.
+	* @param[out] sOwnerUUID - Stream Context UUID String.
 	*/
-	std::string CDataStream::GetContextUUID()
+	void CDataStream::GetContext(eStreamContextType & eContextType, std::string & sOwnerUUID)
 	{
-		LibAMCF_uint32 bytesNeededContextUUID = 0;
-		LibAMCF_uint32 bytesWrittenContextUUID = 0;
-		CheckError(libamcf_datastream_getcontextuuid(m_pHandle, 0, &bytesNeededContextUUID, nullptr));
-		std::vector<char> bufferContextUUID(bytesNeededContextUUID);
-		CheckError(libamcf_datastream_getcontextuuid(m_pHandle, bytesNeededContextUUID, &bytesWrittenContextUUID, &bufferContextUUID[0]));
-		
-		return std::string(&bufferContextUUID[0]);
+		LibAMCF_uint32 bytesNeededOwnerUUID = 0;
+		LibAMCF_uint32 bytesWrittenOwnerUUID = 0;
+		CheckError(libamcf_datastream_getcontext(m_pHandle, &eContextType, 0, &bytesNeededOwnerUUID, nullptr));
+		std::vector<char> bufferOwnerUUID(bytesNeededOwnerUUID);
+		CheckError(libamcf_datastream_getcontext(m_pHandle, &eContextType, bytesNeededOwnerUUID, &bytesWrittenOwnerUUID, &bufferOwnerUUID[0]));
+		sOwnerUUID = std::string(&bufferOwnerUUID[0]);
 	}
 	
 	/**
@@ -719,30 +720,28 @@ public:
 	}
 	
 	/**
-	* CStreamUpload::GetUsageContext - returns the usage context of the stream upload
-	* @return UsageContext String.
+	* CStreamUpload::GetContextType - returns the usage context of the stream upload
+	* @return Stream Context Type.
 	*/
-	std::string CStreamUpload::GetUsageContext()
+	eStreamContextType CStreamUpload::GetContextType()
 	{
-		LibAMCF_uint32 bytesNeededUsageContext = 0;
-		LibAMCF_uint32 bytesWrittenUsageContext = 0;
-		CheckError(libamcf_streamupload_getusagecontext(m_pHandle, 0, &bytesNeededUsageContext, nullptr));
-		std::vector<char> bufferUsageContext(bytesNeededUsageContext);
-		CheckError(libamcf_streamupload_getusagecontext(m_pHandle, bytesNeededUsageContext, &bytesWrittenUsageContext, &bufferUsageContext[0]));
+		eStreamContextType resultContextType = (eStreamContextType) 0;
+		CheckError(libamcf_streamupload_getcontexttype(m_pHandle, &resultContextType));
 		
-		return std::string(&bufferUsageContext[0]);
+		return resultContextType;
 	}
 	
 	/**
 	* CStreamUpload::UploadData - uploads the passed data to the server. MUST only be called once.
 	* @param[in] DataBuffer - Data to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @return Returns if upload was successful.
 	*/
-	POperationResult CStreamUpload::UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize)
+	POperationResult CStreamUpload::UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount)
 	{
 		LibAMCFHandle hSuccess = nullptr;
-		CheckError(libamcf_streamupload_uploaddata(m_pHandle, (LibAMCF_uint64)DataBuffer.size(), DataBuffer.data(), nChunkSize, &hSuccess));
+		CheckError(libamcf_streamupload_uploaddata(m_pHandle, (LibAMCF_uint64)DataBuffer.size(), DataBuffer.data(), nChunkSize, nThreadCount, &hSuccess));
 		
 		if (!hSuccess) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
@@ -754,12 +753,13 @@ public:
 	* CStreamUpload::UploadFile - uploads a file to the server. MUST only be called once.
 	* @param[in] sFileName - File to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @return Returns if upload was successful.
 	*/
-	POperationResult CStreamUpload::UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize)
+	POperationResult CStreamUpload::UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount)
 	{
 		LibAMCFHandle hSuccess = nullptr;
-		CheckError(libamcf_streamupload_uploadfile(m_pHandle, sFileName.c_str(), nChunkSize, &hSuccess));
+		CheckError(libamcf_streamupload_uploadfile(m_pHandle, sFileName.c_str(), nChunkSize, nThreadCount, &hSuccess));
 		
 		if (!hSuccess) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
@@ -972,18 +972,35 @@ public:
 	* CConnection::CreateUpload - Creates a file upload instance. Must be authenticated to make it work.
 	* @param[in] sName - Name of the file to be uploaded.
 	* @param[in] sMimeType - Mimetype of the file to be uploaded.
-	* @param[in] sUsageContext - Context string for the usage type of the file.
+	* @param[in] eContextType - Stream Context Type.
 	* @return File upload instance.
 	*/
-	PStreamUpload CConnection::CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext)
+	PStreamUpload CConnection::CreateUpload(const std::string & sName, const std::string & sMimeType, const eStreamContextType eContextType)
 	{
 		LibAMCFHandle hInstance = nullptr;
-		CheckError(libamcf_connection_createupload(m_pHandle, sName.c_str(), sMimeType.c_str(), sUsageContext.c_str(), &hInstance));
+		CheckError(libamcf_connection_createupload(m_pHandle, sName.c_str(), sMimeType.c_str(), eContextType, &hInstance));
 		
 		if (!hInstance) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CStreamUpload>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CConnection::PrepareBuild - Prepares a build from an uploaded data stream. Must be authenticated to make it work.
+	* @param[in] pDataStream - Data stream MUST have been created as build job context type.
+	* @return Returns if build preparation was successful.
+	*/
+	POperationResult CConnection::PrepareBuild(classParam<CDataStream> pDataStream)
+	{
+		LibAMCFHandle hDataStream = pDataStream.GetHandle();
+		LibAMCFHandle hSuccess = nullptr;
+		CheckError(libamcf_connection_preparebuild(m_pHandle, hDataStream, &hSuccess));
+		
+		if (!hSuccess) {
+			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<COperationResult>(m_pWrapper, hSuccess);
 	}
 
 } // namespace LibAMCF

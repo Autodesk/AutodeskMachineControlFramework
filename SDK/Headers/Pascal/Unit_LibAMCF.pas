@@ -117,6 +117,18 @@ const
 	LIBAMCF_ERROR_OPERATIONERROR = 35;
 	LIBAMCF_ERROR_OPERATIONTIMEOUT = 36;
 	LIBAMCF_ERROR_UPLOADDIDNOTFINISH = 37;
+	LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE = 38;
+
+(*************************************************************************************************************************
+ Declaration of enums
+**************************************************************************************************************************)
+
+type
+
+	TLibAMCFStreamContextType = (
+		eStreamContextTypeUnknown,
+		eStreamContextTypeNewBuildJob
+	);
 
 
 (*************************************************************************************************************************
@@ -205,15 +217,16 @@ type
 	TLibAMCFDataStream_GetUUIDFunc = function(pDataStream: TLibAMCFHandle; const nUUIDBufferSize: Cardinal; out pUUIDNeededChars: Cardinal; pUUIDBuffer: PAnsiChar): TLibAMCFResult; cdecl;
 	
 	(**
-	* Returns the stream's context UUID.
+	* Returns the stream's context type and owner UUID.
 	*
 	* @param[in] pDataStream - DataStream instance.
-	* @param[in] nContextUUIDBufferSize - size of the buffer (including trailing 0)
-	* @param[out] pContextUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-	* @param[out] pContextUUIDBuffer -  buffer of Stream Context UUID String., may be NULL
+	* @param[out] pContextType - Stream Context Type.
+	* @param[in] nOwnerUUIDBufferSize - size of the buffer (including trailing 0)
+	* @param[out] pOwnerUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+	* @param[out] pOwnerUUIDBuffer -  buffer of Stream Context UUID String., may be NULL
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFDataStream_GetContextUUIDFunc = function(pDataStream: TLibAMCFHandle; const nContextUUIDBufferSize: Cardinal; out pContextUUIDNeededChars: Cardinal; pContextUUIDBuffer: PAnsiChar): TLibAMCFResult; cdecl;
+	TLibAMCFDataStream_GetContextFunc = function(pDataStream: TLibAMCFHandle; out pContextType: Integer; const nOwnerUUIDBufferSize: Cardinal; out pOwnerUUIDNeededChars: Cardinal; pOwnerUUIDBuffer: PAnsiChar): TLibAMCFResult; cdecl;
 	
 	(**
 	* Returns the stream name.
@@ -299,12 +312,10 @@ type
 	* returns the usage context of the stream upload
 	*
 	* @param[in] pStreamUpload - StreamUpload instance.
-	* @param[in] nUsageContextBufferSize - size of the buffer (including trailing 0)
-	* @param[out] pUsageContextNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-	* @param[out] pUsageContextBuffer -  buffer of UsageContext String., may be NULL
+	* @param[out] pContextType - Stream Context Type.
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFStreamUpload_GetUsageContextFunc = function(pStreamUpload: TLibAMCFHandle; const nUsageContextBufferSize: Cardinal; out pUsageContextNeededChars: Cardinal; pUsageContextBuffer: PAnsiChar): TLibAMCFResult; cdecl;
+	TLibAMCFStreamUpload_GetContextTypeFunc = function(pStreamUpload: TLibAMCFHandle; out pContextType: Integer): TLibAMCFResult; cdecl;
 	
 	(**
 	* uploads the passed data to the server. MUST only be called once.
@@ -313,10 +324,11 @@ type
 	* @param[in] nDataCount - Number of elements in buffer
 	* @param[in] pDataBuffer - uint8 buffer of Data to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @param[out] pSuccess - Returns if upload was successful.
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFStreamUpload_UploadDataFunc = function(pStreamUpload: TLibAMCFHandle; const nDataCount: QWord; const pDataBuffer: PByte; const nChunkSize: Cardinal; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
+	TLibAMCFStreamUpload_UploadDataFunc = function(pStreamUpload: TLibAMCFHandle; const nDataCount: QWord; const pDataBuffer: PByte; const nChunkSize: Cardinal; const nThreadCount: Cardinal; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
 	
 	(**
 	* uploads a file to the server. MUST only be called once.
@@ -324,10 +336,11 @@ type
 	* @param[in] pStreamUpload - StreamUpload instance.
 	* @param[in] pFileName - File to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @param[out] pSuccess - Returns if upload was successful.
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFStreamUpload_UploadFileFunc = function(pStreamUpload: TLibAMCFHandle; const pFileName: PAnsiChar; const nChunkSize: Cardinal; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
+	TLibAMCFStreamUpload_UploadFileFunc = function(pStreamUpload: TLibAMCFHandle; const pFileName: PAnsiChar; const nChunkSize: Cardinal; const nThreadCount: Cardinal; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
 	
 	(**
 	* Starts a chunked upload. MUST not be used together with uploadData or uploadFile
@@ -479,11 +492,21 @@ type
 	* @param[in] pConnection - Connection instance.
 	* @param[in] pName - Name of the file to be uploaded.
 	* @param[in] pMimeType - Mimetype of the file to be uploaded.
-	* @param[in] pUsageContext - Context string for the usage type of the file.
+	* @param[in] eContextType - Stream Context Type.
 	* @param[out] pInstance - File upload instance.
 	* @return error code or 0 (success)
 	*)
-	TLibAMCFConnection_CreateUploadFunc = function(pConnection: TLibAMCFHandle; const pName: PAnsiChar; const pMimeType: PAnsiChar; const pUsageContext: PAnsiChar; out pInstance: TLibAMCFHandle): TLibAMCFResult; cdecl;
+	TLibAMCFConnection_CreateUploadFunc = function(pConnection: TLibAMCFHandle; const pName: PAnsiChar; const pMimeType: PAnsiChar; const eContextType: Integer; out pInstance: TLibAMCFHandle): TLibAMCFResult; cdecl;
+	
+	(**
+	* Prepares a build from an uploaded data stream. Must be authenticated to make it work.
+	*
+	* @param[in] pConnection - Connection instance.
+	* @param[in] pDataStream - Data stream MUST have been created as build job context type.
+	* @param[out] pSuccess - Returns if build preparation was successful.
+	* @return error code or 0 (success)
+	*)
+	TLibAMCFConnection_PrepareBuildFunc = function(pConnection: TLibAMCFHandle; const pDataStream: TLibAMCFHandle; out pSuccess: TLibAMCFHandle): TLibAMCFResult; cdecl;
 	
 (*************************************************************************************************************************
  Global function definitions 
@@ -615,7 +638,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		constructor Create(AWrapper: TLibAMCFWrapper; AHandle: TLibAMCFHandle);
 		destructor Destroy; override;
 		function GetUUID(): String;
-		function GetContextUUID(): String;
+		procedure GetContext(out AContextType: TLibAMCFStreamContextType; out AOwnerUUID: String);
 		function GetName(): String;
 		function GetMimeType(): String;
 		function GetSHA256(): String;
@@ -634,9 +657,9 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		destructor Destroy; override;
 		function GetName(): String;
 		function GetMimeType(): String;
-		function GetUsageContext(): String;
-		function UploadData(const AData: TByteDynArray; const AChunkSize: Cardinal): TLibAMCFOperationResult;
-		function UploadFile(const AFileName: String; const AChunkSize: Cardinal): TLibAMCFOperationResult;
+		function GetContextType(): TLibAMCFStreamContextType;
+		function UploadData(const AData: TByteDynArray; const AChunkSize: Cardinal; const AThreadCount: Cardinal): TLibAMCFOperationResult;
+		function UploadFile(const AFileName: String; const AChunkSize: Cardinal; const AThreadCount: Cardinal): TLibAMCFOperationResult;
 		function BeginChunking(const ADataSize: QWord): TLibAMCFOperationResult;
 		function UploadChunk(const AData: TByteDynArray): TLibAMCFOperationResult;
 		function FinishChunking(): TLibAMCFOperationResult;
@@ -662,7 +685,8 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		function RefreshAuthentication(): TLibAMCFOperationResult;
 		function Ping(): TLibAMCFOperationResult;
 		function GetAuthToken(): String;
-		function CreateUpload(const AName: String; const AMimeType: String; const AUsageContext: String): TLibAMCFStreamUpload;
+		function CreateUpload(const AName: String; const AMimeType: String; const AContextType: TLibAMCFStreamContextType): TLibAMCFStreamUpload;
+		function PrepareBuild(const ADataStream: TLibAMCFDataStream): TLibAMCFOperationResult;
 	end;
 
 (*************************************************************************************************************************
@@ -678,7 +702,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		FLibAMCFOperationResult_SuccessFunc: TLibAMCFOperationResult_SuccessFunc;
 		FLibAMCFOperationResult_GetErrorMessageFunc: TLibAMCFOperationResult_GetErrorMessageFunc;
 		FLibAMCFDataStream_GetUUIDFunc: TLibAMCFDataStream_GetUUIDFunc;
-		FLibAMCFDataStream_GetContextUUIDFunc: TLibAMCFDataStream_GetContextUUIDFunc;
+		FLibAMCFDataStream_GetContextFunc: TLibAMCFDataStream_GetContextFunc;
 		FLibAMCFDataStream_GetNameFunc: TLibAMCFDataStream_GetNameFunc;
 		FLibAMCFDataStream_GetMimeTypeFunc: TLibAMCFDataStream_GetMimeTypeFunc;
 		FLibAMCFDataStream_GetSHA256Func: TLibAMCFDataStream_GetSHA256Func;
@@ -686,7 +710,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		FLibAMCFDataStream_GetTimestampFunc: TLibAMCFDataStream_GetTimestampFunc;
 		FLibAMCFStreamUpload_GetNameFunc: TLibAMCFStreamUpload_GetNameFunc;
 		FLibAMCFStreamUpload_GetMimeTypeFunc: TLibAMCFStreamUpload_GetMimeTypeFunc;
-		FLibAMCFStreamUpload_GetUsageContextFunc: TLibAMCFStreamUpload_GetUsageContextFunc;
+		FLibAMCFStreamUpload_GetContextTypeFunc: TLibAMCFStreamUpload_GetContextTypeFunc;
 		FLibAMCFStreamUpload_UploadDataFunc: TLibAMCFStreamUpload_UploadDataFunc;
 		FLibAMCFStreamUpload_UploadFileFunc: TLibAMCFStreamUpload_UploadFileFunc;
 		FLibAMCFStreamUpload_BeginChunkingFunc: TLibAMCFStreamUpload_BeginChunkingFunc;
@@ -704,6 +728,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		FLibAMCFConnection_PingFunc: TLibAMCFConnection_PingFunc;
 		FLibAMCFConnection_GetAuthTokenFunc: TLibAMCFConnection_GetAuthTokenFunc;
 		FLibAMCFConnection_CreateUploadFunc: TLibAMCFConnection_CreateUploadFunc;
+		FLibAMCFConnection_PrepareBuildFunc: TLibAMCFConnection_PrepareBuildFunc;
 		FLibAMCFGetVersionFunc: TLibAMCFGetVersionFunc;
 		FLibAMCFGetLastErrorFunc: TLibAMCFGetLastErrorFunc;
 		FLibAMCFReleaseInstanceFunc: TLibAMCFReleaseInstanceFunc;
@@ -727,7 +752,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		property LibAMCFOperationResult_SuccessFunc: TLibAMCFOperationResult_SuccessFunc read FLibAMCFOperationResult_SuccessFunc;
 		property LibAMCFOperationResult_GetErrorMessageFunc: TLibAMCFOperationResult_GetErrorMessageFunc read FLibAMCFOperationResult_GetErrorMessageFunc;
 		property LibAMCFDataStream_GetUUIDFunc: TLibAMCFDataStream_GetUUIDFunc read FLibAMCFDataStream_GetUUIDFunc;
-		property LibAMCFDataStream_GetContextUUIDFunc: TLibAMCFDataStream_GetContextUUIDFunc read FLibAMCFDataStream_GetContextUUIDFunc;
+		property LibAMCFDataStream_GetContextFunc: TLibAMCFDataStream_GetContextFunc read FLibAMCFDataStream_GetContextFunc;
 		property LibAMCFDataStream_GetNameFunc: TLibAMCFDataStream_GetNameFunc read FLibAMCFDataStream_GetNameFunc;
 		property LibAMCFDataStream_GetMimeTypeFunc: TLibAMCFDataStream_GetMimeTypeFunc read FLibAMCFDataStream_GetMimeTypeFunc;
 		property LibAMCFDataStream_GetSHA256Func: TLibAMCFDataStream_GetSHA256Func read FLibAMCFDataStream_GetSHA256Func;
@@ -735,7 +760,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		property LibAMCFDataStream_GetTimestampFunc: TLibAMCFDataStream_GetTimestampFunc read FLibAMCFDataStream_GetTimestampFunc;
 		property LibAMCFStreamUpload_GetNameFunc: TLibAMCFStreamUpload_GetNameFunc read FLibAMCFStreamUpload_GetNameFunc;
 		property LibAMCFStreamUpload_GetMimeTypeFunc: TLibAMCFStreamUpload_GetMimeTypeFunc read FLibAMCFStreamUpload_GetMimeTypeFunc;
-		property LibAMCFStreamUpload_GetUsageContextFunc: TLibAMCFStreamUpload_GetUsageContextFunc read FLibAMCFStreamUpload_GetUsageContextFunc;
+		property LibAMCFStreamUpload_GetContextTypeFunc: TLibAMCFStreamUpload_GetContextTypeFunc read FLibAMCFStreamUpload_GetContextTypeFunc;
 		property LibAMCFStreamUpload_UploadDataFunc: TLibAMCFStreamUpload_UploadDataFunc read FLibAMCFStreamUpload_UploadDataFunc;
 		property LibAMCFStreamUpload_UploadFileFunc: TLibAMCFStreamUpload_UploadFileFunc read FLibAMCFStreamUpload_UploadFileFunc;
 		property LibAMCFStreamUpload_BeginChunkingFunc: TLibAMCFStreamUpload_BeginChunkingFunc read FLibAMCFStreamUpload_BeginChunkingFunc;
@@ -753,6 +778,7 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		property LibAMCFConnection_PingFunc: TLibAMCFConnection_PingFunc read FLibAMCFConnection_PingFunc;
 		property LibAMCFConnection_GetAuthTokenFunc: TLibAMCFConnection_GetAuthTokenFunc read FLibAMCFConnection_GetAuthTokenFunc;
 		property LibAMCFConnection_CreateUploadFunc: TLibAMCFConnection_CreateUploadFunc read FLibAMCFConnection_CreateUploadFunc;
+		property LibAMCFConnection_PrepareBuildFunc: TLibAMCFConnection_PrepareBuildFunc read FLibAMCFConnection_PrepareBuildFunc;
 		property LibAMCFGetVersionFunc: TLibAMCFGetVersionFunc read FLibAMCFGetVersionFunc;
 		property LibAMCFGetLastErrorFunc: TLibAMCFGetLastErrorFunc read FLibAMCFGetLastErrorFunc;
 		property LibAMCFReleaseInstanceFunc: TLibAMCFReleaseInstanceFunc read FLibAMCFReleaseInstanceFunc;
@@ -774,8 +800,41 @@ TLibAMCFSymbolLookupMethod = function(const pSymbolName: PAnsiChar; out pValue: 
 		function CreateConnection(const ABaseURL: String): TLibAMCFConnection;
 	end;
 
+(*************************************************************************************************************************
+ Enum conversion
+**************************************************************************************************************************)
+
+	function convertStreamContextTypeToConst(const AValue: TLibAMCFStreamContextType): Integer;
+	function convertConstToStreamContextType(const AValue: Integer): TLibAMCFStreamContextType;
+
 
 implementation
+
+(*************************************************************************************************************************
+ Enum conversion
+**************************************************************************************************************************)
+
+	function convertStreamContextTypeToConst(const AValue: TLibAMCFStreamContextType): Integer;
+	begin
+		case AValue of
+			eStreamContextTypeUnknown: Result := 0;
+			eStreamContextTypeNewBuildJob: Result := 1;
+			else 
+				raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_INVALIDPARAM, 'invalid enum value');
+		end;
+	end;
+	
+	function convertConstToStreamContextType(const AValue: Integer): TLibAMCFStreamContextType;
+	begin
+		case AValue of
+			0: Result := eStreamContextTypeUnknown;
+			1: Result := eStreamContextTypeNewBuildJob;
+			else 
+				raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_INVALIDPARAM, 'invalid enum constant');
+		end;
+	end;
+	
+	
 
 
 (*************************************************************************************************************************
@@ -825,6 +884,7 @@ implementation
 			LIBAMCF_ERROR_OPERATIONERROR: ADescription := 'Operation Error.';
 			LIBAMCF_ERROR_OPERATIONTIMEOUT: ADescription := 'Operation Timeout.';
 			LIBAMCF_ERROR_UPLOADDIDNOTFINISH: ADescription := 'Upload did not finish.';
+			LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE: ADescription := 'Invalid stream context type.';
 			else
 				ADescription := 'unknown';
 		end;
@@ -949,18 +1009,21 @@ implementation
 		Result := StrPas(@bufferUUID[0]);
 	end;
 
-	function TLibAMCFDataStream.GetContextUUID(): String;
+	procedure TLibAMCFDataStream.GetContext(out AContextType: TLibAMCFStreamContextType; out AOwnerUUID: String);
 	var
-		bytesNeededContextUUID: Cardinal;
-		bytesWrittenContextUUID: Cardinal;
-		bufferContextUUID: array of Char;
+		ResultContextType: Integer;
+		bytesNeededOwnerUUID: Cardinal;
+		bytesWrittenOwnerUUID: Cardinal;
+		bufferOwnerUUID: array of Char;
 	begin
-		bytesNeededContextUUID:= 0;
-		bytesWrittenContextUUID:= 0;
-		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetContextUUIDFunc(FHandle, 0, bytesNeededContextUUID, nil));
-		SetLength(bufferContextUUID, bytesNeededContextUUID);
-		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetContextUUIDFunc(FHandle, bytesNeededContextUUID, bytesWrittenContextUUID, @bufferContextUUID[0]));
-		Result := StrPas(@bufferContextUUID[0]);
+		ResultContextType := 0;
+		bytesNeededOwnerUUID:= 0;
+		bytesWrittenOwnerUUID:= 0;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetContextFunc(FHandle, ResultContextType, 0, bytesNeededOwnerUUID, nil));
+		SetLength(bufferOwnerUUID, bytesNeededOwnerUUID);
+		FWrapper.CheckError(Self, FWrapper.LibAMCFDataStream_GetContextFunc(FHandle, ResultContextType, bytesNeededOwnerUUID, bytesWrittenOwnerUUID, @bufferOwnerUUID[0]));
+		AContextType := convertConstToStreamContextType(ResultContextType);
+		AOwnerUUID := StrPas(@bufferOwnerUUID[0]);
 	end;
 
 	function TLibAMCFDataStream.GetName(): String;
@@ -1066,21 +1129,16 @@ implementation
 		Result := StrPas(@bufferMimeType[0]);
 	end;
 
-	function TLibAMCFStreamUpload.GetUsageContext(): String;
+	function TLibAMCFStreamUpload.GetContextType(): TLibAMCFStreamContextType;
 	var
-		bytesNeededUsageContext: Cardinal;
-		bytesWrittenUsageContext: Cardinal;
-		bufferUsageContext: array of Char;
+		ResultContextType: Integer;
 	begin
-		bytesNeededUsageContext:= 0;
-		bytesWrittenUsageContext:= 0;
-		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetUsageContextFunc(FHandle, 0, bytesNeededUsageContext, nil));
-		SetLength(bufferUsageContext, bytesNeededUsageContext);
-		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetUsageContextFunc(FHandle, bytesNeededUsageContext, bytesWrittenUsageContext, @bufferUsageContext[0]));
-		Result := StrPas(@bufferUsageContext[0]);
+		ResultContextType := 0;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_GetContextTypeFunc(FHandle, ResultContextType));
+		Result := convertConstToStreamContextType(ResultContextType);
 	end;
 
-	function TLibAMCFStreamUpload.UploadData(const AData: TByteDynArray; const AChunkSize: Cardinal): TLibAMCFOperationResult;
+	function TLibAMCFStreamUpload.UploadData(const AData: TByteDynArray; const AChunkSize: Cardinal; const AThreadCount: Cardinal): TLibAMCFOperationResult;
 	var
 		PtrData: PByte;
 		LenData: QWord;
@@ -1096,18 +1154,18 @@ implementation
 		
 		Result := nil;
 		HSuccess := nil;
-		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_UploadDataFunc(FHandle, QWord(LenData), PtrData, AChunkSize, HSuccess));
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_UploadDataFunc(FHandle, QWord(LenData), PtrData, AChunkSize, AThreadCount, HSuccess));
 		if Assigned(HSuccess) then
 			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
 
-	function TLibAMCFStreamUpload.UploadFile(const AFileName: String; const AChunkSize: Cardinal): TLibAMCFOperationResult;
+	function TLibAMCFStreamUpload.UploadFile(const AFileName: String; const AChunkSize: Cardinal; const AThreadCount: Cardinal): TLibAMCFOperationResult;
 	var
 		HSuccess: TLibAMCFHandle;
 	begin
 		Result := nil;
 		HSuccess := nil;
-		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_UploadFileFunc(FHandle, PAnsiChar(AFileName), AChunkSize, HSuccess));
+		FWrapper.CheckError(Self, FWrapper.LibAMCFStreamUpload_UploadFileFunc(FHandle, PAnsiChar(AFileName), AChunkSize, AThreadCount, HSuccess));
 		if Assigned(HSuccess) then
 			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
@@ -1274,15 +1332,31 @@ implementation
 		Result := StrPas(@bufferToken[0]);
 	end;
 
-	function TLibAMCFConnection.CreateUpload(const AName: String; const AMimeType: String; const AUsageContext: String): TLibAMCFStreamUpload;
+	function TLibAMCFConnection.CreateUpload(const AName: String; const AMimeType: String; const AContextType: TLibAMCFStreamContextType): TLibAMCFStreamUpload;
 	var
 		HInstance: TLibAMCFHandle;
 	begin
 		Result := nil;
 		HInstance := nil;
-		FWrapper.CheckError(Self, FWrapper.LibAMCFConnection_CreateUploadFunc(FHandle, PAnsiChar(AName), PAnsiChar(AMimeType), PAnsiChar(AUsageContext), HInstance));
+		FWrapper.CheckError(Self, FWrapper.LibAMCFConnection_CreateUploadFunc(FHandle, PAnsiChar(AName), PAnsiChar(AMimeType), convertStreamContextTypeToConst(AContextType), HInstance));
 		if Assigned(HInstance) then
 			Result := TLibAMCFStreamUpload.Create(FWrapper, HInstance);
+	end;
+
+	function TLibAMCFConnection.PrepareBuild(const ADataStream: TLibAMCFDataStream): TLibAMCFOperationResult;
+	var
+		ADataStreamHandle: TLibAMCFHandle;
+		HSuccess: TLibAMCFHandle;
+	begin
+		if Assigned(ADataStream) then
+		ADataStreamHandle := ADataStream.TheHandle
+		else
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_INVALIDPARAM, 'ADataStream is a nil value.');
+		Result := nil;
+		HSuccess := nil;
+		FWrapper.CheckError(Self, FWrapper.LibAMCFConnection_PrepareBuildFunc(FHandle, ADataStreamHandle, HSuccess));
+		if Assigned(HSuccess) then
+			Result := TLibAMCFOperationResult.Create(FWrapper, HSuccess);
 	end;
 
 (*************************************************************************************************************************
@@ -1313,7 +1387,7 @@ implementation
 		FLibAMCFOperationResult_SuccessFunc := LoadFunction('libamcf_operationresult_success');
 		FLibAMCFOperationResult_GetErrorMessageFunc := LoadFunction('libamcf_operationresult_geterrormessage');
 		FLibAMCFDataStream_GetUUIDFunc := LoadFunction('libamcf_datastream_getuuid');
-		FLibAMCFDataStream_GetContextUUIDFunc := LoadFunction('libamcf_datastream_getcontextuuid');
+		FLibAMCFDataStream_GetContextFunc := LoadFunction('libamcf_datastream_getcontext');
 		FLibAMCFDataStream_GetNameFunc := LoadFunction('libamcf_datastream_getname');
 		FLibAMCFDataStream_GetMimeTypeFunc := LoadFunction('libamcf_datastream_getmimetype');
 		FLibAMCFDataStream_GetSHA256Func := LoadFunction('libamcf_datastream_getsha256');
@@ -1321,7 +1395,7 @@ implementation
 		FLibAMCFDataStream_GetTimestampFunc := LoadFunction('libamcf_datastream_gettimestamp');
 		FLibAMCFStreamUpload_GetNameFunc := LoadFunction('libamcf_streamupload_getname');
 		FLibAMCFStreamUpload_GetMimeTypeFunc := LoadFunction('libamcf_streamupload_getmimetype');
-		FLibAMCFStreamUpload_GetUsageContextFunc := LoadFunction('libamcf_streamupload_getusagecontext');
+		FLibAMCFStreamUpload_GetContextTypeFunc := LoadFunction('libamcf_streamupload_getcontexttype');
 		FLibAMCFStreamUpload_UploadDataFunc := LoadFunction('libamcf_streamupload_uploaddata');
 		FLibAMCFStreamUpload_UploadFileFunc := LoadFunction('libamcf_streamupload_uploadfile');
 		FLibAMCFStreamUpload_BeginChunkingFunc := LoadFunction('libamcf_streamupload_beginchunking');
@@ -1339,6 +1413,7 @@ implementation
 		FLibAMCFConnection_PingFunc := LoadFunction('libamcf_connection_ping');
 		FLibAMCFConnection_GetAuthTokenFunc := LoadFunction('libamcf_connection_getauthtoken');
 		FLibAMCFConnection_CreateUploadFunc := LoadFunction('libamcf_connection_createupload');
+		FLibAMCFConnection_PrepareBuildFunc := LoadFunction('libamcf_connection_preparebuild');
 		FLibAMCFGetVersionFunc := LoadFunction('libamcf_getversion');
 		FLibAMCFGetLastErrorFunc := LoadFunction('libamcf_getlasterror');
 		FLibAMCFReleaseInstanceFunc := LoadFunction('libamcf_releaseinstance');
@@ -1375,7 +1450,7 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getuuid'), @FLibAMCFDataStream_GetUUIDFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getcontextuuid'), @FLibAMCFDataStream_GetContextUUIDFunc);
+		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getcontext'), @FLibAMCFDataStream_GetContextFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_datastream_getname'), @FLibAMCFDataStream_GetNameFunc);
@@ -1399,7 +1474,7 @@ implementation
 		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_getmimetype'), @FLibAMCFStreamUpload_GetMimeTypeFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
-		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_getusagecontext'), @FLibAMCFStreamUpload_GetUsageContextFunc);
+		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_getcontexttype'), @FLibAMCFStreamUpload_GetContextTypeFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_streamupload_uploaddata'), @FLibAMCFStreamUpload_UploadDataFunc);
@@ -1451,6 +1526,9 @@ implementation
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_connection_createupload'), @FLibAMCFConnection_CreateUploadFunc);
+		if AResult <> LIBAMCF_SUCCESS then
+			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
+		AResult := ALookupMethod(PAnsiChar('libamcf_connection_preparebuild'), @FLibAMCFConnection_PrepareBuildFunc);
 		if AResult <> LIBAMCF_SUCCESS then
 			raise ELibAMCFException.CreateCustomMessage(LIBAMCF_ERROR_COULDNOTLOADLIBRARY, '');
 		AResult := ALookupMethod(PAnsiChar('libamcf_getversion'), @FLibAMCFGetVersionFunc);

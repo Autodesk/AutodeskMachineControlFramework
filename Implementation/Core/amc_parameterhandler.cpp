@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "libmc_exceptiontypes.hpp"
 
+#include "common_utils.hpp"
+
 #define AMC_MAXPARAMETERGROUPCOUNT (1024 * 1024)
 
 namespace AMC {
@@ -72,6 +74,9 @@ namespace AMC {
 
 	PParameterGroup CParameterHandler::addGroup(const std::string& sName, const std::string& sDescription)
 	{
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sName);
+
 		PParameterGroup pGroup = std::make_shared<CParameterGroup>(sName, sDescription);
 		addGroup(pGroup);
 		return pGroup;

@@ -86,8 +86,9 @@ public:
 
 	std::string GetAuthToken() override;
 
-	IStreamUpload * CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext) override;
+	IStreamUpload* CreateUpload(const std::string& sName, const std::string& sMimeType, const LibAMCF::eStreamContextType eContextType) override;
 
+	IOperationResult* PrepareBuild(IDataStream* pDataStream) override;
 
 };
 

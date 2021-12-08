@@ -21,8 +21,8 @@
 				<v-tab-item :key="moduleTab.uuid" style="overflow:auto; width:100%; height:100%;">
 						<Module_Content :key="moduleTab.name" v-if="(moduleTab.type == 'content')" :module="moduleTab" :Application="Application" />					
 						<Module_Tabs :key="moduleTab.name" v-if="(moduleTab.type == 'tabs')" :module="moduleTab" :Application="Application" />							
-						<Module_VerticalSplit :key="moduleTab.name" v-if="(moduleTab.type == 'verticalsplit')" :module="moduleTab" :Application="Application" />							
-						<Module_HorizontalSplit :key="moduleTab.name" v-if="(moduleTab.type == 'horizontalsplit')" :module="moduleTab" :Application="Application" />							
+						<Module_Grid :key="moduleTab.name" v-if="(moduleTab.type == 'grid')" :module="moduleTab" :Application="Application" />							
+						<Module_GLScene :key="moduleTab.name" v-if="(moduleTab.type == 'glscene')" :module="moduleTab" :Application="Application" />							
 				</v-tab-item>
 							
 			</template>	
@@ -36,8 +36,8 @@
 
 	import Module_Content from "./Module_Content.vue";
 	import Module_Tabs from "./Module_Tabs.vue";
-	import Module_VerticalSplit from "./Module_VerticalSplit.vue";
-	import Module_HorizontalSplit from "./Module_HorizontalSplit.vue";
+	import Module_Grid from "./Module_Grid.vue";
+	import Module_GLScene from "./Module_GLScene.vue";
 
 	export default {
 		props: ["Application", "module"],
@@ -45,8 +45,8 @@
 		components: {
 			Module_Content,
 			Module_Tabs,
-			Module_VerticalSplit,
-			Module_HorizontalSplit
+			Module_Grid,
+			Module_GLScene,
 		},
 		
 		data: () => ({

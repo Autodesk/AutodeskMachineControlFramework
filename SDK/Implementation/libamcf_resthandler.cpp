@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _WASM
 #include <restclient-cpp/connection.h>
 #include <restclient-cpp/restclient.h>
+#else //_WASM
+#include <emscripten/fetch.h>
+#include <emscripten/emscripten.h>
 #endif //_WASM
 
 CRestHandler::CRestHandler(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount)
@@ -65,11 +68,62 @@ bool CRestHandler::hasResultValue(const std::string& sKey)
 }
 
 CRestHandler_RawPost::CRestHandler_RawPost(const std::string& sIdentifier, const std::string& sURL, const std::string& sAuthToken, uint32_t nTimeOut, uint32_t nRetryCount)
-    : CRestHandler(sIdentifier, sURL, sAuthToken, nTimeOut, nRetryCount)
+    : CRestHandler(sIdentifier, sURL, sAuthToken, nTimeOut, nRetryCount),
+    m_ResponseCode (0)
 {
 
 }
 
+
+#ifdef _WASM
+void restHandlerPostSucceeded(emscripten_fetch_t* fetch) {
+    printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
+
+    if (fetch->userData) {
+        CRestHandler_RawPost* pRawPost = (CRestHandler_RawPost *) fetch->userData;
+        pRawPost->postSucceeded (fetch->data, fetch->numBytes);
+    }
+    
+    emscripten_fetch_close(fetch); 
+    
+}
+
+void restHandlerPostFailed(emscripten_fetch_t* fetch) {
+    printf("Downloading %s failed, HTTP failure status code: %d.\n", fetch->url, fetch->status);
+    if (fetch->userData) {
+        CRestHandler_RawPost* pRawPost = (CRestHandler_RawPost *) fetch->userData;
+        pRawPost->postFailed(fetch->status);
+    }
+    emscripten_fetch_close(fetch); 
+}
+#endif //_WASM
+
+void CRestHandler_RawPost::postSucceeded(const char* pData, size_t nDataSize)
+{
+    if (pData) {
+        auto beginIter = static_cast<const char*> (pData);
+        auto endIter = beginIter + nDataSize;
+
+        m_ResponseCode = 200;
+        m_ResponseBody = std::string(beginIter, endIter);
+    }
+}
+
+void CRestHandler_RawPost::postFailed(uint32_t nResponseCode)
+{
+    m_ResponseCode = nResponseCode;
+    m_ResponseBody = "";
+}
+
+uint32_t CRestHandler_RawPost::getResponseCode()
+{
+    return m_ResponseCode;
+}
+
+std::string CRestHandler_RawPost::getResponseBody()
+{
+    return m_ResponseBody;
+}
 
 void CRestHandler_RawPost::sendRawRequest(const std::string& sRequestBody, const std::string& sContentType)
 {
@@ -89,7 +143,36 @@ void CRestHandler_RawPost::sendRawRequest(const std::string& sRequestBody, const
         RestClient::Response RESTresponse = RestClient::post(m_sURL, sContentType, sRequestBody, headers, m_nTimeout, true);
         sResponseBody = RESTresponse.body;
         nResponseCode = RESTresponse.code;
+#else //_WASM
+        m_ResponseCode = 0;
+        emscripten_fetch_attr_t attr;
+        emscripten_fetch_attr_init(&attr);
+        attr.requestMethod[0] = 'P';
+        attr.requestMethod[1] = 'O';
+        attr.requestMethod[2] = 'S';
+        attr.requestMethod[3] = 'T';
+        attr.requestMethod[4] = 0;
+        attr.userData = this;
+        attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+        attr.onsuccess = restHandlerPostSucceeded;
+        attr.onerror = restHandlerPostFailed;
+        attr.requestData = sRequestBody.c_str();
+        attr.requestDataSize = sRequestBody.length();
+
+        emscripten_fetch(&attr, m_sURL.c_str());
+        
+        uint32_t nSleepIteration = 100;
+        uint32_t nTimer = 0;
+        while ((nTimer < m_nTimeout) && (getResponseCode() == 0)) {
+            emscripten_sleep(nSleepIteration);
+            nTimer += nSleepIteration;
+        }
+
+        nResponseCode = getResponseCode();
+        sResponseBody = m_ResponseBody;
+
 #endif //_WASM
+
         nRetries--;
     }
 

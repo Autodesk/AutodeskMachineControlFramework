@@ -180,7 +180,11 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironme
 				PUIModule_ContentFormEntity pEntity;
 
 				if (sNodeName == "edit") {
-					pEntity = pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string(), valueAttrib.as_string ());
+					auto prefixAttrib = formNode.attribute("prefix");
+					auto suffixAttrib = formNode.attribute("suffix");
+					auto parameterAttrib = formNode.attribute("parameter");
+
+					pEntity = pForm->addEdit(nameAttrib.as_string(),  captionAttrib.as_string(), valueAttrib.as_string (), prefixAttrib.as_string (), suffixAttrib.as_string (), parameterAttrib.as_string ());
 				}
 
 				if (sNodeName == "switch") {

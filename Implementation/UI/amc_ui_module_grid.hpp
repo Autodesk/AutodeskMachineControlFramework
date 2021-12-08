@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_HORIZONTALSPLIT
-#define __AMC_UI_MODULE_HORIZONTALSPLIT
+#ifndef __AMC_UI_MODULE_GRID
+#define __AMC_UI_MODULE_GRID
 
 #include "header_protection.hpp"
 
@@ -48,40 +48,96 @@ namespace LibMCData {
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
-	amcDeclareDependingClass(CUIModule_HorizontalSplit, PUIModule_HorizontalSplit);
-	amcDeclareDependingClass(CUIModule_HorizontalSection, PUIModule_HorizontalSection);
+	amcDeclareDependingClass(CUIModule_Grid, PUIModule_Grid);
+	amcDeclareDependingClass(CUIModule_GridSection, PUIModule_GridSection);
+	amcDeclareDependingClass(CUIModule_GridRow, PUIModule_GridRow);
+	amcDeclareDependingClass(CUIModule_GridColumn, PUIModule_GridColumn);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
-	class CUIModule_HorizontalSection {
+
+	enum class eUIModule_GridColumnPosition {
+		gcpUnknown, gcpFull, gcpLeft, gcpCentered, gcpRight
+	};
+
+	enum class eUIModule_GridRowPosition {
+		crpUnknown, grpFull, grpTop, grpCentered, grpBottom
+	};
+
+	class CUIModule_GridColumn {
+	private:
+		float m_Width;
+		std::string m_sUnit;
+	public:
+		CUIModule_GridColumn(float fWidth, const std::string & sUnit);
+
+		float getWidth();
+		std::string getWidthUnitString();
+
+		static std::string gridPositionToString(eUIModule_GridColumnPosition ePosition);
+		static eUIModule_GridColumnPosition stringToGridPosition(const std::string& sString);
+	};
+
+	class CUIModule_GridRow {
+	private:
+		float m_Height;
+		std::string m_sUnit;
+	public:
+		CUIModule_GridRow(float fHeight, const std::string& sUnit);
+
+		float getHeight();
+		std::string getHeightUnitString();
+
+		static std::string gridPositionToString(eUIModule_GridRowPosition ePosition);
+		static eUIModule_GridRowPosition stringToGridPosition(const std::string& sString);
+
+	};
+
+	class CUIModule_GridSection {
 	private:
 		PUIModule m_pModule;
-		double m_fixedWidthInPercentiles;
+		int m_nColumnStart, m_nColumnEnd, m_nRowStart, m_nRowEnd;
+		eUIModule_GridColumnPosition m_ColumnPosition;
+		eUIModule_GridRowPosition m_RowPosition;
+
 	public:
-		CUIModule_HorizontalSection(PUIModule pModule, double fixedWidthInPercentiles);
+		CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
 
 		CUIModule * getModule();
-		double getFixedWidthInPercentiles();
+
+		int getColumnStart();
+		int getColumnEnd();
+		int getRowStart();
+		int getRowEnd ();
+
+		eUIModule_GridColumnPosition getColumnPosition ();
+		std::string getColumnPositionString();
+		eUIModule_GridRowPosition getRowPosition ();
+		std::string getRowPositionString();
+
 	};
 
 
-	class CUIModule_HorizontalSplit : public CUIModule {
+	class CUIModule_Grid : public CUIModule {
 	protected:		
-
-		std::map<std::string, PUIModuleItem> m_ItemMap;
-		std::map<std::string, PUIModule_HorizontalSection> m_SectionMap;
-		std::vector<PUIModule_HorizontalSection> m_SectionList;
 
 		std::string m_sCaption;
 
-		void addSection(PUIModule pModule, double fixedWidthInPercentiles);
+		std::map<std::string, PUIModuleItem> m_ItemMap;
+		std::map<std::string, PUIModule_GridSection> m_SectionMap;
+		std::vector<PUIModule_GridSection> m_SectionList;
+
+		std::vector<PUIModule_GridRow> m_Rows;
+		std::vector<PUIModule_GridColumn> m_Columns;
+
+		void addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
 
 	public:
 
-		CUIModule_HorizontalSplit(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_Grid(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
 		
-		virtual ~CUIModule_HorizontalSplit();
+		virtual ~CUIModule_Grid();
 
 		virtual std::string getType() override;
 
@@ -94,7 +150,7 @@ namespace AMC {
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
-		PUIModule_HorizontalSection findSection(const std::string& sUUID);
+		PUIModule_GridSection findSection(const std::string& sUUID);
 
 		void configurePostLoading() override;
 
@@ -104,5 +160,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MODULE_HORIZONTALSPLIT
+#endif //__AMC_UI_MODULE_GRID
 
