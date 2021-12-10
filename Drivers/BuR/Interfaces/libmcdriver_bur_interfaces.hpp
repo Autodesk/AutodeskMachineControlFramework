@@ -395,6 +395,17 @@ typedef IBaseSharedPtr<IPLCCommandList> PIPLCCommandList;
 class IDriver_BuR : public virtual IDriver {
 public:
 	/**
+	* IDriver_BuR::SetToSimulationMode - Turns the driver into a simulation mode.
+	*/
+	virtual void SetToSimulationMode() = 0;
+
+	/**
+	* IDriver_BuR::IsSimulationMode - Returns if the driver is in simulation mode.
+	* @return Flag if driver is in simulation mode.
+	*/
+	virtual bool IsSimulationMode() = 0;
+
+	/**
 	* IDriver_BuR::Connect - Connects to a BuR PLC Controller.
 	* @param[in] sIPAddress - IP Address of PLC Service.
 	* @param[in] nPort - Port of PLC Service.

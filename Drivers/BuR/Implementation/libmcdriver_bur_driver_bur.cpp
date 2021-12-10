@@ -129,6 +129,7 @@ CDriver_BuR::CDriver_BuR(const std::string& sName, LibMCEnv::PDriverEnvironment 
        m_nPatchVersion (0), 
        m_nBuildVersion (0), 
        m_bIsQueryingParameters (false),
+       m_SimulationMode (false),
        m_nMaxPacketQueueSize(1024) 
 
 {  
@@ -249,6 +250,17 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
 
 }
 
+void CDriver_BuR::SetToSimulationMode()
+{
+    m_SimulationMode = true;
+}
+
+bool CDriver_BuR::IsSimulationMode()
+{
+    return m_SimulationMode;
+}
+
+
 std::string CDriver_BuR::GetName()
 {
     return m_sName;
@@ -280,48 +292,51 @@ void CDriver_BuR::QueryParameters()
 
     uint64_t nTimeStamp = generateTimeStamp ();
 
-    if (m_pConnector.get() != nullptr) {
-        m_bIsQueryingParameters = true;
+    if (!m_SimulationMode) {
 
-        m_pConnector->queryParameters(nTimeStamp,
-            [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
+        if (m_pConnector.get() != nullptr) {
+            m_bIsQueryingParameters = true;
 
-            m_bIsQueryingParameters = false;
+            m_pConnector->queryParameters(nTimeStamp,
+                [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
+
+                m_bIsQueryingParameters = false;
 
 
-            for (auto driverParameter : m_DriverParameters) {
-                std::lock_guard<std::mutex> driverLock(m_driverEnvironmentMutex);
-                auto sName = driverParameter->getName();
+                for (auto driverParameter : m_DriverParameters) {
+                    std::lock_guard<std::mutex> driverLock(m_driverEnvironmentMutex);
+                    auto sName = driverParameter->getName();
 
-                if (dynamic_cast<CDriver_BuRDIntValue*> (driverParameter.get()) != nullptr) {
-                    m_pDriverEnvironment->SetIntegerParameter(sName, pPacket->readUInt32(driverParameter->getAddress()));
+                    if (dynamic_cast<CDriver_BuRDIntValue*> (driverParameter.get()) != nullptr) {
+                        m_pDriverEnvironment->SetIntegerParameter(sName, pPacket->readUInt32(driverParameter->getAddress()));
+                    }
+
+                    if (dynamic_cast<CDriver_BuRIntValue*> (driverParameter.get()) != nullptr) {
+                        m_pDriverEnvironment->SetIntegerParameter(sName, pPacket->readUInt16(driverParameter->getAddress()));
+                    }
+
+                    if (dynamic_cast<CDriver_BuRRealValue*> (driverParameter.get()) != nullptr) {
+                        m_pDriverEnvironment->SetDoubleParameter(sName, pPacket->readFloat(driverParameter->getAddress()));
+                    }
+
+                    if (dynamic_cast<CDriver_BuRLRealValue*> (driverParameter.get()) != nullptr) {
+                        m_pDriverEnvironment->SetDoubleParameter(sName, pPacket->readDouble(driverParameter->getAddress()));
+                    }
+
+                    if (dynamic_cast<CDriver_BuRBoolValue*> (driverParameter.get()) != nullptr) {
+                        m_pDriverEnvironment->SetBoolParameter(sName, pPacket->readBool(driverParameter->getAddress()));
+                    }
+
+                    auto pStringValue = dynamic_cast<CDriver_BuRStringValue*> (driverParameter.get());
+                    if (pStringValue != nullptr) {
+                        m_pDriverEnvironment->SetStringParameter(sName, pPacket->readString(driverParameter->getAddress(), pStringValue->getLength()));
+                    }
+
                 }
 
-                if (dynamic_cast<CDriver_BuRIntValue*> (driverParameter.get()) != nullptr) {
-                    m_pDriverEnvironment->SetIntegerParameter(sName, pPacket->readUInt16(driverParameter->getAddress()));
-                }
 
-                if (dynamic_cast<CDriver_BuRRealValue*> (driverParameter.get()) != nullptr) {
-                    m_pDriverEnvironment->SetDoubleParameter(sName, pPacket->readFloat(driverParameter->getAddress()));
-                }
-
-                if (dynamic_cast<CDriver_BuRLRealValue*> (driverParameter.get()) != nullptr) {
-                    m_pDriverEnvironment->SetDoubleParameter(sName, pPacket->readDouble(driverParameter->getAddress()));
-                }
-
-                if (dynamic_cast<CDriver_BuRBoolValue*> (driverParameter.get()) != nullptr) {
-                    m_pDriverEnvironment->SetBoolParameter(sName, pPacket->readBool(driverParameter->getAddress()));
-                }
-
-                auto pStringValue = dynamic_cast<CDriver_BuRStringValue*> (driverParameter.get());
-                if (pStringValue != nullptr) {
-                    m_pDriverEnvironment->SetStringParameter(sName, pPacket->readString(driverParameter->getAddress(), pStringValue->getLength()));
-                }
-
-            }
-
-
-        });
+            });
+        }
     }
 
 }
@@ -330,8 +345,12 @@ void CDriver_BuR::QueryParameters()
 
 void CDriver_BuR::Connect(const std::string& sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout)
 {        
-    if (m_pConnector.get() != nullptr)
-        m_pConnector->connect(sIPAddress, nPort, nTimeout);
+    if (!m_SimulationMode) {
+
+        if (m_pConnector.get() != nullptr)
+            m_pConnector->connect(sIPAddress, nPort, nTimeout);
+
+    }
 }
 
 void CDriver_BuR::Disconnect()
@@ -343,9 +362,6 @@ void CDriver_BuR::Disconnect()
 
 IPLCCommandList* CDriver_BuR::CreateCommandList()
 {
-    if (m_pConnector.get() == nullptr)
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTCONNECTED);
-
     return new CPLCCommandList(m_pConnector, this); 
     
 }
@@ -374,7 +390,7 @@ void CDriver_BuR::StopJournaling()
 
 void CDriver_BuR::RefreshJournal()
 {
-/*    if (m_pConnector.get() == nullptr)
+/*    if (m_pConnector.get() != nullptr)
         m_pConnector->refreshJournal(); */
 
 }
