@@ -41,8 +41,6 @@ namespace AMC {
 
 	public:
 
-		static void extractParameterDetailsFromDotString (const std::string & sParameterPath, std::string & sParameterInstance, std::string & sParameterGroup, std::string & sParameterName);
-
 	};
 
 	

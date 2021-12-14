@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statemachinedata.hpp"
 #include "libmc_exceptiontypes.hpp"
 
+#include "common_utils.hpp"
+
 
 namespace AMC {
 
@@ -94,6 +96,102 @@ namespace AMC {
 
 		return "";
 	}
+
+
+
+
+	void CStateMachineData::extractParameterDetailsFromDotString(const std::string& sParameterPath, std::string& sParameterInstance, std::string& sParameterGroup, std::string& sParameterName)
+	{
+		std::string sTrimmedPath = AMCCommon::CUtils::trimString(sParameterPath);
+
+		auto nPointPosition1 = sTrimmedPath.find(".");
+		if (nPointPosition1 != std::string::npos) {
+
+			sParameterInstance = sTrimmedPath.substr(0, nPointPosition1);
+
+			std::string sRestString = sTrimmedPath.substr(nPointPosition1 + 1);
+
+			auto nPointPosition2 = sRestString.find(".");
+			if (nPointPosition2 != std::string::npos) {
+				sParameterGroup = sRestString.substr(0, nPointPosition2);
+				sParameterName = sRestString.substr(nPointPosition2 + 1);
+
+				if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterInstance))
+					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERINSTANCE, sParameterInstance);
+				if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterGroup))
+					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sParameterGroup);
+				if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))
+					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERNAME, sParameterName);
+
+			}
+			else {
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERPATH, sParameterPath);
+			}
+
+		}
+		else {
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERPATH, sParameterPath);
+		}
+	}
+
+
+	bool CStateMachineData::evaluateBooleanExpression(const std::string& sExpression)
+	{
+		std::string sTrimmedExpression = AMCCommon::CUtils::trimString(sExpression);
+
+		if (sTrimmedExpression.empty())
+			return false;
+
+		if (sTrimmedExpression.at (0) == '!')
+			return evaluateIntegerExpression(sTrimmedExpression.substr (1)) == 0;
+
+		return evaluateIntegerExpression(sTrimmedExpression) != 0;
+	}
+
+
+	int64_t CStateMachineData::evaluateIntegerExpression(const std::string& sExpression)
+	{
+		if (sExpression.empty())
+			return 0;
+
+		std::string::const_iterator it = sExpression.begin();
+		while (it != sExpression.end() && std::isdigit(*it)) ++it;
+		bool bIsNumber = !sExpression.empty() && it == sExpression.end();
+
+		if (bIsNumber)
+			return std::atoi(sExpression.c_str ());
+
+		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
+		CStateMachineData::extractParameterDetailsFromDotString(sExpression, sParameterInstanceName, sParameterGroupName, sParameterName);
+
+		auto pParameterHandler = getParameterHandler(sParameterInstanceName);
+		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
+		return pParameterGroup->getIntParameterValueByName(sParameterName);
+	}
+
+	std::string CStateMachineData::evaluateNumberExpression(const std::string& sExpression)
+	{
+		if (sExpression.empty())
+			return 0;
+
+		std::string::const_iterator it = sExpression.begin();
+		while (it != sExpression.end() && (std::isdigit(*it) || (*it == '.') || (*it == '-'))) ++it;
+		bool bIsNumber = !sExpression.empty() && it == sExpression.end();
+
+		if (bIsNumber)
+			return sExpression.c_str();
+
+		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
+		CStateMachineData::extractParameterDetailsFromDotString(sExpression, sParameterInstanceName, sParameterGroupName, sParameterName);
+
+		auto pParameterHandler = getParameterHandler(sParameterInstanceName);
+		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
+		return std::to_string (pParameterGroup->getDoubleParameterValueByName(sParameterName));
+
+	}
+
+	
+
 
 }
 
