@@ -7,6 +7,23 @@ const nullUUID = "00000000-0000-0000-0000-000000000000";
 const nullToken = "0000000000000000000000000000000000000000000000000000000000000000";
 
 
+	
+function updateAMCFormEntityFromContentEntry (entry, entity) {
+	
+	if ((entity) && (entry)) {
+		entity.remotevalue = entry.defaultvalue;
+		entity.prefix = entry.prefix;
+		entity.suffix = entry.suffix;
+		entity.readonly = entry.readonly;
+		entity.disabled = entry.disabled;
+		
+		if (entity.value != entity.remotevalue) {
+			entity.value = entity.remotevalue;				
+		}
+	}
+			
+}
+
 export default class AMCApplication {
 	
 	constructor (apiBaseURL)
@@ -194,6 +211,7 @@ export default class AMCApplication {
                 });	
 			
 	}
+
 	
 	
 	prepareModuleItem (item) 
@@ -219,7 +237,14 @@ export default class AMCApplication {
 		
 		if (item.type === "form") {
 
-			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true, 
+				callback: function(appcontent, item) {
+					
+					for (var entry of item.entries) {						
+						updateAMCFormEntityFromContentEntry (entry, appcontent.FormEntities[entry.uuid]);																	
+					}
+				}
+			};
 			
 			for (var entity of item.entities) {
 				
@@ -433,6 +458,12 @@ export default class AMCApplication {
 						this.AppContent.ContentItems[uuid].entries.push (entry);
 					}
 					this.AppContent.ContentItems[uuid].refresh = true;
+					
+					var itemCallback = this.AppContent.ContentItems[uuid].callback;
+					if (itemCallback) {						
+						itemCallback (this.AppContent, this.AppContent.ContentItems[uuid]);
+					}
+					
                 })
                 .catch(err => {
 					
