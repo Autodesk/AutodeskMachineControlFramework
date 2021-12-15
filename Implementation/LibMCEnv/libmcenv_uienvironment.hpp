@@ -66,7 +66,8 @@ private:
 	AMC::PStateSignalHandler m_pSignalHandler;
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
-
+	std::string m_sModalDialogToShow;
+	std::string m_sPageToActivate;
 
 	std::string m_sContextUUID;
 	std::map<std::pair <std::string, std::string>, std::string> m_FormValues;
@@ -76,6 +77,10 @@ protected:
 public:
 
 	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID, AMC::PParameterHandler pClientVariableHandler);
+
+	void ActivateModalDialog(const std::string& sDialogName) override;
+
+	void ActivatePage(const std::string& sPageName) override;
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
@@ -134,6 +139,10 @@ public:
 	std::string GetEventContext() override;
 
 	void addFormValue(const std::string& sFormIdentifier, const std::string & sValueIdentifier, const std::string & sValue);
+
+	std::string getModalDialogToShow();
+
+	std::string getPageToActivate();
 
 };
 

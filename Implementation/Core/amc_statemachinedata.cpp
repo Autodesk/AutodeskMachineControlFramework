@@ -172,7 +172,7 @@ namespace AMC {
 	std::string CStateMachineData::evaluateNumberExpression(const std::string& sExpression)
 	{
 		if (sExpression.empty())
-			return 0;
+			return "";
 
 		std::string::const_iterator it = sExpression.begin();
 		while (it != sExpression.end() && (std::isdigit(*it) || (*it == '.') || (*it == '-'))) ++it;

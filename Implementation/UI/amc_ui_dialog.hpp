@@ -29,12 +29,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_PAGE
-#define __AMC_UI_PAGE
+#ifndef __AMC_UI_DIALOG
+#define __AMC_UI_DIALOG
 
 #include "header_protection.hpp"
 
-#ifndef __AMCIMPL_UI_PAGE
+#ifndef __AMCIMPL_UI_DIALOG
 #error this header is protected and should only be included in the corresponding implementation CPP files.
 #endif
 
@@ -50,50 +50,23 @@ namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIPage, PUIPage);	
+	amcDeclareDependingClass(CUIDialog, PUIDialog);	
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 
 
-	class CUIPage : public CUIModule_ContentRegistry {
+	class CUIDialog : public CUIPage {
 	protected:
-		std::string m_sName;
-
-		std::vector<PUIModule> m_Modules;
-		std::map <std::string, PUIModule> m_ModuleMap;
-		std::map<std::string, PUIModuleItem> m_ItemMapOfPage;
-
-		std::map<std::string, std::string> m_FormNameMap;
-
-		CUIModule_UIEventHandler* m_pUIEventHandler;
-
 
 	public:
 
-		CUIPage(const std::string & sName, CUIModule_UIEventHandler* pUIEventHandler);
+		CUIDialog(const std::string & sName, CUIModule_UIEventHandler* pUIEventHandler);
 		
-		virtual ~CUIPage();
-
-		std::string getName();
-
-		void addModule (PUIModule pModule);
-
-		PUIModule findModule (const std::string & sName);
-		uint32_t getModuleCount();
-		PUIModule getModule (const uint32_t nIndex);
-
-		void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray);
-
-		virtual PUIModuleItem findModuleItemByUUID(const std::string& sUUID) override;
-		virtual void registerFormName(const std::string& sFormUUID, const std::string& sFormName) override;
-		virtual std::string findFormUUIDByName(const std::string& sFormName) override;
-
-		virtual void configurePostLoading();
-
-		virtual void ensureUIEventExists(const std::string& sEventName) override;
-										
+		virtual ~CUIDialog();
+		
 	};
 		
 }
 
 
-#endif //__AMC_UI_PAGE
+#endif //__AMC_UI_DIALOG
 

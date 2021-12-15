@@ -66,6 +66,16 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
 
 }
 
+void CUIEnvironment::ActivateModalDialog(const std::string& sDialogName)
+{
+    m_sModalDialogToShow = sDialogName;
+}
+
+void CUIEnvironment::ActivatePage(const std::string& sPageName)
+{
+    m_sPageToActivate = sPageName;
+}
+
 ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
 {
     if (!m_pSignalHandler->hasSignalDefinition(sMachineInstance, sSignalName))
@@ -291,4 +301,15 @@ std::string CUIEnvironment::GetEventContext()
 void CUIEnvironment::addFormValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier, const std::string& sValue)
 {
     m_FormValues.insert(std::make_pair (std::make_pair (sFormIdentifier, sValueIdentifier), sValue));
+}
+
+
+std::string CUIEnvironment::getModalDialogToShow()
+{
+    return m_sModalDialogToShow;
+}
+
+std::string CUIEnvironment::getPageToActivate()
+{
+    return m_sPageToActivate;
 }

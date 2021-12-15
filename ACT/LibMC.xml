@@ -395,6 +395,12 @@
 		<error name="INVALIDSTATEMACHINENAME" code="378" description="Invalid state machine name" />
 		<error name="INVALIDGRIDPOSITION" code="379" description="Invalid grid position" />
 		
+		<error name="INVALIDDIALOGNAME" code="380" description="Invalid dialog name" />
+		<error name="DUPLICATEDIALOG" code="381" description="Duplicate dialog" />
+		<error name="DIALOGNOTFOUND" code="382" description="Dialog not found" />
+		
+		<error name="COULDNOTHANDLEEVENT" code="383" description="Could not handle event" />
+		
 			
 	</errors>
 	
