@@ -32,12 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_TOOLBARITEM
 #define __AMCIMPL_API_CONSTANTS
 #define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_DIALOG
 #define __AMCIMPL_UI_MODULE
 
 #include "amc_ui_handler.hpp"
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
+#include "amc_ui_dialog.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
 #include "amc_parameterhandler.hpp"
 
@@ -60,7 +62,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "PugiXML/pugixml.hpp"
 
+#include <sstream>
+
 using namespace AMC;
+
+CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::string& sPageToActivate, const std::string& sDialogToShow)
+    : m_nErrorCode (nErrorCode), m_sErrorMessage (sErrorMessage), m_sPageToActivate (sPageToActivate), m_sDialogToShow (sDialogToShow)
+{
+
+}
+
+uint32_t CUIHandleEventResponse::getErrorCode()
+{
+    return m_nErrorCode;
+}
+
+std::string CUIHandleEventResponse::getErrorMessage()
+{
+    return m_sErrorMessage;
+}
+
+std::string CUIHandleEventResponse::getPageToActivate()
+{
+    return m_sPageToActivate;
+}
+
+std::string CUIHandleEventResponse::getDialogToShow()
+{
+    return m_sDialogToShow;
+}
+
+bool CUIHandleEventResponse::hasPageToActivate()
+{
+    return !m_sPageToActivate.empty();
+}
+
+bool CUIHandleEventResponse::hasDialogToShow()
+{
+    return !m_sDialogToShow.empty();
+}
+
+
 
 CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
     : m_dLogoAspectRatio (1.0), 
@@ -120,7 +162,7 @@ PUIPage CUIHandler::findPage(const std::string& sName)
     auto iter = m_Pages.find(sName);
 
     if (iter == m_Pages.end())
-        throw ELibMCInterfaceException(LIBMC_ERROR_PAGENOTFOUND);
+        throw ELibMCCustomException(LIBMC_ERROR_PAGENOTFOUND, sName);
 
     return iter->second;
 }
@@ -133,6 +175,21 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
     writer.addString(AMC_API_KEY_UI_MAINPAGE, m_pMainPage->getName());
     writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
     writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
+
+    CJSONWriterObject colorsObject(writer);
+    for (auto color : m_Colors) {
+
+        std::stringstream sColorStream;
+        uint32_t nRed = color.second & 0xff;
+        uint32_t nGreen = (color.second >> 8) & 0xff;
+        uint32_t nBlue = (color.second >> 16) & 0xff;
+
+        sColorStream << "#" << std::setfill('0') << std::setw(2) << std::hex << nRed << nGreen << nBlue;
+
+        colorsObject.addString(color.first, sColorStream.str());
+    }
+
+    writer.addObject(AMC_API_KEY_UI_COLORS, colorsObject);
 
 }
 
@@ -176,6 +233,22 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer)
         pages.addObject(page);
     }
     writer.addArray(AMC_API_KEY_UI_PAGES, pages);
+
+
+    CJSONWriterArray dialogs(writer);
+    for (auto iter : m_Dialogs) {
+        CJSONWriterObject dialog(writer);
+        dialog.addString(AMC_API_KEY_UI_DIALOGNAME, iter.second->getName());
+
+        CJSONWriterArray modules(writer);
+        iter.second->writeModulesToJSON(writer, modules);
+
+        dialog.addArray(AMC_API_KEY_UI_MODULES, modules);
+
+        dialogs.addObject(dialog);
+    }
+    writer.addArray(AMC_API_KEY_UI_DIALOGS, dialogs);
+
 }
 
 PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
@@ -192,6 +265,35 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
 
     return pPage;
 }
+
+
+PUIDialog CUIHandler::addDialog_Unsafe(const std::string& sName)
+{
+    if (sName.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDIALOGNAME);
+
+    auto iIterator = m_Dialogs.find(sName);
+    if (iIterator != m_Dialogs.end())
+        throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEDIALOG, sName);
+
+    auto pDialog = std::make_shared<CUIDialog>(sName, this);
+    m_Dialogs.insert(std::make_pair(sName, pDialog));
+
+    return pDialog;
+
+}
+
+PUIDialog CUIHandler::findDialog(const std::string& sName)
+{
+    auto iter = m_Dialogs.find(sName);
+
+    if (iter == m_Dialogs.end())
+        throw ELibMCCustomException(LIBMC_ERROR_DIALOGNOTFOUND, sName);
+
+    return iter->second;
+
+}
+
 
 
 void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
@@ -234,6 +336,55 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMAINPAGE);
     std::string sMainPage(mainpageAttrib.as_string());
 
+    auto colorsNode = xmlNode.child("colors");
+    if (!colorsNode.empty()) {
+
+        auto colorNodes = colorsNode.children("color");
+        for (pugi::xml_node colorNode : colorNodes) {
+            auto nameColorAttrib = colorNode.attribute("name");
+            auto redColorAttrib = colorNode.attribute("red");
+            auto greenColorAttrib = colorNode.attribute("green");
+            auto blueColorAttrib = colorNode.attribute("blue");
+
+            std::string sColorName = nameColorAttrib.as_string();
+            if (sColorName.empty ())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORNAME);
+            if (redColorAttrib.empty())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORREDCHANNEL);
+            if (greenColorAttrib.empty())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORGREENCHANNEL);
+            if (blueColorAttrib.empty())
+                throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGCOLORBLUECHANNEL);
+
+
+            double dRed = redColorAttrib.as_double(-1.0);
+            double dGreen = greenColorAttrib.as_double(-1.0);
+            double dBlue = blueColorAttrib.as_double(-1.0);
+            if ((dRed < 0.0) || (dRed > 1.0))
+                throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCOLORREDCHANNEL);
+            if ((dGreen < 0.0) || (dGreen > 1.0))
+                throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCOLORGREENCHANNEL);
+            if ((dBlue < 0.0) || (dBlue > 1.0))
+                throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCOLORBLUECHANNEL);
+
+            int32_t nRed = (int32_t)(dRed * 255.0f);
+            int32_t nGreen = (int32_t)(dGreen * 255.0f);
+            int32_t nBlue = (int32_t)(dBlue * 255.0f);
+            if (nRed < 0) nRed = 0;
+            if (nGreen < 0) nGreen = 0;
+            if (nBlue < 0) nBlue = 0;
+            if (nRed > 255) nRed = 255;
+            if (nGreen > 255) nGreen = 255;
+            if (nBlue > 255) nBlue = 255;
+
+            uint32_t nColor = (nRed + nGreen * 256 + nBlue * 65536);
+            m_Colors.insert(std::make_pair (sColorName, nColor));
+
+        }
+
+    }
+
+
     auto logoNode = xmlNode.child("logo");
     if (!logoNode.empty()) {
 
@@ -272,6 +423,28 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
             auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
             auto pModule = CUIModuleFactory::createModule(pageChild, pModuleEnvironment);
             pPage->addModule(pModule);
+
+        }
+
+    }
+
+
+    auto dialogNodes = xmlNode.children("dialog");
+    for (pugi::xml_node dialogNode : dialogNodes) {
+
+        auto dialogNameAttrib = dialogNode.attribute("name");
+        if (dialogNameAttrib.empty())
+            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPAGENAME);
+        std::string sDialogName(dialogNameAttrib.as_string());
+
+        auto pDialog = addDialog_Unsafe(sDialogName);
+
+        auto dialogChildren = dialogNode.children();
+        for (pugi::xml_node dialogChild : dialogChildren) {
+
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get());
+            auto pModule = CUIModuleFactory::createModule(dialogChild, pModuleEnvironment);
+            pDialog->addModule(pModule);
 
         }
 
@@ -333,6 +506,8 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
     // Update all cross-references!
     for (auto pPage : m_Pages)
         pPage.second->configurePostLoading();
+    for (auto pDialog : m_Dialogs)
+        pDialog.second->configurePostLoading();
 
 }
 
@@ -401,73 +576,97 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 }
 
 
-void CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
+CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
 {
 
     LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sContextUUID, pClientVariableHandler);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
-    auto pPage = findPageOfModuleItem(sSenderUUID);
-    if (pPage.get() == nullptr)
-        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
+    uint32_t nErrorCode = 0;
+    std::string sErrorMessage;
 
-    auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
-    if (pModuleItem.get() == nullptr)
-        throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+    try {
 
-    auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+        auto pPage = findPageOfModuleItem(sSenderUUID);
+        if (pPage.get() == nullptr)
+            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
 
-    if (!sFormValueJSON.empty()) {
+        auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
+        if (pModuleItem.get() == nullptr)
+            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
 
-        rapidjson::Document document;
-        document.Parse(sFormValueJSON.c_str());
-        if (!document.IsObject())
-            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
+        auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
+
+        if (!sFormValueJSON.empty()) {
+
+            rapidjson::Document document;
+            document.Parse(sFormValueJSON.c_str());
+            if (!document.IsObject())
+                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
 
 
-        for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin();
-            itr != document.MemberEnd(); ++itr)
-        {
-            if (!itr->name.IsString())
-                throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
-            std::string sEntityUUID = itr->name.GetString();
-            std::string sFormValue;
+            for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin();
+                itr != document.MemberEnd(); ++itr)
+            {
+                if (!itr->name.IsString())
+                    throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+                std::string sEntityUUID = itr->name.GetString();
+                std::string sFormValue;
 
-            if (itr->value.IsString()) {
-                sFormValue = itr->value.GetString();
+                if (itr->value.IsString()) {
+                    sFormValue = itr->value.GetString();
+                }
+                else if (itr->value.IsInt64()) {
+                    sFormValue = std::to_string(itr->value.GetInt64());
+                }
+                else if (itr->value.IsBool()) {
+                    sFormValue = std::to_string(itr->value.GetBool());
+                }
+                else if (itr->value.IsDouble()) {
+                    sFormValue = std::to_string(itr->value.GetDouble());
+                }
+                else
+                    throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
+
+
+
+                auto pFormItem = pPage->findModuleItemByUUID(sEntityUUID);
+                auto pForm = std::dynamic_pointer_cast<CUIModule_ContentForm> (pFormItem);
+                if (pForm.get() != nullptr) {
+
+                    auto pFormEntity = pForm->findEntityByUUID(sEntityUUID);
+                    if (pFormEntity.get() == nullptr)
+                        throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNOTFOUND, sEventName + "/" + sEntityUUID);
+
+                    pInternalUIEnvironment->addFormValue(pForm->getName(), pFormEntity->getName(), sFormValue);
+
+                }
+
+
             }
-            else if (itr->value.IsInt64()) {
-                sFormValue = std::to_string (itr->value.GetInt64());
-            }
-            else if (itr->value.IsBool()) {
-                sFormValue = std::to_string(itr->value.GetBool());
-            }
-            else if (itr->value.IsDouble()) {
-                sFormValue = std::to_string(itr->value.GetDouble());
-            }
-            else
-                throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
-
-            
-
-            auto pFormItem = pPage->findModuleItemByUUID(sEntityUUID);
-            auto pForm = std::dynamic_pointer_cast<CUIModule_ContentForm> (pFormItem);
-            if (pForm.get() != nullptr) {
-
-                auto pFormEntity = pForm->findEntityByUUID(sEntityUUID);
-                if (pFormEntity.get() == nullptr) 
-                    throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNOTFOUND, sEventName + "/" + sEntityUUID);
-
-                pInternalUIEnvironment->addFormValue(pForm->getName (), pFormEntity->getName (), sFormValue);
-                
-            }
-                        
 
         }
 
-    }
+        pEvent->Handle(pExternalEnvironment);
 
-    pEvent->Handle(pExternalEnvironment);
+    } 
+    catch (LibMCUI::ELibMCUIException & UIException) {
+        nErrorCode = UIException.getErrorCode();
+        sErrorMessage = UIException.what();
+    }
+    catch (ELibMCInterfaceException & Exception) {
+        nErrorCode = Exception.getErrorCode();
+        sErrorMessage = Exception.what();
+    }
+    catch (std::exception & StdException) {
+        nErrorCode = LIBMC_ERROR_COULDNOTHANDLEEVENT;
+        sErrorMessage = StdException.what();
+    }
+ 
+
+
+    return CUIHandleEventResponse (nErrorCode, sErrorMessage, pInternalUIEnvironment->getPageToActivate(), pInternalUIEnvironment->getModalDialogToShow ());
+       
 
 }
 

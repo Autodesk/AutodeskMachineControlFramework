@@ -42,7 +42,65 @@ using namespace LibMCUI::Impl;
 
 
 /*************************************************************************************************************************
- Class declaration of CEventHandler
+ Class declaration of CEvent_StartBuildPreparation
+**************************************************************************************************************************/
+
+class CEvent_StartBuildPreparation : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "startbuildpreparation";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		auto sJobUUID = pUIEnvironment->GetEventContext();
+		pUIEnvironment->LogMessage("Clicked on StartBuildPreparation Button");
+
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_preparebuildjob");
+		pSignal->SetString("jobuuid", sJobUUID);
+		pSignal->SetString("jobname", "Job");
+		pSignal->Trigger(); 
+
+	}
+
+};
+
+
+
+/*************************************************************************************************************************
+ Class declaration of CEvent_CancelBuildPreparation
+**************************************************************************************************************************/
+
+class CEvent_CancelBuildPreparation : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "cancelbuildpreparation";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on CancelBuildPreparation Button");
+
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_cancelbuildpreparation");
+		pSignal->Trigger();
+		
+
+	}
+
+};
+
+
+
+/*************************************************************************************************************************
+ Class declaration of CEvent_StartBuild
 **************************************************************************************************************************/
 
 class CEvent_StartBuild : public virtual CEvent {
@@ -56,14 +114,31 @@ public:
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
-		if (pUIEnvironment.get() == nullptr)
-			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
-		auto sJobUUID = pUIEnvironment->GetEventContext();
-		auto pSignal = pUIEnvironment->PrepareSignal("demo", "signal_startjob");
-		pSignal->SetString("jobuuid", sJobUUID);
-		pSignal->SetString("jobname", "testjob");
+		pUIEnvironment->LogMessage("Clicked on StartBuild Button");
+
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startbuild");
 		pSignal->Trigger();
+
+	}
+
+};
+
+
+
+class CEvent_ChangeManualValues : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "changemanualvalues";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->ActivateModalDialog("testdialog");
 
 	}
 
@@ -73,11 +148,22 @@ public:
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
 {
 	IEvent* pEventInstance = nullptr;
+	if (createEventInstanceByName<CEvent_StartBuildPreparation>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_CancelBuildPreparation>(sEventName, pEventInstance))
+		return pEventInstance;
 	if (createEventInstanceByName<CEvent_StartBuild>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_ChangeManualValues>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
 }
+
+
+
 
 #ifdef _MSC_VER
 #pragma warning(pop)

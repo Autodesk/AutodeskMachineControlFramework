@@ -334,11 +334,11 @@ public:
 
 };
 
-CStreamUpload::CStreamUpload(PConnectionState pConnectionState, const std::string& sName, const std::string& sMimeType, const std::string& sUsageContext)
+CStreamUpload::CStreamUpload(PConnectionState pConnectionState, const std::string& sName, const std::string& sMimeType, const LibAMCF::eStreamContextType StreamContext)
     : m_pConnectionState (pConnectionState), 
 	  m_sName (sName), 
 	  m_sMimeType (sMimeType), 
-	  m_sUsageContext (sUsageContext), 
+	  m_StreamContext(StreamContext),
 	  m_nTotalUploadSize (0), 
 	  m_nCurrentUploadSize (0),
 	  m_nFinishedBytes (0),
@@ -360,37 +360,39 @@ std::string CStreamUpload::GetMimeType()
     return m_sMimeType;
 }
 
-std::string CStreamUpload::GetUsageContext()
+LibAMCF::eStreamContextType CStreamUpload::GetContextType() 
 {
-    return m_sUsageContext;
+    return m_StreamContext;
 }
 
-
-IOperationResult * CStreamUpload::UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8 * pDataBuffer, const LibAMCF_uint32 nChunkSize)
+IOperationResult* CStreamUpload::UploadData(const LibAMCF_uint64 nDataBufferSize, const LibAMCF_uint8* pDataBuffer, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount)
 {
-    if (nChunkSize < AMCF_MINUPLOADCHUNKSIZE)
-        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
-    if (nChunkSize > AMCF_MAXUPLOADCHUNKSIZE)
-        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
-    if (nDataBufferSize == 0)
-        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA);
-    if (pDataBuffer == nullptr)
-        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
+	if (nChunkSize < AMCF_MINUPLOADCHUNKSIZE)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
+	if (nChunkSize > AMCF_MAXUPLOADCHUNKSIZE)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
+	if (nDataBufferSize == 0)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_CANNOTUPLOADEMPTYDATA);
+	if (pDataBuffer == nullptr)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDPARAM);
 
-    uint64_t nChunksNeeded = (nDataBufferSize + (nChunkSize - 1)) / nChunkSize;
+	uint64_t nChunksNeeded = (nDataBufferSize + (nChunkSize - 1)) / nChunkSize;
 
 	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+
 }
 
-IOperationResult * CStreamUpload::UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize)
+IOperationResult* CStreamUpload::UploadFile(const std::string& sFileName, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount)
 {
-    if (nChunkSize < AMCF_MINUPLOADCHUNKSIZE)
-	    throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
-    if (nChunkSize > AMCF_MAXUPLOADCHUNKSIZE)
-        throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
+	if (nChunkSize < AMCF_MINUPLOADCHUNKSIZE)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
+	if (nChunkSize > AMCF_MAXUPLOADCHUNKSIZE)
+		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDUPLOADCHUNKSIZE);
 
 	throw ELibAMCFInterfaceException(LIBAMCF_ERROR_NOTIMPLEMENTED);
+
 }
+
 
 IOperationResult* CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
 {
@@ -410,8 +412,19 @@ IOperationResult* CStreamUpload::BeginChunking(const LibAMCF_uint64 nDataSize)
 		m_HashBlockSHA256Sums.resize(nHashBlockCount);
 	}
 
+	std::string sStreamContextString;
+	switch (m_StreamContext) {
+		case eStreamContextType::NewBuildJob:
+			sStreamContextString = "build";
+			break;
 
-	auto pRequest = std::make_shared<CAsyncBeginChunkingRequest>(m_pConnectionState, m_sName, m_nTotalUploadSize, m_sMimeType, m_sUsageContext);
+		default:
+			throw ELibAMCFInterfaceException(LIBAMCF_ERROR_INVALIDSTREAMCONTEXTTYPE);
+
+	}
+
+
+	auto pRequest = std::make_shared<CAsyncBeginChunkingRequest>(m_pConnectionState, m_sName, m_nTotalUploadSize, m_sMimeType, sStreamContextString);
 	auto pRequestHandler = m_pConnectionState->getRequestHandler();
 	pRequestHandler->executeRequest(pRequest, [this](CAsyncResult* pResult) {
 
@@ -545,6 +558,6 @@ IDataStream * CStreamUpload::GetDataStream()
 	if (!m_bUploadFinished)
 		throw ELibAMCFInterfaceException(LIBAMCF_ERROR_UPLOADDIDNOTFINISH);
 
-	return new CDataStream (m_sStreamUUID, m_sContextUUID, m_sName, m_sMimeType, m_sCalculatedSHA256, m_nTotalUploadSize, m_sUploadTimestamp);
+	return new CDataStream (m_sStreamUUID, m_StreamContext, m_sContextUUID, m_sName, m_sMimeType, m_sCalculatedSHA256, m_nTotalUploadSize, m_sUploadTimestamp);
 }
 

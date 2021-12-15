@@ -67,18 +67,46 @@
 		<v-container class="fill-height" fluid v-if="appIsError">
 			<Dialog_Error :Application="Application" />
         </v-container>		
-
+		
 		<template v-for="uiPage in Application.AppContent.Pages">
-			<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:85vh; display:block">
+			<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:100%; display:block">
 								
 				<template v-for="uiModule in uiPage.modules">
 					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
-					<Module_VerticalSplit :key="uiModule.name" v-if="(uiModule.type == 'verticalsplit')" :module="uiModule" :Application="Application" />							
-					<Module_HorizontalSplit :key="uiModule.name" v-if="(uiModule.type == 'horizontalsplit')" :module="uiModule" :Application="Application" />							
+					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
+					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
 				</template>										
 						
 			</v-container>		
+		</template>
+		
+		<template v-for="uiDialog in Application.AppContent.Dialogs">
+			<v-dialog :key="uiDialog.name"						
+				v-model="uiDialog.dialogIsActive"
+				transition="dialog-bottom-transition"
+				max-width="290"
+			>
+			
+			<v-card> 
+          <v-card-title>
+            Privacy Policy
+          </v-card-title>
+		  
+		  <v-card-text>
+			
+			<template v-for="uiModule in uiDialog.modules">
+					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
+					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
+					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
+					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
+				</template>										
+				
+		   </v-card-text>
+			</v-card>
+			
+				
+        </v-dialog>		
 		</template>
         
     </v-main>
@@ -100,8 +128,8 @@
 	
 	import Module_Content from "./Module_Content.vue";
 	import Module_Tabs from "./Module_Tabs.vue";
-	import Module_VerticalSplit from "./Module_VerticalSplit.vue";
-	import Module_HorizontalSplit from "./Module_HorizontalSplit.vue";
+	import Module_Grid from "./Module_Grid.vue";
+	import Module_GLScene from "./Module_GLScene.vue";
 	
 	export default {
 
@@ -114,7 +142,8 @@
 			}
 			
 			this.Application = new AMCApplication (baseURL);
-			this.Application.retrieveConfiguration();
+			this.Application.retrieveConfiguration(this.$vuetify.theme.themes);
+						
 		},
 		
 
@@ -174,6 +203,7 @@
 
 				return (this.Application.AppState.currentStatus === "login") || (this.Application.AppState.currentStatus === "ready");
 			} 
+			
 		},
 		
 		components: {
@@ -181,8 +211,8 @@
 			Dialog_Error,
 			Module_Content,
 			Module_Tabs,
-			Module_VerticalSplit,
-			Module_HorizontalSplit
+			Module_GLScene,
+			Module_Grid
 		},	
 
 		methods: {

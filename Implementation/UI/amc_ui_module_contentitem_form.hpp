@@ -48,6 +48,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_ContentFormSwitch, PUIModule_ContentFormSwitch);
 	amcDeclareDependingClass(CUIModule_ContentFormMemo, PUIModule_ContentFormMemo);
 	amcDeclareDependingClass(CUIModule_ContentFormCheckbox, PUIModule_ContentFormCheckbox);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 
 	class CUIModule_ContentFormEntity {
 	protected:
@@ -55,13 +56,15 @@ namespace AMC {
 		std::string m_sName;
 		std::string m_sUUID;
 		std::string m_sCaption;
-		std::string m_sDefaultValue;
-		std::string m_sValue;
-		bool m_bDisabled;
-		bool m_bReadOnly;
+
+		std::string m_sDisabledExpression;
+		std::string m_sReadOnlyExpression;
+
+		PStateMachineData m_pStateMachineData;
+
 	public:
 
-		CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormEntity();
 
@@ -71,35 +74,47 @@ namespace AMC {
 
 		std::string getCaption();
 
-		std::string getDefaultValue ();
-
-		std::string getValue ();
-
 		bool getDisabled ();
 
 		bool getReadOnly ();
 
-		void setValue (const std::string & sValue);
-
 		void setDisabled(bool bDisabled);
+
+		void setDisabledExpression(const std::string & sExpression);
 
 		void setReadOnly(bool bReadOnly);
 
+		void setReadOnlyExpression(const std::string& sExpression);
+
 		virtual std::string getTypeString() = 0;
+
+		virtual void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object);
 
 	};
 
 		
 	class CUIModule_ContentFormEdit : public CUIModule_ContentFormEntity {
 	protected:
+		std::string m_sPrefix;
+		std::string m_sSuffix;
+		std::string m_sParameterMapping;
+		std::string m_sDefaultValue;
 
 	public:
 
-		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string & sPrefix, const std::string & sSuffix, const std::string & sParameterMapping, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormEdit();
 
 		virtual std::string getTypeString() override;
+
+		void writeParametersToJSON(CJSONWriter& writer, CJSONWriterObject& object);
+
+		virtual void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 
@@ -109,7 +124,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormSwitch();
 
@@ -122,7 +137,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormMemo();
 
@@ -135,7 +150,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormCombobox();
 
@@ -150,17 +165,21 @@ namespace AMC {
 		std::map<std::string, PUIModule_ContentFormEntity> m_EntityUUIDMap;
 		std::string m_sName;
 
+		PStateMachineData m_pStateMachineData;
+
 		void addEntityEx(PUIModule_ContentFormEntity pEntity);
 
 	public:
 
-		CUIModule_ContentForm(const std::string & sName);
+		CUIModule_ContentForm(const std::string & sName, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentForm();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
-		PUIModule_ContentFormEntity addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+
+		PUIModule_ContentFormEntity addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string & sPrefix, const std::string& sSuffix, const std::string& sParameterMapping);
 		PUIModule_ContentFormEntity addSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 		PUIModule_ContentFormEntity addMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);
 		PUIModule_ContentFormEntity addCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue);

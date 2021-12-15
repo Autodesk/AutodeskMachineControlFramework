@@ -62,6 +62,7 @@ private:
 protected:
 
     std::string m_sUUID;
+    eStreamContextType m_ContextType;
     std::string m_sContextUUID;
     std::string m_sName;
     std::string m_sMimeType;
@@ -71,11 +72,11 @@ protected:
 
 public:
 
-    CDataStream (const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const std::string & sSHA256, uint64_t nSize, const std::string & sTimestamp);
+    CDataStream (const std::string & sUUID, const eStreamContextType ContextType, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const std::string & sSHA256, uint64_t nSize, const std::string & sTimestamp);
 
 	std::string GetUUID() override;
 
-	std::string GetContextUUID() override;
+    void GetContext(LibAMCF::eStreamContextType& eContextType, std::string& sOwnerUUID) override;
 
 	std::string GetName() override;
 

@@ -7,6 +7,23 @@ const nullUUID = "00000000-0000-0000-0000-000000000000";
 const nullToken = "0000000000000000000000000000000000000000000000000000000000000000";
 
 
+	
+function updateAMCFormEntityFromContentEntry (entry, entity) {
+	
+	if ((entity) && (entry)) {
+		entity.remotevalue = entry.defaultvalue;
+		entity.prefix = entry.prefix;
+		entity.suffix = entry.suffix;
+		entity.readonly = entry.readonly;
+		entity.disabled = entry.disabled;
+		
+		if (entity.value != entity.remotevalue) {
+			entity.value = entity.remotevalue;				
+		}
+	}
+			
+}
+
 export default class AMCApplication {
 	
 	constructor (apiBaseURL)
@@ -29,7 +46,8 @@ export default class AMCApplication {
             TextCopyRight: "",
             MainPage: "",
 			LogoUUID: "",
-			LogoAspectRatio: 1.0
+			LogoAspectRatio: 1.0,
+			Colors: {}
         }
 		
 		this.AppContent = {
@@ -37,6 +55,9 @@ export default class AMCApplication {
             ToolbarItems: [],
 			ContentItems: [],					
 			Pages: [],
+			Dialogs: [],
+			PageMap: new Map(),
+			DialogMap: new Map(),
 			FormEntities: []
 		}
 
@@ -107,7 +128,7 @@ export default class AMCApplication {
 	}		
 
 				
-	retrieveConfiguration () 
+	retrieveConfiguration (vuetifythemes) 
 	{
 		this.axiosGetRequest ("/ui/config")
 			.then(resultJSON => {
@@ -116,9 +137,26 @@ export default class AMCApplication {
 				this.AppDefinition.MainPage = resultJSON.data.mainpage;
 				this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
 				this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;			
+				if (resultJSON.data.colors) {
+					this.AppDefinition.Colors = resultJSON.data.colors;
+				} else {
+					this.AppDefinition.Colors = {};
+				}
 				this.setStatus ("login");
-					
+									
 				document.title = this.AppDefinition.TextApplicationName;
+				
+				if (vuetifythemes) {
+					if (this.AppDefinition.Colors.primary)
+						vuetifythemes.light.primary = this.AppDefinition.Colors.primary;
+					if (this.AppDefinition.Colors.secondary)
+						vuetifythemes.light.secondary = this.AppDefinition.Colors.secondary;
+					if (this.AppDefinition.Colors.accent)
+						vuetifythemes.light.accent = this.AppDefinition.Colors.accent;
+					if (this.AppDefinition.Colors.error)
+						vuetifythemes.light.error = this.AppDefinition.Colors.error;
+				}
+				
 				
 				this.changePage (this.AppDefinition.MainPage);
 			})
@@ -176,6 +214,7 @@ export default class AMCApplication {
                 });	
 			
 	}
+
 	
 	
 	prepareModuleItem (item) 
@@ -200,6 +239,15 @@ export default class AMCApplication {
 		}
 		
 		if (item.type === "form") {
+
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true, 
+				callback: function(appcontent, item) {
+					
+					for (var entry of item.entries) {						
+						updateAMCFormEntityFromContentEntry (entry, appcontent.FormEntities[entry.uuid]);																	
+					}
+				}
+			};
 			
 			for (var entity of item.entities) {
 				
@@ -210,7 +258,10 @@ export default class AMCApplication {
 					  disabled: entity.disabled, 
 					  readonly: entity.readonly
 					  };
+					  
+					  
 				entity.dataObject = this.AppContent.FormEntities[entity.uuid];
+							
 			}
 			
 		
@@ -237,17 +288,122 @@ export default class AMCApplication {
 			}			
 		}
 
-		if (module.type === "verticalsplit") {
+		if (module.type === "grid") {
+						
+						
+			module.cssstyle = "display: grid; width:100%; height:100%;";
+			
+			var columnString = "";
+			var rowString = "";
+			var areaString = "";
+			
+			if (module.columns) {
+				if (module.rows) {
+					var columnCount = module.columns.length;
+					var rowCount = module.rows.length;
+			
+					var row, column;
+					var gridMap = new Array(rowCount);
+					for (row = 0; row < rowCount; row++) {
+						gridMap[row] = new Array(columnCount);
+						
+						for (column = 0; column < columnCount; column++) {
+							var templatename = "_grid_" + module.name + "_" + column + "_" + row;
+							gridMap[row][column] = templatename;							
+						}
+					} 
+					
+					for (section of module.sections) {
+						
+						var columnstart = section.columnstart;
+						var columnend = section.columnend;
+						var rowstart = section.rowstart;
+						var rowend = section.rowend;						
+												
+						if ((columnstart <= columnend) && (rowstart <= rowend) && (columnstart > 0) && (rowstart > 0) &&
+						   (columnend <= columnCount) && (rowend <= rowCount)) {
+						
+							for (row = rowstart - 1; row < rowend; row++) {						
+								for (column = columnstart - 1; column < columnend; column++) {
+									gridMap[row][column] = section.name;
+								}
+							}
+						}
+					}
+					
+					for (row = 0; row < rowCount; row++) {
+						var rowObject = module.rows[row];
+											
+						if (rowObject.unit === "px") {
+							rowString = rowString + rowObject.height + "px ";
+						} else if (rowObject.unit === "free") {
+							rowString = rowString + rowObject.height + "fr ";
+						} else if (rowObject.unit === "pt") {
+							rowString = rowString + rowObject.height + "pt ";
+						} else {
+							rowString = rowString + "auto ";
+						}
+					}
+
+					for (column = 0; column < columnCount; column++) {
+						var columnObject = module.columns[column];
+											
+						if (columnObject.unit === "px") {
+							columnString = columnString + columnObject.width + "px ";
+						} else if (columnObject.unit === "free") {
+							columnString = columnString + columnObject.width + "fr ";
+						} else if (columnObject.unit === "pt") {
+							columnString = columnString + columnObject.width + "pt ";
+						} else {
+							columnString = columnString + "auto ";
+						}
+							
+					}
+					
+					for (row = 0; row < rowCount; row++) {						
+						areaString = areaString + "\"";
+						for (column = 0; column < columnCount; column++) {
+							if (column > 0) {
+								areaString = areaString + " ";
+							}
+							areaString = areaString + gridMap[row][column];
+						}
+						areaString = areaString + "\" ";
+					}
+					
+			
+				}
+			} 		
+									
+			module.cssstyle = module.cssstyle + "grid-template-columns: " + columnString + ";";
+			module.cssstyle = module.cssstyle + "grid-template-rows: "+ rowString + ";";			
+			module.cssstyle = module.cssstyle + "grid-template-areas: " + areaString;
+						
 			for (section of module.sections) {
+								
+				var marginx = "margin-left: 0; margin-right: 0;";
+				var marginy = "margin-top: 0; margin-bottom: 0;";
+				
+				if (section.columnposition) {
+					if (section.columnposition == "centered")
+						marginx = "margin-left: auto; margin-right: auto;";
+					if (section.columnposition == "right")
+						marginx = "margin-left: auto; margin-right: 0;"
+				}
+
+				if (section.rowposition) {
+					if (section.rowposition == "centered")
+						marginy = "margin-top: auto; margin-bottom: auto;";
+					if (section.rowposition == "bottom")
+						marginy = "margin-top: auto; margin-bottom: 0;";
+				} 
+				
+				section.cssstyle = "overflow:auto; grid-area:" + section.name + ";" + marginx + marginy;				
+												
 				this.prepareModule (section)
-			}			
+			}
 		}
 
-		if (module.type === "horizontalsplit") {
-			for (section of module.sections) {
-				this.prepareModule (section)
-			}			
-		}
 	}
 
 	
@@ -259,15 +415,28 @@ export default class AMCApplication {
                     this.AppContent.MenuItems = resultJSON.data.menuitems;
                     this.AppContent.ToolbarItems = resultJSON.data.toolbaritems;
 					
-					var page, module;
-					for (page of resultJSON.data.pages) {
+					var page, dialog, module;
+					for (page of resultJSON.data.pages) {						
 						for (module of page.modules) {
 							this.prepareModule (module)
-						}						
-					
+						}											
+						
+						this.AppContent.PageMap.set (page.name, page);
+						
 					}
+
+					for (dialog of resultJSON.data.dialogs) {
+						for (module of dialog.modules) {
+							this.prepareModule (module)
+						}											
+
+						dialog.dialogIsActive = false;
+						this.AppContent.DialogMap.set (dialog.name, dialog);
+					}
+
 					
 					this.AppContent.Pages = resultJSON.data.pages;
+					this.AppContent.Dialogs = resultJSON.data.dialogs;					
                    
                 })
                 .catch(err => {
@@ -305,6 +474,12 @@ export default class AMCApplication {
 						this.AppContent.ContentItems[uuid].entries.push (entry);
 					}
 					this.AppContent.ContentItems[uuid].refresh = true;
+					
+					var itemCallback = this.AppContent.ContentItems[uuid].callback;
+					if (itemCallback) {						
+						itemCallback (this.AppContent, this.AppContent.ContentItems[uuid]);
+					}
+					
                 })
                 .catch(err => {
 					
@@ -451,6 +626,17 @@ export default class AMCApplication {
 			}
 										
         }
+		
+		showDialog (dialog) {
+			
+			if (dialog) {
+				if (this.AppContent.DialogMap.has (dialog)) {
+					var dialogObject = this.AppContent.DialogMap.get (dialog);
+					dialogObject.dialogIsActive = true;
+				}
+			}
+			
+		}
 
 
 		getImageURL (uuid) {
@@ -467,8 +653,13 @@ export default class AMCApplication {
 				"formvalues": formvalues
 			})
 				.then(resultHandleEvent => {
-					resultHandleEvent;
-					//alert (resultHandleEvent.data);
+					if (resultHandleEvent.data.pagetoactivate) {
+						this.changePage (resultHandleEvent.data.pagetoactivate);
+					}
+					if (resultHandleEvent.data.dialogtoshow) {
+						this.showDialog (resultHandleEvent.data.dialogtoshow);
+					}
+					
 				})
                 .catch(err => {
 					alert (err);

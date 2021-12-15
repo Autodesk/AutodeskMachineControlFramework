@@ -95,5 +95,5 @@ namespace AMC {
 }
 
 
-#endif //__AMC_UI_MENUITEM
+#endif //__AMC_UI_PAGE
 

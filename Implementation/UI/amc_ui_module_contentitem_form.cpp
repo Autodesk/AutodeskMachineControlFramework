@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_CONSTANTS
 
 #include "amc_ui_module_contentitem_form.hpp"
+#include "amc_ui_utils.hpp"
+#include "amc_statemachinedata.hpp"
+#include "amc_parameterhandler.hpp"
+
 #include "libmc_exceptiontypes.hpp"
 
 #include "amc_api_constants.hpp"
@@ -40,9 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentFormEntity::CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, const std::string & sDefaultValue)
-	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption), m_sName (sName), m_sDefaultValue (sDefaultValue), m_sValue (sDefaultValue), m_bDisabled (false), m_bReadOnly (false)
+CUIModule_ContentFormEntity::CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, PStateMachineData pStateMachineData)
+	: m_sUUID(AMCCommon::CUtils::createUUID()),
+	m_sCaption(sCaption),
+	m_sName(sName),
+	m_sDisabledExpression("0"),
+	m_sReadOnlyExpression("0"),
+	m_pStateMachineData(pStateMachineData)
 {
+	LibMCAssertNotNull(pStateMachineData.get());
+
 	if (sName == "")
 		throw ELibMCInterfaceException(LIBMC_ERROR_FORMENTITYNAMEMISSING);
 
@@ -69,46 +80,79 @@ std::string CUIModule_ContentFormEntity::getCaption()
 	return m_sCaption;
 }
 
-std::string CUIModule_ContentFormEntity::getDefaultValue()
-{
-	return m_sDefaultValue;
-}
-
-std::string CUIModule_ContentFormEntity::getValue()
-{
-	return m_sValue;
-}
 
 bool CUIModule_ContentFormEntity::getDisabled()
 {
-	return m_bDisabled;
+	return m_pStateMachineData->evaluateBooleanExpression(m_sDisabledExpression);
+
 }
 
 bool CUIModule_ContentFormEntity::getReadOnly()
 {
-	return m_bReadOnly;
+
+	if (m_sReadOnlyExpression == "0")
+		return false;
+	if (m_sReadOnlyExpression == "1")
+		return true;
+
+	return false;
 }
 
-void CUIModule_ContentFormEntity::setValue(const std::string& sValue)
-{
-	m_sValue = sValue;
-}
 
 void CUIModule_ContentFormEntity::setDisabled(bool bDisabled)
 {
-	m_bDisabled = bDisabled;
+	m_sDisabledExpression = bDisabled ? "1" : "0";
 }
 
 void CUIModule_ContentFormEntity::setReadOnly(bool bReadOnly)
 {
-	m_bReadOnly = bReadOnly;
+	m_sReadOnlyExpression = bReadOnly ? "1" : "0";
+}
+
+void CUIModule_ContentFormEntity::setDisabledExpression(const std::string& sExpression)
+{
+	m_sDisabledExpression = sExpression;
 }
 
 
-CUIModule_ContentFormEdit::CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
-	: CUIModule_ContentFormEntity (sName, sCaption, sDefaultValue)
+void CUIModule_ContentFormEntity::setReadOnlyExpression(const std::string& sExpression)
 {
+	m_sReadOnlyExpression = sExpression;
+}
 
+
+void CUIModule_ContentFormEntity::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_FORMUUID, getUUID());
+	object.addString(AMC_API_KEY_UI_FORMCAPTION, getCaption());
+	object.addString(AMC_API_KEY_UI_FORMTYPE, getTypeString());
+	object.addBool(AMC_API_KEY_UI_FORMDISABLED, getDisabled());
+	object.addBool(AMC_API_KEY_UI_FORMREADONLY, getReadOnly());
+
+}
+
+
+void CUIModule_ContentFormEntity::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	object.addString(AMC_API_KEY_UI_FORMUUID, getUUID());
+	object.addString(AMC_API_KEY_UI_FORMCAPTION, getCaption());
+	object.addBool(AMC_API_KEY_UI_FORMDISABLED, getDisabled());
+	object.addBool(AMC_API_KEY_UI_FORMREADONLY, getReadOnly());
+
+}
+
+
+
+CUIModule_ContentFormEdit::CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string& sPrefix, const std::string& sSuffix, const std::string& sParameterMapping, PStateMachineData pStateMachineData)
+	: CUIModule_ContentFormEntity (sName, sCaption, pStateMachineData), m_sPrefix (sPrefix), m_sSuffix (sSuffix), m_sDefaultValue (sDefaultValue), m_sParameterMapping (sParameterMapping)
+{
+	if (!sParameterMapping.empty()) {
+
+		// Parse Parameter Mapping String
+		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
+		CStateMachineData::extractParameterDetailsFromDotString(sParameterMapping, sParameterInstanceName, sParameterGroupName, sParameterName);
+
+	}
 }
 
 CUIModule_ContentFormEdit::~CUIModule_ContentFormEdit()
@@ -122,8 +166,52 @@ std::string CUIModule_ContentFormEdit::getTypeString()
 }
 
 
-CUIModule_ContentFormSwitch::CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
-	: CUIModule_ContentFormEntity (sName, sCaption, sDefaultValue)
+void CUIModule_ContentFormEdit::writeParametersToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	if (!m_sParameterMapping.empty()) {
+
+		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
+		CStateMachineData::extractParameterDetailsFromDotString(m_sParameterMapping, sParameterInstanceName, sParameterGroupName, sParameterName);
+
+		auto pParameterHandler = m_pStateMachineData->getParameterHandler(sParameterInstanceName);
+		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
+		auto sParameterValue = pParameterGroup->getParameterValueByName(sParameterName);
+
+		object.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, sParameterValue);
+	}
+	else {
+		object.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, m_sDefaultValue);
+	}
+	object.addString(AMC_API_KEY_UI_FORMPREFIX, m_sPrefix);
+	object.addString(AMC_API_KEY_UI_FORMSUFFIX, m_sSuffix);
+
+}
+
+
+void CUIModule_ContentFormEdit::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	LibMCAssertNotNull(m_pStateMachineData);
+
+	CUIModule_ContentFormEntity::addDefinitionToJSON(writer, object);
+
+	writeParametersToJSON(writer, object);
+
+}
+
+void CUIModule_ContentFormEdit::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	LibMCAssertNotNull(m_pStateMachineData);
+
+	CUIModule_ContentFormEntity::addContentToJSON(writer, object);
+
+	writeParametersToJSON(writer, object);
+
+}
+
+
+
+CUIModule_ContentFormSwitch::CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData)
+	: CUIModule_ContentFormEntity (sName, sCaption, pStateMachineData)
 {
 
 }
@@ -139,8 +227,8 @@ std::string CUIModule_ContentFormSwitch::getTypeString()
 }
 
 
-CUIModule_ContentFormMemo::CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
-	: CUIModule_ContentFormEntity (sName, sCaption, sDefaultValue)
+CUIModule_ContentFormMemo::CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData)
+	: CUIModule_ContentFormEntity (sName, sCaption, pStateMachineData)
 {
 
 }
@@ -155,8 +243,8 @@ std::string CUIModule_ContentFormMemo::getTypeString()
 	return "memo";
 }
 
-CUIModule_ContentFormCombobox::CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
-	: CUIModule_ContentFormEntity(sName, sCaption, sDefaultValue)
+CUIModule_ContentFormCombobox::CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData)
+	: CUIModule_ContentFormEntity(sName, sCaption, pStateMachineData)
 {
 
 }
@@ -173,9 +261,12 @@ std::string CUIModule_ContentFormCombobox::getTypeString()
 }
 
 
-CUIModule_ContentForm::CUIModule_ContentForm(const std::string& sName)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sName(sName)
+CUIModule_ContentForm::CUIModule_ContentForm(const std::string& sName, PStateMachineData pStateMachineData)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()),
+	  m_sName(sName),
+	  m_pStateMachineData(pStateMachineData)
 {
+	LibMCAssertNotNull(pStateMachineData);
 
 }
 
@@ -194,12 +285,7 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 
 	for (auto pEntity : m_Entities) {
 		CJSONWriterObject entityObject(writer);
-		entityObject.addString(AMC_API_KEY_UI_FORMUUID, pEntity->getUUID ());
-		entityObject.addString(AMC_API_KEY_UI_FORMCAPTION, pEntity->getCaption ());
-		entityObject.addString(AMC_API_KEY_UI_FORMTYPE, pEntity->getTypeString ());
-		entityObject.addString(AMC_API_KEY_UI_FORMDEFAULTVALUE, pEntity->getDefaultValue ());
-		entityObject.addBool(AMC_API_KEY_UI_FORMDISABLED, pEntity->getDisabled());
-		entityObject.addBool(AMC_API_KEY_UI_FORMREADONLY, pEntity->getReadOnly());
+		pEntity->addDefinitionToJSON(writer, entityObject);
 		entityArray.addObject(entityObject);
 	}
 
@@ -209,30 +295,43 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 }
 
 
-PUIModule_ContentFormEntity CUIModule_ContentForm::addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
+void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+{
+	CJSONWriterArray entityArray(writer);
+	for (auto pEntity : m_Entities) {
+		CJSONWriterObject entityObject(writer);
+		pEntity->addContentToJSON(writer, entityObject);
+		entityArray.addObject(entityObject);
+	}
+
+	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entityArray);
+}
+
+
+PUIModule_ContentFormEntity CUIModule_ContentForm::addEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string& sPrefix, const std::string& sSuffix, const std::string& sParameterMapping)
 {	
-	auto pEntity = std::make_shared<CUIModule_ContentFormEdit>(sName, sCaption, sDefaultValue);
+	auto pEntity = std::make_shared<CUIModule_ContentFormEdit>(sName, sCaption, sDefaultValue, sPrefix, sSuffix, sParameterMapping, m_pStateMachineData);
 	addEntityEx(pEntity);
 	return pEntity;
 }
 
 PUIModule_ContentFormEntity CUIModule_ContentForm::addSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
 {
-	auto pEntity = std::make_shared<CUIModule_ContentFormSwitch>(sName, sCaption, sDefaultValue);
+	auto pEntity = std::make_shared<CUIModule_ContentFormSwitch>(sName, sCaption, sDefaultValue, m_pStateMachineData);
 	addEntityEx(pEntity);
 	return pEntity;
 }
 
 PUIModule_ContentFormEntity CUIModule_ContentForm::addMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
 {
-	auto pEntity = std::make_shared<CUIModule_ContentFormMemo>(sName, sCaption, sDefaultValue);
+	auto pEntity = std::make_shared<CUIModule_ContentFormMemo>(sName, sCaption, sDefaultValue, m_pStateMachineData);
 	addEntityEx(pEntity);
 	return pEntity;
 }
 
 PUIModule_ContentFormEntity CUIModule_ContentForm::addCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue)
 {
-	auto pEntity = std::make_shared<CUIModule_ContentFormCombobox>(sName, sCaption, sDefaultValue);
+	auto pEntity = std::make_shared<CUIModule_ContentFormCombobox>(sName, sCaption, sDefaultValue, m_pStateMachineData);
 	addEntityEx(pEntity);
 	return pEntity;
 }

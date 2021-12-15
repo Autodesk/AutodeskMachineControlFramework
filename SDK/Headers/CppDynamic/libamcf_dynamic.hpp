@@ -368,7 +368,7 @@ public:
 	}
 	
 	inline std::string GetUUID();
-	inline std::string GetContextUUID();
+	inline void GetContext(eStreamContextType & eContextType, std::string & sOwnerUUID);
 	inline std::string GetName();
 	inline std::string GetMimeType();
 	inline std::string GetSHA256();
@@ -392,9 +392,9 @@ public:
 	
 	inline std::string GetName();
 	inline std::string GetMimeType();
-	inline std::string GetUsageContext();
-	inline POperationResult UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize);
-	inline POperationResult UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize);
+	inline eStreamContextType GetContextType();
+	inline POperationResult UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount);
+	inline POperationResult UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount);
 	inline POperationResult BeginChunking(const LibAMCF_uint64 nDataSize);
 	inline POperationResult UploadChunk(const CInputVector<LibAMCF_uint8> & DataBuffer);
 	inline POperationResult FinishChunking();
@@ -425,7 +425,8 @@ public:
 	inline POperationResult RefreshAuthentication();
 	inline POperationResult Ping();
 	inline std::string GetAuthToken();
-	inline PStreamUpload CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext);
+	inline PStreamUpload CreateUpload(const std::string & sName, const std::string & sMimeType, const eStreamContextType eContextType);
+	inline POperationResult PrepareBuild(classParam<CDataStream> pDataStream);
 };
 	
 	/**
@@ -545,7 +546,7 @@ public:
 		pWrapperTable->m_OperationResult_Success = nullptr;
 		pWrapperTable->m_OperationResult_GetErrorMessage = nullptr;
 		pWrapperTable->m_DataStream_GetUUID = nullptr;
-		pWrapperTable->m_DataStream_GetContextUUID = nullptr;
+		pWrapperTable->m_DataStream_GetContext = nullptr;
 		pWrapperTable->m_DataStream_GetName = nullptr;
 		pWrapperTable->m_DataStream_GetMimeType = nullptr;
 		pWrapperTable->m_DataStream_GetSHA256 = nullptr;
@@ -553,7 +554,7 @@ public:
 		pWrapperTable->m_DataStream_GetTimestamp = nullptr;
 		pWrapperTable->m_StreamUpload_GetName = nullptr;
 		pWrapperTable->m_StreamUpload_GetMimeType = nullptr;
-		pWrapperTable->m_StreamUpload_GetUsageContext = nullptr;
+		pWrapperTable->m_StreamUpload_GetContextType = nullptr;
 		pWrapperTable->m_StreamUpload_UploadData = nullptr;
 		pWrapperTable->m_StreamUpload_UploadFile = nullptr;
 		pWrapperTable->m_StreamUpload_BeginChunking = nullptr;
@@ -571,6 +572,7 @@ public:
 		pWrapperTable->m_Connection_Ping = nullptr;
 		pWrapperTable->m_Connection_GetAuthToken = nullptr;
 		pWrapperTable->m_Connection_CreateUpload = nullptr;
+		pWrapperTable->m_Connection_PrepareBuild = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -681,12 +683,12 @@ public:
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DataStream_GetContextUUID = (PLibAMCFDataStream_GetContextUUIDPtr) GetProcAddress(hLibrary, "libamcf_datastream_getcontextuuid");
+		pWrapperTable->m_DataStream_GetContext = (PLibAMCFDataStream_GetContextPtr) GetProcAddress(hLibrary, "libamcf_datastream_getcontext");
 		#else // _WIN32
-		pWrapperTable->m_DataStream_GetContextUUID = (PLibAMCFDataStream_GetContextUUIDPtr) dlsym(hLibrary, "libamcf_datastream_getcontextuuid");
+		pWrapperTable->m_DataStream_GetContext = (PLibAMCFDataStream_GetContextPtr) dlsym(hLibrary, "libamcf_datastream_getcontext");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DataStream_GetContextUUID == nullptr)
+		if (pWrapperTable->m_DataStream_GetContext == nullptr)
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -753,12 +755,12 @@ public:
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) GetProcAddress(hLibrary, "libamcf_streamupload_getusagecontext");
+		pWrapperTable->m_StreamUpload_GetContextType = (PLibAMCFStreamUpload_GetContextTypePtr) GetProcAddress(hLibrary, "libamcf_streamupload_getcontexttype");
 		#else // _WIN32
-		pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) dlsym(hLibrary, "libamcf_streamupload_getusagecontext");
+		pWrapperTable->m_StreamUpload_GetContextType = (PLibAMCFStreamUpload_GetContextTypePtr) dlsym(hLibrary, "libamcf_streamupload_getcontexttype");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_StreamUpload_GetUsageContext == nullptr)
+		if (pWrapperTable->m_StreamUpload_GetContextType == nullptr)
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -915,6 +917,15 @@ public:
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Connection_PrepareBuild = (PLibAMCFConnection_PrepareBuildPtr) GetProcAddress(hLibrary, "libamcf_connection_preparebuild");
+		#else // _WIN32
+		pWrapperTable->m_Connection_PrepareBuild = (PLibAMCFConnection_PrepareBuildPtr) dlsym(hLibrary, "libamcf_connection_preparebuild");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Connection_PrepareBuild == nullptr)
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibAMCFGetVersionPtr) GetProcAddress(hLibrary, "libamcf_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibAMCFGetVersionPtr) dlsym(hLibrary, "libamcf_getversion");
@@ -1017,8 +1028,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetUUID == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libamcf_datastream_getcontextuuid", (void**)&(pWrapperTable->m_DataStream_GetContextUUID));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetContextUUID == nullptr) )
+		eLookupError = (*pLookup)("libamcf_datastream_getcontext", (void**)&(pWrapperTable->m_DataStream_GetContext));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataStream_GetContext == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libamcf_datastream_getname", (void**)&(pWrapperTable->m_DataStream_GetName));
@@ -1049,8 +1060,8 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StreamUpload_GetMimeType == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libamcf_streamupload_getusagecontext", (void**)&(pWrapperTable->m_StreamUpload_GetUsageContext));
-		if ( (eLookupError != 0) || (pWrapperTable->m_StreamUpload_GetUsageContext == nullptr) )
+		eLookupError = (*pLookup)("libamcf_streamupload_getcontexttype", (void**)&(pWrapperTable->m_StreamUpload_GetContextType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StreamUpload_GetContextType == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libamcf_streamupload_uploaddata", (void**)&(pWrapperTable->m_StreamUpload_UploadData));
@@ -1119,6 +1130,10 @@ public:
 		
 		eLookupError = (*pLookup)("libamcf_connection_createupload", (void**)&(pWrapperTable->m_Connection_CreateUpload));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Connection_CreateUpload == nullptr) )
+			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libamcf_connection_preparebuild", (void**)&(pWrapperTable->m_Connection_PrepareBuild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Connection_PrepareBuild == nullptr) )
 			return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libamcf_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1242,18 +1257,18 @@ public:
 	}
 	
 	/**
-	* CDataStream::GetContextUUID - Returns the stream's context UUID.
-	* @return Stream Context UUID String.
+	* CDataStream::GetContext - Returns the stream's context type and owner UUID.
+	* @param[out] eContextType - Stream Context Type.
+	* @param[out] sOwnerUUID - Stream Context UUID String.
 	*/
-	std::string CDataStream::GetContextUUID()
+	void CDataStream::GetContext(eStreamContextType & eContextType, std::string & sOwnerUUID)
 	{
-		LibAMCF_uint32 bytesNeededContextUUID = 0;
-		LibAMCF_uint32 bytesWrittenContextUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetContextUUID(m_pHandle, 0, &bytesNeededContextUUID, nullptr));
-		std::vector<char> bufferContextUUID(bytesNeededContextUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetContextUUID(m_pHandle, bytesNeededContextUUID, &bytesWrittenContextUUID, &bufferContextUUID[0]));
-		
-		return std::string(&bufferContextUUID[0]);
+		LibAMCF_uint32 bytesNeededOwnerUUID = 0;
+		LibAMCF_uint32 bytesWrittenOwnerUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetContext(m_pHandle, &eContextType, 0, &bytesNeededOwnerUUID, nullptr));
+		std::vector<char> bufferOwnerUUID(bytesNeededOwnerUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataStream_GetContext(m_pHandle, &eContextType, bytesNeededOwnerUUID, &bytesWrittenOwnerUUID, &bufferOwnerUUID[0]));
+		sOwnerUUID = std::string(&bufferOwnerUUID[0]);
 	}
 	
 	/**
@@ -1363,30 +1378,28 @@ public:
 	}
 	
 	/**
-	* CStreamUpload::GetUsageContext - returns the usage context of the stream upload
-	* @return UsageContext String.
+	* CStreamUpload::GetContextType - returns the usage context of the stream upload
+	* @return Stream Context Type.
 	*/
-	std::string CStreamUpload::GetUsageContext()
+	eStreamContextType CStreamUpload::GetContextType()
 	{
-		LibAMCF_uint32 bytesNeededUsageContext = 0;
-		LibAMCF_uint32 bytesWrittenUsageContext = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetUsageContext(m_pHandle, 0, &bytesNeededUsageContext, nullptr));
-		std::vector<char> bufferUsageContext(bytesNeededUsageContext);
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetUsageContext(m_pHandle, bytesNeededUsageContext, &bytesWrittenUsageContext, &bufferUsageContext[0]));
+		eStreamContextType resultContextType = (eStreamContextType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_GetContextType(m_pHandle, &resultContextType));
 		
-		return std::string(&bufferUsageContext[0]);
+		return resultContextType;
 	}
 	
 	/**
 	* CStreamUpload::UploadData - uploads the passed data to the server. MUST only be called once.
 	* @param[in] DataBuffer - Data to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @return Returns if upload was successful.
 	*/
-	POperationResult CStreamUpload::UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize)
+	POperationResult CStreamUpload::UploadData(const CInputVector<LibAMCF_uint8> & DataBuffer, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount)
 	{
 		LibAMCFHandle hSuccess = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_UploadData(m_pHandle, (LibAMCF_uint64)DataBuffer.size(), DataBuffer.data(), nChunkSize, &hSuccess));
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_UploadData(m_pHandle, (LibAMCF_uint64)DataBuffer.size(), DataBuffer.data(), nChunkSize, nThreadCount, &hSuccess));
 		
 		if (!hSuccess) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
@@ -1398,12 +1411,13 @@ public:
 	* CStreamUpload::UploadFile - uploads a file to the server. MUST only be called once.
 	* @param[in] sFileName - File to be uploaded.
 	* @param[in] nChunkSize - Chunk size to use in bytes. MUST be a multiple of 64kB. MUST be at least 64kB and less than 64MB.
+	* @param[in] nThreadCount - How many concurrent threads shall be maximally used.
 	* @return Returns if upload was successful.
 	*/
-	POperationResult CStreamUpload::UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize)
+	POperationResult CStreamUpload::UploadFile(const std::string & sFileName, const LibAMCF_uint32 nChunkSize, const LibAMCF_uint32 nThreadCount)
 	{
 		LibAMCFHandle hSuccess = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_UploadFile(m_pHandle, sFileName.c_str(), nChunkSize, &hSuccess));
+		CheckError(m_pWrapper->m_WrapperTable.m_StreamUpload_UploadFile(m_pHandle, sFileName.c_str(), nChunkSize, nThreadCount, &hSuccess));
 		
 		if (!hSuccess) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
@@ -1616,18 +1630,35 @@ public:
 	* CConnection::CreateUpload - Creates a file upload instance. Must be authenticated to make it work.
 	* @param[in] sName - Name of the file to be uploaded.
 	* @param[in] sMimeType - Mimetype of the file to be uploaded.
-	* @param[in] sUsageContext - Context string for the usage type of the file.
+	* @param[in] eContextType - Stream Context Type.
 	* @return File upload instance.
 	*/
-	PStreamUpload CConnection::CreateUpload(const std::string & sName, const std::string & sMimeType, const std::string & sUsageContext)
+	PStreamUpload CConnection::CreateUpload(const std::string & sName, const std::string & sMimeType, const eStreamContextType eContextType)
 	{
 		LibAMCFHandle hInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Connection_CreateUpload(m_pHandle, sName.c_str(), sMimeType.c_str(), sUsageContext.c_str(), &hInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Connection_CreateUpload(m_pHandle, sName.c_str(), sMimeType.c_str(), eContextType, &hInstance));
 		
 		if (!hInstance) {
 			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CStreamUpload>(m_pWrapper, hInstance);
+	}
+	
+	/**
+	* CConnection::PrepareBuild - Prepares a build from an uploaded data stream. Must be authenticated to make it work.
+	* @param[in] pDataStream - Data stream MUST have been created as build job context type.
+	* @return Returns if build preparation was successful.
+	*/
+	POperationResult CConnection::PrepareBuild(classParam<CDataStream> pDataStream)
+	{
+		LibAMCFHandle hDataStream = pDataStream.GetHandle();
+		LibAMCFHandle hSuccess = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Connection_PrepareBuild(m_pHandle, hDataStream, &hSuccess));
+		
+		if (!hSuccess) {
+			CheckError(LIBAMCF_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<COperationResult>(m_pWrapper, hSuccess);
 	}
 
 } // namespace LibAMCF

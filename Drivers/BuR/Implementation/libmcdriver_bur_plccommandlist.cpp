@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CPLCCommandList
 #include "libmcdriver_bur_interfaceexception.hpp"
 
 // Include custom headers here.
+#include <iostream>
 #include <future>
 #define PLC_INVALID_LISTIDENTIFIER 0xFFFFFFFF
 
@@ -48,22 +49,24 @@ using namespace LibMCDriver_BuR::Impl;
 CPLCCommandList::CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGenerator* pTimeStampGenerator)
     : m_pConnector (pConnector), m_pTimeStampGenerator (pTimeStampGenerator), m_ListIdentifier (PLC_INVALID_LISTIDENTIFIER)
 {
-    if (pConnector.get () == nullptr)
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
     if (pTimeStampGenerator == nullptr)
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
 
-    auto nTimeStamp = m_pTimeStampGenerator->generateTimeStamp();
-    auto nSequenceID = m_pConnector->sendSimpleCommandToPLC(BUR_COMMAND_DIRECT_BEGINLIST, nTimeStamp, 
-        [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
-            
-        m_ListIdentifier = pPacket->readUInt32(0);
+    if (m_pConnector.get() != nullptr) {
 
-        m_CommandSequences.erase(pSendInfo->getSequenceID ());
+        auto nTimeStamp = m_pTimeStampGenerator->generateTimeStamp();
+        auto nSequenceID = m_pConnector->sendSimpleCommandToPLC(BUR_COMMAND_DIRECT_BEGINLIST, nTimeStamp,
+            [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
 
-    });
+            m_ListIdentifier = pPacket->readUInt32(0);
 
-    m_CommandSequences.insert(nSequenceID);
+            m_CommandSequences.erase(pSendInfo->getSequenceID());
+
+        });
+
+        m_CommandSequences.insert(nSequenceID);
+
+    }
 
 }
 
@@ -100,14 +103,19 @@ void CPLCCommandList::AddCommand(IPLCCommand* pCommandInstance)
     }
 
     auto nTimeStamp = m_pTimeStampGenerator->generateTimeStamp();
-    auto nSequenceID = m_pConnector->sendCommandToPLC(pDuplicateCommand->getCommandID (), payLoad, nTimeStamp,
-        [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
 
-        m_CommandSequences.erase(pSendInfo->getSequenceID());
+    if (m_pConnector.get() != nullptr) {
 
-    }); 
+        auto nSequenceID = m_pConnector->sendCommandToPLC(pDuplicateCommand->getCommandID(), payLoad, nTimeStamp,
+            [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
 
-    m_CommandSequences.insert(nSequenceID);
+            m_CommandSequences.erase(pSendInfo->getSequenceID());
+
+        });
+
+        m_CommandSequences.insert(nSequenceID);
+    }
+
 }
 
 
@@ -118,29 +126,81 @@ void CPLCCommandList::ExecuteList()
     auto nTimeStamp = m_pTimeStampGenerator->generateTimeStamp();
     auto commandCallback = [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
 
-   
+        m_CommandSequences.erase(pSendInfo->getSequenceID());
+
+    };
+
+    if (m_pConnector.get() != nullptr) {
+        auto nSequenceID = m_pConnector->sendSimpleCommandToPLC(BUR_COMMAND_DIRECT_EXECUTELIST, nTimeStamp, commandCallback, m_ListIdentifier);
+        m_CommandSequences.insert(nSequenceID);
+    }
+
+
+}
+
+
+std::future<uint8_t> CPLCCommandList::receiveListStatus()
+{
+    std::promise<uint8_t> receivedListStatus;
+    auto futureListStatus = receivedListStatus.get_future();
+    m_receivedListStatus.push_back(std::move(receivedListStatus));
+
+    auto globalPromiseP = &m_receivedListStatus.back();
+
+    auto nTimeStamp = m_pTimeStampGenerator->generateTimeStamp();
+    auto commandCallback = [this, globalPromiseP](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
+
+        uint8_t listStatus = pPacket->readUInt8 (0);
+        globalPromiseP->set_value(listStatus);
 
         m_CommandSequences.erase(pSendInfo->getSequenceID());
 
     };
 
-    auto nSequenceID = m_pConnector->sendSimpleCommandToPLC(BUR_COMMAND_DIRECT_EXECUTELIST, nTimeStamp, commandCallback, m_ListIdentifier);
-    m_CommandSequences.insert(nSequenceID);
+    if (m_pConnector.get() != nullptr) {
+        auto nSequenceID = m_pConnector->sendSimpleCommandToPLC(BUR_COMMAND_DIRECT_LISTSTATUS, nTimeStamp, commandCallback, m_ListIdentifier);
+        m_CommandSequences.insert(nSequenceID);
+    }
 
-
+    return futureListStatus;
 }
 
 bool CPLCCommandList::WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS)
 {
-    return false;
+    uint64_t nStartTime = m_pTimeStampGenerator->generateTimeStamp();
+
+    int statusValue = 255;
+    while (statusValue != 6) {
+        auto futureListStatus = receiveListStatus();
+        futureListStatus.wait_for(std::chrono::milliseconds(nReactionTimeInMS));
+        
+        if (futureListStatus.valid())
+        {
+            statusValue = futureListStatus.get();
+        }
+        else {
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COMMANDREACTIONTIMEOUT);
+        }
+
+        uint64_t nCurrentTime = m_pTimeStampGenerator->generateTimeStamp();
+        if (nCurrentTime > nStartTime + nWaitForTimeInMS)
+            return false;
+        
+
+    }
+    return true;
+
 }
 
 void CPLCCommandList::PauseList()
 {
+    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTIMPLEMENTED);
+
 }
 
 void CPLCCommandList::ResumeList()
 {
+    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTIMPLEMENTED);
 }
 
 
@@ -155,7 +215,9 @@ void CPLCCommandList::FinishList()
 
     };
 
-    auto nSequenceID = m_pConnector->sendSimpleCommandToPLC(BUR_COMMAND_DIRECT_FINISHLIST, nTimeStamp, commandCallback, m_ListIdentifier);
-    m_CommandSequences.insert(nSequenceID);
+    if (m_pConnector.get() != nullptr) {
+        auto nSequenceID = m_pConnector->sendSimpleCommandToPLC(BUR_COMMAND_DIRECT_FINISHLIST, nTimeStamp, commandCallback, m_ListIdentifier);
+        m_CommandSequences.insert(nSequenceID);
+    }
 
 }

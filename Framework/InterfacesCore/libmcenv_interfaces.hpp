@@ -1291,6 +1291,18 @@ typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
 class IUIEnvironment : public virtual IBase {
 public:
 	/**
+	* IUIEnvironment::ActivateModalDialog - activates a modal dialog on the client.
+	* @param[in] sDialogName - Name of the dialog to activate.
+	*/
+	virtual void ActivateModalDialog(const std::string & sDialogName) = 0;
+
+	/**
+	* IUIEnvironment::ActivatePage - changes the current page on the client.
+	* @param[in] sDialogName - Name of the dialog to activate.
+	*/
+	virtual void ActivatePage(const std::string & sDialogName) = 0;
+
+	/**
 	* IUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.

@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_sessionhandler.hpp"
 
 #include "common_importstream_native.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 
 // Include custom headers here.
@@ -284,10 +285,13 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
     if (slibraryName.length() == 0)
         throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPLUGINNAME);
 
-
     auto pInstance = findMachineInstance(sName, false);
     if (pInstance.get() != nullptr)
         throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATESTATENAME);
+
+    if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+        throw ELibMCCustomException(LIBMC_ERROR_INVALIDSTATEMACHINENAME, sName);
+
     
     m_pSystemState->logger()->logMessage("Creating state machine \"" + sName + "\"", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
     pInstance = std::make_shared<CStateMachineInstance> (sName, sDescription, m_pEnvironmentWrapper, m_pSystemState, m_pStateJournal);

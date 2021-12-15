@@ -366,7 +366,7 @@ void CLibAMCFDataStream::Init()
 
 		// Prototype
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetUUID", GetUUID);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "GetContextUUID", GetContextUUID);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetContext", GetContext);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetName", GetName);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetMimeType", GetMimeType);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetSHA256", GetSHA256);
@@ -432,26 +432,30 @@ void CLibAMCFDataStream::GetUUID(const FunctionCallbackInfo<Value>& args)
 }
 
 
-void CLibAMCFDataStream::GetContextUUID(const FunctionCallbackInfo<Value>& args) 
+void CLibAMCFDataStream::GetContext(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
 		try {
-        unsigned int bytesNeededContextUUID = 0;
-        unsigned int bytesWrittenContextUUID = 0;
+        Local<Object> outObject = Object::New(isolate);
+        eLibAMCFStreamContextType eReturnContextType;
+        unsigned int bytesNeededOwnerUUID = 0;
+        unsigned int bytesWrittenOwnerUUID = 0;
         sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetContextUUID.");
-        if (wrapperTable->m_DataStream_GetContextUUID == nullptr)
-            throw std::runtime_error("Could not call LibAMCF method DataStream::GetContextUUID.");
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetContext.");
+        if (wrapperTable->m_DataStream_GetContext == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method DataStream::GetContext.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult initErrorCode = wrapperTable->m_DataStream_GetContextUUID(instanceHandle, 0, &bytesNeededContextUUID, nullptr);
+        LibAMCFResult initErrorCode = wrapperTable->m_DataStream_GetContext(instanceHandle, &eReturnContextType, 0, &bytesNeededOwnerUUID, nullptr);
         CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
-        std::vector<char> bufferContextUUID;
-        bufferContextUUID.resize(bytesNeededContextUUID);
-        LibAMCFResult errorCode = wrapperTable->m_DataStream_GetContextUUID(instanceHandle, bytesNeededContextUUID, &bytesWrittenContextUUID, &bufferContextUUID[0]);
+        std::vector<char> bufferOwnerUUID;
+        bufferOwnerUUID.resize(bytesNeededOwnerUUID);
+        LibAMCFResult errorCode = wrapperTable->m_DataStream_GetContext(instanceHandle, &eReturnContextType, bytesNeededOwnerUUID, &bytesWrittenOwnerUUID, &bufferOwnerUUID[0]);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        args.GetReturnValue().Set(String::NewFromUtf8(isolate, &bufferContextUUID[0]));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "ContextType"), Integer::New(isolate, (int)eReturnContextType));
+        outObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "OwnerUUID"), String::NewFromUtf8(isolate, &bufferOwnerUUID[0]));
+        args.GetReturnValue().Set(outObject);
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -613,7 +617,7 @@ void CLibAMCFStreamUpload::Init()
 		// Prototype
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetName", GetName);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetMimeType", GetMimeType);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "GetUsageContext", GetUsageContext);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "GetContextType", GetContextType);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "UploadData", UploadData);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "UploadFile", UploadFile);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "BeginChunking", BeginChunking);
@@ -708,26 +712,21 @@ void CLibAMCFStreamUpload::GetMimeType(const FunctionCallbackInfo<Value>& args)
 }
 
 
-void CLibAMCFStreamUpload::GetUsageContext(const FunctionCallbackInfo<Value>& args) 
+void CLibAMCFStreamUpload::GetContextType(const FunctionCallbackInfo<Value>& args) 
 {
 		Isolate* isolate = args.GetIsolate();
 		HandleScope scope(isolate);
 		try {
-        unsigned int bytesNeededUsageContext = 0;
-        unsigned int bytesWrittenUsageContext = 0;
+        eLibAMCFStreamContextType eReturnContextType;
         sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
-            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetUsageContext.");
-        if (wrapperTable->m_StreamUpload_GetUsageContext == nullptr)
-            throw std::runtime_error("Could not call LibAMCF method StreamUpload::GetUsageContext.");
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method GetContextType.");
+        if (wrapperTable->m_StreamUpload_GetContextType == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method StreamUpload::GetContextType.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult initErrorCode = wrapperTable->m_StreamUpload_GetUsageContext(instanceHandle, 0, &bytesNeededUsageContext, nullptr);
-        CheckError(isolate, wrapperTable, instanceHandle, initErrorCode);
-        std::vector<char> bufferUsageContext;
-        bufferUsageContext.resize(bytesNeededUsageContext);
-        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_GetUsageContext(instanceHandle, bytesNeededUsageContext, &bytesWrittenUsageContext, &bufferUsageContext[0]);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_GetContextType(instanceHandle, &eReturnContextType);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
-        args.GetReturnValue().Set(String::NewFromUtf8(isolate, &bufferUsageContext[0]));
+        args.GetReturnValue().Set(Integer::New(isolate, (int)eReturnContextType));
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -743,7 +742,11 @@ void CLibAMCFStreamUpload::UploadData(const FunctionCallbackInfo<Value>& args)
         if (!args[1]->IsUint32()) {
             throw std::runtime_error("Expected uint32 parameter 1 (ChunkSize)");
         }
+        if (!args[2]->IsUint32()) {
+            throw std::runtime_error("Expected uint32 parameter 2 (ThreadCount)");
+        }
         unsigned int nChunkSize = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int nThreadCount = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         LibAMCFHandle hReturnSuccess = nullptr;
         sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
@@ -751,7 +754,7 @@ void CLibAMCFStreamUpload::UploadData(const FunctionCallbackInfo<Value>& args)
         if (wrapperTable->m_StreamUpload_UploadData == nullptr)
             throw std::runtime_error("Could not call LibAMCF method StreamUpload::UploadData.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_UploadData(instanceHandle, 0, nullptr, nChunkSize, &hReturnSuccess);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_UploadData(instanceHandle, 0, nullptr, nChunkSize, nThreadCount, &hReturnSuccess);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         Local<Object> instanceObjSuccess = CLibAMCFOperationResult::NewInstance(args.Holder(), hReturnSuccess);
         args.GetReturnValue().Set(instanceObjSuccess);
@@ -773,9 +776,13 @@ void CLibAMCFStreamUpload::UploadFile(const FunctionCallbackInfo<Value>& args)
         if (!args[1]->IsUint32()) {
             throw std::runtime_error("Expected uint32 parameter 1 (ChunkSize)");
         }
+        if (!args[2]->IsUint32()) {
+            throw std::runtime_error("Expected uint32 parameter 2 (ThreadCount)");
+        }
         v8::String::Utf8Value sutf8FileName(isolate, args[0]);
         std::string sFileName = *sutf8FileName;
         unsigned int nChunkSize = (unsigned int) args[1]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
+        unsigned int nThreadCount = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         LibAMCFHandle hReturnSuccess = nullptr;
         sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
@@ -783,7 +790,7 @@ void CLibAMCFStreamUpload::UploadFile(const FunctionCallbackInfo<Value>& args)
         if (wrapperTable->m_StreamUpload_UploadFile == nullptr)
             throw std::runtime_error("Could not call LibAMCF method StreamUpload::UploadFile.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_UploadFile(instanceHandle, sFileName.c_str(), nChunkSize, &hReturnSuccess);
+        LibAMCFResult errorCode = wrapperTable->m_StreamUpload_UploadFile(instanceHandle, sFileName.c_str(), nChunkSize, nThreadCount, &hReturnSuccess);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         Local<Object> instanceObjSuccess = CLibAMCFOperationResult::NewInstance(args.Holder(), hReturnSuccess);
         args.GetReturnValue().Set(instanceObjSuccess);
@@ -954,6 +961,7 @@ void CLibAMCFConnection::Init()
 		NODE_SET_PROTOTYPE_METHOD(tpl, "Ping", Ping);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "GetAuthToken", GetAuthToken);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "CreateUpload", CreateUpload);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "PrepareBuild", PrepareBuild);
 		constructor.Reset(isolate, tpl->GetFunction(isolate->GetCurrentContext()).ToLocalChecked());
 
 }
@@ -1225,15 +1233,14 @@ void CLibAMCFConnection::CreateUpload(const FunctionCallbackInfo<Value>& args)
         if (!args[1]->IsString()) {
             throw std::runtime_error("Expected string parameter 1 (MimeType)");
         }
-        if (!args[2]->IsString()) {
-            throw std::runtime_error("Expected string parameter 2 (UsageContext)");
+        if (!args[2]->IsUint32()) {
+            throw std::runtime_error("Expected enum parameter 2 (ContextType)");
         }
         v8::String::Utf8Value sutf8Name(isolate, args[0]);
         std::string sName = *sutf8Name;
         v8::String::Utf8Value sutf8MimeType(isolate, args[1]);
         std::string sMimeType = *sutf8MimeType;
-        v8::String::Utf8Value sutf8UsageContext(isolate, args[2]);
-        std::string sUsageContext = *sutf8UsageContext;
+        unsigned int eContextType = (unsigned int) args[2]->IntegerValue(isolate->GetCurrentContext()).ToChecked();
         LibAMCFHandle hReturnInstance = nullptr;
         sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
         if (wrapperTable == nullptr)
@@ -1241,10 +1248,41 @@ void CLibAMCFConnection::CreateUpload(const FunctionCallbackInfo<Value>& args)
         if (wrapperTable->m_Connection_CreateUpload == nullptr)
             throw std::runtime_error("Could not call LibAMCF method Connection::CreateUpload.");
         LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
-        LibAMCFResult errorCode = wrapperTable->m_Connection_CreateUpload(instanceHandle, sName.c_str(), sMimeType.c_str(), sUsageContext.c_str(), &hReturnInstance);
+        LibAMCFResult errorCode = wrapperTable->m_Connection_CreateUpload(instanceHandle, sName.c_str(), sMimeType.c_str(), (eLibAMCFStreamContextType) eContextType, &hReturnInstance);
         CheckError(isolate, wrapperTable, instanceHandle, errorCode);
         Local<Object> instanceObjInstance = CLibAMCFStreamUpload::NewInstance(args.Holder(), hReturnInstance);
         args.GetReturnValue().Set(instanceObjInstance);
+
+		} catch (std::exception & E) {
+				RaiseError(isolate, E.what());
+		}
+}
+
+
+void CLibAMCFConnection::PrepareBuild(const FunctionCallbackInfo<Value>& args) 
+{
+		Isolate* isolate = args.GetIsolate();
+		HandleScope scope(isolate);
+		try {
+        if (!args[0]->IsObject()) {
+            throw std::runtime_error("Expected class parameter 0 (DataStream)");
+        }
+        Local<Object> objDataStream = args[0]->ToObject(isolate->GetCurrentContext()).ToLocalChecked();
+        CLibAMCFDataStream * instanceDataStream = ObjectWrap::Unwrap<CLibAMCFDataStream>(objDataStream);
+        if (instanceDataStream == nullptr)
+            throw std::runtime_error("Invalid Object parameter 0 (DataStream)");
+        LibAMCFHandle hDataStream = instanceDataStream->getHandle( objDataStream );
+        LibAMCFHandle hReturnSuccess = nullptr;
+        sLibAMCFDynamicWrapperTable * wrapperTable = CLibAMCFBaseClass::getDynamicWrapperTable(args.Holder());
+        if (wrapperTable == nullptr)
+            throw std::runtime_error("Could not get wrapper table for LibAMCF method PrepareBuild.");
+        if (wrapperTable->m_Connection_PrepareBuild == nullptr)
+            throw std::runtime_error("Could not call LibAMCF method Connection::PrepareBuild.");
+        LibAMCFHandle instanceHandle = CLibAMCFBaseClass::getHandle(args.Holder());
+        LibAMCFResult errorCode = wrapperTable->m_Connection_PrepareBuild(instanceHandle, hDataStream, &hReturnSuccess);
+        CheckError(isolate, wrapperTable, instanceHandle, errorCode);
+        Local<Object> instanceObjSuccess = CLibAMCFOperationResult::NewInstance(args.Holder(), hReturnSuccess);
+        args.GetReturnValue().Set(instanceObjSuccess);
 
 		} catch (std::exception & E) {
 				RaiseError(isolate, E.what());
@@ -1310,6 +1348,8 @@ void CLibAMCFWrapper::New(const FunctionCallbackInfo<Value>& args)
 						std::auto_ptr<sLibAMCFDynamicWrapperTable> wrapperTable( new sLibAMCFDynamicWrapperTable );
 						CheckError(isolate, nullptr, nullptr, LoadLibAMCFWrapperTable(wrapperTable.get(), sLibraryName.c_str()));
 						newObject->SetInternalField(NODEWRAPPER_TABLEINDEX, External::New(isolate, wrapperTable.release()));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eStreamContextType_Unknown"), Integer::New(isolate, 0));
+						newObject->Set(isolate->GetCurrentContext(), String::NewFromUtf8(isolate, "eStreamContextType_NewBuildJob"), Integer::New(isolate, 1));
 						obj->Wrap(newObject);
 						args.GetReturnValue().Set(newObject);
 				} else {

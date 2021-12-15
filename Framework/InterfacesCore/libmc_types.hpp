@@ -377,6 +377,37 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_COULDNOTFINDEVENTSENDER 350
 #define LIBMC_ERROR_DUPLICATEFORMNAME 351
 #define LIBMC_ERROR_EVENTNOTFOUND 352
+#define LIBMC_ERROR_MISSINGCOLORNAME 353
+#define LIBMC_ERROR_MISSINGCOLORREDCHANNEL 354
+#define LIBMC_ERROR_MISSINGCOLORGREENCHANNEL 355
+#define LIBMC_ERROR_MISSINGCOLORBLUECHANNEL 356
+#define LIBMC_ERROR_INVALIDCOLORREDCHANNEL 357
+#define LIBMC_ERROR_INVALIDCOLORGREENCHANNEL 358
+#define LIBMC_ERROR_INVALIDCOLORBLUECHANNEL 359
+#define LIBMC_ERROR_MISSINGCOLUMNWIDTH 360
+#define LIBMC_ERROR_INVALIDCOLUMNWIDTH 361
+#define LIBMC_ERROR_MISSINGCOLUMNUNIT 362
+#define LIBMC_ERROR_MISSINGROWHEIGHT 363
+#define LIBMC_ERROR_INVALIDROWHEIGHT 364
+#define LIBMC_ERROR_MISSINGROWUNIT 365
+#define LIBMC_ERROR_MISSINGCOLUMNSTARTATTRIB 366
+#define LIBMC_ERROR_MISSINGCOLUMNENDATTRIB 367
+#define LIBMC_ERROR_MISSINGROWSTARTATTRIB 368
+#define LIBMC_ERROR_MISSINGROWENDATTRIB 369
+#define LIBMC_ERROR_INVALIDCOLUMNSTARTATTRIB 370
+#define LIBMC_ERROR_INVALIDCOLUMNENDATTRIB 371
+#define LIBMC_ERROR_INVALIDROWSTARTATTRIB 372
+#define LIBMC_ERROR_INVALIDROWENDATTRIB 373
+#define LIBMC_ERROR_INVALIDPARAMETERPATH 374
+#define LIBMC_ERROR_INVALIDPARAMETERINSTANCE 375
+#define LIBMC_ERROR_INVALIDPARAMETERGROUP 376
+#define LIBMC_ERROR_INVALIDPARAMETERNAME 377
+#define LIBMC_ERROR_INVALIDSTATEMACHINENAME 378
+#define LIBMC_ERROR_INVALIDGRIDPOSITION 379
+#define LIBMC_ERROR_INVALIDDIALOGNAME 380
+#define LIBMC_ERROR_DUPLICATEDIALOG 381
+#define LIBMC_ERROR_DIALOGNOTFOUND 382
+#define LIBMC_ERROR_COULDNOTHANDLEEVENT 383
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -666,6 +697,37 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_COULDNOTFINDEVENTSENDER: return "Could not find event sender";
     case LIBMC_ERROR_DUPLICATEFORMNAME: return "Duplicate form name";
     case LIBMC_ERROR_EVENTNOTFOUND: return "Event not found";
+    case LIBMC_ERROR_MISSINGCOLORNAME: return "Missing color name";
+    case LIBMC_ERROR_MISSINGCOLORREDCHANNEL: return "Missing red color channel";
+    case LIBMC_ERROR_MISSINGCOLORGREENCHANNEL: return "Missing green color channel";
+    case LIBMC_ERROR_MISSINGCOLORBLUECHANNEL: return "Missing blue color channel";
+    case LIBMC_ERROR_INVALIDCOLORREDCHANNEL: return "Invalid red color channel";
+    case LIBMC_ERROR_INVALIDCOLORGREENCHANNEL: return "Invalid green color channel";
+    case LIBMC_ERROR_INVALIDCOLORBLUECHANNEL: return "Invalid blue color channel";
+    case LIBMC_ERROR_MISSINGCOLUMNWIDTH: return "Missing column width";
+    case LIBMC_ERROR_INVALIDCOLUMNWIDTH: return "Invalid column width";
+    case LIBMC_ERROR_MISSINGCOLUMNUNIT: return "Missing column unit";
+    case LIBMC_ERROR_MISSINGROWHEIGHT: return "Missing row height";
+    case LIBMC_ERROR_INVALIDROWHEIGHT: return "Invalid row height";
+    case LIBMC_ERROR_MISSINGROWUNIT: return "Missing row unit";
+    case LIBMC_ERROR_MISSINGCOLUMNSTARTATTRIB: return "Missing column start attrib";
+    case LIBMC_ERROR_MISSINGCOLUMNENDATTRIB: return "Missing column end attrib";
+    case LIBMC_ERROR_MISSINGROWSTARTATTRIB: return "Missing row start attrib";
+    case LIBMC_ERROR_MISSINGROWENDATTRIB: return "Missing row end attrib";
+    case LIBMC_ERROR_INVALIDCOLUMNSTARTATTRIB: return "Invalid column start attrib";
+    case LIBMC_ERROR_INVALIDCOLUMNENDATTRIB: return "Invalid column end attrib";
+    case LIBMC_ERROR_INVALIDROWSTARTATTRIB: return "Invalid row start attrib";
+    case LIBMC_ERROR_INVALIDROWENDATTRIB: return "Invalid row end attrib";
+    case LIBMC_ERROR_INVALIDPARAMETERPATH: return "Invalid parameter path";
+    case LIBMC_ERROR_INVALIDPARAMETERINSTANCE: return "Invalid parameter instance";
+    case LIBMC_ERROR_INVALIDPARAMETERGROUP: return "Invalid parameter group";
+    case LIBMC_ERROR_INVALIDPARAMETERNAME: return "Invalid parameter name";
+    case LIBMC_ERROR_INVALIDSTATEMACHINENAME: return "Invalid state machine name";
+    case LIBMC_ERROR_INVALIDGRIDPOSITION: return "Invalid grid position";
+    case LIBMC_ERROR_INVALIDDIALOGNAME: return "Invalid dialog name";
+    case LIBMC_ERROR_DUPLICATEDIALOG: return "Duplicate dialog";
+    case LIBMC_ERROR_DIALOGNOTFOUND: return "Dialog not found";
+    case LIBMC_ERROR_COULDNOTHANDLEEVENT: return "Could not handle event";
     default: return "unknown error";
   }
 }

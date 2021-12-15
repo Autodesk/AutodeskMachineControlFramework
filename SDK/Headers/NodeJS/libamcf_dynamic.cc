@@ -57,7 +57,7 @@ LibAMCFResult InitLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	pWrapperTable->m_OperationResult_Success = NULL;
 	pWrapperTable->m_OperationResult_GetErrorMessage = NULL;
 	pWrapperTable->m_DataStream_GetUUID = NULL;
-	pWrapperTable->m_DataStream_GetContextUUID = NULL;
+	pWrapperTable->m_DataStream_GetContext = NULL;
 	pWrapperTable->m_DataStream_GetName = NULL;
 	pWrapperTable->m_DataStream_GetMimeType = NULL;
 	pWrapperTable->m_DataStream_GetSHA256 = NULL;
@@ -65,7 +65,7 @@ LibAMCFResult InitLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	pWrapperTable->m_DataStream_GetTimestamp = NULL;
 	pWrapperTable->m_StreamUpload_GetName = NULL;
 	pWrapperTable->m_StreamUpload_GetMimeType = NULL;
-	pWrapperTable->m_StreamUpload_GetUsageContext = NULL;
+	pWrapperTable->m_StreamUpload_GetContextType = NULL;
 	pWrapperTable->m_StreamUpload_UploadData = NULL;
 	pWrapperTable->m_StreamUpload_UploadFile = NULL;
 	pWrapperTable->m_StreamUpload_BeginChunking = NULL;
@@ -83,6 +83,7 @@ LibAMCFResult InitLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	pWrapperTable->m_Connection_Ping = NULL;
 	pWrapperTable->m_Connection_GetAuthToken = NULL;
 	pWrapperTable->m_Connection_CreateUpload = NULL;
+	pWrapperTable->m_Connection_PrepareBuild = NULL;
 	pWrapperTable->m_GetVersion = NULL;
 	pWrapperTable->m_GetLastError = NULL;
 	pWrapperTable->m_ReleaseInstance = NULL;
@@ -197,12 +198,12 @@ LibAMCFResult LoadLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_DataStream_GetContextUUID = (PLibAMCFDataStream_GetContextUUIDPtr) GetProcAddress(hLibrary, "libamcf_datastream_getcontextuuid");
+	pWrapperTable->m_DataStream_GetContext = (PLibAMCFDataStream_GetContextPtr) GetProcAddress(hLibrary, "libamcf_datastream_getcontext");
 	#else // _WIN32
-	pWrapperTable->m_DataStream_GetContextUUID = (PLibAMCFDataStream_GetContextUUIDPtr) dlsym(hLibrary, "libamcf_datastream_getcontextuuid");
+	pWrapperTable->m_DataStream_GetContext = (PLibAMCFDataStream_GetContextPtr) dlsym(hLibrary, "libamcf_datastream_getcontext");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_DataStream_GetContextUUID == NULL)
+	if (pWrapperTable->m_DataStream_GetContext == NULL)
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -269,12 +270,12 @@ LibAMCFResult LoadLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
-	pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) GetProcAddress(hLibrary, "libamcf_streamupload_getusagecontext");
+	pWrapperTable->m_StreamUpload_GetContextType = (PLibAMCFStreamUpload_GetContextTypePtr) GetProcAddress(hLibrary, "libamcf_streamupload_getcontexttype");
 	#else // _WIN32
-	pWrapperTable->m_StreamUpload_GetUsageContext = (PLibAMCFStreamUpload_GetUsageContextPtr) dlsym(hLibrary, "libamcf_streamupload_getusagecontext");
+	pWrapperTable->m_StreamUpload_GetContextType = (PLibAMCFStreamUpload_GetContextTypePtr) dlsym(hLibrary, "libamcf_streamupload_getcontexttype");
 	dlerror();
 	#endif // _WIN32
-	if (pWrapperTable->m_StreamUpload_GetUsageContext == NULL)
+	if (pWrapperTable->m_StreamUpload_GetContextType == NULL)
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
@@ -428,6 +429,15 @@ LibAMCFResult LoadLibAMCFWrapperTable(sLibAMCFDynamicWrapperTable * pWrapperTabl
 	dlerror();
 	#endif // _WIN32
 	if (pWrapperTable->m_Connection_CreateUpload == NULL)
+		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
+	
+	#ifdef _WIN32
+	pWrapperTable->m_Connection_PrepareBuild = (PLibAMCFConnection_PrepareBuildPtr) GetProcAddress(hLibrary, "libamcf_connection_preparebuild");
+	#else // _WIN32
+	pWrapperTable->m_Connection_PrepareBuild = (PLibAMCFConnection_PrepareBuildPtr) dlsym(hLibrary, "libamcf_connection_preparebuild");
+	dlerror();
+	#endif // _WIN32
+	if (pWrapperTable->m_Connection_PrepareBuild == NULL)
 		return LIBAMCF_ERROR_COULDNOTFINDLIBRARYEXPORT;
 	
 	#ifdef _WIN32
