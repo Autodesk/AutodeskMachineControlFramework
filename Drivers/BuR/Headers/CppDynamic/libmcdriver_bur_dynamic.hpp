@@ -413,6 +413,8 @@ public:
 	{
 	}
 	
+	inline void SetToSimulationMode();
+	inline bool IsSimulationMode();
 	inline void Connect(const std::string & sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout);
 	inline void Disconnect();
 	inline PPLCCommandList CreateCommandList();
@@ -558,6 +560,8 @@ public:
 		pWrapperTable->m_PLCCommandList_WaitForList = nullptr;
 		pWrapperTable->m_PLCCommandList_PauseList = nullptr;
 		pWrapperTable->m_PLCCommandList_ResumeList = nullptr;
+		pWrapperTable->m_Driver_BuR_SetToSimulationMode = nullptr;
+		pWrapperTable->m_Driver_BuR_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_BuR_Connect = nullptr;
 		pWrapperTable->m_Driver_BuR_Disconnect = nullptr;
 		pWrapperTable->m_Driver_BuR_CreateCommandList = nullptr;
@@ -753,6 +757,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_PLCCommandList_ResumeList == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_SetToSimulationMode = (PLibMCDriver_BuRDriver_BuR_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_settosimulationmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_SetToSimulationMode = (PLibMCDriver_BuRDriver_BuR_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_settosimulationmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_SetToSimulationMode == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_IsSimulationMode = (PLibMCDriver_BuRDriver_BuR_IsSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_issimulationmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_IsSimulationMode = (PLibMCDriver_BuRDriver_BuR_IsSimulationModePtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_issimulationmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_IsSimulationMode == nullptr)
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -955,6 +977,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_plccommandlist_resumelist", (void**)&(pWrapperTable->m_PLCCommandList_ResumeList));
 		if ( (eLookupError != 0) || (pWrapperTable->m_PLCCommandList_ResumeList == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_settosimulationmode", (void**)&(pWrapperTable->m_Driver_BuR_SetToSimulationMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_SetToSimulationMode == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_issimulationmode", (void**)&(pWrapperTable->m_Driver_BuR_IsSimulationMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_IsSimulationMode == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_connect", (void**)&(pWrapperTable->m_Driver_BuR_Connect));
@@ -1206,6 +1236,26 @@ public:
 	/**
 	 * Method definitions for class CDriver_BuR
 	 */
+	
+	/**
+	* CDriver_BuR::SetToSimulationMode - Turns the driver into a simulation mode.
+	*/
+	void CDriver_BuR::SetToSimulationMode()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_SetToSimulationMode(m_pHandle));
+	}
+	
+	/**
+	* CDriver_BuR::IsSimulationMode - Returns if the driver is in simulation mode.
+	* @return Flag if driver is in simulation mode.
+	*/
+	bool CDriver_BuR::IsSimulationMode()
+	{
+		bool resultSimulationModeEnabled = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_IsSimulationMode(m_pHandle, &resultSimulationModeEnabled));
+		
+		return resultSimulationModeEnabled;
+	}
 	
 	/**
 	* CDriver_BuR::Connect - Connects to a BuR PLC Controller.

@@ -126,6 +126,23 @@ public:
 
 
 
+class CEvent_ChangeManualValues : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "changemanualvalues";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->ActivateModalDialog("testdialog");
+
+	}
+
+};
 
 
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
@@ -137,9 +154,16 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_StartBuild>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_ChangeManualValues>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
 }
+
+
+
 
 #ifdef _MSC_VER
 #pragma warning(pop)

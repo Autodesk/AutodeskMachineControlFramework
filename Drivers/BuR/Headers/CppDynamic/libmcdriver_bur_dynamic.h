@@ -214,6 +214,23 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRPLCCommandList_ResumeListPtr) (L
 **************************************************************************************************************************/
 
 /**
+* Turns the driver into a simulation mode.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_SetToSimulationModePtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Returns if the driver is in simulation mode.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[out] pSimulationModeEnabled - Flag if driver is in simulation mode.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_IsSimulationModePtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR, bool * pSimulationModeEnabled);
+
+/**
 * Connects to a BuR PLC Controller.
 *
 * @param[in] pDriver_BuR - Driver_BuR instance.
@@ -366,6 +383,8 @@ typedef struct {
 	PLibMCDriver_BuRPLCCommandList_WaitForListPtr m_PLCCommandList_WaitForList;
 	PLibMCDriver_BuRPLCCommandList_PauseListPtr m_PLCCommandList_PauseList;
 	PLibMCDriver_BuRPLCCommandList_ResumeListPtr m_PLCCommandList_ResumeList;
+	PLibMCDriver_BuRDriver_BuR_SetToSimulationModePtr m_Driver_BuR_SetToSimulationMode;
+	PLibMCDriver_BuRDriver_BuR_IsSimulationModePtr m_Driver_BuR_IsSimulationMode;
 	PLibMCDriver_BuRDriver_BuR_ConnectPtr m_Driver_BuR_Connect;
 	PLibMCDriver_BuRDriver_BuR_DisconnectPtr m_Driver_BuR_Disconnect;
 	PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr m_Driver_BuR_CreateCommandList;

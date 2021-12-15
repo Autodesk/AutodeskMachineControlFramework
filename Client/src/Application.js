@@ -7,6 +7,23 @@ const nullUUID = "00000000-0000-0000-0000-000000000000";
 const nullToken = "0000000000000000000000000000000000000000000000000000000000000000";
 
 
+	
+function updateAMCFormEntityFromContentEntry (entry, entity) {
+	
+	if ((entity) && (entry)) {
+		entity.remotevalue = entry.defaultvalue;
+		entity.prefix = entry.prefix;
+		entity.suffix = entry.suffix;
+		entity.readonly = entry.readonly;
+		entity.disabled = entry.disabled;
+		
+		if (entity.value != entity.remotevalue) {
+			entity.value = entity.remotevalue;				
+		}
+	}
+			
+}
+
 export default class AMCApplication {
 	
 	constructor (apiBaseURL)
@@ -38,6 +55,9 @@ export default class AMCApplication {
             ToolbarItems: [],
 			ContentItems: [],					
 			Pages: [],
+			Dialogs: [],
+			PageMap: new Map(),
+			DialogMap: new Map(),
 			FormEntities: []
 		}
 
@@ -194,6 +214,7 @@ export default class AMCApplication {
                 });	
 			
 	}
+
 	
 	
 	prepareModuleItem (item) 
@@ -219,7 +240,14 @@ export default class AMCApplication {
 		
 		if (item.type === "form") {
 
-			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true, 
+				callback: function(appcontent, item) {
+					
+					for (var entry of item.entries) {						
+						updateAMCFormEntityFromContentEntry (entry, appcontent.FormEntities[entry.uuid]);																	
+					}
+				}
+			};
 			
 			for (var entity of item.entities) {
 				
@@ -387,15 +415,28 @@ export default class AMCApplication {
                     this.AppContent.MenuItems = resultJSON.data.menuitems;
                     this.AppContent.ToolbarItems = resultJSON.data.toolbaritems;
 					
-					var page, module;
-					for (page of resultJSON.data.pages) {
+					var page, dialog, module;
+					for (page of resultJSON.data.pages) {						
 						for (module of page.modules) {
 							this.prepareModule (module)
-						}						
-					
+						}											
+						
+						this.AppContent.PageMap.set (page.name, page);
+						
 					}
+
+					for (dialog of resultJSON.data.dialogs) {
+						for (module of dialog.modules) {
+							this.prepareModule (module)
+						}											
+
+						dialog.dialogIsActive = false;
+						this.AppContent.DialogMap.set (dialog.name, dialog);
+					}
+
 					
 					this.AppContent.Pages = resultJSON.data.pages;
+					this.AppContent.Dialogs = resultJSON.data.dialogs;					
                    
                 })
                 .catch(err => {
@@ -433,6 +474,12 @@ export default class AMCApplication {
 						this.AppContent.ContentItems[uuid].entries.push (entry);
 					}
 					this.AppContent.ContentItems[uuid].refresh = true;
+					
+					var itemCallback = this.AppContent.ContentItems[uuid].callback;
+					if (itemCallback) {						
+						itemCallback (this.AppContent, this.AppContent.ContentItems[uuid]);
+					}
+					
                 })
                 .catch(err => {
 					
@@ -579,6 +626,17 @@ export default class AMCApplication {
 			}
 										
         }
+		
+		showDialog (dialog) {
+			
+			if (dialog) {
+				if (this.AppContent.DialogMap.has (dialog)) {
+					var dialogObject = this.AppContent.DialogMap.get (dialog);
+					dialogObject.dialogIsActive = true;
+				}
+			}
+			
+		}
 
 
 		getImageURL (uuid) {
@@ -595,8 +653,13 @@ export default class AMCApplication {
 				"formvalues": formvalues
 			})
 				.then(resultHandleEvent => {
-					resultHandleEvent;
-					//alert (resultHandleEvent.data);
+					if (resultHandleEvent.data.pagetoactivate) {
+						this.changePage (resultHandleEvent.data.pagetoactivate);
+					}
+					if (resultHandleEvent.data.dialogtoshow) {
+						this.showDialog (resultHandleEvent.data.dialogtoshow);
+					}
+					
 				})
                 .catch(err => {
 					alert (err);

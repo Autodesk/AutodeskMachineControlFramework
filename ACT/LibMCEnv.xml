@@ -690,7 +690,7 @@
 		<method name="SetNextState" description="sets the next state">
 			<param name="StateName" type="string" pass="in" description="Name of next state" />
 		</method>
-
+				
 		<method name="LogMessage" description="logs a string as message">
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
@@ -801,13 +801,20 @@
 
 	<class name="UIEnvironment" parent="Base" description="Environment of the UI">
 	  
+		<method name="ActivateModalDialog" description="activates a modal dialog on the client.">
+			<param name="DialogName" type="string" pass="in" description="Name of the dialog to activate." />
+		</method>
+	  
+		<method name="ActivatePage" description="changes the current page on the client.">
+			<param name="DialogName" type="string" pass="in" description="Name of the dialog to activate." />
+		</method>
+	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="SignalName" type="string" pass="in" description="Name Of signal channel." />
 			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />
-		</method>
-	  
-		
+		</method>		
+	  		
 		<method name="GetMachineState" description="Retrieves the machine state">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="StateName" type="string" pass="return" description="Name of current state" />

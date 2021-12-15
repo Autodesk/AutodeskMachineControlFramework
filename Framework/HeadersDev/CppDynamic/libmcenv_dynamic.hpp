@@ -734,6 +734,8 @@ public:
 	{
 	}
 	
+	inline void ActivateModalDialog(const std::string & sDialogName);
+	inline void ActivatePage(const std::string & sDialogName);
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline void LogMessage(const std::string & sLogString);
@@ -976,6 +978,8 @@ public:
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
+		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -2245,6 +2249,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ActivatePage = (PLibMCEnvUIEnvironment_ActivatePagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatepage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ActivatePage = (PLibMCEnvUIEnvironment_ActivatePagePtr) dlsym(hLibrary, "libmcenv_uienvironment_activatepage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ActivatePage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -3074,6 +3096,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_activatepage", (void**)&(pWrapperTable->m_UIEnvironment_ActivatePage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivatePage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
@@ -4984,6 +5014,24 @@ public:
 	/**
 	 * Method definitions for class CUIEnvironment
 	 */
+	
+	/**
+	* CUIEnvironment::ActivateModalDialog - activates a modal dialog on the client.
+	* @param[in] sDialogName - Name of the dialog to activate.
+	*/
+	void CUIEnvironment::ActivateModalDialog(const std::string & sDialogName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ActivateModalDialog(m_pHandle, sDialogName.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::ActivatePage - changes the current page on the client.
+	* @param[in] sDialogName - Name of the dialog to activate.
+	*/
+	void CUIEnvironment::ActivatePage(const std::string & sDialogName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ActivatePage(m_pHandle, sDialogName.c_str()));
+	}
 	
 	/**
 	* CUIEnvironment::PrepareSignal - prepares a signal object to trigger later.

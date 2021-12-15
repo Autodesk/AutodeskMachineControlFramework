@@ -28,53 +28,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKET_STARTFIRMWARE
-#define __AMC_OIE_PACKET_STARTFIRMWARE
+#define __AMCIMPL_UI_DIALOG
+#define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
 
-#include "oie_packet.hpp"
+#include "amc_ui_page.hpp"
+#include "amc_ui_dialog.hpp"
+#include "amc_ui_module.hpp"
+#include "libmc_exceptiontypes.hpp"
+#include "common_utils.hpp"
 
-namespace LibOIE::Impl {
-	
-	class CPacket_StartFirmware : public CPacket {
-		protected:
+using namespace AMC;
 
-			bool m_bFirmwareStarted;
-			std::string m_sFirmwareFileName;
+CUIDialog::CUIDialog(const std::string& sName, CUIModule_UIEventHandler* pUIEventHandler)
+	: CUIPage (sName, pUIEventHandler)
+{
 
-		public:
-
-			CPacket_StartFirmware(uint32_t nSequenceNumber, bool bFirmwareStarted, std::string sFirmwareFileName);
-			CPacket_StartFirmware(CPacketReader & pReader);
-
-			virtual ~CPacket_StartFirmware();
-
-			virtual void serialize(CPacketWriter& packetWriter) override;
-
-	};
-	
-
-	class CPacket_StartFirmwareRequest : public CPacket_StartFirmware {
-
-	protected:
-
-	public:
-		CPacket_StartFirmwareRequest (CPacketReader & pReader);
-		
-		virtual ePacketType getType() override;
-	};
-
-	class CPacket_StartFirmwareReply : public CPacket_StartFirmware {
-		
-		protected:
-		
-		public:
-			CPacket_StartFirmwareReply (CPacketReader & pReader);		
-			
-			virtual ePacketType getType() override;
-	};
-	
 }
 
+CUIDialog::~CUIDialog()
+{
 
-#endif //__AMC_OIE_PACKET_STARTFIRMWARE
-
+}

@@ -41,6 +41,8 @@ private:
 	std::string m_sName; 
 	std::string m_sType;
 
+	bool m_SimulationMode;
+
 	float m_fMaxLaserPowerInWatts;
 
 	std::shared_ptr<IRTCSelector> m_pRTCSelector;
@@ -64,6 +66,10 @@ public:
 	std::string GetType() override;
 
 	void QueryParameters() override;
+
+	void SetToSimulationMode() override;
+
+	bool IsSimulationMode() override;
 
 	void Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) override;
 

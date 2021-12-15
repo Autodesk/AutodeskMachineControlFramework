@@ -101,9 +101,10 @@ public:
 		auto nTimeout = pStateEnvironment->GetIntegerParameter("plcconfig", "timeout");
 
 		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
+		pDriver->SetToSimulationMode();
 
 		pStateEnvironment->LogMessage("Connecting to PLC...");
-		pDriver->Connect(sIPAddress, nPort, nTimeout);
+		pDriver->Connect(sIPAddress, nPort, nTimeout);	
 		pStateEnvironment->LogMessage("successful...");
 
 		auto pPLCCommandList = pDriver->CreateCommandList();

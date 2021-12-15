@@ -1469,6 +1469,24 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibM
 **************************************************************************************************************************/
 
 /**
+* activates a modal dialog on the client.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pDialogName - Name of the dialog to activate.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_activatemodaldialog(LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
+
+/**
+* changes the current page on the client.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pDialogName - Name of the dialog to activate.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.

@@ -161,7 +161,7 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironme
 			if (formNameAttrib.empty ())
 				throw ELibMCCustomException(LIBMC_ERROR_FORMNAMEMISSING, getName());
 
-			auto pForm = std::make_shared <CUIModule_ContentForm>(formNameAttrib.as_string ());
+			auto pForm = std::make_shared <CUIModule_ContentForm>(formNameAttrib.as_string (), pUIModuleEnvironment->stateMachineData());
 			addItem(pForm);
 
 			pUIModuleEnvironment->formRegistry()->registerFormName(pForm->getUUID(), pForm->getName ());
@@ -200,12 +200,12 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PUIModuleEnvironme
 				}
 
 				auto disabledAttrib = formNode.attribute("disabled");
-				if (!disabledAttrib.empty())
-					pEntity->setDisabled(disabledAttrib.as_bool());
+				if (!disabledAttrib.empty()) 
+					pEntity->setDisabledExpression(disabledAttrib.as_string());
 
 				auto readonlyAttrib = formNode.attribute("readonly");
 				if (!readonlyAttrib.empty())
-					pEntity->setReadOnly(readonlyAttrib.as_bool());
+					pEntity->setReadOnlyExpression(readonlyAttrib.as_string());
 
 
 			}

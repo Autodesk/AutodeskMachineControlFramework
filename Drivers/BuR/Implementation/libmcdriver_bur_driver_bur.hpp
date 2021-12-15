@@ -66,6 +66,8 @@ protected:
     std::mutex m_driverEnvironmentMutex;
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
+    bool m_SimulationMode;
+
     uint32_t m_nWorkerThreadCount;
     uint32_t m_nMaxReceiveBufferSize;
 
@@ -89,6 +91,10 @@ protected:
 public:
 
     CDriver_BuR (const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+
+    void SetToSimulationMode() override;
+
+    bool IsSimulationMode() override;
 
     void Configure(const std::string& sConfigurationString) override;
 

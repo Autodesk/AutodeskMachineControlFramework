@@ -28,53 +28,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_OIE_PACKET_STOPFIRMWARE
-#define __AMC_OIE_PACKET_STOPFIRMWARE
 
-#include "oie_packet.hpp"
+#ifndef __AMC_UI_DIALOG
+#define __AMC_UI_DIALOG
 
-namespace LibOIE::Impl {
-	
-	class CPacket_StopFirmware : public CPacket {
-		protected:
+#include "header_protection.hpp"
 
-			bool m_bFirmwareStopped;
-			std::string m_sFirmwareFileName;
+#ifndef __AMCIMPL_UI_DIALOG
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
-		public:
+#include "Core/amc_jsonwriter.hpp"
 
-			CPacket_StopFirmware(uint32_t nSequenceNumber, bool bFirmwareStopped, std::string sFirmwareFileName);
-			CPacket_StopFirmware(CPacketReader & pReader);
+#include <vector>
+#include <map>
 
-			virtual ~CPacket_StopFirmware();
+#include "Libraries/PugiXML/pugixml.hpp"
+#include "amc_ui_interfaces.hpp"
 
-			virtual void serialize(CPacketWriter& packetWriter) override;
+namespace AMC {
 
-	};
-	
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIPage, PUIPage);	
+	amcDeclareDependingClass(CUIDialog, PUIDialog);	
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 
-	class CPacket_StopFirmwareRequest : public CPacket_StopFirmware {
 
+	class CUIDialog : public CUIPage {
 	protected:
 
 	public:
-		CPacket_StopFirmwareRequest (CPacketReader & pReader);
-		
-		virtual ePacketType getType() override;
-	};
 
-	class CPacket_StopFirmwareReply : public CPacket_StopFirmware {
+		CUIDialog(const std::string & sName, CUIModule_UIEventHandler* pUIEventHandler);
 		
-		protected:
+		virtual ~CUIDialog();
 		
-		public:
-			CPacket_StopFirmwareReply (CPacketReader & pReader);		
-			
-			virtual ePacketType getType() override;
 	};
-	
+		
 }
 
 
-#endif //__AMC_OIE_PACKET_STOPFIRMWARE
+#endif //__AMC_UI_DIALOG
 

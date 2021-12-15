@@ -227,6 +227,23 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_plccommandlist_re
 **************************************************************************************************************************/
 
 /**
+* Turns the driver into a simulation mode.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_settosimulationmode(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
+* Returns if the driver is in simulation mode.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @param[out] pSimulationModeEnabled - Flag if driver is in simulation mode.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_issimulationmode(LibMCDriver_BuR_Driver_BuR pDriver_BuR, bool * pSimulationModeEnabled);
+
+/**
 * Connects to a BuR PLC Controller.
 *
 * @param[in] pDriver_BuR - Driver_BuR instance.

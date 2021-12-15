@@ -94,7 +94,8 @@ public:
 		pStateEnvironment->LogMessage("Initialising ScanLab Driver");
 
 		auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
-		pDriver->LoadSDK("rtc6dllx64");
+		//pDriver->LoadSDK("rtc6dllx64");
+		pDriver->SetToSimulationMode();
 
 		auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
 		auto sNetmask = pStateEnvironment->GetStringParameter("cardconfig", "netmask");
@@ -128,11 +129,14 @@ public:
 
 		pDriver->LoadFirmware(sFirmwareResource, "rtc6rbf", "rtc6dat");
 
-		std::vector<uint8_t> CorrectionFileBuffer;
-		pStateEnvironment->LogMessage("Loading correction file...");
-		pStateEnvironment->LoadResourceData(sCorrectionResourceName, CorrectionFileBuffer);
+		if (!pDriver->IsSimulationMode()) {
+			std::vector<uint8_t> CorrectionFileBuffer;
+			pStateEnvironment->LogMessage("Loading correction file...");
+			pStateEnvironment->LoadResourceData(sCorrectionResourceName, CorrectionFileBuffer);
 
-		pDriver->SetCorrectionFile(CorrectionFileBuffer, nTableIndex, nDimension, nTableNumberHeadA, nTableNumberHeadB);
+			pDriver->SetCorrectionFile(CorrectionFileBuffer, nTableIndex, nDimension, nTableNumberHeadA, nTableNumberHeadB);
+		}
+
 
 		pStateEnvironment->LogMessage("Configuring laser...");
 		pDriver->ConfigureLaserMode(LibMCDriver_ScanLab::eLaserMode::YAG1, LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1, dMaxLaserPower, false, false, true, true, false, false);

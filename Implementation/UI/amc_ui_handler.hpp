@@ -66,6 +66,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
 	amcDeclareDependingClass(CUIPage, PUIPage);
+	amcDeclareDependingClass(CUIDialog, PUIDialog);
 	amcDeclareDependingClass(CLogger, PLogger);
 	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
 	amcDeclareDependingClass(CUIModule, PUIModule);
@@ -73,6 +74,26 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+
+
+	class CUIHandleEventResponse {
+	private:
+		uint32_t m_nErrorCode;
+		std::string m_sErrorMessage;
+		std::string m_sPageToActivate;
+		std::string m_sDialogToShow;
+	public:
+		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, const std::string& sDialogToShow);
+
+		uint32_t getErrorCode();
+		std::string getErrorMessage ();
+		std::string getPageToActivate();
+		std::string getDialogToShow();
+
+		bool hasPageToActivate();
+		bool hasDialogToShow();
+
+	};
 
 	class CUIHandler : public CUIModule_UIEventHandler {
 	protected:
@@ -94,6 +115,7 @@ namespace AMC {
 		std::vector <PUIToolbarItem> m_ToolbarItems;
 
 		std::map <std::string, PUIPage> m_Pages;
+		std::map <std::string, PUIDialog> m_Dialogs;
 		PUIPage m_pMainPage;
 
 		LibMCUI::PWrapper m_pUIPluginWrapper;
@@ -102,9 +124,12 @@ namespace AMC {
 
 		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
-		PUIPage addPage_Unsafe (const std::string& sName);
 
+		PUIPage addPage_Unsafe (const std::string& sName);
 		PUIPage findPage(const std::string& sName);
+
+		PUIDialog addDialog_Unsafe(const std::string& sName);
+		PUIDialog findDialog(const std::string& sName);
 
 	public:
 
@@ -126,7 +151,7 @@ namespace AMC {
 		
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
+		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 	};

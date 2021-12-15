@@ -119,6 +119,8 @@ public:
 		double targetO2 = pStateEnvironment->GetDoubleParameter("processsettings", "targeto2");
 		pStateEnvironment->SetDoubleParameter("processsettings", "targeto2", targetO2 + 1.0);
 
+		pStateEnvironment->SetBoolParameter("ui", "preparebuilddisabled", !pStateEnvironment->GetBoolParameter("ui", "preparebuilddisabled"));
+
 		pStateEnvironment->LogMessage ("Waiting for user input...");
 		if (pStateEnvironment->WaitForSignal("signal_preparebuildjob", 100, pSignalHandler)) {
 			auto sJobUUID = pSignalHandler->GetUUID("jobuuid");

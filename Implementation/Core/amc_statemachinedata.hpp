@@ -64,6 +64,12 @@ namespace AMC {
 		CParameterGroup* getDataStore(const std::string& sInstanceName);
 		void setInstanceStateName(const std::string& sInstanceName, const std::string& sInstanceState);
 		std::string getInstanceStateName(const std::string& sInstanceName);
+
+		static void extractParameterDetailsFromDotString(const std::string& sParameterPath, std::string& sParameterInstance, std::string& sParameterGroup, std::string& sParameterName);
+
+		bool evaluateBooleanExpression(const std::string & sExpression);
+		int64_t evaluateIntegerExpression(const std::string& sExpression);
+		std::string evaluateNumberExpression(const std::string& sExpression);
 	};
 
 	

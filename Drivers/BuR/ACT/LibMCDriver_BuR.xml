@@ -247,6 +247,13 @@ Custom implementation
 
 	<class name="Driver_BuR" parent="Driver" description="A Driver for a BR Automation PLC.">
 
+		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
+		</method>
+		
+		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
+			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
+		</method>	
+
 		<method name="Connect" description= "Connects to a BuR PLC Controller.">
 			<param name="IPAddress" type="string" pass="in" description="IP Address of PLC Service." />
 			<param name="Port" type="uint32" pass="in" description="Port of PLC Service." />				

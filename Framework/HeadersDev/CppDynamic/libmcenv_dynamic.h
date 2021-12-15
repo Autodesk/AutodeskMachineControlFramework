@@ -1456,6 +1456,24 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadResourceDataPtr) (LibMCEn
 **************************************************************************************************************************/
 
 /**
+* activates a modal dialog on the client.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pDialogName - Name of the dialog to activate.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ActivateModalDialogPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
+
+/**
+* changes the current page on the client.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pDialogName - Name of the dialog to activate.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ActivatePagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -1952,6 +1970,8 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetIntegerParameterPtr m_StateEnvironment_GetIntegerParameter;
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
+	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
+	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
 	PLibMCEnvUIEnvironment_PrepareSignalPtr m_UIEnvironment_PrepareSignal;
 	PLibMCEnvUIEnvironment_GetMachineStatePtr m_UIEnvironment_GetMachineState;
 	PLibMCEnvUIEnvironment_LogMessagePtr m_UIEnvironment_LogMessage;

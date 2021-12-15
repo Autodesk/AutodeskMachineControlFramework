@@ -404,6 +404,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDPARAMETERNAME 377
 #define LIBMC_ERROR_INVALIDSTATEMACHINENAME 378
 #define LIBMC_ERROR_INVALIDGRIDPOSITION 379
+#define LIBMC_ERROR_INVALIDDIALOGNAME 380
+#define LIBMC_ERROR_DUPLICATEDIALOG 381
+#define LIBMC_ERROR_DIALOGNOTFOUND 382
+#define LIBMC_ERROR_COULDNOTHANDLEEVENT 383
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -720,6 +724,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDPARAMETERNAME: return "Invalid parameter name";
     case LIBMC_ERROR_INVALIDSTATEMACHINENAME: return "Invalid state machine name";
     case LIBMC_ERROR_INVALIDGRIDPOSITION: return "Invalid grid position";
+    case LIBMC_ERROR_INVALIDDIALOGNAME: return "Invalid dialog name";
+    case LIBMC_ERROR_DUPLICATEDIALOG: return "Duplicate dialog";
+    case LIBMC_ERROR_DIALOGNOTFOUND: return "Dialog not found";
+    case LIBMC_ERROR_COULDNOTHANDLEEVENT: return "Could not handle event";
     default: return "unknown error";
   }
 }
