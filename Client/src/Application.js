@@ -55,6 +55,9 @@ export default class AMCApplication {
             ToolbarItems: [],
 			ContentItems: [],					
 			Pages: [],
+			Dialogs: [],
+			PageMap: new Map(),
+			DialogMap: new Map(),
 			FormEntities: []
 		}
 
@@ -412,15 +415,28 @@ export default class AMCApplication {
                     this.AppContent.MenuItems = resultJSON.data.menuitems;
                     this.AppContent.ToolbarItems = resultJSON.data.toolbaritems;
 					
-					var page, module;
-					for (page of resultJSON.data.pages) {
+					var page, dialog, module;
+					for (page of resultJSON.data.pages) {						
 						for (module of page.modules) {
 							this.prepareModule (module)
-						}						
-					
+						}											
+						
+						this.AppContent.PageMap.set (page.name, page);
+						
 					}
+
+					for (dialog of resultJSON.data.dialogs) {
+						for (module of dialog.modules) {
+							this.prepareModule (module)
+						}											
+
+						dialog.dialogIsActive = false;
+						this.AppContent.DialogMap.set (dialog.name, dialog);
+					}
+
 					
 					this.AppContent.Pages = resultJSON.data.pages;
+					this.AppContent.Dialogs = resultJSON.data.dialogs;					
                    
                 })
                 .catch(err => {
@@ -610,6 +626,17 @@ export default class AMCApplication {
 			}
 										
         }
+		
+		showDialog (dialog) {
+			
+			if (dialog) {
+				if (this.AppContent.DialogMap.has (dialog)) {
+					var dialogObject = this.AppContent.DialogMap.get (dialog);
+					dialogObject.dialogIsActive = true;
+				}
+			}
+			
+		}
 
 
 		getImageURL (uuid) {
@@ -626,8 +653,13 @@ export default class AMCApplication {
 				"formvalues": formvalues
 			})
 				.then(resultHandleEvent => {
-					resultHandleEvent;
-					//alert (resultHandleEvent.data);
+					if (resultHandleEvent.data.pagetoactivate) {
+						this.changePage (resultHandleEvent.data.pagetoactivate);
+					}
+					if (resultHandleEvent.data.dialogtoshow) {
+						this.showDialog (resultHandleEvent.data.dialogtoshow);
+					}
+					
 				})
                 .catch(err => {
 					alert (err);
