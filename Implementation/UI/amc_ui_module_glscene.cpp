@@ -78,7 +78,7 @@ std::string CUIModule_GLScene::getCaption()
 }
 
 
-void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
+void CUIModule_GLScene::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
@@ -97,4 +97,10 @@ void CUIModule_GLScene::populateItemMap(std::map<std::string, PUIModuleItem>& it
 
 void CUIModule_GLScene::configurePostLoading()
 {
+}
+
+
+void CUIModule_GLScene::populateClientVariables(CParameterHandler* pParameterHandler)
+{
+
 }

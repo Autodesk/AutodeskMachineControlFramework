@@ -92,7 +92,7 @@ namespace AMC {
 
 		virtual ~CUIModule_ContentButtonGroup();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 		PUIModule_ContentButton addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValues);
 

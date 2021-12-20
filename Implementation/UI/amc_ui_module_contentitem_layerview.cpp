@@ -51,7 +51,7 @@ CUIModule_ContentLayerView::~CUIModule_ContentLayerView()
 }
 
 
-void CUIModule_ContentLayerView::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentLayerView::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "layerview");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);

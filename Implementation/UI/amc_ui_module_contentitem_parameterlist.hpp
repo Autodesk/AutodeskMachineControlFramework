@@ -87,9 +87,9 @@ namespace AMC {
 
 		virtual ~CUIModule_ContentParameterList();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
-		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 		void addEntry(const std::string& sStateMachine, const std::string& sParameterGroup, const std::string& sParameter);
 

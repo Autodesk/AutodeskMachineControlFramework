@@ -50,6 +50,7 @@ namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIPage, PUIPage);	
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 
 
@@ -80,7 +81,7 @@ namespace AMC {
 		uint32_t getModuleCount();
 		PUIModule getModule (const uint32_t nIndex);
 
-		virtual void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray);
+		virtual void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray, CParameterHandler* pClientVariableHandler);
 
 		virtual PUIModuleItem findModuleItemByUUID(const std::string& sUUID) override;
 		virtual void registerFormName(const std::string& sFormUUID, const std::string& sFormName) override;
@@ -89,6 +90,8 @@ namespace AMC {
 		virtual void configurePostLoading();
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
 										
 	};
 		

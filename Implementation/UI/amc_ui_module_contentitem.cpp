@@ -67,12 +67,12 @@ std::string CUIModule_ContentItem::getUUID()
 	return m_sUUID;
 }
 
-void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 
 }
 
-void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 
 }
@@ -83,4 +83,10 @@ std::list <std::string> CUIModule_ContentItem::getReferenceUUIDs()
 	resultList.push_back(m_sUUID);
 
 	return resultList;
+}
+
+
+void CUIModule_ContentItem::populateClientVariables(CParameterHandler* pParameterHandler)
+{
+
 }

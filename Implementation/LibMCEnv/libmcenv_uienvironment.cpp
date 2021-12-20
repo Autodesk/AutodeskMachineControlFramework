@@ -57,11 +57,14 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
       m_pClientVariableHandler (pClientVariableHandler),
       m_bCloseModalDialog (false)
 {
+
     if (pLogger.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pStateMachineData.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }

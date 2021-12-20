@@ -409,6 +409,10 @@
 		<error name="INVALIDITEMPREFIX" code="390" description="Invalid item prefix" />				
 		<error name="EMPTYITEMNAME" code="391" description="Empty item name" />
 		
+		<error name="EXPRESSIONVALUEGIVENTWICE" code="392" description="Expression value is given twice" />
+		<error name="INVALIDINTEGEREXPRESSION" code="393" description="Invalid integer expression" />
+		<error name="INVALIDNUMBEREXPRESSION" code="394" description="Invalid number expression" />
+		<error name="INVALIDBOOLEANEXPRESSION" code="395" description="Invalid boolean expression" />
 			
 	</errors>
 	

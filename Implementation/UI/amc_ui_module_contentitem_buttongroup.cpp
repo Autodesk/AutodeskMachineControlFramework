@@ -104,7 +104,7 @@ CUIModule_ContentButtonGroup::~CUIModule_ContentButtonGroup()
 }
 
 
-void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buttongroup");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);

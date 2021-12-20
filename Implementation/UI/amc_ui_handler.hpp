@@ -142,8 +142,8 @@ namespace AMC {
 		std::string getAppName();
 		std::string getCopyrightString();
 
-		void writeConfigurationToJSON (CJSONWriter & writer);
-		void writeStateToJSON(CJSONWriter& writer);
+		void writeConfigurationToJSON (CJSONWriter & writer, CParameterHandler* pClientVariableHandler);
+		void writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler);
 
 		void loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pCoreResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
 
@@ -156,6 +156,8 @@ namespace AMC {
 		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
+
+		virtual void populateClientVariables(CParameterHandler * pClientVariableHandler);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

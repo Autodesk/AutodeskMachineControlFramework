@@ -11,15 +11,17 @@ const nullToken = "0000000000000000000000000000000000000000000000000000000000000
 function updateAMCFormEntityFromContentEntry (entry, entity) {
 	
 	if ((entity) && (entry)) {
-		entity.remotevalue = entry.defaultvalue;
+		
+		if (entity.remotevalue != entry.value) {
+			entity.value = entry.value;				
+		}		
+		entity.remotevalue = entry.value;
 		entity.prefix = entry.prefix;
 		entity.suffix = entry.suffix;
 		entity.readonly = entry.readonly;
 		entity.disabled = entry.disabled;
 		
-		if (entity.value != entity.remotevalue) {
-			entity.value = entity.remotevalue;				
-		}
+
 	}
 			
 }
@@ -254,8 +256,8 @@ export default class AMCApplication {
 				
 				this.AppContent.FormEntities[entity.uuid] = 
 					{ uuid: entity.uuid, 
-					  value: entity.defaultvalue, 
-					  remotevalue: entity.defaultvalue, 
+					  value: entity.value, 
+					  remotevalue: entity.value, 
 					  disabled: entity.disabled, 
 					  readonly: entity.readonly
 					  };

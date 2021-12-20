@@ -55,6 +55,7 @@ namespace AMC {
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CUIModuleEnvironment {
 	private:
@@ -88,7 +89,7 @@ namespace AMC {
 
 		virtual std::string getType() = 0;
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject, CParameterHandler* pClientVariableHandler) = 0;
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
 
@@ -102,6 +103,9 @@ namespace AMC {
 		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
 
 		virtual void configurePostLoading() = 0;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler) = 0;
+
 
 	};
 

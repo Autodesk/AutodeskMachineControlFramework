@@ -57,7 +57,7 @@ namespace AMC {
 
 		virtual ~CUIModule_ContentUpload();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 	};
 

@@ -416,6 +416,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EMPTYITEMPREFIX 389
 #define LIBMC_ERROR_INVALIDITEMPREFIX 390
 #define LIBMC_ERROR_EMPTYITEMNAME 391
+#define LIBMC_ERROR_EXPRESSIONVALUEGIVENTWICE 392
+#define LIBMC_ERROR_INVALIDINTEGEREXPRESSION 393
+#define LIBMC_ERROR_INVALIDNUMBEREXPRESSION 394
+#define LIBMC_ERROR_INVALIDBOOLEANEXPRESSION 395
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -744,6 +748,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EMPTYITEMPREFIX: return "Empty item prefix";
     case LIBMC_ERROR_INVALIDITEMPREFIX: return "Invalid item prefix";
     case LIBMC_ERROR_EMPTYITEMNAME: return "Empty item name";
+    case LIBMC_ERROR_EXPRESSIONVALUEGIVENTWICE: return "Expression value is given twice";
+    case LIBMC_ERROR_INVALIDINTEGEREXPRESSION: return "Invalid integer expression";
+    case LIBMC_ERROR_INVALIDNUMBEREXPRESSION: return "Invalid number expression";
+    case LIBMC_ERROR_INVALIDBOOLEANEXPRESSION: return "Invalid boolean expression";
     default: return "unknown error";
   }
 }

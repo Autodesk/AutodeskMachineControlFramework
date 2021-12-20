@@ -97,7 +97,7 @@ CUIModule_ContentParameterList::~CUIModule_ContentParameterList()
 
 }
 
-void CUIModule_ContentParameterList::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentParameterList::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "parameterlist");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
@@ -134,7 +134,7 @@ void CUIModule_ContentParameterList::addDefinitionToJSON(CJSONWriter& writer, CJ
 }
 
 
-void CUIModule_ContentParameterList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentParameterList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 
 	CJSONWriterArray entryArray(writer);

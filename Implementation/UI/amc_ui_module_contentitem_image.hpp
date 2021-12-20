@@ -39,11 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
+#include "pugixml.hpp"
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentImage, PUIModule_ContentImage);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 	class CUIModule_ContentImage : public CUIModule_ContentItem {
 	protected:		
@@ -55,11 +57,13 @@ namespace AMC {
 
 	public:
 
+		static PUIModule_ContentImage makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+
 		CUIModule_ContentImage(const std::string & sUUID, double dAspectRatio, const std::string& sItemName, const std::string& sModulePath);
 		
 		virtual ~CUIModule_ContentImage();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 		void setMaxWidth(double dMaxWidth);
 		void clearMaxWidth();

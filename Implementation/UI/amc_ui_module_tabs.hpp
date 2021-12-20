@@ -52,6 +52,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CUIModule_Tabs : public CUIModule {
 	protected:		
@@ -76,7 +77,7 @@ namespace AMC {
 
 		std::string getCaption () override;
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
@@ -84,6 +85,8 @@ namespace AMC {
 		PUIModule findTab(const std::string& sUUID);
 
 		void configurePostLoading() override;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler) override;
 
 	};
 

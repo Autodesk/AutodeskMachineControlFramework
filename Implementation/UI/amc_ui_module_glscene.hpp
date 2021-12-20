@@ -48,6 +48,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	
 
@@ -68,13 +69,16 @@ namespace AMC {
 
 		std::string getCaption () override;
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
 
 		void configurePostLoading() override;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler) override;
+
 
 	};
 

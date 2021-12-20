@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_parameterhandler.hpp"
 
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
@@ -321,7 +322,7 @@ std::string CUIModule_Grid::getCaption()
 }
 
 
-void CUIModule_Grid::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
+void CUIModule_Grid::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
@@ -350,7 +351,7 @@ void CUIModule_Grid::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObjec
 	CJSONWriterArray sectionsNode(writer);
 	for (auto section : m_SectionList) {
 		CJSONWriterObject sectionObject(writer);
-		section->getModule()->writeDefinitionToJSON (writer, sectionObject);
+		section->getModule()->writeDefinitionToJSON (writer, sectionObject, pClientVariableHandler);
 		sectionObject.addInteger(AMC_API_KEY_UI_COLUMNSTART, section->getColumnStart ());
 		sectionObject.addInteger(AMC_API_KEY_UI_COLUMNEND, section->getColumnEnd ());
 		sectionObject.addInteger(AMC_API_KEY_UI_ROWSTART, section->getRowStart());
@@ -402,4 +403,13 @@ void CUIModule_Grid::configurePostLoading()
 {
 	for (auto pSection : m_SectionList)
 		pSection->getModule()->configurePostLoading();
+}
+
+
+void CUIModule_Grid::populateClientVariables(CParameterHandler* pParameterHandler)
+{
+	LibMCAssertNotNull(pParameterHandler);
+	for (auto pSection : m_SectionList)
+		pSection->getModule()->populateClientVariables(pParameterHandler);
+
 }
