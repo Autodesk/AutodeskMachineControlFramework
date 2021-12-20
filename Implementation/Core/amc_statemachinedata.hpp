@@ -70,6 +70,7 @@ namespace AMC {
 		bool evaluateBooleanExpression(const std::string & sExpression);
 		int64_t evaluateIntegerExpression(const std::string& sExpression);
 		std::string evaluateNumberExpression(const std::string& sExpression);
+		std::string evaluateStringExpression(const std::string& sExpression);
 	};
 
 	

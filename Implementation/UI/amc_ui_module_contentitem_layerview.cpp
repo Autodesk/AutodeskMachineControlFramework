@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_ContentLayerView::CUIModule_ContentLayerView()
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID())
+CUIModule_ContentLayerView::CUIModule_ContentLayerView(const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath)
 {
 
 }

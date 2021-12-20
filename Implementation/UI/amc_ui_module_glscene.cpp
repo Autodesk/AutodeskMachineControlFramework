@@ -45,7 +45,7 @@ using namespace AMC;
 
 
 
-CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModule_GLScene::CUIModule_GLScene(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
 

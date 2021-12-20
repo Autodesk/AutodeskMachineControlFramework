@@ -66,14 +66,21 @@ namespace AMC {
 		std::string m_sTitle;
 		std::string m_sSubtitle;
 
+		std::string m_sModulePath;
+
+		uint32_t m_nNamingIDCounter;
+
 		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
 		std::vector<PUIModule_ContentItem> m_Items;
 
 		void addItem(PUIModule_ContentItem pItem);
 
+		std::string getDefaultContentName(const std::string & sPrefix);
+		std::string readItemNameFromXML (const pugi::xml_node & itemNode, const std::string & sPrefix);
+
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_Content(pugi::xml_node & xmlNode, const std::string & sPath, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_Content();
 

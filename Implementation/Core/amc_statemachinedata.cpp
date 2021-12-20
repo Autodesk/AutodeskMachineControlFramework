@@ -190,6 +190,18 @@ namespace AMC {
 
 	}
 
+
+	std::string CStateMachineData::evaluateStringExpression(const std::string& sExpression)
+	{
+		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
+		CStateMachineData::extractParameterDetailsFromDotString(sExpression, sParameterInstanceName, sParameterGroupName, sParameterName);
+
+		auto pParameterHandler = getParameterHandler(sParameterInstanceName);
+		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
+		return pParameterGroup->getParameterValueByName(sParameterName);
+	}
+
+
 	
 
 

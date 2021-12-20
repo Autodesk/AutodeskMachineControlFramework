@@ -82,8 +82,9 @@ namespace AMC {
 		std::string m_sErrorMessage;
 		std::string m_sPageToActivate;
 		std::string m_sDialogToShow;
+		bool m_bCloseModalDialog;
 	public:
-		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, const std::string& sDialogToShow);
+		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, bool bCloseModalDialog, const std::string& sDialogToShow);
 
 		uint32_t getErrorCode();
 		std::string getErrorMessage ();
@@ -92,6 +93,7 @@ namespace AMC {
 
 		bool hasPageToActivate();
 		bool hasDialogToShow();
+		bool closeModalDialog();
 
 	};
 
@@ -128,7 +130,7 @@ namespace AMC {
 		PUIPage addPage_Unsafe (const std::string& sName);
 		PUIPage findPage(const std::string& sName);
 
-		PUIDialog addDialog_Unsafe(const std::string& sName);
+		PUIDialog addDialog_Unsafe(const std::string& sName, const std::string& sTitle);
 		PUIDialog findDialog(const std::string& sName);
 
 	public:

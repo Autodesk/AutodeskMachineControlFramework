@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
@@ -51,7 +51,7 @@ CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
-		auto pTab = CUIModuleFactory::createModule(childNode, pUIModuleEnvironment);
+		auto pTab = CUIModuleFactory::createModule(childNode, sPath, pUIModuleEnvironment);
 		addTab (pTab);			
 	}
 

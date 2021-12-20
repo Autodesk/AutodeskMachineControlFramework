@@ -66,7 +66,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_Tabs(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_Tabs(pugi::xml_node & xmlNode, const std::string & sPath, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_Tabs();
 

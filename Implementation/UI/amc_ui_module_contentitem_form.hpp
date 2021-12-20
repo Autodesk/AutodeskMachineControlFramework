@@ -53,6 +53,8 @@ namespace AMC {
 	class CUIModule_ContentFormEntity {
 	protected:
 
+		std::string m_sElementPath;
+
 		std::string m_sName;
 		std::string m_sUUID;
 		std::string m_sCaption;
@@ -64,7 +66,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormEntity(const std::string& sName, const std::string& sCaption, const std::string & sFormPath, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormEntity();
 
@@ -92,6 +94,8 @@ namespace AMC {
 
 		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object);
 
+		virtual std::string getElementPath();
+
 	};
 
 		
@@ -104,7 +108,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, const std::string & sPrefix, const std::string & sSuffix, const std::string & sParameterMapping, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sCaption, const std::string& sFormPath, const std::string& sDefaultValue, const std::string & sPrefix, const std::string & sSuffix, const std::string & sParameterMapping, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormEdit();
 
@@ -124,7 +128,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sCaption, const std::string& sFormPath, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormSwitch();
 
@@ -137,7 +141,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormMemo(const std::string& sName, const std::string& sCaption, const std::string& sFormPath, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormMemo();
 
@@ -150,7 +154,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sCaption, const std::string& sFormPath, const std::string& sDefaultValue, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormCombobox();
 
@@ -171,7 +175,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentForm(const std::string & sName, PStateMachineData pStateMachineData);
+		CUIModule_ContentForm(PStateMachineData pStateMachineData, const std::string& sName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentForm();
 

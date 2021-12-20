@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 
 #include "libmcdata_dynamic.hpp"
@@ -44,9 +45,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentItem::CUIModule_ContentItem(const std::string& sUUID)
-	: m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
+CUIModule_ContentItem::CUIModule_ContentItem(const std::string& sUUID, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModuleItem (sModulePath + "." + sItemName), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sItemName (sItemName)
 {
+
+	if (sItemName.empty ())
+		throw ELibMCCustomException(LIBMC_ERROR_EMPTYITEMNAME, sModulePath);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sItemName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDITEMPATH, sModulePath + "." + sItemName);
 
 }
 

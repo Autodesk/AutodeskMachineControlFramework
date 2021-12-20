@@ -52,7 +52,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentParagraph(const std::string & sText);
+		CUIModule_ContentParagraph(const std::string& sText, const std::string & sItemName, const std::string& sModulePath);
 		
 		virtual ~CUIModule_ContentParagraph();
 

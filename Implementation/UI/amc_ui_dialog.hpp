@@ -57,11 +57,16 @@ namespace AMC {
 	class CUIDialog : public CUIPage {
 	protected:
 
+		std::string m_sTitle;
+
 	public:
 
-		CUIDialog(const std::string & sName, CUIModule_UIEventHandler* pUIEventHandler);
+		CUIDialog(const std::string & sName, const std::string& sTitle, CUIModule_UIEventHandler* pUIEventHandler);
 		
 		virtual ~CUIDialog();
+
+		std::string getTitle ();
+
 		
 	};
 		

@@ -49,7 +49,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentLayerView();
+		CUIModule_ContentLayerView(const std::string& sItemName, const std::string & sModulePath);
 
 		virtual ~CUIModule_ContentLayerView();
 

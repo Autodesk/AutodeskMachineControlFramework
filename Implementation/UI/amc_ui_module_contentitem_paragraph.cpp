@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentParagraph::CUIModule_ContentParagraph(const std::string& sText)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID ()), m_sText (sText)
+CUIModule_ContentParagraph::CUIModule_ContentParagraph(const std::string& sText, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID (), sItemName, sModulePath), m_sText (sText)
 {
 
 }

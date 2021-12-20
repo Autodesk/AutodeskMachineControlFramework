@@ -42,23 +42,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
+PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
 	std::string sType = xmlNode.name();
 
 	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, pUIModuleEnvironment);
+		return std::make_shared<CUIModule_Content>(xmlNode, sPath, pUIModuleEnvironment);
 
 	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, pUIModuleEnvironment);
+		return std::make_shared<CUIModule_Tabs>(xmlNode, sPath, pUIModuleEnvironment);
 
 	if (sType == CUIModule_Grid::getStaticType())
-		return std::make_shared<CUIModule_Grid>(xmlNode, pUIModuleEnvironment);
+		return std::make_shared<CUIModule_Grid>(xmlNode, sPath, pUIModuleEnvironment);
 
 	if (sType == CUIModule_GLScene::getStaticType())
-		return std::make_shared<CUIModule_GLScene>(xmlNode, pUIModuleEnvironment);
+		return std::make_shared<CUIModule_GLScene>(xmlNode, sPath, pUIModuleEnvironment);
 
 	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 

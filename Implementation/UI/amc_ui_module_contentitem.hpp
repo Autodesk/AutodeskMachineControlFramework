@@ -53,10 +53,12 @@ namespace AMC {
 	protected:		
 
 		std::string m_sUUID;
+		std::string m_sItemName;
+
 
 	public:
 
-		CUIModule_ContentItem(const std::string & sUUID);
+		CUIModule_ContentItem(const std::string & sUUID, const std::string & sItemName, const std::string& sModulePath);
 		
 		virtual ~CUIModule_ContentItem();
 

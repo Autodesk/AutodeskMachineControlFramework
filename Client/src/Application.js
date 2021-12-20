@@ -76,6 +76,7 @@ export default class AMCApplication {
 	{
 		this.AppState.currentStatus = "error";
 		this.AppState.currentError = message;
+		this.closeAllDialogs ();
 	}
 	
 	
@@ -627,9 +628,19 @@ export default class AMCApplication {
 										
         }
 		
+		closeAllDialogs () {
+			var	dialog;
+			for (dialog of this.AppContent.Dialogs) {
+				dialog.dialogIsActive = false;
+			}
+		}
+		
 		showDialog (dialog) {
 			
+			this.closeAllDialogs ();
+			
 			if (dialog) {
+							
 				if (this.AppContent.DialogMap.has (dialog)) {
 					var dialogObject = this.AppContent.DialogMap.get (dialog);
 					dialogObject.dialogIsActive = true;
@@ -659,6 +670,10 @@ export default class AMCApplication {
 					if (resultHandleEvent.data.dialogtoshow) {
 						this.showDialog (resultHandleEvent.data.dialogtoshow);
 					}
+					if (resultHandleEvent.data.closedialogs) {
+						this.closeAllDialogs ();
+					}
+					
 					
 				})
                 .catch(err => {

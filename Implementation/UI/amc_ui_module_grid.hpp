@@ -135,7 +135,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_Grid(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_Grid(pugi::xml_node & xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_Grid();
 

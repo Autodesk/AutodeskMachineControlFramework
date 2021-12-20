@@ -52,6 +52,7 @@ namespace AMC {
 	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
 	protected:
 
+		std::string m_sItemName;
 		std::string m_sLoadingText;
 		std::string m_sBuildNameCaption;
 		std::string m_sBuildLayersCaption;
@@ -65,7 +66,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentBuildList();
 

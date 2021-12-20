@@ -45,8 +45,8 @@ using namespace AMC;
 
 
 
-CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID, double dAspectRatio)
-	: CUIModule_ContentItem(sUUID), 
+CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID, double dAspectRatio, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(sUUID, sItemName, sModulePath),
 	m_dAspectRatio(dAspectRatio),
 	m_dMaxWidth (0.0),
 	m_dMaxHeight (0.0),

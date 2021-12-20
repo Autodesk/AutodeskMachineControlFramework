@@ -230,8 +230,13 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 		writer.addString(AMC_API_KEY_UI_EVENTERRORMESSAGE, pEventResult.getErrorMessage());
 	} 
 	else {
-		if (pEventResult.hasDialogToShow ())
-			writer.addString(AMC_API_KEY_UI_EVENTDIALOGTOSHOW, pEventResult.getDialogToShow());
+		if (pEventResult.closeModalDialog()) {
+			writer.addInteger(AMC_API_KEY_UI_EVENTCLOSEDIALOGS, 1);
+		}
+		else {
+			if (pEventResult.hasDialogToShow())
+				writer.addString(AMC_API_KEY_UI_EVENTDIALOGTOSHOW, pEventResult.getDialogToShow());
+		}
 		if (pEventResult.hasPageToActivate())
 			writer.addString(AMC_API_KEY_UI_EVENTPAGETOACTIVATE, pEventResult.getPageToActivate());
 	}

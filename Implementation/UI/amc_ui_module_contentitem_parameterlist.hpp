@@ -83,7 +83,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData);
+		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData, const std::string& sItemName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentParameterList();
 

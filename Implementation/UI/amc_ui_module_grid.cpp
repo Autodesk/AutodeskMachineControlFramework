@@ -195,7 +195,7 @@ std::string CUIModule_GridSection::getRowPositionString()
 	return CUIModule_GridRow::gridPositionToString(m_RowPosition);
 }
 
-CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
@@ -289,7 +289,7 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 			if (!sRowPosition.empty())
 				eRowPosition = CUIModule_GridRow::stringToGridPosition(sRowPosition);
 
-			auto pSection = CUIModuleFactory::createModule(childNode, pUIModuleEnvironment);
+			auto pSection = CUIModuleFactory::createModule(childNode, sPath, pUIModuleEnvironment);
 			addSection (pSection, nColumnStart, nColumnEnd, nRowStart, nRowEnd, eColumnPosition, eRowPosition); 
 
 		}

@@ -79,8 +79,8 @@ bool CUIModule_ContentParameterListEntry::isFullGroup()
 
 
 
-CUIModule_ContentParameterList::CUIModule_ContentParameterList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData)
-	: CUIModule_ContentItem (AMCCommon::CUtils::createUUID()), m_sLoadingText (sLoadingText), m_nEntriesPerPage (nEntriesPerPage), m_pStateMachineData(pStateMachineData)
+CUIModule_ContentParameterList::CUIModule_ContentParameterList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData, const std::string& sItemName, const std::string & sModulePath)
+	: CUIModule_ContentItem (AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sLoadingText (sLoadingText), m_nEntriesPerPage (nEntriesPerPage), m_pStateMachineData(pStateMachineData)
 {
 	if (pStateMachineData.get() == nullptr)
 		throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);

@@ -55,7 +55,7 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentImage(const std::string & sUUID, double dAspectRatio);
+		CUIModule_ContentImage(const std::string & sUUID, double dAspectRatio, const std::string& sItemName, const std::string& sModulePath);
 		
 		virtual ~CUIModule_ContentImage();
 
