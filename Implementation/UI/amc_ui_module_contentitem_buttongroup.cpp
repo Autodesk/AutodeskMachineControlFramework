@@ -92,8 +92,8 @@ void CUIModule_ContentButton::writeFormValuesToJSON(CJSONWriterArray& pArray)
 }
 
 
-CUIModule_ContentButtonGroup::CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_pFormOwner (pFormOwner)
+CUIModule_ContentButtonGroup::CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_pFormOwner (pFormOwner)
 {
 	LibMCAssertNotNull(pFormOwner);
 }
@@ -104,7 +104,7 @@ CUIModule_ContentButtonGroup::~CUIModule_ContentButtonGroup()
 }
 
 
-void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buttongroup");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);

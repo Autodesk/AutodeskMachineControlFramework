@@ -663,8 +663,11 @@ IAPIRequestHandler* CMCContext::CreateAPIRequestHandler(const std::string& sURI,
         if (bNeedsToBeAuthorized)
             throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDAUTHORIZATION);
 
-        if (bCreateNewSession)
-            pAuth = pSessionHandler->createNewAuthenticationSession ();
+        if (bCreateNewSession) {
+            pAuth = pSessionHandler->createNewAuthenticationSession();
+            LibMCAssertNotNull(pAuth);
+            m_pSystemState->uiHandler()->populateClientVariables(pAuth->getClientVariableHandler().get());
+        }
         else
             pAuth = pSessionHandler->createEmptyAuthenticationSession();
 

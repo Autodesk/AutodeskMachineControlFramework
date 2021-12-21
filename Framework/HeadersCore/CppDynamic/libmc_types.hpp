@@ -408,6 +408,18 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DUPLICATEDIALOG 381
 #define LIBMC_ERROR_DIALOGNOTFOUND 382
 #define LIBMC_ERROR_COULDNOTHANDLEEVENT 383
+#define LIBMC_ERROR_INVALIDFORMPATH 384
+#define LIBMC_ERROR_MISSINGITEMNAME 385
+#define LIBMC_ERROR_INVALIDITEMPATH 386
+#define LIBMC_ERROR_INVALIDMODULEPATH 387
+#define LIBMC_ERROR_BUILDLISTNAMEMISSING 388
+#define LIBMC_ERROR_EMPTYITEMPREFIX 389
+#define LIBMC_ERROR_INVALIDITEMPREFIX 390
+#define LIBMC_ERROR_EMPTYITEMNAME 391
+#define LIBMC_ERROR_EXPRESSIONVALUEGIVENTWICE 392
+#define LIBMC_ERROR_INVALIDINTEGEREXPRESSION 393
+#define LIBMC_ERROR_INVALIDNUMBEREXPRESSION 394
+#define LIBMC_ERROR_INVALIDBOOLEANEXPRESSION 395
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -728,6 +740,18 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DUPLICATEDIALOG: return "Duplicate dialog";
     case LIBMC_ERROR_DIALOGNOTFOUND: return "Dialog not found";
     case LIBMC_ERROR_COULDNOTHANDLEEVENT: return "Could not handle event";
+    case LIBMC_ERROR_INVALIDFORMPATH: return "Invalid form path";
+    case LIBMC_ERROR_MISSINGITEMNAME: return "Missing item name";
+    case LIBMC_ERROR_INVALIDITEMPATH: return "Invalid item path";
+    case LIBMC_ERROR_INVALIDMODULEPATH: return "Invalid module path";
+    case LIBMC_ERROR_BUILDLISTNAMEMISSING: return "Build list name missing";
+    case LIBMC_ERROR_EMPTYITEMPREFIX: return "Empty item prefix";
+    case LIBMC_ERROR_INVALIDITEMPREFIX: return "Invalid item prefix";
+    case LIBMC_ERROR_EMPTYITEMNAME: return "Empty item name";
+    case LIBMC_ERROR_EXPRESSIONVALUEGIVENTWICE: return "Expression value is given twice";
+    case LIBMC_ERROR_INVALIDINTEGEREXPRESSION: return "Invalid integer expression";
+    case LIBMC_ERROR_INVALIDNUMBEREXPRESSION: return "Invalid number expression";
+    case LIBMC_ERROR_INVALIDBOOLEANEXPRESSION: return "Invalid boolean expression";
     default: return "unknown error";
   }
 }

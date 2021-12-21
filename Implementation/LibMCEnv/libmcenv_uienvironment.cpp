@@ -47,21 +47,24 @@ using namespace LibMCEnv::Impl;
  Class definition of CUIEnvironment 
 **************************************************************************************************************************/
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID, AMC::PParameterHandler pClientVariableHandler)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, AMC::PParameterHandler pClientVariableHandler)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
       m_pSignalHandler (pSignalHandler),
       m_sLogSubSystem ("ui"),
-      m_sContextUUID (AMCCommon::CUtils::normalizeUUIDString (sContextUUID)),
       m_sSenderUUID (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID)),
-      m_pClientVariableHandler (pClientVariableHandler)
+      m_pClientVariableHandler (pClientVariableHandler),
+      m_bCloseModalDialog (false)
 {
+
     if (pLogger.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pStateMachineData.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
@@ -69,6 +72,13 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
 void CUIEnvironment::ActivateModalDialog(const std::string& sDialogName)
 {
     m_sModalDialogToShow = sDialogName;
+    m_bCloseModalDialog = false;
+}
+
+void CUIEnvironment::CloseModalDialog()
+{
+    m_sModalDialogToShow = "";
+    m_bCloseModalDialog = true;
 }
 
 void CUIEnvironment::ActivatePage(const std::string& sPageName)
@@ -106,35 +116,35 @@ void CUIEnvironment::LogInfo(const std::string & sLogString)
 
 
 
-std::string CUIEnvironment::GetMachineStringParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
+std::string CUIEnvironment::GetMachineParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
     auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
-std::string CUIEnvironment::GetMachineUUIDParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) 
+std::string CUIEnvironment::GetMachineParameterAsUUID(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
     auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getParameterValueByName(sParameterName);
 }
 
-LibMCEnv_double CUIEnvironment::GetMachineDoubleParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
+LibMCEnv_double CUIEnvironment::GetMachineParameterAsDouble(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
     auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getDoubleParameterValueByName(sParameterName);
 }
 
-LibMCEnv_int64 CUIEnvironment::GetMachineIntegerParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
+LibMCEnv_int64 CUIEnvironment::GetMachineParameterAsInteger(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
     auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
     return pGroup->getIntParameterValueByName(sParameterName);
 }
 
-bool CUIEnvironment::GetMachineBoolParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
+bool CUIEnvironment::GetMachineParameterAsBool(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName)
 {
     auto pParameterHandler = m_pStateMachineData->getParameterHandler(sMachineInstance);
     auto pGroup = pParameterHandler->findGroup(sParameterGroup, true);
@@ -142,171 +152,108 @@ bool CUIEnvironment::GetMachineBoolParameter(const std::string& sMachineInstance
 }
 
 
-
-std::string CUIEnvironment::GetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName)
+std::string CUIEnvironment::GetUIProperty(const std::string& sElementPath, const std::string& sPropertyName) 
 {   
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    return pGroup->getParameterValueByName(sVariableName);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    return pGroup->getParameterValueByName(sPropertyName);
 }
 
-std::string CUIEnvironment::GetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName) 
+std::string CUIEnvironment::GetUIPropertyAsUUID(const std::string& sElementPath, const std::string& sPropertyName)
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    return pGroup->getParameterValueByName(sVariableName);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    return pGroup->getParameterValueByName(sPropertyName);
 
 }
 
-LibMCEnv_double CUIEnvironment::GetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName)
+LibMCEnv_double CUIEnvironment::GetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName)
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    return pGroup->getDoubleParameterValueByName(sVariableName);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    return pGroup->getDoubleParameterValueByName(sPropertyName);
 }
 
-LibMCEnv_int64 CUIEnvironment::GetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName)
+LibMCEnv_int64 CUIEnvironment::GetUIPropertyAsInteger(const std::string& sElementPath, const std::string& sPropertyName)
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    return pGroup->getIntParameterValueByName(sVariableName);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    return pGroup->getIntParameterValueByName(sPropertyName);
 }
 
-bool CUIEnvironment::GetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName)
+bool CUIEnvironment::GetUIPropertyAsBool(const std::string& sElementPath, const std::string& sPropertyName)
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    return pGroup->getBoolParameterValueByName(sVariableName);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    return pGroup->getBoolParameterValueByName(sPropertyName);
 }
 
-void CUIEnvironment::SetClientStringVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue)
+void CUIEnvironment::SetUIProperty(const std::string& sElementPath, const std::string& sPropertyName, const std::string& sValue)
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    pGroup->setParameterValueByName(sVariableName, sValue);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    pGroup->setParameterValueByName(sPropertyName, sValue);
 }
 
-void CUIEnvironment::SetClientUUIDVariable(const std::string& sVariableGroup, const std::string& sVariableName, const std::string& sValue)
+void CUIEnvironment::SetUIPropertyAsUUID(const std::string& sElementPath, const std::string& sPropertyName, const std::string& sValue)
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    pGroup->setParameterValueByName(sVariableName, AMCCommon::CUtils::normalizeUUIDString ( sValue));
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::normalizeUUIDString ( sValue));
 }
 
-void CUIEnvironment::SetClientDoubleVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_double dValue)
+void CUIEnvironment::SetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_double dValue) 
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    pGroup->setDoubleParameterValueByName(sVariableName, dValue);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    pGroup->setDoubleParameterValueByName(sPropertyName, dValue);
 
 }
 
-void CUIEnvironment::SetClientIntegerVariable(const std::string& sVariableGroup, const std::string& sVariableName, const LibMCEnv_int64 nValue) 
+void CUIEnvironment::SetUIPropertyAsInteger(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_int64 nValue) 
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    pGroup->setIntParameterValueByName(sVariableName, nValue);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    pGroup->setIntParameterValueByName(sPropertyName, nValue);
 }
 
-void CUIEnvironment::SetClientBoolVariable(const std::string& sVariableGroup, const std::string& sVariableName, const bool bValue)
+void CUIEnvironment::SetUIPropertyAsBool(const std::string& sElementPath, const std::string& sPropertyName, const bool bValue)
 {
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
-    auto pGroup = m_pClientVariableHandler->findGroup(sVariableGroup, true);
-    pGroup->setBoolParameterValueByName(sVariableName, bValue);
+    auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
+    pGroup->setBoolParameterValueByName(sPropertyName, bValue);
 }
 
-
-
-bool CUIEnvironment::HasFormValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
-{
-    auto iIter = m_FormValues.find(std::make_pair(sFormIdentifier, sValueIdentifier));
-    return (iIter != m_FormValues.end());
-}
-
-std::string CUIEnvironment::GetFormStringValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
-{
-    auto iIter = m_FormValues.find(std::make_pair (sFormIdentifier, sValueIdentifier));
-
-    if (iIter == m_FormValues.end())
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_FORMVALUENOTFOUND, "form value not found: " + sValueIdentifier);
-
-    return iIter->second;
-}
-
-std::string CUIEnvironment::GetFormUUIDValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
-{
-    return AMCCommon::CUtils::normalizeUUIDString(GetFormStringValue(sFormIdentifier, sValueIdentifier));
-}
-
-LibMCEnv_double CUIEnvironment::GetFormDoubleValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
-{
-    auto sValue = GetFormStringValue(sFormIdentifier, sValueIdentifier);
-
-    try {
-        return std::stod(sValue);
-    }
-    catch (std::exception& e) {
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE, e.what() + (" / " + sValueIdentifier));
-
-    }
-}
-
-LibMCEnv_int64 CUIEnvironment::GetFormIntegerValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
-{
-    auto sValue = GetFormStringValue(sFormIdentifier, sValueIdentifier);
-
-    try {
-        return std::stoll(sValue);
-    }
-    catch (std::exception& e) {
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE, e.what() + (" / " + sValueIdentifier));
-
-    }
-
-}
-
-bool CUIEnvironment::GetFormBoolValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier)
-{
-    return (GetFormIntegerValue(sFormIdentifier, sValueIdentifier) != 0);
-}
-
-
-
-std::string CUIEnvironment::GetEventContext()
-{
-    return m_sContextUUID;
-}
-
-
-void CUIEnvironment::addFormValue(const std::string& sFormIdentifier, const std::string& sValueIdentifier, const std::string& sValue)
-{
-    m_FormValues.insert(std::make_pair (std::make_pair (sFormIdentifier, sValueIdentifier), sValue));
-}
 
 
 std::string CUIEnvironment::getModalDialogToShow()
 {
     return m_sModalDialogToShow;
+}
+
+bool CUIEnvironment::getCloseModalDialog()
+{
+    return m_bCloseModalDialog;
 }
 
 std::string CUIEnvironment::getPageToActivate()

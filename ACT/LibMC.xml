@@ -400,7 +400,19 @@
 		<error name="DIALOGNOTFOUND" code="382" description="Dialog not found" />
 		
 		<error name="COULDNOTHANDLEEVENT" code="383" description="Could not handle event" />
+		<error name="INVALIDFORMPATH" code="384" description="Invalid form path" />
+		<error name="MISSINGITEMNAME" code="385" description="Missing item name" />
+		<error name="INVALIDITEMPATH" code="386" description="Invalid item path" />
+		<error name="INVALIDMODULEPATH" code="387" description="Invalid module path" />
+		<error name="BUILDLISTNAMEMISSING" code="388" description="Build list name missing" />		
+		<error name="EMPTYITEMPREFIX" code="389" description="Empty item prefix" />
+		<error name="INVALIDITEMPREFIX" code="390" description="Invalid item prefix" />				
+		<error name="EMPTYITEMNAME" code="391" description="Empty item name" />
 		
+		<error name="EXPRESSIONVALUEGIVENTWICE" code="392" description="Expression value is given twice" />
+		<error name="INVALIDINTEGEREXPRESSION" code="393" description="Invalid integer expression" />
+		<error name="INVALIDNUMBEREXPRESSION" code="394" description="Invalid number expression" />
+		<error name="INVALIDBOOLEANEXPRESSION" code="395" description="Invalid boolean expression" />
 			
 	</errors>
 	

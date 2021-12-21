@@ -40,7 +40,7 @@ using namespace AMC;
 
 #define APISESSION_RANDOMKEYITERATIONS 16
 
-CAPISession::CAPISession(CParameterHandler* pClientParameterHandler)
+CAPISession::CAPISession()
 	: m_sUUID(AMCCommon::CUtils::createUUID()),
 	m_sKey(AMCCommon::CUtils::calculateRandomSHA256String (APISESSION_RANDOMKEYITERATIONS)),
 	m_sToken(AMCCommon::CUtils::calculateRandomSHA256String(APISESSION_RANDOMKEYITERATIONS)),
@@ -48,12 +48,7 @@ CAPISession::CAPISession(CParameterHandler* pClientParameterHandler)
 	m_bAuthenticated(false)
 {
 
-	if (pClientParameterHandler != nullptr) {
-		m_pClientVariableHandler = pClientParameterHandler->duplicate();
-	}
-	else {
-		m_pClientVariableHandler = std::make_shared<CParameterHandler>("");
-	}
+	m_pClientVariableHandler = std::make_shared<CParameterHandler>("");
 	
 }
 	

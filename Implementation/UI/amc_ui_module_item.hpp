@@ -38,13 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_Item, PUIModule_Item);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CUIModuleItem {
 	protected:		
+
+		std::string m_sItemPath;
 	
 	public:
 
-		CUIModuleItem()
+		CUIModuleItem(const std::string& sItemPath)
+			: m_sItemPath(sItemPath)
 		{
 
 		}
@@ -58,9 +62,17 @@ namespace AMC {
 		{
 		}
 
+
+		virtual std::string getItemPath()
+		{
+			return m_sItemPath;
+		}
+
 		virtual std::string getUUID () = 0;
 
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) = 0;
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler * pClientVariableHandler) = 0;
+
+		
 
 	};
 

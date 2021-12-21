@@ -45,9 +45,13 @@ using namespace AMC;
 
 
 
-CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sDetailPage (sDetailPage), m_pBuildJobHandler (pBuildJobHandler)
+CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sDetailPage (sDetailPage), m_pBuildJobHandler (pBuildJobHandler)
 {
+	if (sModulePath.empty ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULEPATH);
+	if (sItemName.empty ())
+		throw ELibMCInterfaceException(LIBMC_ERROR_BUILDLISTNAMEMISSING);
 	if (pBuildJobHandler.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
@@ -62,7 +66,7 @@ CUIModule_ContentBuildList::~CUIModule_ContentBuildList()
 
 }
 
-void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buildlist");
@@ -94,7 +98,7 @@ void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entriesArray);
 }
 
-void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 
 	CJSONWriterArray entryArray(writer);

@@ -49,11 +49,11 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentLayerView();
+		CUIModule_ContentLayerView(const std::string& sItemName, const std::string & sModulePath);
 
 		virtual ~CUIModule_ContentLayerView();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 	};
 

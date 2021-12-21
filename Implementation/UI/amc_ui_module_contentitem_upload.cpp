@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string& sSuccessPage)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID()), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption), m_sSuccessPage (sSuccessPage)
+CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string& sSuccessPage, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption), m_sSuccessPage (sSuccessPage)
 {
 
 }
@@ -55,7 +55,7 @@ CUIModule_ContentUpload::~CUIModule_ContentUpload()
 
 }
 
-void CUIModule_ContentUpload::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentUpload::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "upload");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_page.hpp"
 #include "amc_ui_module.hpp"
+#include "amc_parameterhandler.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
@@ -110,11 +111,11 @@ PUIModule CUIPage::getModule(const uint32_t nIndex)
 	return m_Modules.at (nIndex);
 }
 
-void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleArray)
+void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleArray, CParameterHandler* pClientVariableHandler)
 {
 	for (auto module : m_Modules) {
 		CJSONWriterObject moduleObject(writer);
-		module->writeDefinitionToJSON(writer, moduleObject);
+		module->writeDefinitionToJSON(writer, moduleObject, pClientVariableHandler);
 
 		moduleArray.addObject(moduleObject);
 	}
@@ -154,5 +155,13 @@ std::string CUIPage::findFormUUIDByName(const std::string& sFormName)
 void CUIPage::ensureUIEventExists(const std::string& sEventName)
 {
 	m_pUIEventHandler->ensureUIEventExists(sEventName);
+}
+
+void CUIPage::populateClientVariables(CParameterHandler* pParameterHandler)
+{
+	LibMCAssertNotNull(pParameterHandler);
+	for (auto pModule : m_Modules) {
+		pModule->populateClientVariables(pParameterHandler);
+	}
 }
 

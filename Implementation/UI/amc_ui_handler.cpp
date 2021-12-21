@@ -66,8 +66,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::string& sPageToActivate, const std::string& sDialogToShow)
-    : m_nErrorCode (nErrorCode), m_sErrorMessage (sErrorMessage), m_sPageToActivate (sPageToActivate), m_sDialogToShow (sDialogToShow)
+CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::string& sPageToActivate, bool bCloseModalDialog, const std::string& sDialogToShow)
+    : m_nErrorCode (nErrorCode), m_sErrorMessage (sErrorMessage), m_sPageToActivate (sPageToActivate), m_sDialogToShow (sDialogToShow), m_bCloseModalDialog (bCloseModalDialog)
 {
 
 }
@@ -102,6 +102,10 @@ bool CUIHandleEventResponse::hasDialogToShow()
     return !m_sDialogToShow.empty();
 }
 
+bool CUIHandleEventResponse::closeModalDialog()
+{
+    return m_bCloseModalDialog;
+}
 
 
 CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
@@ -168,7 +172,7 @@ PUIPage CUIHandler::findPage(const std::string& sName)
 }
 
 
-void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
+void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler)
 {
     writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
     writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
@@ -193,7 +197,7 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer)
 
 }
 
-void CUIHandler::writeStateToJSON(CJSONWriter& writer)
+void CUIHandler::writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler)
 {
 	CJSONWriterArray menuItems(writer);
 
@@ -226,7 +230,7 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer)
         page.addString(AMC_API_KEY_UI_PAGENAME, iter.second->getName());
 
         CJSONWriterArray modules(writer);
-        iter.second->writeModulesToJSON (writer, modules);
+        iter.second->writeModulesToJSON (writer, modules, pClientVariableHandler);
 
         page.addArray(AMC_API_KEY_UI_MODULES, modules);
 
@@ -239,9 +243,10 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer)
     for (auto iter : m_Dialogs) {
         CJSONWriterObject dialog(writer);
         dialog.addString(AMC_API_KEY_UI_DIALOGNAME, iter.second->getName());
+        dialog.addString(AMC_API_KEY_UI_DIALOGTITLE, iter.second->getTitle());
 
         CJSONWriterArray modules(writer);
-        iter.second->writeModulesToJSON(writer, modules);
+        iter.second->writeModulesToJSON(writer, modules, pClientVariableHandler);
 
         dialog.addArray(AMC_API_KEY_UI_MODULES, modules);
 
@@ -267,7 +272,7 @@ PUIPage CUIHandler::addPage_Unsafe(const std::string& sName)
 }
 
 
-PUIDialog CUIHandler::addDialog_Unsafe(const std::string& sName)
+PUIDialog CUIHandler::addDialog_Unsafe(const std::string& sName, const std::string& sTitle)
 {
     if (sName.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDDIALOGNAME);
@@ -276,7 +281,7 @@ PUIDialog CUIHandler::addDialog_Unsafe(const std::string& sName)
     if (iIterator != m_Dialogs.end())
         throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEDIALOG, sName);
 
-    auto pDialog = std::make_shared<CUIDialog>(sName, this);
+    auto pDialog = std::make_shared<CUIDialog>(sName, sTitle, this);
     m_Dialogs.insert(std::make_pair(sName, pDialog));
 
     return pDialog;
@@ -421,7 +426,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         for (pugi::xml_node pageChild : pageChildren) {
             
             auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
-            auto pModule = CUIModuleFactory::createModule(pageChild, pModuleEnvironment);
+            auto pModule = CUIModuleFactory::createModule(pageChild, sPageName, pModuleEnvironment);
             pPage->addModule(pModule);
 
         }
@@ -437,13 +442,16 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPAGENAME);
         std::string sDialogName(dialogNameAttrib.as_string());
 
-        auto pDialog = addDialog_Unsafe(sDialogName);
+        auto dialogTitleAttrib = dialogNode.attribute("title");
+        std::string sDialogTitle(dialogTitleAttrib.as_string());
+
+        auto pDialog = addDialog_Unsafe(sDialogName, sDialogTitle);
 
         auto dialogChildren = dialogNode.children();
         for (pugi::xml_node dialogChild : dialogChildren) {
 
             auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get());
-            auto pModule = CUIModuleFactory::createModule(dialogChild, pModuleEnvironment);
+            auto pModule = CUIModuleFactory::createModule(dialogChild, sDialogName, pModuleEnvironment);
             pDialog->addModule(pModule);
 
         }
@@ -519,6 +527,12 @@ PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
             return pModuleItem;
     }
 
+    for (auto pDialog : m_Dialogs) {
+        auto pModuleItem = pDialog.second->findModuleItemByUUID(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pModuleItem;
+    }
+
     return nullptr;
 }
 
@@ -528,6 +542,12 @@ PUIPage CUIHandler::findPageOfModuleItem(const std::string& sUUID)
         auto pModuleItem = pPage.second->findModuleItemByUUID(sUUID);
         if (pModuleItem.get() != nullptr)
             return pPage.second;
+    }
+
+    for (auto pDialog : m_Dialogs) {
+        auto pModuleItem = pDialog.second->findModuleItemByUUID(sUUID);
+        if (pModuleItem.get() != nullptr)
+            return pDialog.second;
     }
 
     return nullptr;
@@ -558,7 +578,9 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
     std::string sSenderUUID = AMCCommon::CUtils::createUUID();
     std::string sContextUUID = AMCCommon::CUtils::createUUID();
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sContextUUID, nullptr);
+    auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
+
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, pDummyClientVariableHandler);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -575,11 +597,23 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 
 }
 
+void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandler)
+{
+    LibMCAssertNotNull(pClientVariableHandler);
+    for (auto pPage : m_Pages) {
+        pPage.second->populateClientVariables(pClientVariableHandler);
+    }
+
+    for (auto pDialog : m_Dialogs) {
+        pDialog.second->populateClientVariables(pClientVariableHandler);
+    }
+}
+
 
 CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
 {
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sContextUUID, pClientVariableHandler);
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, pClientVariableHandler);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     uint32_t nErrorCode = 0;
@@ -593,11 +627,11 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
         if (pModuleItem.get() == nullptr)
-            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);        
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
-        if (!sFormValueJSON.empty()) {
+        if ((pClientVariableHandler.get() != nullptr) && (!sFormValueJSON.empty())) {
 
             rapidjson::Document document;
             document.Parse(sFormValueJSON.c_str());
@@ -638,7 +672,8 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
                     if (pFormEntity.get() == nullptr)
                         throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNOTFOUND, sEventName + "/" + sEntityUUID);
 
-                    pInternalUIEnvironment->addFormValue(pForm->getName(), pFormEntity->getName(), sFormValue);
+                    auto pGroup = pClientVariableHandler->findGroup(pFormEntity->getElementPath(), true);
+                    pGroup->setParameterValueByName("value", sFormValue);                     
 
                 }
 
@@ -664,8 +699,12 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
     }
  
 
+    if (nErrorCode) {
+        m_pLogger->logMessage(sErrorMessage, "ui", AMC::eLogLevel::Message);
 
-    return CUIHandleEventResponse (nErrorCode, sErrorMessage, pInternalUIEnvironment->getPageToActivate(), pInternalUIEnvironment->getModalDialogToShow ());
+    }
+
+    return CUIHandleEventResponse (nErrorCode, sErrorMessage, pInternalUIEnvironment->getPageToActivate(), pInternalUIEnvironment->getCloseModalDialog (),  pInternalUIEnvironment->getModalDialogToShow ());
        
 
 }

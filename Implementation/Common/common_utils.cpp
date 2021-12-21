@@ -477,6 +477,42 @@ namespace AMCCommon {
 		return true;
 	}
 
+	bool CUtils::stringIsValidAlphanumericPathString(const std::string& sString)
+	{
+		if (sString.empty())
+			return false;
+
+		if (sString.at(0) == '_')
+			return false;
+
+		bool previousCharWasDot = true; // first character is not allowed to be a dot.
+
+		for (const char& cChar : sString) {
+			if (!(((cChar >= '0') && (cChar <= '9'))
+				|| ((cChar >= 'a') && (cChar <= 'z'))
+				|| ((cChar >= 'A') && (cChar <= 'Z'))
+				|| (cChar == '_') || (cChar == '.')
+				))
+				return false;
+
+			if ((cChar == '.')) {
+				if (previousCharWasDot) // two dots in a row is invalid!
+					return false;
+				previousCharWasDot = true;
+			}
+			else {
+				previousCharWasDot = false;
+			}
+			
+		}
+
+		// Last characters is also not allowed to be a dot
+		if (previousCharWasDot)
+			return false;
+
+		return true;
+	}
+
 	std::string CUtils::normalizeUUIDString(std::string sRawString)
 	{
 		

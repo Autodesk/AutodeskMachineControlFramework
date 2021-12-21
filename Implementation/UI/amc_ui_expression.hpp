@@ -29,56 +29,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_MODULE_CONTENTITEM_BUILDLIST
-#define __AMC_UI_MODULE_CONTENTITEM_BUILDLIST
+#ifndef __AMC_UI_EXPRESSION
+#define __AMC_UI_EXPRESSION
 
 #include "header_protection.hpp"
 
-#ifndef __AMCIMPL_UI_MODULE
-#error this header is protected and should only be included in the corresponding implementation CPP files.
-#endif
+#include <memory>
+#include <string>
 
-#include "amc_ui_module_contentitem.hpp"
-
-namespace LibMCData {
-	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
-}
+#include <pugixml.hpp>
 
 namespace AMC {
 
-	amcDeclareDependingClass(CUIModule_ContentBuildList, PUIModule_ContentBuildList);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 
-	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
-	protected:
-
-		std::string m_sItemName;
-		std::string m_sLoadingText;
-		std::string m_sBuildNameCaption;
-		std::string m_sBuildLayersCaption;
-		std::string m_sBuildUUIDCaption;
-
-		std::string m_sDetailPage;
-
-		uint32_t m_nEntriesPerPage;
-
-		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-
+	class CUIExpression {
+	private:
+		std::string m_sFixedValue;
+		std::string m_sExpressionValue;
 	public:
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath);
+		CUIExpression();
+		CUIExpression (const pugi::xml_node & xmlNode, const std::string & attributeName);
 
-		virtual ~CUIModule_ContentBuildList();
+		std::string evaluateStringValue(CStateMachineData * pStateMachineData);
+		std::string evaluateStringValue(PStateMachineData pStateMachineData);
+		double evaluateNumberValue(CStateMachineData* pStateMachineData);
+		double evaluateNumberValue(PStateMachineData pStateMachineData);
+		int64_t evaluateIntegerValue(CStateMachineData* pStateMachineData);
+		int64_t evaluateIntegerValue(PStateMachineData pStateMachineData);
+		bool evaluateBoolValue(CStateMachineData* pStateMachineData);
+		bool evaluateBoolValue(PStateMachineData pStateMachineData);
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		void checkExpressionSyntax(CStateMachineData* pStateMachineData);
+		void checkExpressionSyntax(PStateMachineData pStateMachineData);
 
-		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		bool needsSync();
 
 	};
-
-
+	
 }
 
 
-#endif //__AMC_UI_MODULE_CONTENTITEM_BUILDLIST
+#endif //__AMC_UI_EXPRESSION
 

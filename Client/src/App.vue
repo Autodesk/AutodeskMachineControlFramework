@@ -89,8 +89,8 @@
 			>
 			
 			<v-card> 
-          <v-card-title>
-            Privacy Policy
+          <v-card-title v-if="uiDialog.title">
+            {{ uiDialog.title }}
           </v-card-title>
 		  
 		  <v-card-text>

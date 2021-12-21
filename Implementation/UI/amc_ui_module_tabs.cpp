@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
@@ -51,7 +51,7 @@ CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, PUIModuleEnvironment pUI
 
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
-		auto pTab = CUIModuleFactory::createModule(childNode, pUIModuleEnvironment);
+		auto pTab = CUIModuleFactory::createModule(childNode, sPath, pUIModuleEnvironment);
 		addTab (pTab);			
 	}
 
@@ -80,7 +80,7 @@ std::string CUIModule_Tabs::getCaption()
 }
 
 
-void CUIModule_Tabs::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
+void CUIModule_Tabs::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
@@ -89,7 +89,7 @@ void CUIModule_Tabs::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObjec
 	CJSONWriterArray tabsNode(writer);
 	for (auto tab : m_Tabs) {
 		CJSONWriterObject tabObject(writer);
-		tab->writeDefinitionToJSON (writer, tabObject);
+		tab->writeDefinitionToJSON (writer, tabObject, pClientVariableHandler);
 		tabsNode.addObject(tabObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_TABS, tabsNode);
@@ -136,4 +136,13 @@ void CUIModule_Tabs::configurePostLoading()
 {
 	for (auto pTab : m_Tabs)
 		pTab->configurePostLoading();
+}
+
+
+void CUIModule_Tabs::populateClientVariables(CParameterHandler* pParameterHandler)
+{
+	LibMCAssertNotNull(pParameterHandler);
+	for (auto pTab : m_Tabs)
+		pTab->populateClientVariables(pParameterHandler);
+
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02">
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02">
 	<services threadcount="32"/>
 
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol" />
@@ -37,6 +37,12 @@
 		</signaldefinition>
 
 		<signaldefinition name="signal_startbuild">
+		</signaldefinition>
+
+		<signaldefinition name="signal_changeprocesssettings" publish="1">
+			<parameter name="targeto2" type="double"/>
+			<parameter name="recoaterspeed" type="double"/>
+			<parameter name="gasflowspeed" type="double"/>
 		</signaldefinition>
 
 
@@ -200,8 +206,19 @@
 			<color name="error" red="0.867" green="0.133" blue="0.133" />
 		</colors>		
 
-		<dialog name="testdialog">
-			<content name="infobox" title="This is a test dialog" headline="">
+		<dialog name="testdialog" title="Change Parameters">
+			<content name="infobox" headline="">
+						<form name="processparameters">
+							<edit name="o2_value" caption="Target Oxygen Value" suffix="ppm" />								
+							<edit name="recoaterspeed" caption="Recoater Speed" suffix="mm/s" />
+							<edit name="gasflowspeed" caption="Gas flow speed" suffix="m/s" />
+						</form>
+						
+						<buttongroup>
+							<button caption="Save" event="onprocessparametersave" formvalues="processparameters" />
+							<button caption="Cancel" event="onprocessparametercancel" />
+						</buttongroup>
+						
 			</content>
 		</dialog>
 
@@ -242,16 +259,17 @@
 				
 				<content name="manualcontrol1" title="" columnstart="1" rowstart="1" columnend="1" rowend="1" columnposition="left" rowposition="top">
 					
-						<form name="processparameters">
+						<form name="processparameters" sync:disabled="main.ui.preparebuilddisabled">
 							<edit name="o2_value" 
-								caption="Target Oxygen Value" 
-								parameter="main.processsettings.targeto2"
+								caption="Target Oxygen Value" 								
+								sync:value="main.processsettings.targeto2"															
 								suffix="ppm" 
 								readonly="1" 
-								disabled="main.ui.preparebuilddisabled" />
 								
-							<edit name="velocity_recoater" caption="Recoater Speed" value="80" suffix="mm/s" readonly="1" />
-							<edit name="gas_velocity" caption="Gas flow speed" value="2" suffix="m/s" readonly="1" />
+								/>
+								
+							<edit name="recoaterspeed" caption="Recoater Speed" sync:value="main.processsettings.recoaterspeed" suffix="mm/s" readonly="1" />
+							<edit name="gasflowspeed" caption="Gas flow speed" sync:value="main.processsettings.gasflowspeed" suffix="m/s" readonly="1" />
 						</form>
 						<buttongroup>
 							<button caption="Change values" event="changemanualvalues" />

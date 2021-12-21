@@ -74,7 +74,7 @@ namespace AMC {
 
 	PParameterGroup CParameterHandler::addGroup(const std::string& sName, const std::string& sDescription)
 	{
-		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sName))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sName);
 
 		PParameterGroup pGroup = std::make_shared<CParameterGroup>(sName, sDescription);
