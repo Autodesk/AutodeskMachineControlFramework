@@ -44,6 +44,7 @@ namespace AMC {
 	class CStateMachineData;
 	typedef std::shared_ptr<CStateMachineData> PStateMachineData;
 
+
 	class CStateMachineData {
 	private:
 
@@ -67,9 +68,6 @@ namespace AMC {
 
 		static void extractParameterDetailsFromDotString(const std::string& sParameterPath, std::string& sParameterInstance, std::string& sParameterGroup, std::string& sParameterName);
 
-		bool evaluateBooleanExpression(const std::string & sExpression);
-		int64_t evaluateIntegerExpression(const std::string& sExpression);
-		std::string evaluateNumberExpression(const std::string& sExpression);
 	};
 
 	

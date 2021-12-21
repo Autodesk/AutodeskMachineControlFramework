@@ -84,7 +84,7 @@ PAPIAuth CAPISessionHandler::createAuthentication(const std::string& sAuthorizat
 
 PAPIAuth CAPISessionHandler::createNewAuthenticationSession()
 {
-	auto pSession = std::make_shared<CAPISession>(m_pDefaultClientVariableHandler.get());
+	auto pSession = std::make_shared<CAPISession>();
 
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	m_SessionMap.insert (std::make_pair (pSession->getUUID(), pSession));

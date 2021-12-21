@@ -53,11 +53,11 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string & sSuccessPage);
+		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string & sSuccessPage, const std::string& sItemName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentUpload();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 	};
 

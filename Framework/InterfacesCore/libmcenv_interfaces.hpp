@@ -1297,6 +1297,11 @@ public:
 	virtual void ActivateModalDialog(const std::string & sDialogName) = 0;
 
 	/**
+	* IUIEnvironment::CloseModalDialog - closes the active modal dialog on the client.
+	*/
+	virtual void CloseModalDialog() = 0;
+
+	/**
 	* IUIEnvironment::ActivatePage - changes the current page on the client.
 	* @param[in] sDialogName - Name of the dialog to activate.
 	*/
@@ -1336,183 +1341,129 @@ public:
 	virtual void LogInfo(const std::string & sLogString) = 0;
 
 	/**
-	* IUIEnvironment::GetMachineStringParameter - returns a string parameter of a state machine
+	* IUIEnvironment::GetMachineParameter - returns a string parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual std::string GetMachineStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual std::string GetMachineParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetMachineUUIDParameter - returns a uuid parameter of a state machine
+	* IUIEnvironment::GetMachineParameterAsUUID - returns a uuid parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual std::string GetMachineUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual std::string GetMachineParameterAsUUID(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetMachineDoubleParameter - returns a double parameter of a state machine
+	* IUIEnvironment::GetMachineParameterAsDouble - returns a double parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual LibMCEnv_double GetMachineDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual LibMCEnv_double GetMachineParameterAsDouble(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetMachineIntegerParameter - returns an int parameter of a state machine
+	* IUIEnvironment::GetMachineParameterAsInteger - returns an int parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual LibMCEnv_int64 GetMachineIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual LibMCEnv_int64 GetMachineParameterAsInteger(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetMachineBoolParameter - returns a bool parameter of a state machine
+	* IUIEnvironment::GetMachineParameterAsBool - returns a bool parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
 	* @return Current Parameter Value
 	*/
-	virtual bool GetMachineBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
+	virtual bool GetMachineParameterAsBool(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) = 0;
 
 	/**
-	* IUIEnvironment::GetClientStringVariable - returns a string variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @return Current Parameter Value
+	* IUIEnvironment::GetUIProperty - returns a string property of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
 	*/
-	virtual std::string GetClientStringVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+	virtual std::string GetUIProperty(const std::string & sElementPath, const std::string & sPropertyName) = 0;
 
 	/**
-	* IUIEnvironment::GetClientUUIDVariable - returns a uuid variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @return Current Parameter Value
+	* IUIEnvironment::GetUIPropertyAsUUID - returns a uuid variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
 	*/
-	virtual std::string GetClientUUIDVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+	virtual std::string GetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName) = 0;
 
 	/**
-	* IUIEnvironment::GetClientDoubleVariable - returns a double variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @return Current Parameter Value
+	* IUIEnvironment::GetUIPropertyAsDouble - returns a double variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
 	*/
-	virtual LibMCEnv_double GetClientDoubleVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+	virtual LibMCEnv_double GetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName) = 0;
 
 	/**
-	* IUIEnvironment::GetClientIntegerVariable - returns an int variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @return Current Parameter Value
+	* IUIEnvironment::GetUIPropertyAsInteger - returns a integer variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
 	*/
-	virtual LibMCEnv_int64 GetClientIntegerVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+	virtual LibMCEnv_int64 GetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName) = 0;
 
 	/**
-	* IUIEnvironment::GetClientBoolVariable - returns a bool variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @return Current Parameter Value
+	* IUIEnvironment::GetUIPropertyAsBool - returns a integer variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
 	*/
-	virtual bool GetClientBoolVariable(const std::string & sVariableGroup, const std::string & sVariableName) = 0;
+	virtual bool GetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName) = 0;
 
 	/**
-	* IUIEnvironment::SetClientStringVariable - sets a string variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @param[in] sValue - Value to set
+	* IUIEnvironment::SetUIProperty - sets a string property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] sValue - New property Value
 	*/
-	virtual void SetClientStringVariable(const std::string & sVariableGroup, const std::string & sVariableName, const std::string & sValue) = 0;
+	virtual void SetUIProperty(const std::string & sElementPath, const std::string & sPropertyName, const std::string & sValue) = 0;
 
 	/**
-	* IUIEnvironment::SetClientUUIDVariable - returns a uuid variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @param[in] sValue - Value to set
+	* IUIEnvironment::SetUIPropertyAsUUID - sets a uuid property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] sValue - New property Value
 	*/
-	virtual void SetClientUUIDVariable(const std::string & sVariableGroup, const std::string & sVariableName, const std::string & sValue) = 0;
+	virtual void SetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName, const std::string & sValue) = 0;
 
 	/**
-	* IUIEnvironment::SetClientDoubleVariable - returns a double variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @param[in] dValue - Value to set
+	* IUIEnvironment::SetUIPropertyAsDouble - sets a double property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] dValue - New property Value
 	*/
-	virtual void SetClientDoubleVariable(const std::string & sVariableGroup, const std::string & sVariableName, const LibMCEnv_double dValue) = 0;
+	virtual void SetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_double dValue) = 0;
 
 	/**
-	* IUIEnvironment::SetClientIntegerVariable - returns an int variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @param[in] nValue - Value to set
+	* IUIEnvironment::SetUIPropertyAsInteger - sets a integer property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] nValue - New property Value
 	*/
-	virtual void SetClientIntegerVariable(const std::string & sVariableGroup, const std::string & sVariableName, const LibMCEnv_int64 nValue) = 0;
+	virtual void SetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_int64 nValue) = 0;
 
 	/**
-	* IUIEnvironment::SetClientBoolVariable - returns a bool variable of the client
-	* @param[in] sVariableGroup - Variable Group
-	* @param[in] sVariableName - Variable Name
-	* @param[in] bValue - Value to set
+	* IUIEnvironment::SetUIPropertyAsBool - sets a bool property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] bValue - New property Value
 	*/
-	virtual void SetClientBoolVariable(const std::string & sVariableGroup, const std::string & sVariableName, const bool bValue) = 0;
-
-	/**
-	* IUIEnvironment::HasFormValue - returns if a form value has been passed.
-	* @param[in] sFormIdentifier - Identifier of the form.
-	* @param[in] sValueIdentifier - Identifier of the form value.
-	* @return Form Value has been passed
-	*/
-	virtual bool HasFormValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
-
-	/**
-	* IUIEnvironment::GetFormStringValue - returns a passed form value from the client. Fails if value is not passed.
-	* @param[in] sFormIdentifier - Identifier of the form.
-	* @param[in] sValueIdentifier - Identifier of the form value.
-	* @return Form Value
-	*/
-	virtual std::string GetFormStringValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
-
-	/**
-	* IUIEnvironment::GetFormUUIDValue - returns a passed form value from the client. Fails if value is not passed.
-	* @param[in] sFormIdentifier - Identifier of the form.
-	* @param[in] sValueIdentifier - Identifier of the form value.
-	* @return Form Value
-	*/
-	virtual std::string GetFormUUIDValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
-
-	/**
-	* IUIEnvironment::GetFormDoubleValue - returns a passed form value from the client. Fails if value is not passed.
-	* @param[in] sFormIdentifier - Identifier of the form.
-	* @param[in] sValueIdentifier - Identifier of the form value.
-	* @return Form Value
-	*/
-	virtual LibMCEnv_double GetFormDoubleValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
-
-	/**
-	* IUIEnvironment::GetFormIntegerValue - returns a passed form value from the client. Fails if value is not passed.
-	* @param[in] sFormIdentifier - Identifier of the form.
-	* @param[in] sValueIdentifier - Identifier of the form value.
-	* @return Form Value
-	*/
-	virtual LibMCEnv_int64 GetFormIntegerValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
-
-	/**
-	* IUIEnvironment::GetFormBoolValue - returns a passed form value from the client. Fails if value is not passed.
-	* @param[in] sFormIdentifier - Identifier of the form.
-	* @param[in] sValueIdentifier - Identifier of the form value.
-	* @return Form Value
-	*/
-	virtual bool GetFormBoolValue(const std::string & sFormIdentifier, const std::string & sValueIdentifier) = 0;
-
-	/**
-	* IUIEnvironment::GetEventContext - returns the event context uuid as string
-	* @return Context UUID
-	*/
-	virtual std::string GetEventContext() = 0;
+	virtual void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue) = 0;
 
 };
 

@@ -47,11 +47,14 @@ using namespace AMC;
 
 
 
-CUIModule_Tab::CUIModule_Tab(pugi::xml_node& xmlNode, PUIModuleEnvironment pModuleEnvironment)
+CUIModule_Tab::CUIModule_Tab(pugi::xml_node& xmlNode, const std::string & sPath, PUIModuleEnvironment pModuleEnvironment)
 {
 	LibMCAssertNotNull(pModuleEnvironment.get());
 
-	m_pModule = CUIModuleFactory::createModule(xmlNode, pModuleEnvironment);
+	m_pModule = CUIModuleFactory::createModule(xmlNode, sPath, pModuleEnvironment);
+
+	auto captionAttrib = xmlNode.attribute("caption");
+	m_sCaption = captionAttrib.as_string();
 }
 
 CUIModule_Tab::~CUIModule_Tab()
@@ -61,7 +64,7 @@ CUIModule_Tab::~CUIModule_Tab()
 
 std::string CUIModule_Tab::getName()
 {
-	return m_sName;
+	return m_pModule->getName();
 }
 
 std::string CUIModule_Tab::getCaption()

@@ -4569,6 +4569,30 @@ LibMCEnvResult libmcenv_uienvironment_activatemodaldialog(LibMCEnv_UIEnvironment
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_closemodaldialog(LibMCEnv_UIEnvironment pUIEnvironment)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUIEnvironment->CloseModalDialog();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -4762,7 +4786,7 @@ LibMCEnvResult libmcenv_uienvironment_loginfo(LibMCEnv_UIEnvironment pUIEnvironm
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getmachinestringparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+LibMCEnvResult libmcenv_uienvironment_getmachineparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -4785,7 +4809,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachinestringparameter(LibMCEnv_UIEnvir
 		
 		bool isCacheCall = (pValueBuffer == nullptr);
 		if (isCacheCall) {
-			sValue = pIUIEnvironment->GetMachineStringParameter(sMachineInstance, sParameterGroup, sParameterName);
+			sValue = pIUIEnvironment->GetMachineParameter(sMachineInstance, sParameterGroup, sParameterName);
 
 			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sValue));
 		}
@@ -4819,7 +4843,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachinestringparameter(LibMCEnv_UIEnvir
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getmachineuuidparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+LibMCEnvResult libmcenv_uienvironment_getmachineparameterasuuid(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -4842,7 +4866,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachineuuidparameter(LibMCEnv_UIEnviron
 		
 		bool isCacheCall = (pValueBuffer == nullptr);
 		if (isCacheCall) {
-			sValue = pIUIEnvironment->GetMachineUUIDParameter(sMachineInstance, sParameterGroup, sParameterName);
+			sValue = pIUIEnvironment->GetMachineParameterAsUUID(sMachineInstance, sParameterGroup, sParameterName);
 
 			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sValue));
 		}
@@ -4876,7 +4900,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachineuuidparameter(LibMCEnv_UIEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getmachinedoubleparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_double * pValue)
+LibMCEnvResult libmcenv_uienvironment_getmachineparameterasdouble(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_double * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -4896,7 +4920,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachinedoubleparameter(LibMCEnv_UIEnvir
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIUIEnvironment->GetMachineDoubleParameter(sMachineInstance, sParameterGroup, sParameterName);
+		*pValue = pIUIEnvironment->GetMachineParameterAsDouble(sMachineInstance, sParameterGroup, sParameterName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4911,7 +4935,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachinedoubleparameter(LibMCEnv_UIEnvir
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getmachineintegerparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_int64 * pValue)
+LibMCEnvResult libmcenv_uienvironment_getmachineparameterasinteger(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, LibMCEnv_int64 * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -4931,7 +4955,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachineintegerparameter(LibMCEnv_UIEnvi
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIUIEnvironment->GetMachineIntegerParameter(sMachineInstance, sParameterGroup, sParameterName);
+		*pValue = pIUIEnvironment->GetMachineParameterAsInteger(sMachineInstance, sParameterGroup, sParameterName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4946,7 +4970,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachineintegerparameter(LibMCEnv_UIEnvi
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getmachineboolparameter(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue)
+LibMCEnvResult libmcenv_uienvironment_getmachineparameterasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pParameterGroup, const char * pParameterName, bool * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
@@ -4966,7 +4990,7 @@ LibMCEnvResult libmcenv_uienvironment_getmachineboolparameter(LibMCEnv_UIEnviron
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIUIEnvironment->GetMachineBoolParameter(sMachineInstance, sParameterGroup, sParameterName);
+		*pValue = pIUIEnvironment->GetMachineParameterAsBool(sMachineInstance, sParameterGroup, sParameterName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -4981,19 +5005,19 @@ LibMCEnvResult libmcenv_uienvironment_getmachineboolparameter(LibMCEnv_UIEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getclientstringvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+LibMCEnvResult libmcenv_uienvironment_getuiproperty(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pValueBuffer) && !(pValueNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		std::string sValue("");
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
@@ -5001,7 +5025,7 @@ LibMCEnvResult libmcenv_uienvironment_getclientstringvariable(LibMCEnv_UIEnviron
 		
 		bool isCacheCall = (pValueBuffer == nullptr);
 		if (isCacheCall) {
-			sValue = pIUIEnvironment->GetClientStringVariable(sVariableGroup, sVariableName);
+			sValue = pIUIEnvironment->GetUIProperty(sElementPath, sPropertyName);
 
 			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sValue));
 		}
@@ -5035,19 +5059,19 @@ LibMCEnvResult libmcenv_uienvironment_getclientstringvariable(LibMCEnv_UIEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getclientuuidvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
+LibMCEnvResult libmcenv_uienvironment_getuipropertyasuuid(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if ( (!pValueBuffer) && !(pValueNeededChars) )
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		std::string sValue("");
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
@@ -5055,7 +5079,7 @@ LibMCEnvResult libmcenv_uienvironment_getclientuuidvariable(LibMCEnv_UIEnvironme
 		
 		bool isCacheCall = (pValueBuffer == nullptr);
 		if (isCacheCall) {
-			sValue = pIUIEnvironment->GetClientUUIDVariable(sVariableGroup, sVariableName);
+			sValue = pIUIEnvironment->GetUIPropertyAsUUID(sElementPath, sPropertyName);
 
 			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sValue));
 		}
@@ -5089,24 +5113,24 @@ LibMCEnvResult libmcenv_uienvironment_getclientuuidvariable(LibMCEnv_UIEnvironme
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getclientdoublevariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_double * pValue)
+LibMCEnvResult libmcenv_uienvironment_getuipropertyasdouble(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, LibMCEnv_double * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pValue == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIUIEnvironment->GetClientDoubleVariable(sVariableGroup, sVariableName);
+		*pValue = pIUIEnvironment->GetUIPropertyAsDouble(sElementPath, sPropertyName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5121,24 +5145,24 @@ LibMCEnvResult libmcenv_uienvironment_getclientdoublevariable(LibMCEnv_UIEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getclientintegervariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_int64 * pValue)
+LibMCEnvResult libmcenv_uienvironment_getuipropertyasinteger(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, LibMCEnv_int64 * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pValue == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIUIEnvironment->GetClientIntegerVariable(sVariableGroup, sVariableName);
+		*pValue = pIUIEnvironment->GetUIPropertyAsInteger(sElementPath, sPropertyName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5153,24 +5177,24 @@ LibMCEnvResult libmcenv_uienvironment_getclientintegervariable(LibMCEnv_UIEnviro
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_getclientboolvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, bool * pValue)
+LibMCEnvResult libmcenv_uienvironment_getuipropertyasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, bool * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pValue == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		*pValue = pIUIEnvironment->GetClientBoolVariable(sVariableGroup, sVariableName);
+		*pValue = pIUIEnvironment->GetUIPropertyAsBool(sElementPath, sPropertyName);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5185,25 +5209,25 @@ LibMCEnvResult libmcenv_uienvironment_getclientboolvariable(LibMCEnv_UIEnvironme
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_setclientstringvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const char * pValue)
+LibMCEnvResult libmcenv_uienvironment_setuiproperty(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, const char * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pValue == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		std::string sValue(pValue);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUIEnvironment->SetClientStringVariable(sVariableGroup, sVariableName, sValue);
+		pIUIEnvironment->SetUIProperty(sElementPath, sPropertyName, sValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5218,25 +5242,25 @@ LibMCEnvResult libmcenv_uienvironment_setclientstringvariable(LibMCEnv_UIEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_setclientuuidvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, const char * pValue)
+LibMCEnvResult libmcenv_uienvironment_setuipropertyasuuid(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, const char * pValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
 		if (pValue == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		std::string sValue(pValue);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUIEnvironment->SetClientUUIDVariable(sVariableGroup, sVariableName, sValue);
+		pIUIEnvironment->SetUIPropertyAsUUID(sElementPath, sPropertyName, sValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5251,22 +5275,22 @@ LibMCEnvResult libmcenv_uienvironment_setclientuuidvariable(LibMCEnv_UIEnvironme
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_setclientdoublevariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_double dValue)
+LibMCEnvResult libmcenv_uienvironment_setuipropertyasdouble(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, LibMCEnv_double dValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUIEnvironment->SetClientDoubleVariable(sVariableGroup, sVariableName, dValue);
+		pIUIEnvironment->SetUIPropertyAsDouble(sElementPath, sPropertyName, dValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5281,22 +5305,22 @@ LibMCEnvResult libmcenv_uienvironment_setclientdoublevariable(LibMCEnv_UIEnviron
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_setclientintegervariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, LibMCEnv_int64 nValue)
+LibMCEnvResult libmcenv_uienvironment_setuipropertyasinteger(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, LibMCEnv_int64 nValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUIEnvironment->SetClientIntegerVariable(sVariableGroup, sVariableName, nValue);
+		pIUIEnvironment->SetUIPropertyAsInteger(sElementPath, sPropertyName, nValue);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5311,307 +5335,23 @@ LibMCEnvResult libmcenv_uienvironment_setclientintegervariable(LibMCEnv_UIEnviro
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_setclientboolvariable(LibMCEnv_UIEnvironment pUIEnvironment, const char * pVariableGroup, const char * pVariableName, bool bValue)
+LibMCEnvResult libmcenv_uienvironment_setuipropertyasbool(LibMCEnv_UIEnvironment pUIEnvironment, const char * pElementPath, const char * pPropertyName, bool bValue)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pVariableGroup == nullptr)
+		if (pElementPath == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pVariableName == nullptr)
+		if (pPropertyName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sVariableGroup(pVariableGroup);
-		std::string sVariableName(pVariableName);
+		std::string sElementPath(pElementPath);
+		std::string sPropertyName(pPropertyName);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUIEnvironment->SetClientBoolVariable(sVariableGroup, sVariableName, bValue);
+		pIUIEnvironment->SetUIPropertyAsBool(sElementPath, sPropertyName, bValue);
 
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_hasformvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, bool * pValuePassed)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pFormIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValueIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValuePassed == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sFormIdentifier(pFormIdentifier);
-		std::string sValueIdentifier(pValueIdentifier);
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pValuePassed = pIUIEnvironment->HasFormValue(sFormIdentifier, sValueIdentifier);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_getformstringvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pFormIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValueIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pValueBuffer) && !(pValueNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sFormIdentifier(pFormIdentifier);
-		std::string sValueIdentifier(pValueIdentifier);
-		std::string sValue("");
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pValueBuffer == nullptr);
-		if (isCacheCall) {
-			sValue = pIUIEnvironment->GetFormStringValue(sFormIdentifier, sValueIdentifier);
-
-			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sValue));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sValue);
-			pIUIEnvironment->_setCache (nullptr);
-		}
-		
-		if (pValueNeededChars)
-			*pValueNeededChars = (LibMCEnv_uint32) (sValue.size()+1);
-		if (pValueBuffer) {
-			if (sValue.size() >= nValueBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
-				pValueBuffer[iValue] = sValue[iValue];
-			pValueBuffer[sValue.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_getformuuidvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, const LibMCEnv_uint32 nValueBufferSize, LibMCEnv_uint32* pValueNeededChars, char * pValueBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pFormIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValueIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if ( (!pValueBuffer) && !(pValueNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sFormIdentifier(pFormIdentifier);
-		std::string sValueIdentifier(pValueIdentifier);
-		std::string sValue("");
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pValueBuffer == nullptr);
-		if (isCacheCall) {
-			sValue = pIUIEnvironment->GetFormUUIDValue(sFormIdentifier, sValueIdentifier);
-
-			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sValue));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sValue);
-			pIUIEnvironment->_setCache (nullptr);
-		}
-		
-		if (pValueNeededChars)
-			*pValueNeededChars = (LibMCEnv_uint32) (sValue.size()+1);
-		if (pValueBuffer) {
-			if (sValue.size() >= nValueBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
-				pValueBuffer[iValue] = sValue[iValue];
-			pValueBuffer[sValue.size()] = 0;
-		}
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_getformdoublevalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, LibMCEnv_double * pValue)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pFormIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValueIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValue == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sFormIdentifier(pFormIdentifier);
-		std::string sValueIdentifier(pValueIdentifier);
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pValue = pIUIEnvironment->GetFormDoubleValue(sFormIdentifier, sValueIdentifier);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_getformintegervalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, LibMCEnv_int64 * pValue)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pFormIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValueIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValue == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sFormIdentifier(pFormIdentifier);
-		std::string sValueIdentifier(pValueIdentifier);
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pValue = pIUIEnvironment->GetFormIntegerValue(sFormIdentifier, sValueIdentifier);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_getformboolvalue(LibMCEnv_UIEnvironment pUIEnvironment, const char * pFormIdentifier, const char * pValueIdentifier, bool * pValue)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if (pFormIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValueIdentifier == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		if (pValue == nullptr)
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sFormIdentifier(pFormIdentifier);
-		std::string sValueIdentifier(pValueIdentifier);
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		*pValue = pIUIEnvironment->GetFormBoolValue(sFormIdentifier, sValueIdentifier);
-
-		return LIBMCENV_SUCCESS;
-	}
-	catch (ELibMCEnvInterfaceException & Exception) {
-		return handleLibMCEnvException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCEnvResult libmcenv_uienvironment_geteventcontext(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nContextUUIDBufferSize, LibMCEnv_uint32* pContextUUIDNeededChars, char * pContextUUIDBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pUIEnvironment;
-
-	try {
-		if ( (!pContextUUIDBuffer) && !(pContextUUIDNeededChars) )
-			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sContextUUID("");
-		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
-		if (!pIUIEnvironment)
-			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-		
-		bool isCacheCall = (pContextUUIDBuffer == nullptr);
-		if (isCacheCall) {
-			sContextUUID = pIUIEnvironment->GetEventContext();
-
-			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sContextUUID));
-		}
-		else {
-			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
-			if (cache == nullptr)
-				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
-			cache->retrieveData (sContextUUID);
-			pIUIEnvironment->_setCache (nullptr);
-		}
-		
-		if (pContextUUIDNeededChars)
-			*pContextUUIDNeededChars = (LibMCEnv_uint32) (sContextUUID.size()+1);
-		if (pContextUUIDBuffer) {
-			if (sContextUUID.size() >= nContextUUIDBufferSize)
-				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
-			for (size_t iContextUUID = 0; iContextUUID < sContextUUID.size(); iContextUUID++)
-				pContextUUIDBuffer[iContextUUID] = sContextUUID[iContextUUID];
-			pContextUUIDBuffer[sContextUUID.size()] = 0;
-		}
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -5906,6 +5646,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcedata;
 	if (sProcName == "libmcenv_uienvironment_activatemodaldialog") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_activatemodaldialog;
+	if (sProcName == "libmcenv_uienvironment_closemodaldialog") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_closemodaldialog;
 	if (sProcName == "libmcenv_uienvironment_activatepage") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_activatepage;
 	if (sProcName == "libmcenv_uienvironment_preparesignal") 
@@ -5918,50 +5660,36 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_logwarning;
 	if (sProcName == "libmcenv_uienvironment_loginfo") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_loginfo;
-	if (sProcName == "libmcenv_uienvironment_getmachinestringparameter") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachinestringparameter;
-	if (sProcName == "libmcenv_uienvironment_getmachineuuidparameter") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineuuidparameter;
-	if (sProcName == "libmcenv_uienvironment_getmachinedoubleparameter") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachinedoubleparameter;
-	if (sProcName == "libmcenv_uienvironment_getmachineintegerparameter") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineintegerparameter;
-	if (sProcName == "libmcenv_uienvironment_getmachineboolparameter") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineboolparameter;
-	if (sProcName == "libmcenv_uienvironment_getclientstringvariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getclientstringvariable;
-	if (sProcName == "libmcenv_uienvironment_getclientuuidvariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getclientuuidvariable;
-	if (sProcName == "libmcenv_uienvironment_getclientdoublevariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getclientdoublevariable;
-	if (sProcName == "libmcenv_uienvironment_getclientintegervariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getclientintegervariable;
-	if (sProcName == "libmcenv_uienvironment_getclientboolvariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getclientboolvariable;
-	if (sProcName == "libmcenv_uienvironment_setclientstringvariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_setclientstringvariable;
-	if (sProcName == "libmcenv_uienvironment_setclientuuidvariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_setclientuuidvariable;
-	if (sProcName == "libmcenv_uienvironment_setclientdoublevariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_setclientdoublevariable;
-	if (sProcName == "libmcenv_uienvironment_setclientintegervariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_setclientintegervariable;
-	if (sProcName == "libmcenv_uienvironment_setclientboolvariable") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_setclientboolvariable;
-	if (sProcName == "libmcenv_uienvironment_hasformvalue") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_hasformvalue;
-	if (sProcName == "libmcenv_uienvironment_getformstringvalue") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getformstringvalue;
-	if (sProcName == "libmcenv_uienvironment_getformuuidvalue") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getformuuidvalue;
-	if (sProcName == "libmcenv_uienvironment_getformdoublevalue") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getformdoublevalue;
-	if (sProcName == "libmcenv_uienvironment_getformintegervalue") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getformintegervalue;
-	if (sProcName == "libmcenv_uienvironment_getformboolvalue") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_getformboolvalue;
-	if (sProcName == "libmcenv_uienvironment_geteventcontext") 
-		*ppProcAddress = (void*) &libmcenv_uienvironment_geteventcontext;
+	if (sProcName == "libmcenv_uienvironment_getmachineparameter") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparameter;
+	if (sProcName == "libmcenv_uienvironment_getmachineparameterasuuid") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparameterasuuid;
+	if (sProcName == "libmcenv_uienvironment_getmachineparameterasdouble") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparameterasdouble;
+	if (sProcName == "libmcenv_uienvironment_getmachineparameterasinteger") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparameterasinteger;
+	if (sProcName == "libmcenv_uienvironment_getmachineparameterasbool") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getmachineparameterasbool;
+	if (sProcName == "libmcenv_uienvironment_getuiproperty") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getuiproperty;
+	if (sProcName == "libmcenv_uienvironment_getuipropertyasuuid") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getuipropertyasuuid;
+	if (sProcName == "libmcenv_uienvironment_getuipropertyasdouble") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getuipropertyasdouble;
+	if (sProcName == "libmcenv_uienvironment_getuipropertyasinteger") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getuipropertyasinteger;
+	if (sProcName == "libmcenv_uienvironment_getuipropertyasbool") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_getuipropertyasbool;
+	if (sProcName == "libmcenv_uienvironment_setuiproperty") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_setuiproperty;
+	if (sProcName == "libmcenv_uienvironment_setuipropertyasuuid") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_setuipropertyasuuid;
+	if (sProcName == "libmcenv_uienvironment_setuipropertyasdouble") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_setuipropertyasdouble;
+	if (sProcName == "libmcenv_uienvironment_setuipropertyasinteger") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_setuipropertyasinteger;
+	if (sProcName == "libmcenv_uienvironment_setuipropertyasbool") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_setuipropertyasbool;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

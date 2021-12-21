@@ -52,8 +52,6 @@ namespace AMC {
 		std::mutex m_Mutex;
 
 		std::map <std::string, PAPISession> m_SessionMap;
-
-		PParameterHandler m_pDefaultClientVariableHandler;
 			
 	protected:
 			

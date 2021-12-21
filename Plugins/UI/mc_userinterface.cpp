@@ -57,11 +57,10 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
-		auto sJobUUID = pUIEnvironment->GetEventContext();
 		pUIEnvironment->LogMessage("Clicked on StartBuildPreparation Button");
 
 		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_preparebuildjob");
-		pSignal->SetString("jobuuid", sJobUUID);
+		//pSignal->SetString("jobuuid", sJobUUID);
 		pSignal->SetString("jobname", "Job");
 		pSignal->Trigger(); 
 
@@ -138,11 +137,65 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
+		double dO2Value = pUIEnvironment->GetMachineParameterAsDouble("main", "processsettings", "targeto2");
+		double dGasFlowSpeed = pUIEnvironment->GetMachineParameterAsDouble("main", "processsettings", "gasflowspeed");
+		double dRecoaterSpeed = pUIEnvironment->GetMachineParameterAsDouble("main", "processsettings", "recoaterspeed");
+		pUIEnvironment->SetUIPropertyAsDouble("testdialog.infobox.processparameters.o2_value", "value", dO2Value);
+		pUIEnvironment->SetUIPropertyAsDouble("testdialog.infobox.processparameters.gasflowspeed", "value", dGasFlowSpeed);
+		pUIEnvironment->SetUIPropertyAsDouble("testdialog.infobox.processparameters.recoaterspeed", "value", dRecoaterSpeed);
+
 		pUIEnvironment->ActivateModalDialog("testdialog");
 
 	}
 
 };
+
+
+class CEvent_OnProcessParameterSave : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onprocessparametersave";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		auto dO2Value = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.o2_value", "value");
+		auto dGasFlowSpeed = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.gasflowspeed", "value");
+		auto dRecoaterSpeed = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.recoaterspeed", "value");
+
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_changeprocesssettings");
+		pSignal->SetDouble("targeto2", dO2Value);
+		pSignal->SetDouble("gasflowspeed", dGasFlowSpeed);
+		pSignal->SetDouble("recoaterspeed", dRecoaterSpeed);
+		pSignal->Trigger();
+
+
+		pUIEnvironment->CloseModalDialog();
+	}
+
+};
+
+class CEvent_OnProcessParameterCancel : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onprocessparametercancel";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->CloseModalDialog();
+	}
+
+};
+
 
 
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
@@ -156,8 +209,11 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_ChangeManualValues>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnProcessParameterSave>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnProcessParameterCancel>(sEventName, pEventInstance))
+		return pEventInstance;
 
-	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
 }

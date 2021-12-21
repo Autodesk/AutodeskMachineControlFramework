@@ -804,6 +804,9 @@
 		<method name="ActivateModalDialog" description="activates a modal dialog on the client.">
 			<param name="DialogName" type="string" pass="in" description="Name of the dialog to activate." />
 		</method>
+
+		<method name="CloseModalDialog" description="closes the active modal dialog on the client.">
+		</method>
 	  
 		<method name="ActivatePage" description="changes the current page on the client.">
 			<param name="DialogName" type="string" pass="in" description="Name of the dialog to activate." />
@@ -831,37 +834,37 @@
 		<method name="LogInfo" description="logs a string as info">
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
-				
-				
-		<method name="GetMachineStringParameter" description="returns a string parameter of a state machine">
+
+								
+		<method name="GetMachineParameter" description="returns a string parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetMachineUUIDParameter" description="returns a uuid parameter of a state machine">
+		<method name="GetMachineParameterAsUUID" description="returns a uuid parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetMachineDoubleParameter" description="returns a double parameter of a state machine">
+		<method name="GetMachineParameterAsDouble" description="returns a double parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="double" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetMachineIntegerParameter" description="returns an int parameter of a state machine">
+		<method name="GetMachineParameterAsInteger" description="returns an int parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
 			<param name="Value" type="int64" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetMachineBoolParameter" description="returns a bool parameter of a state machine">
+		<method name="GetMachineParameterAsBool" description="returns a bool parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
@@ -870,110 +873,67 @@
 
 
 
-
-		<method name="GetClientStringVariable" description="returns a string variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
+		<method name="GetUIProperty" description="returns a string property of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="string" pass="return" description="Current property Value" />
 		</method>
 
-		<method name="GetClientUUIDVariable" description="returns a uuid variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
+		<method name="GetUIPropertyAsUUID" description="returns a uuid variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="string" pass="return" description="Current property Value" />
 		</method>
 
-		<method name="GetClientDoubleVariable" description="returns a double variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="double" pass="return" description="Current Parameter Value" />
+		<method name="GetUIPropertyAsDouble" description="returns a double variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="double" pass="return" description="Current property Value" />
 		</method>
 
-		<method name="GetClientIntegerVariable" description="returns an int variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="int64" pass="return" description="Current Parameter Value" />
+		<method name="GetUIPropertyAsInteger" description="returns a integer variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="int64" pass="return" description="Current property Value" />
 		</method>
 
-		<method name="GetClientBoolVariable" description="returns a bool variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="bool" pass="return" description="Current Parameter Value" />
-		</method>
-
-
-		<method name="SetClientStringVariable" description="sets a string variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="string" pass="in" description="Value to set" />
-		</method>
-
-		<method name="SetClientUUIDVariable" description="returns a uuid variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="string" pass="in" description="Value to set" />
-		</method>
-
-		<method name="SetClientDoubleVariable" description="returns a double variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="double" pass="in" description="Value to set" />
-		</method>
-
-		<method name="SetClientIntegerVariable" description="returns an int variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="int64" pass="in" description="Value to set" />
-		</method>
-
-		<method name="SetClientBoolVariable" description="returns a bool variable of the client">
-			<param name="VariableGroup" type="string" pass="in" description="Variable Group" />
-			<param name="VariableName" type="string" pass="in" description="Variable Name" />
-			<param name="Value" type="bool" pass="in" description="Value to set" />
+		<method name="GetUIPropertyAsBool" description="returns a integer variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="bool" pass="return" description="Current property Value" />
 		</method>
 
 
-
-		<method name="HasFormValue" description="returns if a form value has been passed.">
-			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
-			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
-			<param name="ValuePassed" type="bool" pass="return" description="Form Value has been passed" />
+		<method name="SetUIProperty" description="sets a string property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="string" pass="in" description="New property Value" />
 		</method>
 
-		<method name="GetFormStringValue" description="returns a passed form value from the client. Fails if value is not passed.">
-			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
-			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
-			<param name="Value" type="string" pass="return" description="Form Value" />
+		<method name="SetUIPropertyAsUUID" description="sets a uuid property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="string" pass="in" description="New property Value" />
 		</method>
 
-		<method name="GetFormUUIDValue" description="returns a passed form value from the client. Fails if value is not passed.">
-			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
-			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
-			<param name="Value" type="string" pass="return" description="Form Value" />
+		<method name="SetUIPropertyAsDouble" description="sets a double property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="double" pass="in" description="New property Value" />
 		</method>
 
-		<method name="GetFormDoubleValue" description="returns a passed form value from the client. Fails if value is not passed.">
-			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
-			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
-			<param name="Value" type="double" pass="return" description="Form Value" />
+		<method name="SetUIPropertyAsInteger" description="sets a integer property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="int64" pass="in" description="New property Value" />
 		</method>
 
-		<method name="GetFormIntegerValue" description="returns a passed form value from the client. Fails if value is not passed.">
-			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
-			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
-			<param name="Value" type="int64" pass="return" description="Form Value" />
+		<method name="SetUIPropertyAsBool" description="sets a bool property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="bool" pass="in" description="New property Value" />
 		</method>
-		
-		<method name="GetFormBoolValue" description="returns a passed form value from the client. Fails if value is not passed.">
-			<param name="FormIdentifier" type="string" pass="in" description="Identifier of the form." />
-			<param name="ValueIdentifier" type="string" pass="in" description="Identifier of the form value." />
-			<param name="Value" type="bool" pass="return" description="Form Value" />
-		</method>
-				
-		<method name="GetEventContext" description="returns the event context uuid as string">
-			<param name="ContextUUID" type="string" pass="return" description="Context UUID" />
-		</method>
-		
+
 
 	</class>
 

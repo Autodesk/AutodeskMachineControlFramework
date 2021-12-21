@@ -82,8 +82,9 @@ namespace AMC {
 		std::string m_sErrorMessage;
 		std::string m_sPageToActivate;
 		std::string m_sDialogToShow;
+		bool m_bCloseModalDialog;
 	public:
-		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, const std::string& sDialogToShow);
+		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, bool bCloseModalDialog, const std::string& sDialogToShow);
 
 		uint32_t getErrorCode();
 		std::string getErrorMessage ();
@@ -92,6 +93,7 @@ namespace AMC {
 
 		bool hasPageToActivate();
 		bool hasDialogToShow();
+		bool closeModalDialog();
 
 	};
 
@@ -128,7 +130,7 @@ namespace AMC {
 		PUIPage addPage_Unsafe (const std::string& sName);
 		PUIPage findPage(const std::string& sName);
 
-		PUIDialog addDialog_Unsafe(const std::string& sName);
+		PUIDialog addDialog_Unsafe(const std::string& sName, const std::string& sTitle);
 		PUIDialog findDialog(const std::string& sName);
 
 	public:
@@ -140,8 +142,8 @@ namespace AMC {
 		std::string getAppName();
 		std::string getCopyrightString();
 
-		void writeConfigurationToJSON (CJSONWriter & writer);
-		void writeStateToJSON(CJSONWriter& writer);
+		void writeConfigurationToJSON (CJSONWriter & writer, CParameterHandler* pClientVariableHandler);
+		void writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler);
 
 		void loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pCoreResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
 
@@ -154,6 +156,8 @@ namespace AMC {
 		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
+
+		virtual void populateClientVariables(CParameterHandler * pClientVariableHandler);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

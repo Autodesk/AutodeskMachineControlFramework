@@ -88,11 +88,11 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner);
+		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const std::string& sItemName, const std::string & sModulePath);
 
 		virtual ~CUIModule_ContentButtonGroup();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 		PUIModule_ContentButton addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValues);
 

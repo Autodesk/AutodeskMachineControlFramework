@@ -104,7 +104,7 @@ public:
 		pDriver->SetToSimulationMode();
 
 		pStateEnvironment->LogMessage("Connecting to PLC...");
-		pDriver->Connect(sIPAddress, nPort, nTimeout);	
+		pDriver->Connect(sIPAddress, (uint32_t) nPort, (uint32_t) nTimeout);
 		pStateEnvironment->LogMessage("successful...");
 
 		auto pPLCCommandList = pDriver->CreateCommandList();

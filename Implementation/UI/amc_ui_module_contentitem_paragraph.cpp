@@ -44,8 +44,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModule_ContentParagraph::CUIModule_ContentParagraph(const std::string& sText)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID ()), m_sText (sText)
+PUIModule_ContentParagraph CUIModule_ContentParagraph::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath)
+{
+	auto textAttrib = xmlNode.attribute("text");
+
+	return std::make_shared <CUIModule_ContentParagraph>(textAttrib.as_string(), sItemName, sModulePath);
+}
+
+CUIModule_ContentParagraph::CUIModule_ContentParagraph(const std::string& sText, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID (), sItemName, sModulePath), m_sText (sText)
 {
 
 }
@@ -60,7 +67,7 @@ std::string CUIModule_ContentParagraph::getText()
 	return m_sText;
 }
 
-void CUIModule_ContentParagraph::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentParagraph::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "paragraph");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);

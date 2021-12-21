@@ -83,13 +83,13 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData);
+		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData, const std::string& sItemName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentParameterList();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
-		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 		void addEntry(const std::string& sStateMachine, const std::string& sParameterGroup, const std::string& sParameter);
 

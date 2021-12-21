@@ -3,7 +3,7 @@ import * as Axios from "axios";
 import * as asmCrypto from "asmcrypto-lite";
 
 
-const nullUUID = "00000000-0000-0000-0000-000000000000";
+//const nullUUID = "00000000-0000-0000-0000-000000000000";
 const nullToken = "0000000000000000000000000000000000000000000000000000000000000000";
 
 
@@ -11,15 +11,17 @@ const nullToken = "0000000000000000000000000000000000000000000000000000000000000
 function updateAMCFormEntityFromContentEntry (entry, entity) {
 	
 	if ((entity) && (entry)) {
-		entity.remotevalue = entry.defaultvalue;
+		
+		if (entity.remotevalue != entry.value) {
+			entity.value = entry.value;				
+		}		
+		entity.remotevalue = entry.value;
 		entity.prefix = entry.prefix;
 		entity.suffix = entry.suffix;
 		entity.readonly = entry.readonly;
 		entity.disabled = entry.disabled;
 		
-		if (entity.value != entity.remotevalue) {
-			entity.value = entity.remotevalue;				
-		}
+
 	}
 			
 }
@@ -37,8 +39,7 @@ export default class AMCApplication {
 		this.AppState = {
             currentStatus: "initial", // one of "initial" / "login" / "ready" / "error",
             currentError: "",
-            activePage: "",
-			activeObject: nullUUID
+            activePage: ""
 		}
 
         this.AppDefinition = {
@@ -76,6 +77,7 @@ export default class AMCApplication {
 	{
 		this.AppState.currentStatus = "error";
 		this.AppState.currentError = message;
+		this.closeAllDialogs ();
 	}
 	
 	
@@ -253,8 +255,8 @@ export default class AMCApplication {
 				
 				this.AppContent.FormEntities[entity.uuid] = 
 					{ uuid: entity.uuid, 
-					  value: entity.defaultvalue, 
-					  remotevalue: entity.defaultvalue, 
+					  value: entity.value, 
+					  remotevalue: entity.value, 
 					  disabled: entity.disabled, 
 					  readonly: entity.readonly
 					  };
@@ -506,7 +508,7 @@ export default class AMCApplication {
 		}
 
 
-		performJobUpload (itemuuid, itemstate, uploadid, chosenfile, successpage) {
+		performJobUpload (itemuuid, itemstate, uploadid, chosenfile) {
 					
 		
 			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!						
@@ -580,12 +582,7 @@ export default class AMCApplication {
 									itemstate.messages = [];
 									itemstate.chosenFile = null;
 									itemstate.uploadid = 0;
-									
-									if (successpage != "") {
-										this.changePage (successpage + ":" + contextuuid);
-										
-									}
-									
+																		
 								})
 								.catch(err => {
 									err;                    
@@ -612,24 +609,24 @@ export default class AMCApplication {
 
         changePage(page) {
 		
-			var pageString = String (page);
-			var colonIndex = pageString.search(":");
-						
-			if (colonIndex === -1) {
-				this.AppState.activePage = pageString;
-				this.AppState.activeObject = "00000000-0000-0000-0000-000000000000";
-			}
-			
-			if (colonIndex > 0) {
-				this.AppState.activePage = pageString.substring (0, colonIndex);
-				this.AppState.activeObject = pageString.substring (colonIndex + 1);
-			}
+			var pageString = String (page);						
+			this.AppState.activePage = pageString;
 										
         }
 		
+		closeAllDialogs () {
+			var	dialog;
+			for (dialog of this.AppContent.Dialogs) {
+				dialog.dialogIsActive = false;
+			}
+		}
+		
 		showDialog (dialog) {
 			
+			this.closeAllDialogs ();
+			
 			if (dialog) {
+							
 				if (this.AppContent.DialogMap.has (dialog)) {
 					var dialogObject = this.AppContent.DialogMap.get (dialog);
 					dialogObject.dialogIsActive = true;
@@ -659,6 +656,10 @@ export default class AMCApplication {
 					if (resultHandleEvent.data.dialogtoshow) {
 						this.showDialog (resultHandleEvent.data.dialogtoshow);
 					}
+					if (resultHandleEvent.data.closedialogs) {
+						this.closeAllDialogs ();
+					}
+					
 					
 				})
                 .catch(err => {
