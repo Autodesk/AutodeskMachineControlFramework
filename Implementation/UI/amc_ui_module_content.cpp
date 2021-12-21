@@ -92,90 +92,23 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, const std::string&
 
 		if (sChildName == "paragraph") 
 			addItem(CUIModule_ContentParagraph::makeFromXML(childNode, sItemName, m_sModulePath));
-
-		if (sChildName == "image") {
+		if (sChildName == "image") 
 			addItem(CUIModule_ContentImage::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		}
-
-		if (sChildName == "upload") {
-			auto classAttrib = childNode.attribute("class");
-			auto captionAttrib = childNode.attribute("caption");
-			auto successpageAttrib = childNode.attribute("successpage");
-			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string(), successpageAttrib.as_string (), sItemName, m_sModulePath));
-		}
-
-		if (sChildName == "layerview") {
-			addItem(std::make_shared <CUIModule_ContentLayerView>(sItemName, m_sModulePath));
-		}
-
-		if (sChildName == "parameterlist") {
-			auto loadingtextAttrib = childNode.attribute("loadingtext");
-			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
-			std::string sLoadingText = loadingtextAttrib.as_string();
-
-			int nEntriesPerPage;
-			if (!entriesperpageAttrib.empty()) {
-				nEntriesPerPage = entriesperpageAttrib.as_int();
-				if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-				if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-			}
-			else {
-				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
-			}
-
-			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pUIModuleEnvironment->stateMachineData(), sItemName, m_sModulePath);
-			addItem (pParameterList);
-
-			pParameterList->loadFromXML(childNode);
-		}
-
-		if (sChildName == "buttongroup") {
-
-			auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->formRegistry(), sItemName, m_sModulePath);
-			addItem(pButtonGroup);
-
-			auto buttonsNodes = childNode.children("button");
-			for (auto buttonNode : buttonsNodes) {
-				auto captionAttrib = buttonNode.attribute("caption");
-				auto targetpageAttrib = buttonNode.attribute("targetpage");
-				auto eventAttrib = buttonNode.attribute("event");
-				auto formvaluesAttrib = buttonNode.attribute("formvalues");
-				auto pButton = pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string(), formvaluesAttrib.as_string ());
-			}
-
-		}
+		if (sChildName == "form")
+			addItem(CUIModule_ContentForm::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "buildlist")
+			addItem(CUIModule_ContentBuildList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "layerview")
+			addItem(CUIModule_ContentLayerView::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "buttongroup") 
+			addItem(CUIModule_ContentButtonGroup::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "upload")
+			addItem(CUIModule_ContentUpload::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "parameterlist")
+			addItem(CUIModule_ContentParameterList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
 
 
-		if (sChildName == "form") {
-			addItem(CUIModule_ContentForm::makeFromXML (childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
-		}
 
-
-		if (sChildName == "buildlist") {
-			auto loadingtextAttrib = childNode.attribute("loadingtext");
-			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
-			auto detailpageAttrib = childNode.attribute("detailpage");
-			std::string sLoadingText = loadingtextAttrib.as_string();
-			std::string sDetailPage = detailpageAttrib.as_string();
-
-			int nEntriesPerPage;
-			if (!entriesperpageAttrib.empty()) {
-				nEntriesPerPage = entriesperpageAttrib.as_int();
-				if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-				if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-			}
-			else {
-				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
-			}
-
-			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pUIModuleEnvironment->buildJobHandler(), sItemName, m_sModulePath);
-			addItem(pBuildList);
-			
-		}
 
 	}
 

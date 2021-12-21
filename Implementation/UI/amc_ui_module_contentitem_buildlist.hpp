@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
+#include "pugixml.hpp"
 
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
@@ -48,6 +49,7 @@ namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentBuildList, PUIModule_ContentBuildList);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
 	protected:
@@ -65,6 +67,8 @@ namespace AMC {
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 
 	public:
+
+		static PUIModule_ContentBuildList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
 		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath);
 

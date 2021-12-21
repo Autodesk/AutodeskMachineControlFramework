@@ -153,7 +153,7 @@ namespace AMC {
 		
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
+		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 

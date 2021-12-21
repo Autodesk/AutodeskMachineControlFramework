@@ -40,10 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_contentitem.hpp"
 
+#include "pugixml.hpp"
+
+
 namespace AMC {
 
 
 	amcDeclareDependingClass(CUIModule_ContentUpload, PUIModule_ContentUpload);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 	class CUIModule_ContentUpload : public CUIModule_ContentItem {
 	protected:
@@ -52,6 +56,8 @@ namespace AMC {
 		std::string m_sSuccessPage;
 
 	public:
+
+		static PUIModule_ContentUpload makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
 		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string & sSuccessPage, const std::string& sItemName, const std::string& sModulePath);
 

@@ -215,14 +215,13 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
 	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
 	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
-	auto sContextUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTCONTEXT, LIBMC_ERROR_INVALIDEVENTCONTEXT);
 
 	std::string sFormValueJSON;
 	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
 		sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
 	}
 
-	auto pEventResult = m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID, sFormValueJSON, pAuth->getClientVariableHandler ());
+	auto pEventResult = m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth->getClientVariableHandler ());
 
 	if (pEventResult.getErrorCode())
 	{

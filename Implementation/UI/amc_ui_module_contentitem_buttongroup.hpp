@@ -40,12 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem.hpp"
 #include "amc_ui_interfaces.hpp"
 
+#include "pugixml.hpp"
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentButtonGroup, PUIModule_ContentButtonGroup);
 	amcDeclareDependingClass(CUIModule_ContentButton, PUIModule_ContentButton);
 	amcDeclareDependingClass(CUIModule_ContentFormEntity, PUIModule_ContentFormEntity);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 
 	class CUIModule_ContentButton {
@@ -87,6 +89,8 @@ namespace AMC {
 		CUIModule_ContentRegistry* m_pFormOwner;
 
 	public:
+
+		static PUIModule_ContentButtonGroup makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
 		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const std::string& sItemName, const std::string & sModulePath);
 

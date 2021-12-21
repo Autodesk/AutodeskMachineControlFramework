@@ -50,6 +50,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_ContentFormSwitch, PUIModule_ContentFormSwitch);
 	amcDeclareDependingClass(CUIModule_ContentFormMemo, PUIModule_ContentFormMemo);
 	amcDeclareDependingClass(CUIModule_ContentFormCheckbox, PUIModule_ContentFormCheckbox);
+	amcDeclareDependingClass(CUIModule_ContentFormCombobox, PUIModule_ContentFormCombobox);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CParameterGroup, PParameterGroup);
@@ -113,6 +114,8 @@ namespace AMC {
 
 	public:
 
+		static PUIModule_ContentFormEdit makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+
 		CUIModule_ContentFormEdit(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, CUIExpression Prefix, CUIExpression Suffix, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormEdit();
@@ -133,6 +136,8 @@ namespace AMC {
 
 	public:
 
+		static PUIModule_ContentFormSwitch makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+
 		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormSwitch();
@@ -152,6 +157,8 @@ namespace AMC {
 
 	public:
 
+		static PUIModule_ContentFormMemo makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
+
 		CUIModule_ContentFormMemo(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormMemo();
@@ -170,6 +177,8 @@ namespace AMC {
 	protected:
 
 	public:
+
+		static PUIModule_ContentFormCombobox makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
 
 		CUIModule_ContentFormCombobox(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, PStateMachineData pStateMachineData);
 
@@ -194,8 +203,6 @@ namespace AMC {
 
 		PStateMachineData m_pStateMachineData;
 
-		void addEntityEx(PUIModule_ContentFormEntity pEntity);
-
 	public:
 
 		static PUIModule_ContentForm makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
@@ -208,10 +215,7 @@ namespace AMC {
 
 		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
-		PUIModule_ContentFormEntity addEdit(const std::string& sName, CUIExpression Caption, CUIExpression Value, CUIExpression Prefix, CUIExpression Suffix);
-		PUIModule_ContentFormEntity addSwitch(const std::string& sName, CUIExpression Caption, CUIExpression Value);
-		PUIModule_ContentFormEntity addMemo(const std::string& sName, CUIExpression Caption, CUIExpression Value);
-		PUIModule_ContentFormEntity addCombobox(const std::string& sName, CUIExpression Caption, CUIExpression Value);
+		void addEntity(PUIModule_ContentFormEntity pEntity);
 		
 		std::string getName();
 

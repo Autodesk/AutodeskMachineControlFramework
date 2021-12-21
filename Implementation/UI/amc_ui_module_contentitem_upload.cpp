@@ -43,6 +43,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
+PUIModule_ContentUpload CUIModule_ContentUpload::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+{
+	auto classAttrib = xmlNode.attribute("class");
+	auto captionAttrib = xmlNode.attribute("caption");
+	auto successpageAttrib = xmlNode.attribute("successpage");
+
+	return std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string(), successpageAttrib.as_string(), sItemName, sModulePath);
+}
+
+
 
 CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string& sSuccessPage, const std::string& sItemName, const std::string& sModulePath)
 	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption), m_sSuccessPage (sSuccessPage)

@@ -610,7 +610,7 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
 }
 
 
-CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
+CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
 {
 
     LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, pClientVariableHandler);

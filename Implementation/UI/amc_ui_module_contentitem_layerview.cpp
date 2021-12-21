@@ -35,9 +35,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_interfaceexception.hpp"
 
 #include "amc_api_constants.hpp"
+#include "amc_ui_module.hpp"
+#include "libmc_exceptiontypes.hpp"
+
 #include "Common/common_utils.hpp"
 
 using namespace AMC;
+
+PUIModule_ContentLayerView CUIModule_ContentLayerView::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+{
+	return std::make_shared <CUIModule_ContentLayerView>(sItemName, sModulePath);
+}
 
 CUIModule_ContentLayerView::CUIModule_ContentLayerView(const std::string& sItemName, const std::string& sModulePath)
 	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath)

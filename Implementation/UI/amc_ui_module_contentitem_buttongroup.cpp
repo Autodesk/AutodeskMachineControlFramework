@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem_form.hpp"
 #include "libmc_interfaceexception.hpp"
 #include "libmc_exceptiontypes.hpp"
-
+#include "amc_ui_module.hpp"
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
 
@@ -89,6 +89,23 @@ void CUIModule_ContentButton::writeFormValuesToJSON(CJSONWriterArray& pArray)
 	for (auto pFormValue : m_pFormValues) {
 		pArray.addString(pFormValue->getUUID());
 	}
+}
+
+PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+{
+	LibMCAssertNotNull(pUIModuleEnvironment);
+	auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->formRegistry(), sItemName, sModulePath);
+
+	auto buttonsNodes = xmlNode.children("button");
+	for (auto buttonNode : buttonsNodes) {
+		auto captionAttrib = buttonNode.attribute("caption");
+		auto targetpageAttrib = buttonNode.attribute("targetpage");
+		auto eventAttrib = buttonNode.attribute("event");
+		auto formvaluesAttrib = buttonNode.attribute("formvalues");
+		auto pButton = pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string(), formvaluesAttrib.as_string());
+	}
+
+	return pButtonGroup;
 }
 
 

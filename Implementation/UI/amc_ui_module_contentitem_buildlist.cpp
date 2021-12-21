@@ -38,12 +38,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
-
+#include "amc_ui_module.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include "libmcdata_dynamic.hpp"
 
 using namespace AMC;
 
+PUIModule_ContentBuildList CUIModule_ContentBuildList::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+{
+	LibMCAssertNotNull(pUIModuleEnvironment);
 
+	auto loadingtextAttrib = xmlNode.attribute("loadingtext");
+	auto entriesperpageAttrib = xmlNode.attribute("entriesperpage");
+	auto detailpageAttrib = xmlNode.attribute("detailpage");
+	std::string sLoadingText = loadingtextAttrib.as_string();
+	std::string sDetailPage = detailpageAttrib.as_string();
+
+	int nEntriesPerPage;
+	if (!entriesperpageAttrib.empty()) {
+		nEntriesPerPage = entriesperpageAttrib.as_int();
+		if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+		if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+	}
+	else {
+		nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
+	}
+
+	return std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pUIModuleEnvironment->buildJobHandler(), sItemName, sModulePath);
+
+}
 
 CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath)
 	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sDetailPage (sDetailPage), m_pBuildJobHandler (pBuildJobHandler)
