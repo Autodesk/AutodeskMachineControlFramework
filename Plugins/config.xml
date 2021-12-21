@@ -226,15 +226,15 @@
 			<content name="infobox" title="SLM Demo System" headline="">
 				<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
 				<paragraph text="This sample configuration serves as Laser Powderbed Fusion demo implementation."/>
-				<upload class="build" caption="Select 3MF files to upload" successpage="previewbuild"/>
+				<upload class="build" caption="Select 3MF files to upload" successevent="onuploadfinished" />
 			</content>
 		</page>
 
 
 		<page name="buildlist">
 			<content name="buildlibrary" title="Build Library">
-				<upload class="build" caption="Select 3MF files to upload" successpage="buildinfo"/>
-				<buildlist loadingtext="Loading builds" entriesperpage="20" detailpage="previewbuild"/>
+				<upload class="build" caption="Select 3MF files to upload" successevent="onuploadfinished" />
+				<buildlist loadingtext="Loading builds" entriesperpage="20" selectevent="onselectbuild"/>
 			</content>
 		</page>
 

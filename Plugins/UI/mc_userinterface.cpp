@@ -196,6 +196,27 @@ public:
 
 };
 
+class CEvent_OnUploadFinished : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onuploadfinished";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		auto sSender = pUIEnvironment->RetrieveEventSender();
+		pUIEnvironment->LogMessage("Uploaded success from " + sSender);
+
+		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "uploaduuid");
+		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
+
+		pUIEnvironment->ActivatePage("previewbuild");
+	}
+
+};
 
 
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
@@ -213,6 +234,9 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnProcessParameterCancel>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnUploadFinished>(sEventName, pEventInstance))
+		return pEventInstance;
+	
 
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
