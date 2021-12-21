@@ -88,7 +88,6 @@ public:
 
 		pStateEnvironment->SetNextState("idle");
 
-
 	}
 
 };
@@ -130,6 +129,21 @@ public:
 			pStateEnvironment->LogMessage("Preparing job " + sJobUUID);
 
 			pStateEnvironment->SetNextState("preparebuild");
+
+		}
+		else if (pStateEnvironment->WaitForSignal("signal_changeprocesssettings", 100, pSignalHandler)) {
+			double dTargetO2 = pSignalHandler->GetDouble("targeto2");
+			double dRecoaterSpeed = pSignalHandler->GetDouble("recoaterspeed");
+			double dGasFlowSpeed = pSignalHandler->GetDouble("gasflowspeed");
+			pSignalHandler->SignalHandled();
+
+			pStateEnvironment->SetDoubleParameter("processsettings", "targeto2", dTargetO2);
+			pStateEnvironment->SetDoubleParameter("processsettings", "recoaterspeed", dRecoaterSpeed);
+			pStateEnvironment->SetDoubleParameter("processsettings", "gasflowspeed", dGasFlowSpeed);
+
+			pStateEnvironment->LogMessage("Updated process Parameters!");
+
+			pStateEnvironment->SetNextState("idle");
 
 		}
 		else {
