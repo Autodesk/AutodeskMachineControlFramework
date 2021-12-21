@@ -40,14 +40,14 @@
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn tile large color="primary" dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
-            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }}
+        <v-btn text large  dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
+            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }} 
         </v-btn>
 
         <v-spacer />
 
         <template v-for="toolbaritem in Application.AppContent.ToolbarItems">
-            <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
+            <v-btn :key="toolbaritem.id" text large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
         </template>

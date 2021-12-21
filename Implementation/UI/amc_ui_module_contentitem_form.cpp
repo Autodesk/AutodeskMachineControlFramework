@@ -382,6 +382,7 @@ PUIModule_ContentForm CUIModule_ContentForm::makeFromXML(const pugi::xml_node& x
 		if (pEntity != nullptr) {
 			pEntity->setDisabledExpression(CUIExpression(formNode, "disabled"));
 			pEntity->setReadOnlyExpression(CUIExpression(formNode, "readonly"));
+			pForm->addEntity(pEntity);
 		}
 
 	}

@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
+
+#define __AMCIMPL_API_CONSTANTS
+#include "amc_api_constants.hpp"
+
 #include "amc_ui_module_contentitem_form.hpp"
 
 using namespace AMC;
@@ -120,6 +124,26 @@ void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleAr
 		moduleArray.addObject(moduleObject);
 	}
 }
+
+void CUIPage::writeModuleItemUpdatesToJSON(CJSONWriter& writer, CJSONWriterArray& itemArray, CParameterHandler* pClientVariableHandler)
+{
+	for (auto module : m_Modules) {
+		std::map <std::string, PUIModuleItem> itemMap;
+		module->populateItemMap(itemMap);
+
+		for (auto item : itemMap) {
+			CJSONWriterObject itemObject(writer);
+			item.second->addContentToJSON(writer, itemObject, pClientVariableHandler);
+
+			if (!itemObject.isEmpty()) {
+				itemObject.addString(AMC_API_KEY_UI_ITEMUUID, item.second->getUUID());
+				itemArray.addObject(itemObject);
+			}
+		}
+	}
+
+}
+
 
 PUIModuleItem CUIPage::findModuleItemByUUID(const std::string& sUUID)
 {

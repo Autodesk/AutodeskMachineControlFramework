@@ -83,6 +83,8 @@ namespace AMC {
 
 		virtual void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray, CParameterHandler* pClientVariableHandler);
 
+		virtual void writeModuleItemUpdatesToJSON(CJSONWriter& writer, CJSONWriterArray& itemArray, CParameterHandler* pClientVariableHandler);
+
 		virtual PUIModuleItem findModuleItemByUUID(const std::string& sUUID) override;
 		virtual void registerFormName(const std::string& sFormUUID, const std::string& sFormName) override;
 		virtual std::string findFormUUIDByName(const std::string& sFormName) override;

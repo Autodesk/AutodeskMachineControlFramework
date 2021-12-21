@@ -28,42 +28,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include "amc_ui_module_item.hpp"
 
-#ifndef __AMC_UI_MODULE_ITEM
-#define __AMC_UI_MODULE_ITEM
+#include "libmc_exceptiontypes.hpp"
 
-#include "header_protection.hpp"
-#include "amc_jsonwriter.hpp"
+using namespace AMC;
 
-
-namespace AMC {
-
-	amcDeclareDependingClass(CUIModule_Item, PUIModule_Item);
-	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
-
-	class CUIModuleItem {
-	protected:		
-
-		std::string m_sItemPath;
-	
-	public:
-
-		CUIModuleItem(const std::string& sItemPath);		
-
-		virtual ~CUIModuleItem();
-
-		virtual void configurePostLoading();
-	
-		virtual std::string getItemPath();
-
-		virtual std::string getUUID () = 0;
-
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler * pClientVariableHandler) = 0;
-
-	};
+CUIModuleItem::CUIModuleItem(const std::string& sItemPath)
+	: m_sItemPath(sItemPath)
+{
 
 }
 
+CUIModuleItem::~CUIModuleItem()
+{
 
-#endif //__AMC_UI_MODULE_ITEM
+}
+
+void CUIModuleItem::configurePostLoading()
+{
+}
+
+
+std::string CUIModuleItem::getItemPath()
+{
+	return m_sItemPath;
+}
+
 

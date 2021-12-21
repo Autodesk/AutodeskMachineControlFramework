@@ -170,8 +170,8 @@ export default class AMCApplication {
 
 	performLogout ()
 	{
-		this.authToken = nullToken;		
-		this.unsuccessfulUpdateCounter = 0;
+		this.API.authToken = nullToken;		
+		this.API.unsuccessfulUpdateCounter = 0;
 	}
 	
 	requestLogin (userName, userPassword) 
@@ -447,6 +447,28 @@ export default class AMCApplication {
         }	
 
 
+		updateContentItemResult (uuid, newEntries)		
+		{
+			if (uuid) {
+				if (newEntries) {
+			
+					var oldentrycount = this.AppContent.ContentItems[uuid].entries.length;					
+					for (var i = 0; i < oldentrycount; i++) {
+						this.AppContent.ContentItems[uuid].entries.pop ();
+					}
+					
+					for (var entry of newEntries) {
+						this.AppContent.ContentItems[uuid].entries.push (entry);
+					}
+								
+					var itemCallback = this.AppContent.ContentItems[uuid].callback;
+					if (itemCallback) {						
+						itemCallback (this.AppContent, this.AppContent.ContentItems[uuid]);
+					}
+				}
+			}
+		}
+
 		updateContentItem (uuid) {
 		
 			this.AppContent.ContentItems[uuid].refresh = false;
@@ -463,24 +485,10 @@ export default class AMCApplication {
 					"headers": headers,
                     url: url
                 })
-                .then(resultJSON => {					
-				
+                .then(resultJSON => {									
+					this.updateContentItemResult (uuid, resultJSON.data.content.entries);
 					this.unsuccessfulUpdateCounter = 0;
-
-					var oldentrycount = this.AppContent.ContentItems[uuid].entries.length;					
-					for (var i = 0; i < oldentrycount; i++) {
-						this.AppContent.ContentItems[uuid].entries.pop ();
-					}
-					
-					for (var entry of resultJSON.data.content.entries) {
-						this.AppContent.ContentItems[uuid].entries.push (entry);
-					}
 					this.AppContent.ContentItems[uuid].refresh = true;
-					
-					var itemCallback = this.AppContent.ContentItems[uuid].callback;
-					if (itemCallback) {						
-						itemCallback (this.AppContent, this.AppContent.ContentItems[uuid]);
-					}
 					
                 })
                 .catch(err => {
@@ -658,6 +666,15 @@ export default class AMCApplication {
 					}
 					if (resultHandleEvent.data.closedialogs) {
 						this.closeAllDialogs ();
+					}
+					if (resultHandleEvent.data.contentupdate) {
+						for (var item of resultHandleEvent.data.contentupdate) {
+							if (item.uuid) {
+								if (item.entries) {
+									this.updateContentItemResult (item.uuid, item.entries);
+								}
+							}
+						}							
 					}
 					
 					
