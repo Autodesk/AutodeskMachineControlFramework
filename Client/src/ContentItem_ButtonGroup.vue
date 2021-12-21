@@ -27,11 +27,10 @@
 	  methods: {	
 		uiModuleButtonClick: function (button) {
 					
-			var contextuuid = this.Application.AppState.activeObject;
 			var formvalues = this.Application.assembleFormValues (button.eventformvalues);
 			
 			if (button.event != "") {		
-				this.Application.triggerUIEvent (button.event, button.uuid, contextuuid, formvalues);
+				this.Application.triggerUIEvent (button.event, button.uuid, formvalues);
 			}
 			
 			if (button.targetpage != "") {

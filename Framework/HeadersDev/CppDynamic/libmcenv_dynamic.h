@@ -1482,6 +1482,17 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CloseModalDialogPtr) (LibMCEnv_U
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ActivatePagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
 
 /**
+* returns name of the UI control that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nSenderNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSenderNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSenderNameBuffer -  buffer of Name of the sender element., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -1900,6 +1911,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
+	PLibMCEnvUIEnvironment_RetrieveEventSenderPtr m_UIEnvironment_RetrieveEventSender;
 	PLibMCEnvUIEnvironment_PrepareSignalPtr m_UIEnvironment_PrepareSignal;
 	PLibMCEnvUIEnvironment_GetMachineStatePtr m_UIEnvironment_GetMachineState;
 	PLibMCEnvUIEnvironment_LogMessagePtr m_UIEnvironment_LogMessage;

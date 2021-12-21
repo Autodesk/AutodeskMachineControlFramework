@@ -259,7 +259,7 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 			writer.addString(AMC_API_KEY_UI_EVENTPAGETOACTIVATE, sPageName);
 
 			// Update state of page to open
-			auto pPage = pUIHandler->findDialog(sPageName);
+			auto pPage = pUIHandler->findPage(sPageName);
 			if (pPage) {
 				pPage->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
 			}

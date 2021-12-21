@@ -546,6 +546,10 @@ namespace AMCCommon {
 		return normalizeUUIDString (guid.str());
 	}
 
+	std::string CUtils::createEmptyUUID()
+	{
+		return "00000000-0000-0000-0000-000000000000";
+	}
 
 
 	void CUtils::deleteFileFromDisk(const std::string& sFileName, bool bMustSucceed)

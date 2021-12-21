@@ -516,7 +516,7 @@ export default class AMCApplication {
 		}
 
 
-		performJobUpload (itemuuid, itemstate, uploadid, chosenfile) {
+		performJobUpload (itemuuid, itemstate, uploadid, chosenfile, successevent, failureevent) {
 					
 		
 			// Attention: itemstate might change with UI interaction. Always check if uploadid matches!						
@@ -590,24 +590,39 @@ export default class AMCApplication {
 									itemstate.messages = [];
 									itemstate.chosenFile = null;
 									itemstate.uploadid = 0;
+									
+									if (successevent) {
+										var eventValues = {}
+										eventValues[itemuuid] = contextuuid;
+										
+										this.triggerUIEvent (successevent, itemuuid, eventValues);
+									}
 																		
 								})
 								.catch(err => {
-									err;                    
+									err;
+									if (failureevent)
+										this.triggerUIEvent (failureevent, itemuuid, {});
 								});
 							})
 							.catch(err => {
 								err;                    
+								if (failureevent)
+									this.triggerUIEvent (failureevent, itemuuid, {});
 							});
 					
 						})
 						.catch(err => {
 							err;                    
+							if (failureevent)
+								this.triggerUIEvent (failureevent, itemuuid, {});
 						});					
 					
 					})
 					.catch(err => {
 						err;                    
+						if (failureevent)
+							this.triggerUIEvent (failureevent, itemuuid, {});
 					});
 					
 				};
@@ -649,13 +664,12 @@ export default class AMCApplication {
 		}
 		
 		
-		triggerUIEvent (eventname, senderuuid, contextuuid, formvalues) {
+		triggerUIEvent (eventname, senderuuid, eventValues) {
 			
             this.axiosPostRequest("/ui/event", {
 				"eventname": eventname,
 				"senderuuid": senderuuid,
-				"contextuuid": contextuuid,
-				"formvalues": formvalues
+				"formvalues": eventValues
 			})
 				.then(resultHandleEvent => {
 					if (resultHandleEvent.data.pagetoactivate) {
@@ -680,7 +694,7 @@ export default class AMCApplication {
 					
 				})
                 .catch(err => {
-					alert (err);
+					console.log (err);
                 });				
 		}
 		

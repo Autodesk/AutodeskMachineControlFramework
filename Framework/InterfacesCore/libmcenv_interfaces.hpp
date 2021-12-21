@@ -1308,6 +1308,12 @@ public:
 	virtual void ActivatePage(const std::string & sDialogName) = 0;
 
 	/**
+	* IUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
+	* @return Name of the sender element.
+	*/
+	virtual std::string RetrieveEventSender() = 0;
+
+	/**
 	* IUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.

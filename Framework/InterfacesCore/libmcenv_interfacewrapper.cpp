@@ -4620,6 +4620,54 @@ LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnv
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if ( (!pSenderNameBuffer) && !(pSenderNameNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sSenderName("");
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSenderNameBuffer == nullptr);
+		if (isCacheCall) {
+			sSenderName = pIUIEnvironment->RetrieveEventSender();
+
+			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sSenderName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSenderName);
+			pIUIEnvironment->_setCache (nullptr);
+		}
+		
+		if (pSenderNameNeededChars)
+			*pSenderNameNeededChars = (LibMCEnv_uint32) (sSenderName.size()+1);
+		if (pSenderNameBuffer) {
+			if (sSenderName.size() >= nSenderNameBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSenderName = 0; iSenderName < sSenderName.size(); iSenderName++)
+				pSenderNameBuffer[iSenderName] = sSenderName[iSenderName];
+			pSenderNameBuffer[sSenderName.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_preparesignal(LibMCEnv_UIEnvironment pUIEnvironment, const char * pMachineInstance, const char * pSignalName, LibMCEnv_SignalTrigger * pSignalInstance)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -5650,6 +5698,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_closemodaldialog;
 	if (sProcName == "libmcenv_uienvironment_activatepage") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_activatepage;
+	if (sProcName == "libmcenv_uienvironment_retrieveeventsender") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_retrieveeventsender;
 	if (sProcName == "libmcenv_uienvironment_preparesignal") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_preparesignal;
 	if (sProcName == "libmcenv_uienvironment_getmachinestate") 

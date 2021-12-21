@@ -57,7 +57,8 @@ namespace AMCCommon {
 		static std::string createUUID();
 		static std::string normalizeUUIDString(std::string sRawString);
 		static std::string normalizeSHA256String(std::string sRawString);		
-		
+		static std::string createEmptyUUID();
+
 		static std::string UTF16toUTF8(std::wstring sString);
 		static std::wstring UTF8toUTF16(std::string sString);
 		static bool UTF8StringIsValid (const std::string & sString);

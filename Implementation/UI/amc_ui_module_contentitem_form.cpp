@@ -361,7 +361,7 @@ PUIModule_ContentForm CUIModule_ContentForm::makeFromXML(const pugi::xml_node& x
 
 	auto pForm = std::make_shared <CUIModule_ContentForm>(pUIModuleEnvironment->stateMachineData(), sItemName, sModulePath);
 
-	pUIModuleEnvironment->formRegistry()->registerFormName(pForm->getUUID(), pForm->getName());
+	pUIModuleEnvironment->contentRegistry()->registerFormName(pForm->getUUID(), pForm->getName());
 
 	auto formNodes = xmlNode.children();
 	for (auto formNode : formNodes) {
@@ -507,4 +507,16 @@ std::list <std::string> CUIModule_ContentForm::getReferenceUUIDs()
 		resultList.push_back(pEntity->getUUID ());
 
 	return resultList;
+}
+
+void CUIModule_ContentForm::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	auto pFormEntity = findEntityByUUID(sPayloadUUID);
+	if (pFormEntity.get() == nullptr)
+		throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNOTFOUND, sEventName + "/" + sPayloadUUID);
+
+	auto pGroup = pClientVariableHandler->findGroup(pFormEntity->getElementPath(), true);
+	pGroup->setParameterValueByName("value", sPayloadValue);
+
 }

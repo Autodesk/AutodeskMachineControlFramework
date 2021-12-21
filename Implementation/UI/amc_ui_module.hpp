@@ -62,15 +62,15 @@ namespace AMC {
 		PStateMachineData m_pStateMachineData;
 		PResourcePackage m_pResourcePackage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-		CUIModule_ContentRegistry* m_pFormRegistry;
+		CUIModule_ContentRegistry* m_pContentRegistry;
 
 	public:
-		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry);
+		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry);
 
 		PStateMachineData stateMachineData();
 		PResourcePackage resourcePackage();
 		LibMCData::PBuildJobHandler buildJobHandler ();
-		CUIModule_ContentRegistry* formRegistry ();
+		CUIModule_ContentRegistry* contentRegistry ();
 
 	};
 

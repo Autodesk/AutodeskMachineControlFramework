@@ -1495,6 +1495,17 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_closemodaldialog(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
 
 /**
+* returns name of the UI control that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nSenderNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSenderNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSenderNameBuffer -  buffer of Name of the sender element., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer);
+
+/**
 * prepares a signal object to trigger later.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.

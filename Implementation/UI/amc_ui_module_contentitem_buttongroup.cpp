@@ -94,7 +94,7 @@ void CUIModule_ContentButton::writeFormValuesToJSON(CJSONWriterArray& pArray)
 PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 {
 	LibMCAssertNotNull(pUIModuleEnvironment);
-	auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->formRegistry(), sItemName, sModulePath);
+	auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->contentRegistry(), sItemName, sModulePath);
 
 	auto buttonsNodes = xmlNode.children("button");
 	for (auto buttonNode : buttonsNodes) {

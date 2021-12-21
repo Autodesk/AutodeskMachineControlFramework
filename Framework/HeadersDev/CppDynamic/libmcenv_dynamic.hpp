@@ -737,6 +737,7 @@ public:
 	inline void ActivateModalDialog(const std::string & sDialogName);
 	inline void CloseModalDialog();
 	inline void ActivatePage(const std::string & sDialogName);
+	inline std::string RetrieveEventSender();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline void LogMessage(const std::string & sLogString);
@@ -975,6 +976,7 @@ public:
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
+		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -2264,6 +2266,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSender = (PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrieveeventsender");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSender = (PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) dlsym(hLibrary, "libmcenv_uienvironment_retrieveeventsender");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -3042,6 +3053,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatepage", (void**)&(pWrapperTable->m_UIEnvironment_ActivatePage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivatePage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsender", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSender));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
@@ -4949,6 +4964,21 @@ public:
 	void CUIEnvironment::ActivatePage(const std::string & sDialogName)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ActivatePage(m_pHandle, sDialogName.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
+	* @return Name of the sender element.
+	*/
+	std::string CUIEnvironment::RetrieveEventSender()
+	{
+		LibMCEnv_uint32 bytesNeededSenderName = 0;
+		LibMCEnv_uint32 bytesWrittenSenderName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, 0, &bytesNeededSenderName, nullptr));
+		std::vector<char> bufferSenderName(bytesNeededSenderName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, bytesNeededSenderName, &bytesWrittenSenderName, &bufferSenderName[0]));
+		
+		return std::string(&bufferSenderName[0]);
 	}
 	
 	/**

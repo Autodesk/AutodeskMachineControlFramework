@@ -809,7 +809,11 @@
 		</method>
 	  
 		<method name="ActivatePage" description="changes the current page on the client.">
-			<param name="DialogName" type="string" pass="in" description="Name of the dialog to activate." />
+			<param name="PageName" type="string" pass="in" description="Name of the page to activate." />
+		</method>
+	  
+		<method name="RetrieveEventSender" description="returns name of the UI control that triggered the event.">
+			<param name="SenderName" type="string" pass="return" description="Name of the sender element." />
 		</method>
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">

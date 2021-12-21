@@ -66,6 +66,7 @@ private:
 	AMC::PStateSignalHandler m_pSignalHandler;
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
+	std::string m_sSenderName;
 
 	std::string m_sModalDialogToShow;
 	bool m_bCloseModalDialog;
@@ -75,13 +76,15 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, AMC::PParameterHandler pClientVariableHandler);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler);
 
 	void ActivateModalDialog(const std::string& sDialogName) override;
 
 	void CloseModalDialog() override;
 
 	void ActivatePage(const std::string& sPageName) override;
+
+	std::string RetrieveEventSender() override;
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 

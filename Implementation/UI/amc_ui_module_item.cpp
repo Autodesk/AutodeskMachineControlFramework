@@ -55,4 +55,9 @@ std::string CUIModuleItem::getItemPath()
 	return m_sItemPath;
 }
 
+void CUIModuleItem::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
+{
+
+}
+
 
