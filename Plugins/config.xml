@@ -239,27 +239,43 @@
 		</page>
 
 		<page name="previewbuild" onload="loadbuildinfo">
-			<content name="buildinformation" title="Build Information" subtitle="Detailed information">
-				<paragraph text="Here you find more information about your build."/>
-				<layerview/>
-				<buttongroup>
-					<button caption="Prepare Build" targetpage="preparebuild" event="startbuildpreparation"/>
-				</buttongroup>
-			</content>
+		
+			<grid name="previewgrid">
+				<column width="3" unit="free" />
+				<column width="150" unit="pt" />
+				
+				<row height="80" unit="pt" />
+				<row height="1" unit="free" />
+		
+				<content name="buildinformation" title="Build Information" subtitle="Detailed information" columnstart="1" rowstart="1" columnend="1" rowend="1" >
+					<paragraph text="Here you find more information about your build."/>
+				</content>
+
+				<content name="actions" columnstart="2" rowstart="1" columnend="2" rowend="1" >
+					<buttongroup>
+						<button caption="Prepare Build" targetpage="preparebuild" event="startbuildpreparation"/>
+					</buttongroup>
+				</content>
+
+				<content name="preview" columnstart="1" rowstart="2" columnend="2" rowend="2" >
+					<layerview />
+				</content>
+			
+			</grid>		
 		</page>
 
 		<page name="preparebuild" onload="loadbuildinfo">
 		
 			<grid name="maingrid">
-				<column width="300" unit="pt" />
 				<column width="3" unit="free" />
+				<column width="150" unit="pt" />
 				
 				<row height="3" unit="free" />
 				<row height="80" unit="pt" />
 				
-				<content name="manualcontrol1" title="" columnstart="1" rowstart="1" columnend="1" rowend="1" columnposition="left" rowposition="top">
+				<content name="manualcontrol1" title="Process" columnstart="2" rowstart="1" columnend="2" rowend="1" columnposition="left" rowposition="top">
 					
-						<form name="processparameters" sync:disabled="main.ui.preparebuilddisabled">
+						<form name="processparameters"  sync:disabled="main.ui.preparebuilddisabled">
 							<edit name="o2_value" 
 								caption="Target Oxygen Value" 								
 								sync:value="main.processsettings.targeto2"															
@@ -277,19 +293,14 @@
 				
 				</content>
 				
-				<content name="manualcontrol2" title="" columnstart="1" rowstart="2" columnend="1" rowend="2" columnposition="left" rowposition="centered">
-					
-						<buttongroup>
-							<button caption="Move to home" />
-							<button caption="Start inertisation" />
-						</buttongroup>				
+				<content name="manualcontrol2" title="" columnstart="2" rowstart="2" columnend="2" rowend="2" columnposition="left" rowposition="centered">
 				</content>
 				
-				<glscene name="manualcontrol3" title="" columnstart="2" rowstart="1" columnend="2" rowend="1">
+				<glscene name="manualcontrol3" title="" columnstart="1" rowstart="1" columnend="1" rowend="1">
 									
 				</glscene>
 				
-				<content name="manualcontrol4" title="" columnstart="2" rowstart="2" columnend="2" rowend="2" columnposition="right" rowposition="centered">
+				<content name="manualcontrol4" title="" columnstart="1" rowstart="2" columnend="1" rowend="2" columnposition="right" rowposition="centered">
 					
 					<buttongroup>
 							<button caption="Start Job" targetpage="buildstatus" event="startbuild"/>
