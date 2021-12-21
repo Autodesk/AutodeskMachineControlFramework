@@ -29,9 +29,7 @@
 	  methods: {	
 	  
 		uiModuleBuildListClick: function (item) {
-			if (item.detailpage != "") {
-				this.Application.changePage (String (item.detailpage) + ":" + String (item.buildUUID));
-			}
+			item;
 		},
 				
 	  }
