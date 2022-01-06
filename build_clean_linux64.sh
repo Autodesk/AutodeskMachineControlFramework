@@ -109,8 +109,6 @@ cp ../Output/${GITHASH}_*.data Framework/Dist/
 cp ../Output/${GITHASH}_*.client Framework/Dist/
 cp ../Output/${GITHASH}_package.xml Framework/Dist/
 cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
-cp ../Output/lib3mf.so Framework/Dist/${GITHASH}_core_lib3mf.so
-cp ../../Templates/libmcconfig.xml ./configuration.xml
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
