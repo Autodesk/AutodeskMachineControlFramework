@@ -112,7 +112,7 @@ cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
-cp ../../Framework/PluginPython/*.* Framework/PluginPython
+#cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
 go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
 
