@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "common_chrono.hpp"
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif 
 
 #ifdef __GNUC__
