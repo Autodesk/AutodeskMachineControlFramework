@@ -116,6 +116,6 @@ cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 
 go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
 
-cp $builddir/DevPackage/AMCF_${GITHASH}.zip $builddir/Artifacts
+cp $builddir/DevPackage/AMCF_${GITHASH}.zip $builddir/Artifacts/devpackage.zip
 
 echo "Build done!"
