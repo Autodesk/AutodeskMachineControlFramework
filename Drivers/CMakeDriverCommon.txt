@@ -76,6 +76,14 @@ target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Imp
 target_include_directories(${DRIVERNAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Interfaces)
 target_compile_options(${DRIVERNAME} PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
 
+if(WIN32)
+if (MSVC)
+else()
+target_link_options(${DRIVERNAME} PRIVATE -static-libgcc -static-libstdc++ --static )
+endif (MSVC)
+endif()
+
+
 set_target_properties(${DRIVERNAME}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"
