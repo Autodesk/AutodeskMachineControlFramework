@@ -46,6 +46,9 @@ dirs_to_make[28]="$builddir_arm"
 dirs_to_make[29]="$outputdir_win32"
 dirs_to_make[30]="$outputdir_linux"
 dirs_to_make[31]="$outputdir_arm"
+dirs_to_make[32]="$builddir_win32/DevPackage/Framework"
+dirs_to_make[33]="$builddir_linux/DevPackage/Framework"
+dirs_to_make[34]="$builddir_arm/DevPackage/Framework"
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -73,17 +76,20 @@ echo "Building Resource builder (Win64)..."
 set GOARCH=amd64
 set GOOS=windows
 go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+cp "$builddir/DevPackage/Framework/buildresources.exe" "$builddir_win32/DevPackage/Framework/buildresources.exe"
 
 echo "Building Resource builder (Linux64)..."
 set GOARCH=amd64
 set GOOS=linux
 go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+cp "$builddir/DevPackage/Framework/buildresources.linux" "$builddir_linux/DevPackage/Framework/buildresources.linux"
 
 echo "Building Resource builder (LinuxARM)..."
 set GOARCH=arm
 set GOOS=linux
 set GOARM=5
 go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+cp "$builddir/DevPackage/Framework/buildresources.arm" "$builddir_arm/DevPackage/Framework/buildresources.arm"
 
 echo "Getting Server Dependencies..."
 go get "github.com/gorilla/handlers"
@@ -104,7 +110,7 @@ set GOOS=linux
 set GOARM=5
 go build -o "$outputdir/amc_server.arm" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
-
+echo "Building Client..."
 cp "$basepath/Client/public/"*.* "$builddir/Client/public"
 cp "$basepath/Client/src/"*.* "$builddir/Client/src"
 cp "$basepath/Client/src/plugins/"*.* "$builddir/Client/src/plugins"
