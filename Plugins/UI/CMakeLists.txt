@@ -88,6 +88,13 @@ target_include_directories(${PLUGINNAME} PRIVATE ${CMAKE_CURRENT_PLUGIN_DIR})
 target_include_directories(${PLUGINNAME} PRIVATE ${CMAKE_CURRENT_HEADER_DIR})
 target_include_directories(${PLUGINNAME} PRIVATE ${CMAKE_CURRENT_DRIVERHEADER_DIR})
 
+if(WIN32)
+if (MSVC)
+else()
+target_link_options(${PLUGINNAME} PRIVATE -static-libgcc -static-libstdc++ --static )
+endif (MSVC)
+endif()
+
 set_target_properties(${PLUGINNAME}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_OUTPUT_DIR}"
