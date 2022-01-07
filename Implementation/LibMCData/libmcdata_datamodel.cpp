@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_logsession.hpp"
 #include "libmcdata_buildjobhandler.hpp"
 #include "libmcdata_loginhandler.hpp"
+#include "libmcdata_persistencyhandler.hpp"
 
 #include "amcdata_databasemigrator.hpp"
 #include "amcdata_sqlhandler_sqlite.hpp"
@@ -43,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amcdata_databasemigrator_storage.hpp"
 #include "amcdata_databasemigrator_buildjobs.hpp"
 #include "amcdata_databasemigrator_users.hpp"
+#include "amcdata_databasemigrator_persistentparameters.hpp"
 
 #include "common_utils.hpp"
 
@@ -75,6 +77,7 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Storage>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_BuildJobs>());
     migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_Users>());
+    migrator.addMigrationClass(std::make_shared<AMCData::CDatabaseMigrationClass_PersistentParameters>());
     migrator.migrateDatabaseSchemas(m_pSQLHandler, m_sInstallationUUID, m_sInstallationSecret);
 
     // Store Database type after successful initialisation
@@ -126,5 +129,10 @@ IBuildJobHandler* CDataModel::CreateBuildJobHandler()
 ILoginHandler* CDataModel::CreateLoginHandler()
 {
     return new CLoginHandler(m_pSQLHandler);
+}
+
+IPersistencyHandler* CDataModel::CreatePersistencyHandler()
+{
+    return new CPersistencyHandler(m_pSQLHandler);
 }
 

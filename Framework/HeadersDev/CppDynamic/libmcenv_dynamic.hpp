@@ -736,7 +736,7 @@ public:
 	
 	inline void ActivateModalDialog(const std::string & sDialogName);
 	inline void CloseModalDialog();
-	inline void ActivatePage(const std::string & sDialogName);
+	inline void ActivatePage(const std::string & sPageName);
 	inline std::string RetrieveEventSender();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
@@ -4959,11 +4959,11 @@ public:
 	
 	/**
 	* CUIEnvironment::ActivatePage - changes the current page on the client.
-	* @param[in] sDialogName - Name of the dialog to activate.
+	* @param[in] sPageName - Name of the page to activate.
 	*/
-	void CUIEnvironment::ActivatePage(const std::string & sDialogName)
+	void CUIEnvironment::ActivatePage(const std::string & sPageName)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ActivatePage(m_pHandle, sDialogName.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ActivatePage(m_pHandle, sPageName.c_str()));
 	}
 	
 	/**

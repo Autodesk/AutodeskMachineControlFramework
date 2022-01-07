@@ -420,6 +420,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDINTEGEREXPRESSION 393
 #define LIBMC_ERROR_INVALIDNUMBEREXPRESSION 394
 #define LIBMC_ERROR_INVALIDBOOLEANEXPRESSION 395
+#define LIBMC_ERROR_INVALIDPERSISTENCYNAME 396
+#define LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT 397
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -752,6 +754,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDINTEGEREXPRESSION: return "Invalid integer expression";
     case LIBMC_ERROR_INVALIDNUMBEREXPRESSION: return "Invalid number expression";
     case LIBMC_ERROR_INVALIDBOOLEANEXPRESSION: return "Invalid boolean expression";
+    case LIBMC_ERROR_INVALIDPERSISTENCYNAME: return "Invalid persistency name";
+    case LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT: return "Only valued parameters can be persistent";
     default: return "unknown error";
   }
 }

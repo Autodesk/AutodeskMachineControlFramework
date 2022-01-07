@@ -626,9 +626,11 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
         if (pModuleItem.get() == nullptr)
-            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);        
+            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);                        
 
-        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, pModuleItem->getItemPath(), pClientVariableHandler);
+        auto sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sSenderPath, pClientVariableHandler);
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);

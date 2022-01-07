@@ -121,7 +121,7 @@ void CDriverEnvironment::RegisterUUIDParameter(const std::string& sParameterName
     if (!m_bIsInitializing)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DRIVERISNOTINITIALISING);
 
-    m_pParameterGroup->addNewStringParameter(sParameterName, sDescription, AMCCommon::CUtils::normalizeUUIDString(sDefaultValue));
+    m_pParameterGroup->addNewUUIDParameter(sParameterName, sDescription, AMCCommon::CUtils::normalizeUUIDString(sDefaultValue));
 }
 
 void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue)

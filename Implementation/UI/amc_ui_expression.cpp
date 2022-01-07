@@ -106,7 +106,7 @@ double CUIExpression::evaluateNumberValue(CStateMachineData* pStateMachineData)
 		if (!bIsNumber)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDNUMBEREXPRESSION, sExpression);
 
-		return std::stod(sExpression);
+		return AMCCommon::CUtils::stringToDouble(sExpression);
 	}
 
 }
@@ -141,7 +141,7 @@ int64_t CUIExpression::evaluateIntegerValue(CStateMachineData* pStateMachineData
 		if (!bIsNumber)
 			throw ELibMCCustomException (LIBMC_ERROR_INVALIDINTEGEREXPRESSION, sExpression);
 
-		return std::stoll(sExpression);
+		return AMCCommon::CUtils::stringToInteger(sExpression);
 	}
 
 }
@@ -209,7 +209,7 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 		if (!bIsNumber)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDBOOLEANEXPRESSION, sExpression);
 
-		int64_t nValue = std::stoll(sExpression);
+		int64_t nValue = AMCCommon::CUtils::stringToInteger(sExpression);
 		if (bInvert)
 			return (nValue == 0);
 

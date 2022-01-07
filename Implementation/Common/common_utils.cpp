@@ -364,6 +364,33 @@ namespace AMCCommon {
 	}
 
 
+	int64_t CUtils::stringToInteger(const std::string& sString)
+	{
+		std::string trimmedString = trimString(sString);
+
+		size_t nConversionErrorIndex = 0;
+		int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+		
+		if (nConversionErrorIndex != trimmedString.length())
+			throw std::runtime_error("invalid integer string: " + sString);
+
+		return nResult;
+	}
+
+	double CUtils::stringToDouble(const std::string& sString)
+	{
+		std::string trimmedString = trimString(sString);
+
+		size_t nConversionErrorIndex = 0;
+		double dResult = std::stod(trimmedString, &nConversionErrorIndex);
+
+		if (nConversionErrorIndex != trimmedString.length())
+			throw std::runtime_error("invalid integer string: " + sString);
+
+		return dResult;
+	}
+
+
     std::wstring CUtils::UTF8toUTF16(const std::string sString)
 	{
 

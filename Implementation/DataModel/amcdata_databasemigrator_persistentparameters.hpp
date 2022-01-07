@@ -29,53 +29,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_PARAMETER
-#define __AMC_PARAMETER
+#ifndef __AMCDATA_DATABASEMIGRATOR_PERSISTENTPARAMETERS
+#define __AMCDATA_DATABASEMIGRATOR_PERSISTENTPARAMETERS
 
-#ifndef _PARAMETER_HEADERPROTECTION
-#error Never include amc_parameter.hpp from outside of amc_parameter.cpp and amc_parametergroup.cpp
-#endif
+#include "amcdata_databasemigrator.hpp"
 
-#include <memory>
-#include <string>
+namespace AMCData {
 
-#include "amc_parametertype.hpp"
-
-namespace AMC {
-
-	class CParameter;
-	typedef std::shared_ptr<CParameter> PParameter;
-
-	class CParameterGroup;
-	typedef std::shared_ptr<CParameterGroup> PParameterGroup;
-
-	class CParameter {
+	class CDatabaseMigrationClass_PersistentParameters : public CDatabaseMigrationClass {
 	public:
-
-		virtual std::string getName() const = 0;
-		virtual std::string getDescription() const = 0;
-		virtual std::string getDefaultValue() const = 0;
-
-		virtual eParameterDataType getDataType() const = 0;
-
-		virtual std::string getStringValue() const = 0;
-		virtual void setStringValue(const std::string& sValue) = 0;
-
-		virtual double getDoubleValue() const = 0;
-		virtual void setDoubleValue(const double dValue) = 0;
-
-		virtual int64_t getIntValue() const = 0;
-		virtual void setIntValue(const int64_t nValue) = 0;
-
-		virtual bool getBoolValue() const = 0;
-		virtual void setBoolValue(const bool bValue) = 0;
-
-		virtual PParameter duplicate() = 0;
+		void increaseSchemaVersion (PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex) override;
 	};
-
 	
 }
 
 
-#endif //__AMC_PARAMETER
+#endif //__AMCDATA_DATABASEMIGRATOR_PERSISTENTPARAMETERS
 

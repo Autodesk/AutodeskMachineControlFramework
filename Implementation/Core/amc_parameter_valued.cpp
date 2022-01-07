@@ -35,10 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_statejournal.hpp"
 #include "libmc_exceptiontypes.hpp"
 
+#include "libmcdata_dynamic.hpp"
+
+#include "common_utils.hpp"
+
 namespace AMC {
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const std::string & sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription (sDescription), m_sDefaultValue (sDefaultValue), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType (eDataType)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -46,8 +50,8 @@ namespace AMC {
 		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string (dDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -55,8 +59,8 @@ namespace AMC {
 		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(std::to_string(nDefaultValue)), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -64,8 +68,8 @@ namespace AMC {
 		m_sValue = m_sDefaultValue;
 	}
 
-	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID)
-		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal)
+	CParameter_Valued::CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID)
+		: m_sName(sName), m_sDescription(sDescription), m_sDefaultValue(bDefaultValue ? "1" : "0"), m_nJournalVariableID(nJournalVariableID), m_pJournal (pJournal), m_DataType(eDataType)
 	{
 		if (sName.length() == 0)
 			throw ELibMCInterfaceException(LIBMC_ERROR_EMPTYPARAMETERNAME);
@@ -93,6 +97,12 @@ namespace AMC {
 		return std::string(m_sDefaultValue.c_str());
 	}
 
+	eParameterDataType CParameter_Valued::getDataType() const
+	{
+		return m_DataType;
+	}
+
+
 	// The following calls are not thread-safe and need to be mutexed in ParameterGroup!
 	std::string CParameter_Valued::getStringValue() const
 	{
@@ -103,31 +113,32 @@ namespace AMC {
 	{
 		if (m_pJournal.get () != nullptr)
 			m_pJournal->updateStringValue(m_nJournalVariableID, sValue);
-		m_sValue = sValue;
+
+		setValueEx (sValue);
 	}
 
 	double CParameter_Valued::getDoubleValue() const
 	{
-		return std::stod (m_sValue);
+		return AMCCommon::CUtils::stringToDouble(m_sValue);
 	}
 
 	void CParameter_Valued::setDoubleValue(const double dValue)
 	{
 		if (m_pJournal.get() != nullptr)
 			m_pJournal->updateDoubleValue(m_nJournalVariableID, dValue);
-		m_sValue = std::to_string(dValue);
+		setValueEx (std::to_string(dValue));
 	}
 
 	int64_t CParameter_Valued::getIntValue() const
 	{
-		return std::stoi(m_sValue);
+		return AMCCommon::CUtils::stringToInteger(m_sValue);
 	}
 
 	void CParameter_Valued::setIntValue(const int64_t nValue)
 	{
 		if (m_pJournal.get() != nullptr)
 			m_pJournal->updateIntegerValue(m_nJournalVariableID, nValue);
-		m_sValue = std::to_string(nValue);
+		setValueEx (std::to_string(nValue));
 	}
 
 	bool CParameter_Valued::getBoolValue() const
@@ -140,18 +151,100 @@ namespace AMC {
 		if (m_pJournal.get() != nullptr)
 			m_pJournal->updateBoolValue(m_nJournalVariableID, bValue);
 		if (bValue)
-			m_sValue = "1";
+			setValueEx ("1");
 		else
-			m_sValue = "0";
+			setValueEx ("0");
 	}
 
 	PParameter CParameter_Valued::duplicate()
 	{
-		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue, m_pJournal, m_nJournalVariableID);
+		auto pParameter = std::make_shared<CParameter_Valued>(m_sName, m_sDescription, m_sDefaultValue, m_DataType, m_pJournal, m_nJournalVariableID);
 		pParameter->m_sValue = m_sValue;
 		return pParameter;
 	}
 
+	void CParameter_Valued::enablePersistency(const std::string& sPersistentName, const std::string& sPersistentUUID, LibMCData::PPersistencyHandler pPersistencyHandler)
+	{
+		disablePersistency();
+
+		if (pPersistencyHandler.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sPersistentName))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPERSISTENCYNAME, sPersistentName);
+
+		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sPersistentUUID);
+
+		if (pPersistencyHandler->HasPersistentParameter(sNormalizedUUID)) {
+
+			switch (m_DataType) {
+			case eParameterDataType::String: 
+				setStringValue(pPersistencyHandler->RetrievePersistentStringParameter(sNormalizedUUID));
+				break;
+			case eParameterDataType::UUID:
+				setStringValue(pPersistencyHandler->RetrievePersistentUUIDParameter (sNormalizedUUID));
+				break;
+			case eParameterDataType::Integer:
+				setIntValue(pPersistencyHandler->RetrievePersistentIntegerParameter(sNormalizedUUID));
+				break;
+			case eParameterDataType::Bool:
+				setBoolValue(pPersistencyHandler->RetrievePersistentBoolParameter(sNormalizedUUID));
+				break;
+			case eParameterDataType::Double:
+				setDoubleValue(pPersistencyHandler->RetrievePersistentDoubleParameter(sNormalizedUUID));
+				break;
+
+			}
+			
+
+		}
+
+		m_sPersistentName = sPersistentName;
+		m_sPersistentUUID = sNormalizedUUID;
+		m_pPersistencyHandler = pPersistencyHandler;
+
+
+	}
+
+	void CParameter_Valued::disablePersistency()
+	{
+		m_pPersistencyHandler = nullptr;
+		m_sPersistentName = "";
+		m_sPersistentUUID = "";
+	}
+
+	
+	void CParameter_Valued::setValueEx(const std::string& sValue)
+	{
+		bool hasChanged = (sValue != m_sValue);
+		m_sValue = sValue;
+
+		if (hasChanged && (m_pPersistencyHandler.get () != nullptr) && (!m_sPersistentUUID.empty ())) {
+			LibMCData::eParameterDataType eParameterType;
+			switch (m_DataType) {
+			case eParameterDataType::String: 
+				eParameterType = LibMCData::eParameterDataType::String; 
+				break;
+			case eParameterDataType::Bool:
+				eParameterType = LibMCData::eParameterDataType::Bool;
+				break;
+			case eParameterDataType::Integer:
+				eParameterType = LibMCData::eParameterDataType::Integer;
+				break;
+			case eParameterDataType::UUID:
+				eParameterType = LibMCData::eParameterDataType::UUID;
+				break;
+			case eParameterDataType::Double:
+				eParameterType = LibMCData::eParameterDataType::Double;
+				break;
+			default:
+				eParameterType = LibMCData::eParameterDataType::Unknown;
+
+			}
+
+			m_pPersistencyHandler->StorePersistentParameter(m_sPersistentUUID, m_sPersistentName, eParameterType, sValue);
+		}
+	}
 
 }
 

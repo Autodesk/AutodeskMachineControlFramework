@@ -220,18 +220,22 @@ void CUIModule_ContentFormEdit::writeVariablesToJSON(CJSONWriter& writer, CJSONW
 PUIModule_ContentFormSwitch CUIModule_ContentFormSwitch::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData)
 {
 	auto nameAttrib = xmlNode.attribute("name");
+	auto changeeventAttrib = xmlNode.attribute ("changeevent");
 
 	if (nameAttrib.empty())
 		throw ELibMCInterfaceException(LIBMC_ERROR_FORMENTITYNAMEMISSING);
+
 	CUIExpression caption(xmlNode, "caption");
 	CUIExpression value(xmlNode, "value");
 
-	return std::make_shared<CUIModule_ContentFormSwitch>(nameAttrib.as_string(), sFormPath, caption, value, pStateMachineData);
+	std::string sOnChangeEvent = changeeventAttrib.as_string();
+
+	return std::make_shared<CUIModule_ContentFormSwitch>(nameAttrib.as_string(), sFormPath, caption, value, sOnChangeEvent, pStateMachineData);
 
 }
 
-CUIModule_ContentFormSwitch::CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, PStateMachineData pStateMachineData)
-	: CUIModule_ContentFormEntity (sName, sFormPath, Caption, pStateMachineData)
+CUIModule_ContentFormSwitch::CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string& sOnChangeEvent, PStateMachineData pStateMachineData)
+	: CUIModule_ContentFormEntity (sName, sFormPath, Caption, pStateMachineData), m_ValueExpression (Value), m_sOnChangeEvent (sOnChangeEvent)
 {
 
 }
@@ -250,16 +254,24 @@ std::string CUIModule_ContentFormSwitch::getTypeString()
 void CUIModule_ContentFormSwitch::populateClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	auto pGroup = registerClientVariableGroup(pClientVariableHandler);
+	pGroup->addNewBoolParameter(AMC_API_KEY_UI_FORMDEFAULTVALUE, "switch value", m_ValueExpression.evaluateBoolValue(m_pStateMachineData));
 }
 
 
 void CUIModule_ContentFormSwitch::syncClientVariables(CParameterHandler* pClientVariableHandler)
 {
+	auto pGroup = getClientVariableGroup(pClientVariableHandler);
+	if (m_ValueExpression.needsSync())
+		pGroup->setBoolParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE, m_ValueExpression.evaluateBoolValue(m_pStateMachineData));
 }
 
 void CUIModule_ContentFormSwitch::writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	auto pGroup = getClientVariableGroup(pClientVariableHandler);
+
+	object.addBool(AMC_API_KEY_UI_FORMDEFAULTVALUE, pGroup->getBoolParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE));
+	if (!m_sOnChangeEvent.empty ())
+		object.addString(AMC_API_KEY_UI_FORMCHANGEEVENT, m_sOnChangeEvent);
 }
 
 
@@ -520,3 +532,17 @@ void CUIModule_ContentForm::setEventPayloadValue(const std::string& sEventName, 
 	pGroup->setParameterValueByName("value", sPayloadValue);
 
 }
+
+std::string CUIModule_ContentForm::findElementPathByUUID(const std::string& sUUID)
+{
+	if (sUUID == m_sUUID)
+		return getItemPath();
+
+	auto pFormEntity = findEntityByUUID(sUUID);
+	if (pFormEntity.get() != nullptr) {
+		return pFormEntity->getElementPath();
+	}
+
+	return "";
+}
+

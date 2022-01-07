@@ -83,6 +83,8 @@ public:
 
 	ILoginHandler* CreateLoginHandler() override;
 
+	IPersistencyHandler* CreatePersistencyHandler() override;
+
 };
 
 } // namespace Impl

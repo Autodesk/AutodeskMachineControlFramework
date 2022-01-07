@@ -4593,19 +4593,19 @@ LibMCEnvResult libmcenv_uienvironment_closemodaldialog(LibMCEnv_UIEnvironment pU
 	}
 }
 
-LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName)
+LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pPageName)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
 
 	try {
-		if (pDialogName == nullptr)
+		if (pPageName == nullptr)
 			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
-		std::string sDialogName(pDialogName);
+		std::string sPageName(pPageName);
 		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
 		if (!pIUIEnvironment)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
-		pIUIEnvironment->ActivatePage(sDialogName);
+		pIUIEnvironment->ActivatePage(sPageName);
 
 		return LIBMCENV_SUCCESS;
 	}

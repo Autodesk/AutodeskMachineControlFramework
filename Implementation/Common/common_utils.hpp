@@ -65,6 +65,8 @@ namespace AMCCommon {
 		static std::string trimString (const std::string& sString);
 		static std::string toLowerString(const std::string& sString);
 		static void splitString (const std::string& sString, const std::string & sDelimiter, std::vector<std::string> & stringVector);
+		static int64_t stringToInteger(const std::string& sString);
+		static double stringToDouble(const std::string& sString);
 
 		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
 		static std::string calculateSHA256FromString(const std::string& sString);

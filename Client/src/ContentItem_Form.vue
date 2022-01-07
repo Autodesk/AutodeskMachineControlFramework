@@ -12,7 +12,7 @@
 
 			<v-row dense no-gutters :key="entity.name" v-if="(entity.type=='switch')" align="center">
 				<v-col cols="3"><v-label>{{ entity.caption }}:</v-label></v-col>
-				<v-col cols="9"><v-switch v-model="entity.dataObject.value"  :disabled="entity.dataObject.disabled" :readonly="entity.dataObject.readonly" /></v-col>
+				<v-col cols="9"><v-switch @change="uiToggleSwitch (entity);" v-model="entity.dataObject.value"  :disabled="entity.dataObject.disabled" :readonly="entity.dataObject.readonly" /></v-col>
 			</v-row>
 
 			<v-row dense no-gutters :key="entity.name" v-if="(entity.type=='memo')">
@@ -37,6 +37,19 @@
 	  props: ["Application", "moduleitem"],
 
 	  methods: {	
+		uiToggleSwitch: function (switchentity) {
+		
+			if (switchentity.dataObject.value != switchentity.dataObject.remotevalue) {
+				if (switchentity.changeevent != "") {
+				
+					console.log ("change event!");
+				
+					var formvalues = this.Application.assembleFormValues ([ switchentity.uuid ]);
+					this.Application.triggerUIEvent (switchentity.changeevent, switchentity.uuid, formvalues);
+				}
+			}
+		}
+	  
 	  }
 	};
 	

@@ -20,6 +20,7 @@ function updateAMCFormEntityFromContentEntry (entry, entity) {
 		entity.suffix = entry.suffix;
 		entity.readonly = entry.readonly;
 		entity.disabled = entry.disabled;
+		entity.changeevent = entry.changeevent;
 		
 
 	}
@@ -258,7 +259,8 @@ export default class AMCApplication {
 					  value: entity.value, 
 					  remotevalue: entity.value, 
 					  disabled: entity.disabled, 
-					  readonly: entity.readonly
+					  readonly: entity.readonly,
+					  changeevent: entity.changeevent
 					  };
 					  
 					  

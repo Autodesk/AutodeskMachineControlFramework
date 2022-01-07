@@ -413,7 +413,10 @@
 		<error name="INVALIDINTEGEREXPRESSION" code="393" description="Invalid integer expression" />
 		<error name="INVALIDNUMBEREXPRESSION" code="394" description="Invalid number expression" />
 		<error name="INVALIDBOOLEANEXPRESSION" code="395" description="Invalid boolean expression" />
-			
+
+		<error name="INVALIDPERSISTENCYNAME" code="396" description="Invalid persistency name" />
+		<error name="ONLYVALUEDPARAMETERSCANBEPERSISTENT" code="397" description="Only valued parameters can be persistent" />
+
 	</errors>
 	
 	

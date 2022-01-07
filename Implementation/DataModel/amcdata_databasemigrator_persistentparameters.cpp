@@ -28,54 +28,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include "amcdata_databasemigrator_persistentparameters.hpp"
+#include "libmcdata_interfaceexception.hpp"
 
-#ifndef __AMC_PARAMETER
-#define __AMC_PARAMETER
+namespace AMCData {
+		
+	void CDatabaseMigrationClass_PersistentParameters::increaseSchemaVersion(PSQLTransaction pTransaction, uint32_t nCurrentVersionIndex)
+	{
 
-#ifndef _PARAMETER_HEADERPROTECTION
-#error Never include amc_parameter.hpp from outside of amc_parameter.cpp and amc_parametergroup.cpp
-#endif
+		if (pTransaction.get() == nullptr)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARAM);
 
-#include <memory>
-#include <string>
+		switch (nCurrentVersionIndex) {
+		case 0: {
+			std::string sPersistentParameters = "CREATE TABLE `persistentparameters` (";
+			sPersistentParameters += "`uuid` varchar ( 64 ) UNIQUE NOT NULL,";
+			sPersistentParameters += "`name` varchar ( 256 ) NOT NULL,";
+			sPersistentParameters += "`datatype` varchar ( 64 ) NOT NULL,";
+			sPersistentParameters += "`value` text NOT NULL,";
+			sPersistentParameters += "`active` integer DEFAULT 1,";
+			sPersistentParameters += "`updateuuid` varchar ( 64 ),";
+			sPersistentParameters += "`timestamp` varchar ( 64 ) NOT NULL)";
+			pTransaction->executeStatement(sPersistentParameters);
 
-#include "amc_parametertype.hpp"
+			break;
+		}
 
-namespace AMC {
+		}
+	}
 
-	class CParameter;
-	typedef std::shared_ptr<CParameter> PParameter;
 
-	class CParameterGroup;
-	typedef std::shared_ptr<CParameterGroup> PParameterGroup;
 
-	class CParameter {
-	public:
-
-		virtual std::string getName() const = 0;
-		virtual std::string getDescription() const = 0;
-		virtual std::string getDefaultValue() const = 0;
-
-		virtual eParameterDataType getDataType() const = 0;
-
-		virtual std::string getStringValue() const = 0;
-		virtual void setStringValue(const std::string& sValue) = 0;
-
-		virtual double getDoubleValue() const = 0;
-		virtual void setDoubleValue(const double dValue) = 0;
-
-		virtual int64_t getIntValue() const = 0;
-		virtual void setIntValue(const int64_t nValue) = 0;
-
-		virtual bool getBoolValue() const = 0;
-		virtual void setBoolValue(const bool bValue) = 0;
-
-		virtual PParameter duplicate() = 0;
-	};
-
-	
 }
 
-
-#endif //__AMC_PARAMETER
 

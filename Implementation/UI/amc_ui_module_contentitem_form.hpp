@@ -133,12 +133,14 @@ namespace AMC {
 
 	class CUIModule_ContentFormSwitch : public CUIModule_ContentFormEntity {
 	protected:
+		CUIExpression m_ValueExpression;
+		std::string m_sOnChangeEvent;
 
 	public:
 
 		static PUIModule_ContentFormSwitch makeFromXML(const pugi::xml_node& xmlNode, const std::string& sFormPath, PStateMachineData pStateMachineData);
 
-		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, PStateMachineData pStateMachineData);
+		CUIModule_ContentFormSwitch(const std::string& sName, const std::string& sFormPath, CUIExpression Caption, CUIExpression Value, const std::string & sOnChangeEvent, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentFormSwitch();
 
@@ -231,6 +233,8 @@ namespace AMC {
 		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
 		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
+
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
 
 	};

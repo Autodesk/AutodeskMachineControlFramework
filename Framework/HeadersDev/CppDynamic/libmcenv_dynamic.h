@@ -1476,10 +1476,10 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CloseModalDialogPtr) (LibMCEnv_U
 * changes the current page on the client.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] pDialogName - Name of the dialog to activate.
+* @param[in] pPageName - Name of the page to activate.
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ActivatePagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ActivatePagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pPageName);
 
 /**
 * returns name of the UI control that triggered the event.

@@ -517,8 +517,14 @@ void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParamet
         if (typeAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGPARAMETERTYPE);
         auto unitsAttrib = parameterNode.attribute("units");
+        auto persistentAttrib = parameterNode.attribute("persistent");
 
-        pGroup->addNewTypedParameter(nameAttrib.as_string(), typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string(), unitsAttrib.as_string());
+        std::string sName = nameAttrib.as_string();
+        std::string sPersistentUUID = persistentAttrib.as_string();
+       
+        pGroup->addNewTypedParameter(sName, typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string(), unitsAttrib.as_string());
+        if (!sPersistentUUID.empty())
+            pGroup->enableParameterPersistency(sName, sPersistentUUID, m_pSystemState->getPersistencyHandler());
     }
 
 }

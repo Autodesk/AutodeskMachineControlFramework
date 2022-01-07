@@ -29,52 +29,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_PARAMETER_INSTANCESTATE
-#define __AMC_PARAMETER_INSTANCESTATE
-
-#ifndef _PARAMETER_HEADERPROTECTION
-#error Never include amc_parameter.hpp from outside of amc_parameter.cpp and amc_parametergroup.cpp
-#endif
+#ifndef __AMC_PARAMETERTYPE
+#define __AMC_PARAMETERTYPE
 
 #include <memory>
 #include <string>
 
-#include "amc_parameter.hpp"
-
 namespace AMC {
 
-	class CParameter_InstanceState : public CParameter {
-	private:
-
-		std::string m_sName;
-		std::string m_sDescription;
-
-	public:
-		CParameter_InstanceState(const std::string & sName, const std::string& sDescription);
-		virtual ~CParameter_InstanceState();
-
-		virtual std::string getName() const override;
-		virtual std::string getDescription() const override;
-		virtual std::string getDefaultValue() const override;
-
-		virtual std::string getStringValue() const override;
-		virtual void setStringValue(const std::string& sValue) override;
-
-		virtual double getDoubleValue() const override;
-		virtual void setDoubleValue(const double dValue) override;
-
-		virtual int64_t getIntValue() const override;
-		virtual void setIntValue(const int64_t nValue) override;
-
-		virtual bool getBoolValue() const override;
-		virtual void setBoolValue(const bool bValue) override;
-
-		virtual PParameter duplicate() override;
-
+	enum class eParameterDataType : int32_t {
+		Unknown = 0,
+		String = 1,
+		UUID = 2,
+		Integer = 3,
+		Double = 4,
+		Bool = 5
 	};
-	
+
 }
 
 
-#endif //__AMC_PARAMETER_DERIVED
+#endif //__AMC_PARAMETERTYPE
 

@@ -1303,9 +1303,9 @@ public:
 
 	/**
 	* IUIEnvironment::ActivatePage - changes the current page on the client.
-	* @param[in] sDialogName - Name of the dialog to activate.
+	* @param[in] sPageName - Name of the page to activate.
 	*/
-	virtual void ActivatePage(const std::string & sDialogName) = 0;
+	virtual void ActivatePage(const std::string & sPageName) = 0;
 
 	/**
 	* IUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.

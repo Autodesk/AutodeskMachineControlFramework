@@ -1489,10 +1489,10 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_closemodaldialog(LibMCEn
 * changes the current page on the client.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
-* @param[in] pDialogName - Name of the dialog to activate.
+* @param[in] pPageName - Name of the page to activate.
 * @return error code or 0 (success)
 */
-LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pDialogName);
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnvironment, const char * pPageName);
 
 /**
 * returns name of the UI control that triggered the event.
