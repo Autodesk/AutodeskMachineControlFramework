@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 
-#include <Windows.h>
-#include <Winsock2.h>
+#include <windows.h>
+#include <winsock2.h>
 #include <ws2tcpip.h>
 #else
 
@@ -108,7 +108,7 @@ CDriver_BuRSocketConnection::CDriver_BuRSocketConnection(const std::string& sIPA
     m_Socket = ConnectSocket;
 #else
     throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTIMPLEMENTED);
-#endif _WIN32
+#endif //_WIN32
 
 
 }
