@@ -219,6 +219,32 @@ public:
 };
 
 
+class CEvent_OnChangeSimulationParameterEvent : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "changesimulationparameter";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		auto sSender = pUIEnvironment->RetrieveEventSender();
+		pUIEnvironment->LogMessage("Change simulation parameter from " + sSender);
+
+		bool bValue = pUIEnvironment->GetUIPropertyAsBool(sSender, "value");
+		pUIEnvironment->LogMessage("Change " + sSender + " to " + std::to_string (bValue));
+
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_changesimulationparameters");
+		pSignal->SetBool("simulatelaser", pUIEnvironment->GetUIPropertyAsBool("main.infobox.simulationparameters.simulatelaser", "value"));
+		pSignal->SetBool("simulateplc", pUIEnvironment->GetUIPropertyAsBool("main.infobox.simulationparameters.simulateplc", "value"));
+		pSignal->Trigger();
+	}
+
+};
+
+
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
 {
 	IEvent* pEventInstance = nullptr;
@@ -236,7 +262,9 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnUploadFinished>(sEventName, pEventInstance))
 		return pEventInstance;
-	
+	if (createEventInstanceByName<CEvent_OnChangeSimulationParameterEvent>(sEventName, pEventInstance))
+		return pEventInstance;
+
 
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);

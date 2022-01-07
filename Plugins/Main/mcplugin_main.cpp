@@ -146,6 +146,19 @@ public:
 			pStateEnvironment->SetNextState("idle");
 
 		}
+		else if (pStateEnvironment->WaitForSignal("signal_changesimulationparameters", 100, pSignalHandler)) {
+			bool bSimulateLaser = pSignalHandler->GetBool("simulatelaser");
+			bool bSimulatePLC = pSignalHandler->GetBool("simulateplc");
+			pSignalHandler->SignalHandled();
+
+			pStateEnvironment->SetBoolParameter("configuration", "simulatelaser", bSimulateLaser);
+			pStateEnvironment->SetBoolParameter("configuration", "simulateplc", bSimulatePLC);
+
+			pStateEnvironment->LogMessage("Updated Simulation Parameters!");
+
+			pStateEnvironment->SetNextState("idle");
+
+		}
 		else {
 
 			pStateEnvironment->SetNextState("idle");
