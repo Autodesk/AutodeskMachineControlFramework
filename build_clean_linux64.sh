@@ -33,7 +33,7 @@ dirs_to_make[21]="$builddir/Client/public"
 dirs_to_make[22]="$builddir/Client/src"
 dirs_to_make[23]="$builddir/Client/src/plugins"
 dirs_to_make[24]="$builddir/Client/dist"
-
+dirs_to_make[25]="$builddir/Artifacts"
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -115,5 +115,7 @@ cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 #cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
 go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
+
+cp $builddir/DevPackage/AMCF_${GITHASH}.zip $builddir/Artifacts
 
 echo "Build done!"
