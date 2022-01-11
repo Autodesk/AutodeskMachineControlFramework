@@ -1,4 +1,4 @@
-import Two from "two.js";
+//import Two from "two.js";
 
 class LayerViewImpl {
 
@@ -6,7 +6,7 @@ class LayerViewImpl {
   
     this.domelement = domelement;
 	
-    this.twoinstance = new Two({
+/*    this.twoinstance = new Two({
 		type: Two.Types.svg,
 		width: domelement.clientWidth,
 		height: domelement.clientHeight,
@@ -23,9 +23,9 @@ class LayerViewImpl {
 	this.sliceGroup = null;
 	
 	this.currentSize = {gridWidth: 0, gridHeight: 0}  
-	this.transform = { x: 0, y: 0, scaling: 1.0 } 
+	this.transform = { x: 0, y: 0, scaling: 1.0 }  
 		
-	this.updateSize (domelement.clientWidth, domelement.clientHeight);
+	this.updateSize (domelement.clientWidth, domelement.clientHeight); */
 	
   }
   

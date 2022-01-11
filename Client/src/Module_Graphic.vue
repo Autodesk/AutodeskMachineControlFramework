@@ -1,7 +1,7 @@
 <template>
 	
 	<div v-if="(module.type == 'graphic')" style="width:100%; height:100%; display:block; overflow:hidden;">
-		<div ref="pixiDiv" style="width:100%; height:100%;"  />
+		<div ref="glDiv" style="width:100%;height:100%;" />
 				
 	</div>
 
@@ -9,7 +9,7 @@
 
 <script>
 
-	import * as PIXI from 'pixi.js'
+	import WebGLImpl from "./WebGLImpl.js"
 
 	export default {
 		props: ["Application", "module"],
@@ -18,66 +18,46 @@
 		},
 		
 		data: () => ({				
-			
+			glInstance: null,
 		}),
 		
-		created() {
-				this.pixiApp = new PIXI.Application ( {  width: 400, height: 300, antialias: true, transparent: true });
-					let sprite = PIXI.Sprite.from('http://localhost:8080/ui_logo.png');
-			sprite.x = 250;
-			sprite.width = 900;
-			sprite.height = 300;
-			this.pixiApp.stage.addChild(sprite);
+		methods: {
+			    animate: function () {
+					requestAnimationFrame(this.animate);
 
-			let graphics = new PIXI.Graphics() 
-			graphics.beginFill(0x1A02D9);
-			graphics.drawRect(0, 0, 100, 300);
-			graphics.endFill();
-			this.pixiApp.stage.addChild(graphics)
+					if (this.glInstance)
+						this.glInstance.renderScene ();
 
-			graphics = new PIXI.Graphics() 
-			graphics.lineStyle(1, 0x303030, 1);
-			for (var x = 0; x < 300; x++) {
-				graphics.moveTo(x * 3, 10);
-				graphics.lineTo(x * 3, 990);
+				},
+		},
+		
+		
+		created () {
+			this.glInstance = this.Application.retrieveWebGLInstance (module.uuid);
+			if (!this.glInstance) {
+				this.glInstance = new WebGLImpl ();
+				this.Application.storeWebGLInstance (this.glInstance);
+							
+				this.glInstance.add2DImage (568 * 2, 139.25 * 2, "/ui_logo.png", 50);
 			}
-			for (var y = 0; y < 300; y++) {
-				graphics.moveTo(10, y * 3);
-				graphics.lineTo(990, y * 3);
-			}
-			this.pixiApp.stage.addChild(graphics)
 		},
 		
 		mounted() {
-			const pixiDiv = this.$refs.pixiDiv;			
-			
-			/*{
-				width: window.innerWidth,
-				height: window.innerHeight,
-				antialias: true,
-				transparent: true,
-				view: canvas,
-			}) */
-			
-			pixiDiv.appendChild(this.pixiApp.view);
-			this.pixiApp.resizeTo = pixiDiv;
-
-		
-
-		},
-		
-		onResize () {
-			const pixiDiv = this.$refs.pixiDiv;
-			if (pixiDiv) {
-				console.log ("new width:" + pixiDiv.width);
-			}
-			
-		},		
-		
-		beforeDestroy() {
-			
-		}
 				
+			const glDiv = this.$refs.glDiv;
+			if (glDiv && this.glInstance) {						
+			
+				var width = glDiv.clientWidth;
+				var height = glDiv.clientHeight;
+				if ((width > 0) && (height > 0)) {
+					this.glInstance.setup2DView (width, height, 0.1, 100);					
+					this.glInstance.resizeTo (width, height);
+					this.glInstance.setupDOMElement (glDiv);														
+					this.animate();
+				}
+				
+			}
+		}
 		
 	};
 	

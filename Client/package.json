@@ -8,14 +8,11 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@babylonjs/core": "^4.2.1",
-    "@babylonjs/loaders": "^4.2.1",
     "@mdi/font": "^6.5.95",
     "asmcrypto-lite": "^1.1.0",
     "axios": "^0.24.0",
-    "pixi.js": "^6.2.1",
     "roboto-fontface": "^0.10.0",
-    "two.js": "^0.7.13",
+    "three": "^0.136.0",
     "vue": "^2.6.14",
     "vuetify": "^2.6.2"
   },

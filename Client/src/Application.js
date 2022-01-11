@@ -40,7 +40,8 @@ export default class AMCApplication {
 		this.AppState = {
             currentStatus: "initial", // one of "initial" / "login" / "ready" / "error",
             currentError: "",
-            activePage: ""
+            activePage: "",
+			WebGLInstances: new Map()
 		}
 
         this.AppDefinition = {
@@ -713,6 +714,16 @@ export default class AMCApplication {
 			return resultObject;
 			
 		}
+		
+		
+		retrieveWebGLInstance (uuid) {
+			return this.AppState.WebGLInstances[uuid];
+		}
+		
+		storeWebGLInstance (uuid, instance) {
+			this.AppState.WebGLInstances[uuid] = instance;
+		}
+		
 
 }
 
