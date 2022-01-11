@@ -103,8 +103,9 @@ namespace AMC {
 
 		virtual PParameter duplicate() override;
 
-		void enablePersistency (const std::string& sPersistentName, const std::string& sPersistentUUID, LibMCData::PPersistencyHandler pPersistencyHandler);
+		void enablePersistency (const std::string& sPersistentName, const std::string& sPersistentUUID);
 		void disablePersistency();
+		void setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler);
 
 	};
 	

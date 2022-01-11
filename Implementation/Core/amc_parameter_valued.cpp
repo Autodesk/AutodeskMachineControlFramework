@@ -163,55 +163,57 @@ namespace AMC {
 		return pParameter;
 	}
 
-	void CParameter_Valued::enablePersistency(const std::string& sPersistentName, const std::string& sPersistentUUID, LibMCData::PPersistencyHandler pPersistencyHandler)
+	void CParameter_Valued::enablePersistency(const std::string& sPersistentName, const std::string& sPersistentUUID)
 	{
 		disablePersistency();
-
-		if (pPersistencyHandler.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 		if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sPersistentName))
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPERSISTENCYNAME, sPersistentName);
 
 		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sPersistentUUID);
 
-		if (pPersistencyHandler->HasPersistentParameter(sNormalizedUUID)) {
-
-			switch (m_DataType) {
-			case eParameterDataType::String: 
-				setStringValue(pPersistencyHandler->RetrievePersistentStringParameter(sNormalizedUUID));
-				break;
-			case eParameterDataType::UUID:
-				setStringValue(pPersistencyHandler->RetrievePersistentUUIDParameter (sNormalizedUUID));
-				break;
-			case eParameterDataType::Integer:
-				setIntValue(pPersistencyHandler->RetrievePersistentIntegerParameter(sNormalizedUUID));
-				break;
-			case eParameterDataType::Bool:
-				setBoolValue(pPersistencyHandler->RetrievePersistentBoolParameter(sNormalizedUUID));
-				break;
-			case eParameterDataType::Double:
-				setDoubleValue(pPersistencyHandler->RetrievePersistentDoubleParameter(sNormalizedUUID));
-				break;
-
-			}
-			
-
-		}
-
 		m_sPersistentName = sPersistentName;
 		m_sPersistentUUID = sNormalizedUUID;
-		m_pPersistencyHandler = pPersistencyHandler;
-
-
 	}
 
 	void CParameter_Valued::disablePersistency()
 	{
-		m_pPersistencyHandler = nullptr;
 		m_sPersistentName = "";
 		m_sPersistentUUID = "";
 	}
+
+	void CParameter_Valued::setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler)
+	{
+		m_pPersistencyHandler = pPersistencyHandler;
+
+		if ((pPersistencyHandler.get() != nullptr) && (!m_sPersistentUUID.empty()))
+		{
+
+			if (pPersistencyHandler->HasPersistentParameter(m_sPersistentUUID)) {
+
+				switch (m_DataType) {
+				case eParameterDataType::String:
+					setStringValue(pPersistencyHandler->RetrievePersistentStringParameter(m_sPersistentUUID));
+					break;
+				case eParameterDataType::UUID:
+					setStringValue(pPersistencyHandler->RetrievePersistentUUIDParameter(m_sPersistentUUID));
+					break;
+				case eParameterDataType::Integer:
+					setIntValue(pPersistencyHandler->RetrievePersistentIntegerParameter(m_sPersistentUUID));
+					break;
+				case eParameterDataType::Bool:
+					setBoolValue(pPersistencyHandler->RetrievePersistentBoolParameter(m_sPersistentUUID));
+					break;
+				case eParameterDataType::Double:
+					setDoubleValue(pPersistencyHandler->RetrievePersistentDoubleParameter(m_sPersistentUUID));
+					break;
+
+				}
+			}
+		}
+
+	}
+
 
 	
 	void CParameter_Valued::setValueEx(const std::string& sValue)

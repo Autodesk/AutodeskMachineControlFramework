@@ -29,49 +29,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifndef __AMC_UI_EXPRESSION
-#define __AMC_UI_EXPRESSION
+#ifndef __AMC_UI_MODULE_GRAPHICITEM
+#define __AMC_UI_MODULE_GRAPHICITEM
 
 #include "header_protection.hpp"
 
-#include <memory>
-#include <string>
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
 
-#include <pugixml.hpp>
+#include "Libraries/PugiXML/pugixml.hpp"
+#include "amc_jsonwriter.hpp"
+#include "amc_ui_module_item.hpp"
 
 namespace AMC {
 
+	amcDeclareDependingClass(CUIModule, PUIModule);
+	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CUIModule_GraphicItem, PUIModule_GraphicItem);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
-	class CUIExpression {
-	private:
-		std::string m_sFixedValue;
-		std::string m_sExpressionValue;
+	
+
+	class CUIModuleGraphicItem : public CUIModuleItem {
+	protected:		
+	
+		std::string m_sUUID;
+		std::string m_sItemName;
+		
 	public:
 
-		CUIExpression();
-		CUIExpression (const pugi::xml_node & xmlNode, const std::string & attributeName);
+		CUIModuleGraphicItem(const std::string & sUUID, const std::string & sItemName, const std::string& sModulePath);
+		
+		virtual ~CUIModuleGraphicItem();
 
-		std::string evaluateStringValue(CStateMachineData * pStateMachineData);
-		std::string evaluateStringValue(PStateMachineData pStateMachineData);
-		double evaluateNumberValue(CStateMachineData* pStateMachineData);
-		double evaluateNumberValue(PStateMachineData pStateMachineData);
-		int64_t evaluateIntegerValue(CStateMachineData* pStateMachineData);
-		int64_t evaluateIntegerValue(PStateMachineData pStateMachineData);
-		bool evaluateBoolValue(CStateMachineData* pStateMachineData);
-		bool evaluateBoolValue(PStateMachineData pStateMachineData);
+		virtual std::string getUUID () override;
 
-		void checkExpressionSyntax(CStateMachineData* pStateMachineData);
-		void checkExpressionSyntax(PStateMachineData pStateMachineData);
+		virtual void addDefinitionToJSON (CJSONWriter & writer, CJSONWriterObject & object, CParameterHandler* pClientVariableHandler);
 
-		bool needsSync();
-		bool isEmpty(CStateMachineData* pStateMachineData);
-		bool isEmpty(PStateMachineData pStateMachineData);
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+
+		// Returns all UUIDs that could be contained in this Item
+		virtual std::list <std::string> getReferenceUUIDs();
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
 
 	};
+
 	
 }
 
 
-#endif //__AMC_UI_EXPRESSION
+#endif //__AMC_UI_MODULE_GRAPHICITEM
 

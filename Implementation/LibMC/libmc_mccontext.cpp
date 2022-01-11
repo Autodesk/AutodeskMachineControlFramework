@@ -174,12 +174,19 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         auto uiLibraryAttrib = userInterfaceNode.attribute("library");
         if (uiLibraryAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_NOUSERINTERFACEPLUGIN);
+
+        m_pSystemState->logger()->logMessage("Starting Journal recording...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        // Start journal recording
+        m_pStateJournal->startRecording();
+
+        // Load persistent parameters
+        for (auto pStateMachineInstance : m_InstanceList)
+            pStateMachineInstance->getParameterHandler()->loadPersistentParameters(m_pSystemState->getPersistencyHandler ());
+
         auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string());
 
         m_pSystemState->logger()->logMessage("Loading UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
         m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
-
-        m_pStateJournal->startRecording();
 
     }
     catch (std::exception& E) {
@@ -524,7 +531,7 @@ void CMCContext::loadParameterGroup(const pugi::xml_node& xmlNode, AMC::PParamet
        
         pGroup->addNewTypedParameter(sName, typeAttrib.as_string(), descriptionAttrib.as_string(), defaultValueAttrib.as_string(), unitsAttrib.as_string());
         if (!sPersistentUUID.empty())
-            pGroup->enableParameterPersistency(sName, sPersistentUUID, m_pSystemState->getPersistencyHandler());
+            pGroup->setParameterPersistentUUID(sName, sPersistentUUID);
     }
 
 }

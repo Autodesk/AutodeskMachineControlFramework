@@ -241,3 +241,14 @@ bool CUIExpression::needsSync()
 {
 	return !m_sExpressionValue.empty();
 }
+
+bool CUIExpression::isEmpty(CStateMachineData* pStateMachineData)
+{
+	std::string sValue = evaluateStringValue(pStateMachineData);
+	return sValue.empty();
+}
+
+bool CUIExpression::isEmpty(PStateMachineData pStateMachineData)
+{
+	return isEmpty(pStateMachineData.get ());
+}

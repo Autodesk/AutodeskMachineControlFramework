@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_tabs.hpp"
 #include "amc_ui_module_grid.hpp"
 #include "amc_ui_module_glscene.hpp"
+#include "amc_ui_module_graphic.hpp"
 
 using namespace AMC;
 
@@ -60,6 +61,10 @@ PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, const std::str
 	if (sType == CUIModule_GLScene::getStaticType())
 		return std::make_shared<CUIModule_GLScene>(xmlNode, sPath, pUIModuleEnvironment);
 
+	if (sType == CUIModule_Graphic::getStaticType())
+		return std::make_shared<CUIModule_Graphic>(xmlNode, sPath, pUIModuleEnvironment);
+	
+
 	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 
 }
@@ -77,6 +82,9 @@ bool CUIModuleFactory::moduleTypeIsRegistered(const std::string& sType)
 		return true;
 
 	if (sType == CUIModule_GLScene::getStaticType())
+		return true;
+
+	if (sType == CUIModule_Graphic::getStaticType())
 		return true;
 
 	return false;

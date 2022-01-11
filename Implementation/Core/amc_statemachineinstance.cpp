@@ -234,7 +234,7 @@ namespace AMC {
 
 	void CStateMachineInstance::startThread()
 	{
-		m_pSystemState->logger()->logMessage("starting instance thread", m_sName, eLogLevel::Message);
+		m_pSystemState->logger()->logMessage("starting instance thread for " + m_sName + "...", m_sName, eLogLevel::Message);
 
 		if (m_pInitState.get() == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_NOINITSTATE, m_sName);
@@ -336,6 +336,7 @@ namespace AMC {
 	{
 		return m_ParameterHandler.get ();
 	}
+
 
 
 }

@@ -76,6 +76,7 @@
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
 					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
+					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
 				</template>										
 						
 			</v-container>		
@@ -100,6 +101,7 @@
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
 					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
+					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
 				</template>										
 				
 		   </v-card-text>
@@ -130,6 +132,7 @@
 	import Module_Tabs from "./Module_Tabs.vue";
 	import Module_Grid from "./Module_Grid.vue";
 	import Module_GLScene from "./Module_GLScene.vue";
+	import Module_Graphic from "./Module_Graphic.vue";
 	
 	export default {
 
@@ -212,6 +215,7 @@
 			Module_Content,
 			Module_Tabs,
 			Module_GLScene,
+			Module_Graphic,
 			Module_Grid
 		},	
 

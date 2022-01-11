@@ -23,6 +23,7 @@
 						<Module_Tabs :key="moduleTab.name" v-if="(moduleTab.type == 'tabs')" :module="moduleTab" :Application="Application" />							
 						<Module_Grid :key="moduleTab.name" v-if="(moduleTab.type == 'grid')" :module="moduleTab" :Application="Application" />							
 						<Module_GLScene :key="moduleTab.name" v-if="(moduleTab.type == 'glscene')" :module="moduleTab" :Application="Application" />							
+						<Module_Graphic :key="moduleTab.name" v-if="(moduleTab.type == 'graphic')" :module="moduleTab" :Application="Application" />							
 				</v-tab-item>
 							
 			</template>	
@@ -38,6 +39,7 @@
 	import Module_Tabs from "./Module_Tabs.vue";
 	import Module_Grid from "./Module_Grid.vue";
 	import Module_GLScene from "./Module_GLScene.vue";
+	import Module_Graphic from "./Module_Graphic.vue";
 
 	export default {
 		props: ["Application", "module"],
@@ -47,6 +49,7 @@
 			Module_Tabs,
 			Module_Grid,
 			Module_GLScene,
+			Module_Graphic,
 		},
 		
 		data: () => ({

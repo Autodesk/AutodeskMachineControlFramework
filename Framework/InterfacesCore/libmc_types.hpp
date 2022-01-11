@@ -669,7 +669,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
     case LIBMC_ERROR_TOOMANYJOURNALVARIABLES: return "Too many journal variables";
     case LIBMC_ERROR_JOURNALISNOTINITIALISING: return "Too many journal variables";
-    case LIBMC_ERROR_JOURNALISNOTRECORDING: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTRECORDING: return "Journal is not recording.";
     case LIBMC_ERROR_INVALIDVARIABLETYPE: return "Invalid variable type";
     case LIBMC_ERROR_INVALIDVARIABLEUNITS: return "Invalid variable units";
     case LIBMC_ERROR_UNITSHAVEALREADYBEENSET: return "Units have already been set";

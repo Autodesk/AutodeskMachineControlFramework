@@ -28,60 +28,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMC_PARAMETERHANDLER
-#define __AMC_PARAMETERHANDLER
 
-#include "amc_parametergroup.hpp"
+#ifndef __AMC_UI_MODULE_GRAPHICITEM_IMAGE
+#define __AMC_UI_MODULE_GRAPHICITEM_IMAGE
 
-#include <memory>
-#include <vector>
-#include <map>
-#include <string>
-#include <mutex>
+#include "header_protection.hpp"
 
-#define AMC_UI_IMAGE_MINASPECTRATIO 0.001
-#define AMC_UI_IMAGE_MAXASPECTRATIO 1000.0
+#ifndef __AMCIMPL_UI_MODULE
+#error this header is protected and should only be included in the corresponding implementation CPP files.
+#endif
+
+#include "amc_ui_module_graphicitem.hpp"
+#include "pugixml.hpp"
+
+#include "amc_ui_expression.hpp"
 
 namespace AMC {
 
-	class CParameterHandler;
-	typedef std::shared_ptr<CParameterHandler> PParameterHandler;
+	amcDeclareDependingClass(CUIModule_GraphicImage, PUIModule_GraphicImage);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
-	class CParameterHandler {
-	private:
+	class CUIModule_GraphicImage : public CUIModuleGraphicItem {
+	protected:		
+		CUIExpression m_ResourceName;
+		CUIExpression m_X;
+		CUIExpression m_Y;
+		CUIExpression m_MaxWidth;
+		CUIExpression m_MaxHeight;
 
-		std::map<std::string, PParameterGroup> m_Groups;
-		std::vector<PParameterGroup> m_GroupList;
+		PUIModuleEnvironment m_pUIModuleEnvironment;
 
-		std::mutex m_Mutex;
-		std::string m_sDescription;
-		
 	public:
 
-		CParameterHandler(std::string sDescription);
+		static PUIModule_GraphicImage makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+
+		CUIModule_GraphicImage(CUIExpression resourceName, CUIExpression x, CUIExpression y, CUIExpression maxWidth, CUIExpression maxHeight, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 		
-		virtual ~CParameterHandler();		
-		
-		bool hasGroup (const std::string & sName);
-		void addGroup (PParameterGroup pGroup);
-		PParameterGroup addGroup(const std::string& sName, const std::string& sDescription);
+		virtual ~CUIModule_GraphicImage();
 
-		uint32_t getGroupCount();
-		PParameterGroup getGroup(const uint32_t nIndex);
-		PParameterGroup findGroup(const std::string& sName, const bool bFailIfNotExisting);
-
-		std::string getDescription();
-		void setDescription(const std::string & sDescription);
-
-		PParameterHandler duplicate();
-
-		void loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler);
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 	};
 
-	
+
 }
 
 
-#endif //__AMC_PARAMETERHANDLER
+#endif //__AMC_UI_MODULE_GRAPHICITEM_IMAGE
 

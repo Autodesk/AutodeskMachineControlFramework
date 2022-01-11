@@ -540,25 +540,41 @@ namespace AMC {
 		m_sInstanceName = sInstanceName;
 	}
 
-	void CParameterGroup::enableParameterPersistency(const std::string& sParameterName, const std::string& sPersistentUUID, LibMCData::PPersistencyHandler pPersistencyHandler)
-	{
-		if (pPersistencyHandler.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-		std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sPersistentUUID);
+	void CParameterGroup::setParameterPersistentUUID(const std::string& sParameterName, const std::string& sPersistentUUID)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 
 		auto iIter = m_Parameters.find(sParameterName);
 		if (iIter == m_Parameters.end())
 			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sParameterName);
-
 		auto pValuedParameter = std::dynamic_pointer_cast<CParameter_Valued> (iIter->second);
 		if (pValuedParameter.get() == nullptr)
 			throw ELibMCCustomException(LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT, m_sName + "/" + sParameterName);
 
-		pValuedParameter->enablePersistency (m_sName + "." + pValuedParameter->getName (), sNormalizedUUID, pPersistencyHandler);
+		if (!sPersistentUUID.empty()) {
+			std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sPersistentUUID);
+			pValuedParameter->enablePersistency(m_sName + "." + pValuedParameter->getName(), sNormalizedUUID);
 
+		}
+		else {
+
+			pValuedParameter->disablePersistency();
+		}
 
 	}
+
+	void CParameterGroup::updateParameterPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		for (auto pParameter : m_ParameterList) {
+			auto pValuedParameter = std::dynamic_pointer_cast<CParameter_Valued> (pParameter);
+			if (pValuedParameter.get() != nullptr)
+				pValuedParameter->setPersistencyHandler (pPersistencyHandler);
+		}
+
+	}
+
 
 }
 

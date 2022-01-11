@@ -115,3 +115,12 @@ void CUIModule_ContentUpload::setEventPayloadValue(const std::string& sEventName
 	}
 
 }
+
+
+std::string CUIModule_ContentUpload::findElementPathByUUID(const std::string& sUUID)
+{
+	if (sUUID == m_sUUID)
+		return getItemPath();
+
+	return "";
+}

@@ -133,7 +133,8 @@ namespace AMC {
 
 		void setJournal(PStateJournal pStateJournal, const std::string & sInstanceName);
 
-		void enableParameterPersistency (const std::string& sParameterName, const std::string & sPersistentUUID, LibMCData::PPersistencyHandler pPersistencyHandler);
+		void setParameterPersistentUUID (const std::string& sParameterName, const std::string& sPersistentUUID);
+		void updateParameterPersistencyHandler (LibMCData::PPersistencyHandler pPersistencyHandler);
 
 	};
 

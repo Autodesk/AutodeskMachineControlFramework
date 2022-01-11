@@ -143,6 +143,13 @@ namespace AMC {
 		return pResult;
 	}
 
+	void CParameterHandler::loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler)
+	{
+		for (auto pGroup : m_GroupList) {
+			pGroup->updateParameterPersistencyHandler(pPersistencyHandler);
+		}
+
+	}
 
 }
 
