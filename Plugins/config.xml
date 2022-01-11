@@ -19,9 +19,9 @@
 		</parametergroup>
 
 		<parametergroup name="processsettings" description="Process Settings">
-			<parameter name="targeto2" description="Target O2 PPM" default="3" type="double"/>
-			<parameter name="recoaterspeed" description="Recoater speed (in mm/s)" default="80" type="double"/>
-			<parameter name="gasflowspeed" description="Gas flow speed (in m/s)" default="2" type="double"/>
+			<parameter name="targeto2" description="Target O2 PPM" default="3" type="double" persistent="e496a265-a9c0-49cb-9f94-541b551b191c" />
+			<parameter name="recoaterspeed" description="Recoater speed (in mm/s)" default="80" type="double" persistent="ee61badf-a5df-4eba-8ccb-613d6a0b3f75" />
+			<parameter name="gasflowspeed" description="Gas flow speed (in m/s)" default="2" type="double" persistent="2accd693-aab7-4dea-99f1-47ed2403d2a8" />
 		</parametergroup>
 
 		<parametergroup name="ui" description="User interface">
@@ -239,7 +239,7 @@
 
 				<form name="simulationparameters">
 					<switch name="simulatelaser" caption="Simulate Laser Control" sync:value="main.configuration.simulatelaser" changeevent="changesimulationparameter" />
-					<switch name="simulateplc" caption="Simulate PLC hehaviour" sync:value="main.configuration.simulateplc" changeevent="changesimulationparameter" />
+					<switch name="simulateplc" caption="Simulate PLC behaviour" sync:value="main.configuration.simulateplc" changeevent="changesimulationparameter" />
 				</form>			
 
 			</content>
@@ -312,9 +312,11 @@
 				<content name="manualcontrol2" title="" columnstart="2" rowstart="2" columnend="2" rowend="2" columnposition="left" rowposition="centered">
 				</content>
 				
-				<glscene name="manualcontrol3" title="" columnstart="1" rowstart="1" columnend="1" rowend="1">
-									
-				</glscene>
+				<graphic name="manualcontrol3" title="" columnstart="1" rowstart="1" columnend="1" rowend="1">
+					
+					<image resource="ui_machine" x="50" y="50" width="100" height="*" z-layer="2" visible="1" clickevent="onmachineclicked" />
+																									
+				</graphic>
 				
 				<content name="manualcontrol4" title="" columnstart="1" rowstart="2" columnend="1" rowend="2" columnposition="right" rowposition="centered">
 					
@@ -333,8 +335,10 @@
 
 		<page name="buildreport">
 
-			<content name="currentbuild" title="Build Report">
-			</content>
+				<glscene name="manualcontrol3" >
+									
+				</glscene>
+
 
 		</page>
 
