@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #else
 
-#define SCANLAB_CALLINGCONVENTION 
+#define OPCUA_CALLINGCONVENTION 
 
 #endif
 
@@ -61,8 +61,8 @@ namespace LibMCDriver_OPCUA {
 
                
 		typedef opcUA_ClientP (OPCUA_CALLINGCONVENTION *POpen62541Ptr_UA_Client_newWithConfig) (const opcUA_ClientConfig* config);
-        typedef void(OPCUA_CALLINGCONVENTION* POpen62541Ptr_UA_Client_delete) (opcUA_ClientP client);
-        typedef opcUA_StatusCode(OPCUA_CALLINGCONVENTION* POpen62541Ptr_UA_Client_getEndpoints) (opcUA_ClientP client, const char* serverUrl, size_t* endpointDescriptionsSize, opcUA_EndpointDescription** endpointDescriptions);
+        typedef void(OPCUA_CALLINGCONVENTION *POpen62541Ptr_UA_Client_delete) (opcUA_ClientP client);
+        typedef opcUA_StatusCode(OPCUA_CALLINGCONVENTION *POpen62541Ptr_UA_Client_getEndpoints) (opcUA_ClientP client, const char* serverUrl, size_t* endpointDescriptionsSize, opcUA_EndpointDescription** endpointDescriptions);
 
 		class COpen62541SDK {
 		private:

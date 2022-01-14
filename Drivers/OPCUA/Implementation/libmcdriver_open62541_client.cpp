@@ -28,15 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include <open62541/client.h>
-#include <open62541/client_config_default.h>
-#include <open62541/client_highlevel.h>
-#include <open62541/plugin/securitypolicy.h>
-#include <open62541/plugin/securitypolicy_default.h>
-
-#include <open62541/plugin/pki_default.h>
-#include <open62541/server_config_default.h>
-
 #include "libmcdriver_open62541_client.hpp"
 #include "libmcdriver_opcua_interfaceexception.hpp"
 
@@ -45,6 +36,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace LibMCDriver_OPCUA::Impl;
 
 #define LIBOPEN62541_LOGBUFFERSIZE 1024
+
+typedef unsigned int UA_UInt32;
+typedef unsigned char UA_Byte;
+typedef void UA_Client;
+typedef UA_Client* UA_ClientP;
+typedef uint32_t UA_StatusCode;
+
+typedef enum {
+	UA_LOGLEVEL_TRACE = 0,
+	UA_LOGLEVEL_DEBUG,
+	UA_LOGLEVEL_INFO,
+	UA_LOGLEVEL_WARNING,
+	UA_LOGLEVEL_ERROR,
+	UA_LOGLEVEL_FATAL
+} UA_LogLevel;
+
+typedef enum {
+	UA_LOGCATEGORY_NETWORK = 0,
+	UA_LOGCATEGORY_SECURECHANNEL,
+	UA_LOGCATEGORY_SESSION,
+	UA_LOGCATEGORY_SERVER,
+	UA_LOGCATEGORY_CLIENT,
+	UA_LOGCATEGORY_USERLAND,
+	UA_LOGCATEGORY_SECURITYPOLICY,
+	UA_LOGCATEGORY_EVENTLOOP
+} UA_LogCategory;
+
+typedef struct {
+	void (*log)(void* logContext, UA_LogLevel level, UA_LogCategory category, const char* msg, va_list args);
+	void* context;
+	void (*clear)(void* context);
+} UA_Logger;
+
+#define CLIENT_CONFIG_BUFFERSIZE 16384
+
+typedef struct {
+	void* clientContext;
+	UA_Logger logger;
+	UA_UInt32 timeout;
+	UA_Byte ReservedBuffer[CLIENT_CONFIG_BUFFERSIZE];
+
+} UA_ClientConfig;
+
+typedef struct {
+	size_t length;
+	UA_Byte* data; /* The content (not null-terminated) */
+} UA_String;
 
 void onClientLog(void* logContext, UA_LogLevel level, UA_LogCategory category, const char* msg, va_list args)
 {
