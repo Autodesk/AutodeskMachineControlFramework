@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_opcua_interfaceexception.hpp"
 
 #include <vector>
+#include <cstring>
 
 using namespace LibMCDriver_OPCUA::Impl;
 
