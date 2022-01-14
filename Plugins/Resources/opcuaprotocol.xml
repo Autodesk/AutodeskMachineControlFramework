@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<opcuaprotocol xmlns="http://schemas.autodesk.com/amc/opcuaprotocol/2021/01">
+
+	<version major="2" minor="0" patch="0" />
+	
+	<queue size="2048" />
+	
+	<clientcertificates>
+	
+		<privatekey>
+		  jskdlkajdlsjadd
+		</privatekey>
+		
+		<publiccertificate>
+		  jskdlkajdlsjadd
+		</publiccertificate>
+
+	</clientcertificates>
+
+	<servercertificates>
+		<trusted>
+			ServerA
+		</trusted>
+		
+		<trusted>
+			ServerB
+		</trusted>
+		
+		<revocation>
+		</revocation>
+			
+	
+	</servercertificates>
+
+	<machinestatus>
+
+		<dint name="journalindex" address="0" description="Journal Index" />
+		<real name="position_buildplate" address="4" description="Position Build Plate" />
+		<real name="position_recoater" address="8" description="Position Recoater" />
+		<real name="o2_buildchamber" address="12" description="O2 Build Chamber" />
+		
+	</machinestatus>
+
+
+	<commands>
+
+		<command name="moverecoater" id="2007">
+			<dint name="recoater" description="recoater position" address="0" />
+			<dint name="velocityrecoater" description="velocityrecoater" address="4" />
+		</command>	
+		
+		<command name="laseron" id="2002">
+		</command>			
+
+		<command name="laseroff" id="2003">
+		</command>			
+
+		<command name="shutdown" id="2004">
+		</command>			
+
+		<command name="turnon" id="2005">
+		</command>			
+
+		<command name="home" id="2006">
+		</command>			
+		
+	</commands>
+
+
+</opcuaprotocol>
+
