@@ -4,6 +4,7 @@
 
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol" />
 	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
+	<driver name="opcua" library="driver_opcua" type="opcua" configurationresource="opcuaprotocol" />
   
 	<statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
