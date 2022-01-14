@@ -856,6 +856,33 @@ typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_SleepPtr) (LibMCEnv_DriverEn
 */
 typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
 
+/**
+* logs a string as message
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LogMessagePtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString);
+
+/**
+* logs a string as warning
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LogWarningPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString);
+
+/**
+* logs a string as info
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvDriverEnvironment_LogInfoPtr) (LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/
@@ -1852,6 +1879,9 @@ typedef struct {
 	PLibMCEnvDriverEnvironment_SetBoolParameterPtr m_DriverEnvironment_SetBoolParameter;
 	PLibMCEnvDriverEnvironment_SleepPtr m_DriverEnvironment_Sleep;
 	PLibMCEnvDriverEnvironment_GetGlobalTimerInMillisecondsPtr m_DriverEnvironment_GetGlobalTimerInMilliseconds;
+	PLibMCEnvDriverEnvironment_LogMessagePtr m_DriverEnvironment_LogMessage;
+	PLibMCEnvDriverEnvironment_LogWarningPtr m_DriverEnvironment_LogWarning;
+	PLibMCEnvDriverEnvironment_LogInfoPtr m_DriverEnvironment_LogInfo;
 	PLibMCEnvSignalTrigger_CanTriggerPtr m_SignalTrigger_CanTrigger;
 	PLibMCEnvSignalTrigger_TriggerPtr m_SignalTrigger_Trigger;
 	PLibMCEnvSignalTrigger_WaitForHandlingPtr m_SignalTrigger_WaitForHandling;

@@ -37,54 +37,10 @@ using namespace LibMCDriver_OPCUA::Impl;
 
 #define LIBOPEN62541_LOGBUFFERSIZE 1024
 
-typedef unsigned int UA_UInt32;
-typedef unsigned char UA_Byte;
-typedef void UA_Client;
-typedef UA_Client* UA_ClientP;
-typedef uint32_t UA_StatusCode;
 
-typedef enum {
-	UA_LOGLEVEL_TRACE = 0,
-	UA_LOGLEVEL_DEBUG,
-	UA_LOGLEVEL_INFO,
-	UA_LOGLEVEL_WARNING,
-	UA_LOGLEVEL_ERROR,
-	UA_LOGLEVEL_FATAL
-} UA_LogLevel;
 
-typedef enum {
-	UA_LOGCATEGORY_NETWORK = 0,
-	UA_LOGCATEGORY_SECURECHANNEL,
-	UA_LOGCATEGORY_SESSION,
-	UA_LOGCATEGORY_SERVER,
-	UA_LOGCATEGORY_CLIENT,
-	UA_LOGCATEGORY_USERLAND,
-	UA_LOGCATEGORY_SECURITYPOLICY,
-	UA_LOGCATEGORY_EVENTLOOP
-} UA_LogCategory;
 
-typedef struct {
-	void (*log)(void* logContext, UA_LogLevel level, UA_LogCategory category, const char* msg, va_list args);
-	void* context;
-	void (*clear)(void* context);
-} UA_Logger;
-
-#define CLIENT_CONFIG_BUFFERSIZE 16384
-
-typedef struct {
-	void* clientContext;
-	UA_Logger logger;
-	UA_UInt32 timeout;
-	UA_Byte ReservedBuffer[CLIENT_CONFIG_BUFFERSIZE];
-
-} UA_ClientConfig;
-
-typedef struct {
-	size_t length;
-	UA_Byte* data; /* The content (not null-terminated) */
-} UA_String;
-
-void onClientLog(void* logContext, UA_LogLevel level, UA_LogCategory category, const char* msg, va_list args)
+void onClientLog(void* logContext, opcUA_LogLevel level, opcUA_LogCategory category, const char* msg, va_list args)
 {
 	if (!logContext)
 		return;
@@ -94,7 +50,7 @@ void onClientLog(void* logContext, UA_LogLevel level, UA_LogCategory category, c
 	std::vector<char> Buffer;
 	Buffer.resize(bufferSize + 1);
 
-	int formatResult = sprintf_s(Buffer.data(), bufferSize, msg, args);
+	int formatResult = snprintf(Buffer.data(), bufferSize, msg, args);
 	if (formatResult < 0)
 		return;
 
@@ -112,11 +68,14 @@ COpen62541Client::COpen62541Client(POpen62541SDK pSDK, COpen62541ClientLogger* p
 		throw ELibMCDriver_OPCUAInterfaceException (LIBMCDRIVER_OPCUA_ERROR_INVALIDPARAM);
 	
 
-	UA_ClientConfig config;
-	config.logger.context = this;
-	config.logger.log = onClientLog;
+	std::unique_ptr<opcUA_ClientConfig> pConfig (new opcUA_ClientConfig);
+	memset(pConfig.get(), 0, sizeof(opcUA_ClientConfig));
+	pConfig->logger.context = this;
+	pConfig->logger.log = onClientLog;
 
-	m_Client = m_pSDK->UA_Client_newWithConfig(&config);
+	m_pSDK->UA_ClientConfig_setDefault(pConfig.get());
+
+	m_Client = m_pSDK->UA_Client_newWithConfig(pConfig.get());
 	if (m_Client == nullptr)
 		throw std::runtime_error("could not create UA client");
 
@@ -136,3 +95,10 @@ void COpen62541Client::onLog(const std::string& sMessage, opcUA_LogLevel level, 
 	if (m_pLogger)
 		m_pLogger->onLog(sMessage, level, category);
 }
+
+
+void COpen62541Client::connect(const std::string& sURL)
+{
+	opcUA_StatusCode status = m_pSDK->UA_Client_connect(m_Client, sURL.c_str ());
+}
+

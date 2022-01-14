@@ -59,6 +59,8 @@ namespace LibMCDriver_OPCUA {
 
 			void onLog(const std::string& sMessage, opcUA_LogLevel level, opcUA_LogCategory category);
 
+			void connect(const std::string & sURL);
+
 		};
 
 		typedef std::shared_ptr<COpen62541Client> POpen62541Client;

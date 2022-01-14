@@ -48,8 +48,8 @@ using namespace LibMCEnv::Impl;
  Class definition of CDriverEnvironment
 **************************************************************************************************************************/
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath)
-    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, const std::string & sDriverName)
+    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -57,7 +57,11 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pToolpathHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pLogger.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (sBaseTempPath.empty ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (sDriverName.empty())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
@@ -190,3 +194,17 @@ LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
     return m_Chrono.getExistenceTimeInMilliseconds();
 }
 
+void CDriverEnvironment::LogMessage(const std::string& sLogString)
+{
+    m_pLogger->logMessage(sLogString, m_sDriverName, AMC::eLogLevel::Message);
+}
+
+void CDriverEnvironment::LogWarning(const std::string& sLogString)
+{
+    m_pLogger->logMessage(sLogString, m_sDriverName, AMC::eLogLevel::Warning);
+}
+
+void CDriverEnvironment::LogInfo(const std::string& sLogString)
+{
+    m_pLogger->logMessage(sLogString, m_sDriverName, AMC::eLogLevel::Info);
+}

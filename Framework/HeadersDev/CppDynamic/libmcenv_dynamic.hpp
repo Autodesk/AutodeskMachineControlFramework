@@ -614,6 +614,9 @@ public:
 	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
+	inline void LogMessage(const std::string & sLogString);
+	inline void LogWarning(const std::string & sLogString);
+	inline void LogInfo(const std::string & sLogString);
 };
 	
 /*************************************************************************************************************************
@@ -917,6 +920,9 @@ public:
 		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_Sleep = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = nullptr;
+		pWrapperTable->m_DriverEnvironment_LogMessage = nullptr;
+		pWrapperTable->m_DriverEnvironment_LogWarning = nullptr;
+		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -1732,6 +1738,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LogMessage = (PLibMCEnvDriverEnvironment_LogMessagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_logmessage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LogMessage = (PLibMCEnvDriverEnvironment_LogMessagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_logmessage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LogMessage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LogWarning = (PLibMCEnvDriverEnvironment_LogWarningPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_logwarning");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LogWarning = (PLibMCEnvDriverEnvironment_LogWarningPtr) dlsym(hLibrary, "libmcenv_driverenvironment_logwarning");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LogWarning == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LogInfo = (PLibMCEnvDriverEnvironment_LogInfoPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_loginfo");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LogInfo = (PLibMCEnvDriverEnvironment_LogInfoPtr) dlsym(hLibrary, "libmcenv_driverenvironment_loginfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LogInfo == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2817,6 +2850,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_logmessage", (void**)&(pWrapperTable->m_DriverEnvironment_LogMessage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogMessage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_logwarning", (void**)&(pWrapperTable->m_DriverEnvironment_LogWarning));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogWarning == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_loginfo", (void**)&(pWrapperTable->m_DriverEnvironment_LogInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogInfo == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
@@ -4222,6 +4267,33 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
 		
 		return resultTimerValue;
+	}
+	
+	/**
+	* CDriverEnvironment::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverEnvironment::LogMessage(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LogMessage(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverEnvironment::LogWarning(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LogWarning(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverEnvironment::LogInfo(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LogInfo(m_pHandle, sLogString.c_str()));
 	}
 	
 	/**

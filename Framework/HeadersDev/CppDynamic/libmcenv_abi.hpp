@@ -869,6 +869,33 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_sleep(LibMCEnv_Drive
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_getglobaltimerinmilliseconds(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 * pTimerValue);
 
+/**
+* logs a string as message
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_logmessage(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString);
+
+/**
+* logs a string as warning
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_logwarning(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString);
+
+/**
+* logs a string as info
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_loginfo(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pLogString);
+
 /*************************************************************************************************************************
  Class definition for SignalTrigger
 **************************************************************************************************************************/

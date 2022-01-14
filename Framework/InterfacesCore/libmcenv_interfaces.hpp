@@ -857,6 +857,24 @@ public:
 	*/
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
+	/**
+	* IDriverEnvironment::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogMessage(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverEnvironment::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogWarning(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverEnvironment::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogInfo(const std::string & sLogString) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;

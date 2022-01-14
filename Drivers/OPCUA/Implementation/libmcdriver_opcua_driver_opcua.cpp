@@ -171,6 +171,8 @@ void CDriver_OPCUA::Configure(const std::string& sConfigurationString)
     auto pSDK = std::make_shared<COpen62541SDK>(m_pOpen62541DLL->GetAbsoluteFileName());
     m_pClient = std::make_shared <COpen62541Client>(pSDK, this);
 
+    m_pClient->connect("localhost:4840");
+
 }
 
 std::string CDriver_OPCUA::GetName()
@@ -247,5 +249,30 @@ void CDriver_OPCUA::RefreshJournal()
 
 void CDriver_OPCUA::onLog(const std::string& sMessage, opcUA_LogLevel level, opcUA_LogCategory category)
 {
-    std::cout << sMessage << std::endl;
+    std::string sCategory;
+    switch (category) {
+    case UA_LOGCATEGORY_NETWORK: sCategory = "network"; break;
+    case UA_LOGCATEGORY_SECURECHANNEL: sCategory = "securechannel"; break;
+    case UA_LOGCATEGORY_SESSION: sCategory = "session"; break;
+    case UA_LOGCATEGORY_SERVER: sCategory = "server"; break;
+    case UA_LOGCATEGORY_CLIENT: sCategory = "client"; break;
+    case UA_LOGCATEGORY_USERLAND: sCategory = "userland"; break;
+    case UA_LOGCATEGORY_SECURITYPOLICY: sCategory = "securitypolicy"; break;
+    case UA_LOGCATEGORY_EVENTLOOP: sCategory = "eventloop"; break;
+    default: sCategory = "unknown";
+    }
+
+    switch (level) {
+    case UA_LOGLEVEL_DEBUG:
+    case UA_LOGLEVEL_INFO:
+        m_pDriverEnvironment->LogInfo(sCategory + " | " + sMessage);
+        break;
+    case UA_LOGLEVEL_WARNING:
+        m_pDriverEnvironment->LogWarning(sCategory + " | " + sMessage);
+        break;
+    case UA_LOGLEVEL_ERROR: 
+    case UA_LOGLEVEL_FATAL:
+        m_pDriverEnvironment->LogMessage(sCategory + " | " + sMessage);
+        break;
+    }
 }

@@ -46,15 +46,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 typedef void opcUA_Client;
-typedef void opcUA_ClientConfig;
 typedef void opcUA_EndpointDescription;
+typedef void opcUA_DataType;
+
+typedef uint8_t opcUA_Byte;
+typedef uint32_t opcUA_UInt32;
 
 typedef opcUA_Client* opcUA_ClientP;
 typedef uint32_t opcUA_StatusCode;
-typedef uint32_t opcUA_LogLevel;
-typedef uint32_t opcUA_LogCategory;
+
+typedef enum {
+	UA_LOGLEVEL_TRACE = 0,
+	UA_LOGLEVEL_DEBUG,
+	UA_LOGLEVEL_INFO,
+	UA_LOGLEVEL_WARNING,
+	UA_LOGLEVEL_ERROR,
+	UA_LOGLEVEL_FATAL
+} opcUA_LogLevel;
+
+typedef enum {
+	UA_LOGCATEGORY_NETWORK = 0,
+	UA_LOGCATEGORY_SECURECHANNEL,
+	UA_LOGCATEGORY_SESSION,
+	UA_LOGCATEGORY_SERVER,
+	UA_LOGCATEGORY_CLIENT,
+	UA_LOGCATEGORY_USERLAND,
+	UA_LOGCATEGORY_SECURITYPOLICY,
+	UA_LOGCATEGORY_EVENTLOOP
+} opcUA_LogCategory;
 
 
+typedef struct {
+	void (*log)(void* logContext, opcUA_LogLevel level, opcUA_LogCategory category, const char* msg, va_list args);
+	void* context;
+	void (*clear)(void* context);
+} opcUA_Logger;
+
+#define CLIENT_CONFIG_BUFFERSIZE 16384
+
+typedef struct {
+	void* clientContext;
+	opcUA_Logger logger;
+	opcUA_UInt32 timeout;
+	opcUA_Byte ReservedBuffer[CLIENT_CONFIG_BUFFERSIZE];
+
+} opcUA_ClientConfig;
+
+typedef struct {
+	size_t length;
+	opcUA_Byte* data;
+} opcUA_String;
 
 namespace LibMCDriver_OPCUA {
 	namespace Impl {
@@ -63,22 +104,32 @@ namespace LibMCDriver_OPCUA {
 		typedef opcUA_ClientP (OPCUA_CALLINGCONVENTION *POpen62541Ptr_UA_Client_newWithConfig) (const opcUA_ClientConfig* config);
         typedef void(OPCUA_CALLINGCONVENTION *POpen62541Ptr_UA_Client_delete) (opcUA_ClientP client);
         typedef opcUA_StatusCode(OPCUA_CALLINGCONVENTION *POpen62541Ptr_UA_Client_getEndpoints) (opcUA_ClientP client, const char* serverUrl, size_t* endpointDescriptionsSize, opcUA_EndpointDescription** endpointDescriptions);
+		typedef opcUA_StatusCode(OPCUA_CALLINGCONVENTION* POpen62541Ptr_UA_Client_connect) (opcUA_ClientP client, const char* endpointUrl);
+		typedef void(OPCUA_CALLINGCONVENTION* POpen62541Ptr_UA_clear) (void *ptr, const opcUA_DataType* type);
+		typedef opcUA_String(OPCUA_CALLINGCONVENTION* POpen62541Ptr_UA_String_fromChars) (const char* src);
+		typedef opcUA_StatusCode(OPCUA_CALLINGCONVENTION* POpen62541Ptr_UA_ClientConfig_setDefault) (opcUA_ClientConfig* config);
+		typedef opcUA_StatusCode(OPCUA_CALLINGCONVENTION* POpen62541Ptr_UA_ClientConfig_setDefaultEncryption) (opcUA_ClientConfig* config, opcUA_String localCertificate, opcUA_String privateKey, const opcUA_String* trustList, size_t trustListSize, const opcUA_String* revocationList, size_t revocationListSize);
+		
 
 		class COpen62541SDK {
 		private:
-			bool m_bIsInitialized;
-
 			void* m_LibraryHandle;
 			void resetFunctionPtrs ();
 		public:
 
             POpen62541Ptr_UA_Client_newWithConfig UA_Client_newWithConfig = nullptr;
             POpen62541Ptr_UA_Client_delete UA_Client_delete = nullptr;
+			POpen62541Ptr_UA_Client_getEndpoints UA_Client_getEndpoints = nullptr;
+			POpen62541Ptr_UA_Client_connect UA_Client_connect = nullptr;
+			POpen62541Ptr_UA_clear UA_clear = nullptr;
+			POpen62541Ptr_UA_String_fromChars UA_String_fromChars  = nullptr;
+			POpen62541Ptr_UA_ClientConfig_setDefault UA_ClientConfig_setDefault = nullptr;
+			//POpen62541Ptr_UA_ClientConfig_setDefaultEncryption UA_ClientConfig_setDefaultEncryption = nullptr;
 
 			COpen62541SDK(const std::string & sDLLNameUTF8);
 			~COpen62541SDK();
 
-			void checkError(uint32_t nUAError);
+			void checkError(opcUA_StatusCode statusCode);
 
 		};
 

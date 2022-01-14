@@ -64,8 +64,10 @@ void* _loadOpen62541Address(void * hLibrary, const char* pSymbolName) {
 #endif
 
 
+
+
 COpen62541SDK::COpen62541SDK(const std::string& sDLLNameUTF8)
-	: m_LibraryHandle (nullptr), m_bIsInitialized (false)
+	: m_LibraryHandle (nullptr)
 {
 
 	resetFunctionPtrs();
@@ -96,6 +98,12 @@ COpen62541SDK::COpen62541SDK(const std::string& sDLLNameUTF8)
 
 	this->UA_Client_newWithConfig = (POpen62541Ptr_UA_Client_newWithConfig)_loadOpen62541Address(hLibrary, "UA_Client_newWithConfig");
 	this->UA_Client_delete = (POpen62541Ptr_UA_Client_delete)_loadOpen62541Address(hLibrary, "UA_Client_delete");
+	this->UA_Client_getEndpoints = (POpen62541Ptr_UA_Client_getEndpoints)_loadOpen62541Address(hLibrary, "UA_Client_getEndpoints");
+	this->UA_Client_connect = (POpen62541Ptr_UA_Client_connect)_loadOpen62541Address(hLibrary, "UA_Client_connect");
+	this->UA_clear = (POpen62541Ptr_UA_clear)_loadOpen62541Address(hLibrary, "UA_clear");
+	this->UA_String_fromChars = (POpen62541Ptr_UA_String_fromChars)_loadOpen62541Address(hLibrary, "UA_String_fromChars");
+	this->UA_ClientConfig_setDefault = (POpen62541Ptr_UA_ClientConfig_setDefault)_loadOpen62541Address(hLibrary, "UA_ClientConfig_setDefault");
+	//this->UA_ClientConfig_setDefaultEncryption = (POpen62541Ptr_UA_ClientConfig_setDefaultEncryption)_loadOpen62541Address(hLibrary, "UA_ClientConfig_setDefaultEncryption");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -118,14 +126,22 @@ COpen62541SDK::~COpen62541SDK()
 }
 
 
-void COpen62541SDK::checkError(uint32_t nUAError) {
-	if (nUAError != 0)
-		throw std::runtime_error("UA Error: " + std::to_string (nUAError));
+void COpen62541SDK::checkError(opcUA_StatusCode statusCode)
+{
+	if (statusCode != 0)
+		throw std::runtime_error("UA Error: " + std::to_string (statusCode));
 }
 
 void COpen62541SDK::resetFunctionPtrs()
 {
 	UA_Client_newWithConfig = nullptr;
 	UA_Client_delete = nullptr;
+	UA_Client_getEndpoints = nullptr;
+	UA_Client_connect = nullptr;
+	UA_clear = nullptr;
+	UA_String_fromChars = nullptr;
+	UA_ClientConfig_setDefault = nullptr;
+	//UA_ClientConfig_setDefaultEncryption = nullptr;
+
 }
 
