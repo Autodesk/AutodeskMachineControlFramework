@@ -78,7 +78,7 @@ namespace AMC {
 
 		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
 
-		virtual std::string CUIModule_ContentUpload::findElementPathByUUID(const std::string& sUUID) override;
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
 
 
