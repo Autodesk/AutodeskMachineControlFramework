@@ -274,9 +274,10 @@
 					</buttongroup>
 				</content>
 
-				<content name="preview" columnstart="1" rowstart="2" columnend="2" rowend="2" >
-					<layerview />
-				</content>
+				<layerview name="preview" columnstart="1" rowstart="2" columnend="2" rowend="2" >
+					<platform sizex="100" sizey="100" originx="50" originy="50" baseimage="buildplate_holes" />
+				
+				</layerview>
 			
 			</grid>		
 		</page>

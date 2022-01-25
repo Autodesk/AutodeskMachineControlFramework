@@ -213,6 +213,9 @@ public:
 		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "uploaduuid");
 		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
 
+		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
+
 		pUIEnvironment->ActivatePage("previewbuild");
 	}
 
