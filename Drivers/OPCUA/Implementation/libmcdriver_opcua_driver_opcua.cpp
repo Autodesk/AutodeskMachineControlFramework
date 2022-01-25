@@ -171,7 +171,7 @@ void CDriver_OPCUA::Configure(const std::string& sConfigurationString)
     auto pSDK = std::make_shared<COpen62541SDK>(m_pOpen62541DLL->GetAbsoluteFileName());
     m_pClient = std::make_shared <COpen62541Client>(pSDK, this);
 
-    m_pClient->connect("localhost:4840");
+    m_pClient->connect("opc.tcp://localhost:4840/freeopcua/server/");
 
 }
 

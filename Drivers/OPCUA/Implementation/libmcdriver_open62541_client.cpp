@@ -100,6 +100,6 @@ void COpen62541Client::onLog(const std::string& sMessage, opcUA_LogLevel level, 
 
 void COpen62541Client::connect(const std::string& sURL)
 {
-	opcUA_StatusCode status = m_pSDK->UA_Client_connect(m_Client, sURL.c_str ());
+//	opcUA_StatusCode status = m_pSDK->UA_Client_connect(m_Client, sURL.c_str ());
 }
 

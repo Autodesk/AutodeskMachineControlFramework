@@ -103,7 +103,7 @@ COpen62541SDK::COpen62541SDK(const std::string& sDLLNameUTF8)
 	this->UA_clear = (POpen62541Ptr_UA_clear)_loadOpen62541Address(hLibrary, "UA_clear");
 	this->UA_String_fromChars = (POpen62541Ptr_UA_String_fromChars)_loadOpen62541Address(hLibrary, "UA_String_fromChars");
 	this->UA_ClientConfig_setDefault = (POpen62541Ptr_UA_ClientConfig_setDefault)_loadOpen62541Address(hLibrary, "UA_ClientConfig_setDefault");
-	//this->UA_ClientConfig_setDefaultEncryption = (POpen62541Ptr_UA_ClientConfig_setDefaultEncryption)_loadOpen62541Address(hLibrary, "UA_ClientConfig_setDefaultEncryption");
+	this->UA_ClientConfig_setDefaultEncryption = (POpen62541Ptr_UA_ClientConfig_setDefaultEncryption)_loadOpen62541Address(hLibrary, "UA_ClientConfig_setDefaultEncryption");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -141,7 +141,7 @@ void COpen62541SDK::resetFunctionPtrs()
 	UA_clear = nullptr;
 	UA_String_fromChars = nullptr;
 	UA_ClientConfig_setDefault = nullptr;
-	//UA_ClientConfig_setDefaultEncryption = nullptr;
+	UA_ClientConfig_setDefaultEncryption = nullptr;
 
 }
 

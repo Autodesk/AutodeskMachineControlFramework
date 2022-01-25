@@ -124,7 +124,7 @@ namespace LibMCDriver_OPCUA {
 			POpen62541Ptr_UA_clear UA_clear = nullptr;
 			POpen62541Ptr_UA_String_fromChars UA_String_fromChars  = nullptr;
 			POpen62541Ptr_UA_ClientConfig_setDefault UA_ClientConfig_setDefault = nullptr;
-			//POpen62541Ptr_UA_ClientConfig_setDefaultEncryption UA_ClientConfig_setDefaultEncryption = nullptr;
+			POpen62541Ptr_UA_ClientConfig_setDefaultEncryption UA_ClientConfig_setDefaultEncryption = nullptr;
 
 			COpen62541SDK(const std::string & sDLLNameUTF8);
 			~COpen62541SDK();
