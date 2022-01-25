@@ -163,7 +163,7 @@
 		
 		<error name="URLNOTFOUND" code="99" description="url not found." />
 		<error name="GENERICBADREQUEST" code="100" description="generic bad request." />
-		
+	
 		
 		
 		<error name="SQLITE_ERROR" code="101" description="SQLite: Generic Error" />
@@ -415,7 +415,9 @@
 		<error name="INVALIDBOOLEANEXPRESSION" code="395" description="Invalid boolean expression" />
 
 		<error name="INVALIDPERSISTENCYNAME" code="396" description="Invalid persistency name" />
-		<error name="ONLYVALUEDPARAMETERSCANBEPERSISTENT" code="397" description="Only valued parameters can be persistent" />
+		<error name="ONLYVALUEDPARAMETERSCANBEPERSISTENT" code="397" description="Only valued parameters can be persistent" />		
+		<error name="PLATFORMINFORMATIONMISSING" code="398" description="Platform information missing" />
+		
 
 	</errors>
 	

@@ -59,7 +59,6 @@ namespace AMC {
 		std::string m_sName;
 
 		std::vector<PUIModule> m_Modules;
-		std::map <std::string, PUIModule> m_ModuleMap;
 		std::map<std::string, PUIModuleItem> m_ItemMapOfPage;
 
 		std::map<std::string, std::string> m_FormNameMap;
@@ -77,7 +76,6 @@ namespace AMC {
 
 		void addModule (PUIModule pModule);
 
-		PUIModule findModule (const std::string & sName);
 		uint32_t getModuleCount();
 		PUIModule getModule (const uint32_t nIndex);
 

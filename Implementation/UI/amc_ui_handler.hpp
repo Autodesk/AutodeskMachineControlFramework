@@ -148,7 +148,7 @@ namespace AMC {
 		PResourcePackage getCoreResourcePackage ();
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
-		
+
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
 		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler);

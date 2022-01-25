@@ -23,7 +23,7 @@
 		
 		methods: {
 			    animate: function () {
-					requestAnimationFrame(this.animate);
+					//requestAnimationFrame(this.animate);
 
 					if (this.glInstance)
 						this.glInstance.renderScene ();
@@ -37,7 +37,7 @@
 			if (!this.glInstance) {
 				this.glInstance = new WebGLImpl ();
 				this.Application.storeWebGLInstance (this.glInstance);
-							
+								
 				this.glInstance.add2DImage (568 * 2, 139.25 * 2, "/ui_logo.png", 50);
 			}
 		},

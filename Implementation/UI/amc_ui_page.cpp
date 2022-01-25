@@ -74,16 +74,10 @@ void CUIPage::addModule(PUIModule pModule)
 	if (sName.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULENAME);
 
-	auto iIter = m_ModuleMap.find(sName);
-	if (iIter != m_ModuleMap.end())
-		throw ELibMCInterfaceException(LIBMC_ERROR_MODULENOTFOUND);
-
 	m_Modules.push_back(pModule);
-	m_ModuleMap.insert(std::make_pair (sName, pModule));
 
 	pModule->populateItemMap(m_ItemMapOfPage);
 	
-
 }
 
 void CUIPage::configurePostLoading()
@@ -92,15 +86,6 @@ void CUIPage::configurePostLoading()
 		pModule->configurePostLoading();
 }
 
-
-PUIModule CUIPage::findModule(const std::string& sName)
-{
-	auto iIter = m_ModuleMap.find(sName);
-	if (iIter == m_ModuleMap.end())
-		throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEMODULE);
-
-	return iIter->second;
-}
 
 uint32_t CUIPage::getModuleCount()
 {
@@ -118,7 +103,7 @@ PUIModule CUIPage::getModule(const uint32_t nIndex)
 void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleArray, CParameterHandler* pClientVariableHandler)
 {
 	for (auto module : m_Modules) {
-		CJSONWriterObject moduleObject(writer);
+		CJSONWriterObject moduleObject(writer);		
 		module->writeDefinitionToJSON(writer, moduleObject, pClientVariableHandler);
 
 		moduleArray.addObject(moduleObject);

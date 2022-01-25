@@ -35,9 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define __AMCIMPL_UI_DIALOG
 #define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
 
 #include "amc_ui_page.hpp"
 #include "amc_ui_dialog.hpp"
+#include "amc_ui_module.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"

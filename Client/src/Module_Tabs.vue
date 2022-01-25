@@ -24,6 +24,7 @@
 						<Module_Grid :key="moduleTab.name" v-if="(moduleTab.type == 'grid')" :module="moduleTab" :Application="Application" />							
 						<Module_GLScene :key="moduleTab.name" v-if="(moduleTab.type == 'glscene')" :module="moduleTab" :Application="Application" />							
 						<Module_Graphic :key="moduleTab.name" v-if="(moduleTab.type == 'graphic')" :module="moduleTab" :Application="Application" />							
+						<Module_LayerView :key="moduleTab.name" v-if="(moduleTab.type == 'layerview')" :module="moduleTab" :Application="Application" />							
 				</v-tab-item>
 							
 			</template>	
@@ -40,6 +41,7 @@
 	import Module_Grid from "./Module_Grid.vue";
 	import Module_GLScene from "./Module_GLScene.vue";
 	import Module_Graphic from "./Module_Graphic.vue";
+	import Module_LayerView from "./Module_LayerView.vue";
 
 	export default {
 		props: ["Application", "module"],
@@ -50,6 +52,7 @@
 			Module_Grid,
 			Module_GLScene,
 			Module_Graphic,
+			Module_LayerView,
 		},
 		
 		data: () => ({

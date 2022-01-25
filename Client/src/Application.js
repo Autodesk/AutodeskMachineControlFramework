@@ -56,7 +56,7 @@ export default class AMCApplication {
 		this.AppContent = {
             MenuItems: [],
             ToolbarItems: [],
-			ContentItems: [],					
+			ContentProperties: [],					
 			Pages: [],
 			Dialogs: [],
 			PageMap: new Map(),
@@ -225,15 +225,15 @@ export default class AMCApplication {
 	{
 		if (item.type === "parameterlist") {
 		
-			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-			item.entries = this.AppContent.ContentItems[item.uuid].entries;
+			this.AppContent.ContentProperties[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			item.entries = this.AppContent.ContentProperties[item.uuid].entries;
 			
 		}
 
 		if (item.type === "buildlist") {
 		
-			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
-			item.entries = this.AppContent.ContentItems[item.uuid].entries;
+			this.AppContent.ContentProperties[item.uuid] = { uuid: item.uuid, entries: [], refresh: true };
+			item.entries = this.AppContent.ContentProperties[item.uuid].entries;
 			
 		}
 		
@@ -244,7 +244,7 @@ export default class AMCApplication {
 		
 		if (item.type === "form") {
 
-			this.AppContent.ContentItems[item.uuid] = { uuid: item.uuid, entries: [], refresh: true, 
+			this.AppContent.ContentProperties[item.uuid] = { uuid: item.uuid, entries: [], refresh: true, 
 				callback: function(appcontent, item) {
 					
 					for (var entry of item.entries) {						
@@ -280,17 +280,53 @@ export default class AMCApplication {
 	{
 		var item, tab, section;
 		
+		if (module.type === "layerview") {		
+			if (module.items) {
+				for (item of module.items) {
+					if (item.type === "platform") { 
+					
+						this.AppContent.ContentProperties[item.uuid] = { 
+							uuid: item.uuid, 
+							entries: [], 
+							refresh: true, 
+							displayed_layer: 0,
+							displayed_build: 0,							
+							builduuid: item.builduuid,
+							currentlayer: item.currentlayer,
+							
+							callback: function(appcontent, item, newitemcontent) {								
+								
+								appcontent.ContentProperties[item.uuid].builduuid = newitemcontent.builduuid;
+								appcontent.ContentProperties[item.uuid].currentlayer = newitemcontent.currentlayer;
+								
+								if (module.onDataHasChanged) {
+									module.onDataHasChanged ();									
+								}
+							}
+						};
+						
+						module.platform = this.AppContent.ContentProperties[item.uuid];
+						
+					}
+				}
+			}
+		}
+		
 		if (module.type === "content") {
-			for (item of module.items) {
-				this.prepareModuleItem (item)
+			if (module.items) {
+				for (item of module.items) {
+					this.prepareModuleItem (item)
+				}
 			}
 			
 		}
 
 		if (module.type === "tabs") {
-			for (tab of module.tabs) {
-				this.prepareModule (tab)
-			}			
+			if (module.tabs) {
+				for (tab of module.tabs) {
+					this.prepareModule (tab)
+				}			
+			}
 		}
 
 		if (module.type === "grid") {
@@ -384,28 +420,30 @@ export default class AMCApplication {
 			module.cssstyle = module.cssstyle + "grid-template-rows: "+ rowString + ";";			
 			module.cssstyle = module.cssstyle + "grid-template-areas: " + areaString;
 						
-			for (section of module.sections) {
-								
-				var marginx = "margin-left: 0; margin-right: 0;";
-				var marginy = "margin-top: 0; margin-bottom: 0;";
-				
-				if (section.columnposition) {
-					if (section.columnposition == "centered")
-						marginx = "margin-left: auto; margin-right: auto;";
-					if (section.columnposition == "right")
-						marginx = "margin-left: auto; margin-right: 0;"
-				}
+			if (module.sections) {
+				for (section of module.sections) {
+									
+					var marginx = "margin-left: 0; margin-right: 0;";
+					var marginy = "margin-top: 0; margin-bottom: 0;";
+					
+					if (section.columnposition) {
+						if (section.columnposition == "centered")
+							marginx = "margin-left: auto; margin-right: auto;";
+						if (section.columnposition == "right")
+							marginx = "margin-left: auto; margin-right: 0;"
+					}
 
-				if (section.rowposition) {
-					if (section.rowposition == "centered")
-						marginy = "margin-top: auto; margin-bottom: auto;";
-					if (section.rowposition == "bottom")
-						marginy = "margin-top: auto; margin-bottom: 0;";
-				} 
-				
-				section.cssstyle = "overflow:auto; grid-area:" + section.name + ";" + marginx + marginy;				
-												
-				this.prepareModule (section)
+					if (section.rowposition) {
+						if (section.rowposition == "centered")
+							marginy = "margin-top: auto; margin-bottom: auto;";
+						if (section.rowposition == "bottom")
+							marginy = "margin-top: auto; margin-bottom: 0;";
+					} 
+					
+					section.cssstyle = "overflow:auto; grid-area:" + section.name + ";" + marginx + marginy;				
+													
+					this.prepareModule (section)
+				}
 			}
 		}
 
@@ -450,31 +488,37 @@ export default class AMCApplication {
         }	
 
 
-		updateContentItemResult (uuid, newEntries)		
+		updateContentItemResult (uuid, content)		
 		{
-			if (uuid) {
-				if (newEntries) {
-			
-					var oldentrycount = this.AppContent.ContentItems[uuid].entries.length;					
-					for (var i = 0; i < oldentrycount; i++) {
-						this.AppContent.ContentItems[uuid].entries.pop ();
+			if (uuid) {				
+				if (content) {
+					if (content.entries) {
+				
+						var oldentrycount = this.AppContent.ContentProperties[uuid].entries.length;					
+						for (var i = 0; i < oldentrycount; i++) {
+							this.AppContent.ContentProperties[uuid].entries.pop ();
+						}
+						
+						for (var entry of content.entries) {
+							this.AppContent.ContentProperties[uuid].entries.push (entry);
+						}
+									
 					}
 					
-					for (var entry of newEntries) {
-						this.AppContent.ContentItems[uuid].entries.push (entry);
-					}
-								
-					var itemCallback = this.AppContent.ContentItems[uuid].callback;
+					var itemCallback = this.AppContent.ContentProperties[uuid].callback;
 					if (itemCallback) {						
-						itemCallback (this.AppContent, this.AppContent.ContentItems[uuid]);
+						itemCallback (this.AppContent, this.AppContent.ContentProperties[uuid], content);
 					}
 				}
+				
 			}
 		}
+		
+				
 
 		updateContentItem (uuid) {
 		
-			this.AppContent.ContentItems[uuid].refresh = false;
+			this.AppContent.ContentProperties[uuid].refresh = false;
 
 			var headers = {}
 			var authToken = this.API.authToken; 
@@ -489,9 +533,9 @@ export default class AMCApplication {
                     url: url
                 })
                 .then(resultJSON => {									
-					this.updateContentItemResult (uuid, resultJSON.data.content.entries);
+					this.updateContentItemResult (uuid, resultJSON.data.content);
 					this.unsuccessfulUpdateCounter = 0;
-					this.AppContent.ContentItems[uuid].refresh = true;
+					this.AppContent.ContentProperties[uuid].refresh = true;
 					
                 })
                 .catch(err => {
@@ -500,17 +544,19 @@ export default class AMCApplication {
 					if (this.unsuccessfulUpdateCounter > 5) {
 						this.setStatusToError (err.message);
 					} else {
-						this.AppContent.ContentItems[uuid].refresh = true;
+						this.AppContent.ContentProperties[uuid].refresh = true;
 					}
 					
                 });
 				
 		}
 
+	
+
 		updateContentItems () {
 
-			for (var key in this.AppContent.ContentItems) {
-				var item = this.AppContent.ContentItems [key];
+			for (var key in this.AppContent.ContentProperties) {
+				var item = this.AppContent.ContentProperties [key];
 				if (item.refresh) {				
 					this.updateContentItem (item.uuid);
 				}
@@ -688,7 +734,7 @@ export default class AMCApplication {
 						for (var item of resultHandleEvent.data.contentupdate) {
 							if (item.uuid) {
 								if (item.entries) {
-									this.updateContentItemResult (item.uuid, item.entries);
+									this.updateContentItemResult (item.uuid, item);
 								}
 							}
 						}							
