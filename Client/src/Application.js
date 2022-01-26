@@ -242,6 +242,8 @@ export default class AMCApplication {
 
             this.AppContent.ContentProperties[item.uuid] = {
                 uuid: item.uuid,
+				selectevent: item.selectevent,
+				selectionvalueuuid: item.selectionvalueuuid,
                 entries: [],
                 refresh: true
             };
@@ -455,8 +457,14 @@ export default class AMCApplication {
                         if (section.rowposition == "bottom")
                             marginy = "margin-top: auto; margin-bottom: 0;";
                     }
+					
+					var overflowtype;
+					if (section.showscrollbars)
+						overflowtype = "auto";
+					else 
+						overflowtype = "hidden";
 
-                    section.cssstyle = "overflow:auto; grid-area:" + section.name + ";" + marginx + marginy;
+                    section.cssstyle = "overflow:" + overflowtype + "; grid-area:" + section.name + ";" + marginx + marginy;
 
                     this.prepareModule(section)
                 }

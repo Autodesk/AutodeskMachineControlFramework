@@ -29,7 +29,14 @@
 	  methods: {	
 	  
 		uiModuleBuildListClick: function (item) {
-			item;
+			if (item) {
+				if (this.moduleitem.selectevent && this.moduleitem.selectionvalueuuid) {
+					var eventValues = {}
+					eventValues[this.moduleitem.selectionvalueuuid] = item.buildUUID;
+			
+					this.Application.triggerUIEvent (this.moduleitem.selectevent, this.moduleitem.uuid, eventValues);
+				}
+			}
 		},
 				
 	  }

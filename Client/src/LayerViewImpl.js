@@ -28,6 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+const LAYERVIEW_MINSCALING = 0.5;
+const LAYERVIEW_MAXSCALING = 125.0;
+
 class LayerViewImpl {
 
     constructor(glInstance) {
@@ -45,8 +48,11 @@ class LayerViewImpl {
             y: 0,
             scaling: 1.0
         }
+		
+		this.renderNeedsUpdate = true;
 
         this.svgImage = this.glInstance.addSVGImage("buildplate", "/buildplate.svg", 35, true, true);
+		this.updateTransform ();
 
     }
 
@@ -61,8 +67,8 @@ class LayerViewImpl {
                 this.glInstance.setup2DView(width, height, 0.1, 100);
             }
 
-            var newWidth = width + 50;
-            var newHeight = height + 50;
+            var newWidth = width * 2 + 50;
+            var newHeight = height * 2 + 50;
 
             if ((this.currentSize.gridWidth < newWidth) || (this.currentSize.gridHeight < newHeight)) {
                 this.currentSize.gridWidth = newWidth;
@@ -74,8 +80,7 @@ class LayerViewImpl {
 
         }
 
-        if (this.glInstance)
-            this.glInstance.renderScene();
+		this.renderNeedsUpdate = true;
     }
 
     createGrid(width, height) {
@@ -86,7 +91,11 @@ class LayerViewImpl {
         if (gridObject)
             this.glInstance.scene.remove(gridObject);
 
-        this.glInstance.add2DGridGeometry("grid", width, height, 50, 4);
+        this.glInstance.add2DGridGeometry("grid", width, height, 50, 5);
+		this.updateTransform ();
+		
+		this.renderNeedsUpdate = true;
+		
 
     }
 
@@ -98,21 +107,24 @@ class LayerViewImpl {
         var gridgeometry = this.glInstance.findElement("grid");
         if (gridgeometry) {
             var gridScale = this.transform.scaling;
-            console.log("prescale: " + gridScale);
 
-            if (gridScale < 1.0) {
-                gridScale = gridScale * 4.0;
+            if (gridScale < 0.5) {
+                gridScale = gridScale * 5.0;
             }
 
-            if (gridScale > 4.0) {
-                gridScale = gridScale / 4.0;
+            if (gridScale > 2.5) {
+                gridScale = gridScale / 5.0;
             }
 
-            if (gridScale > 4.0) {
-                gridScale = gridScale / 4.0;
+            if (gridScale > 2.5) {
+                gridScale = gridScale / 5.0;
             }
 
-            var fullGridSize = gridScale * 16.0 * 4;
+            if (gridScale > 2.5) {
+                gridScale = gridScale / 5.0;
+            }
+
+            var fullGridSize = gridScale * 25.0 * 5;
             var gridTranslationX = this.transform.x - Math.ceil((this.transform.x / fullGridSize)) * fullGridSize;
             var gridTranslationY = this.transform.y - Math.ceil((this.transform.y / fullGridSize)) * fullGridSize;
 
@@ -131,12 +143,15 @@ class LayerViewImpl {
             buildplategeometry.setPosition(this.transform.x, this.transform.y, 0.0);
             buildplategeometry.setScale(this.transform.scaling,  - this.transform.scaling, 1.0);
         }
+		
+		this.renderNeedsUpdate = true;
 
-        if (this.glInstance)
-            this.glInstance.renderScene();
     }
 
     loadLayer(segmentsArray) {
+
+		if (!this.glInstance) 
+			return;
 
         var segmentCount = segmentsArray.length;
         var segmentIndex;
@@ -185,10 +200,10 @@ class LayerViewImpl {
 
         }
 
-        if (this.glInstance) {
-            this.glInstance.add2DLineGeometry("layerdata", lines, 60, 0.1, 0x000000);
-
-        }
+        
+        this.glInstance.add2DLineGeometry("layerdata", lines, 60, 0.1, 0x000000);
+		this.updateTransform ();
+		this.RenderScene (true);
 
     }
 
@@ -230,13 +245,17 @@ class LayerViewImpl {
         this.transform.x = this.transform.x - centerx;
         this.transform.y = this.transform.y - centery;
 
+		console.log("oldscaling: " + this.transform.scaling);
+
         var oldScaling = this.transform.scaling;
         this.transform.scaling = oldScaling * factor;
-        if (this.transform.scaling < 1.0)
-            this.transform.scaling = 1.0;
+        if (this.transform.scaling < LAYERVIEW_MINSCALING)
+            this.transform.scaling = LAYERVIEW_MINSCALING;
 
-        if (this.transform.scaling > 64.0)
-            this.transform.scaling = 64.0;
+        if (this.transform.scaling > LAYERVIEW_MAXSCALING)
+            this.transform.scaling = LAYERVIEW_MAXSCALING;
+
+		console.log("newscaling: " + this.transform.scaling);
 
         factor = this.transform.scaling / oldScaling;
 
@@ -244,8 +263,59 @@ class LayerViewImpl {
         this.transform.y = Math.ceil(this.transform.y * factor + centery);
 
         this.updateTransform();
-
+		
     }
+		
+	
+	CenterOnRectangle (minx, miny, maxx, maxy)
+	{
+		var sizex = maxx - minx;
+		var sizey = maxy - miny;
+		
+		if ((this.currentSize.viewPortWidth > 0) && (this.currentSize.viewPortHeight > 0)) {
+			if ((sizex > 0) && (sizey > 0)) {
+				
+				var scalingx = (this.currentSize.viewPortWidth / sizex);
+				var scalingy = (this.currentSize.viewPortHeight / sizey);
+				
+				var newcenterx = (maxx + minx) * 0.5;
+				var newcentery = (maxy + miny) * 0.5;
+				
+				var viewcenterx = this.currentSize.viewPortWidth * 0.5;
+				var viewcentery = this.currentSize.viewPortHeight * 0.5;
+								
+				this.transform.x = viewcenterx - this.transform.scaling * newcenterx;
+				this.transform.y = viewcentery + this.transform.scaling * newcentery;
+								
+				var newScaling;
+				if (scalingx > scalingy) {
+					newScaling = scalingy;
+				} else {
+					newScaling = scalingx;
+				}
+				
+				this.SetAbsoluteScaling (newScaling, viewcenterx, viewcentery);
+			
+			}
+		}
+		
+		
+	}
+	
+	
+    RenderScene (forceRender = false) 
+	{
+		if (forceRender) {
+			this.renderNeedsUpdate = true;
+		}
+		
+		if (this.renderNeedsUpdate && this.glInstance) {
+			this.glInstance.renderScene ();
+			this.renderNeedsUpdate = false;
+		}			
+		
+	} 
+	
 
 }
 

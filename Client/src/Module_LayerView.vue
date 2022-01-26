@@ -2,8 +2,10 @@
 	
 	<div v-if="(module.type == 'layerview')" style="width:100%; height:100%; display:block; overflow:hidden;">
 		
-			<div ref="layerViewDiv" style="width:100%;height:100%;" v-resize="onResize" @mousedown="onStartDragging" @mousemove="onDragging" @wheel="onMouseWheel" />
-		
+			<div ref="layerViewDiv" style="width:100%;height:100%;" v-resize="onResize" @mousedown="onStartDragging" @mousemove="onDragging" @wheel="onMouseWheel">
+								
+			</div>
+								
 	</div>
 
 </template>
@@ -22,7 +24,6 @@
 		data: () => ({				
 			glInstance: null,
 			LayerViewerInstance: null,
-			ScaleFactor: 0,
 			LayerIndex: 1,
 			dragging: false,
 			dragcurrentx: 0,
@@ -31,13 +32,6 @@
 		}),
 		
 		methods: {
-			    animate: function () {
-					//requestAnimationFrame(this.animate);
-
-					if (this.glInstance)
-						this.glInstance.renderScene ();
-
-				},
 				
 				onResize: function () {
 					var domelement = this.$refs.layerViewDiv; 
@@ -48,17 +42,10 @@
 						return;
 						
 					this.LayerViewerInstance.updateSize (domelement.clientWidth, domelement.clientHeight);
+					this.LayerViewerInstance.RenderScene (true);
 				},
 				
-				
-				onScalingChanged: function () {
-					if (!this.LayerViewerInstance) 
-						return;
-						
-					this.LayerViewerInstance.SetAbsoluteScaling (Math.pow (1.03, this.ScaleFactor));
 								
-				},
-				
 				
 				onLayerChanged: function () {
 				
@@ -74,10 +61,16 @@
 							this.Application.axiosPostRequest ("/build/toolpath", { "builduuid": platform.builduuid, "layerindex": platform.currentlayer })
 							  .then(layerJSON => {
 								
-								this.LayerViewerInstance.loadLayer (layerJSON.data.segments);				
+								if (this.LayerViewerInstance) {
+									this.LayerViewerInstance.loadLayer (layerJSON.data.segments);				
+									this.LayerViewerInstance.RenderScene (true);
+								}
 							  
 							})
 							.catch(err => {
+								if (this.LayerViewerInstance) {
+									this.LayerViewerInstance.RenderScene (true);
+								}
 								err;
 								//
 							});
@@ -91,6 +84,13 @@
 				  this.dragging = true;
 				  this.dragcurrentx = event.clientX;
 				  this.dragcurrenty = event.clientY;
+				  
+				  var boxRectangle = event.target.getBoundingClientRect();
+ 
+				  var localX = ( event.clientX - boxRectangle.left );
+			      var localY = ( event.clientY - boxRectangle.top );				  
+				  
+				  this.LayerViewerInstance.glInstance.pick2DElement (localX, localY);
 				},
 				
 				onStopDragging: function () {
@@ -109,6 +109,7 @@
 										
 					if (this.LayerViewerInstance) {
 						this.LayerViewerInstance.Drag (deltaX, deltaY);
+						this.LayerViewerInstance.RenderScene (true);
 					}
 				  }
 				},
@@ -133,10 +134,11 @@
 					var boxRectangle = domelement.getBoundingClientRect();
 					var localX = ( viewportX - boxRectangle.left );
 					var localY = ( viewportY - boxRectangle.top );				
+										
+					var scaleFactor = - deltaWheel * 1.5;
 					
-					this.ScaleFactor = this.ScaleFactor - deltaWheel * 1.5;
-					
-					this.LayerViewerInstance.SetAbsoluteScaling (Math.pow (1.03, this.ScaleFactor), localX, localY);
+					this.LayerViewerInstance.ScaleRelative (Math.pow (1.03, scaleFactor), localX, localY);
+					this.LayerViewerInstance.RenderScene (true);
 			
 				}
 				
@@ -144,7 +146,11 @@
 		
 		
 		created () {
-			this.module.onDataHasChanged = this.onLayerChanged;
+			this.module.onDataHasChanged = this.onLayerChanged;			
+			if (this.module.platform) {
+				this.module.platform.displayed_layer = 0;
+				this.module.platform.displayed_build = 0;
+			}
 			
 			this.glInstance = this.Application.retrieveWebGLInstance (module.uuid);
 			if (!this.glInstance) {
@@ -152,6 +158,7 @@
 				this.Application.storeWebGLInstance (this.glInstance);
 				
 				this.LayerViewerInstance = new LayerViewImpl (this.glInstance);				
+				this.LayerViewerInstance.RenderScene (true);
 				
 			}
 		},
@@ -170,6 +177,9 @@
 					if ((width > 0) && (height > 0)) {						
 						this.glInstance.setupDOMElement (layerViewDiv);														
 						this.LayerViewerInstance.updateSize (width, height);
+						this.LayerViewerInstance.CenterOnRectangle (-10, -10, 110, 110);
+						this.LayerViewerInstance.RenderScene (true);
+						
 					}
 					
 				}
@@ -178,6 +188,9 @@
 							
 					
 			})
+			
+			if (this.LayerViewerInstance)
+				this.LayerViewerInstance.RenderScene (true);
 		}
 		
 	};

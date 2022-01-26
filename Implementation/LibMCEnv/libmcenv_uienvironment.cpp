@@ -219,8 +219,12 @@ void CUIEnvironment::SetUIPropertyAsUUID(const std::string& sElementPath, const 
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
+
     auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
-    pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::normalizeUUIDString ( sValue));
+    if (!sValue.empty())
+        pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+    else
+        pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::createEmptyUUID());
 }
 
 void CUIEnvironment::SetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_double dValue) 

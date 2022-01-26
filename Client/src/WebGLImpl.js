@@ -34,6 +34,8 @@ import {
 }
 from "three/examples/jsm/loaders/SVGLoader";
 
+const RAYCAST_LINE_THRESHOLD = 3;
+
 class WebGLElement {
 
     constructor() {
@@ -144,37 +146,40 @@ class WebGLGridElement extends WebGLElement {
 
         var lineCountX = width / factor + 1;
         var lineCountY = height / factor + 1;
+		
+		var gridRecursion = 5;
+		var gridRecursionSquared = gridRecursion * gridRecursion;
 
         for (x = 0; x < lineCountX; x++) {
-            if (x % 4 != 0) {
+            if (x % gridRecursion != 0) {
                 gridArray1.push(x * factor, 0, x * factor, height);
             }
         }
 
         for (y = 0; y < lineCountY; y++) {
-            if (y % 4 != 0) {
+            if (y % gridRecursion != 0) {
                 gridArray1.push(0, y * factor, width, y * factor);
             }
         }
 
-        for (x = 0; x < (lineCountX / 4); x++) {
-            if (x % 4 != 0) {
-                gridArray2.push(x * 4 * factor, 0, x * 4 * factor, height);
+        for (x = 0; x < (lineCountX / gridRecursion); x++) {
+            if (x % gridRecursion != 0) {
+                gridArray2.push(x * gridRecursion * factor, 0, x * gridRecursion * factor, height);
             }
         }
 
-        for (y = 0; y < (lineCountY / 4); y++) {
-            if (y % 4 != 0) {
-                gridArray2.push(0, y * 4 * factor, width, y * 4 * factor);
+        for (y = 0; y < (lineCountY / gridRecursion); y++) {
+            if (y % gridRecursion != 0) {
+                gridArray2.push(0, y * gridRecursion * factor, width, y * gridRecursion * factor);
             }
         }
 
-        for (x = 0; x < (lineCountX / 16); x++) {
-            gridArray3.push(x * 16 * factor, 0, x * 16 * factor, height);
+        for (x = 0; x < (lineCountX / gridRecursionSquared); x++) {
+            gridArray3.push(x * gridRecursionSquared * factor, 0, x * gridRecursionSquared * factor, height);
         }
 
-        for (y = 0; y < (lineCountY / 16); y++) {
-            gridArray3.push(0, y * 16 * factor, width, y * 16 * factor);
+        for (y = 0; y < (lineCountY / gridRecursionSquared); y++) {
+            gridArray3.push(0, y * gridRecursionSquared * factor, width, y * gridRecursionSquared * factor);
         }
 
         this.lineElement1 = new WebGLLinesElement(gridArray1, zValue, 0.5, 0xe0e0e0);
@@ -281,6 +286,9 @@ class WebGLImpl {
         });
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0xffffff);
+		
+		this.raycaster = new THREE.Raycaster();
+		this.raycaster.params.Line.threshold = RAYCAST_LINE_THRESHOLD;
 
         this.renderElements = new Map();
     }
@@ -409,6 +417,26 @@ class WebGLImpl {
         });
 
     }
+	
+	
+	pick2DElement (x, y)
+	{		
+		if (this.camera) {
+			
+			console.log("pick X: " + x + " y: " + y);
+			
+			const pointer = new THREE.Vector2();
+			pointer.x = x;
+			pointer.y = y;
+			
+			this.raycaster.setFromCamera( pointer, this.camera );
+			
+			const intersects = this.raycaster.intersectObjects( this.scene.children[1], true );
+			if (intersects.length > 0) {
+				alert ("intersect");
+			}
+		}
+	}
 
     setupDemoScene() {
         this.camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 1, 3500);

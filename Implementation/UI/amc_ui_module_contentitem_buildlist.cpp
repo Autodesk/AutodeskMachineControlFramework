@@ -50,9 +50,9 @@ PUIModule_ContentBuildList CUIModule_ContentBuildList::makeFromXML(const pugi::x
 
 	auto loadingtextAttrib = xmlNode.attribute("loadingtext");
 	auto entriesperpageAttrib = xmlNode.attribute("entriesperpage");
-	auto detailpageAttrib = xmlNode.attribute("detailpage");
+	auto selectEventAttrib = xmlNode.attribute("selectevent");
 	std::string sLoadingText = loadingtextAttrib.as_string();
-	std::string sDetailPage = detailpageAttrib.as_string();
+	std::string sSelectEvent = selectEventAttrib.as_string();
 
 	int nEntriesPerPage;
 	if (!entriesperpageAttrib.empty()) {
@@ -66,12 +66,12 @@ PUIModule_ContentBuildList CUIModule_ContentBuildList::makeFromXML(const pugi::x
 		nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
 	}
 
-	return std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pUIModuleEnvironment->buildJobHandler(), sItemName, sModulePath);
+	return std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sSelectEvent, pUIModuleEnvironment->buildJobHandler(), sItemName, sModulePath);
 
 }
 
-CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sDetailPage (sDetailPage), m_pBuildJobHandler (pBuildJobHandler)
+CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string& sSelectEvent, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sLoadingText(sLoadingText), m_nEntriesPerPage(nEntriesPerPage), m_sSelectEvent(sSelectEvent), m_pBuildJobHandler (pBuildJobHandler)
 {
 	if (sModulePath.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULEPATH);
@@ -83,6 +83,8 @@ CUIModule_ContentBuildList::CUIModule_ContentBuildList(const std::string& sLoadi
 	m_sBuildNameCaption = "Build name";
 	m_sBuildLayersCaption = "Layers";
 	m_sBuildUUIDCaption = "UUID";
+
+	m_sSelectedBuildField = AMCCommon::CUtils::createUUID();
 
 }
 
@@ -97,7 +99,9 @@ void CUIModule_ContentBuildList::addDefinitionToJSON(CJSONWriter& writer, CJSONW
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buildlist");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
 	object.addString(AMC_API_KEY_UI_ITEMLOADINGTEXT, m_sLoadingText);
-	object.addString(AMC_API_KEY_UI_ITEMDETAILPAGE, m_sDetailPage);
+	object.addString(AMC_API_KEY_UI_ITEMSELECTEVENT, m_sSelectEvent);
+	object.addString(AMC_API_KEY_UI_ITEMSELECTIONVALUEUUID, m_sSelectedBuildField);
+
 	object.addInteger(AMC_API_KEY_UI_ITEMENTRIESPERPAGE, m_nEntriesPerPage);
 
 	CJSONWriterArray headersArray(writer);
@@ -141,7 +145,6 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 
 		pBuildJob->GetTimeStamp();
 
-		entryObject.addString(AMC_API_KEY_UI_ITEMDETAILPAGE, m_sDetailPage);
 		entryArray.addObject(entryObject);
 
 	}
@@ -150,3 +153,41 @@ void CUIModule_ContentBuildList::addContentToJSON(CJSONWriter& writer, CJSONWrit
 }
 
 
+void CUIModule_ContentBuildList::populateClientVariables(CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "build list UI element");
+	pGroup->addNewStringParameter("selecteduuid", "selected build UUID", AMCCommon::CUtils::createEmptyUUID());
+}
+
+void CUIModule_ContentBuildList::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	if (AMCCommon::CUtils::normalizeUUIDString(sPayloadUUID) == m_sSelectedBuildField) {
+		auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+		pGroup->setParameterValueByName("selecteduuid", AMCCommon::CUtils::normalizeUUIDString(sPayloadValue));
+
+	}
+
+}
+
+
+std::string CUIModule_ContentBuildList::findElementPathByUUID(const std::string& sUUID)
+{
+	if (sUUID == m_sSelectedBuildField)
+		return getItemPath();
+	if (sUUID == getUUID ())
+		return getItemPath();
+
+	return "";
+}
+
+
+std::list <std::string> CUIModule_ContentBuildList::getReferenceUUIDs()
+{
+	std::list <std::string> sUUIDList;
+	sUUIDList.push_back(m_sSelectedBuildField);
+	sUUIDList.push_back(getUUID ());
+
+	return sUUIDList;
+}
