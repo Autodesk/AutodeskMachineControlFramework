@@ -1188,18 +1188,23 @@ func (inst APIRequestHandler) Handle(rawBody []uint8) (string, uint32, error) {
 // GetResultData returns the cached stream content of the resulting data. Call only after Handle().
 func (inst APIRequestHandler) GetResultData(data []uint8) ([]uint8, error) {
 	var neededfordata C.uint64_t
+	neededfordata = 0;
 	returnValue := C.CCall_libmc_apirequesthandler_getresultdata(inst.wrapperRef.LibraryHandle, inst.Ref, 0, &neededfordata, nil)
 	if returnValue != 0 {
 		return nil, makeError(uint32(returnValue))
 	}
-	if len(data) < int(neededfordata) {
-	 data = append(data, make([]uint8, int(neededfordata)-len(data))...)
+	
+	if (neededfordata > 0) {
+	
+		data = make([]uint8, int(neededfordata));
+		returnValue = C.CCall_libmc_apirequesthandler_getresultdata(inst.wrapperRef.LibraryHandle, inst.Ref, neededfordata, nil, (*C.uint8_t)(unsafe.Pointer(&data[0])))
+		if returnValue != 0 {
+			return nil, makeError(uint32(returnValue))
+		}
+		return data[:int(neededfordata)], nil
+	} else {
+		return make([]uint8, 0), nil;
 	}
-	returnValue = C.CCall_libmc_apirequesthandler_getresultdata(inst.wrapperRef.LibraryHandle, inst.Ref, neededfordata, nil, (*C.uint8_t)(unsafe.Pointer(&data[0])))
-	if returnValue != 0 {
-		return nil, makeError(uint32(returnValue))
-	}
-	return data[:int(neededfordata)], nil
 }
 
 
