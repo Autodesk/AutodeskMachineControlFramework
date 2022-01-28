@@ -61,11 +61,11 @@ CDataModel::CDataModel()
 
 }
 
-void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType eDataBaseType, const std::string & sConnectionString)
+void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType dataBaseType, const std::string & sConnectionString)
     
 {
     m_pStoragePath = std::make_shared<AMCData::CStoragePath> (sDataDirectory);
-    if (eDataBaseType == eDataBaseType::SqLite) {
+    if (dataBaseType == eDataBaseType::SqLite) {
         m_pSQLHandler = std::make_shared<AMCData::CSQLHandler_SQLite>(sConnectionString);
     }
     else {
@@ -81,7 +81,7 @@ void CDataModel::InitialiseDatabase(const std::string & sDataDirectory, const Li
     migrator.migrateDatabaseSchemas(m_pSQLHandler, m_sInstallationUUID, m_sInstallationSecret);
 
     // Store Database type after successful initialisation
-    m_eDataBaseType = eDataBaseType;
+    m_eDataBaseType = dataBaseType;
 }
 
 LibMCData_uint32 CDataModel::GetDataModelVersion()
