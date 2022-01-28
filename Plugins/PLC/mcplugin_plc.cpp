@@ -117,26 +117,26 @@ public:
 		auto pPLCCommand_Home = pDriver->CreateCommand("home");
 		pPLCCommandList->AddCommand(pPLCCommand_Home);
 
-		/*auto pPLCCommand1 = pDriver->CreateCommand("moverecoater");
-		pPLCCommand1->SetIntegerParameter("recoater", 40000);
-		pPLCCommand1->SetIntegerParameter("velocityrecoater", 2000);
-		pPLCCommandList->AddCommand(pPLCCommand1);
-
-		auto pPLCCommand2 = pDriver->CreateCommand("moverecoater");
-		pPLCCommand2->SetIntegerParameter("recoater", 0);
-		pPLCCommand2->SetIntegerParameter("velocityrecoater", 10000);
-		pPLCCommandList->AddCommand(pPLCCommand2);  */
 
 		pPLCCommandList->FinishList();
 		pPLCCommandList->ExecuteList();
 
+		bool bReady = false;
+		for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
+			pDriver->QueryParameters();
 
-		if (pPLCCommandList->WaitForList(300, 100000)) {
+			if (pPLCCommandList->WaitForList(300, 100)) {
+				bReady = true;
+				break;
+			}
+		}
+
+		if (bReady) {
 			pStateEnvironment->LogMessage("Printer turned on");
 		}
 		else {
 			pStateEnvironment->LogMessage("Timeout while turning on printer!");
-		}
+		} 
 
 		pStateEnvironment->SetNextState("idle");
 	}
@@ -166,6 +166,10 @@ public:
 
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+
+		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
+		pDriver->QueryParameters();
+
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
 		if (pStateEnvironment->WaitForSignal("signal_recoatlayer", 0, pHandlerInstance)) {			
@@ -207,17 +211,40 @@ public:
 		
 		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
 		
-	auto pPLCCommandList = pDriver->CreateCommandList();
+		auto pPLCCommandList = pDriver->CreateCommandList();
 
-		auto pPLCCommand1 = pDriver->CreateCommand("moverecoater");
-		pPLCCommand1->SetIntegerParameter("recoater", 40000);
-		pPLCCommand1->SetIntegerParameter("velocityrecoater", 2000);
-		pPLCCommandList->AddCommand(pPLCCommand1);
 
-		auto pPLCCommand2 = pDriver->CreateCommand("moverecoater");
-		pPLCCommand2->SetIntegerParameter("recoater", 0);
-		pPLCCommand2->SetIntegerParameter("velocityrecoater", 10000);
-		pPLCCommandList->AddCommand(pPLCCommand2);  
+		for (uint32_t nIndex = 0; nIndex < 1; nIndex++) {
+			auto pPLCCommand1 = pDriver->CreateCommand("move");
+			pPLCCommand1->SetIntegerParameter("targetx", 100000);
+			pPLCCommand1->SetIntegerParameter("targety", 100000);
+			pPLCCommand1->SetIntegerParameter("targetz", 0);
+			pPLCCommand1->SetIntegerParameter("velocity", 10000);
+			pPLCCommandList->AddCommand(pPLCCommand1);
+
+			auto pPLCCommand2 = pDriver->CreateCommand("move");
+			pPLCCommand2->SetIntegerParameter("targetx", 200000);
+			pPLCCommand2->SetIntegerParameter("targety", 100000);
+			pPLCCommand2->SetIntegerParameter("targetz", 0);
+			pPLCCommand2->SetIntegerParameter("velocity", 10000);
+			pPLCCommandList->AddCommand(pPLCCommand2);
+
+			auto pPLCCommand3 = pDriver->CreateCommand("move");
+			pPLCCommand3->SetIntegerParameter("targetx", 200000);
+			pPLCCommand3->SetIntegerParameter("targety", 200000);
+			pPLCCommand3->SetIntegerParameter("targetz", 0);
+			pPLCCommand3->SetIntegerParameter("velocity", 10000);
+			pPLCCommandList->AddCommand(pPLCCommand3);
+
+			auto pPLCCommand4 = pDriver->CreateCommand("move");
+			pPLCCommand4->SetIntegerParameter("targetx", 100000);
+			pPLCCommand4->SetIntegerParameter("targety", 200000);
+			pPLCCommand4->SetIntegerParameter("targetz", 0);
+			pPLCCommand4->SetIntegerParameter("velocity", 10000);
+			pPLCCommandList->AddCommand(pPLCCommand4);
+
+		}
+
 
 		pPLCCommandList->FinishList();
 		pPLCCommandList->ExecuteList();

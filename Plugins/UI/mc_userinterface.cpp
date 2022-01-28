@@ -58,9 +58,11 @@ public:
 	{
 
 		pUIEnvironment->LogMessage("Clicked on StartBuildPreparation Button");
+		std::string sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID("previewbuild.preview", "builduuid");
+		pUIEnvironment->LogMessage("Preparing build " + sBuildUUID);
 
 		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_preparebuildjob");
-		//pSignal->SetString("jobuuid", sJobUUID);
+		pSignal->SetString("jobuuid", sBuildUUID);
 		pSignal->SetString("jobname", "Job");
 		pSignal->Trigger(); 
 
@@ -222,6 +224,53 @@ public:
 };
 
 
+class CEvent_OnUnloadBuildPreview : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "unloadbuildpreview";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		pUIEnvironment->LogMessage("Unloading build preview...");
+
+		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", "");
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
+	}
+
+};
+
+
+
+class CEvent_OnSelectBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onselectbuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		auto sSender = pUIEnvironment->RetrieveEventSender();
+		pUIEnvironment->LogMessage("Build item selected from " + sSender);
+
+		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
+		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
+
+		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
+
+		pUIEnvironment->ActivatePage("previewbuild");
+	}
+
+};
+
+
 class CEvent_OnChangeSimulationParameterEvent : public virtual CEvent {
 
 public:
@@ -248,6 +297,30 @@ public:
 };
 
 
+class CEvent_TestMovement : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "testmovement";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on TestMovement Button");
+
+		auto pSignal = pUIEnvironment->PrepareSignal("plc", "signal_recoatlayer");
+		pSignal->Trigger();
+
+
+	}
+
+};
+
+
+
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
 {
 	IEvent* pEventInstance = nullptr;
@@ -265,10 +338,15 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnUploadFinished>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnSelectBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnUnloadBuildPreview>(sEventName, pEventInstance))
+		return pEventInstance;	
 	if (createEventInstanceByName<CEvent_OnChangeSimulationParameterEvent>(sEventName, pEventInstance))
 		return pEventInstance;
-
-
+	if (createEventInstanceByName<CEvent_TestMovement>(sEventName, pEventInstance))
+		return pEventInstance;
+	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
 }

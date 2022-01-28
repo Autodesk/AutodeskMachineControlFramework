@@ -242,6 +242,10 @@
 					<switch name="simulatelaser" caption="Simulate Laser Control" sync:value="main.configuration.simulatelaser" changeevent="changesimulationparameter" />
 					<switch name="simulateplc" caption="Simulate PLC behaviour" sync:value="main.configuration.simulateplc" changeevent="changesimulationparameter" />
 				</form>			
+				
+				<buttongroup>
+					<button caption="Test Movement" event="testmovement"/>
+				</buttongroup>
 
 			</content>
 			
@@ -259,23 +263,68 @@
 		
 			<grid name="previewgrid">
 				<column width="3" unit="free" />
-				<column width="150" unit="pt" />
+				<column width="3" unit="free" />
+				<column width="3" unit="free" />
+				<column width="3" unit="free" />
+				<column width="3" unit="free" />
 				
-				<row height="80" unit="pt" />
+				<row height="120" unit="pt" />
 				<row height="1" unit="free" />
 		
-				<content name="buildinformation" title="Build Information" subtitle="Detailed information" columnstart="1" rowstart="1" columnend="1" rowend="1" >
-					<paragraph text="Here you find more information about your build."/>
+
+				<content name="buildimage" columnstart="1" rowstart="1" columnend="1" rowend="1" >
+					<image resource="ui_machine" x="50" y="50" width="120" height="100" z-layer="2" visible="1" />					
 				</content>
 
-				<content name="actions" columnstart="2" rowstart="1" columnend="2" rowend="1" >
+				<content name="buildinformation" columnstart="2" rowstart="1" columnend="2" rowend="1" rowposition="centered" >
+						<form name="infoform" >
+							<edit name="buildname" 
+								caption="Build name" 
+								value="Build 274642"
+								readonly="1" 							
+								/>
+							<edit name="layers" 
+								caption="Build details" 
+								value="1 part."
+								readonly="1" 							
+								/>
+						</form>
+					
+				</content>
+
+				<content name="layerinformation" columnstart="3" rowstart="1" columnend="3" rowend="1" rowposition="centered" >
+						<form name="layerform" >
+							<edit name="currentlayer" 
+								caption="Current Layer" 
+								value="1 / 48"
+								readonly="1" 							
+								/>
+							<edit name="currentheight" 
+								caption="Current height" 
+								value="0.1mm / 10.0mm"
+								readonly="1" 							
+								/>
+						</form>
+					
+				</content>
+
+				<content name="settings" columnstart="4" rowstart="1" columnend="4" rowend="1" rowposition="centered" >
+						<form name="settingsform" >
+							<switch name="showcolors" caption="Hatch Colors" />
+							<switch name="showmodel" caption="Model Geometry" />
+						</form>
+					
+				</content>
+
+				<content name="actions" columnstart="5" rowstart="1" columnend="5" rowend="1" rowposition="centered" >
 					<buttongroup>
 						<button caption="Prepare Build" targetpage="preparebuild" event="startbuildpreparation"/>
+						<button caption="Close Preview" targetpage="buildlist" event="unloadbuildpreview" />
 					</buttongroup>
 				</content>
 
-				<layerview name="preview" columnstart="1" rowstart="2" columnend="2" rowend="2" >
-					<platform sizex="100" sizey="100" originx="50" originy="50" baseimage="buildplate_holes" />
+				<layerview name="preview" columnstart="1" rowstart="2" columnend="5" rowend="2" >
+					<platform sizex="100" sizey="100" originx="50" originy="50" baseimage="buildplate" />
 				
 				</layerview>
 			
@@ -293,17 +342,18 @@
 				
 				<content name="manualcontrol1" title="Process" columnstart="2" rowstart="1" columnend="2" rowend="1" columnposition="left" rowposition="top">
 					
-						<form name="processparameters"  sync:disabled="main.ui.preparebuilddisabled">
+						<form name="processparameters" >
 							<edit name="o2_value" 
 								caption="Target Oxygen Value" 								
 								sync:value="main.processsettings.targeto2"															
 								suffix="ppm" 
 								readonly="1" 
+								sync:disabled="main.ui.preparebuilddisabled"
 								
 								/>
 								
-							<edit name="recoaterspeed" caption="Recoater Speed" sync:value="main.processsettings.recoaterspeed" suffix="mm/s" readonly="1" />
-							<edit name="gasflowspeed" caption="Gas flow speed" sync:value="main.processsettings.gasflowspeed" suffix="m/s" readonly="1" />
+							<edit name="recoaterspeed" caption="Recoater Speed" sync:value="main.processsettings.recoaterspeed" suffix="mm/s" readonly="1" sync:disabled="main.ui.preparebuilddisabled" />
+							<edit name="gasflowspeed" caption="Gas flow speed" sync:value="main.processsettings.gasflowspeed" suffix="m/s" readonly="1" sync:disabled="main.ui.preparebuilddisabled" />
 						</form>
 						<buttongroup>
 							<button caption="Change values" event="changemanualvalues" />
@@ -351,6 +401,9 @@
 					<entry statemachine="main" group="processsettings"/>
 					<entry statemachine="main" group="jobinfo"/>
 					<entry statemachine="main" group="ui"/>
+					<entry statemachine="plc" group="plcconfig"/>
+					<entry statemachine="plc" group="plcstate"/>
+					
           <entry statemachine="laser" group="sdkstate"/>          
         </parameterlist>
 			</content>
