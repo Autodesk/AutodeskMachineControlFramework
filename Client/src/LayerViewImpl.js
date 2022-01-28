@@ -51,7 +51,6 @@ class LayerViewImpl {
 		
 		this.renderNeedsUpdate = true;
 
-        this.svgImage = this.glInstance.addSVGImage("buildplate", "/buildplate.svg", 35, true, true);
 		this.updateTransform ();
 
     }
@@ -315,6 +314,19 @@ class LayerViewImpl {
 		}			
 		
 	} 
+	
+
+	SetBuildPlateSVG (url) {
+		if (this.glInstance) {
+			if (url) {
+				this.svgImage = this.glInstance.addSVGImage("buildplate", url, 35, true, true);
+			} else {
+				this.glInstance.removeElement ("buildplate");
+			}
+		}
+	}
+        
+	
 	
 
 }

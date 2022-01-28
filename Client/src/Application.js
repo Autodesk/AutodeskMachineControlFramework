@@ -312,11 +312,21 @@ export default class AMCApplication {
                             displayed_build: 0,
                             builduuid: item.builduuid,
                             currentlayer: item.currentlayer,
+							baseimageresource: item.baseimageresource,
+							sizex: item.sizex,
+							sizey: item.sizey,
+							originx: item.originx,
+							originy: item.originy,
 
                             callback: function (appcontent, item, newitemcontent) {
 
                                 appcontent.ContentProperties[item.uuid].builduuid = newitemcontent.builduuid;
                                 appcontent.ContentProperties[item.uuid].currentlayer = newitemcontent.currentlayer;
+                                appcontent.ContentProperties[item.uuid].baseimageresource = newitemcontent.baseimageresource;
+                                appcontent.ContentProperties[item.uuid].sizex = newitemcontent.sizex;
+                                appcontent.ContentProperties[item.uuid].sizey = newitemcontent.sizey;
+                                appcontent.ContentProperties[item.uuid].originx = newitemcontent.originx;
+                                appcontent.ContentProperties[item.uuid].originy = newitemcontent.originy;
 
                                 if (module.onDataHasChanged) {
                                     module.onDataHasChanged();

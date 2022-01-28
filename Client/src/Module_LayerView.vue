@@ -12,6 +12,8 @@
 
 <script>
 
+	const ZOOM_MARGIN = 10;
+
 	import WebGLImpl from "./WebGLImpl.js"
 	import LayerViewImpl from "./LayerViewImpl.js"
 
@@ -177,7 +179,17 @@
 					if ((width > 0) && (height > 0)) {						
 						this.glInstance.setupDOMElement (layerViewDiv);														
 						this.LayerViewerInstance.updateSize (width, height);
-						this.LayerViewerInstance.CenterOnRectangle (-10, -10, 110, 110);
+						
+						var platform = this.module.platform;
+						if (platform) {
+						
+							if (platform.baseimageresource) {
+								this.LayerViewerInstance.SetBuildPlateSVG (this.Application.getImageURL (platform.baseimageresource));
+							}
+						
+							this.LayerViewerInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
+						}
+						
 						this.LayerViewerInstance.RenderScene (true);
 						
 					}
