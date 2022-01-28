@@ -26,4 +26,5 @@ add_subdirectory(MQTT)
 add_subdirectory(Ximc)
 add_subdirectory(BuR)
 add_subdirectory(OPCUA)
+add_subdirectory(ADS)
 
