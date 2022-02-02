@@ -56,6 +56,8 @@
 			      var localY = ( event.clientY - boxRectangle.top );				  
 				  
 				  this.GraphicInstance.glInstance.pick2DElement (localX, localY);
+				  this.GraphicInstance.updateTransform ();
+				  this.GraphicInstance.RenderScene (true);
 				},
 				
 				onStopDragging: function () {
@@ -63,7 +65,7 @@
 				  this.dragcurrentx = 0;
 				  this.dragcurrenty = 0;
 				},
-				
+								
 				onDragging: function () {
 				  if (this.dragging) {
 				  
@@ -80,6 +82,27 @@
 				  }
 				},							
 				
+				
+				updateGraphic: function () {
+					
+					if (this.glInstance && this.GraphicInstance && this.module && this.module.items)  {
+					
+						this.GraphicInstance.BeginUpdate ();
+					
+						for (var item of this.module.items) {
+							if (item.imageuuid && item.name) {
+								this.GraphicInstance.AddSVGElement (this.Application.getImageURL (item.imageuuid), item.name, item.z);
+								
+							}
+						}								
+
+						this.GraphicInstance.EndUpdate ();
+					
+					}
+				
+				}				
+				
+				
 		},
 		
 		
@@ -90,7 +113,10 @@
 				this.glInstance = new WebGLImpl ();
 				this.Application.storeWebGLInstance (this.glInstance);
 				
-				this.GraphicInstance = new GraphicImpl (this.glInstance);				
+				this.GraphicInstance = new GraphicImpl (this.glInstance);
+				
+				this.updateGraphic ();
+								
 				this.GraphicInstance.RenderScene (true);
 				
 			}
@@ -118,8 +144,9 @@
 								this.GraphicInstance.SetBuildPlateSVG (this.Application.getImageURL (platform.baseimageresource));
 							}
 						
-							this.GraphicInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
 						} */
+						
+						this.GraphicInstance.CenterOnRectangle (this.module.viewminx, this.module.viewminy, this.module.viewmaxx, this.module.viewmaxy);
 						
 						this.GraphicInstance.RenderScene (true);
 						

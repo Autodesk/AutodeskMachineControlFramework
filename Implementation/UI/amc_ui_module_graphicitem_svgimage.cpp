@@ -88,6 +88,7 @@ void CUIModule_GraphicSVGImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWr
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "svgimage");
+	object.addString(AMC_API_KEY_UI_ITEMNAME, m_sItemName);
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
 
 	std::string sResourceName = m_ResourceName.evaluateStringValue(pStateMachineData);

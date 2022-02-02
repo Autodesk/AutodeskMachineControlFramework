@@ -77,6 +77,28 @@ class WebGLElement {
         }
     }
 
+    setPositionXY(x, y) {
+
+        this.position.x = x;
+        this.position.y = y;
+
+        if (this.glelement) {
+            this.glelement.position.x = x;
+            this.glelement.position.y = y;
+        }
+    }
+
+    setScaleXY(x, y) {
+        this.scale.x = x;
+        this.scale.y = y;
+
+        if (this.glelement) {
+            this.glelement.scale.x = x;
+            this.glelement.scale.y = y;
+        }
+    }
+
+
 }
 
 class WebGLLinesElement extends WebGLElement {
@@ -84,7 +106,7 @@ class WebGLLinesElement extends WebGLElement {
     constructor(lineData, zValue, lineThickness, lineColor) {
         super();
 
-        var geometry = new THREE.BufferGeometry();
+        let geometry = new THREE.BufferGeometry();
         const material = new THREE.MeshBasicMaterial({
             vertexColors: false,
             color: lineColor
@@ -136,19 +158,18 @@ class WebGLGridElement extends WebGLElement {
         this.lineElement2 = null;
         this.lineElement3 = null;
 
-        var group = new THREE.Group()
+        let group = new THREE.Group()
 
-            var gridArray1 = []
-            var gridArray2 = []
-            var gridArray3 = []
-            var x,
-        y;
+        let gridArray1 = []
+        let gridArray2 = []
+        let gridArray3 = []
+        let x, y;
 
-        var lineCountX = width / factor + 1;
-        var lineCountY = height / factor + 1;
+        let lineCountX = width / factor + 1;
+        let lineCountY = height / factor + 1;
 		
-		var gridRecursion = 5;
-		var gridRecursionSquared = gridRecursion * gridRecursion;
+		let gridRecursion = 5;
+		let gridRecursionSquared = gridRecursion * gridRecursion;
 
         for (x = 0; x < lineCountX; x++) {
             if (x % gridRecursion != 0) {
@@ -373,7 +394,7 @@ class WebGLImpl {
         if (!identifier)
             return;
 
-        var gridElement = new WebGLGridElement(width, height, zValue, factor);
+        let gridElement = new WebGLGridElement(width, height, zValue, factor);
 
         this.addElement(identifier, gridElement);
 
@@ -384,7 +405,7 @@ class WebGLImpl {
         if (!identifier)
             return;
 
-        var linesElement = new WebGLLinesElement(lineData, zValue, lineThickness, lineColor);
+        let linesElement = new WebGLLinesElement(lineData, zValue, lineThickness, lineColor);
 
         this.addElement(identifier, linesElement);
 
@@ -395,12 +416,15 @@ class WebGLImpl {
         if (!identifier)
             return;
 
-        var renderElements = this.renderElements;
-        var scene = this.scene;
+        let renderElements = this.renderElements;
+        let scene = this.scene;
 
         const loader = new SVGLoader();
         loader.load(url, function (data) {
-            var svgElement = new WebGLSVGElement(data, zValue, fillShapes, showStrokes);
+			
+			console.log ("svg " + identifier + " z Value: " + zValue);
+			
+            let svgElement = new WebGLSVGElement(data, zValue, fillShapes, showStrokes);
 
             if (renderElements.has(identifier)) {
                 scene.remove(identifier);
@@ -421,7 +445,7 @@ class WebGLImpl {
 	
 	pick2DElement (x, y)
 	{		
-		if (this.camera) {
+		/*if (this.camera) {
 			
 			console.log("pick X: " + x + " y: " + y);
 			
@@ -435,7 +459,8 @@ class WebGLImpl {
 			if (intersects.length > 0) {
 				alert ("intersect");
 			}
-		}
+		} */
+		
 	}
 
     setupDemoScene() {
@@ -575,7 +600,7 @@ class WebGLImpl {
             vertexColors: true
         });
 
-        var mesh = new THREE.Mesh(geometry, material);
+        let mesh = new THREE.Mesh(geometry, material);
         this.scene.add(mesh);
 
         this.renderScene();

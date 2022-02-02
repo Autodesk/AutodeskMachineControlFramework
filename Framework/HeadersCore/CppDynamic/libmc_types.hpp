@@ -425,6 +425,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_PLATFORMINFORMATIONMISSING 398
 #define LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION 399
 #define LIBMC_ERROR_EXPRESSIONVALUEMISSING 400
+#define LIBMC_ERROR_INVALIDVIEWPORTCOORD 401
+#define LIBMC_ERROR_VIEWPORTCOORDMISSING 402
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -762,6 +764,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_PLATFORMINFORMATIONMISSING: return "Platform information missing";
     case LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION: return "Invalid button distribution";
     case LIBMC_ERROR_EXPRESSIONVALUEMISSING: return "Expression value missing";
+    case LIBMC_ERROR_INVALIDVIEWPORTCOORD: return "Invalid viewport coordinate";
+    case LIBMC_ERROR_VIEWPORTCOORDMISSING: return "Viewport coordinate missing";
     default: return "unknown error";
   }
 }

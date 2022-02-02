@@ -127,20 +127,20 @@ class LayerViewImpl {
             var gridTranslationX = this.transform.x - Math.ceil((this.transform.x / fullGridSize)) * fullGridSize;
             var gridTranslationY = this.transform.y - Math.ceil((this.transform.y / fullGridSize)) * fullGridSize;
 
-            gridgeometry.setPosition(gridTranslationX, gridTranslationY, 0.0);
-            gridgeometry.setScale(gridScale, gridScale, 1.0);
+            gridgeometry.setPositionXY(gridTranslationX, gridTranslationY);
+            gridgeometry.setScaleXY(gridScale, gridScale);
         }
 
         var layergeometry = this.glInstance.findElement("layerdata");
         if (layergeometry) {
-            layergeometry.setPosition(this.transform.x, this.transform.y, 0.0);
-            layergeometry.setScale(this.transform.scaling,  - this.transform.scaling, 1.0);
+            layergeometry.setPositionXY(this.transform.x, this.transform.y);
+            layergeometry.setScaleXY(this.transform.scaling,  - this.transform.scaling);
         }
 
         var buildplategeometry = this.glInstance.findElement("buildplate");
         if (buildplategeometry) {
-            buildplategeometry.setPosition(this.transform.x, this.transform.y, 0.0);
-            buildplategeometry.setScale(this.transform.scaling,  - this.transform.scaling, 1.0);
+            buildplategeometry.setPositionXY(this.transform.x, this.transform.y, buildplategeometry);
+            buildplategeometry.setScaleXY(this.transform.scaling,  - this.transform.scaling);
         }
 		
 		this.renderNeedsUpdate = true;

@@ -61,6 +61,9 @@ namespace AMC {
 
 		std::string m_sModulePath;
 
+		double m_dMinX, m_dMinY;
+		double m_dMaxX, m_dMaxY;
+
 		std::map<std::string, PUIModuleGraphicItem> m_ItemMap;
 		std::vector<PUIModuleGraphicItem> m_Items;
 
@@ -68,6 +71,8 @@ namespace AMC {
 
 		std::string getDefaultContentName(const std::string& sPrefix);
 		std::string readItemNameFromXML(const pugi::xml_node& itemNode, const std::string& sPrefix);
+
+		void readViewPort(const pugi::xml_node& viewportNode);
 
 	public:
 

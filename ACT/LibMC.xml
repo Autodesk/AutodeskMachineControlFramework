@@ -420,6 +420,8 @@
 		
 		<error name="INVALIDBUTTONDISTRIBUTION" code="399" description="Invalid button distribution" />		
 		<error name="EXPRESSIONVALUEMISSING" code="400" description="Expression value missing" />		
+		<error name="INVALIDVIEWPORTCOORD" code="401" description="Invalid viewport coordinate" />		
+		<error name="VIEWPORTCOORDMISSING" code="402" description="Viewport coordinate missing" />		
 
 	
 

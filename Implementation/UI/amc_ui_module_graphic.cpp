@@ -48,10 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-
+#define GRAPHIC_INVALIDVIEWCOORD -2.0E6
+#define GRAPHIC_MINVIEWCOORD -1.0E6
+#define GRAPHIC_MAXVIEWCOORD +1.0E6
 
 CUIModule_Graphic::CUIModule_Graphic(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
-: CUIModule (getNameFromXML(xmlNode)), m_nNamingIDCounter (1)
+: CUIModule (getNameFromXML(xmlNode)), m_nNamingIDCounter (1), m_dMinX (0.0), m_dMinY (0.0), m_dMaxX (100.0), m_dMaxY (100.0)
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
@@ -73,7 +75,7 @@ CUIModule_Graphic::CUIModule_Graphic(pugi::xml_node& xmlNode, const std::string&
 		if (sChildName == "svgimage")
 			addItem(CUIModule_GraphicSVGImage::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
 		if (sChildName == "view") {
-
+			readViewPort(childNode);
 
 		}
 	}
@@ -109,6 +111,11 @@ void CUIModule_Graphic::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
+
+	moduleObject.addDouble(AMC_API_KEY_UI_VIEWMINX, m_dMinX);
+	moduleObject.addDouble(AMC_API_KEY_UI_VIEWMINY, m_dMinY);
+	moduleObject.addDouble(AMC_API_KEY_UI_VIEWMAXX, m_dMaxX);
+	moduleObject.addDouble(AMC_API_KEY_UI_VIEWMAXY, m_dMaxY);
 
 	CJSONWriterArray itemsNode(writer);
 	for (auto item : m_Items) {
@@ -194,3 +201,46 @@ void CUIModule_Graphic::addItem(PUIModuleGraphicItem pItem)
 		m_ItemMap.insert(std::make_pair(sUUID, pItem));
 
 }
+
+
+void CUIModule_Graphic::readViewPort(const pugi::xml_node& viewportNode)
+{
+	auto minXattrib = viewportNode.attribute("minx");
+	auto minYattrib = viewportNode.attribute("miny");
+	auto maxXattrib = viewportNode.attribute("maxx");
+	auto maxYattrib = viewportNode.attribute("maxy");
+
+	if (minXattrib.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_VIEWPORTCOORDMISSING, m_sModulePath);
+	if (minYattrib.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_VIEWPORTCOORDMISSING, m_sModulePath);
+	if (maxXattrib.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_VIEWPORTCOORDMISSING, m_sModulePath);
+	if (maxYattrib.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_VIEWPORTCOORDMISSING, m_sModulePath);
+
+	m_dMinX = minXattrib.as_double(-GRAPHIC_INVALIDVIEWCOORD);
+	if ((m_dMinX < GRAPHIC_MINVIEWCOORD) || (m_dMinX > GRAPHIC_MAXVIEWCOORD))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDVIEWPORTCOORD, m_sModulePath + " " + minXattrib.as_string());
+
+	m_dMinY = minYattrib.as_double(-GRAPHIC_INVALIDVIEWCOORD);
+	if ((m_dMinY < GRAPHIC_MINVIEWCOORD) || (m_dMinY > GRAPHIC_MAXVIEWCOORD))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDVIEWPORTCOORD, m_sModulePath + " " + minYattrib.as_string());
+
+	m_dMaxX = maxXattrib.as_double(-GRAPHIC_INVALIDVIEWCOORD);
+	if ((m_dMaxX < GRAPHIC_MINVIEWCOORD) || (m_dMaxX > GRAPHIC_MAXVIEWCOORD))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDVIEWPORTCOORD, m_sModulePath + " " + maxXattrib.as_string());
+
+	m_dMaxY = maxYattrib.as_double(-GRAPHIC_INVALIDVIEWCOORD);
+	if ((m_dMaxY < GRAPHIC_MINVIEWCOORD) || (m_dMaxY > GRAPHIC_MAXVIEWCOORD))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDVIEWPORTCOORD, m_sModulePath + " " + maxYattrib.as_string());
+
+	if (m_dMaxX < m_dMinX)
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDVIEWPORTCOORD, m_sModulePath);
+	if (m_dMaxY < m_dMinY)
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDVIEWPORTCOORD, m_sModulePath);
+
+	
+
+}
+

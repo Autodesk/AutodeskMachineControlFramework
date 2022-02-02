@@ -36,6 +36,8 @@ const GRAPHIC_ZLEVEL_MAX = 100;
 const GRAPHIC_MINSCALING = 0.5;
 const GRAPHIC_MAXSCALING = 125.0;
 
+const GRAPHIC_GRIDZVALUE = 1;
+
 class GraphicImpl {
 
     constructor(glInstance) {
@@ -55,6 +57,7 @@ class GraphicImpl {
         }
 		
 		this.renderNeedsUpdate = true;
+		this.graphicElements = new Set();
 
 		this.updateTransform ();
 
@@ -71,8 +74,8 @@ class GraphicImpl {
                 this.glInstance.setup2DView(width, height, 0.1, 100);
             }
 
-            var newWidth = width * 2 + 50;
-            var newHeight = height * 2 + 50;
+            let newWidth = width * 2 + 50;
+            let newHeight = height * 2 + 50;
 
             if ((this.currentSize.gridWidth < newWidth) || (this.currentSize.gridHeight < newHeight)) {
                 this.currentSize.gridWidth = newWidth;
@@ -91,11 +94,11 @@ class GraphicImpl {
         if (!this.glInstance)
             return;
 
-        var gridObject = this.glInstance.scene.getObjectByName("grid");
+        let gridObject = this.glInstance.scene.getObjectByName("grid");
         if (gridObject)
             this.glInstance.scene.remove(gridObject);
 
-        this.glInstance.add2DGridGeometry("grid", width, height, 50, 5);
+        this.glInstance.add2DGridGeometry("grid", width, height, GRAPHIC_GRIDZVALUE, 5);
 		this.updateTransform ();
 		
 		this.renderNeedsUpdate = true;
@@ -108,9 +111,9 @@ class GraphicImpl {
         if (!this.glInstance)
             return;
 
-        var gridgeometry = this.glInstance.findElement("grid");
+        let gridgeometry = this.glInstance.findElement("grid");
         if (gridgeometry) {
-            var gridScale = this.transform.scaling;
+            let gridScale = this.transform.scaling;
 
             if (gridScale < 0.5) {
                 gridScale = gridScale * 5.0;
@@ -128,13 +131,21 @@ class GraphicImpl {
                 gridScale = gridScale / 5.0;
             }
 
-            var fullGridSize = gridScale * 25.0 * 5;
-            var gridTranslationX = this.transform.x - Math.ceil((this.transform.x / fullGridSize)) * fullGridSize;
-            var gridTranslationY = this.transform.y - Math.ceil((this.transform.y / fullGridSize)) * fullGridSize;
+            let fullGridSize = gridScale * 25.0 * 5;
+            let gridTranslationX = this.transform.x - Math.ceil((this.transform.x / fullGridSize)) * fullGridSize;
+            let gridTranslationY = this.transform.y - Math.ceil((this.transform.y / fullGridSize)) * fullGridSize;
 
-            gridgeometry.setPosition(gridTranslationX, gridTranslationY, 0.0);
-            gridgeometry.setScale(gridScale, gridScale, 1.0);
+            gridgeometry.setPositionXY(gridTranslationX, gridTranslationY);
+            gridgeometry.setScaleXY(gridScale, gridScale);
         }
+		
+		for (const name of this.graphicElements) {
+			let geometryElement = this.glInstance.findElement(name);
+			if (geometryElement) {
+				geometryElement.setPositionXY(this.transform.x, this.transform.y);
+				geometryElement.setScaleXY(this.transform.scaling,  this.transform.scaling);
+			}
+		}
 		
 		this.renderNeedsUpdate = true;
 
@@ -169,7 +180,7 @@ class GraphicImpl {
 
 		console.log("oldscaling: " + this.transform.scaling);
 
-        var oldScaling = this.transform.scaling;
+        let oldScaling = this.transform.scaling;
         this.transform.scaling = oldScaling * factor;
         if (this.transform.scaling < GRAPHIC_MINSCALING)
             this.transform.scaling = GRAPHIC_MINSCALING;
@@ -191,25 +202,25 @@ class GraphicImpl {
 	
 	CenterOnRectangle (minx, miny, maxx, maxy)
 	{
-		var sizex = maxx - minx;
-		var sizey = maxy - miny;
+		let sizex = maxx - minx;
+		let sizey = maxy - miny;
 		
 		if ((this.currentSize.viewPortWidth > 0) && (this.currentSize.viewPortHeight > 0)) {
 			if ((sizex > 0) && (sizey > 0)) {
 				
-				var scalingx = (this.currentSize.viewPortWidth / sizex);
-				var scalingy = (this.currentSize.viewPortHeight / sizey);
+				let scalingx = (this.currentSize.viewPortWidth / sizex);
+				let scalingy = (this.currentSize.viewPortHeight / sizey);
 				
-				var newcenterx = (maxx + minx) * 0.5;
-				var newcentery = (maxy + miny) * 0.5;
+				let newcenterx = (maxx + minx) * 0.5;
+				let newcentery = (maxy + miny) * 0.5;
 				
-				var viewcenterx = this.currentSize.viewPortWidth * 0.5;
-				var viewcentery = this.currentSize.viewPortHeight * 0.5;
+				let viewcenterx = this.currentSize.viewPortWidth * 0.5;
+				let viewcentery = this.currentSize.viewPortHeight * 0.5;
 								
 				this.transform.x = viewcenterx - this.transform.scaling * newcenterx;
-				this.transform.y = viewcentery + this.transform.scaling * newcentery;
+				this.transform.y = viewcentery - this.transform.scaling * newcentery;
 								
-				var newScaling;
+				let newScaling;
 				if (scalingx > scalingy) {
 					newScaling = scalingy;
 				} else {
@@ -253,11 +264,26 @@ class GraphicImpl {
 		
 		if (this.glInstance) {
 			if (url) {
-				this.svgImage = this.glInstance.addSVGImage(name, url.toString (), zLevel, true, true);
+				this.glInstance.addSVGImage(name, url.toString (), zLevel, true, true);
+				this.graphicElements.add (name);
+				
 			} else {
 				this.glInstance.removeElement (name);
+				this.graphicElements.delete (name);
 			}
+			
+			
 		}
+	}
+	
+	BeginUpdate ()
+	{
+		this.graphicElements.clear ();
+	}
+	
+	
+	EndUpdate ()
+	{
 	}
 
 }
