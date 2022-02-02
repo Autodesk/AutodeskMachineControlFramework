@@ -52,6 +52,10 @@ git rev-parse --verify --short HEAD > "$builddir/githash.txt"
 GITHASH=$(<"$builddir/githash.txt")
 echo "git hash: $GITHASH"
 
+git rev-parse --verify HEAD > "$builddir/longgithash.txt"
+LONGGITHASH=$(<"$builddir/longgithash.txt")
+echo "long git hash: $LONGGITHASH"
+
 cd "$basepath"
 
 echo "Building Resource builder (Win64)..."
@@ -59,39 +63,27 @@ set GOARCH=amd64
 set GOOS=windows
 go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/Server/buildResources.go"
 
-echo "Building Resource builder (Linux64)..."
-set GOARCH=amd64
-set GOOS=linux
-go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
-
-echo "Building Resource builder (LinuxARM)..."
-set GOARCH=arm
-set GOOS=linux
-set GOARM=5
-go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
-
 echo "Building Go Server..."
 go get "github.com/gorilla/handlers"
 go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
+cp "$basepath/Client/public/"*.* "$builddir/Client/public"
+cp "$basepath/Client/src/"*.* "$builddir/Client/src"
+cp "$basepath/Client/src/plugins/"*.* "$builddir/Client/src/plugins"
+cp "$basepath/Client/"*.js "$builddir/Client"
+cp "$basepath/Client/"*.json "$builddir/Client"
 
-#cp "$basepath/Client/public/"*.* "$builddir/Client/public"
-#cp "$basepath/Client/src/"*.* "$builddir/Client/src"
-#cp "$basepath/Client/src/plugins/"*.* "$builddir/Client/src/plugins"
-#cp "$basepath/Client/"*.js "$builddir/Client"
-#cp "$basepath/Client/"*.json "$builddir/Client"
+cd "$builddir/Client"
 
-#cd "$builddir/Client"
+npm install
+npm run build
 
-#npm install
-#npm run build
-
-#go run ../../Server/createDist.go ../Output $GITHASH
+go run ../../Server/createDist.go ../Output $GITHASH
 
 cd "$builddir"
 
 echo "Building Core Modules"
-cmake ..
+cmake -DCMAKE_TOOLCHAIN_FILE=$basepath/CMake/CrossCompile_Win32FromDebian.txt ..
 cmake --build . --config Release
 
 echo "Building Core Resources"
@@ -112,10 +104,12 @@ cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
-#cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
-go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
+go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${LONGGITHASH} win64
 
-cp $builddir/DevPackage/AMCF_${GITHASH}.zip $builddir/Artifacts/devpackage.zip
+sha256sum $builddir/DevPackage/amcf_win64_${LONGGITHASH}.zip
+
+cp $builddir/DevPackage/amcf_win64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
 
 echo "Build done!"
+
