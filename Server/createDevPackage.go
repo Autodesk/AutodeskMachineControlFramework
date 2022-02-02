@@ -74,16 +74,17 @@ func addDirectory (zipWriter * zip.Writer, basePath string, relativePath string)
 func main() {
 			
 	argsWithProg := os.Args;
-	if (len (argsWithProg) < 4) {
-		log.Fatal ("Please start with createDist <devpackagepath> <outputpath> <githash>");
+	if (len (argsWithProg) < 5) {
+		log.Fatal ("Please start with createDist <devpackagepath> <outputpath> <githash> <systemprefix>");
 	}
 			
 	
 	DevPackageDir := filepath.Clean (argsWithProg[1]) + "/";
 	OutputPath := filepath.Clean (argsWithProg[2]) + "/";
 	hexSum := argsWithProg[3];
+	systemprefix := argsWithProg[4];
 		
-	zipName := "AMCF_" + hexSum + ".zip"
+	zipName := "amcf_" + systemprefix + "_" + hexSum + ".zip"
 		
     newZipFile, err := os.Create(OutputPath + zipName)
     if err != nil {
@@ -120,18 +121,29 @@ func main() {
 		log.Fatal(err)
 	}
 	
-	err = addFile (zipWriter, DevPackageDir + "buildresources.exe", "buildresources.exe");
-	if err != nil {
-		log.Fatal(err)
-	}
+	if (systemprefix == "win64") {
+	
+		err = addFile (zipWriter, DevPackageDir + "buildresources.exe", "buildresources.exe");
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+	} else if (systemprefix == "linux64") {
 
-	err = addFile (zipWriter, DevPackageDir + "buildresources.linux", "buildresources.linux");
-	if err != nil {
-		log.Fatal(err)
+		err = addFile (zipWriter, DevPackageDir + "buildresources.linux", "buildresources.linux");
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+	} else if (systemprefix == "rpi") {
+	
+		err = addFile (zipWriter, DevPackageDir + "buildresources.arm", "buildresources.arm");
+		if err != nil {
+			log.Fatal(err)
+		}
+		
+	} else {
+		log.Fatal("Invalid system prefix: " + systemprefix);
 	}
-
-	err = addFile (zipWriter, DevPackageDir + "buildresources.arm", "buildresources.arm");
-	if err != nil {
-		log.Fatal(err)
-	}
+	
 }

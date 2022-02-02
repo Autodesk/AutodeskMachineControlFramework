@@ -44,16 +44,16 @@ set GOARCH=amd64
 set GOOS=windows
 go build -o "%builddir%/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
 
-echo "Building Resource builder (Linux64)..."
-set GOARCH=amd64
-set GOOS=linux
-go build -o "%builddir%/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+REM echo "Building Resource builder (Linux64)..."
+REM set GOARCH=amd64
+REM set GOOS=linux
+REM go build -o "%builddir%/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
 
-echo "Building Resource builder (LinuxARM)..."
-set GOARCH=arm
-set GOOS=linux
-set GOARM=5
-go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+REM echo "Building Resource builder (LinuxARM)..."
+REM set GOARCH=arm
+REM set GOOS=linux
+REM set GOARM=5
+REM go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
 
 echo "Building Server..."
 set GOARCH=amd64
@@ -94,7 +94,7 @@ copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
 copy ..\..\Framework\PluginPython\*.* Framework\PluginPython
 del Framework\Dist\%GITHASH%_core.data
 
-go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %LONGGITHASH%
+go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %LONGGITHASH% win64
 
 echo "Build done!"
 

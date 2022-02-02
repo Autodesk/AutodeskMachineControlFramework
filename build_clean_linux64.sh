@@ -52,6 +52,10 @@ git rev-parse --verify --short HEAD > "$builddir/githash.txt"
 GITHASH=$(<"$builddir/githash.txt")
 echo "git hash: $GITHASH"
 
+git rev-parse --verify HEAD > "$builddir/longgithash.txt"
+LONGGITHASH=$(<"$builddir/longgithash.txt")
+echo "long git hash: $LONGGITHASH"
+
 cd "$basepath"
 
 echo "Building Resource builder (Win64)..."
@@ -114,8 +118,8 @@ cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 #cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
-go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
+go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${LONGGITHASH} linux64
 
-cp $builddir/DevPackage/AMCF_${GITHASH}.zip $builddir/Artifacts/devpackage.zip
+cp $builddir/DevPackage/AMCF_linux64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
 
 echo "Build done!"
