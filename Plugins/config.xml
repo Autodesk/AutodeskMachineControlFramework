@@ -383,9 +383,9 @@
 				<graphic name="manualcontrol3" title="" columnstart="1" rowstart="1" columnend="1" rowend="1">
 				
 					<view minx="0" miny="0" maxx="160" maxy="110" />
+										
+					<svgimage resource="buildplate" x="0" y="0" z="45" scalex="1.0" scaley="1.0" angle="0.0" />
 					
-					<svgimage resource="machineimage" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
-
 				</graphic>
 
 				<content name="manualcontrol4" title="" columnstart="1" rowstart="2" columnend="1" rowend="2" columnposition="left" rowposition="centered">
