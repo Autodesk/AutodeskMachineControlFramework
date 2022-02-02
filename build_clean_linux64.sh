@@ -58,26 +58,14 @@ echo "long git hash: $LONGGITHASH"
 
 cd "$basepath"
 
-echo "Building Resource builder (Win64)..."
-set GOARCH=amd64
-set GOOS=windows
-go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/Server/buildResources.go"
-
 echo "Building Resource builder (Linux64)..."
 set GOARCH=amd64
 set GOOS=linux
 go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
 
-echo "Building Resource builder (LinuxARM)..."
-set GOARCH=arm
-set GOOS=linux
-set GOARM=5
-go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
-
 echo "Building Go Server..."
 go get "github.com/gorilla/handlers"
 go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
-
 
 cp "$basepath/Client/public/"*.* "$builddir/Client/public"
 cp "$basepath/Client/src/"*.* "$builddir/Client/src"
@@ -116,10 +104,12 @@ cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
-#cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
 go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${LONGGITHASH} linux64
 
-cp $builddir/DevPackage/AMCF_linux64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
+sha256sum $builddir/DevPackage/amcf_linux64_${LONGGITHASH}.zip
+
+cp $builddir/DevPackage/amcf_linux64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
 
 echo "Build done!"
+
