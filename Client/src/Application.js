@@ -251,6 +251,35 @@ export default class AMCApplication {
 
         }
 
+        if (item.type === "buttongroup") {
+
+			item.buttoncssstyle = ""; 
+			item.cssstyle = "";
+			
+			if (item.buttondistribution == "rightaligned") {
+				item.cssstyle = item.cssstyle + "text-align: right;"; 
+			}
+
+			if (item.buttondistribution == "leftaligned") {
+				item.cssstyle = item.cssstyle + "text-align: left;"; 
+			}
+
+			if (item.buttondistribution == "centered") {
+				item.cssstyle = item.cssstyle + "text-align: centered;"; 
+			}
+
+			if (item.buttondistribution == "equal") {
+				
+				var buttoncount = item.buttons.length;
+				if (buttoncount > 0) {
+					item.buttoncssstyle = item.buttoncssstyle + "min-width: calc(" + (100.0 / buttoncount) + "% - 10px);"; 
+				}
+				
+				item.cssstyle = item.cssstyle + "text-align: center;";	
+			}
+        }
+
+
         if (item.type === "upload") {
             item.state = {
                 uploadid: 0,

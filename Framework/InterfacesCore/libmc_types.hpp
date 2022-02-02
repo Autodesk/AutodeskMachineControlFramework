@@ -423,6 +423,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDPERSISTENCYNAME 396
 #define LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT 397
 #define LIBMC_ERROR_PLATFORMINFORMATIONMISSING 398
+#define LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION 399
+#define LIBMC_ERROR_EXPRESSIONVALUEMISSING 400
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -758,6 +760,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDPERSISTENCYNAME: return "Invalid persistency name";
     case LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT: return "Only valued parameters can be persistent";
     case LIBMC_ERROR_PLATFORMINFORMATIONMISSING: return "Platform information missing";
+    case LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION: return "Invalid button distribution";
+    case LIBMC_ERROR_EXPRESSIONVALUEMISSING: return "Expression value missing";
     default: return "unknown error";
   }
 }

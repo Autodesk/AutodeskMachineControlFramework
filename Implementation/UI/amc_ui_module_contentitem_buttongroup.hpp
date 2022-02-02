@@ -50,6 +50,15 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 
+
+	enum class eUIModule_ContentButtonDistribution : int32_t {
+		cbdRightAligned = 0,
+		cbdLeftAligned = 1,
+		cbdCentered = 2,
+		cbdEquallyDistributed = 3,
+	};
+
+
 	class CUIModule_ContentButton {
 	protected:
 
@@ -88,11 +97,13 @@ namespace AMC {
 		std::list<PUIModule_ContentButton> m_Buttons;
 		CUIModule_ContentRegistry* m_pFormOwner;
 
+		eUIModule_ContentButtonDistribution m_ButtonDistribution;
+
 	public:
 
 		static PUIModule_ContentButtonGroup makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const std::string& sItemName, const std::string & sModulePath);
+		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const eUIModule_ContentButtonDistribution buttonDistribution, const std::string& sItemName, const std::string & sModulePath);
 
 		virtual ~CUIModule_ContentButtonGroup();
 
@@ -104,6 +115,13 @@ namespace AMC {
 
 		// Returns all UUIDs that could be contained in this Item
 		virtual std::list <std::string> getReferenceUUIDs() override;
+
+		eUIModule_ContentButtonDistribution getButtonDistribution ();
+		void setButtonDistribution(const eUIModule_ContentButtonDistribution buttonDistribution);
+
+		static eUIModule_ContentButtonDistribution stringToButtonDistribution(const std::string & sValue);
+		static std::string buttonDistributionToString(const eUIModule_ContentButtonDistribution buttonDistribution);
+
 
 
 	};

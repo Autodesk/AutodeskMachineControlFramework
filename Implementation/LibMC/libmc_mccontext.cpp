@@ -103,7 +103,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pSystemState->driverHandler()->setTempBasePath(sTempPathUTF8);
 
 #else
-    m_pSystemState->driverHandler()->setTempBasePath("/temp");
+    m_pSystemState->driverHandler()->setTempBasePath("/tmp");
 #endif
 }
 

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_graphic.hpp"
 #include "amc_ui_module_graphicitem.hpp"
 #include "amc_ui_module_graphicitem_image.hpp"
+#include "amc_ui_module_graphicitem_svgimage.hpp"
 
 #include "common_utils.hpp"
 
@@ -69,6 +70,12 @@ CUIModule_Graphic::CUIModule_Graphic(pugi::xml_node& xmlNode, const std::string&
 
 		if (sChildName == "image")
 			addItem(CUIModule_GraphicImage::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "svgimage")
+			addItem(CUIModule_GraphicSVGImage::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "view") {
+
+
+		}
 	}
 
 }

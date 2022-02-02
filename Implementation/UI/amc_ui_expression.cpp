@@ -40,7 +40,22 @@ CUIExpression::CUIExpression()
 
 }
 
+CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, bool bValueMustExist)
+{
+	readFromXML(xmlNode, attributeName, "", bValueMustExist);
+}
+
 CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName)
+{
+	readFromXML(xmlNode, attributeName, "", false);
+}
+
+CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue)
+{
+	readFromXML(xmlNode, attributeName, defaultValue, false);
+}
+
+void CUIExpression::readFromXML(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue, bool bValueMustExist)
 {
 	auto valueAttrib = xmlNode.attribute(attributeName.c_str());
 	auto syncvalueAttrib = xmlNode.attribute(("sync:" + attributeName).c_str());
@@ -55,7 +70,16 @@ CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& a
 		m_sExpressionValue = sSyncValue;
 	}
 	else {
-		m_sFixedValue = sValue;
+		if (!valueAttrib.empty()) {
+			m_sFixedValue = sValue;
+		}
+		else {
+
+			if (bValueMustExist) 
+				throw ELibMCCustomException(LIBMC_ERROR_EXPRESSIONVALUEMISSING, attributeName);
+
+			m_sFixedValue = defaultValue;
+		}
 	}
 }
 

@@ -1,9 +1,8 @@
 <template>
 	
 	<div v-if="(module.type == 'layerview')" style="width:100%; height:100%; display:block; overflow:hidden;">
-		
+			
 			<div ref="layerViewDiv" style="width:100%;height:100%;" v-resize="onResize" @mousedown="onStartDragging" @mousemove="onDragging" @wheel="onMouseWheel">
-								
 			</div>
 								
 	</div>

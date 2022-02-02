@@ -7,7 +7,7 @@
 			</p>
 			<p v-if="module.subtitle != ''" >{{ module.subtitle }}</p>
 
-			<div v-if="module.items.length > 0" class="text--primary">
+			<div v-if="module.items.length > 0" class="text--primary" width="100%">
 			
 				<template v-for="moduleitem in module.items">
 					

@@ -1,12 +1,10 @@
 <template>
 
-<div v-if="(moduleitem.type=='buttongroup')" class="text-right">  	
-	<v-spacer></v-spacer>
-		
+<div v-if="(moduleitem.type=='buttongroup')" v-bind:style="moduleitem.cssstyle" > 
 	<template v-for="button in moduleitem.buttons">
 	
-		<span :key="button.name" v-on:click.stop="uiModuleButtonClick (button);" class="pa-2">	
-			<v-btn color="primary">
+		<span :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">	
+			<v-btn color="primary" class="ml-1 mr-1" v-bind:style="moduleitem.buttoncssstyle" >
 				{{ button.caption }}
 			</v-btn>			
 		</span>
@@ -38,7 +36,12 @@
 			}
 		
 		}
+	  },
+	  
+	  created () {
+	  	  
 	  }
+	  
 	};
 	
 </script>

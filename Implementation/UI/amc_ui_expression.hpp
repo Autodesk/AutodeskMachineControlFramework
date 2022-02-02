@@ -47,10 +47,14 @@ namespace AMC {
 	private:
 		std::string m_sFixedValue;
 		std::string m_sExpressionValue;
+
+		void readFromXML(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue, bool bValueMustExist);
 	public:
 
 		CUIExpression();
 		CUIExpression (const pugi::xml_node & xmlNode, const std::string & attributeName);
+		CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, bool bValueMustExist);
+		CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue);
 
 		std::string evaluateStringValue(CStateMachineData * pStateMachineData);
 		std::string evaluateStringValue(PStateMachineData pStateMachineData);

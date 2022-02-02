@@ -94,7 +94,14 @@ void CUIModule_ContentButton::writeFormValuesToJSON(CJSONWriterArray& pArray)
 PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 {
 	LibMCAssertNotNull(pUIModuleEnvironment);
-	auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->contentRegistry(), sItemName, sModulePath);
+
+	eUIModule_ContentButtonDistribution buttonDistribution = eUIModule_ContentButtonDistribution::cbdRightAligned;
+	auto distributionAttrib = xmlNode.attribute ("distribution");
+	if (!distributionAttrib.empty()) {
+		buttonDistribution = stringToButtonDistribution(distributionAttrib.as_string ());
+	}	
+
+	auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->contentRegistry(), buttonDistribution, sItemName, sModulePath);
 
 	auto buttonsNodes = xmlNode.children("button");
 	for (auto buttonNode : buttonsNodes) {
@@ -109,8 +116,8 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 }
 
 
-CUIModule_ContentButtonGroup::CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const std::string& sItemName, const std::string& sModulePath)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_pFormOwner (pFormOwner)
+CUIModule_ContentButtonGroup::CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const eUIModule_ContentButtonDistribution buttonDistribution, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_pFormOwner (pFormOwner), m_ButtonDistribution (buttonDistribution)
 {
 	LibMCAssertNotNull(pFormOwner);
 }
@@ -125,6 +132,7 @@ void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSO
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buttongroup");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_BUTTONDISTRIBUTION, buttonDistributionToString (m_ButtonDistribution));
 
 	CJSONWriterArray buttonArray(writer);
 
@@ -229,4 +237,50 @@ std::list <std::string> CUIModule_ContentButtonGroup::getReferenceUUIDs()
 	}
 
 	return resultList;
+}
+
+
+eUIModule_ContentButtonDistribution CUIModule_ContentButtonGroup::getButtonDistribution()
+{
+	return m_ButtonDistribution;
+}
+
+void CUIModule_ContentButtonGroup::setButtonDistribution(const eUIModule_ContentButtonDistribution buttonDistribution)
+{
+	m_ButtonDistribution = buttonDistribution;
+}
+
+eUIModule_ContentButtonDistribution CUIModule_ContentButtonGroup::stringToButtonDistribution(const std::string& sValue)
+{
+	if (sValue == "rightaligned")
+		return eUIModule_ContentButtonDistribution::cbdRightAligned;
+	if (sValue == "leftaligned")
+		return eUIModule_ContentButtonDistribution::cbdLeftAligned;
+	if (sValue == "centered")
+		return eUIModule_ContentButtonDistribution::cbdCentered;
+	if (sValue == "equal")
+		return eUIModule_ContentButtonDistribution::cbdEquallyDistributed;
+
+	throw ELibMCCustomException(LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION, "invalid button distribution: " + sValue);
+}
+
+
+std::string CUIModule_ContentButtonGroup::buttonDistributionToString(const eUIModule_ContentButtonDistribution buttonDistribution)
+{
+	switch (buttonDistribution)
+	{
+
+		case eUIModule_ContentButtonDistribution::cbdRightAligned:
+			return "rightaligned";
+		case eUIModule_ContentButtonDistribution::cbdLeftAligned:
+			return "leftaligned";
+		case eUIModule_ContentButtonDistribution::cbdCentered:
+			return "centered";
+		case eUIModule_ContentButtonDistribution::cbdEquallyDistributed:
+			return "equal";
+
+		default:
+			return "";
+
+	}
 }
