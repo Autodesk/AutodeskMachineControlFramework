@@ -5,7 +5,7 @@ set -e
 export GO111MODULE="off" 
 
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-builddir="$basepath/build"
+builddir="$basepath/build_linux64"
 outputdir="$builddir/Output"
 
 dirs_to_make[0]="$builddir"
