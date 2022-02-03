@@ -3,7 +3,7 @@ set GO111MODULE=off
 
 set basepath=%~dp0
 echo %basepath%
-set builddir=%basepath%\build
+set builddir=%basepath%\build_win64
 set outputdir=%builddir%\Output
 
 if not exist "%builddir%" (mkdir "%builddir%")
