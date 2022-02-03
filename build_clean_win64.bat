@@ -65,7 +65,7 @@ echo "Building Client"
 cd "%basepath%\Client"
 call build_client_clean.bat
 cd "%builddir%\Client"
-go run ../../Server/createDist.go ../Output %GITHASH%
+go run ../../Server/createDist.go ../Output %GITHASH% win64
 
 cd "%builddir%"
 

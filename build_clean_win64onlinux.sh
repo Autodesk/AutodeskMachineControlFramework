@@ -78,7 +78,7 @@ cd "$builddir/Client"
 npm install
 npm run build
 
-go run ../../Server/createDist.go ../Output $GITHASH
+go run ../../Server/createDist.go ../Output $GITHASH win64
 
 cd "$builddir"
 
@@ -94,13 +94,13 @@ cd "$builddir/DevPackage"
 cp ../githash.txt Framework/Dist/disthash.txt
 cp ../Output/amc_server Framework/Dist/
 cp ../Output/amc_server.xml Framework/Dist/
-cp ../Output/${GITHASH}_core_libmc.so Framework/Dist/
-cp ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
-cp ../Output/${GITHASH}_core_libmcdata.so Framework/Dist/
+cp ../Output/${GITHASH}_core_libmc.dll Framework/Dist/
+cp ../Output/${GITHASH}_core_lib3mf.dll Framework/Dist/
+cp ../Output/${GITHASH}_core_libmcdata.dll Framework/Dist/
 cp ../Output/${GITHASH}_*.data Framework/Dist/
 cp ../Output/${GITHASH}_*.client Framework/Dist/
 cp ../Output/${GITHASH}_package.xml Framework/Dist/
-cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
+cp ../Output/${GITHASH}_driver_*.dll Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp

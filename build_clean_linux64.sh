@@ -78,7 +78,7 @@ cd "$builddir/Client"
 npm install
 npm run build
 
-go run ../../Server/createDist.go ../Output $GITHASH
+go run ../../Server/createDist.go ../Output $GITHASH linux64
 
 cd "$builddir"
 

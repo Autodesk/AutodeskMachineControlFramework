@@ -99,18 +99,28 @@ func main() {
 	Root.XMLNs = "http://schemas.autodesk.com/amc/resourcepackage/2020/07";
 	
 	var dllExtension string
-	if runtime.GOOS == "windows" {
-		dllExtension = "dll";
-	} else {
-		dllExtension = "so";
-	}
 	
 		
 	argsWithProg := os.Args;
-	if (len (argsWithProg) < 3) {
-		log.Fatal ("Please start with createDist <outputpath> <githash>");
+	if (len (argsWithProg) < 4) {
+		log.Fatal ("Please start with createDist <outputpath> <githash> <systemprefix>");
 	}
 			
+	if (systemprefix == "win64") {
+	
+		dllExtension = "dll";
+		
+	} else if (systemprefix == "linux64") {
+
+		dllExtension = "so";
+		
+	} else if (systemprefix == "rpi") {
+	
+		dllExtension = "so";
+		
+	} else {
+		log.Fatal("Invalid system prefix: " + systemprefix);
+	}
 	
 	OutputDir := filepath.Clean (argsWithProg[1]) + "/";
 	hexSum := argsWithProg[2];
