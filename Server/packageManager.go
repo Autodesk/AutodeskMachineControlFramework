@@ -82,7 +82,7 @@ func main() {
 			}
 			defer targetFile.Close()
 			
-			downloadURL := downloadURLBase + "/AMCF_" + gitHash + ".zip";
+			downloadURL := downloadURLBase + "/amcf_" + gitHash + ".zip";
 			log.Println ("Downloading package from " + downloadURL);
 				
 			response, err := http.Get(downloadURL);

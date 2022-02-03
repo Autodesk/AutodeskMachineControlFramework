@@ -427,6 +427,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_EXPRESSIONVALUEMISSING 400
 #define LIBMC_ERROR_INVALIDVIEWPORTCOORD 401
 #define LIBMC_ERROR_VIEWPORTCOORDMISSING 402
+#define LIBMC_ERROR_MACHINEINSTANCENOTFOUND 403
+#define LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS 404
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -766,6 +768,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_EXPRESSIONVALUEMISSING: return "Expression value missing";
     case LIBMC_ERROR_INVALIDVIEWPORTCOORD: return "Invalid viewport coordinate";
     case LIBMC_ERROR_VIEWPORTCOORDMISSING: return "Viewport coordinate missing";
+    case LIBMC_ERROR_MACHINEINSTANCENOTFOUND: return "Machine instance not found";
+    case LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS: return "Could not get temp path from Windows";
     default: return "unknown error";
   }
 }

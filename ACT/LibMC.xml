@@ -422,6 +422,11 @@
 		<error name="EXPRESSIONVALUEMISSING" code="400" description="Expression value missing" />		
 		<error name="INVALIDVIEWPORTCOORD" code="401" description="Invalid viewport coordinate" />		
 		<error name="VIEWPORTCOORDMISSING" code="402" description="Viewport coordinate missing" />		
+		
+		<error name="MACHINEINSTANCENOTFOUND" code="403" description="Machine instance not found" />		
+		<error name="COULDNOTGETTEMPPATHFROMWINDOWS" code="404" description="Could not get temp path from Windows" />		
+		
+		
 
 	
 
