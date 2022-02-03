@@ -445,6 +445,7 @@ class WebGLImpl {
 	
 	pick2DElement (x, y)
 	{		
+		x; y;
 		/*if (this.camera) {
 			
 			console.log("pick X: " + x + " y: " + y);
