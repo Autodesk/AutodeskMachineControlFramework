@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"fmt"
-	"runtime"
 	"io/ioutil"
 	"strings"
 	"path/filepath"
@@ -105,6 +104,10 @@ func main() {
 	if (len (argsWithProg) < 4) {
 		log.Fatal ("Please start with createDist <outputpath> <githash> <systemprefix>");
 	}
+	
+	OutputDir := filepath.Clean (argsWithProg[1]) + "/";
+	hexSum := argsWithProg[2];
+	systemprefix := argsWithProg[3];
 			
 	if (systemprefix == "win64") {
 	
@@ -121,10 +124,7 @@ func main() {
 	} else {
 		log.Fatal("Invalid system prefix: " + systemprefix);
 	}
-	
-	OutputDir := filepath.Clean (argsWithProg[1]) + "/";
-	hexSum := argsWithProg[2];
-	
+		
 		
 	ClientZIPName := hexSum + "_core.client";
 	CoreResourcesName := hexSum + "_core.data";
