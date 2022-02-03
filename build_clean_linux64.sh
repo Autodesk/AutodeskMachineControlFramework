@@ -109,7 +109,7 @@ go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir
 
 sha256sum $builddir/DevPackage/amcf_linux64_${LONGGITHASH}.zip
 
-cp $builddir/DevPackage/amcf_linux64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
+cp $builddir/DevPackage/amcf_linux64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage_linux64.zip
 
 echo "Build done!"
 

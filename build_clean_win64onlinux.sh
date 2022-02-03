@@ -5,7 +5,7 @@ set -e
 export GO111MODULE="off" 
 
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-builddir="$basepath/build"
+builddir="$basepath/build_win64"
 outputdir="$builddir/Output"
 
 dirs_to_make[0]="$builddir"
@@ -109,7 +109,7 @@ go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir
 
 sha256sum $builddir/DevPackage/amcf_win64_${LONGGITHASH}.zip
 
-cp $builddir/DevPackage/amcf_win64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
+cp $builddir/DevPackage/amcf_win64_${LONGGITHASH}.zip $builddir/Artifacts/devpackage_win64.zip
 
 echo "Build done!"
 
