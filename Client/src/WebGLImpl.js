@@ -97,6 +97,19 @@ class WebGLElement {
             this.glelement.scale.y = y;
         }
     }
+	
+	
+	updateGLPosition () 
+	{
+        if (this.glelement) {
+            this.glelement.position.x = this.position.x;
+            this.glelement.position.y = this.position.y;
+            this.glelement.position.z = this.position.z;
+            this.glelement.scale.x = this.scale.x;
+            this.glelement.scale.y = this.scale.y;
+            this.glelement.scale.z = this.scale.z;
+        }
+	}
 
 
 }
@@ -219,15 +232,21 @@ class WebGLGridElement extends WebGLElement {
 
 class WebGLSVGElement extends WebGLElement {
 
-    constructor(data, zValue, fillShapes, showStrokes) {
+    constructor ()
+	{
         super();
+		this.glelement = null
+	}
+	
+	
+	loadData (data, fillShapes, showStrokes) {
 
         const paths = data.paths;
 
         const group = new THREE.Group();
         group.position.x = 0;
         group.position.y = 0;
-        group.position.z = zValue;
+        group.position.z = 0;
         group.scale.y *=  - 1;
 
         for (let i = 0; i < paths.length; i++) {
@@ -416,26 +435,24 @@ class WebGLImpl {
         if (!identifier)
             return;
 
-        let renderElements = this.renderElements;
+        //let renderElements = this.renderElements;
         let scene = this.scene;
+
+        let svgElement = new WebGLSVGElement();
+        this.addElement(identifier, svgElement);
+		
+		svgElement.setPosition (0, 0, zValue);
 
         const loader = new SVGLoader();
         loader.load(url, function (data) {
+						
+			svgElement.loadData (data, fillShapes, showStrokes);
 			
-			console.log ("svg " + identifier + " z Value: " + zValue);
-			
-            let svgElement = new WebGLSVGElement(data, zValue, fillShapes, showStrokes);
-
-            if (renderElements.has(identifier)) {
-                scene.remove(identifier);
-                renderElements.delete(identifier);
-            }
-
-            renderElements.set(identifier, svgElement);
-
             if (svgElement.glelement) {
                 svgElement.glelement.name = identifier;
                 scene.add(svgElement.glelement);
+				
+				svgElement.updateGLPosition ();
             }
 
         });

@@ -1,16 +1,16 @@
 @echo off
-mkdir ..\build\Client
-mkdir ..\build\Client\public
-mkdir ..\build\Client\src
-mkdir ..\build\Client\src\plugins
+mkdir ..\build_win64\Client
+mkdir ..\build_win64\Client\public
+mkdir ..\build_win64\Client\src
+mkdir ..\build_win64\Client\src\plugins
 
-copy public\*.* ..\build\Client\public
-copy src\*.* ..\build\Client\src
-copy src\plugins\*.* ..\build\Client\src\plugins
-copy *.js ..\build\Client
-copy *.json ..\build\Client
+copy public\*.* ..\build_win64\Client\public
+copy src\*.* ..\build_win64\Client\src
+copy src\plugins\*.* ..\build_win64\Client\src\plugins
+copy *.js ..\build_win64\Client
+copy *.json ..\build_win64\Client
 
-cd ..\build\Client
+cd ..\build_win64\Client
 
 call npm install
 call npm run build
