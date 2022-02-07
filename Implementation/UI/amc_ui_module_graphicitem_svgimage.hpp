@@ -68,7 +68,8 @@ namespace AMC {
 		
 		virtual ~CUIModule_GraphicSVGImage();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+
 
 	};
 

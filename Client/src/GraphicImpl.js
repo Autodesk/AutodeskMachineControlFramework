@@ -40,9 +40,14 @@ const GRAPHIC_GRIDZVALUE = 1;
 
 class GraphicImpl {
 
-    constructor(glInstance) {
+    constructor(glInstance, showGrid) {
 
         this.glInstance = glInstance;
+		if (showGrid) {
+			this.showGrid = true;
+		} else {
+			this.showGrid = false;
+		}
 
         this.currentSize = {
             gridWidth: 0,
@@ -50,14 +55,14 @@ class GraphicImpl {
             viewPortWidth: 0,
             viewPortHeight: 0
         }
-        this.transform = {
+        this.viewtransform = {
             x: 0,
             y: 0,
             scaling: 1.0
         }
 		
 		this.renderNeedsUpdate = true;
-		this.graphicElements = new Set();
+		this.graphicElements = new Map();
 
 		this.updateTransform ();
 
@@ -76,14 +81,18 @@ class GraphicImpl {
 
             let newWidth = width * 2 + 50;
             let newHeight = height * 2 + 50;
+			
+			if (this.showGrid) {
 
-            if ((this.currentSize.gridWidth < newWidth) || (this.currentSize.gridHeight < newHeight)) {
-                this.currentSize.gridWidth = newWidth;
-                this.currentSize.gridHeight = newHeight;
+				if ((this.currentSize.gridWidth < newWidth) || (this.currentSize.gridHeight < newHeight)) {
+					this.currentSize.gridWidth = newWidth;
+					this.currentSize.gridHeight = newHeight;
 
-                this.createGrid(newWidth, newHeight);
+					this.createGrid(newWidth, newHeight);
 
-            }
+				}
+				
+			}
 
         }
 
@@ -103,7 +112,6 @@ class GraphicImpl {
 		
 		this.renderNeedsUpdate = true;
 		
-
     }
 
     updateTransform() {
@@ -113,7 +121,7 @@ class GraphicImpl {
 
         let gridgeometry = this.glInstance.findElement("grid");
         if (gridgeometry) {
-            let gridScale = this.transform.scaling;
+            let gridScale = this.viewtransform.scaling;
 
             if (gridScale < 0.5) {
                 gridScale = gridScale * 5.0;
@@ -132,18 +140,18 @@ class GraphicImpl {
             }
 
             let fullGridSize = gridScale * 25.0 * 5;
-            let gridTranslationX = this.transform.x - Math.ceil((this.transform.x / fullGridSize)) * fullGridSize;
-            let gridTranslationY = this.transform.y - Math.ceil((this.transform.y / fullGridSize)) * fullGridSize;
+            let gridTranslationX = this.viewtransform.x - Math.ceil((this.viewtransform.x / fullGridSize)) * fullGridSize;
+            let gridTranslationY = this.viewtransform.y - Math.ceil((this.viewtransform.y / fullGridSize)) * fullGridSize;
 
             gridgeometry.setPositionXY(gridTranslationX, gridTranslationY);
             gridgeometry.setScaleXY(gridScale, gridScale);
         }
 		
-		for (const name of this.graphicElements) {
+		for (const [name, graphicElement] of this.graphicElements) {
 			let geometryElement = this.glInstance.findElement(name);
 			if (geometryElement) {
-				geometryElement.setPositionXY(this.transform.x, this.transform.y);
-				geometryElement.setScaleXY(this.transform.scaling,  this.transform.scaling);
+				geometryElement.setPositionXY(this.viewtransform.x + graphicElement.position_x * this.viewtransform.scaling, this.viewtransform.y + graphicElement.position_y * this.viewtransform.scaling);
+				geometryElement.setScaleXY(this.viewtransform.scaling,  this.viewtransform.scaling);
 			}
 		}
 		
@@ -161,7 +169,7 @@ class GraphicImpl {
             centery = this.twoinstance.height * 0.5;
         }
 
-        this.ScaleRelative(newScaling / this.transform.scaling, centerx, centery);
+        this.ScaleRelative(newScaling / this.viewtransform.scaling, centerx, centery);
 
     }
 
@@ -175,25 +183,21 @@ class GraphicImpl {
             centery = this.currentSize.viewPortHeight * 0.5;
         }
 
-        this.transform.x = this.transform.x - centerx;
-        this.transform.y = this.transform.y - centery;
+        this.viewtransform.x = this.viewtransform.x - centerx;
+        this.viewtransform.y = this.viewtransform.y - centery;
 
-		console.log("oldscaling: " + this.transform.scaling);
+        let oldScaling = this.viewtransform.scaling;
+        this.viewtransform.scaling = oldScaling * factor;
+        if (this.viewtransform.scaling < GRAPHIC_MINSCALING)
+            this.viewtransform.scaling = GRAPHIC_MINSCALING;
 
-        let oldScaling = this.transform.scaling;
-        this.transform.scaling = oldScaling * factor;
-        if (this.transform.scaling < GRAPHIC_MINSCALING)
-            this.transform.scaling = GRAPHIC_MINSCALING;
+        if (this.viewtransform.scaling > GRAPHIC_MAXSCALING)
+            this.viewtransform.scaling = GRAPHIC_MAXSCALING;
 
-        if (this.transform.scaling > GRAPHIC_MAXSCALING)
-            this.transform.scaling = GRAPHIC_MAXSCALING;
+        factor = this.viewtransform.scaling / oldScaling;
 
-		console.log("newscaling: " + this.transform.scaling);
-
-        factor = this.transform.scaling / oldScaling;
-
-        this.transform.x = Math.ceil(this.transform.x * factor + centerx);
-        this.transform.y = Math.ceil(this.transform.y * factor + centery);
+        this.viewtransform.x = Math.ceil(this.viewtransform.x * factor + centerx);
+        this.viewtransform.y = Math.ceil(this.viewtransform.y * factor + centery);
 
         this.updateTransform();
 		
@@ -217,8 +221,8 @@ class GraphicImpl {
 				let viewcenterx = this.currentSize.viewPortWidth * 0.5;
 				let viewcentery = this.currentSize.viewPortHeight * 0.5;
 								
-				this.transform.x = viewcenterx - this.transform.scaling * newcenterx;
-				this.transform.y = viewcentery - this.transform.scaling * newcentery;
+				this.viewtransform.x = viewcenterx - this.viewtransform.scaling * newcenterx;
+				this.viewtransform.y = viewcentery - this.viewtransform.scaling * newcentery;
 								
 				let newScaling;
 				if (scalingx > scalingy) {
@@ -265,7 +269,7 @@ class GraphicImpl {
 		if (this.glInstance) {
 			if (url) {
 				this.glInstance.addSVGImage(name, url.toString (), zLevel, true, true);
-				this.graphicElements.add (name);
+				this.graphicElements.set (name, { position_x: 0, position_y: 0, scale_x: 1.0, scale_y: 1.0 });
 				
 			} else {
 				this.glInstance.removeElement (name);
@@ -284,7 +288,40 @@ class GraphicImpl {
 	
 	EndUpdate ()
 	{
+		this.updateTransform ();
+		this.RenderScene (false);
 	}
+	
+	SetElementTranslation (identifier, translationx, translationy)
+	{
+		if (isNaN (translationx))
+			return;
+		if (isNaN (translationy))
+			return;
+		
+		if (this.graphicElements.has (identifier)) {
+			let graphicElement = this.graphicElements.get (identifier);
+			graphicElement.position_x = translationx;
+			graphicElement.position_y = translationy;
+			this.graphicElements.set (identifier, graphicElement);
+		}
+	}
+	
+	SetElementScaling (identifier, scalex, scaley)
+	{
+		if (isNaN (scalex))
+			return;
+		if (isNaN (scaley))
+			return;
+		
+		if (this.graphicElements.has (identifier)) {
+			let graphicElement = this.graphicElements.get (identifier);
+			graphicElement.scale_x = scalex;
+			graphicElement.scale_y = scaley;
+			this.graphicElements.set (identifier, graphicElement);
+		}
+	}
+
 
 }
 

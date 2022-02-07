@@ -67,10 +67,6 @@ std::string CUIModuleGraphicItem::getUUID()
 	return m_sUUID;
 }
 
-void CUIModuleGraphicItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
-{
-
-}
 
 void CUIModuleGraphicItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {

@@ -52,6 +52,10 @@ function updateAMCFormEntityFromContentEntry(entry, entity) {
 
 }
 
+
+
+
+
 export default class AMCApplication {
 
     constructor(apiBaseURL) {
@@ -235,7 +239,6 @@ export default class AMCApplication {
                 refresh: true
             };
             item.entries = this.AppContent.ContentProperties[item.uuid].entries;
-
         }
 
         if (item.type === "buildlist") {
@@ -250,6 +253,17 @@ export default class AMCApplication {
             item.entries = this.AppContent.ContentProperties[item.uuid].entries;
 
         }
+		
+		
+        if (item.type === "svgimage") {
+
+            this.AppContent.ContentProperties[item.uuid] = {
+                uuid: item.uuid,
+                refresh: true
+            };
+
+        }
+		
 
         if (item.type === "buttongroup") {
 
@@ -376,8 +390,16 @@ export default class AMCApplication {
                     this.prepareModuleItem(item)
                 }
             }
-
         }
+
+        if (module.type === "graphic") {
+            if (module.items) {
+                for (item of module.items) {
+                    this.prepareModuleItem(item)
+                }
+            }
+        }
+
 
         if (module.type === "tabs") {
             if (module.tabs) {

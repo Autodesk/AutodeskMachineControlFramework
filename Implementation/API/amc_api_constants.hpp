@@ -132,6 +132,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_VIEWMINY "viewminy"
 #define AMC_API_KEY_UI_VIEWMAXX "viewmaxx"
 #define AMC_API_KEY_UI_VIEWMAXY "viewmaxy"
+#define AMC_API_KEY_UI_SHOWGRID "showgrid"
 #define AMC_API_KEY_UI_ORIGINX "originx"
 #define AMC_API_KEY_UI_ORIGINY "originy"
 #define AMC_API_KEY_UI_BASEIMAGERESOURCE "baseimageresource"

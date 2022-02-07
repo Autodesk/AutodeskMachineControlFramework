@@ -83,7 +83,7 @@ CUIModule_GraphicSVGImage::~CUIModule_GraphicSVGImage()
 }
 
 
-void CUIModule_GraphicSVGImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_GraphicSVGImage::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 
@@ -95,11 +95,11 @@ void CUIModule_GraphicSVGImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWr
 	auto pResourceEntry = m_pUIModuleEnvironment->resourcePackage()->findEntryByName(sResourceName, false);
 
 	if (pResourceEntry.get() != nullptr) {
-		object.addString(AMC_API_KEY_UI_ITEMIMAGEUUID, pResourceEntry->getUUID ());
+		object.addString(AMC_API_KEY_UI_ITEMIMAGEUUID, pResourceEntry->getUUID());
 	}
 
 	object.addDouble(AMC_API_KEY_UI_ITEMX, m_X.evaluateNumberValue(pStateMachineData));
-	object.addDouble(AMC_API_KEY_UI_ITEMY, m_Y.evaluateNumberValue (pStateMachineData));
+	object.addDouble(AMC_API_KEY_UI_ITEMY, m_Y.evaluateNumberValue(pStateMachineData));
 	object.addDouble(AMC_API_KEY_UI_ITEMZ, m_Z.evaluateNumberValue(pStateMachineData));
 	object.addDouble(AMC_API_KEY_UI_ITEMSCALEX, m_ScaleX.evaluateNumberValue(pStateMachineData));
 	object.addDouble(AMC_API_KEY_UI_ITEMSCALEY, m_ScaleY.evaluateNumberValue(pStateMachineData));

@@ -80,7 +80,7 @@ CUIModule_GraphicImage::~CUIModule_GraphicImage()
 }
 
 
-void CUIModule_GraphicImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_GraphicImage::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) 
 {
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 

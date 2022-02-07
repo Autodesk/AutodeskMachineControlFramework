@@ -63,6 +63,7 @@ namespace AMC {
 
 		double m_dMinX, m_dMinY;
 		double m_dMaxX, m_dMaxY;
+		bool m_bShowGrid;
 
 		std::map<std::string, PUIModuleGraphicItem> m_ItemMap;
 		std::vector<PUIModuleGraphicItem> m_Items;

@@ -92,6 +92,8 @@
 						for (var item of this.module.items) {
 							if (item.imageuuid && item.name) {
 								this.GraphicInstance.AddSVGElement (this.Application.getImageURL (item.imageuuid), item.name, item.z);
+								this.GraphicInstance.SetElementTranslation (item.name, item.x, item.y);
+								this.GraphicInstance.SetElementScaling (item.name, item.scalex, item.scaley);
 								
 							}
 						}								
@@ -113,7 +115,7 @@
 				this.glInstance = new WebGLImpl ();
 				this.Application.storeWebGLInstance (this.glInstance);
 				
-				this.GraphicInstance = new GraphicImpl (this.glInstance);
+				this.GraphicInstance = new GraphicImpl (this.glInstance, this.module.showgrid);
 				
 				this.updateGraphic ();
 								
@@ -136,15 +138,6 @@
 					if ((width > 0) && (height > 0)) {						
 						this.glInstance.setupDOMElement (graphicDiv);														
 						this.GraphicInstance.updateSize (width, height);
-						
-						/*var platform = this.module.platform;
-						if (platform) {
-						
-							if (platform.baseimageresource) {
-								this.GraphicInstance.SetBuildPlateSVG (this.Application.getImageURL (platform.baseimageresource));
-							}
-						
-						} */
 						
 						this.GraphicInstance.CenterOnRectangle (this.module.viewminx, this.module.viewminy, this.module.viewmaxx, this.module.viewmaxy);
 						

@@ -435,7 +435,6 @@ class WebGLImpl {
         if (!identifier)
             return;
 
-        //let renderElements = this.renderElements;
         let scene = this.scene;
 
         let svgElement = new WebGLSVGElement();
@@ -444,7 +443,7 @@ class WebGLImpl {
 		svgElement.setPosition (0, 0, zValue);
 
         const loader = new SVGLoader();
-        loader.load(url, function (data) {
+        loader.load(url, (data) => {
 						
 			svgElement.loadData (data, fillShapes, showStrokes);
 			
@@ -452,9 +451,11 @@ class WebGLImpl {
                 svgElement.glelement.name = identifier;
                 scene.add(svgElement.glelement);
 				
-				svgElement.updateGLPosition ();
+				svgElement.updateGLPosition ();						
             }
-
+			
+			this.renderScene ();
+									
         });
 
     }

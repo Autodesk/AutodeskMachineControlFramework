@@ -53,7 +53,7 @@ using namespace AMC;
 #define GRAPHIC_MAXVIEWCOORD +1.0E6
 
 CUIModule_Graphic::CUIModule_Graphic(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
-: CUIModule (getNameFromXML(xmlNode)), m_nNamingIDCounter (1), m_dMinX (0.0), m_dMinY (0.0), m_dMaxX (100.0), m_dMaxY (100.0)
+: CUIModule (getNameFromXML(xmlNode)), m_nNamingIDCounter (1), m_dMinX (0.0), m_dMinY (0.0), m_dMaxX (100.0), m_dMaxY (100.0), m_bShowGrid (false)
 {
 
 	LibMCAssertNotNull(pUIModuleEnvironment.get());
@@ -116,11 +116,12 @@ void CUIModule_Graphic::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 	moduleObject.addDouble(AMC_API_KEY_UI_VIEWMINY, m_dMinY);
 	moduleObject.addDouble(AMC_API_KEY_UI_VIEWMAXX, m_dMaxX);
 	moduleObject.addDouble(AMC_API_KEY_UI_VIEWMAXY, m_dMaxY);
+	moduleObject.addBool(AMC_API_KEY_UI_SHOWGRID, m_bShowGrid);
 
 	CJSONWriterArray itemsNode(writer);
 	for (auto item : m_Items) {
 		CJSONWriterObject itemObject(writer);
-		item->addDefinitionToJSON(writer, itemObject, pClientVariableHandler);
+		item->addContentToJSON(writer, itemObject, pClientVariableHandler);
 		itemsNode.addObject(itemObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);
@@ -209,6 +210,7 @@ void CUIModule_Graphic::readViewPort(const pugi::xml_node& viewportNode)
 	auto minYattrib = viewportNode.attribute("miny");
 	auto maxXattrib = viewportNode.attribute("maxx");
 	auto maxYattrib = viewportNode.attribute("maxy");
+	auto showGridAttrib = viewportNode.attribute("showgrid");
 
 	if (minXattrib.empty())
 		throw ELibMCCustomException(LIBMC_ERROR_VIEWPORTCOORDMISSING, m_sModulePath);
@@ -240,6 +242,10 @@ void CUIModule_Graphic::readViewPort(const pugi::xml_node& viewportNode)
 	if (m_dMaxY < m_dMinY)
 		throw ELibMCCustomException(LIBMC_ERROR_INVALIDVIEWPORTCOORD, m_sModulePath);
 
+	if (!showGridAttrib.empty()) {
+		m_bShowGrid = showGridAttrib.as_bool();
+
+	}
 	
 
 }
