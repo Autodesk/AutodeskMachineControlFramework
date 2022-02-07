@@ -358,7 +358,7 @@
 				<row height="3" unit="free"/>
 				<row height="80" unit="pt"/>
 
-				<content name="manualcontrol1" title="Process" columnstart="2" rowstart="1" columnend="2" rowend="1" columnposition="left" rowposition="top">
+				<content name="manualcontrol1" columnstart="2" rowstart="1" columnend="2" rowend="1" columnposition="left" rowposition="top">
 
 					<form name="processparameters">
 						<edit name="o2_value"
@@ -382,9 +382,12 @@
 
 				<graphic name="manualcontrol3" title="" columnstart="1" rowstart="1" columnend="1" rowend="1">
 				
-					<view minx="0" miny="0" maxx="160" maxy="110" />
+					<view minx="0" miny="0" maxx="160" maxy="110" showgrid="0" />
 										
-					<svgimage resource="buildplate" x="0" y="0" z="45" scalex="1.0" scaley="1.0" angle="0.0" />
+					<svgimage resource="machinesketch" x="0" y="0" z="45" scalex="1.0" scaley="1.0" angle="0.0" />
+					<svgimage name="platform" resource="platform" x="35" y="5" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
+					<svgimage name="powderreservoir" resource="platform" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
+					<svgimage name="recoater" resource="recoatersketch" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
 					
 				</graphic>
 
