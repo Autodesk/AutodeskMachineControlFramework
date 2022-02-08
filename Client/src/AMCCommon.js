@@ -47,6 +47,7 @@ export class AMCObject {
 	constructor ()
 	{
 		this.classSet = new Set ();
+		this.classSet.add ("amcObject");	
 	}
 	
 	registerClass (className)

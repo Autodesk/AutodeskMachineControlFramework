@@ -43,9 +43,7 @@ import AMCApplicationModule_LayerView from "./AMCModule_LayerView.js"
 
 import AMCApplicationPage from "./AMCPage.js"
 import AMCApplicationDialog from "./AMCDialog.js"
-
-
-
+import AMCUpload from "./AMCImplementation_Upload.js"
 
 
 export default class AMCApplication extends Common.AMCObject {
@@ -403,13 +401,122 @@ export default class AMCApplication extends Common.AMCObject {
 		
 	}
 	
+	
+	onJobUploadChunkSuccess (application, uploadObject, chunkData, uploadOffset) {
+		
+		Assert.ObjectInstance (application, "amcApplication");
+		Assert.ObjectInstance (uploadObject, "amcUpload");
+		Assert.IntegerValue (uploadOffset);
+		
+		uploadObject.setStateToProgress ();
+		
+		const formData = new FormData();
+		formData.append("size", chunkData.byteLength);
+		formData.append("offset", uploadOffset);
+		formData.append("data", new Blob([chunkData], {
+                        type: "application/3mf"
+                    }), uploadObject.getFileName ());
+
+		application.axiosPostFormData("/upload/" + uploadObject.streamuuid, formData)
+			.then(resultUploadHandle => {
+				resultUploadHandle;
+				if (!uploadObject.readChunk (application, application.onJobUploadChunkSuccess)) {
+					
+					let checkSum = uploadObject.calculateChecksum ();
+					
+					uploadObject.setStateMessage ("Waiting for server to finish upload...");
+					
+                    application.axiosPostRequest("/upload/finish", {
+                        "streamuuid": uploadObject.streamuuid,
+                        "sha256": checkSum
+                    })
+                    .then(resultUploadFinish => {
+
+                        resultUploadFinish;
+
+						uploadObject.setStateMessage ("Preparing build...");
+
+                        application.axiosPostRequest("/build/prepare", {
+                            "builduuid": uploadObject.contextuuid,
+                        })
+                        .then(resultBuildPrepare => {
+                            resultBuildPrepare;
+                            uploadObject.itemstate.messages = [];
+                            uploadObject.itemstate.chosenFile = null;
+                            uploadObject.itemstate.uploadid = 0;
+							
+							alert ("Upload successful!");
+
+                            /*if (successevent) {
+                                let eventValues = {}
+                                eventValues[itemuuid] = contextuuid;
+
+                                this.triggerUIEvent(successevent, itemuuid, eventValues);
+                            } */
+
+                        })
+                        .catch(err => {
+                            err;
+//                            if (failureevent)
+                                //this.triggerUIEvent(failureevent, itemuuid, {});
+                        });
+                    })					
+					
+					
+				}
+			})
+            .catch(err => {
+                err;
+            });
+		
+		
+	}
+	
 
     performJobUpload(itemuuid, itemstate, uploadid, chosenfile, successevent, failureevent) {
+		
+		// Attention: itemstate might change with UI interaction. Always check if uploadid matches!		
+		itemuuid;
+		uploadid;
+		successevent;
+		failureevent;
+								
+		this.axiosPostRequest("/upload/", {
+			"context": "build",
+            "name": chosenfile.name,
+            "size": chosenfile.size,
+            "mimetype": "application/3mf",
+        })
 
-        // Attention: itemstate might change with UI interaction. Always check if uploadid matches!
-        itemstate.messages = ["Reading file..."];
+            .then(resultUploadInit => {
+				
+				Assert.ObjectValue (resultUploadInit);
+				Assert.ObjectValue (resultUploadInit.data);				
+                let streamuuid = Assert.UUIDValue (resultUploadInit.data.streamuuid);
+                let contextuuid = Assert.UUIDValue (resultUploadInit.data.contextuuid);
+												
+				let currentUpload = new AMCUpload (chosenfile, itemstate, uploadid, streamuuid, contextuuid);
+				currentUpload.setStateMessage ("Starting Upload...");
+				
+				//let reader = new FileReader();
+				currentUpload.readChunk (this, this.onJobUploadChunkSuccess);
+				
+				
+			})
+            .catch(err => {
+                err;
+                if (failureevent)
+                    this.triggerUIEvent(failureevent, itemuuid, {});
+            });
+		
 
-        let reader = new FileReader();
+/*        
+
+
+		*/
+	
+
+/*        let reader = new FileReader();
         reader.readAsArrayBuffer(chosenfile);
 
         reader.onload = () => {
@@ -514,7 +621,7 @@ export default class AMCApplication extends Common.AMCObject {
                     this.triggerUIEvent(failureevent, itemuuid, {});
             });
 
-        };
+        }; */
 
     }
 
