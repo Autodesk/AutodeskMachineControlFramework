@@ -10,7 +10,7 @@
 
 <script>
 
-	import WebGLImpl from "./WebGLImpl.js"
+	import WebGLImpl from "./AMCImplementation_WebGL.js"
 
 	export default {
 		props: ["Application", "module"],

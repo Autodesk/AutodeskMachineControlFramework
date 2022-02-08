@@ -29,10 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 import * as THREE from 'three';
-import {
-    SVGLoader
-}
-from "three/examples/jsm/loaders/SVGLoader";
+import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader";
 
 const RAYCAST_LINE_THRESHOLD = 3;
 

@@ -11,8 +11,8 @@
 
 <script>
 
-	import WebGLImpl from "./WebGLImpl.js"
-	import GraphicImpl from "./GraphicImpl.js"
+	import WebGLImpl from "./AMCImplementation_WebGL.js"
+	import GraphicImpl from "./AMCImplementation_Graphic.js"
 
 	export default {
 		props: ["Application", "module"],

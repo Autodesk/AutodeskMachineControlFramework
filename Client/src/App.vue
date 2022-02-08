@@ -125,17 +125,17 @@
 
 <script>
 
-	import AMCApplication from "./Application.js"
+	import AMCApplication from "./AMCApplication.js"
 	
 	import Dialog_Login from "./Dialog_Login.vue";
 	import Dialog_Error from "./Dialog_Error.vue";
 	
-	import Module_Content from "./Module_Content.vue";
-	import Module_Tabs from "./Module_Tabs.vue";
-	import Module_Grid from "./Module_Grid.vue";
-	import Module_GLScene from "./Module_GLScene.vue";
-	import Module_Graphic from "./Module_Graphic.vue";
-	import Module_LayerView from "./Module_LayerView.vue";
+	import Module_Content from "./AMCModule_Content.vue";
+	import Module_Tabs from "./AMCModule_Tabs.vue";
+	import Module_Grid from "./AMCModule_Grid.vue";
+	import Module_GLScene from "./AMCModule_GLScene.vue";
+	import Module_Graphic from "./AMCModule_Graphic.vue";
+	import Module_LayerView from "./AMCModule_LayerView.vue";
 	
 	export default {
 

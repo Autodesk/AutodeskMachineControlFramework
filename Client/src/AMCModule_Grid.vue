@@ -20,11 +20,11 @@
 
 <script>
 
-	import Module_Content from "./Module_Content.vue";
-	import Module_Tabs from "./Module_Tabs.vue";
-	import Module_GLScene from "./Module_GLScene.vue";
-	import Module_Graphic from "./Module_Graphic.vue";
-	import Module_LayerView from "./Module_LayerView.vue";
+	import Module_Content from "./AMCModule_Content.vue";
+	import Module_Tabs from "./AMCModule_Tabs.vue";
+	import Module_GLScene from "./AMCModule_GLScene.vue";
+	import Module_Graphic from "./AMCModule_Graphic.vue";
+	import Module_LayerView from "./AMCModule_LayerView.vue";
 
 	export default {
 		props: ["Application", "module"],

@@ -13,8 +13,8 @@
 
 	const ZOOM_MARGIN = 10;
 
-	import WebGLImpl from "./WebGLImpl.js"
-	import LayerViewImpl from "./LayerViewImpl.js"
+	import WebGLImpl from "./AMCImplementation_WebGL.js"
+	import LayerViewImpl from "./AMCImplementation_LayerView.js"
 
 	export default {
 		props: ["Application", "module"],

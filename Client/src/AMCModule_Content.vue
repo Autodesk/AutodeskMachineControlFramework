@@ -12,9 +12,7 @@
 				<template v-for="moduleitem in module.items">
 					
 					<ContentItem_Paragraph :key="moduleitem.uuid" v-if="(moduleitem.type=='paragraph')" :moduleitem="moduleitem" :Application="Application" />
-					
-					<ContentItem_LayerView :key="moduleitem.uuid" v-if="(moduleitem.type=='layerview')" :moduleitem="moduleitem" :Application="Application" />
-					
+										
 					<ContentItem_Image :key="moduleitem.uuid" v-if="(moduleitem.type=='image')" :moduleitem="moduleitem" :Application="Application" />
 					
 					<ContentItem_Upload :key="moduleitem.uuid" v-if="(moduleitem.type=='upload')" :moduleitem="moduleitem" :Application="Application" />
@@ -39,21 +37,19 @@
 
 <script>
 
-	import ContentItem_LayerView from './ContentItem_LayerView.vue';
-	import ContentItem_Paragraph from './ContentItem_Paragraph.vue';
-	import ContentItem_Image from './ContentItem_Image.vue';
-	import ContentItem_Upload from './ContentItem_Upload.vue';
-	import ContentItem_BuildList from './ContentItem_BuildList.vue';
-	import ContentItem_ParameterList from './ContentItem_ParameterList.vue';
-	import ContentItem_ButtonGroup from './ContentItem_ButtonGroup.vue';
-	import ContentItem_Form from './ContentItem_Form.vue';
+	import ContentItem_Paragraph from './AMCModule_ContentItem_Paragraph.vue';
+	import ContentItem_Image from './AMCModule_ContentItem_Image.vue';
+	import ContentItem_Upload from './AMCModule_ContentItem_Upload.vue';
+	import ContentItem_BuildList from './AMCModule_ContentItem_BuildList.vue';
+	import ContentItem_ParameterList from './AMCModule_ContentItem_ParameterList.vue';
+	import ContentItem_ButtonGroup from './AMCModule_ContentItem_ButtonGroup.vue';
+	import ContentItem_Form from './AMCModule_ContentItem_Form.vue';
 
 
 	export default {
 		props: ["Application", "module"],
 	  
 		components: {
-			ContentItem_LayerView,
 			ContentItem_Paragraph,
 			ContentItem_Image,
 			ContentItem_Upload,
