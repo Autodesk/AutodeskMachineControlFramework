@@ -1,6 +1,6 @@
 <template>
 
-	<div width="99%" flat v-if="(module.type == 'content')">
+	<div width="99%" flat v-if="(module.type == 'content')" style="max-height:100px">
 			<div v-if="module.title != ''"> {{ module.headline }}</div>
 			<p v-if="module.title != ''" class="display-1 text--primary">
 				{{ module.title }}
@@ -8,7 +8,7 @@
 			<p v-if="module.subtitle != ''" >{{ module.subtitle }}</p>
 
 			<div v-if="module.items.length > 0" class="text--primary" width="100%">
-			
+
 				<template v-for="moduleitem in module.items">
 					
 					<ContentItem_Paragraph :key="moduleitem.uuid" v-if="(moduleitem.type=='paragraph')" :moduleitem="moduleitem" :Application="Application" />

@@ -138,14 +138,15 @@ eUIModule_GridRowPosition CUIModule_GridRow::stringToGridPosition(const std::str
 }
 
 
-CUIModule_GridSection::CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition)
+CUIModule_GridSection::CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars)
 	: m_pModule (pModule),
 	m_nColumnStart (nColumnStart),
 	m_nColumnEnd (nColumnEnd),
 	m_nRowStart (nRowStart),
 	m_nRowEnd (nRowEnd),
 	m_ColumnPosition (columnPosition),
-	m_RowPosition (rowPosition)
+	m_RowPosition (rowPosition),
+	m_bScrollbars (bScrollbars)
 {
 	LibMCAssertNotNull(pModule.get ());
 }
@@ -173,6 +174,11 @@ int CUIModule_GridSection::getRowStart()
 int CUIModule_GridSection::CUIModule_GridSection::getRowEnd()
 {
 	return m_nRowEnd;
+}
+
+bool CUIModule_GridSection::getScrollbars()
+{
+	return m_bScrollbars;
 }
 
 
@@ -290,8 +296,14 @@ CUIModule_Grid::CUIModule_Grid(pugi::xml_node& xmlNode, const std::string& sPath
 			if (!sRowPosition.empty())
 				eRowPosition = CUIModule_GridRow::stringToGridPosition(sRowPosition);
 
+			bool bScrollbars = false;
+			auto scrollbarsAttrib = childNode.attribute("scrollbars");
+			if (!scrollbarsAttrib.empty())
+				bScrollbars = scrollbarsAttrib.as_bool();
+
+
 			auto pSection = CUIModuleFactory::createModule(childNode, sPath, pUIModuleEnvironment);
-			addSection (pSection, nColumnStart, nColumnEnd, nRowStart, nRowEnd, eColumnPosition, eRowPosition); 
+			addSection (pSection, nColumnStart, nColumnEnd, nRowStart, nRowEnd, eColumnPosition, eRowPosition, bScrollbars);
 
 		}
 
@@ -357,6 +369,7 @@ void CUIModule_Grid::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObjec
 		sectionObject.addInteger(AMC_API_KEY_UI_COLUMNEND, section->getColumnEnd ());
 		sectionObject.addInteger(AMC_API_KEY_UI_ROWSTART, section->getRowStart());
 		sectionObject.addInteger(AMC_API_KEY_UI_ROWEND, section->getRowEnd());
+		sectionObject.addBool(AMC_API_KEY_UI_SCROLLBARS, section->getScrollbars());
 		sectionObject.addString(AMC_API_KEY_UI_COLUMNPOSITION, CUIModule_GridColumn::gridPositionToString(section->getColumnPosition()));
 		sectionObject.addString(AMC_API_KEY_UI_ROWPOSITION, CUIModule_GridRow::gridPositionToString(section->getRowPosition()));
 		sectionsNode.addObject(sectionObject);
@@ -383,10 +396,10 @@ PUIModule_GridSection CUIModule_Grid::findSection(const std::string& sUUID)
 	return nullptr;
 }
 
-void CUIModule_Grid::addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition)
+void CUIModule_Grid::addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars)
 {
 	LibMCAssertNotNull(pModule.get());
-	auto pSection = std::make_shared<CUIModule_GridSection>(pModule, nColumnStart, nColumnEnd, nRowStart, nRowEnd, columnPosition, rowPosition);
+	auto pSection = std::make_shared<CUIModule_GridSection>(pModule, nColumnStart, nColumnEnd, nRowStart, nRowEnd, columnPosition, rowPosition, bScrollbars);
 
 	m_SectionList.push_back(pSection);
 	m_SectionMap.insert(std::make_pair (pSection->getModule ()->getUUID (), pSection));

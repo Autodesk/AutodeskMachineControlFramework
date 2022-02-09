@@ -60,6 +60,7 @@ export default class AMCApplicationModule_Grid extends Common.AMCApplicationModu
 			section.rowend = Assert.IntegerValue (sectionJSON.rowend);
 			section.columnposition = Assert.IdentifierString (sectionJSON.columnposition);
 			section.rowposition = Assert.IdentifierString (sectionJSON.rowposition);
+			section.scrollbars = Assert.BoolValue (sectionJSON.scrollbars);
 			
 			var marginx = "margin-left: 0; margin-right: 0;";
 			var marginy = "margin-top: 0; margin-bottom: 0;";
@@ -79,12 +80,13 @@ export default class AMCApplicationModule_Grid extends Common.AMCApplicationModu
 			}
 			
 			var overflowtype;
-			if (section.showscrollbars)
-				overflowtype = "auto";
-			else 
+			if (section.scrollbars) {
+				overflowtype = "scroll";
+			} else {
 				overflowtype = "hidden";
+			}
 
-			section.cssstyle = "overflow:" + overflowtype + "; grid-area:" + section.name + ";" + marginx + marginy;
+			section.cssstyle = "overflow:" + overflowtype + "; overflow-x:" + overflowtype + "; grid-area:" + section.name + ";" + marginx + marginy;
 			
 			
 			if (section) {				

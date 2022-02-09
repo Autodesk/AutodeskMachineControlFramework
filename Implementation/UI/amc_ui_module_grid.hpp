@@ -101,9 +101,10 @@ namespace AMC {
 		int m_nColumnStart, m_nColumnEnd, m_nRowStart, m_nRowEnd;
 		eUIModule_GridColumnPosition m_ColumnPosition;
 		eUIModule_GridRowPosition m_RowPosition;
+		bool m_bScrollbars;
 
 	public:
-		CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
+		CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars);
 
 		CUIModule * getModule();
 
@@ -116,6 +117,7 @@ namespace AMC {
 		std::string getColumnPositionString();
 		eUIModule_GridRowPosition getRowPosition ();
 		std::string getRowPositionString();
+		bool getScrollbars ();
 
 	};
 
@@ -132,7 +134,7 @@ namespace AMC {
 		std::vector<PUIModule_GridRow> m_Rows;
 		std::vector<PUIModule_GridColumn> m_Columns;
 
-		void addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
+		void addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars);
 
 	public:
 

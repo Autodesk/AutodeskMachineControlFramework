@@ -20,8 +20,6 @@
 						
 				<v-tab-item :key="moduleTab.uuid" style="overflow:auto; width:100%; height:100%;">
 						<Module_Content :key="moduleTab.name" v-if="(moduleTab.type == 'content')" :module="moduleTab" :Application="Application" />					
-						<Module_Tabs :key="moduleTab.name" v-if="(moduleTab.type == 'tabs')" :module="moduleTab" :Application="Application" />							
-						<Module_Grid :key="moduleTab.name" v-if="(moduleTab.type == 'grid')" :module="moduleTab" :Application="Application" />							
 						<Module_GLScene :key="moduleTab.name" v-if="(moduleTab.type == 'glscene')" :module="moduleTab" :Application="Application" />							
 						<Module_Graphic :key="moduleTab.name" v-if="(moduleTab.type == 'graphic')" :module="moduleTab" :Application="Application" />							
 						<Module_LayerView :key="moduleTab.name" v-if="(moduleTab.type == 'layerview')" :module="moduleTab" :Application="Application" />							
@@ -37,8 +35,6 @@
 <script>
 
 	import Module_Content from "./AMCModule_Content.vue";
-	import Module_Tabs from "./AMCModule_Tabs.vue";
-	import Module_Grid from "./AMCModule_Grid.vue";
 	import Module_GLScene from "./AMCModule_GLScene.vue";
 	import Module_Graphic from "./AMCModule_Graphic.vue";
 	import Module_LayerView from "./AMCModule_LayerView.vue";
@@ -48,8 +44,6 @@
 	  
 		components: {
 			Module_Content,
-			Module_Tabs,
-			Module_Grid,
 			Module_GLScene,
 			Module_Graphic,
 			Module_LayerView,

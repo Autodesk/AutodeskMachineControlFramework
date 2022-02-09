@@ -40,6 +40,21 @@ export default class AMCApplicationModule_Tabs extends Common.AMCApplicationModu
 		Assert.ObjectValue (moduleJSON);				
 		super (page, moduleJSON.uuid, moduleJSON.type, moduleJSON.name, moduleJSON.caption);		
 		this.registerClass ("amcModule_Tabs");
+		
+		this.tabs = [];
+
+		Assert.ArrayValue (moduleJSON.tabs);
+		for (let tabJSON of moduleJSON.tabs) {
+			
+			let tab = this.page.application.createModuleInstance (this.page, tabJSON);
+			
+			if (tab) {				
+				this.tabs.push (tab);
+				this.page.application.addModule (tab);
+			} else {
+				throw "Module type not found: " + tabJSON.type;
+			}
+		}
 				
 	}
 		
