@@ -260,7 +260,7 @@
 			</content>
 		</page>
 
-		<page name="previewbuild" onload="loadbuildinfo">
+		<page name="previewbuild">
 
 			<grid name="previewgrid">
 				<column width="180" unit="pt"/>
@@ -343,14 +343,14 @@
 
 
 				<layerview name="preview" columnstart="1" rowstart="3" columnend="5" rowend="3">
-					<platform sizex="100" sizey="100" originx="50" originy="50" baseimage="buildplate"/>
+					<platform sizex="300" sizey="300" originx="150" originy="150" baseimage="buildplate"/>
 
 				</layerview>
 
 			</grid>
 		</page>
 
-		<page name="preparebuild" onload="loadbuildinfo">
+		<page name="preparebuild">
 
 			<grid name="maingrid">
 				<column width="3" unit="free"/>
@@ -395,7 +395,7 @@
 				<content name="manualcontrol4" title="" columnstart="1" rowstart="2" columnend="1" rowend="2" columnposition="left" rowposition="centered">
 
 					<buttongroup distribution="equal">
-						<button caption="Start Job" targetpage="buildstatus" event="startbuild"/>
+						<button caption="Start Job" event="startbuild"/>
 						<button caption="Cancel Preparation" targetpage="main" event="cancelbuildpreparation"/>
 					</buttongroup>
 
@@ -488,7 +488,7 @@
 
 
 				<layerview name="preview" columnstart="1" rowstart="3" columnend="3" rowend="3">
-					<platform sizex="100" sizey="100" originx="50" originy="50" baseimage="buildplate"/>
+					<platform sizex="300" sizey="300" originx="150" originy="150" sync:layerindex="main.jobinfo.currentlayer"  baseimage="buildplate"/>
 				</layerview>
 				
 				

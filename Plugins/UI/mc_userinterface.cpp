@@ -118,13 +118,44 @@ public:
 
 		pUIEnvironment->LogMessage("Clicked on StartBuild Button");
 
+		auto sBuildUUID = pUIEnvironment->GetMachineParameterAsUUID("main", "jobinfo", "jobuuid");
+		pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);
+
 		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startbuild");
 		pSignal->Trigger();
+
+		pUIEnvironment->ActivatePage("buildstatus");
 
 	}
 
 };
 
+
+/*************************************************************************************************************************
+ Class declaration of CEvent_StartBuild
+**************************************************************************************************************************/
+
+class CEvent_NewLayerStarted : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "newlayerstarted";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		auto nCurrentLayer = pUIEnvironment->GetMachineParameterAsInteger("main", "jobinfo", "currentlayer");
+
+		pUIEnvironment->LogMessage("New layer started: " + std::to_string (nCurrentLayer));
+		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", nCurrentLayer);
+
+	}
+
+};
 
 
 class CEvent_ChangeManualValues : public virtual CEvent {
@@ -216,7 +247,7 @@ public:
 		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
 
 		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 2);
 
 		pUIEnvironment->ActivatePage("previewbuild");
 	}
@@ -263,7 +294,7 @@ public:
 		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
 
 		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 2);
 
 		pUIEnvironment->ActivatePage("previewbuild");
 	}
@@ -408,6 +439,9 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_ResumeBuild>(sEventName, pEventInstance))
 		return pEventInstance;	
+	if (createEventInstanceByName<CEvent_NewLayerStarted>(sEventName, pEventInstance))
+		return pEventInstance;
+	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
 }

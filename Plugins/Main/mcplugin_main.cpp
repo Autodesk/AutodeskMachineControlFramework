@@ -283,7 +283,6 @@ public:
 		auto nLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		pStateEnvironment->LogMessage("Starting layer " + std::to_string (nLayer));
 
-
 		pStateEnvironment->SetNextState("recoatlayer");
 	}
 
