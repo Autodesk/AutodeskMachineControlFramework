@@ -369,8 +369,12 @@ class WebGLImpl {
         if (!identifier)
             return false;
 
+		let selectedObject = this.scene.getObjectByName(identifier);
+		if (selectedObject) {
+			this.scene.remove(selectedObject);
+		}
+		
         if (this.renderElements.has(identifier)) {
-            this.scene.remove(identifier);
             this.renderElements.delete(identifier);
         }
 
@@ -420,6 +424,8 @@ class WebGLImpl {
     add2DLineGeometry(identifier, lineData, zValue, lineThickness, lineColor) {
         if (!identifier)
             return;
+		
+		this.removeElement (identifier);
 
         let linesElement = new WebGLLinesElement(lineData, zValue, lineThickness, lineColor);
 

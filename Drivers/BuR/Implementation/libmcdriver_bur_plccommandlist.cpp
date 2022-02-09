@@ -46,7 +46,7 @@ using namespace LibMCDriver_BuR::Impl;
  Class definition of CPLCCommandList 
 **************************************************************************************************************************/
 
-CPLCCommandList::CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGenerator* pTimeStampGenerator)
+CPLCCommandList::CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGenerator* pTimeStampGenerator, bool bIsSimulationMode)
     : m_pConnector (pConnector), m_pTimeStampGenerator (pTimeStampGenerator), m_ListIdentifier (PLC_INVALID_LISTIDENTIFIER)
 {
     if (pTimeStampGenerator == nullptr)
@@ -168,6 +168,9 @@ std::future<uint8_t> CPLCCommandList::receiveListStatus()
 bool CPLCCommandList::WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS)
 {
     uint64_t nStartTime = m_pTimeStampGenerator->generateTimeStamp();
+    if (m_bIsSimulationMode) {
+        return true;
+    }
 
     int statusValue = 255;
     while (statusValue != 6) {

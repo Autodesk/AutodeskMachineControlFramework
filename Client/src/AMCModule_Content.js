@@ -174,7 +174,6 @@ class AMCApplicationItem_Content_Paragraph extends Common.AMCApplicationItem {
 		
 		this.text = itemJSON.text;
 		
-				
 	}
 		
 }
@@ -195,7 +194,6 @@ class AMCApplicationItem_Content_Image extends Common.AMCApplicationItem {
 		if (itemJSON.maxheight) 
 			this.maxheight = Assert.NumberValue (itemJSON.maxheight);
 		
-						
 	}
 		
 }

@@ -87,7 +87,8 @@
 			<v-dialog :key="uiDialog.name"						
 				v-model="uiDialog.dialogIsActive"
 				transition="dialog-bottom-transition"
-				max-width="290"
+				max-width="50vw"
+				min-height="50vh"
 			>
 			
 			<v-card> 

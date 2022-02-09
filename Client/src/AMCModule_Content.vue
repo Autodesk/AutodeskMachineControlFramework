@@ -1,6 +1,6 @@
 <template>
 
-	<div width="99%" flat v-if="(module.type == 'content')" style="max-height:100px">
+	<div width="99%" flat v-if="(module.type == 'content')" style="max-height:50vh">
 			<div v-if="module.title != ''"> {{ module.headline }}</div>
 			<p v-if="module.title != ''" class="display-1 text--primary">
 				{{ module.title }}

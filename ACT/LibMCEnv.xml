@@ -349,7 +349,7 @@
 		<method name="DeleteFromDisk" description = "Deletes the temporary file.">
 			<param name="Success" type="bool" pass="return" description="returns if deletion was successful or file did not exist in the first place." />
 		</method>
-
+				
 	</class>
 
 	<class name="WorkingFileIterator" parent="Iterator">

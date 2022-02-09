@@ -48,6 +48,10 @@ class LayerViewImpl {
             y: 0,
             scaling: 1.0
         }
+        this.origin = {
+            x: 0,
+            y: 0
+        }
 		
 		this.renderNeedsUpdate = true;
 
@@ -133,7 +137,7 @@ class LayerViewImpl {
 
         var layergeometry = this.glInstance.findElement("layerdata");
         if (layergeometry) {
-            layergeometry.setPositionXY(this.transform.x, this.transform.y);
+            layergeometry.setPositionXY(this.transform.x + this.origin.x * this.transform.scaling, this.transform.y - this.origin.y  * this.transform.scaling);
             layergeometry.setScaleXY(this.transform.scaling,  - this.transform.scaling);
         }
 
@@ -200,7 +204,7 @@ class LayerViewImpl {
         }
 
         
-        this.glInstance.add2DLineGeometry("layerdata", lines, 60, 0.1, 0x000000);
+        this.glInstance.add2DLineGeometry("layerdata", lines, 60, 0.05, 0x000000);
 		this.updateTransform ();
 		this.RenderScene (true);
 
@@ -326,6 +330,15 @@ class LayerViewImpl {
 		}
 	}
         
+		
+	setOrigin (x, y)
+	{
+		if (isNaN (x) || isNaN (y))
+			return;
+		
+		this.origin.x = x;
+		this.origin.y = y;
+	}
 	
 	
 

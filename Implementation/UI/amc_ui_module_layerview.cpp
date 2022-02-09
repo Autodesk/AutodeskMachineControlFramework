@@ -49,9 +49,9 @@ using namespace AMC;
 
 
 
-CUIModule_LayerViewPlatformItem::CUIModule_LayerViewPlatformItem(const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModule_LayerViewPlatformItem::CUIModule_LayerViewPlatformItem(const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression layerIndex, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment)
 	: CUIModuleItem(sItemPath), m_SizeX(sizeX), m_SizeY(sizeY), m_OriginX(originX), m_OriginY(originY), m_BaseImage(baseImage), m_pUIModuleEnvironment(pUIModuleEnvironment),
-		m_sUUID(AMCCommon::CUtils::createUUID ())
+	m_sUUID(AMCCommon::CUtils::createUUID()), m_LayerIndex(layerIndex)
 {
 	LibMCAssertNotNull(m_pUIModuleEnvironment);
 
@@ -85,6 +85,8 @@ void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSO
 		pGroup->setParameterValueByName(AMC_API_KEY_UI_ORIGINX, m_OriginX.evaluateStringValue(pStateMachineData));
 	if (m_OriginY.needsSync())
 		pGroup->setParameterValueByName(AMC_API_KEY_UI_ORIGINY, m_OriginY.evaluateStringValue(pStateMachineData));
+	if (m_LayerIndex.needsSync())
+		pGroup->setIntParameterValueByName(AMC_API_KEY_UI_CURRENTLAYER, m_LayerIndex.evaluateIntegerValue(pStateMachineData));
 
 	object.addDouble(AMC_API_KEY_UI_SIZEX, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_SIZEX));
 	object.addDouble(AMC_API_KEY_UI_SIZEY, pGroup->getDoubleParameterValueByName(AMC_API_KEY_UI_SIZEY));
@@ -147,8 +149,9 @@ CUIModule_LayerView::CUIModule_LayerView(pugi::xml_node& xmlNode, const std::str
 	CUIExpression originX(platformNode, "originx");
 	CUIExpression originY(platformNode, "originy");
 	CUIExpression baseImage(platformNode, "baseimage");
+	CUIExpression layerIndex(platformNode, "layerindex", false);
 
-	m_PlatformItem = std::make_shared<CUIModule_LayerViewPlatformItem>(m_sModulePath, sizeX, sizeY, originX, originY, baseImage, pUIModuleEnvironment);
+	m_PlatformItem = std::make_shared<CUIModule_LayerViewPlatformItem>(m_sModulePath, sizeX, sizeY, originX, originY, layerIndex, baseImage, pUIModuleEnvironment);
 
 }
 

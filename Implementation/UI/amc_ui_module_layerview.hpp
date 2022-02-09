@@ -60,12 +60,13 @@ namespace AMC {
 		CUIExpression m_OriginX;
 		CUIExpression m_OriginY;
 		CUIExpression m_BaseImage;
+		CUIExpression m_LayerIndex;
 		PUIModuleEnvironment m_pUIModuleEnvironment;
 		std::string m_sUUID;
 
 	public:
 
-		CUIModule_LayerViewPlatformItem (const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_LayerViewPlatformItem (const std::string& sItemPath, CUIExpression sizeX, CUIExpression sizeY, CUIExpression originX, CUIExpression originY, CUIExpression layerIndex, CUIExpression baseImage, PUIModuleEnvironment pUIModuleEnvironment);
 
 		virtual std::string getUUID() override;
 

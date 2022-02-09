@@ -621,15 +621,21 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
     try {
 
-        auto pPage = findPageOfModuleItem(sSenderUUID);
-        if (pPage.get() == nullptr)
-            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
+        std::string sSenderPath;
+        AMC::PUIPage pPage;
+        if (!sSenderUUID.empty()) {
 
-        auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
-        if (pModuleItem.get() == nullptr)
-            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);                        
+            pPage = findPageOfModuleItem(sSenderUUID);
+            if (pPage.get() == nullptr)
+                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
 
-        auto sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+            auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
+            if (pModuleItem.get() == nullptr)
+                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+
+            sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+
+        }
 
         LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sSenderPath, pClientVariableHandler);
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
@@ -668,9 +674,11 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
                     throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
 
 
-                auto pModuleItem = pPage->findModuleItemByUUID(sEntityUUID);
-                if (pModuleItem.get() != nullptr) {
-                    pModuleItem->setEventPayloadValue(sEventName, sEntityUUID, sPayloadValue, pClientVariableHandler.get());
+                if (pPage.get() != nullptr) {
+                    auto pModuleItem = pPage->findModuleItemByUUID(sEntityUUID);
+                    if (pModuleItem.get() != nullptr) {
+                        pModuleItem->setEventPayloadValue(sEventName, sEntityUUID, sPayloadValue, pClientVariableHandler.get());
+                    }
                 }
 
 

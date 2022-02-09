@@ -53,7 +53,6 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
       m_pStateMachineData(pStateMachineData),
       m_pSignalHandler (pSignalHandler),
       m_sLogSubSystem ("ui"),
-      m_sSenderUUID (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID)),
       m_sSenderName (sSenderName),
       m_pClientVariableHandler (pClientVariableHandler),
       m_bCloseModalDialog (false)
@@ -67,6 +66,13 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    if (!sSenderUUID.empty()) {
+        m_sSenderUUID = (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID));
+    }
+    else {
+        m_sSenderUUID = AMCCommon::CUtils::createEmptyUUID();
+    }
 
 }
 

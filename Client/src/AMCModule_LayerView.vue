@@ -186,6 +186,7 @@
 								this.LayerViewerInstance.SetBuildPlateSVG (this.Application.getImageURL (platform.baseimageresource));
 							}
 						
+							this.LayerViewerInstance.setOrigin (platform.originx, platform.originy);
 							this.LayerViewerInstance.CenterOnRectangle (- ZOOM_MARGIN, - ZOOM_MARGIN, platform.sizex + ZOOM_MARGIN, platform.sizey + ZOOM_MARGIN);
 						}
 						

@@ -46,6 +46,8 @@ class AMCApplicationItem_LayerView_Platform extends Common.AMCApplicationItem {
 		this.displayed_build = Common.nullUUID ();
 		
 		this.updateFromJSON (itemJSON);
+		
+		this.setRefreshFlag ();
 											
 	}
 

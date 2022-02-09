@@ -78,11 +78,13 @@ private:
     std::list<std::promise<uint8_t>> m_receivedListStatus;
     std::future<uint8_t> receiveListStatus();
 
+    bool m_bIsSimulationMode;
+
 protected:
 
 public:
 
-    CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGenerator* pTimeStampGenerator);
+    CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGenerator* pTimeStampGenerator, bool bIsSimulationMode);
 
     ~CPLCCommandList();
 
