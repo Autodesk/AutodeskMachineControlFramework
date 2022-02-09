@@ -320,6 +320,62 @@ public:
 };
 
 
+class CEvent_PauseBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "pausebuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Pause Build");
+
+	}
+
+};
+
+
+class CEvent_CancelBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "cancelbuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Cancel Build");
+
+	}
+
+};
+
+
+class CEvent_ResumeBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "resumebuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Resume Build");
+
+	}
+
+};
+
 
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
 {
@@ -346,9 +402,14 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_TestMovement>(sEventName, pEventInstance))
 		return pEventInstance;
-	
+	if (createEventInstanceByName<CEvent_CancelBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_PauseBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_ResumeBuild>(sEventName, pEventInstance))
+		return pEventInstance;	
 
-	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
+	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
 }
 
 

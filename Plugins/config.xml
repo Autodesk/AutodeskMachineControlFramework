@@ -92,13 +92,14 @@
 		<state name="finishlayer" repeatdelay="100">
 			<outstate target="beginlayer"/>
 			<outstate target="finishbuild"/>
+			<outstate target="buildpaused"/>
 		</state>
 
 		<state name="finishbuild" repeatdelay="100">
 			<outstate target="idle"/>
 		</state>
 
-		<state name="pausebuild" repeatdelay="100">
+		<state name="buildpaused" repeatdelay="400">
 			<outstate target="beginlayer"/>
 			<outstate target="cancelbuild"/>
 		</state>
@@ -403,14 +404,128 @@
 
 		</page>
 
-		<page name="buildstatus" onload="">
-</page>
+
+		<page name="buildstatus">
+
+			<grid name="previewgrid">
+				<column width="180" unit="pt"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+
+				<row height="50" unit="pt"/>
+				<row height="50" unit="pt"/>
+				<row height="1" unit="free"/>
+
+
+				<content name="buildimage" columnstart="1" rowstart="1" columnend="1" rowend="2">
+					<image resource="tray" x="50" y="50" width="120" height="100" z-layer="2" visible="1" aspectratio="1.8"/>
+				</content>
+
+				<content name="buildinformation1" columnstart="2" rowstart="1" columnend="2" rowend="1" rowposition="centered">
+					<form name="infoform1">
+						<edit name="buildname"
+						caption="Build name"
+						value="Build 274642"
+						readonly="1" />
+					</form>
+				</content>
+
+
+				<content name="buildinformation2" columnstart="2" rowstart="2" columnend="2" rowend="2" rowposition="centered">
+					<form name="infoform2">
+						<edit name="layers"
+						caption="Build details"
+						value="1 part."
+						readonly="1" />
+					</form>
+
+				</content>
+
+				<content name="layerinformation1" columnstart="3" rowstart="1" columnend="3" rowend="1" rowposition="centered">
+					<form name="layerform1">
+						<edit name="currentlayer"
+						caption="Current Layer"
+						value="1 / 48"
+						readonly="1" />
+					</form>
+				</content>
+				<content name="layerinformation2" columnstart="3" rowstart="2" columnend="3" rowend="2" rowposition="centered">
+					<form name="layerform2">
+						<edit name="currentheight"
+						caption="Current height"
+						value="0.1mm / 10.0mm"
+						readonly="1" />
+					</form>
+
+				</content>
+
+				<content name="settings1" columnstart="4" rowstart="1" columnend="4" rowend="1" rowposition="centered">
+					<form name="settingsform1">
+						<switch name="showcolors" caption="Hatch Colors"/>
+					</form>
+
+				</content>
+				<content name="settings2" columnstart="4" rowstart="2" columnend="4" rowend="2" rowposition="centered">
+					<form name="settingsform2">
+						<switch name="showmodel" caption="Model Geometry"/>
+					</form>
+
+				</content>
+
+				<content name="actions1" columnstart="5" rowstart="1" columnend="5" rowend="1" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Pause Build" event="pausebuild"/>
+					</buttongroup>
+				</content>
+
+				<content name="actions2" columnstart="5" rowstart="2" columnend="5" rowend="2" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Cancel Build" event="cancelbuild"/>
+					</buttongroup>
+				</content>
+
+
+				<layerview name="preview" columnstart="1" rowstart="3" columnend="3" rowend="3">
+					<platform sizex="100" sizey="100" originx="50" originy="50" baseimage="buildplate"/>
+				</layerview>
+				
+				
+				<tabs name="buildtabs"  columnstart="4" rowstart="3" columnend="5" rowend="3" >
+							
+					<content name="systemstate" caption="System State">
+					
+						<parameterlist loadingtext="Loading parameters">
+							<entry statemachine="main" group="jobinfo" />
+							<entry statemachine="plc" group="plcstate" />
+							<entry statemachine="laser" group="cardconfig" />
+							<entry statemachine="laser" group="sdkstate" />
+							<entry statemachine="laser" group="correction" />
+												
+						</parameterlist>	
+						
+					</content>		
+
+					<content name="part list" caption="Part List">
+					
+					</content>	
+
+					<content name="systemstate" caption="Log Messages">
+					
+					</content>					
+				
+				</tabs>
+				
+
+			</grid>
+		</page>
 
 		<page name="buildreport">
 
 			<glscene name="manualcontrol3">
 
-</glscene>
+			</glscene>
 
 
 		</page>

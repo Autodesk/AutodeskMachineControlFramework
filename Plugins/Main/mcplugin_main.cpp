@@ -460,19 +460,19 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMainState_PauseBuild
+ Class definition of CMainState_BuildPaused
 **************************************************************************************************************************/
-class CMainState_PauseBuild : public virtual CMainState {
+class CMainState_BuildPaused : public virtual CMainState {
 public:
 
-	CMainState_PauseBuild(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_BuildPaused(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "pausebuild";
+		return "buildpaused";
 	}
 
 
@@ -590,7 +590,7 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 	if (createStateInstanceByName<CMainState_FinishBuild>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_PauseBuild>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_BuildPaused>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	if (createStateInstanceByName<CMainState_CancelBuild>(sStateName, pStateInstance, m_pPluginData))
