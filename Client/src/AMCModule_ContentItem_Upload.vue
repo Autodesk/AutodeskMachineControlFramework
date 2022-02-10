@@ -14,27 +14,23 @@
 	  methods: {	
 	  
 			uiUploadStart: function (item) {
-					item.state.idcounter = item.state.idcounter + 1;
-					if (item.state.chosenFile) {
+														
+					if (item) {
+						if (item.state) {
+							if (item.state.chosenFile) {
+								item.state.generateUploadID ();
+								this.Application.performJobUpload (item.state, item.uploadsuccessevent, item.uploadfailureevent);
+							} else {		
+								item.state.cancelUpload ();
+							}
+								
+						}					
+					}
 					
-						if (item.state.uploadid === 0) {
-							item.state.messages = ["Uploading..."];					
 					
-						} else {
-							item.state.messages = ["Replacing upload..."];
-						}
 						item.state.uploadid = item.state.idcounter; 
 						
-						this.Application.performJobUpload (item.uuid, item.state, item.state.uploadid, item.state.chosenFile, item.uploadsuccessevent, item.uploadfailureevent);
 						
-					} else {
-					
-						if (!(item.state.uploadid === 0)) {
-							item.state.uploadid = 0; 
-							item.state.messages = ["Canceled upload..."];
-						}
-					
-					}
 					
 				
 			},	

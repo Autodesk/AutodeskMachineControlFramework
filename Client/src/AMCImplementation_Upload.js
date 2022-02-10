@@ -36,26 +36,29 @@ import * as Common from "./AMCCommon.js"
 
 export default class AMCUpload extends Common.AMCObject {
 	
-	constructor (uploadFile, itemstate, uploadid, streamuuid, contextuuid) 
+	constructor (itemState, streamuuid, contextuuid) 
 	{		
 		super ();
+		
+		Assert.ObjectInstance (itemState, "amcUploadState");
+		Assert.UUIDValue (streamuuid);
+		Assert.UUIDValue (contextuuid);
+		
 		this.registerClass ("amcUpload");
-		
-		if (!uploadFile)
-			throw "invalid upload file";
-		
-		// item state object
-		this.itemstate = itemstate;
-		this.uploadid = Assert.IntegerValue (uploadid);
-		this.streamuuid = Assert.UUIDValue (streamuuid);
-		this.contextuuid = Assert.UUIDValue (contextuuid);
+								
+		this.itemState = itemState;
+		this.uploadID = Assert.IntegerValue (itemState.getUploadID ());
+		this.streamuuid = streamuuid;
+		this.contextuuid = contextuuid;
 		this.sha256sum = Common.nullToken ();
+		this.successEvent = "";
+		this.failureEvent = "";
 		
-		this.fileToUpload = uploadFile;
-		this.fileName = Assert.StringValue (uploadFile.name);
+		this.fileToUpload = itemState.getChosenFile ();
+		this.fileName = Assert.StringValue (this.fileToUpload.name);
 		
 		// Get upload size and chunk count
-		this.fileSize = Assert.IntegerValue (uploadFile.size);
+		this.fileSize = Assert.IntegerValue (this.fileToUpload.size);
 		this.chunkSize = 128 * 1024;		
 		if (this.fileSize <= 0)
 			throw "invalid upload size";		
@@ -148,20 +151,33 @@ export default class AMCUpload extends Common.AMCObject {
 		
 		return false;
 	}
-
-
-	setStateMessage  (message)
+	
+	
+	setStateMessageToProgress ()
 	{
-		if (this.itemstate) {
-			Assert.ObjectValue (this.itemstate);
-			this.itemstate.messages = [ Assert.StringValue (message) ];
-		}		
+		if (this.itemState) {
+			Assert.ObjectValue (this.itemState);
+			
+			this.itemState.setMessage (this.itemState.progressMessage + " (" + this.getProgressString () + ")");
+		}
 	}
 	
-	
-	setStateToProgress ()
+	setStateMessageToWaiting ()
 	{
-		this.setStateMessage ("Uploading (" + this.getProgressString () + ")...");
+		if (this.itemState) {
+			Assert.ObjectValue (this.itemState);
+			
+			this.itemState.setMessage (this.itemState.waitMessage);
+		}
+	}
+	
+	setStateMessageToPreparing ()
+	{
+		if (this.itemState) {
+			Assert.ObjectValue (this.itemState);
+			
+			this.itemState.setMessage (this.itemState.buildMessage);
+		}
 	}
 	
 	calculateChecksum ()
@@ -177,6 +193,69 @@ export default class AMCUpload extends Common.AMCObject {
 	{
 		return this.sha256sum;		
 	}
+	
+	checkIfUploadIsActive ()
+	{
+		if (this.itemState) {
+			return (this.itemState.getUploadID () === this.uploadID);
+		} else {
+			return false;
+		}
+	}
+	
+	clearUploadState ()
+	{
+		if (this.itemState) {
+			this.itemState.finishUpload ();
+		}
+	}
+	
+	hasSuccessEvent ()
+	{
+		if (this.successEvent) 
+		{
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	setSuccessEvent (eventName) 
+	{
+		this.successEvent = Assert.StringValue (eventName);
+	}
+	
+	getSuccessEvent ()
+	{
+		return this.successEvent;
+	}
+
+	hasFailureEvent ()
+	{
+		if (this.failureEvent) 
+		{
+			return true;
+		}
+		
+		return false;		
+	}
+	
+	getFailureEvent ()
+	{
+		return this.failureEvent;
+	}
+	
+	setFailureEvent (eventName) 
+	{
+		this.failureEvent = Assert.StringValue (eventName);
+	}
+	
+	getItemUUID ()
+	{
+		Assert.ObjectInstance (this.itemState, "amcUploadState");
+		return this.itemState.getItemUUID ();
+	}
+
 
 }
 

@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
 
+import AMCUploadState from "./AMCImplementation_UploadState.js"
+
 
 class AMCApplicationItem_Content_ParameterList extends Common.AMCApplicationItem {
 	
@@ -96,12 +98,7 @@ class AMCApplicationItem_Content_Upload extends Common.AMCApplicationItem {
 		this.uploadisinitial = 1;
 		this.uploadissaving = 0;
 				
-		this.state = {
-                uploadid: 0,
-                chosenFile: null,
-                idcounter: 0,
-                messages: []
-            }
+		this.state = new AMCUploadState (this.uuid);
 		
 		this.setRefreshFlag ();
 		
