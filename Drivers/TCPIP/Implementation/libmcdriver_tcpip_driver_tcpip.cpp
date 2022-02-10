@@ -149,7 +149,7 @@ IDriver_TCPIPPacket* CDriver_TCPIP::ReceivePacket(const LibMCDriver_TCPIP_uint32
 	if (m_pSocketConnection.get() == nullptr)
 		throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_DRIVERNOTCONNECTED);
 
-	auto pPacket = std::make_unique<CDriver_TCPIPPacket> ();
+	std::unique_ptr<CDriver_TCPIPPacket> pPacket(new CDriver_TCPIPPacket());
 	m_pSocketConnection->receiveBuffer(pPacket->getBufferDataReference (), nPacketSize, true);
 
 	return pPacket.release();
