@@ -32,13 +32,17 @@ Abstract: This is a stub class definition of CDriver_TCPIP
 */
 
 #include "libmcdriver_tcpip_driver_tcpip.hpp"
+#include "libmcdriver_tcpip_driver_tcpippacket.hpp"
 #include "libmcdriver_tcpip_interfaceexception.hpp"
 
 // Include custom headers here.
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
+#define TCPIPDRIVER_MAXSENDCOUNT (1024UL * 1024UL * 1024UL)
+
 using namespace LibMCDriver_TCPIP::Impl;
+
 
 /*************************************************************************************************************************
  Class definition of CDriver_TCPIP 
@@ -56,6 +60,7 @@ CDriver_TCPIP::~CDriver_TCPIP()
 
 void CDriver_TCPIP::Configure(const std::string& sConfigurationString)
 {
+	CDriver_TCPIPSocketConnection::initializeNetworking();
 }
 
 std::string CDriver_TCPIP::GetName()
@@ -101,10 +106,61 @@ bool CDriver_TCPIP::IsSimulationMode()
 
 void CDriver_TCPIP::Connect(const std::string& sIPAddress, const LibMCDriver_TCPIP_uint32 nPort, const LibMCDriver_TCPIP_uint32 nTimeout)
 {
+	m_pSocketConnection = nullptr;
 
+	m_pSocketConnection = std::make_shared< CDriver_TCPIPSocketConnection>(sIPAddress, nPort);
 }
 
 void CDriver_TCPIP::Disconnect()
 {
+	if (m_pSocketConnection)
+		m_pSocketConnection->disconnect();
+	m_pSocketConnection = nullptr;
 
+}
+
+void CDriver_TCPIP::SendBuffer(const LibMCDriver_TCPIP_uint64 nBufferBufferSize, const LibMCDriver_TCPIP_uint8* pBufferBuffer)
+{
+
+	if (m_pSocketConnection.get () == nullptr)
+		throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_DRIVERNOTCONNECTED);
+
+	if ((nBufferBufferSize > 0) && (pBufferBuffer != nullptr)) {
+		if (nBufferBufferSize > TCPIPDRIVER_MAXSENDCOUNT)
+			throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_SENDCOUNTEXCEEDSMAXIMUM);
+
+		m_pSocketConnection->sendBuffer(pBufferBuffer, (size_t) nBufferBufferSize);
+	}
+
+}
+
+
+bool CDriver_TCPIP::WaitForData(const LibMCDriver_TCPIP_uint32 nTimeOutInMS)
+{
+	if (m_pSocketConnection.get() == nullptr)
+		throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_DRIVERNOTCONNECTED);
+
+	return m_pSocketConnection->waitForData(nTimeOutInMS);
+}
+
+
+IDriver_TCPIPPacket* CDriver_TCPIP::ReceivePacket(const LibMCDriver_TCPIP_uint32 nPacketSize, const LibMCDriver_TCPIP_uint32 nTimeOutInMS) 
+{
+	if (m_pSocketConnection.get() == nullptr)
+		throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_DRIVERNOTCONNECTED);
+
+	auto pPacket = std::make_unique<CDriver_TCPIPPacket> ();
+	m_pSocketConnection->receiveBuffer(pPacket->getBufferDataReference (), nPacketSize, true);
+
+	return pPacket.release();
+
+}
+
+bool CDriver_TCPIP::IsConnected()
+{
+	if (m_pSocketConnection.get() != nullptr) {
+		return m_pSocketConnection->isConnected();
+	}
+
+	return false;
 }

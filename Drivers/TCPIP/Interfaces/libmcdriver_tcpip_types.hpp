@@ -154,6 +154,7 @@ inline const char * LIBMCDRIVER_TCPIP_GETERRORSTRING (LibMCDriver_TCPIPResult nE
 
 typedef LibMCDriver_TCPIPHandle LibMCDriver_TCPIP_Base;
 typedef LibMCDriver_TCPIPHandle LibMCDriver_TCPIP_Driver;
+typedef LibMCDriver_TCPIPHandle LibMCDriver_TCPIP_Driver_TCPIPPacket;
 typedef LibMCDriver_TCPIPHandle LibMCDriver_TCPIP_Driver_TCPIP;
 
 namespace LibMCDriver_TCPIP {

@@ -53,6 +53,7 @@
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
 		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
 		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />		
+		<error name="COULDNOTCONNECT" code="1003" description="the driver is not connected" />		
 		
 	</errors>
 
@@ -123,12 +124,23 @@ Custom implementation
 
 		<method name="Connect" description= "Connects to a UART device.">
 			<param name="DeviceAddress" type="string" pass="in" description="Device Address of COM Port." />
+			<param name="BaudRate" type="uint32" pass="in" description="BaudRate in baud." />				
 			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
 		</method>
 
 
 		<method name="Disconnect" description= "Disconnects from device">
 		</method>
+		
+		<method name="IsConnected" description="Returns if the driver is connected.">		
+			<param name="IsConnected" type="bool" pass="return" description="." />
+		</method>	
+
+		<method name="SendLine" description= "Sends a string over UART and waits for a returning string.">
+			<param name="LineToSend" type="string" pass="in" description="Line to send" />
+			<param name="ReceivedLine" type="string" pass="return" description="Received line" />
+			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+		</method>		
 
 	</class>
 

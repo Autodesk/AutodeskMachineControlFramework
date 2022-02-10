@@ -57,6 +57,7 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IDriver_TCPIPPacket;
 class IDriver_TCPIP;
 
 
@@ -310,6 +311,31 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for Driver_TCPIPPacket 
+**************************************************************************************************************************/
+
+class IDriver_TCPIPPacket : public virtual IBase {
+public:
+	/**
+	* IDriver_TCPIPPacket::GetSize - Returns the size of the packet.
+	* @return returns size of packet.
+	*/
+	virtual LibMCDriver_TCPIP_uint32 GetSize() = 0;
+
+	/**
+	* IDriver_TCPIPPacket::GetData - Returns the data of the packet.
+	* @param[in] nBufferBufferSize - Number of elements in buffer
+	* @param[out] pBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pBufferBuffer - uint8 buffer of packet data.
+	*/
+	virtual void GetData(LibMCDriver_TCPIP_uint64 nBufferBufferSize, LibMCDriver_TCPIP_uint64* pBufferNeededCount, LibMCDriver_TCPIP_uint8 * pBufferBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriver_TCPIPPacket> PIDriver_TCPIPPacket;
+
+
+/*************************************************************************************************************************
  Class interface for Driver_TCPIP 
 **************************************************************************************************************************/
 
@@ -344,6 +370,28 @@ public:
 	* IDriver_TCPIP::Disconnect - Disconnects from the Server.
 	*/
 	virtual void Disconnect() = 0;
+
+	/**
+	* IDriver_TCPIP::SendBuffer - Sends a buffer of bytes to the Server.
+	* @param[in] nBufferBufferSize - Number of elements in buffer
+	* @param[in] pBufferBuffer - packet payload.
+	*/
+	virtual void SendBuffer(const LibMCDriver_TCPIP_uint64 nBufferBufferSize, const LibMCDriver_TCPIP_uint8 * pBufferBuffer) = 0;
+
+	/**
+	* IDriver_TCPIP::WaitForData - Waits for a server packet to arrive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Flag if a new packet has arrived.
+	*/
+	virtual bool WaitForData(const LibMCDriver_TCPIP_uint32 nTimeOutInMS) = 0;
+
+	/**
+	* IDriver_TCPIP::ReceivePacket - Receives a fixed length packet. Fails if there is a connection error.
+	* @param[in] nPacketSize - Size of packet to receive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Port.
+	*/
+	virtual IDriver_TCPIPPacket * ReceivePacket(const LibMCDriver_TCPIP_uint32 nPacketSize, const LibMCDriver_TCPIP_uint32 nTimeOutInMS) = 0;
 
 };
 

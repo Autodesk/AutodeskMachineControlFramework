@@ -346,6 +346,62 @@ LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_queryparameters(LibMCDriver_TCP
 
 
 /*************************************************************************************************************************
+ Class implementation for Driver_TCPIPPacket
+**************************************************************************************************************************/
+LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpippacket_getsize(LibMCDriver_TCPIP_Driver_TCPIPPacket pDriver_TCPIPPacket, LibMCDriver_TCPIP_uint32 * pPacketSize)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_TCPIPPacket;
+
+	try {
+		if (pPacketSize == nullptr)
+			throw ELibMCDriver_TCPIPInterfaceException (LIBMCDRIVER_TCPIP_ERROR_INVALIDPARAM);
+		IDriver_TCPIPPacket* pIDriver_TCPIPPacket = dynamic_cast<IDriver_TCPIPPacket*>(pIBaseClass);
+		if (!pIDriver_TCPIPPacket)
+			throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_INVALIDCAST);
+		
+		*pPacketSize = pIDriver_TCPIPPacket->GetSize();
+
+		return LIBMCDRIVER_TCPIP_SUCCESS;
+	}
+	catch (ELibMCDriver_TCPIPInterfaceException & Exception) {
+		return handleLibMCDriver_TCPIPException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpippacket_getdata(LibMCDriver_TCPIP_Driver_TCPIPPacket pDriver_TCPIPPacket, const LibMCDriver_TCPIP_uint64 nBufferBufferSize, LibMCDriver_TCPIP_uint64* pBufferNeededCount, LibMCDriver_TCPIP_uint8 * pBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_TCPIPPacket;
+
+	try {
+		if ((!pBufferBuffer) && !(pBufferNeededCount))
+			throw ELibMCDriver_TCPIPInterfaceException (LIBMCDRIVER_TCPIP_ERROR_INVALIDPARAM);
+		IDriver_TCPIPPacket* pIDriver_TCPIPPacket = dynamic_cast<IDriver_TCPIPPacket*>(pIBaseClass);
+		if (!pIDriver_TCPIPPacket)
+			throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_INVALIDCAST);
+		
+		pIDriver_TCPIPPacket->GetData(nBufferBufferSize, pBufferNeededCount, pBufferBuffer);
+
+		return LIBMCDRIVER_TCPIP_SUCCESS;
+	}
+	catch (ELibMCDriver_TCPIPInterfaceException & Exception) {
+		return handleLibMCDriver_TCPIPException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for Driver_TCPIP
 **************************************************************************************************************************/
 LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_settosimulationmode(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP)
@@ -475,6 +531,86 @@ LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_disconnect(LibMCDriver_TC
 	}
 }
 
+LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_sendbuffer(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP, LibMCDriver_TCPIP_uint64 nBufferBufferSize, const LibMCDriver_TCPIP_uint8 * pBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_TCPIP;
+
+	try {
+		if ( (!pBufferBuffer) && (nBufferBufferSize>0))
+			throw ELibMCDriver_TCPIPInterfaceException (LIBMCDRIVER_TCPIP_ERROR_INVALIDPARAM);
+		IDriver_TCPIP* pIDriver_TCPIP = dynamic_cast<IDriver_TCPIP*>(pIBaseClass);
+		if (!pIDriver_TCPIP)
+			throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_INVALIDCAST);
+		
+		pIDriver_TCPIP->SendBuffer(nBufferBufferSize, pBufferBuffer);
+
+		return LIBMCDRIVER_TCPIP_SUCCESS;
+	}
+	catch (ELibMCDriver_TCPIPInterfaceException & Exception) {
+		return handleLibMCDriver_TCPIPException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_waitfordata(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP, LibMCDriver_TCPIP_uint32 nTimeOutInMS, bool * pDataAvailable)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_TCPIP;
+
+	try {
+		if (pDataAvailable == nullptr)
+			throw ELibMCDriver_TCPIPInterfaceException (LIBMCDRIVER_TCPIP_ERROR_INVALIDPARAM);
+		IDriver_TCPIP* pIDriver_TCPIP = dynamic_cast<IDriver_TCPIP*>(pIBaseClass);
+		if (!pIDriver_TCPIP)
+			throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_INVALIDCAST);
+		
+		*pDataAvailable = pIDriver_TCPIP->WaitForData(nTimeOutInMS);
+
+		return LIBMCDRIVER_TCPIP_SUCCESS;
+	}
+	catch (ELibMCDriver_TCPIPInterfaceException & Exception) {
+		return handleLibMCDriver_TCPIPException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_receivepacket(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP, LibMCDriver_TCPIP_uint32 nPacketSize, LibMCDriver_TCPIP_uint32 nTimeOutInMS, LibMCDriver_TCPIP_Driver_TCPIPPacket * pPacket)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_TCPIP;
+
+	try {
+		if (pPacket == nullptr)
+			throw ELibMCDriver_TCPIPInterfaceException (LIBMCDRIVER_TCPIP_ERROR_INVALIDPARAM);
+		IBase* pBasePacket(nullptr);
+		IDriver_TCPIP* pIDriver_TCPIP = dynamic_cast<IDriver_TCPIP*>(pIBaseClass);
+		if (!pIDriver_TCPIP)
+			throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_INVALIDCAST);
+		
+		pBasePacket = pIDriver_TCPIP->ReceivePacket(nPacketSize, nTimeOutInMS);
+
+		*pPacket = (IBase*)(pBasePacket);
+		return LIBMCDRIVER_TCPIP_SUCCESS;
+	}
+	catch (ELibMCDriver_TCPIPInterfaceException & Exception) {
+		return handleLibMCDriver_TCPIPException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -502,6 +638,10 @@ LibMCDriver_TCPIPResult LibMCDriver_TCPIP::Impl::LibMCDriver_TCPIP_GetProcAddres
 		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_tcpip_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_queryparameters;
+	if (sProcName == "libmcdriver_tcpip_driver_tcpippacket_getsize") 
+		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpippacket_getsize;
+	if (sProcName == "libmcdriver_tcpip_driver_tcpippacket_getdata") 
+		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpippacket_getdata;
 	if (sProcName == "libmcdriver_tcpip_driver_tcpip_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpip_settosimulationmode;
 	if (sProcName == "libmcdriver_tcpip_driver_tcpip_issimulationmode") 
@@ -512,6 +652,12 @@ LibMCDriver_TCPIPResult LibMCDriver_TCPIP::Impl::LibMCDriver_TCPIP_GetProcAddres
 		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpip_isconnected;
 	if (sProcName == "libmcdriver_tcpip_driver_tcpip_disconnect") 
 		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpip_disconnect;
+	if (sProcName == "libmcdriver_tcpip_driver_tcpip_sendbuffer") 
+		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpip_sendbuffer;
+	if (sProcName == "libmcdriver_tcpip_driver_tcpip_waitfordata") 
+		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpip_waitfordata;
+	if (sProcName == "libmcdriver_tcpip_driver_tcpip_receivepacket") 
+		*ppProcAddress = (void*) &libmcdriver_tcpip_driver_tcpip_receivepacket;
 	if (sProcName == "libmcdriver_tcpip_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_tcpip_getversion;
 	if (sProcName == "libmcdriver_tcpip_getlasterror") 

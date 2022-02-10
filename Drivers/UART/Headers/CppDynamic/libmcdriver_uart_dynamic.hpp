@@ -364,8 +364,10 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
-	inline void Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nTimeout);
+	inline void Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nBaudRate, const LibMCDriver_UART_uint32 nTimeout);
 	inline void Disconnect();
+	inline bool IsConnected();
+	inline std::string SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout);
 };
 	
 	/**
@@ -499,6 +501,8 @@ public:
 		pWrapperTable->m_Driver_UART_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_UART_Connect = nullptr;
 		pWrapperTable->m_Driver_UART_Disconnect = nullptr;
+		pWrapperTable->m_Driver_UART_IsConnected = nullptr;
+		pWrapperTable->m_Driver_UART_SendLine = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -645,6 +649,24 @@ public:
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_IsConnected = (PLibMCDriver_UARTDriver_UART_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_isconnected");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_IsConnected = (PLibMCDriver_UARTDriver_UART_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_isconnected");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_IsConnected == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_SendLine = (PLibMCDriver_UARTDriver_UART_SendLinePtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_sendline");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_SendLine = (PLibMCDriver_UARTDriver_UART_SendLinePtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_sendline");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_SendLine == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_UARTGetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_uart_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_UARTGetVersionPtr) dlsym(hLibrary, "libmcdriver_uart_getversion");
@@ -761,6 +783,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_disconnect", (void**)&(pWrapperTable->m_Driver_UART_Disconnect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_Disconnect == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_isconnected", (void**)&(pWrapperTable->m_Driver_UART_IsConnected));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_IsConnected == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_sendline", (void**)&(pWrapperTable->m_Driver_UART_SendLine));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SendLine == nullptr) )
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_uart_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -914,11 +944,12 @@ public:
 	/**
 	* CDriver_UART::Connect - Connects to a UART device.
 	* @param[in] sDeviceAddress - Device Address of COM Port.
+	* @param[in] nBaudRate - BaudRate in baud.
 	* @param[in] nTimeout - Timeout in milliseconds.
 	*/
-	void CDriver_UART::Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nTimeout)
+	void CDriver_UART::Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nBaudRate, const LibMCDriver_UART_uint32 nTimeout)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_Connect(m_pHandle, sDeviceAddress.c_str(), nTimeout));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_Connect(m_pHandle, sDeviceAddress.c_str(), nBaudRate, nTimeout));
 	}
 	
 	/**
@@ -927,6 +958,35 @@ public:
 	void CDriver_UART::Disconnect()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* CDriver_UART::IsConnected - Returns if the driver is connected.
+	* @return .
+	*/
+	bool CDriver_UART::IsConnected()
+	{
+		bool resultIsConnected = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_IsConnected(m_pHandle, &resultIsConnected));
+		
+		return resultIsConnected;
+	}
+	
+	/**
+	* CDriver_UART::SendLine - Sends a string over UART and waits for a returning string.
+	* @param[in] sLineToSend - Line to send
+	* @return Received line
+	* @param[in] nTimeout - Timeout in milliseconds.
+	*/
+	std::string CDriver_UART::SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout)
+	{
+		LibMCDriver_UART_uint32 bytesNeededReceivedLine = 0;
+		LibMCDriver_UART_uint32 bytesWrittenReceivedLine = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), 0, &bytesNeededReceivedLine, nullptr, nTimeout));
+		std::vector<char> bufferReceivedLine(bytesNeededReceivedLine);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), bytesNeededReceivedLine, &bytesWrittenReceivedLine, &bufferReceivedLine[0], nTimeout));
+		
+		return std::string(&bufferReceivedLine[0]);
 	}
 
 } // namespace LibMCDriver_UART

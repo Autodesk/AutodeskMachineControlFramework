@@ -27,87 +27,68 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver_UART
+Abstract: This is a stub class definition of CDriver_TCPIPPacket
 
 */
 
-
-#ifndef __LIBMCDRIVER_UART_DRIVER_UART
-#define __LIBMCDRIVER_UART_DRIVER_UART
-
-#include "libmcdriver_uart_interfaces.hpp"
-
-// Parent classes
-#include "libmcdriver_uart_driver.hpp"
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include "libmcdriver_tcpip_driver_tcpippacket.hpp"
+#include "libmcdriver_tcpip_interfaceexception.hpp"
 
 // Include custom headers here.
-#include <string>
+#define TCPIPDRIVER_MAXPACKETSIZE (1024UL * 1024UL * 1024UL)
 
-namespace serial {
-	class Serial;
-}
-
-namespace LibMCDriver_UART {
-namespace Impl {
-
+using namespace LibMCDriver_TCPIP::Impl;
 
 /*************************************************************************************************************************
- Class declaration of CDriver_UART 
+ Class definition of CDriver_TCPIPPacket 
 **************************************************************************************************************************/
+CDriver_TCPIPPacket::CDriver_TCPIPPacket()
+{
 
-class CDriver_UART : public virtual IDriver_UART, public virtual CDriver {
-private:
+}
 
-	std::string m_sName;
+CDriver_TCPIPPacket::~CDriver_TCPIPPacket()
+{
 
-	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+}
 
-	bool m_bSimulationMode;
+LibMCDriver_TCPIP_uint32 CDriver_TCPIPPacket::GetSize()
+{
+    if (m_BufferData.size() > TCPIPDRIVER_MAXPACKETSIZE)
+        throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM);
 
-	std::unique_ptr<serial::Serial> m_pConnection;
+    return (uint32_t) m_BufferData.size();
+}
 
-protected:
+void CDriver_TCPIPPacket::GetData(LibMCDriver_TCPIP_uint64 nBufferBufferSize, LibMCDriver_TCPIP_uint64* pBufferNeededCount, LibMCDriver_TCPIP_uint8 * pBufferBuffer)
+{
+    uint64_t nPacketSize = m_BufferData.size();
+    if (nPacketSize > TCPIPDRIVER_MAXPACKETSIZE)
+        throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM);
 
-public:
 
-	CDriver_UART(const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+    if (pBufferNeededCount != nullptr)
+        *pBufferNeededCount = nPacketSize;
 
-	virtual ~CDriver_UART();
+    if (pBufferBuffer != nullptr) {
 
-	void Configure(const std::string& sConfigurationString) override;
+        if (nBufferBufferSize < nPacketSize)
+            throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_BUFFERTOOSMALL);
 
-	std::string GetName() override;
+        
+        if (nPacketSize > 0) {
+            uint8_t* pSrc = m_BufferData.data();
+            uint8_t* pDst = pBufferBuffer;
+            for (uint64_t nIndex = 0; nIndex < nPacketSize; nIndex++) {
+                *pDst = *pSrc;
+                pDst++;
+                pSrc++;
+            }
+        }
+    }
+}
 
-	std::string GetType() override;
-
-	void GetVersion(LibMCDriver_UART_uint32& nMajor, LibMCDriver_UART_uint32& nMinor, LibMCDriver_UART_uint32& nMicro, std::string& sBuild) override;
-
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
-	void QueryParameters() override;
-
-	void SetToSimulationMode() override;
-
-	bool IsSimulationMode() override;
-
-	void Connect(const std::string& sDeviceAddress, const LibMCDriver_UART_uint32 nBaudRate, const LibMCDriver_UART_uint32 nTimeout) override;
-
-	void Disconnect() override;
-
-	bool IsConnected() override;
-
-	std::string SendLine(const std::string& sLineToSend, const LibMCDriver_UART_uint32 nTimeout) override;
-
-};
-
-} // namespace Impl
-} // namespace LibMCDriver_UART
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-#endif // __LIBMCDRIVER_UART_DRIVER_UART
+std::vector<uint8_t>& CDriver_TCPIPPacket::getBufferDataReference()
+{
+    return m_BufferData;
+}

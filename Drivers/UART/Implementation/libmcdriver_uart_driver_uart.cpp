@@ -35,8 +35,11 @@ Abstract: This is a stub class definition of CDriver_UART
 #include "libmcdriver_uart_interfaceexception.hpp"
 
 // Include custom headers here.
+#include "serial/serial.h"
+
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
+
 
 using namespace LibMCDriver_UART::Impl;
 
@@ -101,11 +104,40 @@ bool CDriver_UART::IsSimulationMode()
 	return m_bSimulationMode;
 }
 
-void CDriver_UART::Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nTimeout)
+void CDriver_UART::Connect(const std::string& sDeviceAddress, const LibMCDriver_UART_uint32 nBaudRate, const LibMCDriver_UART_uint32 nTimeout)
 {
+	m_pConnection.reset();
+
+	m_pConnection.reset(new serial::Serial(sDeviceAddress, nBaudRate, serial::Timeout::simpleTimeout(nTimeout)));
+
+	if (!m_pConnection->isOpen()) {
+		m_pConnection.reset();
+		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_COULDNOTCONNECT);
+	}
+
 }
 
 void CDriver_UART::Disconnect()
 {
+	m_pConnection.reset();
 }
+
+bool CDriver_UART::IsConnected()
+{
+	if (m_pConnection.get() != nullptr) {
+		return m_pConnection->available();
+	}
+
+	return false;
+}
+
+std::string CDriver_UART::SendLine(const std::string& sLineToSend, const LibMCDriver_UART_uint32 nTimeout)
+{
+	if (m_pConnection.get() == nullptr) 
+		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED);
+
+	m_pConnection->write(sLineToSend);
+	return m_pConnection->readline();
+}
+
 

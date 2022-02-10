@@ -145,10 +145,11 @@ typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_IsSimulationModePt
 *
 * @param[in] pDriver_UART - Driver_UART instance.
 * @param[in] pDeviceAddress - Device Address of COM Port.
+* @param[in] nBaudRate - BaudRate in baud.
 * @param[in] nTimeout - Timeout in milliseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_ConnectPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pDeviceAddress, LibMCDriver_UART_uint32 nTimeout);
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_ConnectPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pDeviceAddress, LibMCDriver_UART_uint32 nBaudRate, LibMCDriver_UART_uint32 nTimeout);
 
 /**
 * Disconnects from device
@@ -157,6 +158,28 @@ typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_ConnectPtr) (LibMC
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_DisconnectPtr) (LibMCDriver_UART_Driver_UART pDriver_UART);
+
+/**
+* Returns if the driver is connected.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pIsConnected - .
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_IsConnectedPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, bool * pIsConnected);
+
+/**
+* Sends a string over UART and waits for a returning string.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] pLineToSend - Line to send
+* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
+* @param[in] nTimeout - Timeout in milliseconds.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SendLinePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer, LibMCDriver_UART_uint32 nTimeout);
 
 /*************************************************************************************************************************
  Global functions
@@ -244,6 +267,8 @@ typedef struct {
 	PLibMCDriver_UARTDriver_UART_IsSimulationModePtr m_Driver_UART_IsSimulationMode;
 	PLibMCDriver_UARTDriver_UART_ConnectPtr m_Driver_UART_Connect;
 	PLibMCDriver_UARTDriver_UART_DisconnectPtr m_Driver_UART_Disconnect;
+	PLibMCDriver_UARTDriver_UART_IsConnectedPtr m_Driver_UART_IsConnected;
+	PLibMCDriver_UARTDriver_UART_SendLinePtr m_Driver_UART_SendLine;
 	PLibMCDriver_UARTGetVersionPtr m_GetVersion;
 	PLibMCDriver_UARTGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_UARTReleaseInstancePtr m_ReleaseInstance;

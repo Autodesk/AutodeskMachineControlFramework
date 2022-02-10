@@ -119,6 +119,19 @@ Custom implementation
 
 -->
 
+	<class name="Driver_TCPIPPacket" parent="Base" description="Contains a received packet data.">
+	
+		<method name="GetSize" description="Returns the size of the packet.">
+			<param name="PacketSize" type="uint32" pass="return" description="returns size of packet." />
+		</method>
+
+		<method name="GetData" description="Returns the data of the packet.">
+			<param name="Buffer" type="basicarray" class="uint8" pass="out" description="packet data." />
+		</method>
+		
+	</class>
+
+
 
 	<class name="Driver_TCPIP" parent="Driver" description="A generic TCP/IP Driver.">
 
@@ -142,6 +155,21 @@ Custom implementation
 		<method name="Disconnect" description= "Disconnects from the Server.">
 		</method>
 
+		<method name="SendBuffer" description= "Sends a buffer of bytes to the Server.">
+			<param name="Buffer" type="basicarray" class="uint8" pass="in" description="packet payload." />		
+		</method>
+
+		<method name="WaitForData" description= "Waits for a server packet to arrive.">
+			<param name="TimeOutInMS" type="uint32" pass="in" description="timeout in Milliseconds." />		
+			<param name="DataAvailable" type="bool" pass="return" description="Flag if a new packet has arrived." />		
+		</method>
+
+		<method name="ReceivePacket" description= "Receives a fixed length packet. Fails if there is a connection error.">
+			<param name="PacketSize" type="uint32" pass="in" description="Size of packet to receive." />	
+			<param name="TimeOutInMS" type="uint32" pass="in" description="timeout in Milliseconds." />		
+			<param name="Packet" type="class" class="Driver_TCPIPPacket" pass="return" description="Port." />				
+		</method>
+		
 	</class>
 
 

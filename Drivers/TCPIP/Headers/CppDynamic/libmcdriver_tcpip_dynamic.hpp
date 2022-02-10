@@ -62,6 +62,7 @@ namespace LibMCDriver_TCPIP {
 class CWrapper;
 class CBase;
 class CDriver;
+class CDriver_TCPIPPacket;
 class CDriver_TCPIP;
 
 /*************************************************************************************************************************
@@ -70,6 +71,7 @@ class CDriver_TCPIP;
 typedef CWrapper CLibMCDriver_TCPIPWrapper;
 typedef CBase CLibMCDriver_TCPIPBase;
 typedef CDriver CLibMCDriver_TCPIPDriver;
+typedef CDriver_TCPIPPacket CLibMCDriver_TCPIPDriver_TCPIPPacket;
 typedef CDriver_TCPIP CLibMCDriver_TCPIPDriver_TCPIP;
 
 /*************************************************************************************************************************
@@ -78,6 +80,7 @@ typedef CDriver_TCPIP CLibMCDriver_TCPIPDriver_TCPIP;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
+typedef std::shared_ptr<CDriver_TCPIPPacket> PDriver_TCPIPPacket;
 typedef std::shared_ptr<CDriver_TCPIP> PDriver_TCPIP;
 
 /*************************************************************************************************************************
@@ -86,6 +89,7 @@ typedef std::shared_ptr<CDriver_TCPIP> PDriver_TCPIP;
 typedef PWrapper PLibMCDriver_TCPIPWrapper;
 typedef PBase PLibMCDriver_TCPIPBase;
 typedef PDriver PLibMCDriver_TCPIPDriver;
+typedef PDriver_TCPIPPacket PLibMCDriver_TCPIPDriver_TCPIPPacket;
 typedef PDriver_TCPIP PLibMCDriver_TCPIPDriver_TCPIP;
 
 
@@ -265,6 +269,7 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
+	friend class CDriver_TCPIPPacket;
 	friend class CDriver_TCPIP;
 
 };
@@ -349,6 +354,24 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDriver_TCPIPPacket 
+**************************************************************************************************************************/
+class CDriver_TCPIPPacket : public CBase {
+public:
+	
+	/**
+	* CDriver_TCPIPPacket::CDriver_TCPIPPacket - Constructor for Driver_TCPIPPacket class.
+	*/
+	CDriver_TCPIPPacket(CWrapper* pWrapper, LibMCDriver_TCPIPHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCDriver_TCPIP_uint32 GetSize();
+	inline void GetData(std::vector<LibMCDriver_TCPIP_uint8> & BufferBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CDriver_TCPIP 
 **************************************************************************************************************************/
 class CDriver_TCPIP : public CDriver {
@@ -367,6 +390,9 @@ public:
 	inline void Connect(const std::string & sIPAddress, const LibMCDriver_TCPIP_uint32 nPort, const LibMCDriver_TCPIP_uint32 nTimeout);
 	inline bool IsConnected();
 	inline void Disconnect();
+	inline void SendBuffer(const CInputVector<LibMCDriver_TCPIP_uint8> & BufferBuffer);
+	inline bool WaitForData(const LibMCDriver_TCPIP_uint32 nTimeOutInMS);
+	inline PDriver_TCPIPPacket ReceivePacket(const LibMCDriver_TCPIP_uint32 nPacketSize, const LibMCDriver_TCPIP_uint32 nTimeOutInMS);
 };
 	
 	/**
@@ -496,11 +522,16 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_Driver_TCPIPPacket_GetSize = nullptr;
+		pWrapperTable->m_Driver_TCPIPPacket_GetData = nullptr;
 		pWrapperTable->m_Driver_TCPIP_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_TCPIP_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_TCPIP_Connect = nullptr;
 		pWrapperTable->m_Driver_TCPIP_IsConnected = nullptr;
 		pWrapperTable->m_Driver_TCPIP_Disconnect = nullptr;
+		pWrapperTable->m_Driver_TCPIP_SendBuffer = nullptr;
+		pWrapperTable->m_Driver_TCPIP_WaitForData = nullptr;
+		pWrapperTable->m_Driver_TCPIP_ReceivePacket = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -611,6 +642,24 @@ public:
 			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_TCPIPPacket_GetSize = (PLibMCDriver_TCPIPDriver_TCPIPPacket_GetSizePtr) GetProcAddress(hLibrary, "libmcdriver_tcpip_driver_tcpippacket_getsize");
+		#else // _WIN32
+		pWrapperTable->m_Driver_TCPIPPacket_GetSize = (PLibMCDriver_TCPIPDriver_TCPIPPacket_GetSizePtr) dlsym(hLibrary, "libmcdriver_tcpip_driver_tcpippacket_getsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_TCPIPPacket_GetSize == nullptr)
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_TCPIPPacket_GetData = (PLibMCDriver_TCPIPDriver_TCPIPPacket_GetDataPtr) GetProcAddress(hLibrary, "libmcdriver_tcpip_driver_tcpippacket_getdata");
+		#else // _WIN32
+		pWrapperTable->m_Driver_TCPIPPacket_GetData = (PLibMCDriver_TCPIPDriver_TCPIPPacket_GetDataPtr) dlsym(hLibrary, "libmcdriver_tcpip_driver_tcpippacket_getdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_TCPIPPacket_GetData == nullptr)
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_TCPIP_SetToSimulationMode = (PLibMCDriver_TCPIPDriver_TCPIP_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_tcpip_driver_tcpip_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_Driver_TCPIP_SetToSimulationMode = (PLibMCDriver_TCPIPDriver_TCPIP_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_tcpip_driver_tcpip_settosimulationmode");
@@ -653,6 +702,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_TCPIP_Disconnect == nullptr)
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_TCPIP_SendBuffer = (PLibMCDriver_TCPIPDriver_TCPIP_SendBufferPtr) GetProcAddress(hLibrary, "libmcdriver_tcpip_driver_tcpip_sendbuffer");
+		#else // _WIN32
+		pWrapperTable->m_Driver_TCPIP_SendBuffer = (PLibMCDriver_TCPIPDriver_TCPIP_SendBufferPtr) dlsym(hLibrary, "libmcdriver_tcpip_driver_tcpip_sendbuffer");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_TCPIP_SendBuffer == nullptr)
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_TCPIP_WaitForData = (PLibMCDriver_TCPIPDriver_TCPIP_WaitForDataPtr) GetProcAddress(hLibrary, "libmcdriver_tcpip_driver_tcpip_waitfordata");
+		#else // _WIN32
+		pWrapperTable->m_Driver_TCPIP_WaitForData = (PLibMCDriver_TCPIPDriver_TCPIP_WaitForDataPtr) dlsym(hLibrary, "libmcdriver_tcpip_driver_tcpip_waitfordata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_TCPIP_WaitForData == nullptr)
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_TCPIP_ReceivePacket = (PLibMCDriver_TCPIPDriver_TCPIP_ReceivePacketPtr) GetProcAddress(hLibrary, "libmcdriver_tcpip_driver_tcpip_receivepacket");
+		#else // _WIN32
+		pWrapperTable->m_Driver_TCPIP_ReceivePacket = (PLibMCDriver_TCPIPDriver_TCPIP_ReceivePacketPtr) dlsym(hLibrary, "libmcdriver_tcpip_driver_tcpip_receivepacket");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_TCPIP_ReceivePacket == nullptr)
 			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -758,6 +834,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_tcpip_driver_tcpippacket_getsize", (void**)&(pWrapperTable->m_Driver_TCPIPPacket_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TCPIPPacket_GetSize == nullptr) )
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tcpip_driver_tcpippacket_getdata", (void**)&(pWrapperTable->m_Driver_TCPIPPacket_GetData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TCPIPPacket_GetData == nullptr) )
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_tcpip_driver_tcpip_settosimulationmode", (void**)&(pWrapperTable->m_Driver_TCPIP_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TCPIP_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -776,6 +860,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_tcpip_driver_tcpip_disconnect", (void**)&(pWrapperTable->m_Driver_TCPIP_Disconnect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TCPIP_Disconnect == nullptr) )
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tcpip_driver_tcpip_sendbuffer", (void**)&(pWrapperTable->m_Driver_TCPIP_SendBuffer));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TCPIP_SendBuffer == nullptr) )
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tcpip_driver_tcpip_waitfordata", (void**)&(pWrapperTable->m_Driver_TCPIP_WaitForData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TCPIP_WaitForData == nullptr) )
+			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_tcpip_driver_tcpip_receivepacket", (void**)&(pWrapperTable->m_Driver_TCPIP_ReceivePacket));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_TCPIP_ReceivePacket == nullptr) )
 			return LIBMCDRIVER_TCPIP_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_tcpip_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -903,6 +999,35 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CDriver_TCPIPPacket
+	 */
+	
+	/**
+	* CDriver_TCPIPPacket::GetSize - Returns the size of the packet.
+	* @return returns size of packet.
+	*/
+	LibMCDriver_TCPIP_uint32 CDriver_TCPIPPacket::GetSize()
+	{
+		LibMCDriver_TCPIP_uint32 resultPacketSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TCPIPPacket_GetSize(m_pHandle, &resultPacketSize));
+		
+		return resultPacketSize;
+	}
+	
+	/**
+	* CDriver_TCPIPPacket::GetData - Returns the data of the packet.
+	* @param[out] BufferBuffer - packet data.
+	*/
+	void CDriver_TCPIPPacket::GetData(std::vector<LibMCDriver_TCPIP_uint8> & BufferBuffer)
+	{
+		LibMCDriver_TCPIP_uint64 elementsNeededBuffer = 0;
+		LibMCDriver_TCPIP_uint64 elementsWrittenBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TCPIPPacket_GetData(m_pHandle, 0, &elementsNeededBuffer, nullptr));
+		BufferBuffer.resize((size_t) elementsNeededBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TCPIPPacket_GetData(m_pHandle, elementsNeededBuffer, &elementsWrittenBuffer, BufferBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CDriver_TCPIP
 	 */
 	
@@ -955,6 +1080,45 @@ public:
 	void CDriver_TCPIP::Disconnect()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TCPIP_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* CDriver_TCPIP::SendBuffer - Sends a buffer of bytes to the Server.
+	* @param[in] BufferBuffer - packet payload.
+	*/
+	void CDriver_TCPIP::SendBuffer(const CInputVector<LibMCDriver_TCPIP_uint8> & BufferBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TCPIP_SendBuffer(m_pHandle, (LibMCDriver_TCPIP_uint64)BufferBuffer.size(), BufferBuffer.data()));
+	}
+	
+	/**
+	* CDriver_TCPIP::WaitForData - Waits for a server packet to arrive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Flag if a new packet has arrived.
+	*/
+	bool CDriver_TCPIP::WaitForData(const LibMCDriver_TCPIP_uint32 nTimeOutInMS)
+	{
+		bool resultDataAvailable = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TCPIP_WaitForData(m_pHandle, nTimeOutInMS, &resultDataAvailable));
+		
+		return resultDataAvailable;
+	}
+	
+	/**
+	* CDriver_TCPIP::ReceivePacket - Receives a fixed length packet. Fails if there is a connection error.
+	* @param[in] nPacketSize - Size of packet to receive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Port.
+	*/
+	PDriver_TCPIPPacket CDriver_TCPIP::ReceivePacket(const LibMCDriver_TCPIP_uint32 nPacketSize, const LibMCDriver_TCPIP_uint32 nTimeOutInMS)
+	{
+		LibMCDriver_TCPIPHandle hPacket = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_TCPIP_ReceivePacket(m_pHandle, nPacketSize, nTimeOutInMS, &hPacket));
+		
+		if (!hPacket) {
+			CheckError(LIBMCDRIVER_TCPIP_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDriver_TCPIPPacket>(m_pWrapper, hPacket);
 	}
 
 } // namespace LibMCDriver_TCPIP

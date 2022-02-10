@@ -108,6 +108,7 @@ typedef void * LibMCDriver_UART_pvoid;
 #define LIBMCDRIVER_UART_ERROR_DRIVERERROR 1000
 #define LIBMCDRIVER_UART_ERROR_DRIVERNOTINITIALISED 1001
 #define LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED 1002
+#define LIBMCDRIVER_UART_ERROR_COULDNOTCONNECT 1003
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_UART
@@ -128,6 +129,7 @@ inline const char * LIBMCDRIVER_UART_GETERRORSTRING (LibMCDriver_UARTResult nErr
     case LIBMCDRIVER_UART_ERROR_DRIVERERROR: return "a driver error occured";
     case LIBMCDRIVER_UART_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
     case LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
+    case LIBMCDRIVER_UART_ERROR_COULDNOTCONNECT: return "the driver is not connected";
     default: return "unknown error";
   }
 }

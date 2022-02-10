@@ -27,19 +27,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDriver_TCPIP
+Abstract: This is the class declaration of CDriver_TCPIPPacket
 
 */
 
 
-#ifndef __LIBMCDRIVER_TCPIP_DRIVER_TCPIP
-#define __LIBMCDRIVER_TCPIP_DRIVER_TCPIP
+#ifndef __LIBMCDRIVER_TCPIP_DRIVER_TCPIPPACKET
+#define __LIBMCDRIVER_TCPIP_DRIVER_TCPIPPACKET
 
 #include "libmcdriver_tcpip_interfaces.hpp"
-#include "libmcdriver_tcpip_sockets.hpp"
 
 // Parent classes
-#include "libmcdriver_tcpip_driver.hpp"
+#include "libmcdriver_tcpip_base.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4250)
@@ -53,56 +52,28 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDriver_TCPIP 
+ Class declaration of CDriver_TCPIPPacket 
 **************************************************************************************************************************/
 
-class CDriver_TCPIP : public virtual IDriver_TCPIP, public virtual CDriver {
+class CDriver_TCPIPPacket : public virtual IDriver_TCPIPPacket, public virtual CBase {
 private:
 
-	std::string m_sName;
-
-	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
-
-	bool m_bSimulationMode;
-
-	std::shared_ptr<CDriver_TCPIPSocketConnection> m_pSocketConnection;
 
 protected:
 
+    std::vector<uint8_t> m_BufferData;
+
 public:
 
-	CDriver_TCPIP(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
+    CDriver_TCPIPPacket();
+    virtual ~CDriver_TCPIPPacket();
 
-	virtual ~CDriver_TCPIP();
+	LibMCDriver_TCPIP_uint32 GetSize() override;
 
-	void Configure(const std::string& sConfigurationString) override;
+	void GetData(LibMCDriver_TCPIP_uint64 nBufferBufferSize, LibMCDriver_TCPIP_uint64* pBufferNeededCount, LibMCDriver_TCPIP_uint8 * pBufferBuffer) override;
 
-	std::string GetName() override;
+    std::vector<uint8_t> & getBufferDataReference ();
 
-	std::string GetType() override;
-
-	void GetVersion(LibMCDriver_TCPIP_uint32& nMajor, LibMCDriver_TCPIP_uint32& nMinor, LibMCDriver_TCPIP_uint32& nMicro, std::string& sBuild) override;
-
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
-	void QueryParameters() override;
-
-
-	void SetToSimulationMode() override;
-
-	bool IsSimulationMode() override;
-
-	void Connect(const std::string& sIPAddress, const LibMCDriver_TCPIP_uint32 nPort, const LibMCDriver_TCPIP_uint32 nTimeout) override;
-
-	void Disconnect() override;
-
-	void SendBuffer(const LibMCDriver_TCPIP_uint64 nBufferBufferSize, const LibMCDriver_TCPIP_uint8* pBufferBuffer) override;
-
-	bool WaitForData(const LibMCDriver_TCPIP_uint32 nTimeOutInMS) override;
-
-	IDriver_TCPIPPacket* ReceivePacket(const LibMCDriver_TCPIP_uint32 nPacketSize, const LibMCDriver_TCPIP_uint32 nTimeOutInMS) override;
-
-	bool IsConnected() override;
 };
 
 } // namespace Impl
@@ -111,4 +82,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_TCPIP_DRIVER_TCPIP
+#endif // __LIBMCDRIVER_TCPIP_DRIVER_TCPIPPACKET

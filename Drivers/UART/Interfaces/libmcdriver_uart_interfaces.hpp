@@ -329,14 +329,29 @@ public:
 	/**
 	* IDriver_UART::Connect - Connects to a UART device.
 	* @param[in] sDeviceAddress - Device Address of COM Port.
+	* @param[in] nBaudRate - BaudRate in baud.
 	* @param[in] nTimeout - Timeout in milliseconds.
 	*/
-	virtual void Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nTimeout) = 0;
+	virtual void Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nBaudRate, const LibMCDriver_UART_uint32 nTimeout) = 0;
 
 	/**
 	* IDriver_UART::Disconnect - Disconnects from device
 	*/
 	virtual void Disconnect() = 0;
+
+	/**
+	* IDriver_UART::IsConnected - Returns if the driver is connected.
+	* @return .
+	*/
+	virtual bool IsConnected() = 0;
+
+	/**
+	* IDriver_UART::SendLine - Sends a string over UART and waits for a returning string.
+	* @param[in] sLineToSend - Line to send
+	* @return Received line
+	* @param[in] nTimeout - Timeout in milliseconds.
+	*/
+	virtual std::string SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout) = 0;
 
 };
 

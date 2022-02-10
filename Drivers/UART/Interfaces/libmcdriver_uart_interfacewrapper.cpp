@@ -398,7 +398,7 @@ LibMCDriver_UARTResult libmcdriver_uart_driver_uart_issimulationmode(LibMCDriver
 	}
 }
 
-LibMCDriver_UARTResult libmcdriver_uart_driver_uart_connect(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pDeviceAddress, LibMCDriver_UART_uint32 nTimeout)
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_connect(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pDeviceAddress, LibMCDriver_UART_uint32 nBaudRate, LibMCDriver_UART_uint32 nTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_UART;
 
@@ -410,7 +410,7 @@ LibMCDriver_UARTResult libmcdriver_uart_driver_uart_connect(LibMCDriver_UART_Dri
 		if (!pIDriver_UART)
 			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
 		
-		pIDriver_UART->Connect(sDeviceAddress, nTimeout);
+		pIDriver_UART->Connect(sDeviceAddress, nBaudRate, nTimeout);
 
 		return LIBMCDRIVER_UART_SUCCESS;
 	}
@@ -436,6 +436,83 @@ LibMCDriver_UARTResult libmcdriver_uart_driver_uart_disconnect(LibMCDriver_UART_
 		
 		pIDriver_UART->Disconnect();
 
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_isconnected(LibMCDriver_UART_Driver_UART pDriver_UART, bool * pIsConnected)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		if (pIsConnected == nullptr)
+			throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_INVALIDPARAM);
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		*pIsConnected = pIDriver_UART->IsConnected();
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_sendline(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer, LibMCDriver_UART_uint32 nTimeout)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		if (pLineToSend == nullptr)
+			throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_INVALIDPARAM);
+		if ( (!pReceivedLineBuffer) && !(pReceivedLineNeededChars) )
+			throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_INVALIDPARAM);
+		std::string sLineToSend(pLineToSend);
+		std::string sReceivedLine("");
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pReceivedLineBuffer == nullptr);
+		if (isCacheCall) {
+			sReceivedLine = pIDriver_UART->SendLine(sLineToSend, nTimeout);
+
+			pIDriver_UART->_setCache (new ParameterCache_1<std::string> (sReceivedLine));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDriver_UART->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+			cache->retrieveData (sReceivedLine);
+			pIDriver_UART->_setCache (nullptr);
+		}
+		
+		if (pReceivedLineNeededChars)
+			*pReceivedLineNeededChars = (LibMCDriver_UART_uint32) (sReceivedLine.size()+1);
+		if (pReceivedLineBuffer) {
+			if (sReceivedLine.size() >= nReceivedLineBufferSize)
+				throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_BUFFERTOOSMALL);
+			for (size_t iReceivedLine = 0; iReceivedLine < sReceivedLine.size(); iReceivedLine++)
+				pReceivedLineBuffer[iReceivedLine] = sReceivedLine[iReceivedLine];
+			pReceivedLineBuffer[sReceivedLine.size()] = 0;
+		}
 		return LIBMCDRIVER_UART_SUCCESS;
 	}
 	catch (ELibMCDriver_UARTInterfaceException & Exception) {
@@ -484,6 +561,10 @@ LibMCDriver_UARTResult LibMCDriver_UART::Impl::LibMCDriver_UART_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_connect;
 	if (sProcName == "libmcdriver_uart_driver_uart_disconnect") 
 		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_disconnect;
+	if (sProcName == "libmcdriver_uart_driver_uart_isconnected") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_isconnected;
+	if (sProcName == "libmcdriver_uart_driver_uart_sendline") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_sendline;
 	if (sProcName == "libmcdriver_uart_getversion") 
 		*ppProcAddress = (void*) &libmcdriver_uart_getversion;
 	if (sProcName == "libmcdriver_uart_getlasterror") 

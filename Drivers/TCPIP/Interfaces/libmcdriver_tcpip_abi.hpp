@@ -133,6 +133,30 @@ LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_geth
 LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_queryparameters(LibMCDriver_TCPIP_Driver pDriver);
 
 /*************************************************************************************************************************
+ Class definition for Driver_TCPIPPacket
+**************************************************************************************************************************/
+
+/**
+* Returns the size of the packet.
+*
+* @param[in] pDriver_TCPIPPacket - Driver_TCPIPPacket instance.
+* @param[out] pPacketSize - returns size of packet.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpippacket_getsize(LibMCDriver_TCPIP_Driver_TCPIPPacket pDriver_TCPIPPacket, LibMCDriver_TCPIP_uint32 * pPacketSize);
+
+/**
+* Returns the data of the packet.
+*
+* @param[in] pDriver_TCPIPPacket - Driver_TCPIPPacket instance.
+* @param[in] nBufferBufferSize - Number of elements in buffer
+* @param[out] pBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pBufferBuffer - uint8 buffer of packet data.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpippacket_getdata(LibMCDriver_TCPIP_Driver_TCPIPPacket pDriver_TCPIPPacket, const LibMCDriver_TCPIP_uint64 nBufferBufferSize, LibMCDriver_TCPIP_uint64* pBufferNeededCount, LibMCDriver_TCPIP_uint8 * pBufferBuffer);
+
+/*************************************************************************************************************************
  Class definition for Driver_TCPIP
 **************************************************************************************************************************/
 
@@ -180,6 +204,37 @@ LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpi
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_disconnect(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP);
+
+/**
+* Sends a buffer of bytes to the Server.
+*
+* @param[in] pDriver_TCPIP - Driver_TCPIP instance.
+* @param[in] nBufferBufferSize - Number of elements in buffer
+* @param[in] pBufferBuffer - uint8 buffer of packet payload.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_sendbuffer(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP, LibMCDriver_TCPIP_uint64 nBufferBufferSize, const LibMCDriver_TCPIP_uint8 * pBufferBuffer);
+
+/**
+* Waits for a server packet to arrive.
+*
+* @param[in] pDriver_TCPIP - Driver_TCPIP instance.
+* @param[in] nTimeOutInMS - timeout in Milliseconds.
+* @param[out] pDataAvailable - Flag if a new packet has arrived.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_waitfordata(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP, LibMCDriver_TCPIP_uint32 nTimeOutInMS, bool * pDataAvailable);
+
+/**
+* Receives a fixed length packet. Fails if there is a connection error.
+*
+* @param[in] pDriver_TCPIP - Driver_TCPIP instance.
+* @param[in] nPacketSize - Size of packet to receive.
+* @param[in] nTimeOutInMS - timeout in Milliseconds.
+* @param[out] pPacket - Port.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_TCPIP_DECLSPEC LibMCDriver_TCPIPResult libmcdriver_tcpip_driver_tcpip_receivepacket(LibMCDriver_TCPIP_Driver_TCPIP pDriver_TCPIP, LibMCDriver_TCPIP_uint32 nPacketSize, LibMCDriver_TCPIP_uint32 nTimeOutInMS, LibMCDriver_TCPIP_Driver_TCPIPPacket * pPacket);
 
 /*************************************************************************************************************************
  Global functions

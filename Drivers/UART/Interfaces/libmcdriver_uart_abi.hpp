@@ -158,10 +158,11 @@ LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_is
 *
 * @param[in] pDriver_UART - Driver_UART instance.
 * @param[in] pDeviceAddress - Device Address of COM Port.
+* @param[in] nBaudRate - BaudRate in baud.
 * @param[in] nTimeout - Timeout in milliseconds.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_connect(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pDeviceAddress, LibMCDriver_UART_uint32 nTimeout);
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_connect(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pDeviceAddress, LibMCDriver_UART_uint32 nBaudRate, LibMCDriver_UART_uint32 nTimeout);
 
 /**
 * Disconnects from device
@@ -170,6 +171,28 @@ LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_co
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_disconnect(LibMCDriver_UART_Driver_UART pDriver_UART);
+
+/**
+* Returns if the driver is connected.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pIsConnected - .
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_isconnected(LibMCDriver_UART_Driver_UART pDriver_UART, bool * pIsConnected);
+
+/**
+* Sends a string over UART and waits for a returning string.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] pLineToSend - Line to send
+* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
+* @param[in] nTimeout - Timeout in milliseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_sendline(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer, LibMCDriver_UART_uint32 nTimeout);
 
 /*************************************************************************************************************************
  Global functions
