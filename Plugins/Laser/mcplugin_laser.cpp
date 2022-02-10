@@ -94,8 +94,14 @@ public:
 		pStateEnvironment->LogMessage("Initialising ScanLab Driver");
 
 		auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
-		//pDriver->LoadSDK("rtc6dllx64");
-		pDriver->SetToSimulationMode();
+		if (pStateEnvironment->GetBoolParameter("cardconfig", "simulatelaser")) {
+			pStateEnvironment->LogMessage("Laser Simulation enabled!...");
+			pDriver->SetToSimulationMode();
+		}
+
+		if (!pDriver->IsSimulationMode()) {
+			pDriver->LoadSDK("rtc6dllx64");
+		}
 
 		auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
 		auto sNetmask = pStateEnvironment->GetStringParameter("cardconfig", "netmask");

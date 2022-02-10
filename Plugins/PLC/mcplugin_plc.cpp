@@ -100,8 +100,11 @@ public:
 		auto nPort = pStateEnvironment->GetIntegerParameter("plcconfig", "port");
 		auto nTimeout = pStateEnvironment->GetIntegerParameter("plcconfig", "timeout");
 
-		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
-		pDriver->SetToSimulationMode();
+		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment); 
+		if (pStateEnvironment->GetBoolParameter("plcconfig", "simulateplc")) {
+			pStateEnvironment->LogMessage("PLC Simulation enabled!...");
+			pDriver->SetToSimulationMode();
+		}
 
 		pStateEnvironment->LogMessage("Connecting to PLC...");
 		pDriver->Connect(sIPAddress, (uint32_t) nPort, (uint32_t) nTimeout);
