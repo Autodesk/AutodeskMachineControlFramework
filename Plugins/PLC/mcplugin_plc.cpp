@@ -46,8 +46,7 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-typedef LibMCDriver_BuR::PDriver_BuR PDriver_BuR;
-typedef LibMCEnv::CDriverCast <LibMCDriver_BuR::CDriver_BuR, LibMCDriver_BuR::CWrapper> PDriverCast_BuR;
+LIBMC_IMPORTDRIVERCLASSES(BuR, BuR)
 
 
 /*************************************************************************************************************************

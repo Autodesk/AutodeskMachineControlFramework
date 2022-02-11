@@ -30,8 +30,8 @@
 		</parametergroup>
 
 		<parametergroup name="configuration" description="Machine Configuration">
-			<parameter name="simulatelaser" description="Simulate laser control" default="0" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
-			<parameter name="simulateplc" description="Simulate PLC behaviour" default="0" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9"/>
+			<parameter name="simulatelaser" description="Simulate laser control" default="1" type="bool" persistent="076c7b5a-7ad7-49bc-9db4-44140402063a"/>
+			<parameter name="simulateplc" description="Simulate PLC behaviour" default="1" type="bool" persistent="d1e8e7d2-8d77-4206-b390-b999300ca8a9"/>
 		</parametergroup>
 
 		<signaldefinition name="signal_preparebuildjob">
@@ -178,7 +178,7 @@
 			<parameter name="ipaddress" description="PLC Ethernet Address" default="127.0.0.1" type="string"/>
 			<parameter name="port" description="PLC Port" default="12000" type="int"/>
 			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
-			<derivedparameter name="simulateplc" statemachine="main" group="configuration" parameter="simulatelaser" />
+			<derivedparameter name="simulateplc" statemachine="main" group="configuration" parameter="simulateplc" />
 		</parametergroup>
 
 		<driverparametergroup name="plcstate" description="BuR State" driver="bur"/>
