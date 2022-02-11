@@ -39,7 +39,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define INVALID_SOCKET 0
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <string.h>
+
+#include <unistd.h>
+
 #endif //_WIN32
+
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -107,7 +117,35 @@ CDriver_TCPIPSocketConnection::CDriver_TCPIPSocketConnection(const std::string& 
 
     m_Socket = ConnectSocket;
 #else
-    throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_NOTIMPLEMENTED);
+
+    struct sockaddr_in serv_addr;
+
+    int iResult;
+
+    memset (&serv_addr, 0, sizeof (serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons (nPort);
+
+    iResult = inet_pton (AF_INET, sIPAddress.c_str (), &serv_addr.sin_addr);
+    if (iResult <= 0) {
+        throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_COULDNOTGETADDRESSINFO, "could not get address info (#" + std::to_string (iResult) + ")");
+    }
+
+
+    int sockfd = 0;
+    sockfd = socket (AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0)
+        throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_COULDNOTCREATESOCKET);
+
+    m_Socket = sockfd;
+
+
+    iResult = connect (sockfd, (struct sockaddr*) &serv_addr, sizeof (serv_addr));
+    if (iResult < 0) {
+        throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_COULDNOTCONNECT, "could not connect to " + sIPAddress + " (#" + std::to_string (iResult) + ")");
+    }
+
+
 #endif //_WIN32
 
 
@@ -132,14 +170,18 @@ void CDriver_TCPIPSocketConnection::sendBuffer(const uint8_t* pBuffer, size_t nC
             throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_INVALIDPARAM);
 
 #ifdef _WIN32
-
         int iResult = send(m_Socket, (const char*)pBuffer, (int) nCount, 0);
         if (iResult == SOCKET_ERROR) {
             disconnect();
             throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_SENDERROR, "could not send data to socket: " + std::to_string(WSAGetLastError()));
         } 
+
 #else
-        throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_NOTIMPLEMENTED);
+        int iResult = send(m_Socket, (const char*)pBuffer, (int) nCount, 0);
+        if (iResult < 0) {
+            disconnect();
+            throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_SENDERROR);
+        } 
 #endif //_WIN32
 
     }
@@ -154,6 +196,10 @@ bool CDriver_TCPIPSocketConnection::waitForData(uint32_t timeOutInMS)
 #ifdef _WIN32
     struct timeval timeout;
     struct fd_set fds;
+#else
+    timeval timeout;
+    fd_set fds;
+#endif
 
     timeout.tv_sec = (timeOutInMS / 1000);
     timeout.tv_usec = (timeOutInMS % 1000) * 1000;
@@ -164,9 +210,6 @@ bool CDriver_TCPIPSocketConnection::waitForData(uint32_t timeOutInMS)
     int selectionResult = select (0, &fds, 0, 0, &timeout);
 
     return selectionResult > 0;
-#else
-    return false;
-#endif //_WIN32
 
 }
 
@@ -185,11 +228,12 @@ void CDriver_TCPIPSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, 
 
         uint32_t totalBytesReceived = 0;
 
-#ifdef _WIN32
         while (totalBytesReceived < nCount) {
 
             uint8_t* pData = &Buffer[oldSize + totalBytesReceived];
-            int bytesReceived = recv(m_Socket, (char*)pData, (int)nCount, 0);
+	    int totalBytesToReceive = nCount - totalBytesReceived;
+
+            int bytesReceived = recv(m_Socket, (char*)pData, (int)totalBytesToReceive, 0);
 
             if (bytesReceived == 0) {
                 disconnect();
@@ -197,7 +241,11 @@ void CDriver_TCPIPSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, 
             }
 
             if (bytesReceived < 0)
+#ifdef _WIN32
                 throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_RECEIVEERROR, "socket receive error: " + std::to_string(WSAGetLastError()));
+#else
+                throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_RECEIVEERROR);
+#endif
 
             totalBytesReceived += bytesReceived;
             if (!bMustReceiveAll)
@@ -207,9 +255,6 @@ void CDriver_TCPIPSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, 
 
         if (totalBytesReceived != nCount)
             Buffer.resize(oldSize + nCount);
-#else
-        throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_NOTIMPLEMENTED);
-#endif // _WIN32
     }
 }
 
@@ -220,6 +265,12 @@ void CDriver_TCPIPSocketConnection::disconnect()
     if (m_Socket != INVALID_SOCKET) {
         closesocket(m_Socket);
     }
+#else
+    if (m_Socket != INVALID_SOCKET) {
+	close (m_Socket);
+    }
+    
+
 #endif //_WIN32
 
     m_Socket = INVALID_SOCKET;
