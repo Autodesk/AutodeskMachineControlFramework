@@ -595,8 +595,8 @@ export default class AMCApplication extends Common.AMCObject {
 			
 			if (this.AppContent.FormEntityMap.has (entityUUID)) {			
 				let entity = this.AppContent.FormEntityMap.get (entityUUID);
-				if (entity.value) {
-					let formValue = entity.value;
+				if (entity.dataObject) {
+					let formValue = entity.dataObject.value;
 					resultObject[entityUUID] = formValue;
 				}
 			}

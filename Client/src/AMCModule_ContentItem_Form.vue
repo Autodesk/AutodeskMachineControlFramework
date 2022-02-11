@@ -10,7 +10,7 @@
 
 			<v-row dense no-gutters :key="entity.name" v-if="(entity.type=='switch')">
 				<v-col cols="10"><v-subheader v-text="entity.caption"></v-subheader></v-col>
-				<v-col cols="2"><v-switch dense hide-details persistent-hint inset /></v-col>
+				<v-col cols="2"><v-switch dense hide-details persistent-hint inset v-model="entity.dataObject.value" @change="uiToggleSwitch (entity)" /></v-col>
 			</v-row>
 
 			<v-row dense no-gutters :key="entity.name" v-if="(entity.type=='memo')">
@@ -35,13 +35,16 @@
 	  methods: {	
 		uiToggleSwitch: function (switchentity) {
 		
-			if (switchentity.dataObject.value != switchentity.dataObject.remotevalue) {
-				if (switchentity.changeevent != "") {
-				
-					console.log ("change event!");
-				
-					var formvalues = this.Application.assembleFormValues ([ switchentity.uuid ]);
-					this.Application.triggerUIEvent (switchentity.changeevent, switchentity.uuid, formvalues);
+			if (switchentity.dataObject) {
+		
+				if (switchentity.dataObject.value != switchentity.dataObject.remotevalue) {
+					if (switchentity.changeevent != "") {
+					
+						console.log ("change event!");
+					
+						var formvalues = this.Application.assembleFormValues ([ switchentity.uuid ]);
+						this.Application.triggerUIEvent (switchentity.changeevent, switchentity.uuid, formvalues);
+					}
 				}
 			}
 		}

@@ -327,6 +327,54 @@ public:
 	virtual bool IsSimulationMode() = 0;
 
 	/**
+	* IDriver_UART::SetParity - Sets a parity mode for the next connection.
+	* @param[in] eParity - Parity mode.
+	*/
+	virtual void SetParity(const LibMCDriver_UART::eUARTParity eParity) = 0;
+
+	/**
+	* IDriver_UART::GetParity - Returns parity mode of the next connection.
+	* @return Parity mode.
+	*/
+	virtual LibMCDriver_UART::eUARTParity GetParity() = 0;
+
+	/**
+	* IDriver_UART::SetStopBits - Sets the stop bits for the next connection.
+	* @param[in] eStopBits - Stop bits
+	*/
+	virtual void SetStopBits(const LibMCDriver_UART::eUARTStopBits eStopBits) = 0;
+
+	/**
+	* IDriver_UART::GetStopBits - Returns the stop bits of the next connection.
+	* @return Stop bits
+	*/
+	virtual LibMCDriver_UART::eUARTStopBits GetStopBits() = 0;
+
+	/**
+	* IDriver_UART::SetByteSize - Sets the bytesize for the next connection.
+	* @param[in] eByteSize - Stop bits
+	*/
+	virtual void SetByteSize(const LibMCDriver_UART::eUARTByteSize eByteSize) = 0;
+
+	/**
+	* IDriver_UART::GetByteSize - Returns the bytesize of the next connection.
+	* @return Stop bits
+	*/
+	virtual LibMCDriver_UART::eUARTByteSize GetByteSize() = 0;
+
+	/**
+	* IDriver_UART::SetFlowControl - Sets the flow control for the next connection.
+	* @param[in] eFlowControl - Flow control
+	*/
+	virtual void SetFlowControl(const LibMCDriver_UART::eUARTFlowControl eFlowControl) = 0;
+
+	/**
+	* IDriver_UART::GetFlowControl - Returns the flow control of the next connection.
+	* @return Flow control
+	*/
+	virtual LibMCDriver_UART::eUARTFlowControl GetFlowControl() = 0;
+
+	/**
 	* IDriver_UART::Connect - Connects to a UART device.
 	* @param[in] sDeviceAddress - Device Address of COM Port.
 	* @param[in] nBaudRate - BaudRate in baud.

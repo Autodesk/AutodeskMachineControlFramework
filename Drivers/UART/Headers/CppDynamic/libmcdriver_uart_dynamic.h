@@ -141,6 +141,78 @@ typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SetToSimulationMod
 typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_IsSimulationModePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, bool * pSimulationModeEnabled);
 
 /**
+* Sets a parity mode for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eParity - Parity mode.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SetParityPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTParity eParity);
+
+/**
+* Returns parity mode of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pParity - Parity mode.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_GetParityPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTParity * pParity);
+
+/**
+* Sets the stop bits for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eStopBits - Stop bits
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SetStopBitsPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTStopBits eStopBits);
+
+/**
+* Returns the stop bits of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pStopBits - Stop bits
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_GetStopBitsPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTStopBits * pStopBits);
+
+/**
+* Sets the bytesize for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eByteSize - Stop bits
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SetByteSizePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTByteSize eByteSize);
+
+/**
+* Returns the bytesize of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pByteSize - Stop bits
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_GetByteSizePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTByteSize * pByteSize);
+
+/**
+* Sets the flow control for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eFlowControl - Flow control
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SetFlowControlPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTFlowControl eFlowControl);
+
+/**
+* Returns the flow control of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pFlowControl - Flow control
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_GetFlowControlPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTFlowControl * pFlowControl);
+
+/**
 * Connects to a UART device.
 *
 * @param[in] pDriver_UART - Driver_UART instance.
@@ -265,6 +337,14 @@ typedef struct {
 	PLibMCDriver_UARTDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_UARTDriver_UART_SetToSimulationModePtr m_Driver_UART_SetToSimulationMode;
 	PLibMCDriver_UARTDriver_UART_IsSimulationModePtr m_Driver_UART_IsSimulationMode;
+	PLibMCDriver_UARTDriver_UART_SetParityPtr m_Driver_UART_SetParity;
+	PLibMCDriver_UARTDriver_UART_GetParityPtr m_Driver_UART_GetParity;
+	PLibMCDriver_UARTDriver_UART_SetStopBitsPtr m_Driver_UART_SetStopBits;
+	PLibMCDriver_UARTDriver_UART_GetStopBitsPtr m_Driver_UART_GetStopBits;
+	PLibMCDriver_UARTDriver_UART_SetByteSizePtr m_Driver_UART_SetByteSize;
+	PLibMCDriver_UARTDriver_UART_GetByteSizePtr m_Driver_UART_GetByteSize;
+	PLibMCDriver_UARTDriver_UART_SetFlowControlPtr m_Driver_UART_SetFlowControl;
+	PLibMCDriver_UARTDriver_UART_GetFlowControlPtr m_Driver_UART_GetFlowControl;
 	PLibMCDriver_UARTDriver_UART_ConnectPtr m_Driver_UART_Connect;
 	PLibMCDriver_UARTDriver_UART_DisconnectPtr m_Driver_UART_Disconnect;
 	PLibMCDriver_UARTDriver_UART_IsConnectedPtr m_Driver_UART_IsConnected;

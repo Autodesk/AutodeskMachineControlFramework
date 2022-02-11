@@ -54,6 +54,11 @@
 		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
 		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />		
 		<error name="COULDNOTCONNECT" code="1003" description="the driver is not connected" />		
+
+		<error name="INVALIDBYTESIZE" code="1004" description="invalid byte size" />		
+		<error name="INVALIDPARITY" code="1005" description="invalid parity" />		
+		<error name="INVALIDFLOWCONTROL" code="1006" description="invalid flow control" />		
+		<error name="INVALIDSTOPBITS" code="1007" description="invalid stop bits" />		
 		
 	</errors>
 
@@ -112,6 +117,32 @@ Custom implementation
 
 -->
 
+	<enum name="UARTParity">
+		<option name="None" value="0"/>
+		<option name="Odd" value="1"/>
+		<option name="Even" value="2"/>
+		<option name="Mark" value="3"/>
+		<option name="Space" value="4"/>
+	</enum>	
+
+	<enum name="UARTStopBits">
+		<option name="OneStopBit" value="1"/>
+		<option name="TwoStopBits" value="2"/>
+		<option name="OnePointFiveStopBits" value="3"/>
+	</enum>	
+
+	<enum name="UARTByteSize">
+		<option name="FiveBits" value="5"/>
+		<option name="SixBits" value="6"/>
+		<option name="SevenBits" value="7"/>
+		<option name="EightBits" value="8"/>
+	</enum>	
+
+	<enum name="UARTFlowControl">
+		<option name="NoFlowControl" value="0"/>
+		<option name="Software" value="1"/>
+		<option name="Hardware" value="2"/>
+	</enum>	
 
 	<class name="Driver_UART" parent="Driver" description="A generic UART Driver.">
 
@@ -121,6 +152,40 @@ Custom implementation
 		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
 			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
 		</method>	
+		
+		
+		<method name="SetParity" description="Sets a parity mode for the next connection.">
+			<param name="Parity" type="enum" class="UARTParity" pass="in" description="Parity mode." />		
+		</method>
+
+		<method name="GetParity" description="Returns parity mode of the next connection.">
+			<param name="Parity" type="enum" class="UARTParity" pass="return" description="Parity mode." />		
+		</method>
+
+		<method name="SetStopBits" description="Sets the stop bits for the next connection.">
+			<param name="StopBits" type="enum" class="UARTStopBits" pass="in" description="Stop bits" />		
+		</method>
+
+		<method name="GetStopBits" description="Returns the stop bits of the next connection.">
+			<param name="StopBits" type="enum" class="UARTStopBits" pass="return" description="Stop bits" />		
+		</method>
+
+		<method name="SetByteSize" description="Sets the bytesize for the next connection.">
+			<param name="ByteSize" type="enum" class="UARTByteSize" pass="in" description="Stop bits" />		
+		</method>
+
+		<method name="GetByteSize" description="Returns the bytesize of the next connection.">
+			<param name="ByteSize" type="enum" class="UARTByteSize" pass="return" description="Stop bits" />		
+		</method>
+		
+		<method name="SetFlowControl" description="Sets the flow control for the next connection.">
+			<param name="FlowControl" type="enum" class="UARTFlowControl" pass="in" description="Flow control" />		
+		</method>
+
+		<method name="GetFlowControl" description="Returns the flow control of the next connection.">
+			<param name="FlowControl" type="enum" class="UARTFlowControl" pass="return" description="Flow control" />		
+		</method>
+		
 
 		<method name="Connect" description= "Connects to a UART device.">
 			<param name="DeviceAddress" type="string" pass="in" description="Device Address of COM Port." />

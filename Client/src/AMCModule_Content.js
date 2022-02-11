@@ -220,7 +220,7 @@ class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 				changeevent: entity.changeevent
 			};
 			
-			//this.moduleInstance.page.application.AppContent.FormEntityMap.set (entity.uuid, entity);
+			this.moduleInstance.page.application.AppContent.FormEntityMap.set (entity.uuid, entity);
 		}
 				
 		this.setRefreshFlag ();
@@ -231,25 +231,32 @@ class AMCApplicationItem_Content_Form extends Common.AMCApplicationItem {
 	updateFromJSON (updateJSON)
 	{
 		Assert.ObjectValue (updateJSON);
-		//Assert.ArrayValue (updateJSON.entities);		
 		
-	/*	for (let entityJSON of updateJSON.entities) {
-			if (this.moduleInstance.page.application.AppContent.FormEntityMap.has (entityJSON.uuid)) {
-				let entity = this.moduleInstance.page.application.AppContent.FormEntityMap.get (entityJSON.uuid);
-				
-				if (entity.remotevalue != entityJSON.value) {
-					entity.value = entityJSON.value;
-				}
-				entity.remotevalue = entityJSON.value;
-				entity.prefix = entityJSON.prefix;
-				entity.suffix = entityJSON.suffix;
-				entity.readonly = entityJSON.readonly;
-				entity.disabled = entityJSON.disabled;
-				entity.changeevent = entityJSON.changeevent;
-				
-			}
+		if (updateJSON.entities) {
+			Assert.ArrayValue (updateJSON.entities);
 			
-		} */
+			for (let entityJSON of updateJSON.entities) {
+				if (this.moduleInstance.page.application.AppContent.FormEntityMap.has (entityJSON.uuid)) {
+					let entity = this.moduleInstance.page.application.AppContent.FormEntityMap.get (entityJSON.uuid);					
+					let dataObject = entity.dataObject;
+					
+					Assert.ObjectValue (dataObject);
+					
+					if (dataObject.remotevalue != entityJSON.value) {
+						dataObject.value = entityJSON.value;
+					}
+					dataObject.remotevalue = entityJSON.value;
+					dataObject.prefix = entityJSON.prefix;
+					dataObject.suffix = entityJSON.suffix;
+					dataObject.readonly = entityJSON.readonly;
+					dataObject.disabled = entityJSON.disabled;
+					dataObject.changeevent = entityJSON.changeevent;
+					
+				}
+				
+			} 
+		}
+		
 				
 	}
 	

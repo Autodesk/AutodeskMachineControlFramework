@@ -426,6 +426,9 @@
 		<error name="MACHINEINSTANCENOTFOUND" code="403" description="Machine instance not found" />		
 		<error name="COULDNOTGETTEMPPATHFROMWINDOWS" code="404" description="Could not get temp path from Windows" />		
 		
+		<error name="DUPLICATEBUTTONNAME" code="405" description="Duplicate button name" />		
+		
+		
 		
 
 	

@@ -398,6 +398,206 @@ LibMCDriver_UARTResult libmcdriver_uart_driver_uart_issimulationmode(LibMCDriver
 	}
 }
 
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setparity(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTParity eParity)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		pIDriver_UART->SetParity(eParity);
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getparity(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTParity * pParity)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		if (pParity == nullptr)
+			throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_INVALIDPARAM);
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		*pParity = pIDriver_UART->GetParity();
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setstopbits(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTStopBits eStopBits)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		pIDriver_UART->SetStopBits(eStopBits);
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getstopbits(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTStopBits * pStopBits)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		if (pStopBits == nullptr)
+			throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_INVALIDPARAM);
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		*pStopBits = pIDriver_UART->GetStopBits();
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setbytesize(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTByteSize eByteSize)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		pIDriver_UART->SetByteSize(eByteSize);
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getbytesize(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTByteSize * pByteSize)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		if (pByteSize == nullptr)
+			throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_INVALIDPARAM);
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		*pByteSize = pIDriver_UART->GetByteSize();
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setflowcontrol(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTFlowControl eFlowControl)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		pIDriver_UART->SetFlowControl(eFlowControl);
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getflowcontrol(LibMCDriver_UART_Driver_UART pDriver_UART, eLibMCDriver_UARTUARTFlowControl * pFlowControl)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_UART;
+
+	try {
+		if (pFlowControl == nullptr)
+			throw ELibMCDriver_UARTInterfaceException (LIBMCDRIVER_UART_ERROR_INVALIDPARAM);
+		IDriver_UART* pIDriver_UART = dynamic_cast<IDriver_UART*>(pIBaseClass);
+		if (!pIDriver_UART)
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDCAST);
+		
+		*pFlowControl = pIDriver_UART->GetFlowControl();
+
+		return LIBMCDRIVER_UART_SUCCESS;
+	}
+	catch (ELibMCDriver_UARTInterfaceException & Exception) {
+		return handleLibMCDriver_UARTException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_UARTResult libmcdriver_uart_driver_uart_connect(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pDeviceAddress, LibMCDriver_UART_uint32 nBaudRate, LibMCDriver_UART_uint32 nTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_UART;
@@ -557,6 +757,22 @@ LibMCDriver_UARTResult LibMCDriver_UART::Impl::LibMCDriver_UART_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_settosimulationmode;
 	if (sProcName == "libmcdriver_uart_driver_uart_issimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_issimulationmode;
+	if (sProcName == "libmcdriver_uart_driver_uart_setparity") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_setparity;
+	if (sProcName == "libmcdriver_uart_driver_uart_getparity") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_getparity;
+	if (sProcName == "libmcdriver_uart_driver_uart_setstopbits") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_setstopbits;
+	if (sProcName == "libmcdriver_uart_driver_uart_getstopbits") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_getstopbits;
+	if (sProcName == "libmcdriver_uart_driver_uart_setbytesize") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_setbytesize;
+	if (sProcName == "libmcdriver_uart_driver_uart_getbytesize") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_getbytesize;
+	if (sProcName == "libmcdriver_uart_driver_uart_setflowcontrol") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_setflowcontrol;
+	if (sProcName == "libmcdriver_uart_driver_uart_getflowcontrol") 
+		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_getflowcontrol;
 	if (sProcName == "libmcdriver_uart_driver_uart_connect") 
 		*ppProcAddress = (void*) &libmcdriver_uart_driver_uart_connect;
 	if (sProcName == "libmcdriver_uart_driver_uart_disconnect") 

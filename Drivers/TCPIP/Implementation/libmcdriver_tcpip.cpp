@@ -39,6 +39,7 @@ Interface version: 1.0.0
 #include "libmcdriver_tcpip_abi.hpp"
 #include "libmcdriver_tcpip_interfaces.hpp"
 #include "libmcdriver_tcpip_interfaceexception.hpp"
+#include "libmcdriver_tcpip_driver_tcpip.hpp"
 
 using namespace LibMCDriver_TCPIP;
 using namespace LibMCDriver_TCPIP::Impl;
@@ -74,7 +75,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_NOTIMPLEMENTED);
+	if (sType == "tcpip")
+		return new CDriver_TCPIP(sName, pDriverEnvironment);
+
+	throw ELibMCDriver_TCPIPInterfaceException(LIBMCDRIVER_TCPIP_ERROR_DRIVERERROR, "driver type not found: " + sType);
 }
 
 

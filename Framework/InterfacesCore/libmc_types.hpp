@@ -429,6 +429,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_VIEWPORTCOORDMISSING 402
 #define LIBMC_ERROR_MACHINEINSTANCENOTFOUND 403
 #define LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS 404
+#define LIBMC_ERROR_DUPLICATEBUTTONNAME 405
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -770,6 +771,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_VIEWPORTCOORDMISSING: return "Viewport coordinate missing";
     case LIBMC_ERROR_MACHINEINSTANCENOTFOUND: return "Machine instance not found";
     case LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS: return "Could not get temp path from Windows";
+    case LIBMC_ERROR_DUPLICATEBUTTONNAME: return "Duplicate button name";
     default: return "unknown error";
   }
 }

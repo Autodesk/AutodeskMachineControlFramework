@@ -109,6 +109,10 @@ typedef void * LibMCDriver_UART_pvoid;
 #define LIBMCDRIVER_UART_ERROR_DRIVERNOTINITIALISED 1001
 #define LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED 1002
 #define LIBMCDRIVER_UART_ERROR_COULDNOTCONNECT 1003
+#define LIBMCDRIVER_UART_ERROR_INVALIDBYTESIZE 1004
+#define LIBMCDRIVER_UART_ERROR_INVALIDPARITY 1005
+#define LIBMCDRIVER_UART_ERROR_INVALIDFLOWCONTROL 1006
+#define LIBMCDRIVER_UART_ERROR_INVALIDSTOPBITS 1007
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_UART
@@ -130,6 +134,10 @@ inline const char * LIBMCDRIVER_UART_GETERRORSTRING (LibMCDriver_UARTResult nErr
     case LIBMCDRIVER_UART_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
     case LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
     case LIBMCDRIVER_UART_ERROR_COULDNOTCONNECT: return "the driver is not connected";
+    case LIBMCDRIVER_UART_ERROR_INVALIDBYTESIZE: return "invalid byte size";
+    case LIBMCDRIVER_UART_ERROR_INVALIDPARITY: return "invalid parity";
+    case LIBMCDRIVER_UART_ERROR_INVALIDFLOWCONTROL: return "invalid flow control";
+    case LIBMCDRIVER_UART_ERROR_INVALIDSTOPBITS: return "invalid stop bits";
     default: return "unknown error";
   }
 }
@@ -144,8 +152,43 @@ typedef LibMCDriver_UARTHandle LibMCDriver_UART_Driver_UART;
 
 namespace LibMCDriver_UART {
 
+  /*************************************************************************************************************************
+   Declaration of enums
+  **************************************************************************************************************************/
+  
+  enum class eUARTParity : LibMCDriver_UART_int32 {
+    None = 0,
+    Odd = 1,
+    Even = 2,
+    Mark = 3,
+    Space = 4
+  };
+  
+  enum class eUARTStopBits : LibMCDriver_UART_int32 {
+    OneStopBit = 1,
+    TwoStopBits = 2,
+    OnePointFiveStopBits = 3
+  };
+  
+  enum class eUARTByteSize : LibMCDriver_UART_int32 {
+    FiveBits = 5,
+    SixBits = 6,
+    SevenBits = 7,
+    EightBits = 8
+  };
+  
+  enum class eUARTFlowControl : LibMCDriver_UART_int32 {
+    NoFlowControl = 0,
+    Software = 1,
+    Hardware = 2
+  };
+  
 } // namespace LibMCDriver_UART;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCDriver_UART::eUARTParity eLibMCDriver_UARTUARTParity;
+typedef LibMCDriver_UART::eUARTStopBits eLibMCDriver_UARTUARTStopBits;
+typedef LibMCDriver_UART::eUARTByteSize eLibMCDriver_UARTUARTByteSize;
+typedef LibMCDriver_UART::eUARTFlowControl eLibMCDriver_UARTUARTFlowControl;
 
 #endif // __LIBMCDRIVER_UART_TYPES_HEADER_CPP

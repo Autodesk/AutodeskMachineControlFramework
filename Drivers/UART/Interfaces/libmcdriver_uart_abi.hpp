@@ -154,6 +154,78 @@ LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_se
 LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_issimulationmode(LibMCDriver_UART_Driver_UART pDriver_UART, bool * pSimulationModeEnabled);
 
 /**
+* Sets a parity mode for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eParity - Parity mode.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setparity(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTParity eParity);
+
+/**
+* Returns parity mode of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pParity - Parity mode.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getparity(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTParity * pParity);
+
+/**
+* Sets the stop bits for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eStopBits - Stop bits
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setstopbits(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTStopBits eStopBits);
+
+/**
+* Returns the stop bits of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pStopBits - Stop bits
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getstopbits(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTStopBits * pStopBits);
+
+/**
+* Sets the bytesize for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eByteSize - Stop bits
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setbytesize(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTByteSize eByteSize);
+
+/**
+* Returns the bytesize of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pByteSize - Stop bits
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getbytesize(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTByteSize * pByteSize);
+
+/**
+* Sets the flow control for the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] eFlowControl - Flow control
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_setflowcontrol(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTFlowControl eFlowControl);
+
+/**
+* Returns the flow control of the next connection.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[out] pFlowControl - Flow control
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_getflowcontrol(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART::eUARTFlowControl * pFlowControl);
+
+/**
 * Connects to a UART device.
 *
 * @param[in] pDriver_UART - Driver_UART instance.

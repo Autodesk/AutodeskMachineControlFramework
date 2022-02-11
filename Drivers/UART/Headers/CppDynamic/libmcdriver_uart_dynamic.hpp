@@ -364,6 +364,14 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
+	inline void SetParity(const eUARTParity eParity);
+	inline eUARTParity GetParity();
+	inline void SetStopBits(const eUARTStopBits eStopBits);
+	inline eUARTStopBits GetStopBits();
+	inline void SetByteSize(const eUARTByteSize eByteSize);
+	inline eUARTByteSize GetByteSize();
+	inline void SetFlowControl(const eUARTFlowControl eFlowControl);
+	inline eUARTFlowControl GetFlowControl();
 	inline void Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nBaudRate, const LibMCDriver_UART_uint32 nTimeout);
 	inline void Disconnect();
 	inline bool IsConnected();
@@ -499,6 +507,14 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_UART_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_UART_IsSimulationMode = nullptr;
+		pWrapperTable->m_Driver_UART_SetParity = nullptr;
+		pWrapperTable->m_Driver_UART_GetParity = nullptr;
+		pWrapperTable->m_Driver_UART_SetStopBits = nullptr;
+		pWrapperTable->m_Driver_UART_GetStopBits = nullptr;
+		pWrapperTable->m_Driver_UART_SetByteSize = nullptr;
+		pWrapperTable->m_Driver_UART_GetByteSize = nullptr;
+		pWrapperTable->m_Driver_UART_SetFlowControl = nullptr;
+		pWrapperTable->m_Driver_UART_GetFlowControl = nullptr;
 		pWrapperTable->m_Driver_UART_Connect = nullptr;
 		pWrapperTable->m_Driver_UART_Disconnect = nullptr;
 		pWrapperTable->m_Driver_UART_IsConnected = nullptr;
@@ -628,6 +644,78 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_UART_IsSimulationMode == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_SetParity = (PLibMCDriver_UARTDriver_UART_SetParityPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_setparity");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_SetParity = (PLibMCDriver_UARTDriver_UART_SetParityPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_setparity");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_SetParity == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_GetParity = (PLibMCDriver_UARTDriver_UART_GetParityPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_getparity");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_GetParity = (PLibMCDriver_UARTDriver_UART_GetParityPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_getparity");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_GetParity == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_SetStopBits = (PLibMCDriver_UARTDriver_UART_SetStopBitsPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_setstopbits");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_SetStopBits = (PLibMCDriver_UARTDriver_UART_SetStopBitsPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_setstopbits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_SetStopBits == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_GetStopBits = (PLibMCDriver_UARTDriver_UART_GetStopBitsPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_getstopbits");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_GetStopBits = (PLibMCDriver_UARTDriver_UART_GetStopBitsPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_getstopbits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_GetStopBits == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_SetByteSize = (PLibMCDriver_UARTDriver_UART_SetByteSizePtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_setbytesize");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_SetByteSize = (PLibMCDriver_UARTDriver_UART_SetByteSizePtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_setbytesize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_SetByteSize == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_GetByteSize = (PLibMCDriver_UARTDriver_UART_GetByteSizePtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_getbytesize");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_GetByteSize = (PLibMCDriver_UARTDriver_UART_GetByteSizePtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_getbytesize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_GetByteSize == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_SetFlowControl = (PLibMCDriver_UARTDriver_UART_SetFlowControlPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_setflowcontrol");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_SetFlowControl = (PLibMCDriver_UARTDriver_UART_SetFlowControlPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_setflowcontrol");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_SetFlowControl == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_GetFlowControl = (PLibMCDriver_UARTDriver_UART_GetFlowControlPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_getflowcontrol");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_GetFlowControl = (PLibMCDriver_UARTDriver_UART_GetFlowControlPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_getflowcontrol");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_GetFlowControl == nullptr)
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -775,6 +863,38 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_issimulationmode", (void**)&(pWrapperTable->m_Driver_UART_IsSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_IsSimulationMode == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_setparity", (void**)&(pWrapperTable->m_Driver_UART_SetParity));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SetParity == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_getparity", (void**)&(pWrapperTable->m_Driver_UART_GetParity));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_GetParity == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_setstopbits", (void**)&(pWrapperTable->m_Driver_UART_SetStopBits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SetStopBits == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_getstopbits", (void**)&(pWrapperTable->m_Driver_UART_GetStopBits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_GetStopBits == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_setbytesize", (void**)&(pWrapperTable->m_Driver_UART_SetByteSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SetByteSize == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_getbytesize", (void**)&(pWrapperTable->m_Driver_UART_GetByteSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_GetByteSize == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_setflowcontrol", (void**)&(pWrapperTable->m_Driver_UART_SetFlowControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SetFlowControl == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_getflowcontrol", (void**)&(pWrapperTable->m_Driver_UART_GetFlowControl));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_GetFlowControl == nullptr) )
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_connect", (void**)&(pWrapperTable->m_Driver_UART_Connect));
@@ -939,6 +1059,90 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_IsSimulationMode(m_pHandle, &resultSimulationModeEnabled));
 		
 		return resultSimulationModeEnabled;
+	}
+	
+	/**
+	* CDriver_UART::SetParity - Sets a parity mode for the next connection.
+	* @param[in] eParity - Parity mode.
+	*/
+	void CDriver_UART::SetParity(const eUARTParity eParity)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SetParity(m_pHandle, eParity));
+	}
+	
+	/**
+	* CDriver_UART::GetParity - Returns parity mode of the next connection.
+	* @return Parity mode.
+	*/
+	eUARTParity CDriver_UART::GetParity()
+	{
+		eUARTParity resultParity = (eUARTParity) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_GetParity(m_pHandle, &resultParity));
+		
+		return resultParity;
+	}
+	
+	/**
+	* CDriver_UART::SetStopBits - Sets the stop bits for the next connection.
+	* @param[in] eStopBits - Stop bits
+	*/
+	void CDriver_UART::SetStopBits(const eUARTStopBits eStopBits)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SetStopBits(m_pHandle, eStopBits));
+	}
+	
+	/**
+	* CDriver_UART::GetStopBits - Returns the stop bits of the next connection.
+	* @return Stop bits
+	*/
+	eUARTStopBits CDriver_UART::GetStopBits()
+	{
+		eUARTStopBits resultStopBits = (eUARTStopBits) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_GetStopBits(m_pHandle, &resultStopBits));
+		
+		return resultStopBits;
+	}
+	
+	/**
+	* CDriver_UART::SetByteSize - Sets the bytesize for the next connection.
+	* @param[in] eByteSize - Stop bits
+	*/
+	void CDriver_UART::SetByteSize(const eUARTByteSize eByteSize)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SetByteSize(m_pHandle, eByteSize));
+	}
+	
+	/**
+	* CDriver_UART::GetByteSize - Returns the bytesize of the next connection.
+	* @return Stop bits
+	*/
+	eUARTByteSize CDriver_UART::GetByteSize()
+	{
+		eUARTByteSize resultByteSize = (eUARTByteSize) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_GetByteSize(m_pHandle, &resultByteSize));
+		
+		return resultByteSize;
+	}
+	
+	/**
+	* CDriver_UART::SetFlowControl - Sets the flow control for the next connection.
+	* @param[in] eFlowControl - Flow control
+	*/
+	void CDriver_UART::SetFlowControl(const eUARTFlowControl eFlowControl)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SetFlowControl(m_pHandle, eFlowControl));
+	}
+	
+	/**
+	* CDriver_UART::GetFlowControl - Returns the flow control of the next connection.
+	* @return Flow control
+	*/
+	eUARTFlowControl CDriver_UART::GetFlowControl()
+	{
+		eUARTFlowControl resultFlowControl = (eUARTFlowControl) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_GetFlowControl(m_pHandle, &resultFlowControl));
+		
+		return resultFlowControl;
 	}
 	
 	/**

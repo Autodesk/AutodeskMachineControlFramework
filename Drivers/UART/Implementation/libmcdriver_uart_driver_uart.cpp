@@ -49,8 +49,12 @@ using namespace LibMCDriver_UART::Impl;
 
 
 CDriver_UART::CDriver_UART(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-	: m_sName (sName), m_pDriverEnvironment (pDriverEnvironment), m_bSimulationMode (false)
-{
+	: m_sName (sName), m_pDriverEnvironment (pDriverEnvironment), m_bSimulationMode (false),
+		m_Parity (LibMCDriver_UART::eUARTParity::Even),
+		m_StopBits(LibMCDriver_UART::eUARTStopBits::OneStopBit),
+		m_ByteSize(LibMCDriver_UART::eUARTByteSize::EightBits),
+		m_FlowControl(LibMCDriver_UART::eUARTFlowControl::NoFlowControl)
+{	
 
 }
 
@@ -108,7 +112,46 @@ void CDriver_UART::Connect(const std::string& sDeviceAddress, const LibMCDriver_
 {
 	m_pConnection.reset();
 
-	m_pConnection.reset(new serial::Serial(sDeviceAddress, nBaudRate, serial::Timeout::simpleTimeout(nTimeout)));
+	serial::bytesize_t byteSize;
+	switch (m_ByteSize) {
+		case eUARTByteSize::FiveBits: byteSize = serial::fivebits; break;
+		case eUARTByteSize::SixBits: byteSize = serial::sixbits; break;
+		case eUARTByteSize::SevenBits: byteSize = serial::sevenbits; break;
+		case eUARTByteSize::EightBits: byteSize = serial::eightbits; break;
+		default:
+			throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDBYTESIZE);
+	}
+
+	serial::stopbits_t stopBits;
+	switch (m_StopBits) {
+	case eUARTStopBits::OneStopBit: stopBits = serial::stopbits_one; break;
+	case eUARTStopBits::TwoStopBits: stopBits = serial::stopbits_two; break;
+	case eUARTStopBits::OnePointFiveStopBits: stopBits = serial::stopbits_one_point_five; break;
+	default:
+		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDSTOPBITS);
+	}
+
+	serial::parity_t parity;
+	switch (m_Parity) {
+	case eUARTParity::None: parity = serial::parity_none; break;
+	case eUARTParity::Odd: parity = serial::parity_odd; break;
+	case eUARTParity::Even: parity = serial::parity_even; break;
+	case eUARTParity::Mark: parity = serial::parity_mark; break;
+	case eUARTParity::Space: parity = serial::parity_space; break;
+	default:
+		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDPARITY);
+	}
+
+	serial::flowcontrol_t flowControl;
+	switch (m_FlowControl) {
+	case eUARTFlowControl::NoFlowControl: flowControl = serial::flowcontrol_none; break;
+	case eUARTFlowControl::Software: flowControl = serial::flowcontrol_software; break;
+	case eUARTFlowControl::Hardware: flowControl = serial::flowcontrol_hardware; break;
+	default:
+		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_INVALIDFLOWCONTROL);
+	}
+
+	m_pConnection.reset(new serial::Serial(sDeviceAddress, nBaudRate, serial::Timeout::simpleTimeout(nTimeout), byteSize, parity, stopBits, flowControl));
 
 	if (!m_pConnection->isOpen()) {
 		m_pConnection.reset();
@@ -141,3 +184,42 @@ std::string CDriver_UART::SendLine(const std::string& sLineToSend, const LibMCDr
 }
 
 
+void CDriver_UART::SetParity(const LibMCDriver_UART::eUARTParity eParity)
+{
+	m_Parity = eParity;
+}
+
+LibMCDriver_UART::eUARTParity CDriver_UART::GetParity()
+{
+	return m_Parity;
+}
+
+void CDriver_UART::SetStopBits(const LibMCDriver_UART::eUARTStopBits eStopBits)
+{
+	m_StopBits = eStopBits;
+}
+
+LibMCDriver_UART::eUARTStopBits CDriver_UART::GetStopBits()
+{
+	return m_StopBits;
+}
+
+void CDriver_UART::SetByteSize(const LibMCDriver_UART::eUARTByteSize eByteSize)
+{
+	m_ByteSize = eByteSize;
+}
+
+LibMCDriver_UART::eUARTByteSize CDriver_UART::GetByteSize()
+{
+	return m_ByteSize;
+}
+
+void CDriver_UART::SetFlowControl(const LibMCDriver_UART::eUARTFlowControl eFlowControl)
+{
+	m_FlowControl = eFlowControl;
+}
+
+LibMCDriver_UART::eUARTFlowControl CDriver_UART::GetFlowControl()
+{
+	return m_FlowControl;
+}

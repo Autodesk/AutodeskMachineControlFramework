@@ -448,7 +448,7 @@ void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObj
 		entityArray.addObject(entityObject);
 	}
 
-	object.addArray(AMC_API_KEY_UI_ITEMENTRIES, entityArray);
+	object.addArray(AMC_API_KEY_UI_FORMENTITIES, entityArray);
 }
 
 void CUIModule_ContentForm::populateClientVariables(CParameterHandler* pClientVariableHandler)

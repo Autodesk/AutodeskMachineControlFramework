@@ -66,13 +66,14 @@ namespace AMC {
 		std::string m_sCaption;
 		std::string m_sTargetPage;
 		std::string m_sEvent;
+		std::string m_sButtonName;
 
 		std::string m_sEventFormValueSetting;
 		std::list<PUIModule_ContentFormEntity> m_pFormValues;
 
 	public:
 
-		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValueSetting);
+		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sEventFormValueSetting);
 
 		virtual ~CUIModule_ContentButton();
 
@@ -86,6 +87,8 @@ namespace AMC {
 
 		std::string getEventFormValueSetting();
 
+		std::string getButtonName();
+
 		void addFormFieldValue(PUIModule_ContentFormEntity pEntity);
 
 		void writeFormValuesToJSON (CJSONWriterArray & pArray);
@@ -95,6 +98,7 @@ namespace AMC {
 	class CUIModule_ContentButtonGroup : public CUIModule_ContentItem {
 	protected:		
 		std::list<PUIModule_ContentButton> m_Buttons;
+		std::map<std::string, PUIModule_ContentButton> m_ButtonMap;
 		CUIModule_ContentRegistry* m_pFormOwner;
 
 		eUIModule_ContentButtonDistribution m_ButtonDistribution;
@@ -109,7 +113,7 @@ namespace AMC {
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
-		PUIModule_ContentButton addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sEventFormValues);
+		PUIModule_ContentButton addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sEventFormValues);
 
 		virtual void configurePostLoading() override;
 
@@ -121,6 +125,8 @@ namespace AMC {
 
 		static eUIModule_ContentButtonDistribution stringToButtonDistribution(const std::string & sValue);
 		static std::string buttonDistributionToString(const eUIModule_ContentButtonDistribution buttonDistribution);
+
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
 
 

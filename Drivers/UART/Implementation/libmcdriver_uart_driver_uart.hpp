@@ -70,6 +70,11 @@ private:
 
 	std::unique_ptr<serial::Serial> m_pConnection;
 
+	LibMCDriver_UART::eUARTParity m_Parity;
+	LibMCDriver_UART::eUARTStopBits m_StopBits;
+	LibMCDriver_UART::eUARTByteSize m_ByteSize;
+	LibMCDriver_UART::eUARTFlowControl m_FlowControl;
+
 protected:
 
 public:
@@ -101,6 +106,23 @@ public:
 	bool IsConnected() override;
 
 	std::string SendLine(const std::string& sLineToSend, const LibMCDriver_UART_uint32 nTimeout) override;
+
+	void SetParity(const LibMCDriver_UART::eUARTParity eParity) override;
+
+	LibMCDriver_UART::eUARTParity GetParity() override;
+
+	void SetStopBits(const LibMCDriver_UART::eUARTStopBits eStopBits) override;
+
+	LibMCDriver_UART::eUARTStopBits GetStopBits() override;
+
+	void SetByteSize(const LibMCDriver_UART::eUARTByteSize eByteSize) override;
+
+	LibMCDriver_UART::eUARTByteSize GetByteSize() override;
+
+	void SetFlowControl(const LibMCDriver_UART::eUARTFlowControl eFlowControl) override;
+
+	LibMCDriver_UART::eUARTFlowControl GetFlowControl() override;
+
 
 };
 
