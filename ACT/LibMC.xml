@@ -428,11 +428,11 @@
 		
 		<error name="DUPLICATEBUTTONNAME" code="405" description="Duplicate button name" />		
 		
+		<error name="SERVERCONFIGURATIONNOTLOADED" code="406" description="Server configuration not loaded" />
+		<error name="COULDNOTPARSESERVERCONFIGURATION" code="407" description="Could not pars server configuration" />
+		<error name="MISSINGSERVERCONFIGURATIONNODE" code="408" description="Missing server configuration node" />
+		<error name="COULDNOTFINDLIBRARYENTRY" code="409" description="Could not find library entry" />
 		
-		
-
-	
-
 	</errors>
 	
 	

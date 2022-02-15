@@ -62,7 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCCommon {
 
 #define LIBMC_MAXSTRINGBUFFERSIZE (1024 * 1024 * 1024)
-#define LIBMC_MAXRANDOMSTRINGITERATIONS 1024
 
 	// Lookup table to convert UTF8 bytes to sequence length
 	const unsigned char UTF8DecodeTable[256] = {
@@ -567,12 +566,6 @@ namespace AMCCommon {
 
 
 
-	std::string CUtils::createUUID()
-	{
-		auto guid = xg::newGuid ();		
-		return normalizeUUIDString (guid.str());
-	}
-
 	std::string CUtils::createEmptyUUID()
 	{
 		return "00000000-0000-0000-0000-000000000000";
@@ -626,42 +619,6 @@ namespace AMCCommon {
 	}
 
 
-	// Returns a UUID, such that sBasePath/sPrefixUUID.extension does not exist.
-	// Tries out maximum nMaxIterations different random uuids.
-	std::string CUtils::findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string& sExtension, const uint32_t nMaxIterations)
-	{
-		if (sBasePath.empty())
-			throw std::runtime_error("empty temporary file base path");
-
-		std::string sBasePathWithDelimiter = sBasePath;
-		std::string sExtensionWithPoint;
-
-		if (!sExtension.empty()) {
-			if (sExtension.at(0) != '.') {
-				sExtensionWithPoint = "." + sExtension;
-			}
-			else {
-				sExtensionWithPoint = sExtension;
-			}
-
-		}
-
-		char lastChar = sBasePathWithDelimiter.at(sBasePathWithDelimiter.length() - 1);
-		if ((lastChar != '/') && (lastChar != '\\'))
-			sBasePathWithDelimiter += "/";
-
-		for (uint32_t nIndex = 0; nIndex < nMaxIterations; nIndex++) {
-			std::string sUUID = createUUID();
-			std::string sFullPath = sBasePathWithDelimiter + sPrefix + sUUID + sExtensionWithPoint;
-
-			if (!fileOrPathExistsOnDisk(sFullPath))
-				return sFullPath;
-
-		}
-
-		throw std::runtime_error("could not create temporary file path");
-
-	}
 
 
 	bool CUtils::fileOrPathExistsOnDisk(const std::string& sPathName)
@@ -669,9 +626,9 @@ namespace AMCCommon {
 
 #ifdef _WIN32
 		std::wstring sFileNameUTF16 = UTF8toUTF16(sPathName);
-		return PathFileExistsW(sFileNameUTF16.c_str ());
+		return PathFileExistsW(sFileNameUTF16.c_str());
 #else
-		if (access(sPathName.c_str (), F_OK) != -1) {
+		if (access(sPathName.c_str(), F_OK) != -1) {
 			return true;
 		}
 		else {
@@ -772,21 +729,6 @@ namespace AMCCommon {
 
 	}
 
-
-
-	std::string CUtils::calculateRandomSHA256String(const uint32_t nIterations)
-	{
-		if ((nIterations == 0) || (nIterations > LIBMC_MAXRANDOMSTRINGITERATIONS))
-			throw std::runtime_error("invalid random string iterations");
-
-		std::string sRandomString;
-
-		uint32_t nCount = nIterations + (((uint32_t) rand()) % nIterations);
-		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++)
-			sRandomString += createUUID();
-
-		return calculateSHA256FromString(sRandomString);
-	}
 
 	std::string CUtils::encodeBase64(const std::string& sString, eBase64Type eType)
 	{		

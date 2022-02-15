@@ -430,6 +430,10 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MACHINEINSTANCENOTFOUND 403
 #define LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS 404
 #define LIBMC_ERROR_DUPLICATEBUTTONNAME 405
+#define LIBMC_ERROR_SERVERCONFIGURATIONNOTLOADED 406
+#define LIBMC_ERROR_COULDNOTPARSESERVERCONFIGURATION 407
+#define LIBMC_ERROR_MISSINGSERVERCONFIGURATIONNODE 408
+#define LIBMC_ERROR_COULDNOTFINDLIBRARYENTRY 409
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -772,6 +776,10 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MACHINEINSTANCENOTFOUND: return "Machine instance not found";
     case LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS: return "Could not get temp path from Windows";
     case LIBMC_ERROR_DUPLICATEBUTTONNAME: return "Duplicate button name";
+    case LIBMC_ERROR_SERVERCONFIGURATIONNOTLOADED: return "Server configuration not loaded";
+    case LIBMC_ERROR_COULDNOTPARSESERVERCONFIGURATION: return "Could not pars server configuration";
+    case LIBMC_ERROR_MISSINGSERVERCONFIGURATIONNODE: return "Missing server configuration node";
+    case LIBMC_ERROR_COULDNOTFINDLIBRARYENTRY: return "Could not find library entry";
     default: return "unknown error";
   }
 }
