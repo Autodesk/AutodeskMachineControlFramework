@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.5)
 
-### The implementation of the Machine Control library component
 project(LibMC)
 
 add_subdirectory(Drivers)
@@ -46,6 +45,98 @@ set(CMAKE_CURRENT_HEADERS_DEV_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Framework/HeadersD
 
 file(STRINGS ${PROJECT_BINARY_DIR}/githash.txt GLOBALGITHASH)
 message(STATUS "Global git hash: \"${GLOBALGITHASH}\"")
+
+
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ SQLite Dependency
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+if(WIN32)
+	if (NOT MSVC)
+		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
+	endif (MSVC)
+
+elseif(UNIX AND NOT APPLE)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
+endif()
+
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ Copy Framework Target
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+add_custom_target(copy_framework ALL)
+
+file (GLOB framework_files_dev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/HeadersDev/CppDynamic/*.*")
+foreach(framework_file_dev ${framework_files_dev})
+
+	get_filename_component(framework_file_devname ${framework_file_dev} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_dev}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_dev}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/HeadersDev/CppDynamic/${framework_file_devname})
+				
+				
+endforeach()
+
+
+file (GLOB framework_files_intfdev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/InterfacesDev/*.*")
+foreach(framework_file_intfdev ${framework_files_intfdev})
+
+	get_filename_component(framework_file_intfdevname ${framework_file_intfdev} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_intfdev}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_intfdev}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/InterfacesDev/${framework_file_intfdevname})				
+				
+endforeach()
+
+
+file (GLOB framework_files_plugincpp LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/PluginCpp/*.*")
+foreach(framework_file_plugincpp ${framework_files_plugincpp})
+
+	get_filename_component(framework_file_plugincppname ${framework_file_plugincpp} NAME)
+	
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_plugincpp}...")
+
+	add_custom_command(
+        TARGET copy_framework PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${framework_file_plugincpp}
+                ${CMAKE_CURRENT_BINARY_DIR}/Framework/PluginCpp/${framework_file_plugincppname})				
+				
+endforeach()
+
+
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ LibMC Core Library
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
 
 file(GLOB LIBMC_SRC_CORE
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Core/*.cpp 
@@ -112,62 +203,6 @@ set(LIBMC_SRC
   ${LIBMC_SRC_DEP_CROSSGUID}
 )
 
-add_custom_target(copy_framework ALL)
-
-file (GLOB framework_files_dev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/HeadersDev/CppDynamic/*.*")
-foreach(framework_file_dev ${framework_files_dev})
-
-	get_filename_component(framework_file_devname ${framework_file_dev} NAME)
-	
-	add_custom_command(
-        TARGET copy_framework PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_dev}...")
-
-	add_custom_command(
-        TARGET copy_framework PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                ${framework_file_dev}
-                ${CMAKE_CURRENT_BINARY_DIR}/Framework/HeadersDev/CppDynamic/${framework_file_devname})
-				
-				
-endforeach()
-
-
-file (GLOB framework_files_intfdev LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/InterfacesDev/*.*")
-foreach(framework_file_intfdev ${framework_files_intfdev})
-
-	get_filename_component(framework_file_intfdevname ${framework_file_intfdev} NAME)
-	
-	add_custom_command(
-        TARGET copy_framework PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_intfdev}...")
-
-	add_custom_command(
-        TARGET copy_framework PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                ${framework_file_intfdev}
-                ${CMAKE_CURRENT_BINARY_DIR}/Framework/InterfacesDev/${framework_file_intfdevname})				
-				
-endforeach()
-
-
-file (GLOB framework_files_plugincpp LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/Framework/PluginCpp/*.*")
-foreach(framework_file_plugincpp ${framework_files_plugincpp})
-
-	get_filename_component(framework_file_plugincppname ${framework_file_plugincpp} NAME)
-	
-	add_custom_command(
-        TARGET copy_framework PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "copying ${framework_file_plugincpp}...")
-
-	add_custom_command(
-        TARGET copy_framework PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                ${framework_file_plugincpp}
-                ${CMAKE_CURRENT_BINARY_DIR}/Framework/PluginCpp/${framework_file_plugincppname})				
-				
-endforeach()
-
 add_library(libmc SHARED ${LIBMC_SRC})
 add_dependencies(libmc copy_framework)
 
@@ -196,6 +231,23 @@ target_include_directories(libmc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/l
 target_include_directories(libmc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries)
 target_include_directories(libmc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
 
+
+if(WIN32)
+
+	if (MSVC)
+		target_link_libraries(libmc Winmm.lib)
+		target_link_libraries(libmc Shlwapi.lib)
+	else()
+		target_link_libraries(libmc winmm.lib)
+		target_link_libraries(libmc shlwapi.lib)
+		target_link_options(libmc PRIVATE -static-libgcc -static-libstdc++ --static )
+	endif (MSVC)
+	
+elseif(UNIX AND NOT APPLE)
+
+endif()
+
+
 set_target_properties(libmc
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Output"
@@ -209,7 +261,13 @@ set_target_properties(libmc
     
 )
 
+#[[++
 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ LibMC Data Model Library
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
 
 file(GLOB LIBMCDATA_SRC_DATAMODEL
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/DataModel/*.cpp
@@ -250,25 +308,18 @@ set_target_properties(libmcdata PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
 if(WIN32)
 
 if (MSVC)
-	target_link_libraries(libmc Winmm.lib)
-	target_link_libraries(libmc Shlwapi.lib)
 	target_link_libraries(libmcdata Winmm.lib)
 	target_link_libraries(libmcdata Shlwapi.lib)
 	target_link_libraries(libmcdata ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite/sqlite3.lib)
 else()
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
-	target_link_libraries(libmc winmm.lib)
-        target_link_libraries(libmc shlwapi.lib)
-        target_link_libraries(libmcdata winmm.lib)
-        target_link_libraries(libmcdata shlwapi.lib)
-        target_link_libraries(libmcdata SQLite3)
-        target_link_options(libmc PRIVATE -static-libgcc -static-libstdc++ --static )
-        target_link_options(libmcdata PRIVATE -static-libgcc -static-libstdc++ --static )
+	target_link_libraries(libmcdata winmm.lib)
+	target_link_libraries(libmcdata shlwapi.lib)
+	target_link_libraries(libmcdata SQLite3)
+	target_link_options(libmcdata PRIVATE -static-libgcc -static-libstdc++ --static )
 endif (MSVC)
 
 elseif(UNIX AND NOT APPLE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
-target_link_libraries(libmcdata SQLite3)
+	target_link_libraries(libmcdata SQLite3)
 endif()
 
 # This makes sure symbols are exported
@@ -305,6 +356,13 @@ set_target_properties(libmcdata
     
 )
 
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ Configuration XML Target
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
 
 
 add_custom_target(configuration_xml ALL DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml)
@@ -330,6 +388,14 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_CURRENT_SOURCE_DIR}/Plugins/config.xml
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_config.xml)
+
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ Copy Distribution Libraries Target
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
 
 add_custom_target(copy_distribution_libraries ALL)
 add_dependencies(copy_distribution_libraries copy_framework)
@@ -394,7 +460,7 @@ endif()
 #[[++
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-++ AMC Server Project Definition
+++ AMC Server Target
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ]]
@@ -413,7 +479,12 @@ file(GLOB SERVER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
+
+if(WIN32)
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/win/*.c
+else()
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/unix/*.c
+endif(WIN32)
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
