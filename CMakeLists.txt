@@ -477,13 +477,9 @@ file(GLOB SERVER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
-
 if(WIN32)
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/win/*.c
-else()
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/unix/*.c
 endif(WIN32)
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
