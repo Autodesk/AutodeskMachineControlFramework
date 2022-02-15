@@ -472,21 +472,35 @@ file(GLOB SERVER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_io.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_configuration.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML/pugixml.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/eventing/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib/*.c
-if(WIN32)
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/win/*.c
-endif(WIN32)
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
 )
 
-add_executable(server ${SERVER_SRC})
+if(WIN32)
+
+file(GLOB SERVER_USOCKETS
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/eventing/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/win/*.c
+)
+
+else()
+
+file(GLOB SERVER_USOCKETS
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/eventing/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
+)
+
+endif(WIN32)
+
+add_executable(server ${SERVER_SRC} ${SERVER_USOCKETS})
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_HEADERS_CORE_DIR})
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/)
