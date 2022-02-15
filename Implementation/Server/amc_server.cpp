@@ -71,7 +71,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 	uint32_t nMinorFrameworkVersion = 0;
 	uint32_t nMicroFrameworkVersion = 0;
 
-	/*log("Loading server configuration...");
+	log("Loading server configuration...");
 
 	std::string sConfigurationXML = m_pServerIO->readConfigurationXMLString(sConfigurationFileName);
 	m_pServerConfiguration = std::make_shared<CServerConfiguration>(sConfigurationXML);
@@ -98,6 +98,10 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 	m_pContext = m_pWrapper->CreateMCContext(m_pDataModel);
 
 	//Register Library Path
+	auto libraryList = m_pServerConfiguration->getLibraryNames();
+	for (auto sLibraryName : libraryList) {
+		m_pContext->RegisterLibraryPath(sLibraryName, m_pServerConfiguration->getLibraryPath(sLibraryName), m_pServerConfiguration->getResourcePath(sLibraryName));
+	}
 
 	m_pContext->Log ("Loading " + m_pServerConfiguration->getPackageName () + " (" + m_pServerConfiguration->getPackageConfig () + ")", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
 	std::string sPackageConfigurationXML = m_pServerIO->readConfigurationXMLString(m_pServerConfiguration->getPackageConfig());
@@ -108,19 +112,110 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 	m_pContext->Log("Loading " + m_pServerConfiguration->getPackageCoreClient() + "...", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
 	m_pContext->LoadClientPackage(m_pServerConfiguration->getPackageCoreClient ());
 
-	m_pContext->StartAllThreads(); */
+	m_pContext->StartAllThreads(); 
+
+	auto pContext = m_pContext;
+
+	std::string sHostName = m_pServerConfiguration->getHostName();
+	uint32_t nPort = m_pServerConfiguration->getPort();
+
+	uWS::App().get("/*", [pContext, this](auto* res, auto* req) {
+
+		try {
+
+			std::string sAuthorization = std::string(req->getHeader ("authorization"));
+			std::string sURL = std::string(req->getUrl());
+			std::cout << "Get Request: " << sURL << std::endl;
+
+			std::vector <uint8_t> Buffer;
+			std::vector <uint8_t> ResultBuffer;
+			std::string sContentType;
+			uint32_t nHttpCode;
+
+			auto pHandler = pContext->CreateAPIRequestHandler(sURL, "GET", sAuthorization);
+			pHandler->Handle(Buffer, sContentType, nHttpCode);
+
+			pHandler->GetResultData(ResultBuffer);
+
+			if (!ResultBuffer.empty()) {
+				std::string_view StringView(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());
+				res->end(StringView);
+			}
+			else {
+				res->end("");
+			}
 
 
-	/* Overly simple hello world app */
-	uWS::App().get("/*", [](auto* res, auto*/*req*/) {
+
+		}
+		catch (std::exception& E) {
+			res->end("");
+			this->log("Fatal Error: " + std::string (E.what ()));
+		} 
+		catch (...) {
+			res->end("");
+			this->log("Unknown fatal error");
+		}
+
+	}).post("/*", [pContext, this](auto* res, auto* req) {
+
+		try {
+
+			std::string sAuthorization = std::string(req->getHeader("authorization"));
+			std::string sURL = std::string(req->getUrl());
+			std::cout << "Post Request: " << sURL << std::endl;
+
+			std::vector <uint8_t> Buffer;
+			std::vector <uint8_t> ResultBuffer;
+			std::string sContentType;
+			uint32_t nHttpCode;
+
+			auto pHandler = pContext->CreateAPIRequestHandler(sURL, "POST", sAuthorization);
+			uint32_t nFieldCount = 0;
+
+			if (pHandler->ExpectsFormData(nFieldCount)) {
+
+			}
+
+			pHandler->Handle(Buffer, sContentType, nHttpCode);
+
+			pHandler->GetResultData(ResultBuffer);
+
+			if (!ResultBuffer.empty()) {
+				std::string_view StringView(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());
+				res->end(StringView);
+			}
+			else {
+				res->end("");
+			}
+
+
+
+		}
+		catch (std::exception& E) {
+			res->end("");
+			this->log("Fatal Error: " + std::string(E.what()));
+		}
+		catch (...) {
+			res->end("");
+			this->log("Unknown fatal error");
+		}
+
+
+	}).put("/*", [pContext](auto* res, auto* req) {
+
 		res->end("Hello world!");
-	}).listen(3000, [](auto* listen_socket) {
+
+		std::cout << "Put Request: " << req->getUrl() << std::endl;
+
+
+	}).listen(sHostName, nPort, [ this, sHostName, nPort ](auto* listen_socket) {
 		if (listen_socket) {
-			std::cout << "Listening on port " << 3000 << std::endl;
+			this->log("Listening on " + sHostName + ":" + std::to_string (nPort));
 		}
 	}).run();
 
-	std::cout << "Failed to listen on port 3000" << std::endl;
+	this->log("Failed to listen on " + sHostName + ":" + std::to_string(nPort));
 }
 
 

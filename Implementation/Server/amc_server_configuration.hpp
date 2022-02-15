@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <memory>
 #include <map>
+#include <set>
 
 #include "libmcdata_dynamic.hpp"
 
@@ -65,6 +66,7 @@ namespace AMC {
 		std::string m_sDataDirectory;
 		LibMCData::eDataBaseType m_DataBaseType;
 		std::string m_sConnectionString;
+
 		std::string m_sPackageName;
 		std::string m_sPackageCoreClient;
 		std::string m_sPackageConfig;
@@ -87,6 +89,10 @@ namespace AMC {
 
 		std::string getLibraryPath(const std::string & sLibraryName);
 		std::string getResourcePath(const std::string& sLibraryName);
+
+		std::set<std::string> getLibraryNames ();
+
+		void loadPackageXML(const std::string sPackageFileName);
 
 	};
 

@@ -433,6 +433,27 @@
 		<error name="MISSINGSERVERCONFIGURATIONNODE" code="408" description="Missing server configuration node" />
 		<error name="COULDNOTFINDLIBRARYENTRY" code="409" description="Could not find library entry" />
 		
+		<error name="INVALIDPORT" code="410" description="Invalid port" />
+		<error name="MISSINGDATANODE" code="411" description="Missing data node" />
+		<error name="MISSINGDATADIRECTORY" code="412" description="Missing data directory" />
+		<error name="DATADIRECTORYDOESNOTEXISTS" code="413" description="Data directory does not exist:" />
+		<error name="INVALIDDATADIRECTORY" code="414" description="Invalid data directory" />
+		<error name="INVALIDSQLITEDBPATH" code="415" description="Missing SQLite DB Path" />
+		<error name="INVALIDDATABASETYPE" code="416" description="Invalid database type" />
+		<error name="DEFAULTPACKAGEMISSING" code="417" description="Default package missing" />
+		<error name="DEFAULTPACKAGENAMEMISSING" code="418" description="Default package name missing" />
+
+		<error name="COULDNOTPARSEPACKAGEXML" code="419" description="Could not parse package xml" />
+		<error name="MISSINGPACKAGENODE" code="420" description="Missing package node" />
+		<error name="MISSINGBUILDNODE" code="421" description="Missing build node" />
+		<error name="MISSINGBUILDNAME" code="422" description="Missing build name" />
+		<error name="MISSINGCONFIGURATIONNAME" code="423" description="Missing configuration name" />
+		<error name="MISSINGCORECLIENT" code="424" description="Missing core client" />
+		<error name="MISSINGLIBRARYNAME" code="425" description="Missing library name" />
+		<error name="MISSINGLIBRARYIMPORTNAME" code="426" description="Missing library import name" />
+		<error name="DUPLICATELIBRARYNAME" code="427" description="Duplicate library name" />
+
+		  
 	</errors>
 	
 	

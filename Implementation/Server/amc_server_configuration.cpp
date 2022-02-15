@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_server_configuration.hpp"
 #include "libmc_dynamic.hpp"
+#include "common_utils.hpp"
+#include "common_importstream_native.hpp"
 
 #include <iostream>
 #include <pugixml.hpp>
@@ -37,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 #define XMLNS_SERVERCONFIG "http://schemas.autodesk.com/amc/2020/06"
-#define XMLNS_PACKAGECONFIG "http://schemas.autodesk.com/amc/2020/06"
+#define XMLNS_PACKAGECONFIG "http://schemas.autodesk.com/amcpackage/2020/06"
 
 CServerLibrary::CServerLibrary(const std::string& sLibraryPath, const std::string& sResourcePath)
 	: m_sLibraryPath (sLibraryPath), m_sResourcePath (sResourcePath)
@@ -81,6 +83,71 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 	if (xmlns != XMLNS_SERVERCONFIG)
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDXMLSCHEMA, "Invalid XML Schema: " + xmlns);
 
+
+	auto serverNode = amcNode.child("server");
+	if (serverNode.empty ())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGSERVERNODE, "Missing server node");
+
+	auto hostnameAttrib = serverNode.attribute("hostname");
+	m_sHostName = hostnameAttrib.as_string();
+	if (m_sHostName.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGHOSTNAME, "Missing host name");
+
+
+	auto portAttrib = serverNode.attribute("port");
+	if (portAttrib.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGPORT, "Missing port");
+	m_nPort = portAttrib.as_uint(0);
+	if ((m_nPort < 0x0400) || (m_nPort > 0xBFFF)) 
+		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPORT, "Invalid port: " + std::string (portAttrib.as_string ()));
+
+
+
+	auto dataNode = amcNode.child("data");
+	if (dataNode.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGDATANODE, "Missing data node");
+
+	auto directoryAttrib = dataNode.attribute("directory");
+	std::string sDataDirectory = directoryAttrib.as_string();
+	if (sDataDirectory.empty ())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGDATADIRECTORY, "Missing data directory");
+	m_sDataDirectory = AMCCommon::CUtils::getFullPathName (sDataDirectory);
+
+	if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(m_sDataDirectory)) {
+		throw LibMC::ELibMCException(LIBMC_ERROR_DATADIRECTORYDOESNOTEXISTS, "Data directory does not exist: " + m_sDataDirectory);
+	}
+
+	if (!AMCCommon::CUtils::pathIsDirectory (m_sDataDirectory))
+		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDDATADIRECTORY, "Invalid data directory: " + m_sDataDirectory);
+
+	auto dataBaseTypeAttrib = dataNode.attribute("database");
+	std::string sDataBaseType = dataBaseTypeAttrib.as_string();
+	if (sDataBaseType == "sqlite") {
+
+		auto sqLiteDBAttrib = dataNode.attribute("sqlitedb");
+		std::string sSQLiteDB = sqLiteDBAttrib.as_string();
+		if (sSQLiteDB.empty ())
+			throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDSQLITEDBPATH, "Missing SQLite DB Path");
+
+		m_DataBaseType = LibMCData::eDataBaseType::SqLite;
+		m_sConnectionString = AMCCommon::CUtils::getFullPathName (AMCCommon::CUtils::includeTrailingPathDelimiter(m_sDataDirectory) + sSQLiteDB);
+
+	}
+	else {
+
+		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDDATABASETYPE, "Invalid database type: " + sDataBaseType);
+	}
+
+	auto defaultPackageNode = amcNode.child("defaultpackage");
+	if (defaultPackageNode.empty ())
+		throw LibMC::ELibMCException(LIBMC_ERROR_DEFAULTPACKAGEMISSING, "Default package missing");
+
+	auto defaultPackageNameAttrib = defaultPackageNode.attribute("name");
+	std::string sDefaultPackageName = defaultPackageNameAttrib.as_string ();
+	if (sDefaultPackageName.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_DEFAULTPACKAGENAMEMISSING, "Default package name missing");
+
+	loadPackageXML(AMCCommon::CUtils::getFullPathName (sDefaultPackageName));
 }
 
 
@@ -145,4 +212,83 @@ std::string CServerConfiguration::getResourcePath(const std::string& sLibraryNam
 		throw LibMC::ELibMCException(LIBMC_ERROR_COULDNOTFINDLIBRARYENTRY, "Could not find library entry: " + sLibraryName);
 
 	return iIter->second->getResourcePath();
+}
+
+std::set<std::string> CServerConfiguration::getLibraryNames()
+{
+	std::set<std::string> libraryNames;
+	for (auto iIter : m_Libraries) {
+		libraryNames.insert(iIter.first);
+	}
+
+	return libraryNames;
+}
+
+
+void CServerConfiguration::loadPackageXML(const std::string sPackageFileName)
+{
+	AMCCommon::CImportStream_Native importStream(sPackageFileName);
+	std::string packageXMLString = importStream.readAsString();
+
+	pugi::xml_document xmlDoc;
+	pugi::xml_parse_result result = xmlDoc.load_string(packageXMLString.c_str());
+	if (!result)
+		throw LibMC::ELibMCException(LIBMC_ERROR_COULDNOTPARSEPACKAGEXML, "Could not parse package xml");
+
+
+	auto packageNode = xmlDoc.child("amcpackage");
+	if (packageNode.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGPACKAGENODE, "Missing package node");
+
+	auto xmlnsAttrib = packageNode.attribute("xmlns");
+	if (xmlnsAttrib.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGXMLSCHEMA, "Missing XML Schema: " + sPackageFileName);
+
+	std::string xmlns(xmlnsAttrib.as_string());
+	if (xmlns != XMLNS_PACKAGECONFIG)
+		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDXMLSCHEMA, "Invalid XML Schema: " + xmlns);
+
+	auto buildNode = packageNode.child("build");
+	if (buildNode.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGBUILDNODE, "Missing build node");
+
+	std::string sName = buildNode.attribute("name").as_string ();
+	if (sName.empty ())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGBUILDNAME, "Missing build name");
+
+	std::string sConfigurationName = buildNode.attribute("configuration").as_string();
+	if (sConfigurationName.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGCONFIGURATIONNAME, "Missing configuration name");
+
+	std::string sCoreClient = buildNode.attribute("coreclient").as_string();
+	if (sCoreClient.empty())
+		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGCORECLIENT, "Missing core client");
+
+	m_sPackageName = sName;
+	m_sPackageConfig = AMCCommon::CUtils::getFullPathName(sConfigurationName);
+	m_sPackageCoreClient = AMCCommon::CUtils::getFullPathName(sCoreClient);
+
+	auto libraries = buildNode.children("library");
+	for (auto libraryNode : libraries) {
+
+		std::string libraryName = libraryNode.attribute("name").as_string ();
+		if (libraryName.empty ())
+			throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGLIBRARYNAME, "Missing library name");
+
+		std::string libraryImport = libraryNode.attribute("import").as_string();
+		if (libraryImport.empty())
+			throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGLIBRARYIMPORTNAME, "Missing library import name: " + libraryName);
+		std::string libraryImportPath = AMCCommon::CUtils::getFullPathName(libraryImport);
+
+		std::string libraryResources = libraryNode.attribute("resources").as_string();
+		std::string libraryResourcePath;
+		if (!libraryResources.empty())
+			libraryResourcePath = AMCCommon::CUtils::getFullPathName(libraryResources);
+
+		if (m_Libraries.find (libraryName) != m_Libraries.end ())
+			throw LibMC::ELibMCException(LIBMC_ERROR_DUPLICATELIBRARYNAME, "Duplicate library name: " + libraryName);
+
+		m_Libraries.insert(std::make_pair (libraryName, std::make_shared<CServerLibrary>(libraryImportPath, libraryResourcePath)));
+	}
+
 }

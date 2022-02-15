@@ -82,6 +82,11 @@ namespace AMCCommon {
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
 		static void deleteDirectoryFromDisk(const std::string& sPath, bool MustSucceed);
 		static void createDirectoryOnDisk(const std::string& sPath);
+		static std::string getFullPathName(const std::string& sRelativePath);
+		static bool pathIsDirectory(const std::string& sPathName);
+
+		static char getPathDelimiter();
+		static std::string includeTrailingPathDelimiter(const std::string& sPathName);
 
 		static std::string findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string & sExtension, const uint32_t nMaxIterations);
 		static std::set<std::string> findContentOfDirectory(const std::string & sDirectory, bool bReturnFiles, bool bReturnDirectories);

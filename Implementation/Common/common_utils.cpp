@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <shlwapi.h>
 #include <iomanip>
 #else
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <ctime>
 #include <unistd.h>
@@ -62,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCCommon {
 
 #define LIBMC_MAXSTRINGBUFFERSIZE (1024 * 1024 * 1024)
+#define LIBMC_MAXPATHBUFFERSIZE 65536
 
 	// Lookup table to convert UTF8 bytes to sequence length
 	const unsigned char UTF8DecodeTable[256] = {
@@ -618,6 +620,32 @@ namespace AMCCommon {
 #endif
 	}
 
+	std::string CUtils::getFullPathName(const std::string& sRelativePath)
+	{
+
+		if (sRelativePath.empty())
+			throw std::runtime_error("empty relative path");
+
+#ifdef _WIN32
+
+		std::wstring sRelativePathW = UTF8toUTF16(sRelativePath);		
+		std::vector<wchar_t> Buffer;
+		Buffer.resize(LIBMC_MAXPATHBUFFERSIZE + 1);
+
+		DWORD nCount = GetFullPathNameW(sRelativePathW.c_str(), LIBMC_MAXPATHBUFFERSIZE, Buffer.data(), nullptr);
+		if (nCount == 0) 
+			throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string (GetLastError ()) + ")");
+
+		Buffer[LIBMC_MAXPATHBUFFERSIZE] = 0;
+
+		return UTF16toUTF8(Buffer.data());		
+
+#else
+		throw std::runtime_error("absolute path resolving not implemented!");
+#endif
+
+
+	}
 
 
 
@@ -638,6 +666,59 @@ namespace AMCCommon {
 
 	}
 
+	char CUtils::getPathDelimiter()
+	{
+#ifdef _WIN32
+		return '\\';
+#else
+		return '/';
+#endif 
+	}
+
+	std::string CUtils::includeTrailingPathDelimiter(const std::string& sPathName)
+	{
+		char delimiter = getPathDelimiter();		
+
+		if (!sPathName.empty()) {
+
+			char lastChar = *sPathName.rbegin();
+			if ((lastChar == '/') || (lastChar == '\\'))
+				return sPathName;
+
+			return sPathName + delimiter;
+
+		}
+		else
+		{
+			return std::string () + delimiter;
+		}
+	
+		
+	}
+
+
+	bool CUtils::pathIsDirectory(const std::string& sPathName)
+	{
+#ifdef _WIN32
+		std::wstring sPathNameW = UTF8toUTF16(sPathName);
+		DWORD dwAttrib = GetFileAttributesW(sPathNameW.c_str());
+
+		return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+			(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+
+#else
+		std::string sAbsolutePath = getFullPathName(sPathName);
+
+		if (access(sAbsolutePath.c_str(), 0) == 0) {
+
+			struct stat status;
+			stat(sAbsolutePath.c_str (), &status);
+
+			return (status.st_mode & S_IFDIR) != 0;
+		}
+		return false;
+#endif
+	}
 
 
 	std::string CUtils::calculateBlockwiseSHA256FromFile(const std::string& sFileNameUTF8, uint32_t nBlockSize)
