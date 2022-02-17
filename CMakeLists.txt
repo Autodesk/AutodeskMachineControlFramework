@@ -408,16 +408,28 @@ if(WIN32)
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf.dll
+			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf_win64.dll
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.dll)
 endif()
 
 if(UNIX)
+if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*armv7.*")
+
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf.so
+			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf_arm32.so
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
+
+else()
+
+add_custom_command(
+	TARGET copy_distribution_libraries POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf_linux64.so
+			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
+
+endif()
 endif()
 
 

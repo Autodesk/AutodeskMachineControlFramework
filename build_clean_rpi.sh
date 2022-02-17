@@ -60,6 +60,7 @@ export GOARCH=arm
 export GOOS=linux
 export GOARM=5
 go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
 
 echo "Building Go Server..."
 go get "github.com/gorilla/handlers"
@@ -80,7 +81,7 @@ go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcs
 #npm install
 #npm run build
 
-#go run ../../Server/createDist.go ../Output $GITHASH
+go run ../../Server/createDist.go ../Output $GITHASH
 
 cd "$builddir"
 
