@@ -81,6 +81,8 @@ go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcs
 #npm install
 #npm run build
 
+unzip precompiled_client.zip $builddir/Client/
+
 go run ../../Server/createDist.go ../Output $GITHASH
 
 cd "$builddir"
