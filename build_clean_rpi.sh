@@ -34,6 +34,7 @@ dirs_to_make[22]="$builddir/Client/src"
 dirs_to_make[23]="$builddir/Client/src/plugins"
 dirs_to_make[24]="$builddir/Client/dist"
 dirs_to_make[25]="$builddir/Artifacts"
+dirs_to_make[26]="$outputdir/data"
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -52,15 +53,18 @@ git rev-parse --verify --short HEAD > "$builddir/githash.txt"
 GITHASH=$(<"$builddir/githash.txt")
 echo "git hash: $GITHASH"
 
-cd "$basepath"
+git rev-parse --verify HEAD > "$builddir/longgithash.txt"
+GITHASH=$(<"$builddir/longgithash.txt")
+echo "long git hash: $LONGGITHASH"
 
+cd "$basepath"
 
 echo "Building Resource builder (LinuxARM)..."
 export GOARCH=arm
 export GOOS=linux
 export GOARM=5
-go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
-go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
+go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
 echo "Building Go Server..."
 go get "github.com/gorilla/handlers"
@@ -71,7 +75,7 @@ go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcs
 
 cp ../../Artifacts/clientdist/clientpackage.zip ../Output/${GITHASH}_core.client
 
-go run ../../Server/createPackageXML.go ../Output $GITHASH rpi
+go run ../../BuildScripts/createPackageXML.go ../Output $GITHASH rpi
 
 cd "$builddir"
 
@@ -80,7 +84,7 @@ cmake ..
 cmake --build . --config Release
 
 echo "Building Core Resources"
-go run ../Server/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
+go run ../BuildScripts/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
 
 echo "Building Developer Package"
 cd "$builddir/DevPackage"
@@ -97,10 +101,9 @@ cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
-#cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
-go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH} rpi
+go run ../../BuildScripts/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH} rpi
 
-cp $builddir/DevPackage/AMCF_${GITHASH}.zip $builddir/Artifacts/devpackage.zip
+cp $builddir/DevPackage/amcf_rpi_${GITHASH}.zip $builddir/Artifacts/devpackage.zip
 
 echo "Build done!"
