@@ -42,6 +42,7 @@ func main() {
 	}
 
 	var Root DistXMLRoot;
+	Root.XMLNs = "http://schemas.autodesk.com/amc/resourcepackage/2020/07";
 				
 	inputPath := argsWithProg[1];
 	outputFileName := argsWithProg[2];

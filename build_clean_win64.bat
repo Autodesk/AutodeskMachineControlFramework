@@ -3,7 +3,7 @@ set GO111MODULE=off
 
 set basepath=%~dp0
 echo %basepath%
-set builddir=%basepath%\build_win64
+set builddir=%basepath%build_win64
 set outputdir=%builddir%\Output
 
 if not exist "%builddir%" (mkdir "%builddir%")
@@ -26,8 +26,15 @@ if not exist "%builddir%\Framework\HeadersDriver\CppDynamic" (mkdir "%builddir%\
 if not exist "%builddir%\Framework\InterfacesDev" (mkdir "%builddir%\Framework\InterfacesDev")
 if not exist "%builddir%\Framework\PluginCpp" (mkdir "%builddir%\Framework\PluginCpp")
 
-copy "%basepath%\Framework\PluginCpp\*.*" "%builddir%\Framework\PluginCpp"
-copy "%basepath%\Framework\InterfacesDev\*.*" "%builddir%\Framework\InterfacesDev"
+copy /y "%basepath%\Framework\PluginCpp\*.*" "%builddir%\Framework\PluginCpp"
+if "%ERRORLEVEL%" neq "0" (
+	goto ERROR
+)
+
+copy /y  "%basepath%\Framework\InterfacesDev\*.*" "%builddir%\Framework\InterfacesDev"
+if "%ERRORLEVEL%" neq "0" (
+	goto ERROR
+)
 
 git rev-parse --verify --short HEAD >"%builddir%\githash.txt"
 SET /p GITHASH=<"%builddir%\githash.txt"
@@ -61,7 +68,10 @@ set GOOS=windows
 go get github.com/gorilla/handlers
 go build -o "%builddir%/Output/amc_server.exe" -ldflags="-s -w" "%basepath%/Server/mcserver.go"
 
-copy "%basepath%\Artifacts\clientdist\clientpackage.zip" "%builddir%\Framework\Dist\%GITHASH%_core.client"
+copy /y "%basepath%Artifacts\clientdist\clientpackage.zip" "%builddir%\Output\%GITHASH%_core.client"
+if "%ERRORLEVEL%" neq "0" (
+	goto ERROR
+)
 
 go run "%basepath%\BuildScripts\createPackageXML.go" "%builddir%\Output" %GITHASH% win64
 
@@ -95,6 +105,14 @@ go run "%basepath%/BuildScripts/createDevPackage.go" .\DevPackage\Framework .\De
 
 echo "Build done!"
 
+goto END
+
+:ERROR
+echo "------------------------------------------------------------"
+echo "FATAL BUILD ERROR!"
+echo "------------------------------------------------------------"
+
+:END
 if "%1" neq "NOPAUSE" (
 	pause
 )
