@@ -83,7 +83,7 @@ go run ../../Server/createDist.go ../Output $GITHASH win64
 cd "$builddir"
 
 echo "Building Core Modules"
-cmake -DCMAKE_TOOLCHAIN_FILE=$basepath/CMake/CrossCompile_Win32FromDebian.txt ..
+cmake -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
 cmake --build . --config Release
 
 echo "Building Core Resources"

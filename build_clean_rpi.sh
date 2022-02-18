@@ -69,21 +69,9 @@ set GOOS=linux
 set GOARM=5
 go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
+cp ../../Artifacts/clientdist/clientpackage.zip ../Output/${GITHASH}_core.client
 
-#cp "$basepath/Client/public/"*.* "$builddir/Client/public"
-#cp "$basepath/Client/src/"*.* "$builddir/Client/src"
-#cp "$basepath/Client/src/plugins/"*.* "$builddir/Client/src/plugins"
-#cp "$basepath/Client/"*.js "$builddir/Client"
-#cp "$basepath/Client/"*.json "$builddir/Client"
-
-#cd "$builddir/Client"
-
-#npm install
-#npm run build
-
-unzip precompiled_client.zip $builddir/Client/
-
-go run ../../Server/createDist.go ../Output $GITHASH
+go run ../../Server/createPackageXML.go ../Output $GITHASH rpi
 
 cd "$builddir"
 
@@ -103,7 +91,7 @@ cp ../Output/${GITHASH}_core_libmc.so Framework/Dist/
 cp ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
 cp ../Output/${GITHASH}_core_libmcdata.so Framework/Dist/
 cp ../Output/${GITHASH}_*.data Framework/Dist/
-cp ../Output/${GITHASH}_*.client Framework/Dist/
+cp ../Output/${GITHASH}_core.client Framework/Dist/
 cp ../Output/${GITHASH}_package.xml Framework/Dist/
 cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
@@ -111,7 +99,7 @@ cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 #cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
-go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
+go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH} rpi
 
 cp $builddir/DevPackage/AMCF_${GITHASH}.zip $builddir/Artifacts/devpackage.zip
 

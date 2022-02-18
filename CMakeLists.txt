@@ -56,9 +56,9 @@ message(STATUS "Global git hash: \"${GLOBALGITHASH}\"")
 ]]
 
 if(WIN32)
-	if (NOT MSVC)
-		add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
-	endif (MSVC)
+if(NOT MSVC)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
+endif()
 
 elseif(UNIX AND NOT APPLE)
 	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Libraries/SQLite)
@@ -408,7 +408,7 @@ if(WIN32)
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf_win64.dll
+			${CMAKE_CURRENT_SOURCE_DIR}/Artifacts/lib3mf/lib3mf_win64.dll
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.dll)
 endif()
 
@@ -418,7 +418,7 @@ if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*armv7.*")
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf_arm32.so
+			${CMAKE_CURRENT_SOURCE_DIR}/Artifacts/lib3mf/lib3mf_arm32.so
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
 
 else()
@@ -426,7 +426,7 @@ else()
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Libraries/lib3mf/lib3mf_linux64.so
+			${CMAKE_CURRENT_SOURCE_DIR}/Artifacts/lib3mf/lib3mf_linux64.so
 			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
 
 endif()
@@ -533,6 +533,8 @@ target_link_libraries(server ws2_32.lib)
 target_link_libraries(server Userenv.lib)
 target_link_libraries(server psapi.lib)
 target_link_libraries(server Iphlpapi.lib)
+else()
+target_link_libraries(server dl)
 endif(WIN32)
 
 set_target_properties(server
@@ -547,3 +549,5 @@ set_target_properties(server
 	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	
     
 )
+
+

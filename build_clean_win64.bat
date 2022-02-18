@@ -8,6 +8,7 @@ set outputdir=%builddir%\Output
 
 if not exist "%builddir%" (mkdir "%builddir%")
 if not exist "%outputdir%" (mkdir "%outputdir%")
+if not exist "%outputdir%\data" (mkdir "%outputdir%\data")
 if not exist "%builddir%\DevPackage" (mkdir "%builddir%\DevPackage")
 if not exist "%builddir%\DevPackage\Framework" (mkdir "%builddir%\DevPackage\Framework")
 if not exist "%builddir%\DevPackage\Framework\HeadersDev" (mkdir "%builddir%\DevPackage\Framework\HeadersDev")
@@ -16,7 +17,6 @@ if not exist "%builddir%\DevPackage\Framework\HeadersDriver" (mkdir "%builddir%\
 if not exist "%builddir%\DevPackage\Framework\HeadersDriver\CppDynamic" (mkdir "%builddir%\DevPackage\Framework\HeadersDriver\CppDynamic")
 if not exist "%builddir%\DevPackage\Framework\InterfacesDev" (mkdir "%builddir%\DevPackage\Framework\InterfacesDev")
 if not exist "%builddir%\DevPackage\Framework\PluginCpp" (mkdir "%builddir%\DevPackage\Framework\PluginCpp")
-if not exist "%builddir%\DevPackage\Framework\PluginPython" (mkdir "%builddir%\DevPackage\Framework\PluginPython")
 if not exist "%builddir%\DevPackage\Framework\Dist" (mkdir "%builddir%\DevPackage\Framework\Dist")
 if not exist "%builddir%\Framework" (mkdir "%builddir%\Framework")
 if not exist "%builddir%\Framework\HeadersDev" (mkdir "%builddir%\Framework\HeadersDev")
@@ -61,11 +61,9 @@ set GOOS=windows
 go get github.com/gorilla/handlers
 go build -o "%builddir%/Output/amc_server.exe" -ldflags="-s -w" "%basepath%/Server/mcserver.go"
 
-echo "Building Client"
-cd "%basepath%\Client"
-call build_client_clean.bat
-cd "%builddir%\Client"
-go run ../../Server/createDist.go ../Output %GITHASH% win64
+copy "%builddir%\Artifacts\clientpackage.zip" "%builddir%\Framework\Dist\%GITHASH%_core.client"
+
+go run "%basepath%\BuildScripts\createPackageXML.go" "%builddir%\Output" %GITHASH% win64
 
 cd "%builddir%"
 
@@ -83,14 +81,13 @@ copy ..\Output\amc_server.xml Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmc.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_lib3mf.dll Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmcdata.dll Framework\Dist\
+copy ..\Output\%GITHASH%_core.client Framework\Dist\
 copy ..\Output\%GITHASH%_*.data Framework\Dist\
-copy ..\Output\%GITHASH%_*.client Framework\Dist\
 copy ..\Output\%GITHASH%_package.xml Framework\Dist\
 copy ..\Output\%GITHASH%_driver_*.dll Framework\Dist\
 copy ..\..\Framework\HeadersDev\CppDynamic\*.* Framework\HeadersDev\CppDynamic
 copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
 copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
-copy ..\..\Framework\PluginPython\*.* Framework\PluginPython
 del Framework\Dist\%GITHASH%_core.data
 
 go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %LONGGITHASH% win64
