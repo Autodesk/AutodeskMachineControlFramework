@@ -128,12 +128,8 @@ func main() {
 	CoreResourcesName := hexSum + "_core.data";
 	LibraryName := hexSum + "_core_libmc." + dllExtension;
 	ConfigName := hexSum + "_config.xml";
-	
-	DistXMLName := "package.xml";
-	
-	packageName := "Build " + hexSum;
-	
-
+		
+	packageName := "Build " + hexSum;	
 
 	fmt.Printf("creating server config in %s\n", OutputDir);
 	

@@ -42,18 +42,18 @@ cd /d "%basepath%"
 echo "Building Resource builder (Win64)..."
 set GOARCH=amd64
 set GOOS=windows
-go build -o "%builddir%/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+go build -o "%builddir%/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "%basepath%/BuildScripts/buildresources.go"
 
 REM echo "Building Resource builder (Linux64)..."
 REM set GOARCH=amd64
 REM set GOOS=linux
-REM go build -o "%builddir%/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+REM go build -o "%builddir%/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "%basepath%/BuildScripts/buildresources.go"
 
 REM echo "Building Resource builder (LinuxARM)..."
 REM set GOARCH=arm
 REM set GOOS=linux
 REM set GOARM=5
-REM go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "%basepath%/Server/buildresources.go"
+REM go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "%basepath%/BuildScripts/buildresources.go"
 
 echo "Building Server..."
 set GOARCH=amd64
@@ -61,7 +61,7 @@ set GOOS=windows
 go get github.com/gorilla/handlers
 go build -o "%builddir%/Output/amc_server.exe" -ldflags="-s -w" "%basepath%/Server/mcserver.go"
 
-copy "%builddir%\Artifacts\clientpackage.zip" "%builddir%\Framework\Dist\%GITHASH%_core.client"
+copy "%basepath%\Artifacts\clientdist\clientpackage.zip" "%builddir%\Framework\Dist\%GITHASH%_core.client"
 
 go run "%basepath%\BuildScripts\createPackageXML.go" "%builddir%\Output" %GITHASH% win64
 
@@ -90,7 +90,8 @@ copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
 copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
 del Framework\Dist\%GITHASH%_core.data
 
-go run ../../Artifacts/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %LONGGITHASH% win64
+cd %builddir%
+go run "%basepath%/BuildScripts/createDevPackage.go" .\DevPackage\Framework .\DevPackage\ %LONGGITHASH% win64
 
 echo "Build done!"
 
