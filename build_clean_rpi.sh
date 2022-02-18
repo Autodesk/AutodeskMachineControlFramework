@@ -73,11 +73,11 @@ set GOOS=linux
 set GOARM=5
 go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
-cp ../../Artifacts/clientdist/clientpackage.zip ../Output/${GITHASH}_core.client
-
-go run ../../BuildScripts/createPackageXML.go ../Output $GITHASH rpi
+cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
 
 cd "$builddir"
+go run "$basepath/BuildScripts/createPackageXML.go" ./Output $GITHASH rpi
+
 
 echo "Building Core Modules"
 cmake ..
