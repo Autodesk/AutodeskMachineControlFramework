@@ -63,7 +63,6 @@ echo "Building Resource builder (LinuxARM)..."
 export GOARCH=arm
 export GOOS=linux
 export GOARM=5
-go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
 echo "Building Go Server..."
@@ -101,9 +100,10 @@ cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
+rm Framework/Dist/${GITHASH}_core.data
 
-go run ../../BuildScripts/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH} rpi
+go run ../../BuildScripts/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${LONGGITHASH} rpi
 
-cp $builddir/DevPackage/amcf_rpi_${GITHASH}.zip $builddir/Artifacts/devpackage.zip
+cp $builddir/DevPackage/amcf_rpi_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
 
 echo "Build done!"
