@@ -90,7 +90,7 @@ copy ..\..\Framework\InterfacesDev\*.* Framework\InterfacesDev
 copy ..\..\Framework\PluginCpp\*.* Framework\PluginCpp
 del Framework\Dist\%GITHASH%_core.data
 
-go run ../../Server/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %LONGGITHASH% win64
+go run ../../Artifacts/createDevPackage.go %builddir%\DevPackage\Framework %builddir%\DevPackage\ %LONGGITHASH% win64
 
 echo "Build done!"
 
