@@ -413,7 +413,7 @@ add_custom_command(
 endif()
 
 if(UNIX)
-if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*armv7.*")
+if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*arm.*")
 
 add_custom_command(
 	TARGET copy_distribution_libraries POST_BUILD
@@ -450,8 +450,8 @@ endif()
 
 
 if(UNIX)
-	if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*armv7.*")
-		message("armv7 detected")
+	if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*arm.*")
+		message("arm detected")
 		add_custom_command(
 			TARGET create_core_resources POST_BUILD
 			COMMAND ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.arm
