@@ -54,7 +54,7 @@ GITHASH=$(<"$builddir/githash.txt")
 echo "git hash: $GITHASH"
 
 git rev-parse --verify HEAD > "$builddir/longgithash.txt"
-GITHASH=$(<"$builddir/longgithash.txt")
+LONGGITHASH=$(<"$builddir/longgithash.txt")
 echo "long git hash: $LONGGITHASH"
 
 cd "$basepath"
