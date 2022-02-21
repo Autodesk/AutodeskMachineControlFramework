@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="Generic Rasterizer Driver" namespace="LibMCDriver_Rasterizer" copyright="Autodesk Inc." year="2022" basename="libmcdriver_rasterizer"
+	version="1.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+
+		<error name="INVALIDSUBSAMPLING" code="9" description="invalid subsampling" />
+		<error name="COULDNOTCOMPRESSPNGIMAGE" code="10" description="could not compress png image" />
+		<error name="EMPTYPNGIMAGEDATA" code="11" description="empty png image data" />
+		<error name="COULDNOTSTOREPNGIMAGE" code="12" description="could not store png image" />
+		<error name="INVALIDXCOORDINATE" code="13" description="invalid x coordinate" />
+		<error name="INVALIDYCOORDINATE" code="14" description="invalid y coordinate" />
+		<error name="INVALIDXCOORDINATERANGE" code="15" description="invalid x coordinate range" />
+		<error name="INVALIDYCOORDINATERANGE" code="16" description="invalid y coordinate range" />
+		<error name="INVALIDPIXELDATACOUNT" code="17" description="invalid pixel data count" />
+		<error name="INVALIDLAYERCOUNT" code="18" description="invalid layer count" />
+		<error name="INVALIDLAYERTHICKNESS" code="19" description="invalid layer thickness" />
+		<error name="INVALIDPIXELCOUNT" code="20" description="invalid pixel count" />
+		<error name="INVALIDDPIVALUE" code="21" description="invalid dpi value" />
+		<error name="DRIVERERROR" code="22" description="driver error" />
+		<error name="INVALIDIDENTIFIER" code="23" description="invalid identifier string" />
+		<error name="IDENTIFIERNOTREGISTERED" code="24" description="identifier not registered" />
+		<error name="IDENTIFIERALREADYREGISTERED" code="25" description="identifier already registered" />		
+		
+	</errors>
+
+	
+<!--
+
+This base Driver interface MUST be in Sync with LibMCDriver.xml
+
+-->
+	
+	<class name="Base">
+	</class>
+	
+	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
+	
+		<method name="GetName" description = "returns the name identifier of the driver">
+			<param name="Name" type="string" pass="return" description="Name of the driver." />
+		</method>
+
+		<method name="GetType" description = "returns the type identifier of the driver">
+			<param name="Type" type="string" pass="return" description="Type of the driver." />
+		</method>
+
+		<method name="GetVersion" description = "returns the version identifiers of the driver">
+			<param name="Major" type="uint32" pass="out" description="Major version." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version." />
+			<param name="Micro" type="uint32" pass="out" description="Micro version." />
+			<param name="Build" type="string" pass="out" description="Build identifier." />
+		</method>
+
+		<method name="GetHeaderInformation" description = "returns the header information">
+			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
+			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
+		</method>
+		
+		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
+		</method>
+	
+	</class>
+
+<!--
+
+End Interface
+
+-->
+
+
+<!--
+
+Custom implementation
+
+-->
+	
+	
+	<enum name="GeometryType">
+		<option name="Unknown" value="0"/>
+		<option name="SolidGeometry" value="1"/>
+		<option name="OpenPolyline" value="2"/>
+		<option name="OpenHatches" value="3"/>
+	</enum>
+
+
+	<struct name="Position2D">
+		<member name="Coordinates" type="double" rows="2"/>
+	</struct>
+
+	<functiontype name="DistortionCallback" description="A callback function for distorting a layer">
+		<param name="OrigX" type="double" pass="in" description="Original X Value"/>
+		<param name="OrigY" type="double" pass="in" description="Original Y Value"/>
+		<param name="NewX" type="double" pass="out" description="Distorted X Value"/>
+		<param name="NewY" type="double" pass="out" description="Distorted Y Value"/>
+		<param name="UserData" type="pointer" pass="in" description="User Data"/>
+	</functiontype>
+
+
+<class name="ImageObject" parent="Base" description="In memory representation of an image.">
+		
+		<method name="GetDPI" description="Returns DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
+			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
+		</method>
+		
+		<method name="GetSize" description="Returns image sizes.">
+			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
+			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
+		</method>
+
+		<method name="GetPixelSize" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="EncodePNG" description="Encodes PNG and stores data stream in image object.">
+		</method>		
+
+		<method name="ClearEncodedPNG" description="Releases encoded data stream of image object.">
+		</method>		
+
+		<method name="GetEncodedPNGData" description="Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>		
+
+		<method name="Clear" description="Sets all pixels to a single value.">
+			<param name="Value" type="uint8" pass="in" description="Pixel value." />
+		</method>		
+
+		<method name="GetPixel" description="Returns one pixel of an image.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="uint8" pass="return" description="Pixel value at this position" />
+		</method>		
+
+		<method name="SetPixel" description="Sets one pixel of an image.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="uint8" pass="in" description="New Pixel value at this position" />
+		</method>		
+
+		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size." />
+		</method>		
+
+		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size." />
+		</method>		
+		
+	</class>
+
+
+	<class name="LayerObject" parent="Base" description="In-memory representation of a layer object.">
+
+		<method name="GetEntityCount" description="Returns count of Entity in Layer.">
+			<param name="EntityCount" type="uint32" pass="return" description="Number of entity in layer." />
+		</method>
+	
+		<method name="GetEntity" description="Returns a entity in a layer.">
+			<param name="EntityIndex" type="uint32" pass="in" description="Index of entity in layer." />
+			<param name="GeometryType" type="enum" class="GeometryType" pass="out" description="Geometry type of Entity." />
+			<param name="Points" type="structarray" class="Position2D" pass="out" description="Points of Entity." />
+		</method>
+
+		<method name="AddEntity" description="Adds a entity to a layer.">
+			<param name="Points" type="structarray" class="Position2D" pass="in" description="Points of Entity." />
+			<param name="GeometryType" type="enum" class="GeometryType" pass="in" description="Geometry type of Entity." />
+			<param name="EntityIndex" type="uint32" pass="return" description="Index of entity in layer." />
+		</method>
+
+		<method name="RemoveSelfIntersections" description="Removes self-intersections of a layer.">
+			<param name="LayerObjectInstance" type="class" class="LayerObject" pass="return" description="New Layer Object Instance" />
+		</method>
+
+		<method name="MergeInto" description="Merges layer into another layer object.">
+			<param name="OtherLayerObject" type="class" class="LayerObject" pass="in" description="Layer object to modify." />
+		</method>
+
+		<method name="CalculateOffset" description="Calculates an offset to a layer.">
+			<param name="OffsetValue" type="double" pass="in" description="Offset in mm" />
+			<param name="LayerObjectInstance" type="class" class="LayerObject" pass="return" description="Offsetted Layer Object Instance" />
+		</method>
+
+		<method name="ThickenPolylines" description="Thickens up polylines of a layer.">
+			<param name="Thickness" type="double" pass="in" description="Thickness in mm" />
+			<param name="LayerObjectInstance" type="class" class="LayerObject" pass="return" description="Offsetted Layer Object Instance" />
+		</method>
+		
+		<method name="ThickenHatches" description="Thickens up hatches of a layer.">
+			<param name="Thickness" type="double" pass="in" description="Thickness in mm" />
+			<param name="LayerObjectInstance" type="class" class="LayerObject" pass="return" description="Offsetted Layer Object Instance" />
+		</method>
+
+		<method name="DistortLayer" description="Distorts a layer with a callback function">
+			<param name="RefinementValue" type="double" pass="in" description="Lines longer than this value are split up in smaller segments to not loose distortion information."/>
+			<param name="DistortionCallback" type="functiontype" class="DistortionCallback" pass="in" description="pointer to the callback function."/>
+			<param name="UserData" type="pointer" pass="in" description="pointer to arbitrary user data that is passed without modification to the callback."/>
+			<param name="LayerObjectInstance" type="class" class="LayerObject" pass="return" description="Offsetted Layer Object Instance" />
+		</method>
+
+	</class>
+
+	<class name="Rasterizer" parent="Base" description="Rasterizer for Layers.">
+	
+		<method name="GetDPI" description="Returns DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
+			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
+		</method>
+		
+		<method name="GetSize" description="Returns image sizes.">
+			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
+			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
+		</method>
+
+		<method name="GetPixelSize" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="GetPosition" description="Returns image position.">
+			<param name="PositionX" type="double" pass="out" description="Position in X in mm" />
+			<param name="PositionY" type="double" pass="out" description="Position in Y in mm" />
+		</method>
+
+		<method name="SetPosition" description="Sets image position.">
+			<param name="PositionX" type="double" pass="in" description="Position in X in mm" />
+			<param name="PositionY" type="double" pass="in" description="Position in Y in mm" />
+		</method>	
+
+		<method name="SetSubsampling" description="Set subsampling values in X and Y.">
+			<param name="SubsamplingX" type="uint32" pass="in" description="Subsampling in X" />
+			<param name="SubsamplingY" type="uint32" pass="in" description="Subsampling in Y" />
+		</method>
+
+		<method name="GetSubsampling" description="Returns subsampling values in X and Y.">
+			<param name="SubsamplingX" type="uint32" pass="out" description="Subsampling in X" />
+			<param name="SubsamplingY" type="uint32" pass="out" description="Subsampling in Y" />
+		</method>
+
+		<method name="AddLayer" description="Adds a layer object to subsample.">
+			<param name="LayerObject" type="class" class="LayerObject" pass="in" description="Layer object instance." />
+		</method>
+
+		<method name="CalculateImage" description="Calculates the image.">
+			<param name="Antialiased" type="bool" pass="in" description="Image output is greyscale if true, black and white with 0.5 threshold if false." />
+			<param name="ImageObject" type="class" class="ImageObject" pass="return" description="ImageObject Instance" />
+		</method>
+
+	</class>
+
+
+	<class name="SliceStack" parent="Base" description="In-memory representation of a slice stack.">
+	
+		<method name="GetLayerCount" description="Returns layer count of slice stack.">
+			<param name="LayerCount" type="uint32" pass="return" description="Returns number of layers" />
+		</method>
+
+		<method name="GetLayerThickness" description="Returns layer thickness of slice stack.">
+			<param name="LayerThickness" type="double" pass="return" description="Returns layer thickness in mm" />
+		</method>
+
+		<method name="GetBottomZ" description="Returns Z value of bottom of slice stack in mm.">
+			<param name="ZValue" type="double" pass="return" description="Z-Value of bottom of slice stack" />
+		</method>
+
+		<method name="GetTopZ" description="Returns Z value of top of slice stack in mm.">
+			<param name="ZValue" type="double" pass="return" description="Z-Value of top of slice stack" />
+		</method>
+
+		<method name="GetLayer" description="Returns layer object for a given Z Value.">
+			<param name="LayerIndex" type="uint32" pass="in" description="Index of layer." />
+			<param name="LayerObject" type="class" class="LayerObject" pass="return" description="LayerObject Instance" />
+		</method>
+
+	
+	</class>	
+	
+	<class name="Driver_Rasterizer" parent="Driver" description="A generic Image rasterizer.">
+
+
+		<method name="CreateSliceStack" description = "creates an empty slice stack.">
+			<param name="LayerCount" type="uint32" pass="in" description="Number of layers. MUST be positive." />
+			<param name="LayerThickness" type="double" pass="in" description="Layerthickness in mm. MUST be positive." />
+			<param name="BottomZ" type="double" pass="in" description="Bottom Z value in mm." />
+			<param name="SliceStackInstance" type="class" class="SliceStack" pass="return" description="Instance of Slice Stack" />
+		</method>
+
+		<method name="CreateEmptyLayer" description = "creates an empty layer object.">
+			<param name="LayerObject" type="class" class="LayerObject" pass="return" description="Instance of a Layer Object" />
+		</method>
+
+		<method name="RegisterInstance" description = "creates a new rasterization instance.">
+			<param name="Identifier" type="string" pass="in" description="Identifier object. MUST be unique." />
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIX" type="double" pass="in" description="DPI in X. MUST be positive." />
+			<param name="DPIY" type="double" pass="in" description="DPI in Y. MUST be positive." />
+			<param name="RasterizerInstance" type="class" class="Rasterizer" pass="return" description="Instance of Rasterizer" />
+		</method>
+
+		<method name="UnregisterInstance" description = "destroys a rasterization instance. Instance MUST exist.">
+			<param name="Identifier" type="string" pass="in" description="Identifier object. MUST be unique." />
+		</method>
+
+		<method name="HasInstance" description = "Checks if a rasterization instance exists.">
+			<param name="Identifier" type="string" pass="in" description="Identifier object. MUST be unique." />
+			<param name="InstanceExists" type="bool" pass="return" description="Flag if instance exists." />
+		</method>
+
+		<method name="GetInstance" description = "retrieves an existing rasterization instance.">
+			<param name="Identifier" type="string" pass="in" description="Identifier object. MUST be unique." />
+			<param name="RasterizerInstance" type="class" class="Rasterizer" pass="return" description="Instance of Rasterizer" />
+		</method>
+		
+	</class>
+
+
+
+
+<!--
+
+End of Custom implementation
+
+-->
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
+			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
+			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="Instance" type="class" class="Driver" pass="return" description="New Driver instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

@@ -29,4 +29,5 @@ add_subdirectory(OPCUA)
 add_subdirectory(ADS)
 add_subdirectory(UART)
 add_subdirectory(TCPIP)
+add_subdirectory(Rasterizer)
 
