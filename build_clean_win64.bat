@@ -65,7 +65,6 @@ REM go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-
 echo "Building Server..."
 set GOARCH=amd64
 set GOOS=windows
-go get github.com/gorilla/handlers
 go build -o "%builddir%/Output/amc_server.exe" -ldflags="-s -w" "%basepath%/Server/mcserver.go"
 
 copy /y "%basepath%Artifacts\clientdist\clientpackage.zip" "%builddir%\Output\%GITHASH%_core.client"
