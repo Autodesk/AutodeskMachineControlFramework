@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CImageObject
 
 // Include custom headers here.
 #include "lodepng.h"
+#include <cmath>
 
 
 using namespace LibMCDriver_Rasterizer::Impl;
