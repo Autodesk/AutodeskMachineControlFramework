@@ -5,8 +5,6 @@ set -e
 export GO111MODULE="off" 
 
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-builddir="$basepath/build"
-outputdir="$builddir/Output"
 
 PLATFORMNAME="linux64"
 
@@ -18,6 +16,10 @@ then
 	PLATFORMNAME="rpi"	
 fi	
 done
+
+builddir="$basepath/build_${PLATFORMNAME}"
+outputdir="$builddir/Output"
+
 
 echo "Building for platform: ${PLATFORMNAME}..."
 
@@ -132,8 +134,9 @@ cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 rm Framework/Dist/${GITHASH}_core.data
 
-go run ../../BuildScripts/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${LONGGITHASH} $PLATFORMNAME
+cd $builddir
+go run "$basedir/BuildScripts/createDevPackage.go" ./DevPackage/Framework" ./DevPackage ${LONGGITHASH} $PLATFORMNAME
 
-cp $builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip $builddir/Artifacts/devpackage.zip
+cp "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "$builddir/Artifacts/devpackage.zip"
 
 echo "Build done!"
