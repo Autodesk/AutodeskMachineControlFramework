@@ -136,11 +136,19 @@ add_custom_command(
 endif()
 
 if(UNIX)
+if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*arm.*")
+add_custom_command(
+	TARGET ${DRIVERNAME} POST_BUILD
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.arm
+			${CMAKE_CURRENT_SOURCE_DIR}/Resources
+			${PROJECT_BINARY_DIR}/../../Output/${GLOBALGITHASH}_driver_${DRIVERSUFFIX}.data)
+else()
 add_custom_command(
 	TARGET ${DRIVERNAME} POST_BUILD
 	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.linux
 			${CMAKE_CURRENT_SOURCE_DIR}/Resources
 			${PROJECT_BINARY_DIR}/../../Output/${GLOBALGITHASH}_driver_${DRIVERSUFFIX}.data)
+endif()
 endif()
 
 

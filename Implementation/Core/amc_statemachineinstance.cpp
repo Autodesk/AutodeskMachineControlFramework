@@ -206,7 +206,7 @@ namespace AMC {
 
 			// Set new current state		
 			if (sCurrentState != sNextState)
-				m_pSystemState->logger()->logMessage("state change: " + sNextState, m_sName, eLogLevel::Debug);
+				m_pSystemState->logger()->logMessage("state change: " + sCurrentState + "->" + sNextState, m_sName, eLogLevel::Debug);
 
 			setCurrentStateInternal (findStateInternal (sNextState, true));
 

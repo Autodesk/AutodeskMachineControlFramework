@@ -136,7 +136,11 @@ namespace AMCCommon {
 				temp.tv_nsec = currentTime.tv_nsec - startTime.tv_nsec;
 			}
 
-			return (temp.tv_nsec / 1000) + temp.tv_sec * 1000000;
+			int64_t microSeconds = ((int64_t)temp.tv_nsec / 1000LL) + (int64_t) temp.tv_sec * 1000000LL;
+			if (microSeconds < 0)
+				throw std::runtime_error ("clock time was returned negative");
+			
+			return (uint64_t) microSeconds;
 #endif
 		}
 
