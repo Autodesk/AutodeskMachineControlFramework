@@ -40,9 +40,6 @@ import (
 	"encoding/xml"
 	"./LibMC"	
 	"./LibMCData"	
-	
-	// Handler for gzip handling of the REST end point.
-	"github.com/gorilla/handlers" 
 )
 
 
@@ -507,9 +504,7 @@ func startAppServer (host string, port uint32, context libmc.MCContext) (error) 
 
 	context.Log (fmt.Sprintf ("Listening on %s:%d", host, port), libmc.LogSubSystem_Network, libmc.LogLevel_Message);			   
 	
-	mux := http.NewServeMux();	
-	mux.HandleFunc("/", RESTHandler);
-	return http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), handlers.CompressHandler(mux));	
+	return http.ListenAndServe(fmt.Sprintf("%s:%d", host, port), makeHandler (RESTHandler));	
 }
 
 

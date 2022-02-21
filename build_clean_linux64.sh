@@ -72,18 +72,35 @@ echo "long git hash: $LONGGITHASH"
 
 cd "$basepath"
 
-echo "Building Resource builder (LinuxARM)..."
-export GOARCH=arm
-export GOOS=linux
-export GOARM=5
-go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
-echo "Building Go Server..."
-go get "github.com/gorilla/handlers"
-set GOARCH=arm
-set GOOS=linux
-set GOARM=5
-go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
+if [$PLATFORMNAME = "rpi"]
+then
+
+	echo "Building Resource builder (LinuxARM)..."
+	export GOARCH=arm
+	export GOOS=linux
+	export GOARM=5
+	go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+
+	echo "Building Go Server..."
+	set GOARCH=arm
+	set GOOS=linux
+	set GOARM=5
+	go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
+
+else
+
+	echo "Building Resource builder (Linux64)..."
+	export GOARCH=amd64
+	export GOOS=linux
+	go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+
+	echo "Building Go Server..."
+	set GOARCH=amd64
+	set GOOS=linux
+	go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
+
+fi	
 
 cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
 
