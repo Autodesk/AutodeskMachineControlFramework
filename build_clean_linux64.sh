@@ -12,7 +12,7 @@ PLATFORMNAME="linux64"
 
 for var in "$@"
 do
-if [$var = "--buildrpi"]
+if ["$var" = "--buildrpi"]
 then
 	PLATFORMNAME="rpi"	
 fi	
@@ -73,7 +73,7 @@ echo "long git hash: $LONGGITHASH"
 cd "$basepath"
 
 
-if [$PLATFORMNAME = "rpi"]
+if ["$PLATFORMNAME" = "rpi"]
 then
 
 	echo "Building Resource builder (LinuxARM)..."
@@ -93,7 +93,7 @@ else
 	echo "Building Resource builder (Linux64)..."
 	export GOARCH=amd64
 	export GOOS=linux
-	go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+	go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
 	echo "Building Go Server..."
 	set GOARCH=amd64
