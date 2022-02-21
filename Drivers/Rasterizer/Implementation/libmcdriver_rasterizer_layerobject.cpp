@@ -63,8 +63,10 @@ CLayerDataObject::CLayerDataObject()
 
 CLayerDataObject::CLayerDataObject(const ClipperLib::Paths& clipperPaths, const double dUnits)
 {
+	uint32_t nEntityIndex;
+
 	for (auto& path : clipperPaths) {
-		auto& entity = addEntity(eGeometryType::SolidGeometry);
+		auto& entity = addEntity(eGeometryType::SolidGeometry, nEntityIndex);
 		auto& points = entity.getPoints();
 		for (auto& clipperPoint : path) {
 			points.push_back(sPosition2D{ clipperPoint.X * dUnits, clipperPoint.Y * dUnits });
@@ -78,8 +80,11 @@ CLayerDataObject::~CLayerDataObject()
 
 }
 
-CLayerDataEntity& CLayerDataObject::addEntity(eGeometryType GeometryType)
+CLayerDataEntity& CLayerDataObject::addEntity(eGeometryType GeometryType, uint32_t& nEntityIndex)
 {
+
+	nEntityIndex = (uint32_t) m_Entities.size();
+
 	m_Entities.push_back(CLayerDataEntity(GeometryType));
 	return *m_Entities.rbegin();
 }
@@ -125,8 +130,10 @@ void CLayerDataObject::mergeInto(CLayerDataObject* pOtherDataObject)
 	if (pOtherDataObject == nullptr)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
 
+	uint32_t nEntityIndex;
+
 	for (auto& entity : m_Entities) {
-		auto& newEntity = pOtherDataObject->addEntity(entity.getGeometryType());
+		auto& newEntity = pOtherDataObject->addEntity(entity.getGeometryType(), nEntityIndex);
 		auto& points = entity.getPoints();
 		auto& newPoints = newEntity.getPoints();
 
@@ -182,12 +189,14 @@ void CLayerObject::GetEntity(const LibMCDriver_Rasterizer_uint32 nEntityIndex, L
 
 LibMCDriver_Rasterizer_uint32 CLayerObject::AddEntity(const LibMCDriver_Rasterizer_uint64 nPointsBufferSize, const LibMCDriver_Rasterizer::sPosition2D * pPointsBuffer, const LibMCDriver_Rasterizer::eGeometryType eGeometryType)
 {
+	uint32_t nEntityIndex = 0;
+
 	if (nPointsBufferSize <= 0)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
 	if (pPointsBuffer == nullptr)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
 
-	auto& entity = m_pLayerDataObject->addEntity(eGeometryType);
+	auto& entity = m_pLayerDataObject->addEntity(eGeometryType, nEntityIndex);
 	auto& points = entity.getPoints();
 
 	points.resize(nPointsBufferSize);
@@ -195,6 +204,9 @@ LibMCDriver_Rasterizer_uint32 CLayerObject::AddEntity(const LibMCDriver_Rasteriz
 	for (size_t nIndex = 0; nIndex < nPointsBufferSize; nIndex++) {
 		points[nIndex] = pPointsBuffer[nIndex];
 	}
+
+	return nEntityIndex;
+
 }
 
 ILayerObject * CLayerObject::RemoveSelfIntersections()

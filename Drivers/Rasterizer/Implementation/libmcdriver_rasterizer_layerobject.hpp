@@ -76,7 +76,7 @@ public:
 
 	virtual ~CLayerDataObject();
 
-	CLayerDataEntity& addEntity(eGeometryType GeometryType);
+	CLayerDataEntity& addEntity(eGeometryType GeometryType, uint32_t & nEntityIndex);
 
 	size_t getEntityCount();
 	CLayerDataEntity& getEntity(const size_t& nIndex);
