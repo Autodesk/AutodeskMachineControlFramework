@@ -12,14 +12,14 @@ PLATFORMNAME="linux64"
 
 for var in "$@"
 do
-if ["$var" = "--buildrpi"]
+echo "command line parameter: $var"
+if test $var = "--buildrpi"
 then
 	PLATFORMNAME="rpi"	
 fi	
 done
 
 echo "Building for platform: ${PLATFORMNAME}..."
-
 
 dirs_to_make[0]="$builddir"
 dirs_to_make[1]="$outputdir"
@@ -73,7 +73,7 @@ echo "long git hash: $LONGGITHASH"
 cd "$basepath"
 
 
-if ["$PLATFORMNAME" = "rpi"]
+if test $PLATFORMNAME = "rpi"
 then
 
 	echo "Building Resource builder (LinuxARM)..."
