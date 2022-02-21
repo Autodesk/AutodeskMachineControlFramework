@@ -135,7 +135,7 @@ cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
 rm Framework/Dist/${GITHASH}_core.data
 
 cd $builddir
-go run "$basedir/BuildScripts/createDevPackage.go" ./DevPackage/Framework" ./DevPackage ${LONGGITHASH} $PLATFORMNAME
+go run "$basedir/BuildScripts/createDevPackage.go" ./DevPackage/Framework ./DevPackage ${LONGGITHASH} $PLATFORMNAME
 
 cp "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "$builddir/Artifacts/devpackage.zip"
 
