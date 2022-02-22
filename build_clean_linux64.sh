@@ -15,6 +15,10 @@ if test $var = "--buildrpi"
 then
 	PLATFORMNAME="rpi"	
 fi	
+if test $var = "--buildwin64"
+then
+	PLATFORMNAME="win64"	
+fi	
 done
 
 builddir="$basepath/build_${PLATFORMNAME}"
@@ -92,6 +96,21 @@ then
 
 else
 
+if test $PLATFORMNAME = "win64"
+then
+
+	echo "Building Resource builder (Win64)..."
+	export GOARCH=amd64
+	export GOOS=windows
+	go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+
+	echo "Building Go Server..."
+	set GOARCH=amd64
+	set GOOS=windows
+	go build -o "$builddir/Output/amc_server.exe" -ldflags="-s -w" "$basepath/Server/mcserver.go"
+
+else
+
 	echo "Building Resource builder (Linux64)..."
 	export GOARCH=amd64
 	export GOOS=linux
@@ -103,6 +122,7 @@ else
 	go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
 fi	
+fi
 
 cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
 
@@ -111,7 +131,13 @@ go run "$basepath/BuildScripts/createPackageXML.go" ./Output $GITHASH $PLATFORMN
 
 
 echo "Building Core Modules"
+if test $PLATFORMNAME = "win64"
+then
+cmake -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
+else
 cmake ..
+fi
+
 cmake --build . --config Release
 
 echo "Building Core Resources"
@@ -120,7 +146,14 @@ go run ../BuildScripts/buildResources.go ../Plugins/Resources "$outputdir/${GITH
 echo "Building Developer Package"
 cd "$builddir/DevPackage"
 cp ../githash.txt Framework/Dist/disthash.txt
+
+if test $PLATFORMNAME = "win64"
+then
+cp ../Output/amc_server.exe Framework/Dist/
+else
 cp ../Output/amc_server Framework/Dist/
+fi
+
 cp ../Output/amc_server.xml Framework/Dist/
 cp ../Output/${GITHASH}_core_libmc.so Framework/Dist/
 cp ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
