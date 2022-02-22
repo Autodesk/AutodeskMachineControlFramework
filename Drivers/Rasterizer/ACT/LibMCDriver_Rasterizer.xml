@@ -145,67 +145,6 @@ Custom implementation
 	</functiontype>
 
 
-<class name="ImageObject" parent="Base" description="In memory representation of an image.">
-		
-		<method name="GetDPI" description="Returns DPI values in X and Y.">
-			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
-			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
-		</method>
-		
-		<method name="GetSize" description="Returns image sizes.">
-			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
-			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
-		</method>
-
-		<method name="GetPixelSize" description="Returns image pixel sizes.">
-			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
-			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
-		</method>		
-
-		<method name="EncodePNG" description="Encodes PNG and stores data stream in image object.">
-		</method>		
-
-		<method name="ClearEncodedPNG" description="Releases encoded data stream of image object.">
-		</method>		
-
-		<method name="GetEncodedPNGData" description="Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
-			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
-		</method>		
-
-		<method name="Clear" description="Sets all pixels to a single value.">
-			<param name="Value" type="uint8" pass="in" description="Pixel value." />
-		</method>		
-
-		<method name="GetPixel" description="Returns one pixel of an image.">
-			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
-			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
-			<param name="Value" type="uint8" pass="return" description="Pixel value at this position" />
-		</method>		
-
-		<method name="SetPixel" description="Sets one pixel of an image.">
-			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
-			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
-			<param name="Value" type="uint8" pass="in" description="New Pixel value at this position" />
-		</method>		
-
-		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data.">
-			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
-			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
-			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
-			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
-			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size." />
-		</method>		
-
-		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
-			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
-			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
-			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
-			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
-			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size." />
-		</method>		
-		
-	</class>
-
 
 	<class name="LayerObject" parent="Base" description="In-memory representation of a layer object.">
 
@@ -299,8 +238,8 @@ Custom implementation
 		</method>
 
 		<method name="CalculateImage" description="Calculates the image.">
+			<param name="ImageObject" type="class" class="LibMCEnv:ImageData" pass="in" description="ImageObject Instance to render into" />
 			<param name="Antialiased" type="bool" pass="in" description="Image output is greyscale if true, black and white with 0.5 threshold if false." />
-			<param name="ImageObject" type="class" class="ImageObject" pass="return" description="ImageObject Instance" />
 		</method>
 
 	</class>

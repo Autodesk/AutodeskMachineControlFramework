@@ -171,24 +171,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 			uint32_t nHttpCode;
 
 			auto pHandler = pContext->CreateAPIRequestHandler(sURL, "POST", sAuthorization);
-			uint32_t nFieldCount = 0;
-
-			if (pHandler->ExpectsFormData(nFieldCount)) {
-
-			}
-
-			pHandler->Handle(Buffer, sContentType, nHttpCode);
-
-			pHandler->GetResultData(ResultBuffer);
-
-			if (!ResultBuffer.empty()) {
-				std::string_view StringView(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());
-				res->end(StringView);
-			}
-			else {
-				res->end("");
-			}
-
+			res->end("");
 
 
 		}

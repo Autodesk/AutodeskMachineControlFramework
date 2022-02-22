@@ -128,14 +128,14 @@ void CRasterizerInstance::AddLayer(ILayerObject* pLayerObject)
 	m_Layers.push_back(pLayerObjectInstance->getDataObject());
 }
 
-IImageObject* CRasterizerInstance::CalculateImage(const bool bAntialiased)
+void CRasterizerInstance::CalculateImage(LibMCEnv::CImageData* pImageData, const bool bAntialiased)
 {
 	auto pImage = std::make_unique<CImageObject>(m_nPixelCountX, m_nPixelCountY, m_dDPIX, m_dDPIY);
 
 	for (auto pLayer : m_Layers)
 		pImage->drawLayerObject(pLayer.get(), 255);
 
-	return pImage.release();
+	
 }
 
 
@@ -197,8 +197,8 @@ void CRasterizer::AddLayer(ILayerObject* pLayerObject)
 	m_pRasterizerInstance->AddLayer(pLayerObject);
 }
 
-IImageObject * CRasterizer::CalculateImage(const bool bAntialiased)
+void CRasterizer::CalculateImage(LibMCEnv::PImageData pImageObject, const bool bAntialiased)
 {
-	return m_pRasterizerInstance->CalculateImage(bAntialiased);
+	m_pRasterizerInstance->CalculateImage(pImageObject.get(), bAntialiased);
 }
 

@@ -61,6 +61,7 @@ namespace LibMCEnv {
 class CWrapper;
 class CBase;
 class CIterator;
+class CImageData;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
@@ -81,6 +82,7 @@ class CUIEnvironment;
 typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
+typedef CImageData CLibMCEnvImageData;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
@@ -101,6 +103,7 @@ typedef CUIEnvironment CLibMCEnvUIEnvironment;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
+typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
@@ -121,6 +124,7 @@ typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
+typedef PImageData PLibMCEnvImageData;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
@@ -307,6 +311,7 @@ private:
 
 	friend class CBase;
 	friend class CIterator;
+	friend class CImageData;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
@@ -399,6 +404,38 @@ public:
 	inline PBase GetCurrent();
 	inline PIterator Clone();
 	inline LibMCEnv_uint64 Count();
+};
+	
+/*************************************************************************************************************************
+ Class CImageData 
+**************************************************************************************************************************/
+class CImageData : public CBase {
+public:
+	
+	/**
+	* CImageData::CImageData - Constructor for ImageData class.
+	*/
+	CImageData(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline eImagePixelFormat GetPixelFormat();
+	inline void ChangePixelFormat(const eImagePixelFormat ePixelFormat);
+	inline void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY);
+	inline void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY);
+	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void EncodePNG();
+	inline void GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void ClearEncodedPNGData();
+	inline void Clear(const LibMCEnv_uint32 nValue);
+	inline LibMCEnv_uint32 GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
+	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
+	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer);
+	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -617,6 +654,8 @@ public:
 	inline void LogMessage(const std::string & sLogString);
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
+	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 };
 	
 /*************************************************************************************************************************
@@ -721,6 +760,8 @@ public:
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
+	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 };
 	
 /*************************************************************************************************************************
@@ -761,6 +802,8 @@ public:
 	inline void SetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_double dValue);
 	inline void SetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_int64 nValue);
 	inline void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue);
+	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 };
 	
 	/**
@@ -849,6 +892,22 @@ public:
 		pWrapperTable->m_Iterator_GetCurrent = nullptr;
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
+		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
+		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
+		pWrapperTable->m_ImageData_GetDPI = nullptr;
+		pWrapperTable->m_ImageData_SetDPI = nullptr;
+		pWrapperTable->m_ImageData_GetSizeInMM = nullptr;
+		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
+		pWrapperTable->m_ImageData_ResizeImage = nullptr;
+		pWrapperTable->m_ImageData_LoadPNG = nullptr;
+		pWrapperTable->m_ImageData_EncodePNG = nullptr;
+		pWrapperTable->m_ImageData_GetEncodedPNGData = nullptr;
+		pWrapperTable->m_ImageData_ClearEncodedPNGData = nullptr;
+		pWrapperTable->m_ImageData_Clear = nullptr;
+		pWrapperTable->m_ImageData_GetPixel = nullptr;
+		pWrapperTable->m_ImageData_SetPixel = nullptr;
+		pWrapperTable->m_ImageData_GetPixelRange = nullptr;
+		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
@@ -923,6 +982,8 @@ public:
 		pWrapperTable->m_DriverEnvironment_LogMessage = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogWarning = nullptr;
 		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
+		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -979,6 +1040,8 @@ public:
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -1003,6 +1066,8 @@ public:
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsDouble = nullptr;
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger = nullptr;
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1099,6 +1164,150 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Iterator_Count == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixelformat");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixelformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixelFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ChangePixelFormat = (PLibMCEnvImageData_ChangePixelFormatPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_changepixelformat");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ChangePixelFormat = (PLibMCEnvImageData_ChangePixelFormatPtr) dlsym(hLibrary, "libmcenv_imagedata_changepixelformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ChangePixelFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetDPI = (PLibMCEnvImageData_GetDPIPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getdpi");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetDPI = (PLibMCEnvImageData_GetDPIPtr) dlsym(hLibrary, "libmcenv_imagedata_getdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetDPI = (PLibMCEnvImageData_SetDPIPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setdpi");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetDPI = (PLibMCEnvImageData_SetDPIPtr) dlsym(hLibrary, "libmcenv_imagedata_setdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetSizeInMM = (PLibMCEnvImageData_GetSizeInMMPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getsizeinmm");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetSizeInMM = (PLibMCEnvImageData_GetSizeInMMPtr) dlsym(hLibrary, "libmcenv_imagedata_getsizeinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetSizeInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetSizeInPixels = (PLibMCEnvImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetSizeInPixels = (PLibMCEnvImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_imagedata_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ResizeImage = (PLibMCEnvImageData_ResizeImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_resizeimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ResizeImage = (PLibMCEnvImageData_ResizeImagePtr) dlsym(hLibrary, "libmcenv_imagedata_resizeimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ResizeImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_LoadPNG = (PLibMCEnvImageData_LoadPNGPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_loadpng");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_LoadPNG = (PLibMCEnvImageData_LoadPNGPtr) dlsym(hLibrary, "libmcenv_imagedata_loadpng");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_LoadPNG == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_encodepng");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) dlsym(hLibrary, "libmcenv_imagedata_encodepng");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_EncodePNG == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getencodedpngdata");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_getencodedpngdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_Clear = (PLibMCEnvImageData_ClearPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_clear");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_Clear = (PLibMCEnvImageData_ClearPtr) dlsym(hLibrary, "libmcenv_imagedata_clear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_Clear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixel = (PLibMCEnvImageData_GetPixelPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixel");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixel = (PLibMCEnvImageData_GetPixelPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixel = (PLibMCEnvImageData_SetPixelPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixel");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixel = (PLibMCEnvImageData_SetPixelPtr) dlsym(hLibrary, "libmcenv_imagedata_setpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixelRange = (PLibMCEnvImageData_GetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixelRange = (PLibMCEnvImageData_GetPixelRangePtr) dlsym(hLibrary, "libmcenv_imagedata_getpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixelRange = (PLibMCEnvImageData_SetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixelRange = (PLibMCEnvImageData_SetPixelRangePtr) dlsym(hLibrary, "libmcenv_imagedata_setpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixelRange == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1768,6 +1977,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = (PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createemptyimage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = (PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_createemptyimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateEmptyImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) GetProcAddress(hLibrary, "libmcenv_signaltrigger_cantrigger");
 		#else // _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) dlsym(hLibrary, "libmcenv_signaltrigger_cantrigger");
@@ -2272,6 +2499,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createemptyimage");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_createemptyimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateEmptyImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
@@ -2488,6 +2733,24 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateEmptyImage = (PLibMCEnvUIEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createemptyimage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateEmptyImage = (PLibMCEnvUIEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_createemptyimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateEmptyImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -2566,6 +2829,70 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_iterator_count", (void**)&(pWrapperTable->m_Iterator_Count));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Count == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixelFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_changepixelformat", (void**)&(pWrapperTable->m_ImageData_ChangePixelFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ChangePixelFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getdpi", (void**)&(pWrapperTable->m_ImageData_GetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setdpi", (void**)&(pWrapperTable->m_ImageData_SetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getsizeinmm", (void**)&(pWrapperTable->m_ImageData_GetSizeInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetSizeInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getsizeinpixels", (void**)&(pWrapperTable->m_ImageData_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_resizeimage", (void**)&(pWrapperTable->m_ImageData_ResizeImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ResizeImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_loadpng", (void**)&(pWrapperTable->m_ImageData_LoadPNG));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_LoadPNG == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_encodepng", (void**)&(pWrapperTable->m_ImageData_EncodePNG));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_EncodePNG == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getencodedpngdata", (void**)&(pWrapperTable->m_ImageData_GetEncodedPNGData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_clearencodedpngdata", (void**)&(pWrapperTable->m_ImageData_ClearEncodedPNGData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_clear", (void**)&(pWrapperTable->m_ImageData_Clear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_Clear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixel", (void**)&(pWrapperTable->m_ImageData_GetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixel", (void**)&(pWrapperTable->m_ImageData_SetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelrange", (void**)&(pWrapperTable->m_ImageData_GetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixelrange", (void**)&(pWrapperTable->m_ImageData_SetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelRange == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
@@ -2864,6 +3191,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogInfo == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createemptyimage", (void**)&(pWrapperTable->m_DriverEnvironment_CreateEmptyImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateEmptyImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_loadpngimage", (void**)&(pWrapperTable->m_DriverEnvironment_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalTrigger_CanTrigger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3088,6 +3423,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createemptyimage", (void**)&(pWrapperTable->m_StateEnvironment_CreateEmptyImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateEmptyImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadpngimage", (void**)&(pWrapperTable->m_StateEnvironment_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3182,6 +3525,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_setuipropertyasbool", (void**)&(pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createemptyimage", (void**)&(pWrapperTable->m_UIEnvironment_CreateEmptyImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateEmptyImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadpngimage", (void**)&(pWrapperTable->m_UIEnvironment_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -3281,6 +3632,187 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Count(m_pHandle, &resultCount));
 		
 		return resultCount;
+	}
+	
+	/**
+	 * Method definitions for class CImageData
+	 */
+	
+	/**
+	* CImageData::GetPixelFormat - Returns Pixel format of the image.
+	* @return Pixel Format of image
+	*/
+	eImagePixelFormat CImageData::GetPixelFormat()
+	{
+		eImagePixelFormat resultPixelFormat = (eImagePixelFormat) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixelFormat(m_pHandle, &resultPixelFormat));
+		
+		return resultPixelFormat;
+	}
+	
+	/**
+	* CImageData::ChangePixelFormat - Changes Pixel format of the image. Might lose alpha or color information during the process.
+	* @param[in] ePixelFormat - new Pixel Format of image
+	*/
+	void CImageData::ChangePixelFormat(const eImagePixelFormat ePixelFormat)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ChangePixelFormat(m_pHandle, ePixelFormat));
+	}
+	
+	/**
+	* CImageData::GetDPI - Returns DPI values in X and Y.
+	* @param[out] dDPIValueX - DPI value in X
+	* @param[out] dDPIValueY - DPI value in Y
+	*/
+	void CImageData::GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetDPI(m_pHandle, &dDPIValueX, &dDPIValueY));
+	}
+	
+	/**
+	* CImageData::SetDPI - Sets DPI values in X and Y.
+	* @param[in] dDPIValueX - new DPI value in X
+	* @param[in] dDPIValueY - new DPI value in Y
+	*/
+	void CImageData::SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetDPI(m_pHandle, dDPIValueX, dDPIValueY));
+	}
+	
+	/**
+	* CImageData::GetSizeInMM - Returns image sizes inmm.
+	* @param[out] dSizeX - Size in X in mm
+	* @param[out] dSizeY - Size in Y in mm
+	*/
+	void CImageData::GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetSizeInMM(m_pHandle, &dSizeX, &dSizeY));
+	}
+	
+	/**
+	* CImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CImageData::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CImageData::ResizeImage - Resizes Image pixel data.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CImageData::ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ResizeImage(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
+	* @param[out] PNGDataBuffer - PNG Data stream.
+	*/
+	void CImageData::LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPNGData = 0;
+		LibMCEnv_uint64 elementsWrittenPNGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, 0, &elementsNeededPNGData, nullptr));
+		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
+	* CImageData::EncodePNG - Encodes PNG and stores data stream in image object.
+	*/
+	void CImageData::EncodePNG()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_EncodePNG(m_pHandle));
+	}
+	
+	/**
+	* CImageData::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+	* @param[out] PNGDataBuffer - PNG Data stream.
+	*/
+	void CImageData::GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPNGData = 0;
+		LibMCEnv_uint64 elementsWrittenPNGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, 0, &elementsNeededPNGData, nullptr));
+		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
+	* CImageData::ClearEncodedPNGData - Releases encoded data stream of image object.
+	*/
+	void CImageData::ClearEncodedPNGData()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ClearEncodedPNGData(m_pHandle));
+	}
+	
+	/**
+	* CImageData::Clear - Sets all pixels to a single value.
+	* @param[in] nValue - Pixel value.
+	*/
+	void CImageData::Clear(const LibMCEnv_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_Clear(m_pHandle, nValue));
+	}
+	
+	/**
+	* CImageData::GetPixel - Returns one pixel of an image.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @return Pixel value at this position
+	*/
+	LibMCEnv_uint32 CImageData::GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY)
+	{
+		LibMCEnv_uint32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixel(m_pHandle, nX, nY, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CImageData::SetPixel - Sets one pixel of an image.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @param[in] nValue - New Pixel value at this position
+	*/
+	void CImageData::SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixel(m_pHandle, nX, nY, nValue));
+	}
+	
+	/**
+	* CImageData::GetPixelRange - Returns a subset of an image or the whole image data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	*/
+	void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValue = 0;
+		LibMCEnv_uint64 elementsWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, 0, &elementsNeededValue, nullptr));
+		ValueBuffer.resize((size_t) elementsNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, elementsNeededValue, &elementsWrittenValue, ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::SetPixelRange - Exchanges a subset of an image or the whole image data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
+	* @param[in] ValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	*/
+	void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
 	}
 	
 	/**
@@ -4297,6 +4829,45 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	PImageData CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateEmptyImage(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CDriverEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
 	 * Method definitions for class CSignalTrigger
 	 */
 	
@@ -5009,6 +5580,45 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	PImageData CStateEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateEmptyImage(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CStateEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CStateEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
 	 * Method definitions for class CUIEnvironment
 	 */
 	
@@ -5323,6 +5933,45 @@ public:
 	void CUIEnvironment::SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetUIPropertyAsBool(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), bValue));
+	}
+	
+	/**
+	* CUIEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	PImageData CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateEmptyImage(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CUIEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CUIEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
 	}
 
 } // namespace LibMCEnv

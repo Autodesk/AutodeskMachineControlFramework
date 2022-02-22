@@ -35,7 +35,6 @@ Abstract: This is a stub class definition of CImageObject
 #include "libmcdriver_rasterizer_interfaceexception.hpp"
 
 // Include custom headers here.
-#include "lodepng.h"
 #include <cmath>
 
 
@@ -60,7 +59,7 @@ CImageObject::CImageObject(const uint32_t nPixelCountX, const uint32_t nPixelCou
 
 	m_PixelData.resize((size_t)m_nPixelCountX * (size_t)m_nPixelCountY);
 
-	Clear(0);
+	clear(0);
 
 }
 
@@ -69,90 +68,15 @@ CImageObject::~CImageObject()
 
 }
 
-void CImageObject::GetDPI(LibMCDriver_Rasterizer_double & dDPIValueX, LibMCDriver_Rasterizer_double & dDPIValueY)
-{
-	dDPIValueX = m_dDPIValueX;
-	dDPIValueY = m_dDPIValueY;
-}
-
-void CImageObject::GetSize(LibMCDriver_Rasterizer_double & dSizeX, LibMCDriver_Rasterizer_double & dSizeY)
-{
-	// 1 inch is 25.4 mm
-	double dMMperPixelX = 25.4 / m_dDPIValueX;
-	double dMMperPixelY = 25.4 / m_dDPIValueY;
-	dSizeX = m_nPixelCountX * dMMperPixelX;
-	dSizeY = m_nPixelCountY * dMMperPixelY;
-}
-
-void CImageObject::GetPixelSize(LibMCDriver_Rasterizer_uint32 & nPixelSizeX, LibMCDriver_Rasterizer_uint32 & nPixelSizeY)
-{
-	nPixelSizeX = m_nPixelCountX;
-	nPixelSizeY = m_nPixelCountY;
-}
-
-void CImageObject::EncodePNG()
-{
-	m_EncodedPNGData.clear();
-
-	unsigned int error = lodepng::encode(m_EncodedPNGData, m_PixelData, m_nPixelCountX, m_nPixelCountY, LCT_GREY, 8);
-
-	if (error)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTCOMPRESSPNGIMAGE);
-
-	if (m_EncodedPNGData.empty())
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTSTOREPNGIMAGE);
-	
-}
-
-void CImageObject::ClearEncodedPNG()
-{
-	m_EncodedPNGData.clear();
-}
-
-void CImageObject::GetEncodedPNGData(LibMCDriver_Rasterizer_uint64 nPNGDataBufferSize, LibMCDriver_Rasterizer_uint64* pPNGDataNeededCount, LibMCDriver_Rasterizer_uint8* pPNGDataBuffer)
-{
-	if (m_EncodedPNGData.empty())
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_EMPTYPNGIMAGEDATA);
-
-	size_t nPNGSize = m_EncodedPNGData.size();
-
-	if (pPNGDataNeededCount != nullptr)
-		*pPNGDataNeededCount = m_EncodedPNGData.size();
-
-	if (pPNGDataBuffer != nullptr) {
-
-		if (nPNGDataBufferSize < nPNGSize)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_BUFFERTOOSMALL);
-
-		uint8_t* pSrc = m_EncodedPNGData.data();
-		uint8_t* pDst = pPNGDataBuffer;
-
-		for (size_t nIndex = 0; nIndex < nPNGSize; nIndex++)
-			*pDst = *pSrc; pDst++; pSrc++;
-	}
-
-}
 
 
-
-void CImageObject::Clear(const LibMCDriver_Rasterizer_uint8 nValue)
+void CImageObject::clear(const LibMCDriver_Rasterizer_uint8 nValue)
 {
 	for (auto iter = m_PixelData.begin(); iter != m_PixelData.end(); iter++)
 		*iter = nValue;
 }
 
-LibMCDriver_Rasterizer_uint8 CImageObject::GetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY)
-{
-	if (nX >= m_nPixelCountX)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATE);
-	if (nY >= m_nPixelCountY)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDYCOORDINATE);
-
-	size_t nAddress = (size_t)nX + (size_t)nY * (size_t)m_nPixelCountX;
-	return m_PixelData[nAddress];
-}
-
-void CImageObject::SetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue)
+void CImageObject::setPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue)
 {
 	if (nX >= m_nPixelCountX)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATE);
@@ -163,81 +87,6 @@ void CImageObject::SetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCD
 	m_PixelData[nAddress] = nValue;
 }
 
-void CImageObject::GetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, LibMCDriver_Rasterizer_uint64 nValueBufferSize, LibMCDriver_Rasterizer_uint64* pValueNeededCount, LibMCDriver_Rasterizer_uint8 * pValueBuffer)
-{
-	if (nXMin >= m_nPixelCountX)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATE);
-	if (nYMin >= m_nPixelCountY)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDYCOORDINATE);
-	if (nXMax >= m_nPixelCountX)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATE);
-	if (nYMax >= m_nPixelCountY)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDYCOORDINATE);
-	if (nXMin > nXMax)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATERANGE);
-	if (nYMin > nYMax)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDYCOORDINATERANGE);
-
-	uint32_t nSizeX = nXMax - nXMin;
-	uint32_t nSizeY = nYMax - nYMin;
-	size_t nNeededSize = (size_t)nSizeX * (size_t)nSizeY;
-
-	if (pValueNeededCount != nullptr)
-		*pValueNeededCount = nNeededSize;
-
-	if (pValueBuffer != nullptr) {
-		if (nValueBufferSize < nNeededSize)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_BUFFERTOOSMALL);
-
-		uint8_t* pTargetData = pValueBuffer;
-		for (uint32_t nY = 0; nY < nSizeY; nY++) {
-			const uint8_t* pSrcData = &m_PixelData[(nY + nYMin) * m_nPixelCountX + nXMin];
-
-			for (uint32_t nX = 0; nX < nSizeX; nX++) {
-				*pTargetData = *pSrcData;
-				pTargetData++;
-				pSrcData++;
-			}
-		}
-
-	}
-}
-
-void CImageObject::SetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, const LibMCDriver_Rasterizer_uint64 nValueBufferSize, const LibMCDriver_Rasterizer_uint8* pValueBuffer)
-{
-	if (pValueBuffer == nullptr)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-	if (nXMin >= m_nPixelCountX)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATE);
-	if (nYMin >= m_nPixelCountY)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDYCOORDINATE);
-	if (nXMax >= m_nPixelCountX)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPIXELCOUNT);
-	if (nYMax >= m_nPixelCountY)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPIXELCOUNT);
-	if (nXMin > nXMax)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATERANGE);
-	if (nYMin > nYMax)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDYCOORDINATERANGE);
-
-	uint32_t nSizeX = nXMax - nXMin;
-	uint32_t nSizeY = nYMax - nYMin;
-	size_t nNeededSize = (size_t)nSizeX * (size_t)nSizeY;
-	if (nValueBufferSize != nNeededSize)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPIXELDATACOUNT);
-
-	const uint8_t* pSrcData = pValueBuffer;
-	for (uint32_t nY = 0; nY < nSizeY; nY++) {
-		uint8_t* pTargetData = &m_PixelData[(nY + nYMin) * m_nPixelCountX + nXMin];
-
-		for (uint32_t nX = 0; nX < nSizeX; nX++) {
-			*pTargetData = *pSrcData;
-			pTargetData++;
-			pSrcData++;
-		}
-	}
-
-}
 
 void CImageObject::drawLayerObject(CLayerDataObject * pLayerDataObject, uint8_t nValue)
 {
@@ -322,7 +171,7 @@ void CImageObject::drawLine(double dX1, double dY1, double dX2, double dY2, uint
 
 	while (1) {
 		if ((intX1 >= 0) && (intY1 >= 0) && (intX1 < (int64_t)m_nPixelCountX) && (intY1 < (int64_t)m_nPixelCountY)) {
-			SetPixel(intX1, intY1, nValue);
+			setPixel(intX1, intY1, nValue);
 		}
 
 		if (intX1 == intX2 && intY1 == intY2) break;

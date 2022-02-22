@@ -47,7 +47,6 @@ Abstract: This is the class declaration of CRasterizer
 
 // Include custom headers here.
 
-
 namespace LibMCDriver_Rasterizer {
 namespace Impl {
 
@@ -94,7 +93,7 @@ public:
 
 	void AddLayer(ILayerObject* pLayerObject);
 
-	IImageObject* CalculateImage(const bool bAntialiased);
+	void CalculateImage(LibMCEnv::CImageData * pImageData, const bool bAntialiased);
 
 };
 
@@ -132,7 +131,7 @@ public:
 
 	void AddLayer(ILayerObject* pLayerObject) override;
 
-	IImageObject * CalculateImage(const bool bAntialiased) override;
+	void CalculateImage(LibMCEnv::PImageData pImageObject, const bool bAntialiased);
 
 };
 

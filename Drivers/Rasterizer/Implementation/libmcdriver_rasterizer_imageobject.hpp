@@ -56,7 +56,7 @@ namespace Impl {
  Class declaration of CImageObject 
 **************************************************************************************************************************/
 
-class CImageObject : public virtual IImageObject, public virtual CBase {
+class CImageObject {
 private:
 
 
@@ -71,35 +71,11 @@ protected:
 
 	std::vector <uint8_t> m_PixelData;
 
-	std::vector<uint8_t> m_EncodedPNGData;
-
 public:
 
 	CImageObject(const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY);
 
-	virtual ~CImageObject();
-
-	void GetDPI(LibMCDriver_Rasterizer_double & dDPIValueX, LibMCDriver_Rasterizer_double & dDPIValueY) override;
-
-	void GetSize(LibMCDriver_Rasterizer_double & dSizeX, LibMCDriver_Rasterizer_double & dSizeY) override;
-
-	void GetPixelSize(LibMCDriver_Rasterizer_uint32 & nPixelSizeX, LibMCDriver_Rasterizer_uint32 & nPixelSizeY) override;
-
-	void EncodePNG() override;
-
-	void ClearEncodedPNG() override;
-
-	void GetEncodedPNGData(LibMCDriver_Rasterizer_uint64 nPNGDataBufferSize, LibMCDriver_Rasterizer_uint64* pPNGDataNeededCount, LibMCDriver_Rasterizer_uint8* pPNGDataBuffer) override;
-
-	void Clear(const LibMCDriver_Rasterizer_uint8 nValue) override;
-
-	LibMCDriver_Rasterizer_uint8 GetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY) override;
-
-	void SetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue) override;
-
-	void GetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, LibMCDriver_Rasterizer_uint64 nValueBufferSize, LibMCDriver_Rasterizer_uint64* pValueNeededCount, LibMCDriver_Rasterizer_uint8 * pValueBuffer) override;
-
-	void SetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, const LibMCDriver_Rasterizer_uint64 nValueBufferSize, const LibMCDriver_Rasterizer_uint8 * pValueBuffer) override;
+	virtual ~CImageObject();	
 
 	void drawLayerObject(CLayerDataObject* pLayerDataObject, uint8_t nValue);
 
@@ -108,6 +84,10 @@ public:
 	void drawLine(double dX1, double dY1, double dX2, double dY2, uint8_t nValue);
 
 	void setPosition(double dPositionX, double dPositionY);
+
+	void clear(uint8_t nValue);
+
+	void setPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue);
 
 };
 

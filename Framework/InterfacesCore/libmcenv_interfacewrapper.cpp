@@ -219,6 +219,422 @@ LibMCEnvResult libmcenv_iterator_count(LibMCEnv_Iterator pIterator, LibMCEnv_uin
 
 
 /*************************************************************************************************************************
+ Class implementation for ImageData
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_imagedata_getpixelformat(LibMCEnv_ImageData pImageData, eLibMCEnvImagePixelFormat * pPixelFormat)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (pPixelFormat == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pPixelFormat = pIImageData->GetPixelFormat();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_changepixelformat(LibMCEnv_ImageData pImageData, eLibMCEnvImagePixelFormat ePixelFormat)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->ChangePixelFormat(ePixelFormat);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_getdpi(LibMCEnv_ImageData pImageData, LibMCEnv_double * pDPIValueX, LibMCEnv_double * pDPIValueY)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (!pDPIValueX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pDPIValueY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->GetDPI(*pDPIValueX, *pDPIValueY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_setdpi(LibMCEnv_ImageData pImageData, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->SetDPI(dDPIValueX, dDPIValueY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_getsizeinmm(LibMCEnv_ImageData pImageData, LibMCEnv_double * pSizeX, LibMCEnv_double * pSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (!pSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->GetSizeInMM(*pSizeX, *pSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_getsizeinpixels(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (!pPixelSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pPixelSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->GetSizeInPixels(*pPixelSizeX, *pPixelSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_resizeimage(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 * pPixelSizeX, LibMCEnv_uint32 * pPixelSizeY)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (!pPixelSizeX)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (!pPixelSizeY)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->ResizeImage(*pPixelSizeX, *pPixelSizeY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_loadpng(LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if ((!pPNGDataBuffer) && !(pPNGDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->LoadPNG(nPNGDataBufferSize, pPNGDataNeededCount, pPNGDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_encodepng(LibMCEnv_ImageData pImageData)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->EncodePNG();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_getencodedpngdata(LibMCEnv_ImageData pImageData, const LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if ((!pPNGDataBuffer) && !(pPNGDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->GetEncodedPNGData(nPNGDataBufferSize, pPNGDataNeededCount, pPNGDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_clearencodedpngdata(LibMCEnv_ImageData pImageData)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->ClearEncodedPNGData();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_clear(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->Clear(nValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_getpixel(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_uint32 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pValue = pIImageData->GetPixel(nX, nY);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_setpixel(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nX, LibMCEnv_uint32 nY, LibMCEnv_uint32 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->SetPixel(nX, nY, nValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_getpixelrange(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if ((!pValueBuffer) && !(pValueNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->GetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueNeededCount, pValueBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_imagedata_setpixelrange(LibMCEnv_ImageData pImageData, LibMCEnv_uint32 nXMin, LibMCEnv_uint32 nYMin, LibMCEnv_uint32 nXMax, LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pImageData;
+
+	try {
+		if ( (!pValueBuffer) && (nValueBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IImageData* pIImageData = dynamic_cast<IImageData*>(pIBaseClass);
+		if (!pIImageData)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIImageData->SetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for ToolpathPart
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_toolpathpart_getname(LibMCEnv_ToolpathPart pToolpathPart, const LibMCEnv_uint32 nNameBufferSize, LibMCEnv_uint32* pNameNeededChars, char * pNameBuffer)
@@ -2715,6 +3131,64 @@ LibMCEnvResult libmcenv_driverenvironment_loginfo(LibMCEnv_DriverEnvironment pDr
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_createemptyimage(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseImageDataInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIDriverEnvironment->CreateEmptyImage(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_loadpngimage(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if ( (!pPNGDataBuffer) && (nPNGDataBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseImageDataInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIDriverEnvironment->LoadPNGImage(nPNGDataBufferSize, pPNGDataBuffer, dDPIValueX, dDPIValueY, ePixelFormat);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for SignalTrigger
@@ -4619,6 +5093,64 @@ LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironm
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_createemptyimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseImageDataInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIStateEnvironment->CreateEmptyImage(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if ( (!pPNGDataBuffer) && (nPNGDataBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseImageDataInstance(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIStateEnvironment->LoadPNGImage(nPNGDataBufferSize, pPNGDataBuffer, dDPIValueX, dDPIValueY, ePixelFormat);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UIEnvironment
@@ -5494,6 +6026,64 @@ LibMCEnvResult libmcenv_uienvironment_setuipropertyasbool(LibMCEnv_UIEnvironment
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_createemptyimage(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseImageDataInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIUIEnvironment->CreateEmptyImage(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_loadpngimage(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if ( (!pPNGDataBuffer) && (nPNGDataBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pImageDataInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseImageDataInstance(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseImageDataInstance = pIUIEnvironment->LoadPNGImage(nPNGDataBufferSize, pPNGDataBuffer, dDPIValueX, dDPIValueY, ePixelFormat);
+
+		*pImageDataInstance = (IBase*)(pBaseImageDataInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -5519,6 +6109,38 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_iterator_clone;
 	if (sProcName == "libmcenv_iterator_count") 
 		*ppProcAddress = (void*) &libmcenv_iterator_count;
+	if (sProcName == "libmcenv_imagedata_getpixelformat") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelformat;
+	if (sProcName == "libmcenv_imagedata_changepixelformat") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_changepixelformat;
+	if (sProcName == "libmcenv_imagedata_getdpi") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getdpi;
+	if (sProcName == "libmcenv_imagedata_setdpi") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_setdpi;
+	if (sProcName == "libmcenv_imagedata_getsizeinmm") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getsizeinmm;
+	if (sProcName == "libmcenv_imagedata_getsizeinpixels") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getsizeinpixels;
+	if (sProcName == "libmcenv_imagedata_resizeimage") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_resizeimage;
+	if (sProcName == "libmcenv_imagedata_loadpng") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_loadpng;
+	if (sProcName == "libmcenv_imagedata_encodepng") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_encodepng;
+	if (sProcName == "libmcenv_imagedata_getencodedpngdata") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getencodedpngdata;
+	if (sProcName == "libmcenv_imagedata_clearencodedpngdata") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_clearencodedpngdata;
+	if (sProcName == "libmcenv_imagedata_clear") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_clear;
+	if (sProcName == "libmcenv_imagedata_getpixel") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getpixel;
+	if (sProcName == "libmcenv_imagedata_setpixel") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_setpixel;
+	if (sProcName == "libmcenv_imagedata_getpixelrange") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelrange;
+	if (sProcName == "libmcenv_imagedata_setpixelrange") 
+		*ppProcAddress = (void*) &libmcenv_imagedata_setpixelrange;
 	if (sProcName == "libmcenv_toolpathpart_getname") 
 		*ppProcAddress = (void*) &libmcenv_toolpathpart_getname;
 	if (sProcName == "libmcenv_toolpathpart_getuuid") 
@@ -5667,6 +6289,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_logwarning;
 	if (sProcName == "libmcenv_driverenvironment_loginfo") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_loginfo;
+	if (sProcName == "libmcenv_driverenvironment_createemptyimage") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createemptyimage;
+	if (sProcName == "libmcenv_driverenvironment_loadpngimage") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_loadpngimage;
 	if (sProcName == "libmcenv_signaltrigger_cantrigger") 
 		*ppProcAddress = (void*) &libmcenv_signaltrigger_cantrigger;
 	if (sProcName == "libmcenv_signaltrigger_trigger") 
@@ -5779,6 +6405,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getboolparameter;
 	if (sProcName == "libmcenv_stateenvironment_loadresourcedata") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcedata;
+	if (sProcName == "libmcenv_stateenvironment_createemptyimage") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_createemptyimage;
+	if (sProcName == "libmcenv_stateenvironment_loadpngimage") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadpngimage;
 	if (sProcName == "libmcenv_uienvironment_activatemodaldialog") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_activatemodaldialog;
 	if (sProcName == "libmcenv_uienvironment_closemodaldialog") 
@@ -5827,6 +6457,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_setuipropertyasinteger;
 	if (sProcName == "libmcenv_uienvironment_setuipropertyasbool") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_setuipropertyasbool;
+	if (sProcName == "libmcenv_uienvironment_createemptyimage") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_createemptyimage;
+	if (sProcName == "libmcenv_uienvironment_loadpngimage") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_loadpngimage;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

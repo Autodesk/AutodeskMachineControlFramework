@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_interfaceexception.hpp"
 #include "amc_systemstate.hpp"
 #include "libmcenv_signaltrigger.hpp"
+#include "libmcenv_imagedata.hpp"
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 
@@ -276,4 +277,16 @@ bool CUIEnvironment::getCloseModalDialog()
 std::string CUIEnvironment::getPageToActivate()
 {
     return m_sPageToActivate;
+}
+
+
+
+IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
+IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
 }

@@ -177,7 +177,9 @@ file(GLOB LIBMC_SRC_DEP_PUGIXML
 file(GLOB LIBMC_SRC_DEP_CROSSGUID
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/crossguid/guid.cpp
 )
-
+file(GLOB LIBMC_SRC_DEP_LODEPNG
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/LodePNG/lodepng.cpp
+)
 source_group("core" FILES ${LIBMC_SRC_CORE})
 source_group("common" FILES ${LIBMC_SRC_COMMON})
 source_group("api" FILES ${LIBMC_SRC_API})
@@ -188,6 +190,7 @@ source_group("dependencies\\crossguid" FILES ${LIBMC_SRC_DEP_CROSSGUID})
 source_group("dependencies\\zip" FILES ${LIBMC_SRC_DEP_ZIP})
 source_group("dependencies\\zlib" FILES ${LIBMC_SRC_DEP_ZLIB})
 source_group("dependencies\\pugixml" FILES ${LIBMC_SRC_DEP_PUGIXML})
+source_group("dependencies\\lodepng" FILES ${LIBMC_SRC_DEP_LODEPNG})
 
 
 set(LIBMC_SRC 
@@ -201,6 +204,7 @@ set(LIBMC_SRC
   ${LIBMC_SRC_DEP_ZLIB}
   ${LIBMC_SRC_DEP_PUGIXML}
   ${LIBMC_SRC_DEP_CROSSGUID}
+  ${LIBMC_SRC_DEP_LODEPNG}
 )
 
 add_library(libmc SHARED ${LIBMC_SRC})

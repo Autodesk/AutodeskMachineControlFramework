@@ -346,294 +346,6 @@ LibMCDriver_RasterizerResult libmcdriver_rasterizer_driver_queryparameters(LibMC
 
 
 /*************************************************************************************************************************
- Class implementation for ImageObject
-**************************************************************************************************************************/
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getdpi(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_double * pDPIValueX, LibMCDriver_Rasterizer_double * pDPIValueY)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		if (!pDPIValueX)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		if (!pDPIValueY)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->GetDPI(*pDPIValueX, *pDPIValueY);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getsize(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_double * pSizeX, LibMCDriver_Rasterizer_double * pSizeY)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		if (!pSizeX)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		if (!pSizeY)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->GetSize(*pSizeX, *pSizeY);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getpixelsize(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 * pPixelSizeX, LibMCDriver_Rasterizer_uint32 * pPixelSizeY)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		if (!pPixelSizeX)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		if (!pPixelSizeY)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->GetPixelSize(*pPixelSizeX, *pPixelSizeY);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_encodepng(LibMCDriver_Rasterizer_ImageObject pImageObject)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->EncodePNG();
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_clearencodedpng(LibMCDriver_Rasterizer_ImageObject pImageObject)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->ClearEncodedPNG();
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getencodedpngdata(LibMCDriver_Rasterizer_ImageObject pImageObject, const LibMCDriver_Rasterizer_uint64 nPNGDataBufferSize, LibMCDriver_Rasterizer_uint64* pPNGDataNeededCount, LibMCDriver_Rasterizer_uint8 * pPNGDataBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		if ((!pPNGDataBuffer) && !(pPNGDataNeededCount))
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->GetEncodedPNGData(nPNGDataBufferSize, pPNGDataNeededCount, pPNGDataBuffer);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_clear(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint8 nValue)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->Clear(nValue);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getpixel(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nX, LibMCDriver_Rasterizer_uint32 nY, LibMCDriver_Rasterizer_uint8 * pValue)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		if (pValue == nullptr)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		*pValue = pIImageObject->GetPixel(nX, nY);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_setpixel(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nX, LibMCDriver_Rasterizer_uint32 nY, LibMCDriver_Rasterizer_uint8 nValue)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->SetPixel(nX, nY, nValue);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getpixelrange(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nXMin, LibMCDriver_Rasterizer_uint32 nYMin, LibMCDriver_Rasterizer_uint32 nXMax, LibMCDriver_Rasterizer_uint32 nYMax, const LibMCDriver_Rasterizer_uint64 nValueBufferSize, LibMCDriver_Rasterizer_uint64* pValueNeededCount, LibMCDriver_Rasterizer_uint8 * pValueBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		if ((!pValueBuffer) && !(pValueNeededCount))
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->GetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueNeededCount, pValueBuffer);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_setpixelrange(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nXMin, LibMCDriver_Rasterizer_uint32 nYMin, LibMCDriver_Rasterizer_uint32 nXMax, LibMCDriver_Rasterizer_uint32 nYMax, LibMCDriver_Rasterizer_uint64 nValueBufferSize, const LibMCDriver_Rasterizer_uint8 * pValueBuffer)
-{
-	IBase* pIBaseClass = (IBase *)pImageObject;
-
-	try {
-		if ( (!pValueBuffer) && (nValueBufferSize>0))
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IImageObject* pIImageObject = dynamic_cast<IImageObject*>(pIBaseClass);
-		if (!pIImageObject)
-			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
-		
-		pIImageObject->SetPixelRange(nXMin, nYMin, nXMax, nYMax, nValueBufferSize, pValueBuffer);
-
-		return LIBMCDRIVER_RASTERIZER_SUCCESS;
-	}
-	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
-		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-
-/*************************************************************************************************************************
  Class implementation for LayerObject
 **************************************************************************************************************************/
 LibMCDriver_RasterizerResult libmcdriver_rasterizer_layerobject_getentitycount(LibMCDriver_Rasterizer_LayerObject pLayerObject, LibMCDriver_Rasterizer_uint32 * pEntityCount)
@@ -1108,21 +820,22 @@ LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_addlayer(LibMCDri
 	}
 }
 
-LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_calculateimage(LibMCDriver_Rasterizer_Rasterizer pRasterizer, bool bAntialiased, LibMCDriver_Rasterizer_ImageObject * pImageObject)
+LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_calculateimage(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCEnv_ImageData pImageObject, bool bAntialiased)
 {
 	IBase* pIBaseClass = (IBase *)pRasterizer;
 
 	try {
-		if (pImageObject == nullptr)
-			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		IBase* pBaseImageObject(nullptr);
+		LibMCEnv::PImageData pIImageObject = std::make_shared<LibMCEnv::CImageData>(CWrapper::sPLibMCEnvWrapper.get(), pImageObject);
+		CWrapper::sPLibMCEnvWrapper->AcquireInstance(pIImageObject.get());
+		if (!pIImageObject)
+			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
+		
 		IRasterizer* pIRasterizer = dynamic_cast<IRasterizer*>(pIBaseClass);
 		if (!pIRasterizer)
 			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
 		
-		pBaseImageObject = pIRasterizer->CalculateImage(bAntialiased);
+		pIRasterizer->CalculateImage(pIImageObject, bAntialiased);
 
-		*pImageObject = (IBase*)(pBaseImageObject);
 		return LIBMCDRIVER_RASTERIZER_SUCCESS;
 	}
 	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
@@ -1477,28 +1190,6 @@ LibMCDriver_RasterizerResult LibMCDriver_Rasterizer::Impl::LibMCDriver_Rasterize
 		*ppProcAddress = (void*) &libmcdriver_rasterizer_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_rasterizer_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_rasterizer_driver_queryparameters;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_getdpi") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_getdpi;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_getsize") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_getsize;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_getpixelsize") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_getpixelsize;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_encodepng") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_encodepng;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_clearencodedpng") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_clearencodedpng;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_getencodedpngdata") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_getencodedpngdata;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_clear") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_clear;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_getpixel") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_getpixel;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_setpixel") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_setpixel;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_getpixelrange") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_getpixelrange;
-	if (sProcName == "libmcdriver_rasterizer_imageobject_setpixelrange") 
-		*ppProcAddress = (void*) &libmcdriver_rasterizer_imageobject_setpixelrange;
 	if (sProcName == "libmcdriver_rasterizer_layerobject_getentitycount") 
 		*ppProcAddress = (void*) &libmcdriver_rasterizer_layerobject_getentitycount;
 	if (sProcName == "libmcdriver_rasterizer_layerobject_getentity") 

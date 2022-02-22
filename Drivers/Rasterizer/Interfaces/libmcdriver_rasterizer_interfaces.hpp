@@ -57,7 +57,6 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
-class IImageObject;
 class ILayerObject;
 class IRasterizer;
 class ISliceStack;
@@ -314,101 +313,6 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
- Class interface for ImageObject 
-**************************************************************************************************************************/
-
-class IImageObject : public virtual IBase {
-public:
-	/**
-	* IImageObject::GetDPI - Returns DPI values in X and Y.
-	* @param[out] dDPIValueX - DPI value in X
-	* @param[out] dDPIValueY - DPI value in Y
-	*/
-	virtual void GetDPI(LibMCDriver_Rasterizer_double & dDPIValueX, LibMCDriver_Rasterizer_double & dDPIValueY) = 0;
-
-	/**
-	* IImageObject::GetSize - Returns image sizes.
-	* @param[out] dSizeX - Size in X in mm
-	* @param[out] dSizeY - Size in Y in mm
-	*/
-	virtual void GetSize(LibMCDriver_Rasterizer_double & dSizeX, LibMCDriver_Rasterizer_double & dSizeY) = 0;
-
-	/**
-	* IImageObject::GetPixelSize - Returns image pixel sizes.
-	* @param[out] nPixelSizeX - Number of pixels in X
-	* @param[out] nPixelSizeY - Number of pixels in Y
-	*/
-	virtual void GetPixelSize(LibMCDriver_Rasterizer_uint32 & nPixelSizeX, LibMCDriver_Rasterizer_uint32 & nPixelSizeY) = 0;
-
-	/**
-	* IImageObject::EncodePNG - Encodes PNG and stores data stream in image object.
-	*/
-	virtual void EncodePNG() = 0;
-
-	/**
-	* IImageObject::ClearEncodedPNG - Releases encoded data stream of image object.
-	*/
-	virtual void ClearEncodedPNG() = 0;
-
-	/**
-	* IImageObject::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-	* @param[in] nPNGDataBufferSize - Number of elements in buffer
-	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
-	*/
-	virtual void GetEncodedPNGData(LibMCDriver_Rasterizer_uint64 nPNGDataBufferSize, LibMCDriver_Rasterizer_uint64* pPNGDataNeededCount, LibMCDriver_Rasterizer_uint8 * pPNGDataBuffer) = 0;
-
-	/**
-	* IImageObject::Clear - Sets all pixels to a single value.
-	* @param[in] nValue - Pixel value.
-	*/
-	virtual void Clear(const LibMCDriver_Rasterizer_uint8 nValue) = 0;
-
-	/**
-	* IImageObject::GetPixel - Returns one pixel of an image.
-	* @param[in] nX - Pixel coordinate in X
-	* @param[in] nY - Pixel coordinate in Y
-	* @return Pixel value at this position
-	*/
-	virtual LibMCDriver_Rasterizer_uint8 GetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY) = 0;
-
-	/**
-	* IImageObject::SetPixel - Sets one pixel of an image.
-	* @param[in] nX - Pixel coordinate in X
-	* @param[in] nY - Pixel coordinate in Y
-	* @param[in] nValue - New Pixel value at this position
-	*/
-	virtual void SetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue) = 0;
-
-	/**
-	* IImageObject::GetPixelRange - Returns a subset of an image or the whole image data.
-	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
-	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
-	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
-	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-	* @param[in] nValueBufferSize - Number of elements in buffer
-	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
-	*/
-	virtual void GetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, LibMCDriver_Rasterizer_uint64 nValueBufferSize, LibMCDriver_Rasterizer_uint64* pValueNeededCount, LibMCDriver_Rasterizer_uint8 * pValueBuffer) = 0;
-
-	/**
-	* IImageObject::SetPixelRange - Exchanges a subset of an image or the whole image data.
-	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
-	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
-	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
-	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-	* @param[in] nValueBufferSize - Number of elements in buffer
-	* @param[in] pValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
-	*/
-	virtual void SetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, const LibMCDriver_Rasterizer_uint64 nValueBufferSize, const LibMCDriver_Rasterizer_uint8 * pValueBuffer) = 0;
-
-};
-
-typedef IBaseSharedPtr<IImageObject> PIImageObject;
-
-
-/*************************************************************************************************************************
  Class interface for LayerObject 
 **************************************************************************************************************************/
 
@@ -549,10 +453,10 @@ public:
 
 	/**
 	* IRasterizer::CalculateImage - Calculates the image.
+	* @param[in] pImageObject - ImageObject Instance to render into
 	* @param[in] bAntialiased - Image output is greyscale if true, black and white with 0.5 threshold if false.
-	* @return ImageObject Instance
 	*/
-	virtual IImageObject * CalculateImage(const bool bAntialiased) = 0;
+	virtual void CalculateImage(LibMCEnv::PImageData pImageObject, const bool bAntialiased) = 0;
 
 };
 

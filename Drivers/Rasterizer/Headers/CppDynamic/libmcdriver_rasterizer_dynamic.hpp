@@ -62,7 +62,6 @@ namespace LibMCDriver_Rasterizer {
 class CWrapper;
 class CBase;
 class CDriver;
-class CImageObject;
 class CLayerObject;
 class CRasterizer;
 class CSliceStack;
@@ -74,7 +73,6 @@ class CDriver_Rasterizer;
 typedef CWrapper CLibMCDriver_RasterizerWrapper;
 typedef CBase CLibMCDriver_RasterizerBase;
 typedef CDriver CLibMCDriver_RasterizerDriver;
-typedef CImageObject CLibMCDriver_RasterizerImageObject;
 typedef CLayerObject CLibMCDriver_RasterizerLayerObject;
 typedef CRasterizer CLibMCDriver_RasterizerRasterizer;
 typedef CSliceStack CLibMCDriver_RasterizerSliceStack;
@@ -86,7 +84,6 @@ typedef CDriver_Rasterizer CLibMCDriver_RasterizerDriver_Rasterizer;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
-typedef std::shared_ptr<CImageObject> PImageObject;
 typedef std::shared_ptr<CLayerObject> PLayerObject;
 typedef std::shared_ptr<CRasterizer> PRasterizer;
 typedef std::shared_ptr<CSliceStack> PSliceStack;
@@ -98,7 +95,6 @@ typedef std::shared_ptr<CDriver_Rasterizer> PDriver_Rasterizer;
 typedef PWrapper PLibMCDriver_RasterizerWrapper;
 typedef PBase PLibMCDriver_RasterizerBase;
 typedef PDriver PLibMCDriver_RasterizerDriver;
-typedef PImageObject PLibMCDriver_RasterizerImageObject;
 typedef PLayerObject PLibMCDriver_RasterizerLayerObject;
 typedef PRasterizer PLibMCDriver_RasterizerRasterizer;
 typedef PSliceStack PLibMCDriver_RasterizerSliceStack;
@@ -281,7 +277,6 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
-	friend class CImageObject;
 	friend class CLayerObject;
 	friend class CRasterizer;
 	friend class CSliceStack;
@@ -369,33 +364,6 @@ public:
 };
 	
 /*************************************************************************************************************************
- Class CImageObject 
-**************************************************************************************************************************/
-class CImageObject : public CBase {
-public:
-	
-	/**
-	* CImageObject::CImageObject - Constructor for ImageObject class.
-	*/
-	CImageObject(CWrapper* pWrapper, LibMCDriver_RasterizerHandle pHandle)
-		: CBase(pWrapper, pHandle)
-	{
-	}
-	
-	inline void GetDPI(LibMCDriver_Rasterizer_double & dDPIValueX, LibMCDriver_Rasterizer_double & dDPIValueY);
-	inline void GetSize(LibMCDriver_Rasterizer_double & dSizeX, LibMCDriver_Rasterizer_double & dSizeY);
-	inline void GetPixelSize(LibMCDriver_Rasterizer_uint32 & nPixelSizeX, LibMCDriver_Rasterizer_uint32 & nPixelSizeY);
-	inline void EncodePNG();
-	inline void ClearEncodedPNG();
-	inline void GetEncodedPNGData(std::vector<LibMCDriver_Rasterizer_uint8> & PNGDataBuffer);
-	inline void Clear(const LibMCDriver_Rasterizer_uint8 nValue);
-	inline LibMCDriver_Rasterizer_uint8 GetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY);
-	inline void SetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue);
-	inline void GetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, std::vector<LibMCDriver_Rasterizer_uint8> & ValueBuffer);
-	inline void SetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, const CInputVector<LibMCDriver_Rasterizer_uint8> & ValueBuffer);
-};
-	
-/*************************************************************************************************************************
  Class CLayerObject 
 **************************************************************************************************************************/
 class CLayerObject : public CBase {
@@ -442,7 +410,7 @@ public:
 	inline void SetSubsampling(const LibMCDriver_Rasterizer_uint32 nSubsamplingX, const LibMCDriver_Rasterizer_uint32 nSubsamplingY);
 	inline void GetSubsampling(LibMCDriver_Rasterizer_uint32 & nSubsamplingX, LibMCDriver_Rasterizer_uint32 & nSubsamplingY);
 	inline void AddLayer(classParam<CLayerObject> pLayerObject);
-	inline PImageObject CalculateImage(const bool bAntialiased);
+	inline void CalculateImage(classParam<LibMCEnv::CImageData> pImageObject, const bool bAntialiased);
 };
 	
 /*************************************************************************************************************************
@@ -615,17 +583,6 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
-		pWrapperTable->m_ImageObject_GetDPI = nullptr;
-		pWrapperTable->m_ImageObject_GetSize = nullptr;
-		pWrapperTable->m_ImageObject_GetPixelSize = nullptr;
-		pWrapperTable->m_ImageObject_EncodePNG = nullptr;
-		pWrapperTable->m_ImageObject_ClearEncodedPNG = nullptr;
-		pWrapperTable->m_ImageObject_GetEncodedPNGData = nullptr;
-		pWrapperTable->m_ImageObject_Clear = nullptr;
-		pWrapperTable->m_ImageObject_GetPixel = nullptr;
-		pWrapperTable->m_ImageObject_SetPixel = nullptr;
-		pWrapperTable->m_ImageObject_GetPixelRange = nullptr;
-		pWrapperTable->m_ImageObject_SetPixelRange = nullptr;
 		pWrapperTable->m_LayerObject_GetEntityCount = nullptr;
 		pWrapperTable->m_LayerObject_GetEntity = nullptr;
 		pWrapperTable->m_LayerObject_AddEntity = nullptr;
@@ -762,105 +719,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_GetDPI = (PLibMCDriver_RasterizerImageObject_GetDPIPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_getdpi");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_GetDPI = (PLibMCDriver_RasterizerImageObject_GetDPIPtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_getdpi");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_GetDPI == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_GetSize = (PLibMCDriver_RasterizerImageObject_GetSizePtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_getsize");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_GetSize = (PLibMCDriver_RasterizerImageObject_GetSizePtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_getsize");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_GetSize == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_GetPixelSize = (PLibMCDriver_RasterizerImageObject_GetPixelSizePtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_getpixelsize");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_GetPixelSize = (PLibMCDriver_RasterizerImageObject_GetPixelSizePtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_getpixelsize");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_GetPixelSize == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_EncodePNG = (PLibMCDriver_RasterizerImageObject_EncodePNGPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_encodepng");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_EncodePNG = (PLibMCDriver_RasterizerImageObject_EncodePNGPtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_encodepng");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_EncodePNG == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_ClearEncodedPNG = (PLibMCDriver_RasterizerImageObject_ClearEncodedPNGPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_clearencodedpng");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_ClearEncodedPNG = (PLibMCDriver_RasterizerImageObject_ClearEncodedPNGPtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_clearencodedpng");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_ClearEncodedPNG == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_GetEncodedPNGData = (PLibMCDriver_RasterizerImageObject_GetEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_getencodedpngdata");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_GetEncodedPNGData = (PLibMCDriver_RasterizerImageObject_GetEncodedPNGDataPtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_getencodedpngdata");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_GetEncodedPNGData == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_Clear = (PLibMCDriver_RasterizerImageObject_ClearPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_clear");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_Clear = (PLibMCDriver_RasterizerImageObject_ClearPtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_clear");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_Clear == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_GetPixel = (PLibMCDriver_RasterizerImageObject_GetPixelPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_getpixel");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_GetPixel = (PLibMCDriver_RasterizerImageObject_GetPixelPtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_getpixel");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_GetPixel == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_SetPixel = (PLibMCDriver_RasterizerImageObject_SetPixelPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_setpixel");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_SetPixel = (PLibMCDriver_RasterizerImageObject_SetPixelPtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_setpixel");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_SetPixel == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_GetPixelRange = (PLibMCDriver_RasterizerImageObject_GetPixelRangePtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_getpixelrange");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_GetPixelRange = (PLibMCDriver_RasterizerImageObject_GetPixelRangePtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_getpixelrange");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_GetPixelRange == nullptr)
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_ImageObject_SetPixelRange = (PLibMCDriver_RasterizerImageObject_SetPixelRangePtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_imageobject_setpixelrange");
-		#else // _WIN32
-		pWrapperTable->m_ImageObject_SetPixelRange = (PLibMCDriver_RasterizerImageObject_SetPixelRangePtr) dlsym(hLibrary, "libmcdriver_rasterizer_imageobject_setpixelrange");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_ImageObject_SetPixelRange == nullptr)
 			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1227,50 +1085,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_getdpi", (void**)&(pWrapperTable->m_ImageObject_GetDPI));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_GetDPI == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_getsize", (void**)&(pWrapperTable->m_ImageObject_GetSize));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_GetSize == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_getpixelsize", (void**)&(pWrapperTable->m_ImageObject_GetPixelSize));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_GetPixelSize == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_encodepng", (void**)&(pWrapperTable->m_ImageObject_EncodePNG));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_EncodePNG == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_clearencodedpng", (void**)&(pWrapperTable->m_ImageObject_ClearEncodedPNG));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_ClearEncodedPNG == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_getencodedpngdata", (void**)&(pWrapperTable->m_ImageObject_GetEncodedPNGData));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_GetEncodedPNGData == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_clear", (void**)&(pWrapperTable->m_ImageObject_Clear));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_Clear == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_getpixel", (void**)&(pWrapperTable->m_ImageObject_GetPixel));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_GetPixel == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_setpixel", (void**)&(pWrapperTable->m_ImageObject_SetPixel));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_SetPixel == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_getpixelrange", (void**)&(pWrapperTable->m_ImageObject_GetPixelRange));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_GetPixelRange == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_rasterizer_imageobject_setpixelrange", (void**)&(pWrapperTable->m_ImageObject_SetPixelRange));
-		if ( (eLookupError != 0) || (pWrapperTable->m_ImageObject_SetPixelRange == nullptr) )
-			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdriver_rasterizer_layerobject_getentitycount", (void**)&(pWrapperTable->m_LayerObject_GetEntityCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LayerObject_GetEntityCount == nullptr) )
 			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1512,133 +1326,6 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CImageObject
-	 */
-	
-	/**
-	* CImageObject::GetDPI - Returns DPI values in X and Y.
-	* @param[out] dDPIValueX - DPI value in X
-	* @param[out] dDPIValueY - DPI value in Y
-	*/
-	void CImageObject::GetDPI(LibMCDriver_Rasterizer_double & dDPIValueX, LibMCDriver_Rasterizer_double & dDPIValueY)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetDPI(m_pHandle, &dDPIValueX, &dDPIValueY));
-	}
-	
-	/**
-	* CImageObject::GetSize - Returns image sizes.
-	* @param[out] dSizeX - Size in X in mm
-	* @param[out] dSizeY - Size in Y in mm
-	*/
-	void CImageObject::GetSize(LibMCDriver_Rasterizer_double & dSizeX, LibMCDriver_Rasterizer_double & dSizeY)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetSize(m_pHandle, &dSizeX, &dSizeY));
-	}
-	
-	/**
-	* CImageObject::GetPixelSize - Returns image pixel sizes.
-	* @param[out] nPixelSizeX - Number of pixels in X
-	* @param[out] nPixelSizeY - Number of pixels in Y
-	*/
-	void CImageObject::GetPixelSize(LibMCDriver_Rasterizer_uint32 & nPixelSizeX, LibMCDriver_Rasterizer_uint32 & nPixelSizeY)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetPixelSize(m_pHandle, &nPixelSizeX, &nPixelSizeY));
-	}
-	
-	/**
-	* CImageObject::EncodePNG - Encodes PNG and stores data stream in image object.
-	*/
-	void CImageObject::EncodePNG()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_EncodePNG(m_pHandle));
-	}
-	
-	/**
-	* CImageObject::ClearEncodedPNG - Releases encoded data stream of image object.
-	*/
-	void CImageObject::ClearEncodedPNG()
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_ClearEncodedPNG(m_pHandle));
-	}
-	
-	/**
-	* CImageObject::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-	* @param[out] PNGDataBuffer - PNG Data stream.
-	*/
-	void CImageObject::GetEncodedPNGData(std::vector<LibMCDriver_Rasterizer_uint8> & PNGDataBuffer)
-	{
-		LibMCDriver_Rasterizer_uint64 elementsNeededPNGData = 0;
-		LibMCDriver_Rasterizer_uint64 elementsWrittenPNGData = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetEncodedPNGData(m_pHandle, 0, &elementsNeededPNGData, nullptr));
-		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetEncodedPNGData(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
-	}
-	
-	/**
-	* CImageObject::Clear - Sets all pixels to a single value.
-	* @param[in] nValue - Pixel value.
-	*/
-	void CImageObject::Clear(const LibMCDriver_Rasterizer_uint8 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_Clear(m_pHandle, nValue));
-	}
-	
-	/**
-	* CImageObject::GetPixel - Returns one pixel of an image.
-	* @param[in] nX - Pixel coordinate in X
-	* @param[in] nY - Pixel coordinate in Y
-	* @return Pixel value at this position
-	*/
-	LibMCDriver_Rasterizer_uint8 CImageObject::GetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY)
-	{
-		LibMCDriver_Rasterizer_uint8 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetPixel(m_pHandle, nX, nY, &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CImageObject::SetPixel - Sets one pixel of an image.
-	* @param[in] nX - Pixel coordinate in X
-	* @param[in] nY - Pixel coordinate in Y
-	* @param[in] nValue - New Pixel value at this position
-	*/
-	void CImageObject::SetPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_SetPixel(m_pHandle, nX, nY, nValue));
-	}
-	
-	/**
-	* CImageObject::GetPixelRange - Returns a subset of an image or the whole image data.
-	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
-	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
-	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
-	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
-	*/
-	void CImageObject::GetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, std::vector<LibMCDriver_Rasterizer_uint8> & ValueBuffer)
-	{
-		LibMCDriver_Rasterizer_uint64 elementsNeededValue = 0;
-		LibMCDriver_Rasterizer_uint64 elementsWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, 0, &elementsNeededValue, nullptr));
-		ValueBuffer.resize((size_t) elementsNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, elementsNeededValue, &elementsWrittenValue, ValueBuffer.data()));
-	}
-	
-	/**
-	* CImageObject::SetPixelRange - Exchanges a subset of an image or the whole image data.
-	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
-	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
-	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
-	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-	* @param[in] ValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
-	*/
-	void CImageObject::SetPixelRange(const LibMCDriver_Rasterizer_uint32 nXMin, const LibMCDriver_Rasterizer_uint32 nYMin, const LibMCDriver_Rasterizer_uint32 nXMax, const LibMCDriver_Rasterizer_uint32 nYMax, const CInputVector<LibMCDriver_Rasterizer_uint8> & ValueBuffer)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_ImageObject_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCDriver_Rasterizer_uint64)ValueBuffer.size(), ValueBuffer.data()));
-	}
-	
-	/**
 	 * Method definitions for class CLayerObject
 	 */
 	
@@ -1860,18 +1547,13 @@ public:
 	
 	/**
 	* CRasterizer::CalculateImage - Calculates the image.
+	* @param[in] pImageObject - ImageObject Instance to render into
 	* @param[in] bAntialiased - Image output is greyscale if true, black and white with 0.5 threshold if false.
-	* @return ImageObject Instance
 	*/
-	PImageObject CRasterizer::CalculateImage(const bool bAntialiased)
+	void CRasterizer::CalculateImage(classParam<LibMCEnv::CImageData> pImageObject, const bool bAntialiased)
 	{
-		LibMCDriver_RasterizerHandle hImageObject = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Rasterizer_CalculateImage(m_pHandle, bAntialiased, &hImageObject));
-		
-		if (!hImageObject) {
-			CheckError(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CImageObject>(m_pWrapper, hImageObject);
+		LibMCEnvHandle hImageObject = pImageObject.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_Rasterizer_CalculateImage(m_pHandle, hImageObject, bAntialiased));
 	}
 	
 	/**

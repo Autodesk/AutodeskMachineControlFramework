@@ -133,127 +133,6 @@ LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasteri
 LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_driver_queryparameters(LibMCDriver_Rasterizer_Driver pDriver);
 
 /*************************************************************************************************************************
- Class definition for ImageObject
-**************************************************************************************************************************/
-
-/**
-* Returns DPI values in X and Y.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[out] pDPIValueX - DPI value in X
-* @param[out] pDPIValueY - DPI value in Y
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getdpi(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_double * pDPIValueX, LibMCDriver_Rasterizer_double * pDPIValueY);
-
-/**
-* Returns image sizes.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[out] pSizeX - Size in X in mm
-* @param[out] pSizeY - Size in Y in mm
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getsize(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_double * pSizeX, LibMCDriver_Rasterizer_double * pSizeY);
-
-/**
-* Returns image pixel sizes.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[out] pPixelSizeX - Number of pixels in X
-* @param[out] pPixelSizeY - Number of pixels in Y
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getpixelsize(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 * pPixelSizeX, LibMCDriver_Rasterizer_uint32 * pPixelSizeY);
-
-/**
-* Encodes PNG and stores data stream in image object.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_encodepng(LibMCDriver_Rasterizer_ImageObject pImageObject);
-
-/**
-* Releases encoded data stream of image object.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_clearencodedpng(LibMCDriver_Rasterizer_ImageObject pImageObject);
-
-/**
-* Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[in] nPNGDataBufferSize - Number of elements in buffer
-* @param[out] pPNGDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getencodedpngdata(LibMCDriver_Rasterizer_ImageObject pImageObject, const LibMCDriver_Rasterizer_uint64 nPNGDataBufferSize, LibMCDriver_Rasterizer_uint64* pPNGDataNeededCount, LibMCDriver_Rasterizer_uint8 * pPNGDataBuffer);
-
-/**
-* Sets all pixels to a single value.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[in] nValue - Pixel value.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_clear(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint8 nValue);
-
-/**
-* Returns one pixel of an image.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[in] nX - Pixel coordinate in X
-* @param[in] nY - Pixel coordinate in Y
-* @param[out] pValue - Pixel value at this position
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getpixel(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nX, LibMCDriver_Rasterizer_uint32 nY, LibMCDriver_Rasterizer_uint8 * pValue);
-
-/**
-* Sets one pixel of an image.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[in] nX - Pixel coordinate in X
-* @param[in] nY - Pixel coordinate in Y
-* @param[in] nValue - New Pixel value at this position
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_setpixel(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nX, LibMCDriver_Rasterizer_uint32 nY, LibMCDriver_Rasterizer_uint8 nValue);
-
-/**
-* Returns a subset of an image or the whole image data.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
-* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
-* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
-* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-* @param[in] nValueBufferSize - Number of elements in buffer
-* @param[out] pValueNeededCount - will be filled with the count of the written elements, or needed buffer size.
-* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_getpixelrange(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nXMin, LibMCDriver_Rasterizer_uint32 nYMin, LibMCDriver_Rasterizer_uint32 nXMax, LibMCDriver_Rasterizer_uint32 nYMax, const LibMCDriver_Rasterizer_uint64 nValueBufferSize, LibMCDriver_Rasterizer_uint64* pValueNeededCount, LibMCDriver_Rasterizer_uint8 * pValueBuffer);
-
-/**
-* Exchanges a subset of an image or the whole image data.
-*
-* @param[in] pImageObject - ImageObject instance.
-* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
-* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
-* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
-* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
-* @param[in] nValueBufferSize - Number of elements in buffer
-* @param[in] pValueBuffer - uint8 buffer of New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_imageobject_setpixelrange(LibMCDriver_Rasterizer_ImageObject pImageObject, LibMCDriver_Rasterizer_uint32 nXMin, LibMCDriver_Rasterizer_uint32 nYMin, LibMCDriver_Rasterizer_uint32 nXMax, LibMCDriver_Rasterizer_uint32 nYMax, LibMCDriver_Rasterizer_uint64 nValueBufferSize, const LibMCDriver_Rasterizer_uint8 * pValueBuffer);
-
-/*************************************************************************************************************************
  Class definition for LayerObject
 **************************************************************************************************************************/
 
@@ -438,11 +317,11 @@ LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasteri
 * Calculates the image.
 *
 * @param[in] pRasterizer - Rasterizer instance.
+* @param[in] pImageObject - ImageObject Instance to render into
 * @param[in] bAntialiased - Image output is greyscale if true, black and white with 0.5 threshold if false.
-* @param[out] pImageObject - ImageObject Instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_calculateimage(LibMCDriver_Rasterizer_Rasterizer pRasterizer, bool bAntialiased, LibMCDriver_Rasterizer_ImageObject * pImageObject);
+LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_calculateimage(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCEnv_ImageData pImageObject, bool bAntialiased);
 
 /*************************************************************************************************************************
  Class definition for SliceStack

@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_workingdirectory.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
+#include "libmcenv_imagedata.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -208,3 +209,15 @@ void CDriverEnvironment::LogInfo(const std::string& sLogString)
 {
     m_pLogger->logMessage(sLogString, m_sDriverName, AMC::eLogLevel::Info);
 }
+
+
+IImageData* CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
+IImageData* CDriverEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createFromPNG (pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
