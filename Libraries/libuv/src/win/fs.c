@@ -646,6 +646,16 @@ void fs__open(uv_fs_t* req) {
   }
 
   if (flags & UV_FS_O_FILEMAP) {
+#ifdef __GNUC__
+    BY_HANDLE_FILE_INFORMATION file_info;
+    if (!GetFileInformationByHandle(file,                                      
+                                      &file_info) {
+      SET_REQ_WIN32_ERROR(req, GetLastError());
+      CloseHandle(file);
+      return;
+    }
+
+#else
     FILE_STANDARD_INFO file_info;
     if (!GetFileInformationByHandleEx(file,
                                       FileStandardInfo,
@@ -655,6 +665,8 @@ void fs__open(uv_fs_t* req) {
       CloseHandle(file);
       return;
     }
+#endif	
+	
     fd_info.is_directory = file_info.Directory;
 
     if (fd_info.is_directory) {

@@ -104,10 +104,10 @@ then
 	export GOOS=windows
 	go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
-	echo "Building Go Server..."
-	set GOARCH=amd64
-	set GOOS=windows
-	go build -o "$builddir/Output/amc_server.exe" -ldflags="-s -w" "$basepath/Server/mcserver.go"
+	echo "Building Resource builder (Linux64)..."
+	export GOARCH=amd64
+	export GOOS=linux
+	go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
 else
 
@@ -133,7 +133,7 @@ go run "$basepath/BuildScripts/createPackageXML.go" ./Output $GITHASH $PLATFORMN
 echo "Building Core Modules"
 if test $PLATFORMNAME = "win64"
 then
-cmake -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
+cmake -DOVERRIDE_BUILDRESOURCES=linux -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
 else
 cmake ..
 fi
