@@ -108,7 +108,7 @@ then
 	export GOARCH=amd64
 	export GOOS=linux
 	go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
-
+	
 else
 
 	echo "Building Resource builder (Linux64)..."
@@ -149,7 +149,8 @@ cp ../githash.txt Framework/Dist/disthash.txt
 
 if test $PLATFORMNAME = "win64"
 then
-cp ../Output/amc_server.exe Framework/Dist/
+# cp ../Output/amc_server.exe Framework/Dist/
+echo "temporarily omitting server..."
 else
 cp ../Output/amc_server Framework/Dist/
 fi

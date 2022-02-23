@@ -649,11 +649,13 @@ void fs__open(uv_fs_t* req) {
 #ifdef __GNUC__
     BY_HANDLE_FILE_INFORMATION file_info;
     if (!GetFileInformationByHandle(file,                                      
-                                      &file_info) {
+                                      &file_info)) {
       SET_REQ_WIN32_ERROR(req, GetLastError());
       CloseHandle(file);
       return;
     }
+
+    fd_info.is_directory = (file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 
 #else
     FILE_STANDARD_INFO file_info;
@@ -665,9 +667,11 @@ void fs__open(uv_fs_t* req) {
       CloseHandle(file);
       return;
     }
+
+    fd_info.is_directory = file_info.Directory;
+
 #endif	
 	
-    fd_info.is_directory = file_info.Directory;
 
     if (fd_info.is_directory) {
       fd_info.size.QuadPart = 0;
