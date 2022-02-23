@@ -150,19 +150,20 @@ cp ../githash.txt Framework/Dist/disthash.txt
 if test $PLATFORMNAME = "win64"
 then
 # cp ../Output/amc_server.exe Framework/Dist/
-echo "temporarily omitting server..."
+DLLEXT=dll
 else
 cp ../Output/amc_server Framework/Dist/
+DLLEXT=so
 fi
 
 cp ../Output/amc_server.xml Framework/Dist/
-cp ../Output/${GITHASH}_core_libmc.so Framework/Dist/
-cp ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
-cp ../Output/${GITHASH}_core_libmcdata.so Framework/Dist/
+cp ../Output/${GITHASH}_core_libmc.${DLLEXT} Framework/Dist/
+cp ../Output/${GITHASH}_core_lib3mf.${DLLEXT} Framework/Dist/
+cp ../Output/${GITHASH}_core_libmcdata.${DLLEXT} Framework/Dist/
 cp ../Output/${GITHASH}_*.data Framework/Dist/
 cp ../Output/${GITHASH}_core.client Framework/Dist/
 cp ../Output/${GITHASH}_package.xml Framework/Dist/
-cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
+cp ../Output/${GITHASH}_driver_*.${DLLEXT} Framework/Dist/
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
