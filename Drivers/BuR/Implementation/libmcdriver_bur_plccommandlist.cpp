@@ -47,7 +47,8 @@ using namespace LibMCDriver_BuR::Impl;
 **************************************************************************************************************************/
 
 CPLCCommandList::CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGenerator* pTimeStampGenerator, bool bIsSimulationMode)
-    : m_pConnector (pConnector), m_pTimeStampGenerator (pTimeStampGenerator), m_ListIdentifier (PLC_INVALID_LISTIDENTIFIER)
+    : m_pConnector(pConnector), m_pTimeStampGenerator(pTimeStampGenerator), m_ListIdentifier(PLC_INVALID_LISTIDENTIFIER),
+    m_bIsSimulationMode (bIsSimulationMode)
 {
     if (pTimeStampGenerator == nullptr)
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
