@@ -121,6 +121,8 @@ typedef void * LibMCDriver_Rasterizer_pvoid;
 #define LIBMCDRIVER_RASTERIZER_ERROR_INVALIDIDENTIFIER 23
 #define LIBMCDRIVER_RASTERIZER_ERROR_IDENTIFIERNOTREGISTERED 24
 #define LIBMCDRIVER_RASTERIZER_ERROR_IDENTIFIERALREADYREGISTERED 25
+#define LIBMCDRIVER_RASTERIZER_ERROR_PIXELFORMATSHOULDBEGREYSCALE 26
+#define LIBMCDRIVER_RASTERIZER_ERROR_PIXELSIZEMISMATCH 27
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Rasterizer
@@ -154,6 +156,8 @@ inline const char * LIBMCDRIVER_RASTERIZER_GETERRORSTRING (LibMCDriver_Rasterize
     case LIBMCDRIVER_RASTERIZER_ERROR_INVALIDIDENTIFIER: return "invalid identifier string";
     case LIBMCDRIVER_RASTERIZER_ERROR_IDENTIFIERNOTREGISTERED: return "identifier not registered";
     case LIBMCDRIVER_RASTERIZER_ERROR_IDENTIFIERALREADYREGISTERED: return "identifier already registered";
+    case LIBMCDRIVER_RASTERIZER_ERROR_PIXELFORMATSHOULDBEGREYSCALE: return "pixel format should be greyscale";
+    case LIBMCDRIVER_RASTERIZER_ERROR_PIXELSIZEMISMATCH: return "pixel size mismatch";
     default: return "unknown error";
   }
 }

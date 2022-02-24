@@ -66,6 +66,8 @@
 		<error name="INVALIDIDENTIFIER" code="23" description="invalid identifier string" />
 		<error name="IDENTIFIERNOTREGISTERED" code="24" description="identifier not registered" />
 		<error name="IDENTIFIERALREADYREGISTERED" code="25" description="identifier already registered" />		
+		<error name="PIXELFORMATSHOULDBEGREYSCALE" code="26" description="pixel format should be greyscale" />
+		<error name="PIXELSIZEMISMATCH" code="27" description="pixel size mismatch" />		
 		
 	</errors>
 

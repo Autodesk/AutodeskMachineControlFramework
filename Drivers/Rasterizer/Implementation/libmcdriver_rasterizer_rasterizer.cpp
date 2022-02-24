@@ -130,12 +130,29 @@ void CRasterizerInstance::AddLayer(ILayerObject* pLayerObject)
 
 void CRasterizerInstance::CalculateImage(LibMCEnv::CImageData* pImageData, const bool bAntialiased)
 {
+	if (pImageData == nullptr)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+
+	if (pImageData->GetPixelFormat () != LibMCEnv::eImagePixelFormat::GreyScale8bit)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_PIXELFORMATSHOULDBEGREYSCALE);
+
+	uint32_t nPixelSizeX = 0;
+	uint32_t nPixelSizeY = 0;
+	pImageData->GetSizeInPixels(nPixelSizeX, nPixelSizeY);
+
+	if (nPixelSizeX != m_nPixelCountX)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_PIXELSIZEMISMATCH);
+	if (nPixelSizeY != m_nPixelCountY)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_PIXELSIZEMISMATCH);
+
+	pImageData->SetDPI(m_dDPIX, m_dDPIY);
+
 	auto pImage = std::make_unique<CImageObject>(m_nPixelCountX, m_nPixelCountY, m_dDPIX, m_dDPIY);
 
 	for (auto pLayer : m_Layers)
 		pImage->drawLayerObject(pLayer.get(), 255);
 
-	
+	pImageData->SetPixelRange(0, 0, m_nPixelCountX, m_nPixelCountY, pImage->getBuffer ());
 }
 
 

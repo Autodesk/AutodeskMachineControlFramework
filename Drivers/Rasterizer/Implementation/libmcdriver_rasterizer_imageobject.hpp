@@ -89,6 +89,8 @@ public:
 
 	void setPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue);
 
+	std::vector<uint8_t> & getBuffer();
+
 };
 
 } // namespace Impl

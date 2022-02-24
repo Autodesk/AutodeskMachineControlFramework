@@ -186,8 +186,9 @@ void CImageData::GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_
 		uint8_t* pSrc = m_EncodedPNGData.data();
 		uint8_t* pDst = pPNGDataBuffer;
 
-		for (size_t nIndex = 0; nIndex < nPNGSize; nIndex++)
+		for (size_t nIndex = 0; nIndex < nPNGSize; nIndex++) {
 			*pDst = *pSrc; pDst++; pSrc++;
+		}
 	}
 }
 
@@ -290,9 +291,9 @@ void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint3
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATE);
 	if (nYMin >= m_nPixelCountY)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDYCOORDINATE);
-	if (nXMax >= m_nPixelCountX)
+	if (nXMax > m_nPixelCountX)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELCOUNT);
-	if (nYMax >= m_nPixelCountY)
+	if (nYMax > m_nPixelCountY)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPIXELCOUNT);
 	if (nXMin > nXMax)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDXCOORDINATERANGE);

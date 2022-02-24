@@ -70,7 +70,7 @@ CImageObject::~CImageObject()
 
 
 
-void CImageObject::clear(const LibMCDriver_Rasterizer_uint8 nValue)
+void CImageObject::clear(uint8_t nValue)
 {
 	for (auto iter = m_PixelData.begin(); iter != m_PixelData.end(); iter++)
 		*iter = nValue;
@@ -186,4 +186,9 @@ void CImageObject::setPosition(double dPositionX, double dPositionY)
 {
 	m_dPositionX = dPositionX;
 	m_dPositionY = dPositionY;
+}
+
+std::vector<uint8_t>& CImageObject::getBuffer()
+{
+	return m_PixelData;
 }
