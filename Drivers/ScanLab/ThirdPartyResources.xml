@@ -2,7 +2,8 @@
 <resources xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018">
 
   <source url="https://www.scanlab.de/sites/default/files/2022-02/RTC6_Software_Package_Rev.1.13.0_2022_02_18.zip"
-		sha256="37a2bfa90d324ffee13b4a6b08161e153589c2dd3bc50f34b6b6ad383ea2b089" >
+		sha256="37a2bfa90d324ffee13b4a6b08161e153589c2dd3bc50f34b6b6ad383ea2b089"
+		type="zip">
 		
 		<content filename="RTC6 Files/Windows/RTC6DLLx64.dll" resourcename="rtc6dllx64" />
 		<content filename="RTC6 Files/Program Files/RTC6DAT.dat" resourcename="rtc6dat" />
