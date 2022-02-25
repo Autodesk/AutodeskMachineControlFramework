@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "uWebSockets/App.h"
+#include "Libraries/cpp-httplib/httplib.h"
 
 #include "amc_server.hpp"
 #include <iostream>
@@ -95,127 +95,122 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 	m_pWrapper->InjectComponent("LibMCData", m_pDataWrapper->GetSymbolLookupMethod());
 
 	log("Initializing framework...");
-	m_pContext = m_pWrapper->CreateMCContext(m_pDataModel);
+	auto pContext = m_pWrapper->CreateMCContext(m_pDataModel);
 
 	//Register Library Path
 	auto libraryList = m_pServerConfiguration->getLibraryNames();
 	for (auto sLibraryName : libraryList) {
-		m_pContext->RegisterLibraryPath(sLibraryName, m_pServerConfiguration->getLibraryPath(sLibraryName), m_pServerConfiguration->getResourcePath(sLibraryName));
+		pContext->RegisterLibraryPath(sLibraryName, m_pServerConfiguration->getLibraryPath(sLibraryName), m_pServerConfiguration->getResourcePath(sLibraryName));
 	}
 
-	m_pContext->Log ("Loading " + m_pServerConfiguration->getPackageName () + " (" + m_pServerConfiguration->getPackageConfig () + ")", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
+	pContext->Log ("Loading " + m_pServerConfiguration->getPackageName () + " (" + m_pServerConfiguration->getPackageConfig () + ")", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
 	std::string sPackageConfigurationXML = m_pServerIO->readConfigurationXMLString(m_pServerConfiguration->getPackageConfig());
 
-	m_pContext->Log("Parsing package configuration", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
-	m_pContext->ParseConfiguration(sPackageConfigurationXML);
+	pContext->Log("Parsing package configuration", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
+	pContext->ParseConfiguration(sPackageConfigurationXML);
 
-	m_pContext->Log("Loading " + m_pServerConfiguration->getPackageCoreClient() + "...", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
-	m_pContext->LoadClientPackage(m_pServerConfiguration->getPackageCoreClient ());
+	pContext->Log("Loading " + m_pServerConfiguration->getPackageCoreClient() + "...", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
+	pContext->LoadClientPackage(m_pServerConfiguration->getPackageCoreClient ());
 
-	m_pContext->StartAllThreads(); 
+	pContext->StartAllThreads();
 
-	auto pContext = m_pContext;
 
 	std::string sHostName = m_pServerConfiguration->getHostName();
 	uint32_t nPort = m_pServerConfiguration->getPort();
 
-	uWS::App().get("/*", [pContext, this](auto* res, auto* req) {
-
-		try {
-
-			std::string sAuthorization = std::string(req->getHeader ("authorization"));
-			std::string sURL = std::string(req->getUrl());
-			std::cout << "Get Request: " << sURL << std::endl;
-
-			std::vector <uint8_t> Buffer;
-			std::vector <uint8_t> ResultBuffer;
-			std::string sContentType;
-			uint32_t nHttpCode;
-
-			auto pHandler = pContext->CreateAPIRequestHandler(sURL, "GET", sAuthorization);
-			pHandler->Handle(Buffer, sContentType, nHttpCode);
-
-			pHandler->GetResultData(ResultBuffer);
-
-			if (!ResultBuffer.empty()) {
-				std::string_view StringView(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());
-				res->end(StringView);
-			}
-			else {
-				res->end("");
-			}
 
 
+	try {
 
-		}
-		catch (std::exception& E) {
-			res->end("");
-			this->log("Fatal Error: " + std::string (E.what ()));
-		} 
-		catch (...) {
-			res->end("");
-			this->log("Unknown fatal error");
-		}
+		httplib::Server svr;
 
-	}).post("/*", [pContext, this](auto* res, auto* req) {
 
-		try {
+		auto requestHandler = [this, pContext](const httplib::Request& req, httplib::Response& res) {
+			try {
 
-			std::string sAuthorization = std::string(req->getHeader("authorization"));
-			std::string sURL = std::string(req->getUrl());
-			std::cout << "Post Request: " << sURL << std::endl;
+				std::string sAuthorization = std::string(req.get_header_value("authorization"));
+				std::string sURL = std::string(req.path);
+				std::string sMethod = req.method;
 
-			/*res->onData([res](std::string_view data, bool last) {
-				std::cout << "Got data: " << data.length() << ", it's the last: " << last << std::endl;
+				std::vector <uint8_t> Buffer;
+				std::vector <uint8_t> ResultBuffer;
+				std::string sContentType;
+				uint32_t nHttpCode;
 
-				if (last) {
-					res->end("Thanks for the data!");
+				auto pHandler = pContext->CreateAPIRequestHandler(sURL, sMethod, sAuthorization);
+
+				uint32_t nFieldCount = 0;
+				if (pHandler->ExpectsFormData(nFieldCount)) {
+					for (uint32_t nIndex = 0; nIndex < nFieldCount; nIndex++) {
+						std::string sName;
+						bool bIsFile = false;
+						bool bIsMandatory = false;
+						pHandler->GetFormDataDetails(nIndex, sName, bIsFile, bIsMandatory);
+
+						if (bIsFile) {
+							auto pFormData = req.get_file_value(sName.c_str());
+							std::vector <uint8_t> FormData(pFormData.content.begin(), pFormData.content.end());
+							pHandler->SetFormDataField(sName, FormData);
+						}
+						else {
+							auto pFormData = req.get_file_value(sName.c_str());
+							pHandler->SetFormStringField(sName, pFormData.content);
+						}
+					}
 				}
-			}); */
 
-			/* Allocate automatic, stack, variable as usual */
-			std::string buffer;
-			/* Move it to storage of lambda */
-			res->onData([res, buffer = std::move(buffer)](std::string_view data, bool last) mutable {
-				/* Mutate the captured data */
-				buffer.append(data.data(), data.length());
-
-				if (last) {
-					/* Use the data */
-					std::cout << "We got all data, length: " << buffer.length() << std::endl;
-
-					us_listen_socket_close(listen_socket);
-					res->end("Thanks for the data!");
-					/* When this socket dies (times out) it will RAII release everything */
+				if (pHandler->ExpectsRawBody()) {
+					auto body = req.body;
+					Buffer.reserve(body.length());
+					for (auto c : body)
+						Buffer.push_back((uint8_t)c);
 				}
-			});
-			/* Unwind stack, delete buffer, will just skip (heap) destruction since it was moved */
-
-		}
-		catch (std::exception& E) {
-			res->end("");
-			this->log("Fatal Error: " + std::string(E.what()));
-		}
-		catch (...) {
-			res->end("");
-			this->log("Unknown fatal error");
-		}
 
 
-	}).put("/*", [pContext](auto* res, auto* req) {
+				pHandler->Handle(Buffer, sContentType, nHttpCode);
 
-		res->end("Hello world!");
+				pHandler->GetResultData(ResultBuffer);
 
-		std::cout << "Put Request: " << req->getUrl() << std::endl;
+				if (!ResultBuffer.empty()) {
+					std::string sResult(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());
 
+					res.set_content(sResult, sContentType.c_str());
 
-	}).listen(sHostName, nPort, [ this, sHostName, nPort ](auto* listen_socket) {
-		if (listen_socket) {
-			this->log("Listening on " + sHostName + ":" + std::to_string (nPort));
-		}
-	}).run();
+				}
+				else {
+					res.set_content("", sContentType.c_str());
+				}
 
-	this->log("Failed to listen on " + sHostName + ":" + std::to_string(nPort));
+				res.status = nHttpCode;
+
+			}
+			catch (std::exception & E) {
+				this->log("Internal server error: " + std::string (E.what()));
+				res.status = 500;
+				res.set_content("Internal Server Error", "text/plain");
+			}
+			catch (...) {
+				this->log("Internal server error (Unknown)");
+
+				res.status = 500;
+				res.set_content("Internal Server Error", "text/plain");
+			}
+		};
+		
+		
+
+		svr.Get("(.*?)", requestHandler);
+		svr.Post("(.*?)", requestHandler);
+		svr.Put("(.*?)", requestHandler);
+
+		svr.listen(sHostName.c_str(), nPort);
+
+		this->log("Failed to listen on " + sHostName + ":" + std::to_string(nPort));
+	}
+	catch (std::exception& E) {
+		this->log("Fatal error while listening on " + sHostName + ":" + std::to_string(nPort));
+		this->log(E.what());
+	}
 }
 
 

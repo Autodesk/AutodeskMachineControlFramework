@@ -559,7 +559,7 @@ set_target_properties(server
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Output"
 	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Output"
 	
-	OUTPUT_NAME "amc_server_next"	
+	OUTPUT_NAME "amc_server"	
 
 	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	
     

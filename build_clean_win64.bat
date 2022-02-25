@@ -62,11 +62,6 @@ REM set GOOS=linux
 REM set GOARM=5
 REM go build -o "%builddir%/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "%basepath%/BuildScripts/buildresources.go"
 
-echo "Building Server..."
-set GOARCH=amd64
-set GOOS=windows
-go build -o "%builddir%/Output/amc_server.exe" -ldflags="-s -w" "%basepath%/Server/mcserver.go"
-
 copy /y "%basepath%Artifacts\clientdist\clientpackage.zip" "%builddir%\Output\%GITHASH%_core.client"
 if "%ERRORLEVEL%" neq "0" (
 	goto ERROR

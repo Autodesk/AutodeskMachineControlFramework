@@ -88,12 +88,6 @@ then
 	export GOARM=5
 	go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
 
-	echo "Building Go Server..."
-	set GOARCH=arm
-	set GOOS=linux
-	set GOARM=5
-	go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
-
 else
 
 if test $PLATFORMNAME = "win64"
@@ -115,11 +109,6 @@ else
 	export GOARCH=amd64
 	export GOOS=linux
 	go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
-
-	echo "Building Go Server..."
-	set GOARCH=amd64
-	set GOOS=linux
-	go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
 fi	
 fi
@@ -149,7 +138,7 @@ cp ../githash.txt Framework/Dist/disthash.txt
 
 if test $PLATFORMNAME = "win64"
 then
-# cp ../Output/amc_server.exe Framework/Dist/
+cp ../Output/amc_server.exe Framework/Dist/
 DLLEXT=dll
 else
 cp ../Output/amc_server Framework/Dist/

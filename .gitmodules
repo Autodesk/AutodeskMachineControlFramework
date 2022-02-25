@@ -31,12 +31,9 @@
 [submodule "submodules/lib3mf"]
 	path = submodules/lib3mf
 	url = https://github.com/3MFConsortium/lib3mf.git
-[submodule "submodules/uWebSockets"]
-	path = submodules/uWebSockets
-	url = https://github.com/uNetworking/uWebSockets.git
 [submodule "submodules/curl"]
 	path = submodules/curl
 	url = https://github.com/curl/curl.git
-[submodule "submodules/libuv"]
-	path = submodules/libuv
-	url = https://github.com/alexanderoster/libuv.git
+[submodule "submodules/cpp-httplib"]
+	path = submodules/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
