@@ -494,62 +494,37 @@ file(GLOB SERVER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
 )
 
-if(WIN32)
+add_executable(server ${SERVER_SRC})
 
-file(GLOB SERVER_USOCKETS
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/eventing/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
-)
-file(GLOB SERVER_LIBUV
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/win/*.c
-)
-
-source_group("usockets" FILES ${SERVER_USOCKETS})
-source_group("libuv" FILES ${SERVER_LIBUV})
-
-set(SERVER_LIBS ${SERVER_USOCKETS} ${SERVER_LIBUV})
-
-else()
-
-file(GLOB SERVER_USOCKETS
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/eventing/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.c
-	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
-)
-
-source_group("usockets" FILES ${SERVER_USOCKETS})
-
-set(SERVER_LIBS ${SERVER_USOCKETS})
-
-endif(WIN32)
-
-add_executable(server ${SERVER_SRC} ${SERVER_LIBS})
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_HEADERS_CORE_DIR})
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/)
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib)
-if(WIN32)
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv)
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src)
-endif(WIN32)
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets)
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
 target_compile_options(server PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
 target_compile_options(server PRIVATE "-DLIBUS_NO_SSL")
 
 if(WIN32)
-target_link_libraries(server shlwapi.lib)
-target_link_libraries(server ws2_32.lib)
-target_link_libraries(server userenv.lib)
-target_link_libraries(server psapi.lib)
-target_link_libraries(server iphlpapi.lib)
+
+	target_link_libraries(server shlwapi.lib)
+	target_link_libraries(server ws2_32.lib)
+	target_link_libraries(server userenv.lib)
+	target_link_libraries(server psapi.lib)
+	target_link_libraries(server iphlpapi.lib)
+	
 else()
-target_link_libraries(server dl)
+
+	find_package(Threads REQUIRED)
+	if(THREADS_HAVE_PTHREAD_ARG)
+	  target_compile_options(server PUBLIC "-pthread")
+	endif()
+	if(CMAKE_THREAD_LIBS_INIT)
+	  target_link_libraries(server "${CMAKE_THREAD_LIBS_INIT}")
+	endif()
+
+	target_link_libraries(server dl)
+
 endif(WIN32)
 
 set_target_properties(server
