@@ -303,12 +303,12 @@ public:
 
             /* And hook it up with the loop */
             /* We empty for both pre and post just to make sure */
-            Loop::get()->addPostHandler(topicTree, [topicTree = topicTree](Loop */*loop*/) {
+            Loop::get()->addPostHandler(topicTree, [topicTree = topicTree](Loop * /*loop*/) {
                 /* Commit pub/sub batches every loop iteration */
                 topicTree->drain();
             });
 
-            Loop::get()->addPreHandler(topicTree, [topicTree = topicTree](Loop */*loop*/) {
+            Loop::get()->addPreHandler(topicTree, [topicTree = topicTree](Loop * /*loop*/) {
                 /* Commit pub/sub batches every loop iteration */
                 topicTree->drain();
             });

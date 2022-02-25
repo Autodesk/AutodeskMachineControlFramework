@@ -165,14 +165,31 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 			std::string sURL = std::string(req->getUrl());
 			std::cout << "Post Request: " << sURL << std::endl;
 
-			std::vector <uint8_t> Buffer;
-			std::vector <uint8_t> ResultBuffer;
-			std::string sContentType;
-			uint32_t nHttpCode;
+			/*res->onData([res](std::string_view data, bool last) {
+				std::cout << "Got data: " << data.length() << ", it's the last: " << last << std::endl;
 
-			auto pHandler = pContext->CreateAPIRequestHandler(sURL, "POST", sAuthorization);
-			res->end("");
+				if (last) {
+					res->end("Thanks for the data!");
+				}
+			}); */
 
+			/* Allocate automatic, stack, variable as usual */
+			std::string buffer;
+			/* Move it to storage of lambda */
+			res->onData([res, buffer = std::move(buffer)](std::string_view data, bool last) mutable {
+				/* Mutate the captured data */
+				buffer.append(data.data(), data.length());
+
+				if (last) {
+					/* Use the data */
+					std::cout << "We got all data, length: " << buffer.length() << std::endl;
+
+					us_listen_socket_close(listen_socket);
+					res->end("Thanks for the data!");
+					/* When this socket dies (times out) it will RAII release everything */
+				}
+			});
+			/* Unwind stack, delete buffer, will just skip (heap) destruction since it was moved */
 
 		}
 		catch (std::exception& E) {

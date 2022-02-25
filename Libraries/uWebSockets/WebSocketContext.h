@@ -41,7 +41,7 @@ private:
     }
 
     /* If we have negotiated compression, set this frame compressed */
-    static bool setCompressed(WebSocketState<isServer> */*wState*/, void *s) {
+    static bool setCompressed(WebSocketState<isServer> * /*wState*/, void *s) {
         WebSocketData *webSocketData = (WebSocketData *) us_socket_ext(SSL, (us_socket_t *) s);
 
         if (webSocketData->compressionStatus == WebSocketData::CompressionStatus::ENABLED) {
@@ -52,7 +52,7 @@ private:
         }
     }
 
-    static void forceClose(WebSocketState<isServer> */*wState*/, void *s, std::string_view reason = {}) {
+    static void forceClose(WebSocketState<isServer> * /*wState*/, void *s, std::string_view reason = {}) {
         us_socket_close(SSL, (us_socket_t *) s, (int) reason.length(), (void *) reason.data());
     }
 
@@ -238,7 +238,7 @@ private:
         return false;
     }
 
-    static bool refusePayloadLength(uint64_t length, WebSocketState<isServer> */*wState*/, void *s) {
+    static bool refusePayloadLength(uint64_t length, WebSocketState<isServer> * /*wState*/, void *s) {
         auto *webSocketContextData = (WebSocketContextData<SSL, USERDATA> *) us_socket_context_ext(SSL, us_socket_context(SSL, (us_socket_t *) s));
 
         /* Return true for refuse, false for accept */
@@ -404,7 +404,7 @@ private:
 
 public:
     /* WebSocket contexts are always child contexts to a HTTP context so no SSL options are needed as they are inherited */
-    static WebSocketContext *create(Loop */*loop*/, us_socket_context_t *parentSocketContext, TopicTree<TopicTreeMessage, TopicTreeBigMessage> *topicTree) {
+    static WebSocketContext *create(Loop * /*loop*/, us_socket_context_t *parentSocketContext, TopicTree<TopicTreeMessage, TopicTreeBigMessage> *topicTree) {
         WebSocketContext *webSocketContext = (WebSocketContext *) us_create_child_socket_context(SSL, parentSocketContext, sizeof(WebSocketContextData<SSL, USERDATA>));
         if (!webSocketContext) {
             return nullptr;

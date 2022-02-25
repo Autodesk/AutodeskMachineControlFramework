@@ -501,9 +501,16 @@ file(GLOB SERVER_USOCKETS
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/eventing/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
+)
+file(GLOB SERVER_LIBUV
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libuv/src/win/*.c
 )
+
+source_group("usockets" FILES ${SERVER_USOCKETS})
+source_group("libuv" FILES ${SERVER_LIBUV})
+
+set(SERVER_LIBS ${SERVER_USOCKETS} ${SERVER_LIBUV})
 
 else()
 
@@ -514,9 +521,13 @@ file(GLOB SERVER_USOCKETS
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/uWebSockets/uSockets/crypto/*.cpp
 )
 
+source_group("usockets" FILES ${SERVER_USOCKETS})
+
+set(SERVER_LIBS ${SERVER_USOCKETS})
+
 endif(WIN32)
 
-add_executable(server ${SERVER_SRC} ${SERVER_USOCKETS})
+add_executable(server ${SERVER_SRC} ${SERVER_LIBS})
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_HEADERS_CORE_DIR})
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
 target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/)
