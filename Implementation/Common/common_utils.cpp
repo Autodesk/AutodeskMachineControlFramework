@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctime>
 #include <unistd.h>
 #include <dirent.h> 
+#include <limits.h>
+#include <stdlib.h>
 #endif
 
 
@@ -641,7 +643,16 @@ namespace AMCCommon {
 		return UTF16toUTF8(Buffer.data());		
 
 #else
-		throw std::runtime_error("absolute path resolving not implemented!");
+		std::vector <char> resolvedPath;
+		resolvedPath.resize(PATH_MAX + 1);
+
+		if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
+			throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
+		}
+
+		resolvedPath[PATH_MAX] = 0;
+		return std::string (resolvedPath.data());
+		
 #endif
 
 
