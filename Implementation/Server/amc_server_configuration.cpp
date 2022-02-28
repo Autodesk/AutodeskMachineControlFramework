@@ -111,7 +111,7 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 	std::string sDataDirectory = directoryAttrib.as_string();
 	if (sDataDirectory.empty ())
 		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGDATADIRECTORY, "Missing data directory");
-	m_sDataDirectory = AMCCommon::CUtils::getFullPathName (sDataDirectory);
+	m_sDataDirectory = AMCCommon::CUtils::getFullPathName (sDataDirectory, true);
 
 	if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(m_sDataDirectory)) {
 		throw LibMC::ELibMCException(LIBMC_ERROR_DATADIRECTORYDOESNOTEXISTS, "Data directory does not exist: " + m_sDataDirectory);
@@ -130,7 +130,7 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 			throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDSQLITEDBPATH, "Missing SQLite DB Path");
 
 		m_DataBaseType = LibMCData::eDataBaseType::SqLite;
-		m_sConnectionString = AMCCommon::CUtils::getFullPathName (AMCCommon::CUtils::includeTrailingPathDelimiter(m_sDataDirectory) + sSQLiteDB);
+		m_sConnectionString = AMCCommon::CUtils::getFullPathName (AMCCommon::CUtils::includeTrailingPathDelimiter(m_sDataDirectory) + sSQLiteDB, false);
 
 	}
 	else {
@@ -147,7 +147,7 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 	if (sDefaultPackageName.empty())
 		throw LibMC::ELibMCException(LIBMC_ERROR_DEFAULTPACKAGENAMEMISSING, "Default package name missing");
 
-	loadPackageXML(AMCCommon::CUtils::getFullPathName (sDefaultPackageName));
+	loadPackageXML(AMCCommon::CUtils::getFullPathName (sDefaultPackageName, true));
 }
 
 
@@ -265,8 +265,8 @@ void CServerConfiguration::loadPackageXML(const std::string sPackageFileName)
 		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGCORECLIENT, "Missing core client");
 
 	m_sPackageName = sName;
-	m_sPackageConfig = AMCCommon::CUtils::getFullPathName(sConfigurationName);
-	m_sPackageCoreClient = AMCCommon::CUtils::getFullPathName(sCoreClient);
+	m_sPackageConfig = AMCCommon::CUtils::getFullPathName(sConfigurationName, true);
+	m_sPackageCoreClient = AMCCommon::CUtils::getFullPathName(sCoreClient, true);
 
 	auto libraries = buildNode.children("library");
 	for (auto libraryNode : libraries) {
@@ -278,12 +278,12 @@ void CServerConfiguration::loadPackageXML(const std::string sPackageFileName)
 		std::string libraryImport = libraryNode.attribute("import").as_string();
 		if (libraryImport.empty())
 			throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGLIBRARYIMPORTNAME, "Missing library import name: " + libraryName);
-		std::string libraryImportPath = AMCCommon::CUtils::getFullPathName(libraryImport);
+		std::string libraryImportPath = AMCCommon::CUtils::getFullPathName(libraryImport, true);
 
 		std::string libraryResources = libraryNode.attribute("resources").as_string();
 		std::string libraryResourcePath;
 		if (!libraryResources.empty())
-			libraryResourcePath = AMCCommon::CUtils::getFullPathName(libraryResources);
+			libraryResourcePath = AMCCommon::CUtils::getFullPathName(libraryResources, true);
 
 		if (m_Libraries.find (libraryName) != m_Libraries.end ())
 			throw LibMC::ELibMCException(LIBMC_ERROR_DUPLICATELIBRARYNAME, "Duplicate library name: " + libraryName);

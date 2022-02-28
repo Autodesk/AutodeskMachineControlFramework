@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <dirent.h> 
 #include <limits.h>
 #include <stdlib.h>
+#include <stdio.h>
 #endif
 
 
@@ -622,7 +623,8 @@ namespace AMCCommon {
 #endif
 	}
 
-	std::string CUtils::getFullPathName(const std::string& sRelativePath)
+	// ATTENTION: On Linux, will try to create the path name if it does not exist!
+	std::string CUtils::getFullPathName(const std::string& sRelativePath, bool bMustExist)
 	{
 
 		if (sRelativePath.empty())
@@ -640,14 +642,37 @@ namespace AMCCommon {
 
 		Buffer[LIBMC_MAXPATHBUFFERSIZE] = 0;
 
-		return UTF16toUTF8(Buffer.data());		
+		std::string sAbsoluteFileName = UTF16toUTF8(Buffer.data());		
+
+		if (bMustExist) {
+			if (!fileOrPathExistsOnDisk(sAbsoluteFileName))
+				throw std::runtime_error("mandatory path/file does not exist on disk: " + sAbsoluteFileName);
+
+		}
+
+		return sAbsoluteFileName;
 
 #else
 		std::vector <char> resolvedPath;
 		resolvedPath.resize(PATH_MAX + 1);
 
+		// realpath unfortunately only works on existing files...
 		if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
-			throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
+			if ((errno == ENOENT) && (!bMustExist)) {
+				FILE* fileP = fopen(sRelativePath.c_str(), "w");
+				if (fileP == nullptr)
+					throw std::runtime_error("inaccessible file path: " + sRelativePath + "(" + std::to_string(errno) + ")");
+
+				fclose(fileP);
+
+				if (unlink(sRelativePath.c_str()))
+					throw std::runtime_error("could not delete file: " + sRelativePath + "(" + std::to_string(errno) + ")");
+
+				if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
+					throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
+				}
+			} else
+				throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
 		}
 
 		resolvedPath[PATH_MAX] = 0;
