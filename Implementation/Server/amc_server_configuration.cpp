@@ -278,12 +278,12 @@ void CServerConfiguration::loadPackageXML(const std::string sPackageFileName)
 		std::string libraryImport = libraryNode.attribute("import").as_string();
 		if (libraryImport.empty())
 			throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGLIBRARYIMPORTNAME, "Missing library import name: " + libraryName);
-		std::string libraryImportPath = AMCCommon::CUtils::getFullPathName(libraryImport, true);
+		std::string libraryImportPath = AMCCommon::CUtils::getFullPathName(libraryImport, false);
 
 		std::string libraryResources = libraryNode.attribute("resources").as_string();
 		std::string libraryResourcePath;
 		if (!libraryResources.empty())
-			libraryResourcePath = AMCCommon::CUtils::getFullPathName(libraryResources, true);
+			libraryResourcePath = AMCCommon::CUtils::getFullPathName(libraryResources, false);
 
 		if (m_Libraries.find (libraryName) != m_Libraries.end ())
 			throw LibMC::ELibMCException(LIBMC_ERROR_DUPLICATELIBRARYNAME, "Duplicate library name: " + libraryName);
