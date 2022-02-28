@@ -665,12 +665,15 @@ namespace AMCCommon {
 
 				fclose(fileP);
 
+				if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
+					int err = errno;
+					unlink(sRelativePath.c_str());
+					throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(err) + ")");
+				}
+
 				if (unlink(sRelativePath.c_str()))
 					throw std::runtime_error("could not delete file: " + sRelativePath + "(" + std::to_string(errno) + ")");
 
-				if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
-					throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
-				}
 			} else
 				throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
 		}
