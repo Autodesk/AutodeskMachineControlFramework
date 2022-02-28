@@ -13,8 +13,8 @@ cd ../_build_lib3mf_linux64
 
 cmake ../submodules/lib3mf
 cmake --build . --config Release
-cp lib3mf.so ../../Artifacts/lib3mf/lib3mf_linux64.so
+cp -L lib3mf.so ../Artifacts/lib3mf/lib3mf_linux64.so
 
-git rev-parse --verify HEAD >"../../Artifacts/lib3mf/_githash_linux64_lib3mf.txt"
+git rev-parse --verify HEAD >"../Artifacts/lib3mf/_githash_linux64_lib3mf.txt"
 
 cd ..
