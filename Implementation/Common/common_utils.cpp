@@ -743,7 +743,7 @@ namespace AMCCommon {
 			(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 
 #else
-		std::string sAbsolutePath = getFullPathName(sPathName);
+		std::string sAbsolutePath = getFullPathName(sPathName, false);
 
 		if (access(sAbsolutePath.c_str(), 0) == 0) {
 
