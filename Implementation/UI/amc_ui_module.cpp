@@ -38,13 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry)
-	: m_pStateMachineData(pStateMachineData), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pFormRegistry (pFormRegistry)
+CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry)
+	: m_pStateMachineData(pStateMachineData), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pContentRegistry(pContentRegistry)
 {
 	LibMCAssertNotNull(pStateMachineData.get());
 	LibMCAssertNotNull(pResourcePackage.get());
 	LibMCAssertNotNull(pBuildJobHandler.get());
-	LibMCAssertNotNull(pFormRegistry);
+	LibMCAssertNotNull(pContentRegistry);
 }
 
 PStateMachineData CUIModuleEnvironment::stateMachineData()
@@ -62,9 +62,9 @@ LibMCData::PBuildJobHandler CUIModuleEnvironment::buildJobHandler()
 	return m_pBuildJobHandler;
 }
 
-CUIModule_ContentRegistry* CUIModuleEnvironment::formRegistry()
+CUIModule_ContentRegistry* CUIModuleEnvironment::contentRegistry()
 {
-	return m_pFormRegistry;
+	return m_pContentRegistry;
 }
 
 

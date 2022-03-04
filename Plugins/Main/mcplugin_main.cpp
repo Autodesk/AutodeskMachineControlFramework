@@ -88,7 +88,6 @@ public:
 
 		pStateEnvironment->SetNextState("idle");
 
-
 	}
 
 };
@@ -119,7 +118,7 @@ public:
 		double targetO2 = pStateEnvironment->GetDoubleParameter("processsettings", "targeto2");
 		pStateEnvironment->SetDoubleParameter("processsettings", "targeto2", targetO2 + 1.0);
 
-		pStateEnvironment->SetBoolParameter("ui", "preparebuilddisabled", !pStateEnvironment->GetBoolParameter("ui", "preparebuilddisabled"));
+		pStateEnvironment->SetBoolParameter("ui", "preparebuilddisabled", true);
 
 		pStateEnvironment->LogMessage ("Waiting for user input...");
 		if (pStateEnvironment->WaitForSignal("signal_preparebuildjob", 100, pSignalHandler)) {
@@ -130,6 +129,19 @@ public:
 			pStateEnvironment->LogMessage("Preparing job " + sJobUUID);
 
 			pStateEnvironment->SetNextState("preparebuild");
+
+		}
+		else if (pStateEnvironment->WaitForSignal("signal_changesimulationparameters", 100, pSignalHandler)) {
+			bool bSimulateLaser = pSignalHandler->GetBool("simulatelaser");
+			bool bSimulatePLC = pSignalHandler->GetBool("simulateplc");
+			pSignalHandler->SignalHandled();
+
+			pStateEnvironment->SetBoolParameter("configuration", "simulatelaser", bSimulateLaser);
+			pStateEnvironment->SetBoolParameter("configuration", "simulateplc", bSimulatePLC);
+
+			pStateEnvironment->LogMessage("Updated Simulation Parameters!");
+
+			pStateEnvironment->SetNextState("idle");
 
 		}
 		else {
@@ -165,11 +177,29 @@ public:
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		pStateEnvironment->LogMessage("Waiting for build preparation...");
+
+		pStateEnvironment->SetBoolParameter("ui", "preparebuilddisabled", false);
+
 		LibMCEnv::PSignalHandler pSignalHandler;
 		if (pStateEnvironment->WaitForSignal("signal_cancelbuildpreparation", 100, pSignalHandler)) {
 			pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", "00000000-0000-0000-0000-000000000000");
 			pSignalHandler->SignalHandled();
 			pStateEnvironment->SetNextState("idle");
+
+		}
+		else if (pStateEnvironment->WaitForSignal("signal_changeprocesssettings", 100, pSignalHandler)) {
+			double dTargetO2 = pSignalHandler->GetDouble("targeto2");
+			double dRecoaterSpeed = pSignalHandler->GetDouble("recoaterspeed");
+			double dGasFlowSpeed = pSignalHandler->GetDouble("gasflowspeed");
+			pSignalHandler->SignalHandled();
+
+			pStateEnvironment->SetDoubleParameter("processsettings", "targeto2", dTargetO2);
+			pStateEnvironment->SetDoubleParameter("processsettings", "recoaterspeed", dRecoaterSpeed);
+			pStateEnvironment->SetDoubleParameter("processsettings", "gasflowspeed", dGasFlowSpeed);
+
+			pStateEnvironment->LogMessage("Updated process Parameters!");
+
+			pStateEnvironment->SetNextState("preparebuild");
 
 		}
 		else if (pStateEnvironment->WaitForSignal("signal_startbuild", 100, pSignalHandler)) {
@@ -252,7 +282,6 @@ public:
 	{
 		auto nLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 		pStateEnvironment->LogMessage("Starting layer " + std::to_string (nLayer));
-
 
 		pStateEnvironment->SetNextState("recoatlayer");
 	}
@@ -430,19 +459,19 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CMainState_PauseBuild
+ Class definition of CMainState_BuildPaused
 **************************************************************************************************************************/
-class CMainState_PauseBuild : public virtual CMainState {
+class CMainState_BuildPaused : public virtual CMainState {
 public:
 
-	CMainState_PauseBuild(const std::string& sStateName, PPluginData pPluginData)
+	CMainState_BuildPaused(const std::string& sStateName, PPluginData pPluginData)
 		: CMainState(getStateName(), sStateName, pPluginData)
 	{
 	}
 
 	static const std::string getStateName()
 	{
-		return "pausebuild";
+		return "buildpaused";
 	}
 
 
@@ -560,7 +589,7 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 	if (createStateInstanceByName<CMainState_FinishBuild>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
-	if (createStateInstanceByName<CMainState_PauseBuild>(sStateName, pStateInstance, m_pPluginData))
+	if (createStateInstanceByName<CMainState_BuildPaused>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	if (createStateInstanceByName<CMainState_CancelBuild>(sStateName, pStateInstance, m_pPluginData))

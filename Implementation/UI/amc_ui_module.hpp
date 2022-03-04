@@ -55,21 +55,22 @@ namespace AMC {
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CUIModuleEnvironment {
 	private:
 		PStateMachineData m_pStateMachineData;
 		PResourcePackage m_pResourcePackage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
-		CUIModule_ContentRegistry* m_pFormRegistry;
+		CUIModule_ContentRegistry* m_pContentRegistry;
 
 	public:
-		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pFormRegistry);
+		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry);
 
 		PStateMachineData stateMachineData();
 		PResourcePackage resourcePackage();
 		LibMCData::PBuildJobHandler buildJobHandler ();
-		CUIModule_ContentRegistry* formRegistry ();
+		CUIModule_ContentRegistry* contentRegistry ();
 
 	};
 
@@ -88,7 +89,7 @@ namespace AMC {
 
 		virtual std::string getType() = 0;
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject, CParameterHandler* pClientVariableHandler) = 0;
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
 
@@ -102,6 +103,9 @@ namespace AMC {
 		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
 
 		virtual void configurePostLoading() = 0;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler) = 0;
+
 
 	};
 

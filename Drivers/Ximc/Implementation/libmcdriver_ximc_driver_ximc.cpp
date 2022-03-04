@@ -57,7 +57,9 @@ void CDriver_Ximc::Configure(const std::string& sConfigurationString)
     m_pBindyDLL = m_pWorkingDirectory->StoreDriverData("bindy.dll", "bindy");
     m_pXiWrapperDLL = m_pWorkingDirectory->StoreDriverData("xiwrapper.dll", "xiwrapper");
 
+#ifdef _WIN32
     SetDllDirectory(m_pWorkingDirectory->GetAbsoluteFilePath().c_str());
+#endif
     m_pXimcSDK = std::make_shared<CXimcSDK>(m_pLibXimcDLL->GetAbsoluteFileName());
 
     char ximc_version_str[33];

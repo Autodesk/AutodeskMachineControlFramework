@@ -68,6 +68,8 @@ namespace AMC {
 
 		void addArray(const std::string& sName, CJSONWriterArray & array);
 
+		bool isEmpty();
+
 	};
 
 
@@ -93,6 +95,8 @@ namespace AMC {
 		void addObject(CJSONWriterObject& object);
 
 		void addArray(CJSONWriterArray& array);
+
+		bool isEmpty();
 
 	};
 

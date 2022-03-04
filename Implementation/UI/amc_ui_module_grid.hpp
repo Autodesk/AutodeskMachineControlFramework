@@ -55,6 +55,7 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 
 	enum class eUIModule_GridColumnPosition {
@@ -100,9 +101,10 @@ namespace AMC {
 		int m_nColumnStart, m_nColumnEnd, m_nRowStart, m_nRowEnd;
 		eUIModule_GridColumnPosition m_ColumnPosition;
 		eUIModule_GridRowPosition m_RowPosition;
+		bool m_bScrollbars;
 
 	public:
-		CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
+		CUIModule_GridSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars);
 
 		CUIModule * getModule();
 
@@ -115,6 +117,7 @@ namespace AMC {
 		std::string getColumnPositionString();
 		eUIModule_GridRowPosition getRowPosition ();
 		std::string getRowPositionString();
+		bool getScrollbars ();
 
 	};
 
@@ -131,11 +134,11 @@ namespace AMC {
 		std::vector<PUIModule_GridRow> m_Rows;
 		std::vector<PUIModule_GridColumn> m_Columns;
 
-		void addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition);
+		void addSection(PUIModule pModule, int nColumnStart, int nColumnEnd, int nRowStart, int nRowEnd, eUIModule_GridColumnPosition columnPosition, eUIModule_GridRowPosition rowPosition, bool bScrollbars);
 
 	public:
 
-		CUIModule_Grid(pugi::xml_node & xmlNode, PUIModuleEnvironment pUIModuleEnvironment);
+		CUIModule_Grid(pugi::xml_node & xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_Grid();
 
@@ -145,7 +148,7 @@ namespace AMC {
 
 		std::string getCaption () override;
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
@@ -153,6 +156,9 @@ namespace AMC {
 		PUIModule_GridSection findSection(const std::string& sUUID);
 
 		void configurePostLoading() override;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler) override;
+
 
 	};
 

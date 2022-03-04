@@ -62,7 +62,7 @@ namespace AMC {
 					
 	public:
 
-		CAPISession(CParameterHandler * pDefaultClientParameterHandler);
+		CAPISession();
 		virtual ~CAPISession();
 
 		std::string getUUID ();		

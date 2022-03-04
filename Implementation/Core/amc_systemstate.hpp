@@ -41,11 +41,13 @@ namespace LibMCData {
 	class CStorage;
 	class CBuildJobHandler;
 	class CLoginHandler;
+	class CPersistencyHandler;
 
 	typedef std::shared_ptr<CDataModel> PDataModel;
 	typedef std::shared_ptr<CStorage> PStorage;
 	typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
 	typedef std::shared_ptr<CLoginHandler> PLoginHandler;
+	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
 }
 
 
@@ -95,6 +97,7 @@ namespace AMC {
 		LibMCData::PStorage m_pStorage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		LibMCData::PLoginHandler m_pLoginHandler;
+		LibMCData::PPersistencyHandler m_pPersistencyHandler;
 
 		std::map <std::string, std::pair <std::string, std::string>> m_LibraryPathes;
 
@@ -129,6 +132,7 @@ namespace AMC {
 
 		LibMCData::PLoginHandler getLoginHandlerInstance();
 		LibMCData::PBuildJobHandler getBuildJobHandlerInstance();
+		LibMCData::PPersistencyHandler getPersistencyHandler();
 		AMCCommon::PChrono getGlobalChronoInstance();
 
 		void addLibraryPath(const std::string & sLibraryName, const std::string & sLibraryPath, const std::string& sLibraryResource);

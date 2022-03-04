@@ -362,7 +362,7 @@ void CDriver_BuR::Disconnect()
 
 IPLCCommandList* CDriver_BuR::CreateCommandList()
 {
-    return new CPLCCommandList(m_pConnector, this); 
+    return new CPLCCommandList(m_pConnector, this, m_SimulationMode);
     
 }
 

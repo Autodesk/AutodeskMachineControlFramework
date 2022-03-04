@@ -161,7 +161,7 @@ void CAPIHandler_Upload::handleInitUploadRequest(CJSONWriter& writer, const uint
 	CAPIJSONRequest jsonRequest(pBodyData, nBodyDataSize);
 
 	auto sContext = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_CONTEXT, LIBMC_ERROR_INVALIDCONTEXTUUID);
-	auto sName = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_NAME, LIBMC_ERROR_INVALIDUPLOADNAME);
+	auto sName = jsonRequest.getRawString(AMC_API_KEY_UPLOAD_NAME, LIBMC_ERROR_INVALIDUPLOADNAME);
 	auto sMimeType = jsonRequest.getNameString(AMC_API_KEY_UPLOAD_MIMETYPE, LIBMC_ERROR_INVALIDMIMETYPE);
 	auto nSize = jsonRequest.getUint64(AMC_API_KEY_UPLOAD_SIZE, 1, pStorage->GetMaxStreamSize(), LIBMC_ERROR_INVALIDSTREAMSIZE);
 

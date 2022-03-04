@@ -75,6 +75,8 @@ namespace AMC {
 
 		PParameterHandler duplicate();
 
+		void loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler);
+
 	};
 
 	
