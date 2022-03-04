@@ -42,8 +42,6 @@ THE SOFTWARE.
 #include <cassert>
 #endif
 
-#include <cstdlib>
-
 BEGIN_XG_NAMESPACE
 
 #ifdef GUID_ANDROID
@@ -200,7 +198,7 @@ unsigned char hexPairToChar(char a, char b)
 }
 
 // create a guid from string
-Guid::Guid(std::string fromString)
+Guid::Guid(std::string_view fromString)
 {
 	char charOne = '\0';
 	char charTwo = '\0';
@@ -311,20 +309,6 @@ Guid newGuid()
 	return Guid{std::move(byteArray)};
 }
 #endif
-
-
-#ifdef _WASM
-Guid newGuid()
-{
-	std::array<unsigned char, 16> bytes;
-	for (int index = 0; index < 16; index++) {
-		bytes[index] = rand () % 256;
-	}
-	return Guid{std::move(bytes)};
-	
-}
-#endif //_WASM
-
 
 // obviously this is the windows version
 #ifdef GUID_WINDOWS

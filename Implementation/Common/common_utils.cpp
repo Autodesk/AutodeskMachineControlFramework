@@ -49,10 +49,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <shlwapi.h>
 #include <iomanip>
 #else
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <ctime>
 #include <unistd.h>
 #include <dirent.h> 
+#include <limits.h>
+#include <stdlib.h>
+#include <stdio.h>
 #endif
 
 
@@ -62,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCCommon {
 
 #define LIBMC_MAXSTRINGBUFFERSIZE (1024 * 1024 * 1024)
-#define LIBMC_MAXRANDOMSTRINGITERATIONS 1024
+#define LIBMC_MAXPATHBUFFERSIZE 65536
 
 	// Lookup table to convert UTF8 bytes to sequence length
 	const unsigned char UTF8DecodeTable[256] = {
@@ -364,6 +368,33 @@ namespace AMCCommon {
 	}
 
 
+	int64_t CUtils::stringToInteger(const std::string& sString)
+	{
+		std::string trimmedString = trimString(sString);
+
+		size_t nConversionErrorIndex = 0;
+		int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
+		
+		if (nConversionErrorIndex != trimmedString.length())
+			throw std::runtime_error("invalid integer string: " + sString);
+
+		return nResult;
+	}
+
+	double CUtils::stringToDouble(const std::string& sString)
+	{
+		std::string trimmedString = trimString(sString);
+
+		size_t nConversionErrorIndex = 0;
+		double dResult = std::stod(trimmedString, &nConversionErrorIndex);
+
+		if (nConversionErrorIndex != trimmedString.length())
+			throw std::runtime_error("invalid integer string: " + sString);
+
+		return dResult;
+	}
+
+
     std::wstring CUtils::UTF8toUTF16(const std::string sString)
 	{
 
@@ -540,12 +571,10 @@ namespace AMCCommon {
 
 
 
-	std::string CUtils::createUUID()
+	std::string CUtils::createEmptyUUID()
 	{
-		auto guid = xg::newGuid ();		
-		return normalizeUUIDString (guid.str());
+		return "00000000-0000-0000-0000-000000000000";
 	}
-
 
 
 	void CUtils::deleteFileFromDisk(const std::string& sFileName, bool bMustSucceed)
@@ -594,43 +623,69 @@ namespace AMCCommon {
 #endif
 	}
 
-
-	// Returns a UUID, such that sBasePath/sPrefixUUID.extension does not exist.
-	// Tries out maximum nMaxIterations different random uuids.
-	std::string CUtils::findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string& sExtension, const uint32_t nMaxIterations)
+	// ATTENTION: On Linux, will try to create the path name if it does not exist!
+	std::string CUtils::getFullPathName(const std::string& sRelativePath, bool bMustExist)
 	{
-		if (sBasePath.empty())
-			throw std::runtime_error("empty temporary file base path");
 
-		std::string sBasePathWithDelimiter = sBasePath;
-		std::string sExtensionWithPoint;
+		if (sRelativePath.empty())
+			throw std::runtime_error("empty relative path");
 
-		if (!sExtension.empty()) {
-			if (sExtension.at(0) != '.') {
-				sExtensionWithPoint = "." + sExtension;
-			}
-			else {
-				sExtensionWithPoint = sExtension;
-			}
+#ifdef _WIN32
 
-		}
+		std::wstring sRelativePathW = UTF8toUTF16(sRelativePath);		
+		std::vector<wchar_t> Buffer;
+		Buffer.resize(LIBMC_MAXPATHBUFFERSIZE + 1);
 
-		char lastChar = sBasePathWithDelimiter.at(sBasePathWithDelimiter.length() - 1);
-		if ((lastChar != '/') && (lastChar != '\\'))
-			sBasePathWithDelimiter += "/";
+		DWORD nCount = GetFullPathNameW(sRelativePathW.c_str(), LIBMC_MAXPATHBUFFERSIZE, Buffer.data(), nullptr);
+		if (nCount == 0) 
+			throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string (GetLastError ()) + ")");
 
-		for (uint32_t nIndex = 0; nIndex < nMaxIterations; nIndex++) {
-			std::string sUUID = createUUID();
-			std::string sFullPath = sBasePathWithDelimiter + sPrefix + sUUID + sExtensionWithPoint;
+		Buffer[LIBMC_MAXPATHBUFFERSIZE] = 0;
 
-			if (!fileOrPathExistsOnDisk(sFullPath))
-				return sFullPath;
+		std::string sAbsoluteFileName = UTF16toUTF8(Buffer.data());		
+
+		if (bMustExist) {
+			if (!fileOrPathExistsOnDisk(sAbsoluteFileName))
+				throw std::runtime_error("mandatory path/file does not exist on disk: " + sAbsoluteFileName);
 
 		}
 
-		throw std::runtime_error("could not create temporary file path");
+		return sAbsoluteFileName;
+
+#else
+		std::vector <char> resolvedPath;
+		resolvedPath.resize(PATH_MAX + 1);
+
+		// realpath unfortunately only works on existing files...
+		if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
+			if ((errno == ENOENT) && (!bMustExist)) {
+				FILE* fileP = fopen(sRelativePath.c_str(), "w");
+				if (fileP == nullptr)
+					throw std::runtime_error("inaccessible file path: " + sRelativePath + "(" + std::to_string(errno) + ")");
+
+				fclose(fileP);
+
+				if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
+					int err = errno;
+					unlink(sRelativePath.c_str());
+					throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(err) + ")");
+				}
+
+				if (unlink(sRelativePath.c_str()))
+					throw std::runtime_error("could not delete file: " + sRelativePath + "(" + std::to_string(errno) + ")");
+
+			} else
+				throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
+		}
+
+		resolvedPath[PATH_MAX] = 0;
+		return std::string (resolvedPath.data());
+		
+#endif
+
 
 	}
+
 
 
 	bool CUtils::fileOrPathExistsOnDisk(const std::string& sPathName)
@@ -638,9 +693,9 @@ namespace AMCCommon {
 
 #ifdef _WIN32
 		std::wstring sFileNameUTF16 = UTF8toUTF16(sPathName);
-		return PathFileExistsW(sFileNameUTF16.c_str ());
+		return PathFileExistsW(sFileNameUTF16.c_str());
 #else
-		if (access(sPathName.c_str (), F_OK) != -1) {
+		if (access(sPathName.c_str(), F_OK) != -1) {
 			return true;
 		}
 		else {
@@ -650,6 +705,59 @@ namespace AMCCommon {
 
 	}
 
+	char CUtils::getPathDelimiter()
+	{
+#ifdef _WIN32
+		return '\\';
+#else
+		return '/';
+#endif 
+	}
+
+	std::string CUtils::includeTrailingPathDelimiter(const std::string& sPathName)
+	{
+		char delimiter = getPathDelimiter();		
+
+		if (!sPathName.empty()) {
+
+			char lastChar = *sPathName.rbegin();
+			if ((lastChar == '/') || (lastChar == '\\'))
+				return sPathName;
+
+			return sPathName + delimiter;
+
+		}
+		else
+		{
+			return std::string () + delimiter;
+		}
+	
+		
+	}
+
+
+	bool CUtils::pathIsDirectory(const std::string& sPathName)
+	{
+#ifdef _WIN32
+		std::wstring sPathNameW = UTF8toUTF16(sPathName);
+		DWORD dwAttrib = GetFileAttributesW(sPathNameW.c_str());
+
+		return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
+			(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+
+#else
+		std::string sAbsolutePath = getFullPathName(sPathName, false);
+
+		if (access(sAbsolutePath.c_str(), 0) == 0) {
+
+			struct stat status;
+			stat(sAbsolutePath.c_str (), &status);
+
+			return (status.st_mode & S_IFDIR) != 0;
+		}
+		return false;
+#endif
+	}
 
 
 	std::string CUtils::calculateBlockwiseSHA256FromFile(const std::string& sFileNameUTF8, uint32_t nBlockSize)
@@ -741,21 +849,6 @@ namespace AMCCommon {
 
 	}
 
-
-
-	std::string CUtils::calculateRandomSHA256String(const uint32_t nIterations)
-	{
-		if ((nIterations == 0) || (nIterations > LIBMC_MAXRANDOMSTRINGITERATIONS))
-			throw std::runtime_error("invalid random string iterations");
-
-		std::string sRandomString;
-
-		uint32_t nCount = nIterations + (((uint32_t) rand()) % nIterations);
-		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++)
-			sRandomString += createUUID();
-
-		return calculateSHA256FromString(sRandomString);
-	}
 
 	std::string CUtils::encodeBase64(const std::string& sString, eBase64Type eType)
 	{		

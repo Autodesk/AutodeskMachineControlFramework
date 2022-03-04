@@ -420,6 +420,38 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDINTEGEREXPRESSION 393
 #define LIBMC_ERROR_INVALIDNUMBEREXPRESSION 394
 #define LIBMC_ERROR_INVALIDBOOLEANEXPRESSION 395
+#define LIBMC_ERROR_INVALIDPERSISTENCYNAME 396
+#define LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT 397
+#define LIBMC_ERROR_PLATFORMINFORMATIONMISSING 398
+#define LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION 399
+#define LIBMC_ERROR_EXPRESSIONVALUEMISSING 400
+#define LIBMC_ERROR_INVALIDVIEWPORTCOORD 401
+#define LIBMC_ERROR_VIEWPORTCOORDMISSING 402
+#define LIBMC_ERROR_MACHINEINSTANCENOTFOUND 403
+#define LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS 404
+#define LIBMC_ERROR_DUPLICATEBUTTONNAME 405
+#define LIBMC_ERROR_SERVERCONFIGURATIONNOTLOADED 406
+#define LIBMC_ERROR_COULDNOTPARSESERVERCONFIGURATION 407
+#define LIBMC_ERROR_MISSINGSERVERCONFIGURATIONNODE 408
+#define LIBMC_ERROR_COULDNOTFINDLIBRARYENTRY 409
+#define LIBMC_ERROR_INVALIDPORT 410
+#define LIBMC_ERROR_MISSINGDATANODE 411
+#define LIBMC_ERROR_MISSINGDATADIRECTORY 412
+#define LIBMC_ERROR_DATADIRECTORYDOESNOTEXISTS 413
+#define LIBMC_ERROR_INVALIDDATADIRECTORY 414
+#define LIBMC_ERROR_INVALIDSQLITEDBPATH 415
+#define LIBMC_ERROR_INVALIDDATABASETYPE 416
+#define LIBMC_ERROR_DEFAULTPACKAGEMISSING 417
+#define LIBMC_ERROR_DEFAULTPACKAGENAMEMISSING 418
+#define LIBMC_ERROR_COULDNOTPARSEPACKAGEXML 419
+#define LIBMC_ERROR_MISSINGPACKAGENODE 420
+#define LIBMC_ERROR_MISSINGBUILDNODE 421
+#define LIBMC_ERROR_MISSINGBUILDNAME 422
+#define LIBMC_ERROR_MISSINGCONFIGURATIONNAME 423
+#define LIBMC_ERROR_MISSINGCORECLIENT 424
+#define LIBMC_ERROR_MISSINGLIBRARYNAME 425
+#define LIBMC_ERROR_MISSINGLIBRARYIMPORTNAME 426
+#define LIBMC_ERROR_DUPLICATELIBRARYNAME 427
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -667,7 +699,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DERIVEDPARAMETERSREADONLY: return "Derived parameters are read only.";
     case LIBMC_ERROR_TOOMANYJOURNALVARIABLES: return "Too many journal variables";
     case LIBMC_ERROR_JOURNALISNOTINITIALISING: return "Too many journal variables";
-    case LIBMC_ERROR_JOURNALISNOTRECORDING: return "Too many journal variables";
+    case LIBMC_ERROR_JOURNALISNOTRECORDING: return "Journal is not recording.";
     case LIBMC_ERROR_INVALIDVARIABLETYPE: return "Invalid variable type";
     case LIBMC_ERROR_INVALIDVARIABLEUNITS: return "Invalid variable units";
     case LIBMC_ERROR_UNITSHAVEALREADYBEENSET: return "Units have already been set";
@@ -752,6 +784,38 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDINTEGEREXPRESSION: return "Invalid integer expression";
     case LIBMC_ERROR_INVALIDNUMBEREXPRESSION: return "Invalid number expression";
     case LIBMC_ERROR_INVALIDBOOLEANEXPRESSION: return "Invalid boolean expression";
+    case LIBMC_ERROR_INVALIDPERSISTENCYNAME: return "Invalid persistency name";
+    case LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT: return "Only valued parameters can be persistent";
+    case LIBMC_ERROR_PLATFORMINFORMATIONMISSING: return "Platform information missing";
+    case LIBMC_ERROR_INVALIDBUTTONDISTRIBUTION: return "Invalid button distribution";
+    case LIBMC_ERROR_EXPRESSIONVALUEMISSING: return "Expression value missing";
+    case LIBMC_ERROR_INVALIDVIEWPORTCOORD: return "Invalid viewport coordinate";
+    case LIBMC_ERROR_VIEWPORTCOORDMISSING: return "Viewport coordinate missing";
+    case LIBMC_ERROR_MACHINEINSTANCENOTFOUND: return "Machine instance not found";
+    case LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS: return "Could not get temp path from Windows";
+    case LIBMC_ERROR_DUPLICATEBUTTONNAME: return "Duplicate button name";
+    case LIBMC_ERROR_SERVERCONFIGURATIONNOTLOADED: return "Server configuration not loaded";
+    case LIBMC_ERROR_COULDNOTPARSESERVERCONFIGURATION: return "Could not pars server configuration";
+    case LIBMC_ERROR_MISSINGSERVERCONFIGURATIONNODE: return "Missing server configuration node";
+    case LIBMC_ERROR_COULDNOTFINDLIBRARYENTRY: return "Could not find library entry";
+    case LIBMC_ERROR_INVALIDPORT: return "Invalid port";
+    case LIBMC_ERROR_MISSINGDATANODE: return "Missing data node";
+    case LIBMC_ERROR_MISSINGDATADIRECTORY: return "Missing data directory";
+    case LIBMC_ERROR_DATADIRECTORYDOESNOTEXISTS: return "Data directory does not exist:";
+    case LIBMC_ERROR_INVALIDDATADIRECTORY: return "Invalid data directory";
+    case LIBMC_ERROR_INVALIDSQLITEDBPATH: return "Missing SQLite DB Path";
+    case LIBMC_ERROR_INVALIDDATABASETYPE: return "Invalid database type";
+    case LIBMC_ERROR_DEFAULTPACKAGEMISSING: return "Default package missing";
+    case LIBMC_ERROR_DEFAULTPACKAGENAMEMISSING: return "Default package name missing";
+    case LIBMC_ERROR_COULDNOTPARSEPACKAGEXML: return "Could not parse package xml";
+    case LIBMC_ERROR_MISSINGPACKAGENODE: return "Missing package node";
+    case LIBMC_ERROR_MISSINGBUILDNODE: return "Missing build node";
+    case LIBMC_ERROR_MISSINGBUILDNAME: return "Missing build name";
+    case LIBMC_ERROR_MISSINGCONFIGURATIONNAME: return "Missing configuration name";
+    case LIBMC_ERROR_MISSINGCORECLIENT: return "Missing core client";
+    case LIBMC_ERROR_MISSINGLIBRARYNAME: return "Missing library name";
+    case LIBMC_ERROR_MISSINGLIBRARYIMPORTNAME: return "Missing library import name";
+    case LIBMC_ERROR_DUPLICATELIBRARYNAME: return "Duplicate library name";
     default: return "unknown error";
   }
 }

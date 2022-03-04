@@ -36,6 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include "common_utils.hpp"
+
+#define __AMCIMPL_API_CONSTANTS
+#include "amc_api_constants.hpp"
+
 #include "amc_ui_module_contentitem_form.hpp"
 
 using namespace AMC;
@@ -70,16 +74,10 @@ void CUIPage::addModule(PUIModule pModule)
 	if (sName.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULENAME);
 
-	auto iIter = m_ModuleMap.find(sName);
-	if (iIter != m_ModuleMap.end())
-		throw ELibMCInterfaceException(LIBMC_ERROR_MODULENOTFOUND);
-
 	m_Modules.push_back(pModule);
-	m_ModuleMap.insert(std::make_pair (sName, pModule));
 
 	pModule->populateItemMap(m_ItemMapOfPage);
 	
-
 }
 
 void CUIPage::configurePostLoading()
@@ -88,15 +86,6 @@ void CUIPage::configurePostLoading()
 		pModule->configurePostLoading();
 }
 
-
-PUIModule CUIPage::findModule(const std::string& sName)
-{
-	auto iIter = m_ModuleMap.find(sName);
-	if (iIter == m_ModuleMap.end())
-		throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEMODULE);
-
-	return iIter->second;
-}
 
 uint32_t CUIPage::getModuleCount()
 {
@@ -114,12 +103,32 @@ PUIModule CUIPage::getModule(const uint32_t nIndex)
 void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleArray, CParameterHandler* pClientVariableHandler)
 {
 	for (auto module : m_Modules) {
-		CJSONWriterObject moduleObject(writer);
+		CJSONWriterObject moduleObject(writer);		
 		module->writeDefinitionToJSON(writer, moduleObject, pClientVariableHandler);
 
 		moduleArray.addObject(moduleObject);
 	}
 }
+
+void CUIPage::writeModuleItemUpdatesToJSON(CJSONWriter& writer, CJSONWriterArray& itemArray, CParameterHandler* pClientVariableHandler)
+{
+	for (auto module : m_Modules) {
+		std::map <std::string, PUIModuleItem> itemMap;
+		module->populateItemMap(itemMap);
+
+		for (auto item : itemMap) {
+			CJSONWriterObject itemObject(writer);
+			item.second->addContentToJSON(writer, itemObject, pClientVariableHandler);
+
+			if (!itemObject.isEmpty()) {
+				itemObject.addString(AMC_API_KEY_UI_ITEMUUID, item.second->getUUID());
+				itemArray.addObject(itemObject);
+			}
+		}
+	}
+
+}
+
 
 PUIModuleItem CUIPage::findModuleItemByUUID(const std::string& sUUID)
 {

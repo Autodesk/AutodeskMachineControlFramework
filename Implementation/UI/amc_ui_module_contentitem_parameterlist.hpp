@@ -42,10 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_contentitem.hpp"
 
+#include "pugixml.hpp"
+
 namespace AMC {
 
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CUIModule_ContentParameterList, PUIModule_ContentParameterList);
 	amcDeclareDependingClass(CUIModule_ContentParameterListEntry, PUIModule_ContentParameterListEntry);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 	
 	class CUIModule_ContentParameterListEntry {
 	private:
@@ -83,6 +87,8 @@ namespace AMC {
 
 	public:
 
+		static PUIModule_ContentParameterList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+
 		CUIModule_ContentParameterList(const std::string & sLoadingText, const uint32_t nEntriesPerPage, PStateMachineData pStateMachineData, const std::string& sItemName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentParameterList();
@@ -97,7 +103,7 @@ namespace AMC {
 
 		CUIModule_ContentParameterListEntry* getEntry(const uint32_t nIndex);
 
-		void loadFromXML(pugi::xml_node& xmlNode);
+		void loadFromXML(const pugi::xml_node& xmlNode);
 
 	};
 

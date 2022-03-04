@@ -40,14 +40,14 @@
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn tile large color="primary" dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
-            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }}
+        <v-btn text large  dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
+            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }} 
         </v-btn>
 
         <v-spacer />
 
         <template v-for="toolbaritem in Application.AppContent.ToolbarItems">
-            <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
+            <v-btn :key="toolbaritem.id" text large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
         </template>
@@ -76,6 +76,8 @@
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
 					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
+					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
+					<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
 				</template>										
 						
 			</v-container>		
@@ -85,7 +87,8 @@
 			<v-dialog :key="uiDialog.name"						
 				v-model="uiDialog.dialogIsActive"
 				transition="dialog-bottom-transition"
-				max-width="290"
+				max-width="50vw"
+				min-height="50vh"
 			>
 			
 			<v-card> 
@@ -100,6 +103,8 @@
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
 					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
+					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
+					<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
 				</template>										
 				
 		   </v-card-text>
@@ -121,15 +126,17 @@
 
 <script>
 
-	import AMCApplication from "./Application.js"
+	import AMCApplication from "./AMCApplication.js"
 	
 	import Dialog_Login from "./Dialog_Login.vue";
 	import Dialog_Error from "./Dialog_Error.vue";
 	
-	import Module_Content from "./Module_Content.vue";
-	import Module_Tabs from "./Module_Tabs.vue";
-	import Module_Grid from "./Module_Grid.vue";
-	import Module_GLScene from "./Module_GLScene.vue";
+	import Module_Content from "./AMCModule_Content.vue";
+	import Module_Tabs from "./AMCModule_Tabs.vue";
+	import Module_Grid from "./AMCModule_Grid.vue";
+	import Module_GLScene from "./AMCModule_GLScene.vue";
+	import Module_Graphic from "./AMCModule_Graphic.vue";
+	import Module_LayerView from "./AMCModule_LayerView.vue";
 	
 	export default {
 
@@ -212,7 +219,9 @@
 			Module_Content,
 			Module_Tabs,
 			Module_GLScene,
-			Module_Grid
+			Module_Graphic,
+			Module_Grid,
+			Module_LayerView
 		},	
 
 		methods: {

@@ -536,6 +536,7 @@ PUIModuleItem CUIHandler::findModuleItem(const std::string& sUUID)
     return nullptr;
 }
 
+
 PUIPage CUIHandler::findPageOfModuleItem(const std::string& sUUID)
 {
     for (auto pPage : m_Pages) {
@@ -576,11 +577,10 @@ template <class C> std::shared_ptr<C> mapInternalUIEnvInstance(std::shared_ptr<L
 void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 {
     std::string sSenderUUID = AMCCommon::CUtils::createUUID();
-    std::string sContextUUID = AMCCommon::CUtils::createUUID();
 
     auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, pDummyClientVariableHandler);
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, "", pDummyClientVariableHandler);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -610,31 +610,42 @@ void CUIHandler::populateClientVariables(CParameterHandler* pClientVariableHandl
 }
 
 
-CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler)
+CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, const std::string& sSenderUUID,const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler)
 {
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, pClientVariableHandler);
-    auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
-
     uint32_t nErrorCode = 0;
+    bool bCloseModalDialog = false;
     std::string sErrorMessage;
+    std::string sPageToActivate;
+    std::string sModalDialogToShow;
 
     try {
 
-        auto pPage = findPageOfModuleItem(sSenderUUID);
-        if (pPage.get() == nullptr)
-            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
+        std::string sSenderPath;
+        AMC::PUIPage pPage;
+        if (!sSenderUUID.empty()) {
 
-        auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
-        if (pModuleItem.get() == nullptr)
-            throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);        
+            pPage = findPageOfModuleItem(sSenderUUID);
+            if (pPage.get() == nullptr)
+                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
+
+            auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
+            if (pModuleItem.get() == nullptr)
+                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+
+            sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+
+        }
+
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sSenderPath, pClientVariableHandler);
+        auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
 
-        if ((pClientVariableHandler.get() != nullptr) && (!sFormValueJSON.empty())) {
+        if ((pClientVariableHandler.get() != nullptr) && (!sEventPayloadJSON.empty())) {
 
             rapidjson::Document document;
-            document.Parse(sFormValueJSON.c_str());
+            document.Parse(sEventPayloadJSON.c_str());
             if (!document.IsObject())
                 throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEEVENTPARAMETERS, sEventName);
 
@@ -645,36 +656,29 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
                 if (!itr->name.IsString())
                     throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
                 std::string sEntityUUID = itr->name.GetString();
-                std::string sFormValue;
+                std::string sPayloadValue;
 
                 if (itr->value.IsString()) {
-                    sFormValue = itr->value.GetString();
+                    sPayloadValue = itr->value.GetString();
                 }
                 else if (itr->value.IsInt64()) {
-                    sFormValue = std::to_string(itr->value.GetInt64());
+                    sPayloadValue = std::to_string(itr->value.GetInt64());
                 }
                 else if (itr->value.IsBool()) {
-                    sFormValue = std::to_string(itr->value.GetBool());
+                    sPayloadValue = std::to_string(itr->value.GetBool());
                 }
                 else if (itr->value.IsDouble()) {
-                    sFormValue = std::to_string(itr->value.GetDouble());
+                    sPayloadValue = std::to_string(itr->value.GetDouble());
                 }
                 else
                     throw ELibMCCustomException(LIBMC_ERROR_INVALIDEVENTPARAMETERS, sEventName);
 
 
-
-                auto pFormItem = pPage->findModuleItemByUUID(sEntityUUID);
-                auto pForm = std::dynamic_pointer_cast<CUIModule_ContentForm> (pFormItem);
-                if (pForm.get() != nullptr) {
-
-                    auto pFormEntity = pForm->findEntityByUUID(sEntityUUID);
-                    if (pFormEntity.get() == nullptr)
-                        throw ELibMCCustomException(LIBMC_ERROR_FORMENTITYNOTFOUND, sEventName + "/" + sEntityUUID);
-
-                    auto pGroup = pClientVariableHandler->findGroup(pFormEntity->getElementPath(), true);
-                    pGroup->setParameterValueByName("value", sFormValue);                     
-
+                if (pPage.get() != nullptr) {
+                    auto pModuleItem = pPage->findModuleItemByUUID(sEntityUUID);
+                    if (pModuleItem.get() != nullptr) {
+                        pModuleItem->setEventPayloadValue(sEventName, sEntityUUID, sPayloadValue, pClientVariableHandler.get());
+                    }
                 }
 
 
@@ -683,6 +687,10 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
         }
 
         pEvent->Handle(pExternalEnvironment);
+
+        sPageToActivate = pInternalUIEnvironment->getPageToActivate();
+        bCloseModalDialog = pInternalUIEnvironment->getCloseModalDialog();
+        sModalDialogToShow = pInternalUIEnvironment->getModalDialogToShow();
 
     } 
     catch (LibMCUI::ELibMCUIException & UIException) {
@@ -704,7 +712,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
     }
 
-    return CUIHandleEventResponse (nErrorCode, sErrorMessage, pInternalUIEnvironment->getPageToActivate(), pInternalUIEnvironment->getCloseModalDialog (),  pInternalUIEnvironment->getModalDialogToShow ());
+    return CUIHandleEventResponse (nErrorCode, sErrorMessage, sPageToActivate, bCloseModalDialog, sModalDialogToShow);
        
 
 }

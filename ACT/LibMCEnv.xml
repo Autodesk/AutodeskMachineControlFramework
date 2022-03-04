@@ -65,11 +65,30 @@
 		<error name="INVALIDDOUBLEFORMVALUE" code="24" description="Invalid double form value." />
 		<error name="INVALIDINTEGERFORMVALUE" code="25" description="Invalid integer form value." />
 		<error name="COULDNNOTACCESSCLIENTVARIABLES" code="26" description="Could not access client variables." />
+		<error name="INVALIDPIXELCOUNT" code="27" description="Invalid pixel count." />
+		<error name="INVALIDDPIVALUE" code="28" description="Invalid dpi value." />
+		<error name="COULDNOTCOMPRESSPNGIMAGE" code="29" description="Could not compress PNG image." />
+		<error name="COULDNOTSTOREPNGIMAGE" code="30" description="Could not store PNG image." />
+		<error name="EMPTYPNGIMAGEDATA" code="31" description="Empty PNG image data." />
+		<error name="INVALIDXCOORDINATE" code="32" description="Invalid X coordinate." />
+		<error name="INVALIDYCOORDINATE" code="33" description="Invalid Y coordinate." />
+		<error name="INVALIDXCOORDINATERANGE" code="34" description="Invalid X coordinate range." />
+		<error name="INVALIDYCOORDINATERANGE" code="35" description="Invalid Y coordinate range." />
+		<error name="INVALIDPIXELDATACOUNT" code="36" description="Invalid pixel data count." />
+		<error name="INVALIDIMAGEBUFFER" code="37" description="Invalid image buffer." />
+		<error name="INVALIDPIXELFORMAT" code="38" description="Invalid pixel format." />
 		
 		
-		
-			
+					
 	</errors>
+
+
+	<enum name="ImagePixelFormat">
+		<option name="Unknown" value="0" />
+		<option name="GreyScale8bit" value="1" />
+		<option name="RGB24bit" value="2" />
+		<option name="RGBA32bit" value="3" />
+	</enum>
 	
 	<enum name="ToolpathSegmentType">
 		<option name="Unknown" value="0" />
@@ -108,7 +127,7 @@
 	</class>
 
 
-	<class name="Iterator">
+	<class name="Iterator" parent="Base">
 		<method name="MoveNext" description="Iterates to the next object in the list.">
 			<param name="HasNext" type="bool" pass="return" description="Iterates to the next object in the list."/>
 		</method>
@@ -125,6 +144,91 @@
 			<param name="Count" type="uint64" pass="return" description="returns the number of objects the iterator captures."/>
 		</method>
 	</class>
+	
+	
+	<class name="ImageData" parent="Base" description="In memory representation of an image.">
+
+		<method name="GetPixelFormat" description="Returns Pixel format of the image.">
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="return" description="Pixel Format of image" />
+		</method>
+
+		<method name="ChangePixelFormat" description="Changes Pixel format of the image. Might lose alpha or color information during the process.">
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="new Pixel Format of image" />
+		</method>
+
+		<method name="GetDPI" description="Returns DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
+			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
+		</method>
+
+		<method name="SetDPI" description="Sets DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="in" description="new DPI value in X" />
+			<param name="DPIValueY" type="double" pass="in" description="new DPI value in Y" />
+		</method>
+		
+		<method name="GetSizeInMM" description="Returns image sizes inmm.">
+			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
+			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
+		</method>
+
+		<method name="GetSizeInPixels" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="ResizeImage" description="Resizes Image pixel data.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="LoadPNG" description="Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>		
+
+		<method name="EncodePNG" description="Encodes PNG and stores data stream in image object.">
+		</method>		
+
+		<method name="GetEncodedPNGData" description="Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>		
+		
+		<method name="ClearEncodedPNGData" description="Releases encoded data stream of image object.">
+		</method>		
+		
+		<method name="Clear" description="Sets all pixels to a single value.">
+			<param name="Value" type="uint32" pass="in" description="Pixel value." />
+		</method>		
+
+		<method name="GetPixel" description="Returns one pixel of an image.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="uint32" pass="return" description="Pixel value at this position" />
+		</method>		
+
+		<method name="SetPixel" description="Sets one pixel of an image.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="uint32" pass="in" description="New Pixel value at this position" />
+		</method>		
+
+		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
+		</method>		
+
+		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
+		</method>
+	
+	</class>
+	
 
 	<class name="ToolpathPart" parent="Base">
 	
@@ -349,7 +453,7 @@
 		<method name="DeleteFromDisk" description = "Deletes the temporary file.">
 			<param name="Success" type="bool" pass="return" description="returns if deletion was successful or file did not exist in the first place." />
 		</method>
-
+				
 	</class>
 
 	<class name="WorkingFileIterator" parent="Iterator">
@@ -493,6 +597,35 @@
 
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="LogMessage" description="logs a string as message">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogWarning" description="logs a string as warning">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogInfo" description="logs a string as info">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+		
+		<method name="CreateEmptyImage" description="creates an empty image object.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
+		</method>		
+		
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
 		</method>
 
 	</class>
@@ -793,9 +926,24 @@
 			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
 		</method>
 
+		<method name="CreateEmptyImage" description="creates an empty image object.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
+		</method>		
+		
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
 
 	</class>
-
 
 
 
@@ -809,7 +957,11 @@
 		</method>
 	  
 		<method name="ActivatePage" description="changes the current page on the client.">
-			<param name="DialogName" type="string" pass="in" description="Name of the dialog to activate." />
+			<param name="PageName" type="string" pass="in" description="Name of the page to activate." />
+		</method>
+	  
+		<method name="RetrieveEventSender" description="returns name of the UI control that triggered the event.">
+			<param name="SenderName" type="string" pass="return" description="Name of the sender element." />
 		</method>
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
@@ -933,8 +1085,24 @@
 			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
 			<param name="Value" type="bool" pass="in" description="New property Value" />
 		</method>
-
-
+		
+		<method name="CreateEmptyImage" description="creates an empty image object.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
+		</method>		
+		
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+		
 	</class>
 
 

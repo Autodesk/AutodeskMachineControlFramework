@@ -737,6 +737,164 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_userexists(LibMCData_L
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nSaltBufferSize, LibMCData_uint32* pSaltNeededChars, char * pSaltBuffer, const LibMCData_uint32 nHashedPasswordBufferSize, LibMCData_uint32* pHashedPasswordNeededChars, char * pHashedPasswordBuffer);
 
 /*************************************************************************************************************************
+ Class definition for PersistencyHandler
+**************************************************************************************************************************/
+
+/**
+* Retrieves if a persistent parameter has been stored.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pParameterExists - returns if parameter exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_haspersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pParameterExists);
+
+/**
+* Retrieves details of a persistent parameter. Fails if parameter does not exist.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns name of the parameter, may be NULL
+* @param[out] pDataType - Returns data type of the parameter
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_getpersistentparameterdetails(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer, LibMCData::eParameterDataType * pDataType);
+
+/**
+* Removes a persistent parameter from database. Does nothing if parameter does not exist.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pParameterExisted - returns if parameter existed.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_deletepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pParameterExisted);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] eDataType - Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type.
+* @param[in] pValue - Value of the parameter. MUST be of appropriate type.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData::eParameterDataType eDataType, const char * pValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] pValue - Value of the parameter. MUST be of appropriate type.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] dValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_double dValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] nValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_int64 nValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] bValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_storepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, bool bValue);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_retrievepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_retrievepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_retrievepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, LibMCData_double * pValue);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_retrievepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, LibMCData_int64 * pValue);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_persistencyhandler_retrievepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pValue);
+
+/*************************************************************************************************************************
  Class definition for DataModel
 **************************************************************************************************************************/
 
@@ -809,6 +967,15 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createnewlogsession(LibMC
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createloginhandler(LibMCData_DataModel pDataModel, LibMCData_LoginHandler * pLoginHandler);
+
+/**
+* creates a persistency handler instance.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pPersistencyHandler - PersistencyHandler instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_createpersistencyhandler(LibMCData_DataModel pDataModel, LibMCData_PersistencyHandler * pPersistencyHandler);
 
 /*************************************************************************************************************************
  Global functions

@@ -46,8 +46,8 @@ using namespace LibMCPlugin::Impl;
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
-typedef LibMCDriver_ScanLab::PDriver_ScanLab_RTC6 PDriver_ScanLab;
-typedef LibMCEnv::CDriverCast <LibMCDriver_ScanLab::CDriver_ScanLab_RTC6, LibMCDriver_ScanLab::CWrapper> PDriverCast_ScanLab;
+LIBMC_IMPORTDRIVERCLASSES(ScanLab, ScanLab_RTC6)
+
 
 /*************************************************************************************************************************
  Class definition of CLaserData
@@ -55,11 +55,11 @@ typedef LibMCEnv::CDriverCast <LibMCDriver_ScanLab::CDriver_ScanLab_RTC6, LibMCD
 class CLaserData : public virtual CPluginData {
 protected:
 	// We need to globally store driver wrappers in the plugin
-	PDriverCast_ScanLab m_DriverCast_ScanLab;
+	PDriverCast_ScanLab_RTC6 m_DriverCast_ScanLab;
 
 public:
 
-	PDriver_ScanLab acquireScanLabDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	PDriver_ScanLab_RTC6 acquireScanLabDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		return m_DriverCast_ScanLab.acquireDriver(pStateEnvironment, "scanlab");
 	}
@@ -94,8 +94,14 @@ public:
 		pStateEnvironment->LogMessage("Initialising ScanLab Driver");
 
 		auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
-		//pDriver->LoadSDK("rtc6dllx64");
-		pDriver->SetToSimulationMode();
+		if (pStateEnvironment->GetBoolParameter("cardconfig", "simulatelaser")) {
+			pStateEnvironment->LogMessage("Laser Simulation enabled!...");
+			pDriver->SetToSimulationMode();
+		}
+
+		if (!pDriver->IsSimulationMode()) {
+			pDriver->LoadSDK("rtc6dllx64");
+		}
 
 		auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
 		auto sNetmask = pStateEnvironment->GetStringParameter("cardconfig", "netmask");

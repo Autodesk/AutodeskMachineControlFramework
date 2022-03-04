@@ -33,6 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_handler.hpp"
 #include "amc_ui_module_item.hpp"
 
+#define __AMCIMPL_UI_DIALOG
+#define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
+
+#include "amc_ui_page.hpp"
+#include "amc_ui_dialog.hpp"
+#include "amc_ui_module.hpp"
+
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
 
@@ -215,14 +223,17 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
 	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
 	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
-	auto sContextUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTCONTEXT, LIBMC_ERROR_INVALIDEVENTCONTEXT);
 
 	std::string sFormValueJSON;
 	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
 		sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
 	}
 
-	auto pEventResult = m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID, sFormValueJSON, pAuth->getClientVariableHandler ());
+	auto pUIHandler = m_pSystemState->uiHandler();
+
+	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth->getClientVariableHandler ());
+
+	CJSONWriterArray contentUpdateNode(writer);
 
 	if (pEventResult.getErrorCode())
 	{
@@ -234,14 +245,35 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 			writer.addInteger(AMC_API_KEY_UI_EVENTCLOSEDIALOGS, 1);
 		}
 		else {
-			if (pEventResult.hasDialogToShow())
-				writer.addString(AMC_API_KEY_UI_EVENTDIALOGTOSHOW, pEventResult.getDialogToShow());
+			if (pEventResult.hasDialogToShow()) {
+				std::string sDialogName = pEventResult.getDialogToShow();
+				writer.addString(AMC_API_KEY_UI_EVENTDIALOGTOSHOW, sDialogName);
+
+				// Update state of dialog to open
+				auto pDialog = pUIHandler->findDialog(sDialogName);
+				if (pDialog) {
+					pDialog->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
+				}
+			}
 		}
-		if (pEventResult.hasPageToActivate())
-			writer.addString(AMC_API_KEY_UI_EVENTPAGETOACTIVATE, pEventResult.getPageToActivate());
+		if (pEventResult.hasPageToActivate()) {
+			std::string sPageName = pEventResult.getPageToActivate();
+			writer.addString(AMC_API_KEY_UI_EVENTPAGETOACTIVATE, sPageName);
+
+			// Update state of page to open
+			auto pPage = pUIHandler->findPage(sPageName);
+			if (pPage) {
+				pPage->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
+			}
+
+		}
+
+		
 	}
 
-
+	if (!contentUpdateNode.isEmpty()) {
+		writer.addArray(AMC_API_KEY_UI_CONTENTUPDATE, contentUpdateNode);
+	}
 
 
 }

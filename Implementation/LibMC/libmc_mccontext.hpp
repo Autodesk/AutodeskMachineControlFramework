@@ -96,7 +96,7 @@ private:
 	void loadParameterGroupDerives (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup, const std::string & sStateMachineInstance);
 	void loadDriverParameterGroup (const pugi::xml_node& xmlNode, AMC::PParameterGroup pGroup);
 
-	void readSignalParameters(const pugi::xml_node& xmlNode, std::list<AMC::CStateSignalParameter> & Parameters, std::list<AMC::CStateSignalParameter>& Results);
+	void readSignalParameters(const std::string & sSignalName, const pugi::xml_node& xmlNode, std::list<AMC::CStateSignalParameter> & Parameters, std::list<AMC::CStateSignalParameter>& Results);
 
 
 protected:

@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
+#include "amc_ui_module.hpp"
 
 #include "libmcdata_dynamic.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
@@ -76,6 +78,35 @@ bool CUIModule_ContentParameterListEntry::isFullGroup()
 {
 	return m_sParameter.empty ();
 }
+
+
+PUIModule_ContentParameterList CUIModule_ContentParameterList::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+{
+	LibMCAssertNotNull(pUIModuleEnvironment);
+	auto loadingtextAttrib = xmlNode.attribute("loadingtext");
+	auto entriesperpageAttrib = xmlNode.attribute("entriesperpage");
+	std::string sLoadingText = loadingtextAttrib.as_string();
+
+	int nEntriesPerPage;
+	if (!entriesperpageAttrib.empty()) {
+		nEntriesPerPage = entriesperpageAttrib.as_int();
+		if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+		if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
+	}
+	else {
+		nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
+	}
+
+	auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pUIModuleEnvironment->stateMachineData(), sItemName, sModulePath);
+
+	pParameterList->loadFromXML(xmlNode);
+
+	return pParameterList;
+
+}
+
 
 
 
@@ -217,7 +248,7 @@ CUIModule_ContentParameterListEntry* CUIModule_ContentParameterList::getEntry(co
 }
 
 
-void CUIModule_ContentParameterList::loadFromXML(pugi::xml_node& xmlNode)
+void CUIModule_ContentParameterList::loadFromXML(const pugi::xml_node& xmlNode)
 {
 	auto entryNodes = xmlNode.children ("entry");
 	for (auto entryNode : entryNodes) {

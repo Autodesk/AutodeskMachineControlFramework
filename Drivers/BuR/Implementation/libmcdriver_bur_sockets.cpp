@@ -29,11 +29,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 
-#include <Windows.h>
-#include <Winsock2.h>
+#include <windows.h>
+#include <winsock2.h>
 #include <ws2tcpip.h>
+#else
+
+#define INVALID_SOCKET 0
+
+#endif //_WIN32
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -49,7 +56,7 @@ using namespace LibMCDriver_BuR::Impl;
 CDriver_BuRSocketConnection::CDriver_BuRSocketConnection(const std::string& sIPAddress, uint32_t nPort)
     : m_Socket (INVALID_SOCKET)
 {
-
+#ifdef _WIN32
     struct addrinfo* result = NULL;
     struct addrinfo* ptr = NULL;
     struct addrinfo hints;
@@ -99,6 +106,11 @@ CDriver_BuRSocketConnection::CDriver_BuRSocketConnection(const std::string& sIPA
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COULDNOTCONNECT, "could not connect to " + sIPAddress + ":" + sPort);
 
     m_Socket = ConnectSocket;
+#else
+    throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTIMPLEMENTED);
+#endif //_WIN32
+
+
 }
 
 CDriver_BuRSocketConnection::~CDriver_BuRSocketConnection()
@@ -119,11 +131,17 @@ void CDriver_BuRSocketConnection::sendBuffer(const uint8_t* pBuffer, size_t nCou
         if (pBuffer == nullptr)
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
 
+#ifdef _WIN32
+
         int iResult = send(m_Socket, (const char*)pBuffer, (int) nCount, 0);
         if (iResult == SOCKET_ERROR) {
             disconnect();
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_SENDERROR, "could not send data to socket: " + std::to_string(WSAGetLastError()));
         } 
+#else
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTIMPLEMENTED);
+#endif //_WIN32
+
     }
 }
 
@@ -133,6 +151,7 @@ bool CDriver_BuRSocketConnection::waitForData(uint32_t timeOutInMS)
     if (m_Socket == INVALID_SOCKET)
         return false;
 
+#ifdef _WIN32
     struct timeval timeout;
     struct fd_set fds;
 
@@ -145,6 +164,9 @@ bool CDriver_BuRSocketConnection::waitForData(uint32_t timeOutInMS)
     int selectionResult = select (0, &fds, 0, 0, &timeout);
 
     return selectionResult > 0;
+#else
+    return false;
+#endif //_WIN32
 
 }
 
@@ -163,6 +185,7 @@ void CDriver_BuRSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, si
 
         uint32_t totalBytesReceived = 0;
 
+#ifdef _WIN32
         while (totalBytesReceived < nCount) {
 
             uint8_t* pData = &Buffer[oldSize + totalBytesReceived];
@@ -184,16 +207,21 @@ void CDriver_BuRSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, si
 
         if (totalBytesReceived != nCount)
             Buffer.resize(oldSize + nCount);
-
+#else
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTIMPLEMENTED);
+#endif // _WIN32
     }
 }
 
 
 void CDriver_BuRSocketConnection::disconnect()
 {
+#ifdef _WIN32
     if (m_Socket != INVALID_SOCKET) {
         closesocket(m_Socket);
     }
+#endif //_WIN32
+
     m_Socket = INVALID_SOCKET;
 }
 
@@ -204,8 +232,10 @@ bool CDriver_BuRSocketConnection::isConnected()
 
 void CDriver_BuRSocketConnection::initializeNetworking()
 {
+#ifdef _WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif //_WIN32
 
 }
 

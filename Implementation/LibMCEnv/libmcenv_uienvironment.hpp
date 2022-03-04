@@ -66,6 +66,7 @@ private:
 	AMC::PStateSignalHandler m_pSignalHandler;
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
+	std::string m_sSenderName;
 
 	std::string m_sModalDialogToShow;
 	bool m_bCloseModalDialog;
@@ -75,13 +76,15 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, AMC::PParameterHandler pClientVariableHandler);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler);
 
 	void ActivateModalDialog(const std::string& sDialogName) override;
 
 	void CloseModalDialog() override;
 
 	void ActivatePage(const std::string& sPageName) override;
+
+	std::string RetrieveEventSender() override;
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
@@ -123,6 +126,10 @@ public:
 	void SetUIPropertyAsInteger(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_int64 nValue) override;
 
 	void SetUIPropertyAsBool(const std::string& sElementPath, const std::string& sPropertyName, const bool bValue) override;
+
+	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
+
+	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 	std::string getModalDialogToShow();
 

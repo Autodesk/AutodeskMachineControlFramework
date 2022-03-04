@@ -39,25 +39,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
+#include "amc_ui_expression.hpp"
+
+#include "pugixml.hpp"
+
 
 namespace AMC {
 
 
 	amcDeclareDependingClass(CUIModule_ContentUpload, PUIModule_ContentUpload);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CUIModule_ContentRegistry, PUIModule_ContentRegistry);
+	
 
 	class CUIModule_ContentUpload : public CUIModule_ContentItem {
 	protected:
-		std::string m_sUploadClass;
-		std::string m_sUploadCaption;
-		std::string m_sSuccessPage;
+		PStateMachineData m_pStateMachineData;
+		CUIExpression m_UploadClass;
+		CUIExpression m_UploadCaption;
+		std::string m_sSuccessEvent;
+		std::string m_sFailureEvent;
+		CUIModule_ContentRegistry* m_pOwner;
 
 	public:
 
-		CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string & sSuccessPage, const std::string& sItemName, const std::string& sModulePath);
+		static PUIModule_ContentUpload makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+
+		CUIModule_ContentUpload(CUIModule_ContentRegistry* pOwner, CUIExpression uploadClass, CUIExpression uploadCaption, const std::string & sSuccessEvent, const std::string& sFailureEvent, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentUpload();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+
+		virtual void configurePostLoading() override;
+
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+
+		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
+
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
+
+
 
 	};
 

@@ -2262,6 +2262,499 @@ LibMCDataResult libmcdata_loginhandler_getuserdetails(LibMCData_LoginHandler pLo
 
 
 /*************************************************************************************************************************
+ Class implementation for PersistencyHandler
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_persistencyhandler_haspersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pParameterExists)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pParameterExists == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pParameterExists = pIPersistencyHandler->HasPersistentParameter(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_getpersistentparameterdetails(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer, eLibMCDataParameterDataType * pDataType)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pDataType)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName("");
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			pIPersistencyHandler->GetPersistentParameterDetails(sUUID, sName, *pDataType);
+
+			pIPersistencyHandler->_setCache (new ParameterCache_2<std::string, LibMCData::eParameterDataType> (sName, *pDataType));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_2<std::string, LibMCData::eParameterDataType>*> (pIPersistencyHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sName, *pDataType);
+			pIPersistencyHandler->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCData_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_deletepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pParameterExisted)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pParameterExisted == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pParameterExisted = pIPersistencyHandler->DeletePersistentParameter(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_storepersistentparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, eLibMCDataParameterDataType eDataType, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName(pName);
+		std::string sValue(pValue);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIPersistencyHandler->StorePersistentParameter(sUUID, sName, eDataType, sValue);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_storepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName(pName);
+		std::string sValue(pValue);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIPersistencyHandler->StorePersistentStringParameter(sUUID, sName, sValue);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_storepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName(pName);
+		std::string sValue(pValue);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIPersistencyHandler->StorePersistentUUIDParameter(sUUID, sName, sValue);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_storepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName(pName);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIPersistencyHandler->StorePersistentDoubleParameter(sUUID, sName, dValue);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_storepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_int64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName(pName);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIPersistencyHandler->StorePersistentIntegerParameter(sUUID, sName, nValue);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_storepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pName == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sName(pName);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIPersistencyHandler->StorePersistentBoolParameter(sUUID, sName, bValue);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_retrievepersistentstringparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pValueBuffer) && !(pValueNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sValue("");
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pValueBuffer == nullptr);
+		if (isCacheCall) {
+			sValue = pIPersistencyHandler->RetrievePersistentStringParameter(sUUID);
+
+			pIPersistencyHandler->_setCache (new ParameterCache_1<std::string> (sValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIPersistencyHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sValue);
+			pIPersistencyHandler->_setCache (nullptr);
+		}
+		
+		if (pValueNeededChars)
+			*pValueNeededChars = (LibMCData_uint32) (sValue.size()+1);
+		if (pValueBuffer) {
+			if (sValue.size() >= nValueBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
+				pValueBuffer[iValue] = sValue[iValue];
+			pValueBuffer[sValue.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_retrievepersistentuuidparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pValueBuffer) && !(pValueNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		std::string sValue("");
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pValueBuffer == nullptr);
+		if (isCacheCall) {
+			sValue = pIPersistencyHandler->RetrievePersistentUUIDParameter(sUUID);
+
+			pIPersistencyHandler->_setCache (new ParameterCache_1<std::string> (sValue));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIPersistencyHandler->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sValue);
+			pIPersistencyHandler->_setCache (nullptr);
+		}
+		
+		if (pValueNeededChars)
+			*pValueNeededChars = (LibMCData_uint32) (sValue.size()+1);
+		if (pValueBuffer) {
+			if (sValue.size() >= nValueBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iValue = 0; iValue < sValue.size(); iValue++)
+				pValueBuffer[iValue] = sValue[iValue];
+			pValueBuffer[sValue.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_retrievepersistentdoubleparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, LibMCData_double * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pValue = pIPersistencyHandler->RetrievePersistentDoubleParameter(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_retrievepersistentintegerparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, LibMCData_int64 * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pValue = pIPersistencyHandler->RetrievePersistentIntegerParameter(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_persistencyhandler_retrievepersistentboolparameter(LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pPersistencyHandler;
+
+	try {
+		if (pUUID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sUUID(pUUID);
+		IPersistencyHandler* pIPersistencyHandler = dynamic_cast<IPersistencyHandler*>(pIBaseClass);
+		if (!pIPersistencyHandler)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pValue = pIPersistencyHandler->RetrievePersistentBoolParameter(sUUID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DataModel
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_datamodel_initialisedatabase(LibMCData_DataModel pDataModel, const char * pDataDirectory, eLibMCDataDataBaseType eDataBaseType, const char * pConnectionString)
@@ -2492,6 +2985,34 @@ LibMCDataResult libmcdata_datamodel_createloginhandler(LibMCData_DataModel pData
 	}
 }
 
+LibMCDataResult libmcdata_datamodel_createpersistencyhandler(LibMCData_DataModel pDataModel, LibMCData_PersistencyHandler * pPersistencyHandler)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pPersistencyHandler == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBasePersistencyHandler(nullptr);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBasePersistencyHandler = pIDataModel->CreatePersistencyHandler();
+
+		*pPersistencyHandler = (IBase*)(pBasePersistencyHandler);
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -2631,6 +3152,34 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_loginhandler_userexists;
 	if (sProcName == "libmcdata_loginhandler_getuserdetails") 
 		*ppProcAddress = (void*) &libmcdata_loginhandler_getuserdetails;
+	if (sProcName == "libmcdata_persistencyhandler_haspersistentparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_haspersistentparameter;
+	if (sProcName == "libmcdata_persistencyhandler_getpersistentparameterdetails") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_getpersistentparameterdetails;
+	if (sProcName == "libmcdata_persistencyhandler_deletepersistentparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_deletepersistentparameter;
+	if (sProcName == "libmcdata_persistencyhandler_storepersistentparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_storepersistentparameter;
+	if (sProcName == "libmcdata_persistencyhandler_storepersistentstringparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_storepersistentstringparameter;
+	if (sProcName == "libmcdata_persistencyhandler_storepersistentuuidparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_storepersistentuuidparameter;
+	if (sProcName == "libmcdata_persistencyhandler_storepersistentdoubleparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_storepersistentdoubleparameter;
+	if (sProcName == "libmcdata_persistencyhandler_storepersistentintegerparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_storepersistentintegerparameter;
+	if (sProcName == "libmcdata_persistencyhandler_storepersistentboolparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_storepersistentboolparameter;
+	if (sProcName == "libmcdata_persistencyhandler_retrievepersistentstringparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentstringparameter;
+	if (sProcName == "libmcdata_persistencyhandler_retrievepersistentuuidparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentuuidparameter;
+	if (sProcName == "libmcdata_persistencyhandler_retrievepersistentdoubleparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentdoubleparameter;
+	if (sProcName == "libmcdata_persistencyhandler_retrievepersistentintegerparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentintegerparameter;
+	if (sProcName == "libmcdata_persistencyhandler_retrievepersistentboolparameter") 
+		*ppProcAddress = (void*) &libmcdata_persistencyhandler_retrievepersistentboolparameter;
 	if (sProcName == "libmcdata_datamodel_initialisedatabase") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_initialisedatabase;
 	if (sProcName == "libmcdata_datamodel_getdatamodelversion") 
@@ -2645,6 +3194,8 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_datamodel_createnewlogsession;
 	if (sProcName == "libmcdata_datamodel_createloginhandler") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_createloginhandler;
+	if (sProcName == "libmcdata_datamodel_createpersistencyhandler") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_createpersistencyhandler;
 	if (sProcName == "libmcdata_getversion") 
 		*ppProcAddress = (void*) &libmcdata_getversion;
 	if (sProcName == "libmcdata_getlasterror") 

@@ -40,7 +40,22 @@ CUIExpression::CUIExpression()
 
 }
 
+CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, bool bValueMustExist)
+{
+	readFromXML(xmlNode, attributeName, "", bValueMustExist);
+}
+
 CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName)
+{
+	readFromXML(xmlNode, attributeName, "", false);
+}
+
+CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue)
+{
+	readFromXML(xmlNode, attributeName, defaultValue, false);
+}
+
+void CUIExpression::readFromXML(const pugi::xml_node& xmlNode, const std::string& attributeName, const std::string& defaultValue, bool bValueMustExist)
 {
 	auto valueAttrib = xmlNode.attribute(attributeName.c_str());
 	auto syncvalueAttrib = xmlNode.attribute(("sync:" + attributeName).c_str());
@@ -55,7 +70,16 @@ CUIExpression::CUIExpression(const pugi::xml_node& xmlNode, const std::string& a
 		m_sExpressionValue = sSyncValue;
 	}
 	else {
-		m_sFixedValue = sValue;
+		if (!valueAttrib.empty()) {
+			m_sFixedValue = sValue;
+		}
+		else {
+
+			if (bValueMustExist) 
+				throw ELibMCCustomException(LIBMC_ERROR_EXPRESSIONVALUEMISSING, attributeName);
+
+			m_sFixedValue = defaultValue;
+		}
 	}
 }
 
@@ -106,7 +130,7 @@ double CUIExpression::evaluateNumberValue(CStateMachineData* pStateMachineData)
 		if (!bIsNumber)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDNUMBEREXPRESSION, sExpression);
 
-		return std::stod(sExpression);
+		return AMCCommon::CUtils::stringToDouble(sExpression);
 	}
 
 }
@@ -141,7 +165,7 @@ int64_t CUIExpression::evaluateIntegerValue(CStateMachineData* pStateMachineData
 		if (!bIsNumber)
 			throw ELibMCCustomException (LIBMC_ERROR_INVALIDINTEGEREXPRESSION, sExpression);
 
-		return std::stoll(sExpression);
+		return AMCCommon::CUtils::stringToInteger(sExpression);
 	}
 
 }
@@ -209,7 +233,7 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 		if (!bIsNumber)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDBOOLEANEXPRESSION, sExpression);
 
-		int64_t nValue = std::stoll(sExpression);
+		int64_t nValue = AMCCommon::CUtils::stringToInteger(sExpression);
 		if (bInvert)
 			return (nValue == 0);
 
@@ -240,4 +264,15 @@ void CUIExpression::checkExpressionSyntax(PStateMachineData pStateMachineData)
 bool CUIExpression::needsSync()
 {
 	return !m_sExpressionValue.empty();
+}
+
+bool CUIExpression::isEmpty(CStateMachineData* pStateMachineData)
+{
+	std::string sValue = evaluateStringValue(pStateMachineData);
+	return sValue.empty();
+}
+
+bool CUIExpression::isEmpty(PStateMachineData pStateMachineData)
+{
+	return isEmpty(pStateMachineData.get ());
 }

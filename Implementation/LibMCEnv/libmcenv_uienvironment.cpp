@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "libmcenv_interfaceexception.hpp"
 #include "amc_systemstate.hpp"
 #include "libmcenv_signaltrigger.hpp"
+#include "libmcenv_imagedata.hpp"
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 
@@ -47,13 +48,13 @@ using namespace LibMCEnv::Impl;
  Class definition of CUIEnvironment 
 **************************************************************************************************************************/
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, AMC::PParameterHandler pClientVariableHandler)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
       m_pSignalHandler (pSignalHandler),
       m_sLogSubSystem ("ui"),
-      m_sSenderUUID (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID)),
+      m_sSenderName (sSenderName),
       m_pClientVariableHandler (pClientVariableHandler),
       m_bCloseModalDialog (false)
 {
@@ -66,6 +67,13 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    if (!sSenderUUID.empty()) {
+        m_sSenderUUID = (AMCCommon::CUtils::normalizeUUIDString(sSenderUUID));
+    }
+    else {
+        m_sSenderUUID = AMCCommon::CUtils::createEmptyUUID();
+    }
 
 }
 
@@ -85,6 +93,12 @@ void CUIEnvironment::ActivatePage(const std::string& sPageName)
 {
     m_sPageToActivate = sPageName;
 }
+
+std::string CUIEnvironment::RetrieveEventSender()
+{
+    return m_sSenderName;
+}
+
 
 ISignalTrigger * CUIEnvironment::PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName)
 {
@@ -212,8 +226,12 @@ void CUIEnvironment::SetUIPropertyAsUUID(const std::string& sElementPath, const 
     if (m_pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES);
 
+
     auto pGroup = m_pClientVariableHandler->findGroup(sElementPath, true);
-    pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::normalizeUUIDString ( sValue));
+    if (!sValue.empty())
+        pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::normalizeUUIDString (sValue));
+    else
+        pGroup->setParameterValueByName(sPropertyName, AMCCommon::CUtils::createEmptyUUID());
 }
 
 void CUIEnvironment::SetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_double dValue) 
@@ -259,4 +277,16 @@ bool CUIEnvironment::getCloseModalDialog()
 std::string CUIEnvironment::getPageToActivate()
 {
     return m_sPageToActivate;
+}
+
+
+
+IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
+IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
 }

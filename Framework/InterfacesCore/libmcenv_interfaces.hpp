@@ -56,6 +56,7 @@ namespace Impl {
 */
 class IBase;
 class IIterator;
+class IImageData;
 class IToolpathPart;
 class IToolpathLayer;
 class IToolpathAccessor;
@@ -288,6 +289,135 @@ public:
 };
 
 typedef IBaseSharedPtr<IIterator> PIIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for ImageData 
+**************************************************************************************************************************/
+
+class IImageData : public virtual IBase {
+public:
+	/**
+	* IImageData::GetPixelFormat - Returns Pixel format of the image.
+	* @return Pixel Format of image
+	*/
+	virtual LibMCEnv::eImagePixelFormat GetPixelFormat() = 0;
+
+	/**
+	* IImageData::ChangePixelFormat - Changes Pixel format of the image. Might lose alpha or color information during the process.
+	* @param[in] ePixelFormat - new Pixel Format of image
+	*/
+	virtual void ChangePixelFormat(const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IImageData::GetDPI - Returns DPI values in X and Y.
+	* @param[out] dDPIValueX - DPI value in X
+	* @param[out] dDPIValueY - DPI value in Y
+	*/
+	virtual void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY) = 0;
+
+	/**
+	* IImageData::SetDPI - Sets DPI values in X and Y.
+	* @param[in] dDPIValueX - new DPI value in X
+	* @param[in] dDPIValueY - new DPI value in Y
+	*/
+	virtual void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY) = 0;
+
+	/**
+	* IImageData::GetSizeInMM - Returns image sizes inmm.
+	* @param[out] dSizeX - Size in X in mm
+	* @param[out] dSizeY - Size in Y in mm
+	*/
+	virtual void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY) = 0;
+
+	/**
+	* IImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IImageData::ResizeImage - Resizes Image pixel data.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	virtual void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY) = 0;
+
+	/**
+	* IImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
+	*/
+	virtual void LoadPNG(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
+
+	/**
+	* IImageData::EncodePNG - Encodes PNG and stores data stream in image object.
+	*/
+	virtual void EncodePNG() = 0;
+
+	/**
+	* IImageData::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[out] pPNGDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pPNGDataBuffer - uint8 buffer of PNG Data stream.
+	*/
+	virtual void GetEncodedPNGData(LibMCEnv_uint64 nPNGDataBufferSize, LibMCEnv_uint64* pPNGDataNeededCount, LibMCEnv_uint8 * pPNGDataBuffer) = 0;
+
+	/**
+	* IImageData::ClearEncodedPNGData - Releases encoded data stream of image object.
+	*/
+	virtual void ClearEncodedPNGData() = 0;
+
+	/**
+	* IImageData::Clear - Sets all pixels to a single value.
+	* @param[in] nValue - Pixel value.
+	*/
+	virtual void Clear(const LibMCEnv_uint32 nValue) = 0;
+
+	/**
+	* IImageData::GetPixel - Returns one pixel of an image.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @return Pixel value at this position
+	*/
+	virtual LibMCEnv_uint32 GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY) = 0;
+
+	/**
+	* IImageData::SetPixel - Sets one pixel of an image.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @param[in] nValue - New Pixel value at this position
+	*/
+	virtual void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue) = 0;
+
+	/**
+	* IImageData::GetPixelRange - Returns a subset of an image or the whole image data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[out] pValueNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pValueBuffer - uint8 buffer of Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	*/
+	virtual void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, LibMCEnv_uint64 nValueBufferSize, LibMCEnv_uint64* pValueNeededCount, LibMCEnv_uint8 * pValueBuffer) = 0;
+
+	/**
+	* IImageData::SetPixelRange - Exchanges a subset of an image or the whole image data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
+	* @param[in] nValueBufferSize - Number of elements in buffer
+	* @param[in] pValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	*/
+	virtual void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const LibMCEnv_uint64 nValueBufferSize, const LibMCEnv_uint8 * pValueBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IImageData> PIImageData;
 
 
 /*************************************************************************************************************************
@@ -857,6 +987,46 @@ public:
 	*/
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
+	/**
+	* IDriverEnvironment::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogMessage(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverEnvironment::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogWarning(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverEnvironment::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogInfo(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IDriverEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriverEnvironment> PIDriverEnvironment;
@@ -1279,6 +1449,28 @@ public:
 	*/
 	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
 
+	/**
+	* IStateEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IStateEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
@@ -1303,9 +1495,15 @@ public:
 
 	/**
 	* IUIEnvironment::ActivatePage - changes the current page on the client.
-	* @param[in] sDialogName - Name of the dialog to activate.
+	* @param[in] sPageName - Name of the page to activate.
 	*/
-	virtual void ActivatePage(const std::string & sDialogName) = 0;
+	virtual void ActivatePage(const std::string & sPageName) = 0;
+
+	/**
+	* IUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
+	* @return Name of the sender element.
+	*/
+	virtual std::string RetrieveEventSender() = 0;
 
 	/**
 	* IUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
@@ -1464,6 +1662,28 @@ public:
 	* @param[in] bValue - New property Value
 	*/
 	virtual void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue) = 0;
+
+	/**
+	* IUIEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	virtual IImageData * CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
+
+	/**
+	* IUIEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] nPNGDataBufferSize - Number of elements in buffer
+	* @param[in] pPNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	virtual IImageData * LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) = 0;
 
 };
 

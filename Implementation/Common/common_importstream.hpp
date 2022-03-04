@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCCOMMON_IMPORTSTREAM
 
 #include <vector>
+#include <string>
 #include <memory>
 
 namespace AMCCommon {
@@ -67,6 +68,21 @@ namespace AMCCommon {
 				readBuffer (Buffer.data(), nSize, true);
 			}
 		}
+
+		virtual std::string readAsString()
+		{
+			std::vector<uint8_t> Buffer;
+			uint64_t nSize = retrieveSize();
+			Buffer.resize(nSize + 1);
+			if (nSize > 0) {
+				seekPosition(0, true);
+				readBuffer(Buffer.data(), nSize, true);
+			}
+
+			Buffer[nSize] = 0;
+			return (char*) Buffer.data();
+		}
+
 	};
 
 }

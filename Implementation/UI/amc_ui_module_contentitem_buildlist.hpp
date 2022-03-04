@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
+#include "pugixml.hpp"
 
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
@@ -48,6 +49,7 @@ namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentBuildList, PUIModule_ContentBuildList);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 	class CUIModule_ContentBuildList : public CUIModule_ContentItem {
 	protected:
@@ -57,8 +59,9 @@ namespace AMC {
 		std::string m_sBuildNameCaption;
 		std::string m_sBuildLayersCaption;
 		std::string m_sBuildUUIDCaption;
+		std::string m_sSelectEvent;
 
-		std::string m_sDetailPage;
+		std::string m_sSelectedBuildField;
 
 		uint32_t m_nEntriesPerPage;
 
@@ -66,13 +69,24 @@ namespace AMC {
 
 	public:
 
-		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sDetailPage, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath);
+		static PUIModule_ContentBuildList makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
+
+		CUIModule_ContentBuildList(const std::string& sLoadingText, const uint32_t nEntriesPerPage, const std::string & sSelectEvent, LibMCData::PBuildJobHandler pBuildJobHandler, const std::string& sItemName, const std::string& sModulePath);
 
 		virtual ~CUIModule_ContentBuildList();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
 		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
+
+		virtual void setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler) override;
+
+		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
+
+		virtual std::list <std::string> getReferenceUUIDs() override;
+
 
 	};
 

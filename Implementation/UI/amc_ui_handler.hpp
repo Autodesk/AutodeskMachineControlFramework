@@ -128,10 +128,8 @@ namespace AMC {
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
 
 		PUIPage addPage_Unsafe (const std::string& sName);
-		PUIPage findPage(const std::string& sName);
 
 		PUIDialog addDialog_Unsafe(const std::string& sName, const std::string& sTitle);
-		PUIDialog findDialog(const std::string& sName);
 
 	public:
 
@@ -150,14 +148,17 @@ namespace AMC {
 		PResourcePackage getCoreResourcePackage ();
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
-		
+
 		PUIPage findPageOfModuleItem(const std::string& sUUID);
 
-		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID, const std::string& sFormValueJSON, PParameterHandler pClientVariableHandler);
+		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler);
 
 		virtual void ensureUIEventExists(const std::string& sEventName) override;
 
 		virtual void populateClientVariables(CParameterHandler * pClientVariableHandler);
+
+		PUIPage findPage(const std::string& sName);
+		PUIDialog findDialog(const std::string& sName);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

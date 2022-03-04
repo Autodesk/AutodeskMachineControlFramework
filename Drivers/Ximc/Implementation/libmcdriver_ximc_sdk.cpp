@@ -53,7 +53,7 @@ void* _loadXimcAddress (HMODULE hLibrary, const char * pSymbolName) {
 	return pFuncPtr;
 }
 #else
-void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName) {
+void* _loadXimcAddress(void * hLibrary, const char* pSymbolName) {
 	void* pFuncPtr = (void*) dlsym(hLibrary, pSymbolName);
 	dlerror();
 	if (pFuncPtr == nullptr)

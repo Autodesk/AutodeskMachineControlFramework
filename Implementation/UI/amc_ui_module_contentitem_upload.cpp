@@ -38,15 +38,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
+#include "amc_ui_module.hpp"
+#include "amc_ui_interfaces.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
+#include "libmc_exceptiontypes.hpp"
+
 using namespace AMC;
 
-
-CUIModule_ContentUpload::CUIModule_ContentUpload(const std::string& sUploadClass, const std::string& sUploadCaption, const std::string& sSuccessPage, const std::string& sItemName, const std::string& sModulePath)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_sUploadClass(sUploadClass), m_sUploadCaption (sUploadCaption), m_sSuccessPage (sSuccessPage)
+PUIModule_ContentUpload CUIModule_ContentUpload::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 {
+	LibMCAssertNotNull(pUIModuleEnvironment);
+	CUIExpression classExpression(xmlNode, "class");
+	CUIExpression captionExpression(xmlNode, "caption");
+
+	auto successeventAttrib = xmlNode.attribute("successevent");
+	auto failureeventAttrib = xmlNode.attribute("failureevent");
+
+	return std::make_shared <CUIModule_ContentUpload> (pUIModuleEnvironment->contentRegistry(), classExpression, captionExpression, successeventAttrib.as_string (), failureeventAttrib.as_string (), sItemName, sModulePath, pUIModuleEnvironment->stateMachineData ());
+}
+
+
+
+CUIModule_ContentUpload::CUIModule_ContentUpload(CUIModule_ContentRegistry* pOwner, CUIExpression uploadClass, CUIExpression uploadCaption, const std::string& sSuccessEvent, const std::string& sFailureEvent, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_UploadClass(uploadClass), m_UploadCaption (uploadCaption), m_sSuccessEvent (sSuccessEvent), m_sFailureEvent (sFailureEvent), m_pStateMachineData (pStateMachineData), m_pOwner (pOwner)
+{
+	LibMCAssertNotNull(pStateMachineData);
+	LibMCAssertNotNull(pOwner);
 
 }
 
@@ -59,12 +78,49 @@ void CUIModule_ContentUpload::addDefinitionToJSON(CJSONWriter& writer, CJSONWrit
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "upload");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADCLASS, m_sUploadClass);
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADCAPTION, m_sUploadCaption);
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADCLASS, m_UploadClass.evaluateStringValue (m_pStateMachineData));
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADCAPTION, m_UploadCaption.evaluateStringValue (m_pStateMachineData));
 	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISINITIAL, 1);
 	object.addInteger(AMC_API_KEY_UI_ITEMUPLOADISSAVING, 0);
 	object.addString(AMC_API_KEY_UI_ITEMUPLOADFILENAME, "");
-	object.addString(AMC_API_KEY_UI_ITEMUPLOADSUCCESSPAGE, m_sSuccessPage);
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADSUCCESSEVENT, m_sSuccessEvent);
+	object.addString(AMC_API_KEY_UI_ITEMUPLOADFAILUREEVENT, m_sFailureEvent);
 }
 
 
+void CUIModule_ContentUpload::configurePostLoading()
+{
+	if (!m_sSuccessEvent.empty())
+		m_pOwner->ensureUIEventExists(m_sSuccessEvent);
+	if (!m_sFailureEvent.empty())
+		m_pOwner->ensureUIEventExists(m_sFailureEvent);
+
+}
+
+
+void CUIModule_ContentUpload::populateClientVariables(CParameterHandler* pClientVariableHandler) 
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	auto pGroup = pClientVariableHandler->addGroup(getItemPath(), "upload UI element");
+	pGroup->addNewStringParameter("uploaduuid", "uploaded UUID", AMCCommon::CUtils::createEmptyUUID ());
+}
+
+void CUIModule_ContentUpload::setEventPayloadValue(const std::string& sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	if (AMCCommon::CUtils::normalizeUUIDString (sPayloadUUID) == getUUID()) {
+		auto pGroup = pClientVariableHandler->findGroup(getItemPath(), true);
+		pGroup->setParameterValueByName("uploaduuid", AMCCommon::CUtils::normalizeUUIDString (sPayloadValue));
+
+	}
+
+}
+
+
+std::string CUIModule_ContentUpload::findElementPathByUUID(const std::string& sUUID)
+{
+	if (sUUID == m_sUUID)
+		return getItemPath();
+
+	return "";
+}

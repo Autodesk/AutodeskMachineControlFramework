@@ -361,6 +361,9 @@ namespace AMC {
 
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
+		if (m_JournalMode != eStateJournalMode::sjmRecording)
+			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
+
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pBoolVariable = std::dynamic_pointer_cast<CStateJournalImplBoolVariable> (iIter->second);
 		if (pBoolVariable.get () == nullptr)
@@ -372,6 +375,9 @@ namespace AMC {
 	void CStateJournalImpl::updateIntegerValue(const uint32_t nVariableID, const int64_t nValue)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_JournalMode != eStateJournalMode::sjmRecording)
+			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
 
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pIntegerVariable = std::dynamic_pointer_cast<CStateJournalImplIntegerVariable> (iIter->second);
@@ -385,6 +391,9 @@ namespace AMC {
 	void CStateJournalImpl::updateStringValue(const uint32_t nVariableID, const std::string& sValue)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		if (m_JournalMode != eStateJournalMode::sjmRecording)
+			throw ELibMCInterfaceException(LIBMC_ERROR_JOURNALISNOTRECORDING);
 
 		auto iIter = m_VariableIDMap.find(nVariableID);
 		auto pStringVariable = std::dynamic_pointer_cast<CStateJournalImplStringVariable> (iIter->second);
