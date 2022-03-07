@@ -48,9 +48,6 @@ namespace AMC {
 	class CDriver;
 	typedef std::shared_ptr<CDriver> PDriver;
 
-	class CLogger;
-	typedef std::shared_ptr<CLogger> PLogger;
-
 	class CToolpathHandler;
 	typedef std::shared_ptr<CToolpathHandler> PToolpathHandler;
 
@@ -60,7 +57,6 @@ namespace AMC {
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 		std::string m_sTempBasePath;
 		PToolpathHandler m_pToolpathHandler;
-		PLogger m_pLogger;
 
 		// List and Map of registered drivers
 		std::list<PDriver> m_DriverList;
@@ -73,7 +69,7 @@ namespace AMC {
 
 	public:
 
-		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger);
+		CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler);
 
 		virtual ~CDriverHandler();
 

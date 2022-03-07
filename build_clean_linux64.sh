@@ -5,27 +5,8 @@ set -e
 export GO111MODULE="off" 
 
 basepath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-PLATFORMNAME="linux64"
-
-for var in "$@"
-do
-echo "command line parameter: $var"
-if test $var = "--buildrpi"
-then
-	PLATFORMNAME="rpi"	
-fi	
-if test $var = "--buildwin64"
-then
-	PLATFORMNAME="win64"	
-fi	
-done
-
-builddir="$basepath/build_${PLATFORMNAME}"
+builddir="$basepath/build"
 outputdir="$builddir/Output"
-
-
-echo "Building for platform: ${PLATFORMNAME}..."
 
 dirs_to_make[0]="$builddir"
 dirs_to_make[1]="$outputdir"
@@ -52,8 +33,7 @@ dirs_to_make[21]="$builddir/Client/public"
 dirs_to_make[22]="$builddir/Client/src"
 dirs_to_make[23]="$builddir/Client/src/plugins"
 dirs_to_make[24]="$builddir/Client/dist"
-dirs_to_make[25]="$builddir/Artifacts"
-dirs_to_make[26]="$outputdir/data"
+
 
 for dir in "${dirs_to_make[@]}"
 do
@@ -72,95 +52,70 @@ git rev-parse --verify --short HEAD > "$builddir/githash.txt"
 GITHASH=$(<"$builddir/githash.txt")
 echo "git hash: $GITHASH"
 
-git rev-parse --verify HEAD > "$builddir/longgithash.txt"
-LONGGITHASH=$(<"$builddir/longgithash.txt")
-echo "long git hash: $LONGGITHASH"
-
 cd "$basepath"
 
+echo "Building Resource builder (Win64)..."
+set GOARCH=amd64
+set GOOS=windows
+go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/Server/buildResources.go"
 
-if test $PLATFORMNAME = "rpi"
-then
+echo "Building Resource builder (Linux64)..."
+set GOARCH=amd64
+set GOOS=linux
+go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/Server/buildResources.go"
 
-	echo "Building Resource builder (LinuxARM)..."
-	export GOARCH=arm
-	export GOOS=linux
-	export GOARM=5
-	go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+echo "Building Resource builder (LinuxARM)..."
+set GOARCH=arm
+set GOOS=linux
+set GOARM=5
+go build -o "$builddir/DevPackage/Framework/buildresources.arm" -ldflags="-s -w" "$basepath/Server/buildResources.go"
 
-else
+echo "Building Go Server..."
+go get "github.com/gorilla/handlers"
+go build -o "$builddir/Output/amc_server" -ldflags="-s -w" "$basepath/Server/mcserver.go"
 
-if test $PLATFORMNAME = "win64"
-then
 
-	echo "Building Resource builder (Win64)..."
-	export GOARCH=amd64
-	export GOOS=windows
-	go build -o "$builddir/DevPackage/Framework/buildresources.exe" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+cp "$basepath/Client/public/"*.* "$builddir/Client/public"
+cp "$basepath/Client/src/"*.* "$builddir/Client/src"
+cp "$basepath/Client/src/plugins/"*.* "$builddir/Client/src/plugins"
+cp "$basepath/Client/"*.js "$builddir/Client"
+cp "$basepath/Client/"*.json "$builddir/Client"
 
-	echo "Building Resource builder (Linux64)..."
-	export GOARCH=amd64
-	export GOOS=linux
-	go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
-	
-else
+cd "$builddir/Client"
 
-	echo "Building Resource builder (Linux64)..."
-	export GOARCH=amd64
-	export GOOS=linux
-	go build -o "$builddir/DevPackage/Framework/buildresources.linux" -ldflags="-s -w" "$basepath/BuildScripts/buildResources.go"
+npm install
+npm run build
 
-fi	
-fi
-
-cp "$basepath/Artifacts/clientdist/clientpackage.zip" "$builddir/Output/${GITHASH}_core.client"
+go run ../../Server/createDist.go ../Output $GITHASH
 
 cd "$builddir"
-go run "$basepath/BuildScripts/createPackageXML.go" ./Output $GITHASH $PLATFORMNAME
-
 
 echo "Building Core Modules"
-if test $PLATFORMNAME = "win64"
-then
-cmake -DOVERRIDE_BUILDRESOURCES=linux -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
-else
 cmake ..
-fi
-
 cmake --build . --config Release
 
 echo "Building Core Resources"
-go run ../BuildScripts/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
+go run ../Server/buildResources.go ../Plugins/Resources "$outputdir/${GITHASH}_core.data"
 
 echo "Building Developer Package"
 cd "$builddir/DevPackage"
 cp ../githash.txt Framework/Dist/disthash.txt
-
-if test $PLATFORMNAME = "win64"
-then
-cp ../Output/amc_server.exe Framework/Dist/
-DLLEXT=dll
-else
 cp ../Output/amc_server Framework/Dist/
-DLLEXT=so
-fi
-
 cp ../Output/amc_server.xml Framework/Dist/
-cp ../Output/${GITHASH}_core_libmc.${DLLEXT} Framework/Dist/
-cp ../Output/${GITHASH}_core_lib3mf.${DLLEXT} Framework/Dist/
-cp ../Output/${GITHASH}_core_libmcdata.${DLLEXT} Framework/Dist/
+cp ../Output/${GITHASH}_core_libmc.so Framework/Dist/
+cp ../Output/${GITHASH}_core_lib3mf.so Framework/Dist/
+cp ../Output/${GITHASH}_core_libmcdata.so Framework/Dist/
 cp ../Output/${GITHASH}_*.data Framework/Dist/
-cp ../Output/${GITHASH}_core.client Framework/Dist/
+cp ../Output/${GITHASH}_*.client Framework/Dist/
 cp ../Output/${GITHASH}_package.xml Framework/Dist/
-cp ../Output/${GITHASH}_driver_*.${DLLEXT} Framework/Dist/
+cp ../Output/${GITHASH}_driver_*.so Framework/Dist/
+cp ../Output/lib3mf.so Framework/Dist/${GITHASH}_core_lib3mf.so
+cp ../../Templates/libmcconfig.xml ./configuration.xml
 cp ../../Framework/HeadersDev/CppDynamic/*.* Framework/HeadersDev/CppDynamic
 cp ../../Framework/InterfacesDev/*.* Framework/InterfacesDev
 cp ../../Framework/PluginCpp/*.* Framework/PluginCpp
-rm Framework/Dist/${GITHASH}_core.data
+cp ../../Framework/PluginPython/*.* Framework/PluginPython
 
-cd $builddir
-go run "$basepath/BuildScripts/createDevPackage.go" ./DevPackage/Framework ./DevPackage ${LONGGITHASH} $PLATFORMNAME
-
-cp "$builddir/DevPackage/amcf_${PLATFORMNAME}_${LONGGITHASH}.zip" "$builddir/Artifacts/devpackage_${PLATFORMNAME}.zip"
+go run ../../Server/createDevPackage.go $builddir/DevPackage/Framework $builddir/DevPackage ${GITHASH}
 
 echo "Build done!"

@@ -33,66 +33,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
 #include "libmc_exceptiontypes.hpp"
-#include "amc_statemachinedata.hpp"
+#include "amc_parameterinstances.hpp"
 
 #include "amc_ui_module_content.hpp"
 #include "amc_ui_module_tabs.hpp"
-#include "amc_ui_module_grid.hpp"
-#include "amc_ui_module_glscene.hpp"
-#include "amc_ui_module_graphic.hpp"
-#include "amc_ui_module_layerview.hpp"
+#include "amc_ui_module_verticalsplit.hpp"
+#include "amc_ui_module_horizontalsplit.hpp"
 
 using namespace AMC;
 
-PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
+PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
 {
 
-	LibMCAssertNotNull(pUIModuleEnvironment.get());
 	std::string sType = xmlNode.name();
 
 	if (sType == CUIModule_Content::getStaticType())
-		return std::make_shared<CUIModule_Content>(xmlNode, sPath, pUIModuleEnvironment);
+		return std::make_shared<CUIModule_Content>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 
 	if (sType == CUIModule_Tabs::getStaticType())
-		return std::make_shared<CUIModule_Tabs>(xmlNode, sPath, pUIModuleEnvironment);
+		return std::make_shared<CUIModule_Tabs>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 
-	if (sType == CUIModule_Grid::getStaticType())
-		return std::make_shared<CUIModule_Grid>(xmlNode, sPath, pUIModuleEnvironment);
+	if (sType == CUIModule_VerticalSplit::getStaticType())
+		return std::make_shared<CUIModule_VerticalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 
-	if (sType == CUIModule_GLScene::getStaticType())
-		return std::make_shared<CUIModule_GLScene>(xmlNode, sPath, pUIModuleEnvironment);
-
-	if (sType == CUIModule_Graphic::getStaticType())
-		return std::make_shared<CUIModule_Graphic>(xmlNode, sPath, pUIModuleEnvironment);
-	
-	if (sType == CUIModule_LayerView::getStaticType())
-		return std::make_shared<CUIModule_LayerView>(xmlNode, sPath, pUIModuleEnvironment);
+	if (sType == CUIModule_HorizontalSplit::getStaticType())
+		return std::make_shared<CUIModule_HorizontalSplit>(xmlNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 
 	throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, sType);
 
 }
-
-
-bool CUIModuleFactory::moduleTypeIsRegistered(const std::string& sType)
-{
-	if (sType == CUIModule_Content::getStaticType())
-		return true;
-
-	if (sType == CUIModule_Tabs::getStaticType())
-		return true;
-
-	if (sType == CUIModule_Grid::getStaticType())
-		return true;
-
-	if (sType == CUIModule_GLScene::getStaticType())
-		return true;
-
-	if (sType == CUIModule_Graphic::getStaticType())
-		return true;
-
-	if (sType == CUIModule_LayerView::getStaticType())
-		return true;
-
-	return false;
-}
-

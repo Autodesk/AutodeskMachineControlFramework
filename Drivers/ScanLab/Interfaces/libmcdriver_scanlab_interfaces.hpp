@@ -774,17 +774,6 @@ typedef IBaseSharedPtr<IDriver_ScanLab> PIDriver_ScanLab;
 class IDriver_ScanLab_RTC6 : public virtual IDriver_ScanLab {
 public:
 	/**
-	* IDriver_ScanLab_RTC6::SetToSimulationMode - Turns the driver into a simulation mode.
-	*/
-	virtual void SetToSimulationMode() = 0;
-
-	/**
-	* IDriver_ScanLab_RTC6::IsSimulationMode - Returns if the driver is in simulation mode.
-	* @return Flag if driver is in simulation mode.
-	*/
-	virtual bool IsSimulationMode() = 0;
-
-	/**
 	* IDriver_ScanLab_RTC6::Initialise - Initializes the RTC6 Scanner Driver.
 	* @param[in] sIP - IP Network Address. Empty string for local card.
 	* @param[in] sNetmask - IP Netmask Address. Empty string for local card.

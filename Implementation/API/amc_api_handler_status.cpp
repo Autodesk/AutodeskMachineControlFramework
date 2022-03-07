@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_api_handler_status.hpp"
-#include "libmc_exceptiontypes.hpp"
 
 #include <vector>
 #include <memory>
@@ -39,10 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Status::CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances, PStateMachineData pStateMachineData)
-	: m_Instances(Instances), m_pStateMachineData (pStateMachineData)
+CAPIHandler_Status::CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances)
+	: m_Instances(Instances)
 {
-	LibMCAssertNotNull(pStateMachineData.get());
 	
 }
 
@@ -69,11 +67,9 @@ PAPIResponse CAPIHandler_Status::handleRequest(const std::string& sURI, const eA
 
 			for (auto pInstance : m_Instances) {
 
-				std::string sInstanceName = pInstance->getName();
-
 				CJSONWriterObject instanceJSONObject(writer);
-				instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_NAME, sInstanceName);
-				instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_STATE, m_pStateMachineData->getInstanceStateName(sInstanceName));
+				instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_NAME, pInstance->getName());
+				instanceJSONObject.addString(AMC_API_KEY_STATUSINSTANCE_STATE, pInstance->getCurrentStateName());
 
 				CJSONWriterArray parameterGroupsJSONArray(writer);
 				auto pParameterHandler = pInstance->getParameterHandler();

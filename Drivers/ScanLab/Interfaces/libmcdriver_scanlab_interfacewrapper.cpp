@@ -1376,56 +1376,6 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_creatertcselector(L
 /*************************************************************************************************************************
  Class implementation for Driver_ScanLab_RTC6
 **************************************************************************************************************************/
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
-
-	try {
-		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
-		if (!pIDriver_ScanLab_RTC6)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		pIDriver_ScanLab_RTC6->SetToSimulationMode();
-
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
-LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, bool * pSimulationModeEnabled)
-{
-	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
-
-	try {
-		if (pSimulationModeEnabled == nullptr)
-			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
-		if (!pIDriver_ScanLab_RTC6)
-			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
-		
-		*pSimulationModeEnabled = pIDriver_ScanLab_RTC6->IsSimulationMode();
-
-		return LIBMCDRIVER_SCANLAB_SUCCESS;
-	}
-	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
-		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
-	}
-	catch (std::exception & StdException) {
-		return handleStdException(pIBaseClass, StdException);
-	}
-	catch (...) {
-		return handleUnhandledException(pIBaseClass);
-	}
-}
-
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_initialise(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
@@ -1693,10 +1643,6 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_loadsdk;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_creatertcselector") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_creatertcselector;
-	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode;
-	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode") 
-		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_initialise") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_initialise;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_loadfirmware") 

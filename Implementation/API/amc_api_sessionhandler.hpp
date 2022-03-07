@@ -44,8 +44,7 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIAuth, PAPIAuth);
 	amcDeclareDependingClass(CAPISession, PAPISession);
 	amcDeclareDependingClass(CAPISessionHandler, PAPISessionHandler);
-	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
-
+	
 	class CAPISessionHandler {
 	private:
 	

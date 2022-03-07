@@ -33,7 +33,6 @@ export default {
   methods: {
 
 	uiReloadPageClick: function () {
-		this.Application.performLogout ();
 		this.Application.setStatus ("initial");
 		this.Application.retrieveConfiguration ();
 	}

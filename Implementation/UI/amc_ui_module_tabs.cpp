@@ -39,19 +39,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
 
-#include "libmc_exceptiontypes.hpp"
+#include "libmc_interfaceexception.hpp"
 
 using namespace AMC;
 
-CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
+CUIModule_Tabs::CUIModule_Tabs(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
 : CUIModule (getNameFromXML(xmlNode))
 {
 
-	LibMCAssertNotNull(pUIModuleEnvironment.get());
+	if (pParameterInstances.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (pBuildJobHandler.get() == nullptr)
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	if (getTypeFromXML(xmlNode) != getStaticType())
+		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
 
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
-		auto pTab = CUIModuleFactory::createModule(childNode, sPath, pUIModuleEnvironment);
+		auto pTab = CUIModuleFactory::createModule(childNode, pParameterInstances, pResourcePackage, pBuildJobHandler);
 		addTab (pTab);			
 	}
 
@@ -80,17 +87,16 @@ std::string CUIModule_Tabs::getCaption()
 }
 
 
-void CUIModule_Tabs::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
+void CUIModule_Tabs::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
-	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
 
 	CJSONWriterArray tabsNode(writer);
 	for (auto tab : m_Tabs) {
 		CJSONWriterObject tabObject(writer);
-		tab->writeDefinitionToJSON (writer, tabObject, pClientVariableHandler);
+		tab->writeDefinitionToJSON (writer, tabObject);
 		tabsNode.addObject(tabObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_TABS, tabsNode);
@@ -133,17 +139,3 @@ void CUIModule_Tabs::populateItemMap(std::map<std::string, PUIModuleItem>& itemM
 		pTab->populateItemMap(itemMap);
 }
 
-void CUIModule_Tabs::configurePostLoading()
-{
-	for (auto pTab : m_Tabs)
-		pTab->configurePostLoading();
-}
-
-
-void CUIModule_Tabs::populateClientVariables(CParameterHandler* pParameterHandler)
-{
-	LibMCAssertNotNull(pParameterHandler);
-	for (auto pTab : m_Tabs)
-		pTab->populateClientVariables(pParameterHandler);
-
-}

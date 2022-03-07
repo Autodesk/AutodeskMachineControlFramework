@@ -39,24 +39,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
-#include "amc_ui_interfaces.hpp"
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
-	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
-
+	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
 
 	class CUIModuleFactory {
 	protected:
 		
 	public:
 	
-		static PUIModule createModule (pugi::xml_node & xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment);
-
-		static bool moduleTypeIsRegistered (const std::string & sType);
+		static PUIModule createModule (pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 										
 	};
 

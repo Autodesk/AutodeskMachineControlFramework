@@ -44,31 +44,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 #include "Libraries/PugiXML/pugixml.hpp"
-#include "amc_ui_interfaces.hpp"
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIPage, PUIPage);	
-	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 
-
-	class CUIPage : public CUIModule_ContentRegistry {
+	class CUIPage {
 	protected:
 		std::string m_sName;
 
 		std::vector<PUIModule> m_Modules;
-		std::map<std::string, PUIModuleItem> m_ItemMapOfPage;
-
-		std::map<std::string, std::string> m_FormNameMap;
-
-		CUIModule_UIEventHandler* m_pUIEventHandler;
-
+		std::map <std::string, PUIModule> m_ModuleMap;
 
 	public:
 
-		CUIPage(const std::string & sName, CUIModule_UIEventHandler* pUIEventHandler);
+		CUIPage(const std::string & sName);
 		
 		virtual ~CUIPage();
 
@@ -76,27 +68,18 @@ namespace AMC {
 
 		void addModule (PUIModule pModule);
 
+		PUIModule findModule (const std::string & sName);
 		uint32_t getModuleCount();
 		PUIModule getModule (const uint32_t nIndex);
 
-		virtual void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray, CParameterHandler* pClientVariableHandler);
+		void writeModulesToJSON(CJSONWriter & writer, CJSONWriterArray & moduleArray);
 
-		virtual void writeModuleItemUpdatesToJSON(CJSONWriter& writer, CJSONWriterArray& itemArray, CParameterHandler* pClientVariableHandler);
-
-		virtual PUIModuleItem findModuleItemByUUID(const std::string& sUUID) override;
-		virtual void registerFormName(const std::string& sFormUUID, const std::string& sFormName) override;
-		virtual std::string findFormUUIDByName(const std::string& sFormName) override;
-
-		virtual void configurePostLoading();
-
-		virtual void ensureUIEventExists(const std::string& sEventName) override;
-
-		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+		PUIModuleItem findModuleItem(const std::string& sUUID);
 										
 	};
 		
 }
 
 
-#endif //__AMC_UI_PAGE
+#endif //__AMC_UI_MENUITEM
 

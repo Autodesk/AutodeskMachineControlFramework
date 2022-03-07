@@ -405,13 +405,6 @@ Custom implementation
 
 	<class name="Driver_ScanLab_RTC6" parent="Driver_ScanLab" description="A LaserScanner Driver for a single laser ScanLAB RTC6 card.">
 
-		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
-		</method>
-		
-		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
-			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
-		</method>		
-
 		<method name="Initialise" description="Initializes the RTC6 Scanner Driver.">
 			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
 			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />

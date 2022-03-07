@@ -70,8 +70,6 @@ namespace AMC {
 		virtual bool getBoolValue() const override;
 		virtual void setBoolValue(const bool bValue) override;
 
-		virtual eParameterDataType getDataType() const override;
-
 		virtual PParameter duplicate() override;
 
 	};

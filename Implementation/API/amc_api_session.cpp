@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_API_SESSION
 
 #include "amc_api_session.hpp"
-#include "amc_parameterhandler.hpp"
 #include "common_utils.hpp"
 
 #include "libmc_interfaceexception.hpp"
@@ -47,8 +46,6 @@ CAPISession::CAPISession()
 	m_sUserName(""),
 	m_bAuthenticated(false)
 {
-
-	m_pClientVariableHandler = std::make_shared<CParameterHandler>("");
 	
 }
 	
@@ -123,9 +120,4 @@ void CAPISession::setUserDetails(const std::string& sUserName, const std::string
 
 	m_sUserName = sUserName;
 	m_sHashedPassword = sHashedPassword;
-}
-
-PParameterHandler CAPISession::getClientVariableHandler()
-{
-	return m_pClientVariableHandler;
 }

@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 #include <vector>
-#include <list>
 #include <set>
 
 namespace AMCCommon {
@@ -57,22 +56,16 @@ namespace AMCCommon {
 		static std::string createUUID();
 		static std::string normalizeUUIDString(std::string sRawString);
 		static std::string normalizeSHA256String(std::string sRawString);		
-		static std::string createEmptyUUID();
-
+		
 		static std::string UTF16toUTF8(std::wstring sString);
 		static std::wstring UTF8toUTF16(std::string sString);
 		static bool UTF8StringIsValid (const std::string & sString);
 		static std::string trimString (const std::string& sString);
 		static std::string toLowerString(const std::string& sString);
-		static void splitString (const std::string& sString, const std::string & sDelimiter, std::vector<std::string> & stringVector);
-		static int64_t stringToInteger(const std::string& sString);
-		static double stringToDouble(const std::string& sString);
 
 		static std::string calculateSHA256FromFile(const std::string& sFileNameUTF8);
 		static std::string calculateSHA256FromString(const std::string& sString);
-		static std::string calculateSHA256FromData(const uint8_t * pData, uint64_t nDataSize);
 		static std::string calculateRandomSHA256String(const uint32_t nIterations);
-		static std::string calculateBlockwiseSHA256FromFile(const std::string& sFileNameUTF8, uint32_t nBlockSize);
 
 		static std::string encodeBase64 (const std::string& sString, eBase64Type eType);
 		static void decodeBase64(const std::string& sString, eBase64Type eType, std::vector<uint8_t> & byteBuffer);
@@ -82,20 +75,9 @@ namespace AMCCommon {
 		static void deleteFileFromDisk(const std::string & sFileName, bool MustSucceed);
 		static void deleteDirectoryFromDisk(const std::string& sPath, bool MustSucceed);
 		static void createDirectoryOnDisk(const std::string& sPath);
-		static bool pathIsDirectory(const std::string& sPathName);
-
-		// ATTENTION: On Unix, this will try to create the path name if it does not exist!
-		static std::string getFullPathName(const std::string& sRelativePath, bool bMustExist);
-
-		static char getPathDelimiter();
-		static std::string includeTrailingPathDelimiter(const std::string& sPathName);
 
 		static std::string findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string & sExtension, const uint32_t nMaxIterations);
 		static std::set<std::string> findContentOfDirectory(const std::string & sDirectory, bool bReturnFiles, bool bReturnDirectories);
-
-		static bool stringIsValidAlphanumericNameString(const std::string& sString); // Only alphanumeric characters and underscore, underscore not as first character!
-		static bool stringIsValidAlphanumericPathString(const std::string& sString); // Only alphanumeric name strings separated by dots
-
 	};
 
 	

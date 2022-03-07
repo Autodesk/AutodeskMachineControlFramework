@@ -1,4 +1,0 @@
-
-emcc @buildargs.txt
-pause
-

@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_api_handler.hpp"
 #include "amc_statemachineinstance.hpp"
-#include "amc_statemachinedata.hpp"
 
 namespace AMC {
 
@@ -43,11 +42,10 @@ namespace AMC {
 	private:
 
 		std::vector <AMC::PStateMachineInstance>& m_Instances;
-		PStateMachineData m_pStateMachineData;
 
 	public:
 
-		CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances, PStateMachineData pStateMachineData);
+		CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances);
 
 		virtual ~CAPIHandler_Status();
 				

@@ -157,12 +157,10 @@ void CStorage::StoreNewStream(const std::string& sUUID, const std::string& sCont
         insertDBEntry(sUUID, sContextUUID, sName, sMimeType, nContentBufferSize, sSHA256, sUserID);        
     }
 
-    std::string sCalculatedSHA256, sCalculatedBlockSHA256;
-
     // Store data asynchroniously on disk and finalize when writing has finished
     auto pWriter = std::make_shared<AMCData::CStorageWriter>(sUUID, m_pStoragePath->getStreamPath (sUUID), nContentBufferSize);
     pWriter->writeChunkAsync(pContentBuffer, nContentBufferSize, 0);
-    pWriter->finalize(sSHA256, "", sCalculatedSHA256, sCalculatedBlockSHA256);
+    pWriter->finalize(sSHA256);
  
 }
 
@@ -208,31 +206,14 @@ void CStorage::StorePartialStream(const std::string & sUUID, const LibMCData_uin
     iIterator->second->writeChunkAsync(pContentBuffer, nContentBufferSize, nOffset);
 }
 
-void CStorage::FinishPartialStream(const std::string& sUUID, const std::string& sSHA2)
-{
-    FinishPartialStreamEx(sUUID, sSHA2, "");
-}
-
-void CStorage::FinishPartialStreamBlockwiseSHA256(const std::string& sUUID, const std::string& sBlockwiseSHA2)
-{
-    FinishPartialStreamEx(sUUID, "", sBlockwiseSHA2);
-}
-
-
-void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string& sSHA2, const std::string& sBlockwiseSHA2)
+void CStorage::FinishPartialStream(const std::string & sUUID, const std::string & sSHA2)
 {
     std::lock_guard<std::mutex> lockGuard(m_StorageWriteMutex);
 
     std::string sParsedUUID = AMCCommon::CUtils::normalizeUUIDString(sUUID);
     auto iIterator = m_PartialWriters.find(sParsedUUID);
 
-    std::string sNormalizedSHA2;
-    if (!sSHA2.empty ())
-        sNormalizedSHA2 = AMCCommon::CUtils::normalizeSHA256String(sSHA2);
-
-    std::string sNormalizedBlockwiseSHA2;
-    if (!sBlockwiseSHA2.empty())
-        sNormalizedBlockwiseSHA2 = AMCCommon::CUtils::normalizeSHA256String(sBlockwiseSHA2);
+    std::string sNormalizedSHA2 = AMCCommon::CUtils::normalizeSHA256String(sSHA2);
 
     if (iIterator == m_PartialWriters.end())
         throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDPARTIALUPLOAD);
@@ -240,17 +221,14 @@ void CStorage::FinishPartialStreamEx(const std::string& sUUID, const std::string
     auto pWriter = iIterator->second;
     m_PartialWriters.erase(iIterator);
 
-    // Write data and calculate checksums
-    std::string sCalculatedSHA256, sCalculatedBlockSHA256;
-    pWriter->finalize (sNormalizedSHA2, sNormalizedBlockwiseSHA2, sCalculatedSHA256, sCalculatedBlockSHA256);
+    pWriter->finalize (sNormalizedSHA2);
 
-    std::string sUpdateQuery = "UPDATE storage_streams SET status=?, sha2=?, sha256_block64k=? WHERE uuid=? AND status=?";
+    std::string sUpdateQuery = "UPDATE storage_streams SET status=?, sha2=? WHERE uuid=? AND status=?";
     auto pUpdateStatement = m_pSQLHandler->prepareStatement(sUpdateQuery);
     pUpdateStatement->setString(1, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssValidated));
-    pUpdateStatement->setString(2, sCalculatedSHA256);
-    pUpdateStatement->setString(3, sCalculatedBlockSHA256);
-    pUpdateStatement->setString(4, sUUID);
-    pUpdateStatement->setString(5, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssNew));
+    pUpdateStatement->setString(2, sNormalizedSHA2);
+    pUpdateStatement->setString(3, sUUID);
+    pUpdateStatement->setString(4, AMCData::CStoragePath::storageStreamStatusToString(AMCData::sssNew));
     pUpdateStatement->execute();
 
 }

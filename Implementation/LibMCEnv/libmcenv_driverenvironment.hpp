@@ -41,7 +41,6 @@ Abstract: This is the class declaration of CDriverEnvironment
 #include "amc_resourcepackage.hpp"
 #include "amc_toolpathhandler.hpp"
 #include "common_chrono.hpp"
-#include "amc_logger.hpp"
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -70,18 +69,16 @@ protected:
 	bool m_bIsInitializing;
 
 	std::string m_sBaseTempPath;
-	std::string m_sDriverName;
 
 	AMC::PParameterGroup m_pParameterGroup;
 	AMC::PResourcePackage m_pResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
-	AMC::PLogger m_pLogger;
 
 	AMCCommon::CChrono m_Chrono;
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string & sBaseTempPath, AMC::PLogger pLogger, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string & sBaseTempPath);
 
 	IWorkingDirectory* CreateWorkingDirectory() override;
 
@@ -115,15 +112,6 @@ public:
 
 	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
-	virtual void LogMessage(const std::string& sLogString) override;
-
-	virtual void LogWarning(const std::string& sLogString) override;
-
-	virtual void LogInfo(const std::string& sLogString) override;
-
-	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
-
-	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
 };
 

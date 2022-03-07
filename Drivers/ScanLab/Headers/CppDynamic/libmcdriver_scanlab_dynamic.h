@@ -537,23 +537,6 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_CreateRTC
 **************************************************************************************************************************/
 
 /**
-* Turns the driver into a simulation mode.
-*
-* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
-
-/**
-* Returns if the driver is in simulation mode.
-*
-* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @param[out] pSimulationModeEnabled - Flag if driver is in simulation mode.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, bool * pSimulationModeEnabled);
-
-/**
 * Initializes the RTC6 Scanner Driver.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
@@ -750,8 +733,6 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCSelector_AcquireEthernetCardBySerialPtr m_RTCSelector_AcquireEthernetCardBySerial;
 	PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr m_Driver_ScanLab_LoadSDK;
 	PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr m_Driver_ScanLab_CreateRTCSelector;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr m_Driver_ScanLab_RTC6_SetToSimulationMode;
-	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr m_Driver_ScanLab_RTC6_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr m_Driver_ScanLab_RTC6_Initialise;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadFirmwarePtr m_Driver_ScanLab_RTC6_LoadFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCorrectionFilePtr m_Driver_ScanLab_RTC6_SetCorrectionFile;

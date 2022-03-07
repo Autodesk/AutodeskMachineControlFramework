@@ -48,31 +48,23 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
-	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CUIModule_ContentItem : public CUIModuleItem {
 	protected:		
 
 		std::string m_sUUID;
-		std::string m_sItemName;
-
 
 	public:
 
-		CUIModule_ContentItem(const std::string & sUUID, const std::string & sItemName, const std::string& sModulePath);
+		CUIModule_ContentItem(const std::string & sUUID);
 		
 		virtual ~CUIModule_ContentItem();
 
 		virtual std::string getUUID () override;
 
-		virtual void addDefinitionToJSON (CJSONWriter & writer, CJSONWriterObject & object, CParameterHandler* pClientVariableHandler);
+		virtual void addDefinitionToJSON (CJSONWriter & writer, CJSONWriterObject & object);
 
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
-
-		// Returns all UUIDs that could be contained in this Item
-		virtual std::list <std::string> getReferenceUUIDs();
-
-		virtual void populateClientVariables(CParameterHandler* pParameterHandler);
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 
