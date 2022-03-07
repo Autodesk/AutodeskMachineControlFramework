@@ -74,7 +74,7 @@ namespace AMCData {
 
 	}
 
-	void CStorageWriter::finalize(const std::string& sNeededSHA256, const std::string& sNeededBlockSHA256, std::string & sCalculatedSHA256, std::string & sCalculatedBlockSHA256)
+	void CStorageWriter::finalize(const std::string& sNeededSHA256)
 	{
 		if (m_pExportStream.get() == nullptr) 
 			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOCURRENTUPLOAD);
@@ -89,27 +89,18 @@ namespace AMCData {
 			// Free ExportStream and close file
 			m_pExportStream = nullptr;
 
-			sCalculatedSHA256 = AMCCommon::CUtils::calculateSHA256FromFile(m_sPath);
-			sCalculatedBlockSHA256 = AMCCommon::CUtils::calculateBlockwiseSHA256FromFile(m_sPath, 65536);
-
-			if (!sNeededSHA256.empty()) {
-				auto sNeededSHA256Normalized = AMCCommon::CUtils::normalizeSHA256String(sNeededSHA256);
-				if (sCalculatedSHA256 != sNeededSHA256Normalized)
-					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH);
-			}
-
-			if (!sNeededBlockSHA256.empty()) {
-				auto sNeededBlockSHA256Normalized = AMCCommon::CUtils::normalizeSHA256String(sNeededBlockSHA256);
-				if (sCalculatedBlockSHA256 != sNeededBlockSHA256Normalized)
-					throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH);
-			}
-
+			auto sNeededSHA256Normalized = AMCCommon::CUtils::normalizeSHA256String(sNeededSHA256);
+			auto sSHA256 = AMCCommon::CUtils::calculateSHA256FromFile(m_sPath);
+			if (sSHA256 != sNeededSHA256Normalized)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_UPLOADCHECKSUMMISMATCH);
 		}
-		catch (...) {
-			m_pExportStream = nullptr;
-
+		catch (ELibMCDataInterfaceException & EDataException) {
 			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
-			throw;
+			throw EDataException;
+		}
+		catch (std::exception& StdException) {
+			AMCCommon::CUtils::deleteFileFromDisk(m_sPath, false);
+			throw StdException;
 		}
 	}
 

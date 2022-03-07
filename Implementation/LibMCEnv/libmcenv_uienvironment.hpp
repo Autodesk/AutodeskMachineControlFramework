@@ -37,7 +37,7 @@ Abstract: This is the class declaration of CUIEnvironment
 
 #include "libmcenv_interfaces.hpp"
 #include "amc_logger.hpp"
-#include "amc_statemachinedata.hpp"
+#include "amc_parameterinstances.hpp"
 #include "amc_statesignalhandler.hpp"
 
 // Parent classes
@@ -61,30 +61,17 @@ namespace Impl {
 class CUIEnvironment : public virtual IUIEnvironment, public virtual CBase {
 private:
 	AMC::PLogger m_pLogger;
-	AMC::PStateMachineData m_pStateMachineData;
-	AMC::PParameterHandler m_pClientVariableHandler;
+	AMC::PParameterInstances m_pParameterInstances;
 	AMC::PStateSignalHandler m_pSignalHandler;
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
-	std::string m_sSenderName;
-
-	std::string m_sModalDialogToShow;
-	bool m_bCloseModalDialog;
-	std::string m_sPageToActivate;
+	std::string m_sContextUUID;
 
 protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler);
-
-	void ActivateModalDialog(const std::string& sDialogName) override;
-
-	void CloseModalDialog() override;
-
-	void ActivatePage(const std::string& sPageName) override;
-
-	std::string RetrieveEventSender() override;
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PParameterInstances pParameterInstances, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sContextUUID);
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
@@ -96,46 +83,17 @@ public:
 
 	void LogInfo(const std::string & sLogString) override;
 
+	std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
-	std::string GetMachineParameter(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
+	std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
-	std::string GetMachineParameterAsUUID(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
+	LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
-	LibMCEnv_double GetMachineParameterAsDouble(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
+	LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
-	LibMCEnv_int64 GetMachineParameterAsInteger(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
+	bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName) override;
 
-	bool GetMachineParameterAsBool(const std::string& sMachineInstance, const std::string& sParameterGroup, const std::string& sParameterName) override;
-
-	std::string GetUIProperty(const std::string& sElementPath, const std::string& sPropertyName) override;
-
-	std::string GetUIPropertyAsUUID(const std::string& sElementPath, const std::string& sPropertyName) override;
-
-	LibMCEnv_double GetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName) override;
-
-	LibMCEnv_int64 GetUIPropertyAsInteger(const std::string& sElementPath, const std::string& sPropertyName) override;
-
-	bool GetUIPropertyAsBool(const std::string& sElementPath, const std::string& sPropertyName) override;
-
-	void SetUIProperty(const std::string& sElementPath, const std::string& sPropertyName, const std::string& sValue) override;
-
-	void SetUIPropertyAsUUID(const std::string& sElementPath, const std::string& sPropertyName, const std::string& sValue) override;
-
-	void SetUIPropertyAsDouble(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_double dValue) override;
-
-	void SetUIPropertyAsInteger(const std::string& sElementPath, const std::string& sPropertyName, const LibMCEnv_int64 nValue) override;
-
-	void SetUIPropertyAsBool(const std::string& sElementPath, const std::string& sPropertyName, const bool bValue) override;
-
-	IImageData* CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
-
-	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
-
-	std::string getModalDialogToShow();
-
-	bool getCloseModalDialog();
-
-	std::string getPageToActivate();
+	std::string GetEventContext() override;
 
 };
 

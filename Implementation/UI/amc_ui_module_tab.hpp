@@ -53,13 +53,14 @@ namespace AMC {
 	class CUIModule_Tab {
 	protected:		
 
+		std::string m_sName;
 		std::string m_sCaption;
 
 		PUIModule m_pModule;
 
 	public:
 
-		CUIModule_Tab(pugi::xml_node & xmlNode, const std::string & sPath, PUIModuleEnvironment pModuleEnvironment);
+		CUIModule_Tab(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
 		
 		virtual ~CUIModule_Tab();
 

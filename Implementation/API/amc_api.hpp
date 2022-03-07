@@ -45,14 +45,16 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIFormFields, PAPIFormFields);	
 	amcDeclareDependingClass(CAPIFieldDetails, PAPIFieldDetails);
 	amcDeclareDependingClass(CAPISessionHandler, PAPISessionHandler);
-	amcDeclareDependingClass(CLogger, PLogger);
+
 
 	class CAPI {
 	private:
 
 		std::list<PAPIHandler> m_ApiHandlers;
 
-		PAPISessionHandler m_pSessionHandler;		
+		PAPISessionHandler m_pSessionHandler;
+
+		PAPIResponse makeError (uint32_t nHTTPError, int32_t errorCode, const std::string & sErrorString);
 
 		PAPIHandler getURIMatch (const std::string& sURI);
 			
@@ -66,7 +68,7 @@ namespace AMC {
 
 		bool expectsRawBody(const std::string& sURI, const eAPIRequestType requestType);
 
-		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth, CLogger* pLogger);
+		PAPIResponse handleRequest(const std::string& sURI, const eAPIRequestType requestType, const uint8_t * pData, uint64_t nCount, CAPIFormFields & pFormFields, PAPIAuth pAuth);
 
 		uint32_t getFormDataFieldCount(const std::string& sURI, const eAPIRequestType requestType);
 
@@ -79,8 +81,6 @@ namespace AMC {
 		static std::string removeLeadingSlashFromURI(const std::string& sURI);
 
 		static eAPIRequestType getRequestTypeFromString(const std::string & sRequestType);
-
-		static PAPIResponse makeError(uint32_t nHTTPError, int32_t errorCode, const std::string& sErrorString);
 
 	};
 

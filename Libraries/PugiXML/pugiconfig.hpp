@@ -1,7 +1,7 @@
 /**
- * pugixml parser - version 1.12
+ * pugixml parser - version 1.10
  * --------------------------------------------------------
- * Copyright (C) 2006-2022, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
+ * Copyright (C) 2006-2019, by Arseny Kapoulkine (arseny.kapoulkine@gmail.com)
  * Report bugs and download new versions at https://pugixml.org/
  *
  * This library is distributed under the MIT License. See notice at the end
@@ -24,10 +24,10 @@
 #define PUGIXML_NO_XPATH
 
 // Uncomment this to disable STL
-#define PUGIXML_NO_STL
+// #define PUGIXML_NO_STL
 
 // Uncomment this to disable exceptions
-#define PUGIXML_NO_EXCEPTIONS
+// #define PUGIXML_NO_EXCEPTIONS
 
 // Set this to control attributes for public classes/functions, i.e.:
 // #define PUGIXML_API __declspec(dllexport) // to export all public symbols from DLL
@@ -40,9 +40,6 @@
 // #define PUGIXML_MEMORY_OUTPUT_STACK 10240
 // #define PUGIXML_MEMORY_XPATH_PAGE_SIZE 4096
 
-// Tune this constant to adjust max nesting for XPath queries
-// #define PUGIXML_XPATH_DEPTH_LIMIT 1024
-
 // Uncomment this to switch to header-only version
 // #define PUGIXML_HEADER_ONLY
 
@@ -52,7 +49,7 @@
 #endif
 
 /**
- * Copyright (c) 2006-2022 Arseny Kapoulkine
+ * Copyright (c) 2006-2019 Arseny Kapoulkine
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation

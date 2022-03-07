@@ -49,14 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <shlwapi.h>
 #include <iomanip>
 #else
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <ctime>
 #include <unistd.h>
 #include <dirent.h> 
-#include <limits.h>
-#include <stdlib.h>
-#include <stdio.h>
 #endif
 
 
@@ -66,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace AMCCommon {
 
 #define LIBMC_MAXSTRINGBUFFERSIZE (1024 * 1024 * 1024)
-#define LIBMC_MAXPATHBUFFERSIZE 65536
+#define LIBMC_MAXRANDOMSTRINGITERATIONS 1024
 
 	// Lookup table to convert UTF8 bytes to sequence length
 	const unsigned char UTF8DecodeTable[256] = {
@@ -338,63 +334,6 @@ namespace AMCCommon {
 	}
 
 
-
-	void CUtils::splitString(const std::string& sString, const std::string& sDelimiter, std::vector<std::string>& stringVector)
-	{
-		auto nDelimiterLength = sDelimiter.length();
-		if (nDelimiterLength == 0)
-			throw std::runtime_error("split string delimiter is empty");
-
-		if (!sString.empty()) {
-			
-			size_t nOffset = 0;
-			bool bFinished = false;
-			while (!bFinished) {
-				auto nPos = sString.find(sDelimiter, nOffset);
-				if (nPos == std::string::npos) {
-					stringVector.push_back(sString);
-					bFinished = true;
-				}
-				else {
-					stringVector.push_back(sString.substr (nOffset, nPos - nOffset));
-					nOffset = nPos + nDelimiterLength;
-				}
-
-			}
-
-
-		}
-
-	}
-
-
-	int64_t CUtils::stringToInteger(const std::string& sString)
-	{
-		std::string trimmedString = trimString(sString);
-
-		size_t nConversionErrorIndex = 0;
-		int64_t nResult = std::stoll(trimmedString, &nConversionErrorIndex, 10);
-		
-		if (nConversionErrorIndex != trimmedString.length())
-			throw std::runtime_error("invalid integer string: " + sString);
-
-		return nResult;
-	}
-
-	double CUtils::stringToDouble(const std::string& sString)
-	{
-		std::string trimmedString = trimString(sString);
-
-		size_t nConversionErrorIndex = 0;
-		double dResult = std::stod(trimmedString, &nConversionErrorIndex);
-
-		if (nConversionErrorIndex != trimmedString.length())
-			throw std::runtime_error("invalid integer string: " + sString);
-
-		return dResult;
-	}
-
-
     std::wstring CUtils::UTF8toUTF16(const std::string sString)
 	{
 
@@ -487,63 +426,6 @@ namespace AMCCommon {
 			);
 	}
 
-
-	bool CUtils::stringIsValidAlphanumericNameString(const std::string& sString)
-	{
-		if (sString.empty())
-			return false;
-
-		if (sString.at(0) == '_')
-			return false;
-
-		for (const char& cChar : sString) {
-			if (!(((cChar >= '0') && (cChar <= '9'))
-				|| ((cChar >= 'a') && (cChar <= 'z'))
-				|| ((cChar >= 'A') && (cChar <= 'Z'))
-				|| (cChar == '_')
-				))
-				return false;
-		}
-
-		return true;
-	}
-
-	bool CUtils::stringIsValidAlphanumericPathString(const std::string& sString)
-	{
-		if (sString.empty())
-			return false;
-
-		if (sString.at(0) == '_')
-			return false;
-
-		bool previousCharWasDot = true; // first character is not allowed to be a dot.
-
-		for (const char& cChar : sString) {
-			if (!(((cChar >= '0') && (cChar <= '9'))
-				|| ((cChar >= 'a') && (cChar <= 'z'))
-				|| ((cChar >= 'A') && (cChar <= 'Z'))
-				|| (cChar == '_') || (cChar == '.')
-				))
-				return false;
-
-			if ((cChar == '.')) {
-				if (previousCharWasDot) // two dots in a row is invalid!
-					return false;
-				previousCharWasDot = true;
-			}
-			else {
-				previousCharWasDot = false;
-			}
-			
-		}
-
-		// Last characters is also not allowed to be a dot
-		if (previousCharWasDot)
-			return false;
-
-		return true;
-	}
-
 	std::string CUtils::normalizeUUIDString(std::string sRawString)
 	{
 		
@@ -571,10 +453,12 @@ namespace AMCCommon {
 
 
 
-	std::string CUtils::createEmptyUUID()
+	std::string CUtils::createUUID()
 	{
-		return "00000000-0000-0000-0000-000000000000";
+		auto guid = xg::newGuid ();		
+		return normalizeUUIDString (guid.str());
 	}
+
 
 
 	void CUtils::deleteFileFromDisk(const std::string& sFileName, bool bMustSucceed)
@@ -623,69 +507,43 @@ namespace AMCCommon {
 #endif
 	}
 
-	// ATTENTION: On Linux, will try to create the path name if it does not exist!
-	std::string CUtils::getFullPathName(const std::string& sRelativePath, bool bMustExist)
+
+	// Returns a UUID, such that sBasePath/sPrefixUUID.extension does not exist.
+	// Tries out maximum nMaxIterations different random uuids.
+	std::string CUtils::findTemporaryFileName(const std::string& sBasePath, const std::string& sPrefix, const std::string& sExtension, const uint32_t nMaxIterations)
 	{
+		if (sBasePath.empty())
+			throw std::runtime_error("empty temporary file base path");
 
-		if (sRelativePath.empty())
-			throw std::runtime_error("empty relative path");
+		std::string sBasePathWithDelimiter = sBasePath;
+		std::string sExtensionWithPoint;
 
-#ifdef _WIN32
-
-		std::wstring sRelativePathW = UTF8toUTF16(sRelativePath);		
-		std::vector<wchar_t> Buffer;
-		Buffer.resize(LIBMC_MAXPATHBUFFERSIZE + 1);
-
-		DWORD nCount = GetFullPathNameW(sRelativePathW.c_str(), LIBMC_MAXPATHBUFFERSIZE, Buffer.data(), nullptr);
-		if (nCount == 0) 
-			throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string (GetLastError ()) + ")");
-
-		Buffer[LIBMC_MAXPATHBUFFERSIZE] = 0;
-
-		std::string sAbsoluteFileName = UTF16toUTF8(Buffer.data());		
-
-		if (bMustExist) {
-			if (!fileOrPathExistsOnDisk(sAbsoluteFileName))
-				throw std::runtime_error("mandatory path/file does not exist on disk: " + sAbsoluteFileName);
+		if (!sExtension.empty()) {
+			if (sExtension.at(0) != '.') {
+				sExtensionWithPoint = "." + sExtension;
+			}
+			else {
+				sExtensionWithPoint = sExtension;
+			}
 
 		}
 
-		return sAbsoluteFileName;
+		char lastChar = sBasePathWithDelimiter.at(sBasePathWithDelimiter.length() - 1);
+		if ((lastChar != '/') && (lastChar != '\\'))
+			sBasePathWithDelimiter += "/";
 
-#else
-		std::vector <char> resolvedPath;
-		resolvedPath.resize(PATH_MAX + 1);
+		for (uint32_t nIndex = 0; nIndex < nMaxIterations; nIndex++) {
+			std::string sUUID = createUUID();
+			std::string sFullPath = sBasePathWithDelimiter + sPrefix + sUUID + sExtensionWithPoint;
 
-		// realpath unfortunately only works on existing files...
-		if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
-			if ((errno == ENOENT) && (!bMustExist)) {
-				FILE* fileP = fopen(sRelativePath.c_str(), "w");
-				if (fileP == nullptr)
-					throw std::runtime_error("inaccessible file path: " + sRelativePath + "(" + std::to_string(errno) + ")");
+			if (!fileOrPathExistsOnDisk(sFullPath))
+				return sFullPath;
 
-				fclose(fileP);
-
-				if (!realpath(sRelativePath.c_str(), resolvedPath.data())) {
-					int err = errno;
-					unlink(sRelativePath.c_str());
-					throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(err) + ")");
-				}
-
-				if (unlink(sRelativePath.c_str()))
-					throw std::runtime_error("could not delete file: " + sRelativePath + "(" + std::to_string(errno) + ")");
-
-			} else
-				throw std::runtime_error("could not get absolute path of " + sRelativePath + "(" + std::to_string(errno) + ")");
 		}
 
-		resolvedPath[PATH_MAX] = 0;
-		return std::string (resolvedPath.data());
-		
-#endif
-
+		throw std::runtime_error("could not create temporary file path");
 
 	}
-
 
 
 	bool CUtils::fileOrPathExistsOnDisk(const std::string& sPathName)
@@ -693,9 +551,9 @@ namespace AMCCommon {
 
 #ifdef _WIN32
 		std::wstring sFileNameUTF16 = UTF8toUTF16(sPathName);
-		return PathFileExistsW(sFileNameUTF16.c_str());
+		return PathFileExistsW(sFileNameUTF16.c_str ());
 #else
-		if (access(sPathName.c_str(), F_OK) != -1) {
+		if (access(sPathName.c_str (), F_OK) != -1) {
 			return true;
 		}
 		else {
@@ -705,112 +563,6 @@ namespace AMCCommon {
 
 	}
 
-	char CUtils::getPathDelimiter()
-	{
-#ifdef _WIN32
-		return '\\';
-#else
-		return '/';
-#endif 
-	}
-
-	std::string CUtils::includeTrailingPathDelimiter(const std::string& sPathName)
-	{
-		char delimiter = getPathDelimiter();		
-
-		if (!sPathName.empty()) {
-
-			char lastChar = *sPathName.rbegin();
-			if ((lastChar == '/') || (lastChar == '\\'))
-				return sPathName;
-
-			return sPathName + delimiter;
-
-		}
-		else
-		{
-			return std::string () + delimiter;
-		}
-	
-		
-	}
-
-
-	bool CUtils::pathIsDirectory(const std::string& sPathName)
-	{
-#ifdef _WIN32
-		std::wstring sPathNameW = UTF8toUTF16(sPathName);
-		DWORD dwAttrib = GetFileAttributesW(sPathNameW.c_str());
-
-		return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
-			(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-
-#else
-		std::string sAbsolutePath = getFullPathName(sPathName, false);
-
-		if (access(sAbsolutePath.c_str(), 0) == 0) {
-
-			struct stat status;
-			stat(sAbsolutePath.c_str (), &status);
-
-			return (status.st_mode & S_IFDIR) != 0;
-		}
-		return false;
-#endif
-	}
-
-
-	std::string CUtils::calculateBlockwiseSHA256FromFile(const std::string& sFileNameUTF8, uint32_t nBlockSize)
-	{
-		if (nBlockSize == 0)
-			throw std::runtime_error("invalid hash block size!");
-
-#ifndef __GNUC__
-		auto sWidePath = AMCCommon::CUtils::UTF8toUTF16(sFileNameUTF8);
-		std::ifstream shaStream;
-		shaStream.open(sWidePath, std::ios::binary);
-#else
-		std::ifstream shaStream;
-		shaStream.open(sFileNameUTF8, std::ios::binary);
-#endif			
-		if (!shaStream.is_open())
-			throw std::runtime_error("could not open file for hash calculation.");
-
-		std::vector<uint8_t> BlockData;
-		BlockData.resize(nBlockSize);
-
-		std::stringstream sConcatenatedSHASums;
-
-		shaStream.seekg(0, shaStream.end);
-		size_t totalBytesToRead = shaStream.tellg();
-		shaStream.seekg(0, shaStream.beg);
-
-		while (totalBytesToRead > 0) {
-			size_t bytesToRead;
-			if (totalBytesToRead >= nBlockSize) {
-				bytesToRead = nBlockSize;
-				totalBytesToRead -= nBlockSize;
-			}
-			else {
-				bytesToRead = totalBytesToRead;
-				BlockData.resize(bytesToRead);
-				totalBytesToRead = 0;
-			}
-
-			shaStream.read((char*)BlockData.data(), bytesToRead);
-			if (!shaStream)
-				throw std::runtime_error("could not read hash stream");
-
-
-			std::vector<unsigned char> hash(picosha2::k_digest_size);
-			picosha2::hash256(BlockData, hash.begin(), hash.end());
-			std::string sBlockChecksum = picosha2::bytes_to_hex_string(hash.begin(), hash.end());
-			sConcatenatedSHASums << sBlockChecksum;
-		}
-
-		return calculateSHA256FromString(sConcatenatedSHASums.str());
-
-	}
 
 
 	std::string CUtils::calculateSHA256FromFile(const std::string& sFileNameUTF8)
@@ -835,20 +587,20 @@ namespace AMCCommon {
 		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
 	}
 
-	std::string CUtils::calculateSHA256FromData(const uint8_t* pData, uint64_t nDataSize)
+
+	std::string CUtils::calculateRandomSHA256String(const uint32_t nIterations)
 	{
-		if ((nDataSize == 0) || (pData == nullptr))
-			throw std::runtime_error("could not calculate SHA256 from empty data");
+		if ((nIterations == 0) || (nIterations > LIBMC_MAXRANDOMSTRINGITERATIONS))
+			throw std::runtime_error("invalid random string iterations");
 
-		auto startIter = static_cast<const uint8_t*> (pData);
-		auto endIter = startIter + nDataSize;
+		std::string sRandomString;
 
-		std::vector<unsigned char> hash(picosha2::k_digest_size);
-		picosha2::hash256(startIter, endIter, hash.begin(), hash.end());
-		return picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+		uint32_t nCount = nIterations + (((uint32_t) rand()) % nIterations);
+		for (uint32_t nIndex = 0; nIndex < nCount; nIndex++)
+			sRandomString += createUUID();
 
+		return calculateSHA256FromString(sRandomString);
 	}
-
 
 	std::string CUtils::encodeBase64(const std::string& sString, eBase64Type eType)
 	{		

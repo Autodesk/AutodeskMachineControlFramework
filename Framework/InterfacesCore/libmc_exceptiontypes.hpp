@@ -49,18 +49,6 @@ public:
 };
 
 
-class ELibMCNoContextException : public ELibMCInterfaceException {
-
-public:
-
-	ELibMCNoContextException(LibMCResult errorCode)
-		: ELibMCInterfaceException(errorCode)
-	{
-	}
-
-};
-
-
 class ELibMCCustomException : public ELibMCInterfaceException {
 	
 public:

@@ -40,8 +40,6 @@ Abstract: This is the class declaration of CAPIRequestHandler
 #include "API/amc_api_response.hpp"
 #include "API/amc_api.hpp"
 
-#include "amc_logger.hpp"
-
 // Parent classes
 #include "libmc_base.hpp"
 #ifdef _MSC_VER
@@ -75,11 +73,9 @@ protected:
 	AMC::CAPIFormFields m_FormFields;
 	AMC::PAPIAuth m_pAuth;
 
-	AMC::PLogger m_pLogger;
-
 public:
 
-	CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth, AMC::PLogger pLogger);
+	CAPIRequestHandler(AMC::PAPI pAPI, const std::string& sURI, const AMC::eAPIRequestType eRequestType, AMC::PAPIAuth pAuth);
 
 	bool ExpectsRawBody() override;
 

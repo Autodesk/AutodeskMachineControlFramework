@@ -29,28 +29,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amc_api_auth.hpp"
-#include "libmc_exceptiontypes.hpp"
-#include "amc_parameterhandler.hpp"
+#include "libmc_interfaceexception.hpp"
 
 #include "common_utils.hpp"
 
 using namespace AMC;
 
 
-CAPIAuth::CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string& sUserName, bool bIsAuthorized, PParameterHandler pClientVariableHandler)
+CAPIAuth::CAPIAuth(const std::string& sSessionUUID, const std::string& sSessionKey, const std::string& sUserName, bool bIsAuthorized)
 	: m_sSessionUUID(AMCCommon::CUtils::normalizeUUIDString(sSessionUUID)), 
 	m_sSessionKey (AMCCommon::CUtils::normalizeSHA256String(sSessionKey)),
 	m_sUserName (sUserName),
 	m_bIsAuthorized (bIsAuthorized)
 
 {
-	if (pClientVariableHandler.get () != nullptr) {
-		m_pClientVariableHandler = pClientVariableHandler;
-	}
-	else
-	{
-		m_pClientVariableHandler = std::make_shared<CParameterHandler>("");
-	}
+
 }
 
 CAPIAuth::~CAPIAuth()
@@ -83,9 +76,4 @@ bool CAPIAuth::userIsAuthorized()
 std::string CAPIAuth::getUserName()
 {
 	return m_sUserName;
-}
-
-PParameterHandler CAPIAuth::getClientVariableHandler()
-{
-	return m_pClientVariableHandler;
 }

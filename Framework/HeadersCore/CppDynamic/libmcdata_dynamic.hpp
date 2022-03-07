@@ -70,7 +70,6 @@ class CBuildJob;
 class CBuildJobIterator;
 class CBuildJobHandler;
 class CLoginHandler;
-class CPersistencyHandler;
 class CDataModel;
 
 /*************************************************************************************************************************
@@ -88,7 +87,6 @@ typedef CBuildJob CLibMCDataBuildJob;
 typedef CBuildJobIterator CLibMCDataBuildJobIterator;
 typedef CBuildJobHandler CLibMCDataBuildJobHandler;
 typedef CLoginHandler CLibMCDataLoginHandler;
-typedef CPersistencyHandler CLibMCDataPersistencyHandler;
 typedef CDataModel CLibMCDataDataModel;
 
 /*************************************************************************************************************************
@@ -106,7 +104,6 @@ typedef std::shared_ptr<CBuildJob> PBuildJob;
 typedef std::shared_ptr<CBuildJobIterator> PBuildJobIterator;
 typedef std::shared_ptr<CBuildJobHandler> PBuildJobHandler;
 typedef std::shared_ptr<CLoginHandler> PLoginHandler;
-typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
 typedef std::shared_ptr<CDataModel> PDataModel;
 
 /*************************************************************************************************************************
@@ -124,7 +121,6 @@ typedef PBuildJob PLibMCDataBuildJob;
 typedef PBuildJobIterator PLibMCDataBuildJobIterator;
 typedef PBuildJobHandler PLibMCDataBuildJobHandler;
 typedef PLoginHandler PLibMCDataLoginHandler;
-typedef PPersistencyHandler PLibMCDataPersistencyHandler;
 typedef PDataModel PLibMCDataDataModel;
 
 
@@ -309,7 +305,6 @@ private:
 	friend class CBuildJobIterator;
 	friend class CBuildJobHandler;
 	friend class CLoginHandler;
-	friend class CPersistencyHandler;
 	friend class CDataModel;
 
 };
@@ -453,7 +448,6 @@ public:
 	inline void BeginPartialStream(const std::string & sUUID, const std::string & sContextUUID, const std::string & sName, const std::string & sMimeType, const LibMCData_uint64 nSize, const std::string & sUserID);
 	inline void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const CInputVector<LibMCData_uint8> & ContentBuffer);
 	inline void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2);
-	inline void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2);
 	inline LibMCData_uint64 GetMaxStreamSize();
 	inline bool ContentTypeIsAccepted(const std::string & sContentType);
 	inline bool StreamIsImage(const std::string & sUUID);
@@ -594,36 +588,6 @@ public:
 };
 	
 /*************************************************************************************************************************
- Class CPersistencyHandler 
-**************************************************************************************************************************/
-class CPersistencyHandler : public CBase {
-public:
-	
-	/**
-	* CPersistencyHandler::CPersistencyHandler - Constructor for PersistencyHandler class.
-	*/
-	CPersistencyHandler(CWrapper* pWrapper, LibMCDataHandle pHandle)
-		: CBase(pWrapper, pHandle)
-	{
-	}
-	
-	inline bool HasPersistentParameter(const std::string & sUUID);
-	inline void GetPersistentParameterDetails(const std::string & sUUID, std::string & sName, eParameterDataType & eDataType);
-	inline bool DeletePersistentParameter(const std::string & sUUID);
-	inline void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const eParameterDataType eDataType, const std::string & sValue);
-	inline void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue);
-	inline void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue);
-	inline void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue);
-	inline void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue);
-	inline void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue);
-	inline std::string RetrievePersistentStringParameter(const std::string & sUUID);
-	inline std::string RetrievePersistentUUIDParameter(const std::string & sUUID);
-	inline LibMCData_double RetrievePersistentDoubleParameter(const std::string & sUUID);
-	inline LibMCData_int64 RetrievePersistentIntegerParameter(const std::string & sUUID);
-	inline bool RetrievePersistentBoolParameter(const std::string & sUUID);
-};
-	
-/*************************************************************************************************************************
  Class CDataModel 
 **************************************************************************************************************************/
 class CDataModel : public CBase {
@@ -644,7 +608,6 @@ public:
 	inline PBuildJobHandler CreateBuildJobHandler();
 	inline PLogSession CreateNewLogSession();
 	inline PLoginHandler CreateLoginHandler();
-	inline PPersistencyHandler CreatePersistencyHandler();
 };
 	
 	/**
@@ -763,7 +726,6 @@ public:
 		pWrapperTable->m_Storage_BeginPartialStream = nullptr;
 		pWrapperTable->m_Storage_StorePartialStream = nullptr;
 		pWrapperTable->m_Storage_FinishPartialStream = nullptr;
-		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = nullptr;
 		pWrapperTable->m_Storage_GetMaxStreamSize = nullptr;
 		pWrapperTable->m_Storage_ContentTypeIsAccepted = nullptr;
 		pWrapperTable->m_Storage_StreamIsImage = nullptr;
@@ -805,20 +767,6 @@ public:
 		pWrapperTable->m_BuildJobHandler_ConvertStringToBuildStatus = nullptr;
 		pWrapperTable->m_LoginHandler_UserExists = nullptr;
 		pWrapperTable->m_LoginHandler_GetUserDetails = nullptr;
-		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = nullptr;
-		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_StorePersistentParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_StorePersistentStringParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_StorePersistentUUIDParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_StorePersistentDoubleParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_StorePersistentIntegerParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_StorePersistentBoolParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentStringParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentUUIDParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter = nullptr;
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter = nullptr;
 		pWrapperTable->m_DataModel_InitialiseDatabase = nullptr;
 		pWrapperTable->m_DataModel_GetDataModelVersion = nullptr;
 		pWrapperTable->m_DataModel_GetInstallationInformation = nullptr;
@@ -826,7 +774,6 @@ public:
 		pWrapperTable->m_DataModel_CreateBuildJobHandler = nullptr;
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
 		pWrapperTable->m_DataModel_CreateLoginHandler = nullptr;
-		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1059,15 +1006,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Storage_FinishPartialStream == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = (PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr) GetProcAddress(hLibrary, "libmcdata_storage_finishpartialstreamblockwisesha256");
-		#else // _WIN32
-		pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 = (PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr) dlsym(hLibrary, "libmcdata_storage_finishpartialstreamblockwisesha256");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1440,132 +1378,6 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_HasPersistentParameter = (PLibMCDataPersistencyHandler_HasPersistentParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_haspersistentparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_HasPersistentParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = (PLibMCDataPersistencyHandler_GetPersistentParameterDetailsPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_getpersistentparameterdetails");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails = (PLibMCDataPersistencyHandler_GetPersistentParameterDetailsPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_getpersistentparameterdetails");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = (PLibMCDataPersistencyHandler_DeletePersistentParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_deletepersistentparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_DeletePersistentParameter = (PLibMCDataPersistencyHandler_DeletePersistentParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_deletepersistentparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_DeletePersistentParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentParameter = (PLibMCDataPersistencyHandler_StorePersistentParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_storepersistentparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentParameter = (PLibMCDataPersistencyHandler_StorePersistentParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_storepersistentparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_StorePersistentParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentStringParameter = (PLibMCDataPersistencyHandler_StorePersistentStringParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_storepersistentstringparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentStringParameter = (PLibMCDataPersistencyHandler_StorePersistentStringParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_storepersistentstringparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_StorePersistentStringParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentUUIDParameter = (PLibMCDataPersistencyHandler_StorePersistentUUIDParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_storepersistentuuidparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentUUIDParameter = (PLibMCDataPersistencyHandler_StorePersistentUUIDParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_storepersistentuuidparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_StorePersistentUUIDParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentDoubleParameter = (PLibMCDataPersistencyHandler_StorePersistentDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_storepersistentdoubleparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentDoubleParameter = (PLibMCDataPersistencyHandler_StorePersistentDoubleParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_storepersistentdoubleparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_StorePersistentDoubleParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentIntegerParameter = (PLibMCDataPersistencyHandler_StorePersistentIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_storepersistentintegerparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentIntegerParameter = (PLibMCDataPersistencyHandler_StorePersistentIntegerParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_storepersistentintegerparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_StorePersistentIntegerParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentBoolParameter = (PLibMCDataPersistencyHandler_StorePersistentBoolParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_storepersistentboolparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_StorePersistentBoolParameter = (PLibMCDataPersistencyHandler_StorePersistentBoolParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_storepersistentboolparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_StorePersistentBoolParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentStringParameter = (PLibMCDataPersistencyHandler_RetrievePersistentStringParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_retrievepersistentstringparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentStringParameter = (PLibMCDataPersistencyHandler_RetrievePersistentStringParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_retrievepersistentstringparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_RetrievePersistentStringParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentUUIDParameter = (PLibMCDataPersistencyHandler_RetrievePersistentUUIDParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_retrievepersistentuuidparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentUUIDParameter = (PLibMCDataPersistencyHandler_RetrievePersistentUUIDParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_retrievepersistentuuidparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_RetrievePersistentUUIDParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter = (PLibMCDataPersistencyHandler_RetrievePersistentDoubleParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_retrievepersistentdoubleparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter = (PLibMCDataPersistencyHandler_RetrievePersistentDoubleParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_retrievepersistentdoubleparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter = (PLibMCDataPersistencyHandler_RetrievePersistentIntegerParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_retrievepersistentintegerparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter = (PLibMCDataPersistencyHandler_RetrievePersistentIntegerParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_retrievepersistentintegerparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter = (PLibMCDataPersistencyHandler_RetrievePersistentBoolParameterPtr) GetProcAddress(hLibrary, "libmcdata_persistencyhandler_retrievepersistentboolparameter");
-		#else // _WIN32
-		pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter = (PLibMCDataPersistencyHandler_RetrievePersistentBoolParameterPtr) dlsym(hLibrary, "libmcdata_persistencyhandler_retrievepersistentboolparameter");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
 		pWrapperTable->m_DataModel_InitialiseDatabase = (PLibMCDataDataModel_InitialiseDatabasePtr) GetProcAddress(hLibrary, "libmcdata_datamodel_initialisedatabase");
 		#else // _WIN32
 		pWrapperTable->m_DataModel_InitialiseDatabase = (PLibMCDataDataModel_InitialiseDatabasePtr) dlsym(hLibrary, "libmcdata_datamodel_initialisedatabase");
@@ -1626,15 +1438,6 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DataModel_CreateLoginHandler == nullptr)
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_DataModel_CreatePersistencyHandler = (PLibMCDataDataModel_CreatePersistencyHandlerPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_createpersistencyhandler");
-		#else // _WIN32
-		pWrapperTable->m_DataModel_CreatePersistencyHandler = (PLibMCDataDataModel_CreatePersistencyHandlerPtr) dlsym(hLibrary, "libmcdata_datamodel_createpersistencyhandler");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_DataModel_CreatePersistencyHandler == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1785,10 +1588,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_storage_finishpartialstream", (void**)&(pWrapperTable->m_Storage_FinishPartialStream));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishPartialStream == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_storage_finishpartialstreamblockwisesha256", (void**)&(pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Storage_FinishPartialStreamBlockwiseSHA256 == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storage_getmaxstreamsize", (void**)&(pWrapperTable->m_Storage_GetMaxStreamSize));
@@ -1955,62 +1754,6 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_LoginHandler_GetUserDetails == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_haspersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_HasPersistentParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_HasPersistentParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_getpersistentparameterdetails", (void**)&(pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_GetPersistentParameterDetails == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_deletepersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_DeletePersistentParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_DeletePersistentParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_storepersistentparameter", (void**)&(pWrapperTable->m_PersistencyHandler_StorePersistentParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_StorePersistentParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_storepersistentstringparameter", (void**)&(pWrapperTable->m_PersistencyHandler_StorePersistentStringParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_StorePersistentStringParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_storepersistentuuidparameter", (void**)&(pWrapperTable->m_PersistencyHandler_StorePersistentUUIDParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_StorePersistentUUIDParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_storepersistentdoubleparameter", (void**)&(pWrapperTable->m_PersistencyHandler_StorePersistentDoubleParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_StorePersistentDoubleParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_storepersistentintegerparameter", (void**)&(pWrapperTable->m_PersistencyHandler_StorePersistentIntegerParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_StorePersistentIntegerParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_storepersistentboolparameter", (void**)&(pWrapperTable->m_PersistencyHandler_StorePersistentBoolParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_StorePersistentBoolParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_retrievepersistentstringparameter", (void**)&(pWrapperTable->m_PersistencyHandler_RetrievePersistentStringParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_RetrievePersistentStringParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_retrievepersistentuuidparameter", (void**)&(pWrapperTable->m_PersistencyHandler_RetrievePersistentUUIDParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_RetrievePersistentUUIDParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_retrievepersistentdoubleparameter", (void**)&(pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_RetrievePersistentDoubleParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_retrievepersistentintegerparameter", (void**)&(pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_RetrievePersistentIntegerParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_persistencyhandler_retrievepersistentboolparameter", (void**)&(pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_PersistencyHandler_RetrievePersistentBoolParameter == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
 		eLookupError = (*pLookup)("libmcdata_datamodel_initialisedatabase", (void**)&(pWrapperTable->m_DataModel_InitialiseDatabase));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_InitialiseDatabase == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2037,10 +1780,6 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createloginhandler", (void**)&(pWrapperTable->m_DataModel_CreateLoginHandler));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreateLoginHandler == nullptr) )
-			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdata_datamodel_createpersistencyhandler", (void**)&(pWrapperTable->m_DataModel_CreatePersistencyHandler));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreatePersistencyHandler == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -2357,16 +2096,6 @@ public:
 	void CStorage::FinishPartialStream(const std::string & sUUID, const std::string & sSHA2)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStream(m_pHandle, sUUID.c_str(), sSHA2.c_str()));
-	}
-	
-	/**
-	* CStorage::FinishPartialStreamBlockwiseSHA256 - Finishes storing a stream with a 64k-Blockwise calculated Checksum.
-	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
-	* @param[in] sBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
-	*/
-	void CStorage::FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Storage_FinishPartialStreamBlockwiseSHA256(m_pHandle, sUUID.c_str(), sBlockwiseSHA2.c_str()));
 	}
 	
 	/**
@@ -2962,190 +2691,6 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CPersistencyHandler
-	 */
-	
-	/**
-	* CPersistencyHandler::HasPersistentParameter - Retrieves if a persistent parameter has been stored.
-	* @param[in] sUUID - UUID of the parameter
-	* @return returns if parameter exists.
-	*/
-	bool CPersistencyHandler::HasPersistentParameter(const std::string & sUUID)
-	{
-		bool resultParameterExists = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_HasPersistentParameter(m_pHandle, sUUID.c_str(), &resultParameterExists));
-		
-		return resultParameterExists;
-	}
-	
-	/**
-	* CPersistencyHandler::GetPersistentParameterDetails - Retrieves details of a persistent parameter. Fails if parameter does not exist.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[out] sName - Returns name of the parameter
-	* @param[out] eDataType - Returns data type of the parameter
-	*/
-	void CPersistencyHandler::GetPersistentParameterDetails(const std::string & sUUID, std::string & sName, eParameterDataType & eDataType)
-	{
-		LibMCData_uint32 bytesNeededName = 0;
-		LibMCData_uint32 bytesWrittenName = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_GetPersistentParameterDetails(m_pHandle, sUUID.c_str(), 0, &bytesNeededName, nullptr, &eDataType));
-		std::vector<char> bufferName(bytesNeededName);
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_GetPersistentParameterDetails(m_pHandle, sUUID.c_str(), bytesNeededName, &bytesWrittenName, &bufferName[0], &eDataType));
-		sName = std::string(&bufferName[0]);
-	}
-	
-	/**
-	* CPersistencyHandler::DeletePersistentParameter - Removes a persistent parameter from database. Does nothing if parameter does not exist.
-	* @param[in] sUUID - UUID of the parameter
-	* @return returns if parameter existed.
-	*/
-	bool CPersistencyHandler::DeletePersistentParameter(const std::string & sUUID)
-	{
-		bool resultParameterExisted = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_DeletePersistentParameter(m_pHandle, sUUID.c_str(), &resultParameterExisted));
-		
-		return resultParameterExisted;
-	}
-	
-	/**
-	* CPersistencyHandler::StorePersistentParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] eDataType - Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type.
-	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
-	*/
-	void CPersistencyHandler::StorePersistentParameter(const std::string & sUUID, const std::string & sName, const eParameterDataType eDataType, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentParameter(m_pHandle, sUUID.c_str(), sName.c_str(), eDataType, sValue.c_str()));
-	}
-	
-	/**
-	* CPersistencyHandler::StorePersistentStringParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] sValue - Value of the parameter.
-	*/
-	void CPersistencyHandler::StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentStringParameter(m_pHandle, sUUID.c_str(), sName.c_str(), sValue.c_str()));
-	}
-	
-	/**
-	* CPersistencyHandler::StorePersistentUUIDParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
-	*/
-	void CPersistencyHandler::StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentUUIDParameter(m_pHandle, sUUID.c_str(), sName.c_str(), sValue.c_str()));
-	}
-	
-	/**
-	* CPersistencyHandler::StorePersistentDoubleParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] dValue - Value of the parameter.
-	*/
-	void CPersistencyHandler::StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentDoubleParameter(m_pHandle, sUUID.c_str(), sName.c_str(), dValue));
-	}
-	
-	/**
-	* CPersistencyHandler::StorePersistentIntegerParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] nValue - Value of the parameter.
-	*/
-	void CPersistencyHandler::StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentIntegerParameter(m_pHandle, sUUID.c_str(), sName.c_str(), nValue));
-	}
-	
-	/**
-	* CPersistencyHandler::StorePersistentBoolParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] bValue - Value of the parameter.
-	*/
-	void CPersistencyHandler::StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue)
-	{
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_StorePersistentBoolParameter(m_pHandle, sUUID.c_str(), sName.c_str(), bValue));
-	}
-	
-	/**
-	* CPersistencyHandler::RetrievePersistentStringParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	std::string CPersistencyHandler::RetrievePersistentStringParameter(const std::string & sUUID)
-	{
-		LibMCData_uint32 bytesNeededValue = 0;
-		LibMCData_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_RetrievePersistentStringParameter(m_pHandle, sUUID.c_str(), 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_RetrievePersistentStringParameter(m_pHandle, sUUID.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
-	
-	/**
-	* CPersistencyHandler::RetrievePersistentUUIDParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	std::string CPersistencyHandler::RetrievePersistentUUIDParameter(const std::string & sUUID)
-	{
-		LibMCData_uint32 bytesNeededValue = 0;
-		LibMCData_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_RetrievePersistentUUIDParameter(m_pHandle, sUUID.c_str(), 0, &bytesNeededValue, nullptr));
-		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_RetrievePersistentUUIDParameter(m_pHandle, sUUID.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
-		
-		return std::string(&bufferValue[0]);
-	}
-	
-	/**
-	* CPersistencyHandler::RetrievePersistentDoubleParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	LibMCData_double CPersistencyHandler::RetrievePersistentDoubleParameter(const std::string & sUUID)
-	{
-		LibMCData_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_RetrievePersistentDoubleParameter(m_pHandle, sUUID.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CPersistencyHandler::RetrievePersistentIntegerParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	LibMCData_int64 CPersistencyHandler::RetrievePersistentIntegerParameter(const std::string & sUUID)
-	{
-		LibMCData_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_RetrievePersistentIntegerParameter(m_pHandle, sUUID.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
-	* CPersistencyHandler::RetrievePersistentBoolParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	bool CPersistencyHandler::RetrievePersistentBoolParameter(const std::string & sUUID)
-	{
-		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_PersistencyHandler_RetrievePersistentBoolParameter(m_pHandle, sUUID.c_str(), &resultValue));
-		
-		return resultValue;
-	}
-	
-	/**
 	 * Method definitions for class CDataModel
 	 */
 	
@@ -3249,21 +2794,6 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CLoginHandler>(m_pWrapper, hLoginHandler);
-	}
-	
-	/**
-	* CDataModel::CreatePersistencyHandler - creates a persistency handler instance.
-	* @return PersistencyHandler instance.
-	*/
-	PPersistencyHandler CDataModel::CreatePersistencyHandler()
-	{
-		LibMCDataHandle hPersistencyHandler = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_CreatePersistencyHandler(m_pHandle, &hPersistencyHandler));
-		
-		if (!hPersistencyHandler) {
-			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
-		}
-		return std::make_shared<CPersistencyHandler>(m_pWrapper, hPersistencyHandler);
 	}
 
 } // namespace LibMCData

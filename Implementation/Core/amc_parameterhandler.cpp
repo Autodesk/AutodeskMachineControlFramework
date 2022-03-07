@@ -32,8 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "libmc_exceptiontypes.hpp"
 
-#include "common_utils.hpp"
-
 #define AMC_MAXPARAMETERGROUPCOUNT (1024 * 1024)
 
 namespace AMC {
@@ -41,6 +39,7 @@ namespace AMC {
 	CParameterHandler::CParameterHandler(std::string sDescription)
 		: m_sDescription (sDescription)
 	{
+		m_DataStore = std::make_shared <CParameterGroup>();
 	}
 
 	CParameterHandler::~CParameterHandler()
@@ -63,10 +62,10 @@ namespace AMC {
 
 		auto sName = pGroup->getName();
 		if (m_Groups.find(sName) != m_Groups.end())
-			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME, m_sDescription + "/" + sName);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERGROUPNAME, m_sInstanceState + "/" + sName);
 
 		if (m_GroupList.size() >= AMC_MAXPARAMETERGROUPCOUNT)
-			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS, m_sDescription + "/" + sName);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERGROUPS, m_sInstanceState + "/" + sName);
 
 		m_Groups.insert(std::make_pair(sName, pGroup));
 		m_GroupList.push_back(pGroup);
@@ -74,9 +73,6 @@ namespace AMC {
 
 	PParameterGroup CParameterHandler::addGroup(const std::string& sName, const std::string& sDescription)
 	{
-		if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString(sName))
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sName);
-
 		PParameterGroup pGroup = std::make_shared<CParameterGroup>(sName, sDescription);
 		addGroup(pGroup);
 		return pGroup;
@@ -96,7 +92,7 @@ namespace AMC {
 		std::lock_guard <std::mutex> lockGuard(m_Mutex);
 
 		if (nIndex >= m_GroupList.size())
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDescription);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sInstanceState);
 
 		return m_GroupList[nIndex];
 	}
@@ -116,6 +112,11 @@ namespace AMC {
 	}
 
 
+	CParameterGroup* CParameterHandler::getDataStore()
+	{
+		return m_DataStore.get();
+	}
+
 
 	std::string CParameterHandler::getDescription()
 	{
@@ -131,25 +132,18 @@ namespace AMC {
 
 	}
 
-
-	PParameterHandler CParameterHandler::duplicate()
+	void CParameterHandler::setInstanceStateName(const std::string& sInstanceState)
 	{
-		auto pResult = std::make_shared<CParameterHandler>(m_sDescription);
-		for (auto pGroup : m_GroupList) {
-			auto pNewGroup = pResult->addGroup(pGroup->getName(), pGroup->getDescription());
-			pNewGroup->addDuplicatesFromGroup(pGroup.get());
-		}		
-
-		return pResult;
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		m_sInstanceState = sInstanceState;
 	}
 
-	void CParameterHandler::loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler)
+	std::string CParameterHandler::getInstanceStateName()
 	{
-		for (auto pGroup : m_GroupList) {
-			pGroup->updateParameterPersistencyHandler(pPersistencyHandler);
-		}
-
+		std::lock_guard <std::mutex> lockGuard(m_Mutex);
+		return m_sInstanceState;
 	}
+
 
 }
 

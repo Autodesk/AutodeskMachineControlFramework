@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RapidJSON/error/error.h"
 #include "RapidJSON/error/en.h"
 
-#include <cmath>
+#ifdef __linux__
+#include <math.h>
+#endif
 
 #define DUETDRIVER_MINSPEED 0.0001
 

@@ -62,8 +62,6 @@ namespace LibMCEnv {
 
 	};
 
-#define LIBMC_IMPORTDRIVERCLASSES(NAMESPACE, CLASSNAME) typedef LibMCDriver_ ## NAMESPACE::PDriver_ ## CLASSNAME PDriver_ ## CLASSNAME; typedef LibMCEnv::CDriverCast <LibMCDriver_ ## NAMESPACE::CDriver_ ## CLASSNAME, LibMCDriver_ ## NAMESPACE::CWrapper> PDriverCast_ ## CLASSNAME;
-
 }
 
 #endif //__LIBMCENV_DRIVERCAST

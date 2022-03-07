@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_contentitem.hpp"
 
-#include "pugixml.hpp"
-
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentParagraph, PUIModule_ContentParagraph);
@@ -54,15 +52,13 @@ namespace AMC {
 
 	public:
 
-		static PUIModule_ContentParagraph makeFromXML(const pugi::xml_node & xmlNode, const std::string& sItemName, const std::string& sModulePath);
-
-		CUIModule_ContentParagraph(const std::string& sText, const std::string & sItemName, const std::string& sModulePath);
+		CUIModule_ContentParagraph(const std::string & sText);
 		
 		virtual ~CUIModule_ContentParagraph();
 
 		std::string getText ();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 

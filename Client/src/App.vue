@@ -40,14 +40,14 @@
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn text large  dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
-            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }} 
+        <v-btn tile large color="primary" dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
+            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }}
         </v-btn>
 
         <v-spacer />
 
         <template v-for="toolbaritem in Application.AppContent.ToolbarItems">
-            <v-btn :key="toolbaritem.id" text large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
+            <v-btn :key="toolbaritem.id" color="primary" large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
         </template>
@@ -67,51 +67,18 @@
 		<v-container class="fill-height" fluid v-if="appIsError">
 			<Dialog_Error :Application="Application" />
         </v-container>		
-		
+
 		<template v-for="uiPage in Application.AppContent.Pages">
-			<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:100%; display:block">
+			<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:85vh; display:block">
 								
 				<template v-for="uiModule in uiPage.modules">
 					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
-					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
-					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
-					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
-					<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
+					<Module_VerticalSplit :key="uiModule.name" v-if="(uiModule.type == 'verticalsplit')" :module="uiModule" :Application="Application" />							
+					<Module_HorizontalSplit :key="uiModule.name" v-if="(uiModule.type == 'horizontalsplit')" :module="uiModule" :Application="Application" />							
 				</template>										
 						
 			</v-container>		
-		</template>
-		
-		<template v-for="uiDialog in Application.AppContent.Dialogs">
-			<v-dialog :key="uiDialog.name"						
-				v-model="uiDialog.dialogIsActive"
-				transition="dialog-bottom-transition"
-				max-width="50vw"
-				min-height="50vh"
-			>
-			
-			<v-card> 
-          <v-card-title v-if="uiDialog.title">
-            {{ uiDialog.title }}
-          </v-card-title>
-		  
-		  <v-card-text>
-			
-			<template v-for="uiModule in uiDialog.modules">
-					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
-					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
-					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
-					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
-					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
-					<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
-				</template>										
-				
-		   </v-card-text>
-			</v-card>
-			
-				
-        </v-dialog>		
 		</template>
         
     </v-main>
@@ -126,17 +93,15 @@
 
 <script>
 
-	import AMCApplication from "./AMCApplication.js"
+	import AMCApplication from "./Application.js"
 	
 	import Dialog_Login from "./Dialog_Login.vue";
 	import Dialog_Error from "./Dialog_Error.vue";
 	
-	import Module_Content from "./AMCModule_Content.vue";
-	import Module_Tabs from "./AMCModule_Tabs.vue";
-	import Module_Grid from "./AMCModule_Grid.vue";
-	import Module_GLScene from "./AMCModule_GLScene.vue";
-	import Module_Graphic from "./AMCModule_Graphic.vue";
-	import Module_LayerView from "./AMCModule_LayerView.vue";
+	import Module_Content from "./Module_Content.vue";
+	import Module_Tabs from "./Module_Tabs.vue";
+	import Module_VerticalSplit from "./Module_VerticalSplit.vue";
+	import Module_HorizontalSplit from "./Module_HorizontalSplit.vue";
 	
 	export default {
 
@@ -149,8 +114,7 @@
 			}
 			
 			this.Application = new AMCApplication (baseURL);
-			this.Application.retrieveConfiguration(this.$vuetify.theme.themes);
-						
+			this.Application.retrieveConfiguration();
 		},
 		
 
@@ -210,7 +174,6 @@
 
 				return (this.Application.AppState.currentStatus === "login") || (this.Application.AppState.currentStatus === "ready");
 			} 
-			
 		},
 		
 		components: {
@@ -218,10 +181,8 @@
 			Dialog_Error,
 			Module_Content,
 			Module_Tabs,
-			Module_GLScene,
-			Module_Graphic,
-			Module_Grid,
-			Module_LayerView
+			Module_VerticalSplit,
+			Module_HorizontalSplit
 		},	
 
 		methods: {

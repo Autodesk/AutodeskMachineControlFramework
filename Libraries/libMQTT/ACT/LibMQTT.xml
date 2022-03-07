@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="MQTT Library" namespace="LibMQTT" copyright="Autodesk Inc." year="2021" basename="libmqtt"
+	version="1.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="Python" indentation="tabs" />
+		<binding language="Pascal" indentation="tabs" />
+		<binding language="CSharp" indentation="tabs" />
+		<binding language="Java" indentation="tabs" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+		
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+			
+	</errors>
+	
+	<class name="Base">
+	</class>
+
+
+	<class name="MQTTContext" parent="Base" description="MQTTContext Class">
+
+		<method name="SetIotEndpoint" description = "sets the IOT end point">
+			<param name="EndPoint" type="string" pass="in" description="IOT End point." />		
+			<param name="Port" type="uint32" pass="in" description="MQTT Port." />		
+		</method>
+
+		<method name="SetRootCertificate" description = "sets the Server root certificate.">
+			<param name="CertificateString" type="string" pass="in" description="Root certificate (in PEM string format)." />		
+		</method>
+
+		<method name="SetClientInformation" description = "sets the Client certificate and keys.">
+			<param name="ClientIdentifier" type="string" pass="in" description="Client identifier." />		
+			<param name="ClientCertificateString" type="string" pass="in" description="Client public key (in PEM string format)." />		
+			<param name="CertificatePrivateKeyString" type="string" pass="in" description="Client private key (in PEM string format)." />		
+		</method>
+		
+	    <method name="SetMqttTopic" description = "sets MQTT topic">
+			<param name="MqttTopic" type="string" pass="in" description="MQTT topic." />		
+		</method>
+		
+	    <method name="SetMqttMessage" description = "sets MQTT message">
+			<param name="MqttMessage" type="string" pass="in" description="MQTT message." />		
+		</method>
+
+		<method name="Connect" description = "Establish a MQTT connection. Disconnects if connected.">
+		</method>
+
+		<method name="Disconnect" description = "Disconnect a running MQTT connection">
+		</method>
+
+		<method name="SendMQTTMessage" description = "Sends an MQTT Message.">
+			<param name="MessageJSON" type="string" pass="in" description="Message in JSON format." />		
+		</method>
+
+	</class>
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="CreateContext" description="Creates a MQTT Context.">
+			<param name="InstanceName" type="string" pass="in" description="Name of instance to be created." />
+			<param name="Instance" type="class" class="MQTTContext" pass="return" description="New Context instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+

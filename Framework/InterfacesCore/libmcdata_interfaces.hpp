@@ -65,7 +65,6 @@ class IBuildJob;
 class IBuildJobIterator;
 class IBuildJobHandler;
 class ILoginHandler;
-class IPersistencyHandler;
 class IDataModel;
 
 
@@ -431,13 +430,6 @@ public:
 	virtual void FinishPartialStream(const std::string & sUUID, const std::string & sSHA2) = 0;
 
 	/**
-	* IStorage::FinishPartialStreamBlockwiseSHA256 - Finishes storing a stream with a 64k-Blockwise calculated Checksum.
-	* @param[in] sUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
-	* @param[in] sBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
-	*/
-	virtual void FinishPartialStreamBlockwiseSHA256(const std::string & sUUID, const std::string & sBlockwiseSHA2) = 0;
-
-	/**
 	* IStorage::GetMaxStreamSize - Returns the maximum stream size that the data model allows.
 	* @return Maximum Stream Size in Bytes.
 	*/
@@ -770,123 +762,6 @@ typedef IBaseSharedPtr<ILoginHandler> PILoginHandler;
 
 
 /*************************************************************************************************************************
- Class interface for PersistencyHandler 
-**************************************************************************************************************************/
-
-class IPersistencyHandler : public virtual IBase {
-public:
-	/**
-	* IPersistencyHandler::HasPersistentParameter - Retrieves if a persistent parameter has been stored.
-	* @param[in] sUUID - UUID of the parameter
-	* @return returns if parameter exists.
-	*/
-	virtual bool HasPersistentParameter(const std::string & sUUID) = 0;
-
-	/**
-	* IPersistencyHandler::GetPersistentParameterDetails - Retrieves details of a persistent parameter. Fails if parameter does not exist.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[out] sName - Returns name of the parameter
-	* @param[out] eDataType - Returns data type of the parameter
-	*/
-	virtual void GetPersistentParameterDetails(const std::string & sUUID, std::string & sName, LibMCData::eParameterDataType & eDataType) = 0;
-
-	/**
-	* IPersistencyHandler::DeletePersistentParameter - Removes a persistent parameter from database. Does nothing if parameter does not exist.
-	* @param[in] sUUID - UUID of the parameter
-	* @return returns if parameter existed.
-	*/
-	virtual bool DeletePersistentParameter(const std::string & sUUID) = 0;
-
-	/**
-	* IPersistencyHandler::StorePersistentParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] eDataType - Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type.
-	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
-	*/
-	virtual void StorePersistentParameter(const std::string & sUUID, const std::string & sName, const LibMCData::eParameterDataType eDataType, const std::string & sValue) = 0;
-
-	/**
-	* IPersistencyHandler::StorePersistentStringParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] sValue - Value of the parameter.
-	*/
-	virtual void StorePersistentStringParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue) = 0;
-
-	/**
-	* IPersistencyHandler::StorePersistentUUIDParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] sValue - Value of the parameter. MUST be of appropriate type.
-	*/
-	virtual void StorePersistentUUIDParameter(const std::string & sUUID, const std::string & sName, const std::string & sValue) = 0;
-
-	/**
-	* IPersistencyHandler::StorePersistentDoubleParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] dValue - Value of the parameter.
-	*/
-	virtual void StorePersistentDoubleParameter(const std::string & sUUID, const std::string & sName, const LibMCData_double dValue) = 0;
-
-	/**
-	* IPersistencyHandler::StorePersistentIntegerParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] nValue - Value of the parameter.
-	*/
-	virtual void StorePersistentIntegerParameter(const std::string & sUUID, const std::string & sName, const LibMCData_int64 nValue) = 0;
-
-	/**
-	* IPersistencyHandler::StorePersistentBoolParameter - Stores a persistent parameter in the database. Creates a new parameter if not existing.
-	* @param[in] sUUID - UUID of the parameter
-	* @param[in] sName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
-	* @param[in] bValue - Value of the parameter.
-	*/
-	virtual void StorePersistentBoolParameter(const std::string & sUUID, const std::string & sName, const bool bValue) = 0;
-
-	/**
-	* IPersistencyHandler::RetrievePersistentStringParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	virtual std::string RetrievePersistentStringParameter(const std::string & sUUID) = 0;
-
-	/**
-	* IPersistencyHandler::RetrievePersistentUUIDParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	virtual std::string RetrievePersistentUUIDParameter(const std::string & sUUID) = 0;
-
-	/**
-	* IPersistencyHandler::RetrievePersistentDoubleParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	virtual LibMCData_double RetrievePersistentDoubleParameter(const std::string & sUUID) = 0;
-
-	/**
-	* IPersistencyHandler::RetrievePersistentIntegerParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	virtual LibMCData_int64 RetrievePersistentIntegerParameter(const std::string & sUUID) = 0;
-
-	/**
-	* IPersistencyHandler::RetrievePersistentBoolParameter - Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
-	* @param[in] sUUID - UUID of the parameter
-	* @return Value of the parameter.
-	*/
-	virtual bool RetrievePersistentBoolParameter(const std::string & sUUID) = 0;
-
-};
-
-typedef IBaseSharedPtr<IPersistencyHandler> PIPersistencyHandler;
-
-
-/*************************************************************************************************************************
  Class interface for DataModel 
 **************************************************************************************************************************/
 
@@ -936,12 +811,6 @@ public:
 	* @return LoginHandler instance.
 	*/
 	virtual ILoginHandler * CreateLoginHandler() = 0;
-
-	/**
-	* IDataModel::CreatePersistencyHandler - creates a persistency handler instance.
-	* @return PersistencyHandler instance.
-	*/
-	virtual IPersistencyHandler * CreatePersistencyHandler() = 0;
 
 };
 

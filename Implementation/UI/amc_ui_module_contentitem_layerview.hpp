@@ -38,25 +38,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "amc_ui_module_contentitem.hpp"
-#include "pugixml.hpp"
+
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_ContentLayerView, PUIModule_ContentLayerView);
-	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
 	class CUIModule_ContentLayerView : public CUIModule_ContentItem {
 	protected:		
 
 	public:
 
-		static PUIModule_ContentLayerView makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
-
-		CUIModule_ContentLayerView(const std::string& sItemName, const std::string & sModulePath);
+		CUIModule_ContentLayerView();
 
 		virtual ~CUIModule_ContentLayerView();
 
-		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object) override;
 
 	};
 

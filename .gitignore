@@ -9,9 +9,6 @@ Output/*.pdb
 Output/*.dist
 Output/dist.xml
 build
-build_win64
-build_linux64
-build_rpi
 ACT/LibMC_component
 ACT/LibMCDriverEnv_component
 ACT/LibMCDriver_component
