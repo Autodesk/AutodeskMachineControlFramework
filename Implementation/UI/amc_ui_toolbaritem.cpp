@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 
 using namespace AMC;
@@ -41,8 +41,7 @@ using namespace AMC;
 CUIToolbarItem::CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
 	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage(pPage)
 {
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pPage.get());
 
 }
 

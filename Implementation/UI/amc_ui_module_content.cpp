@@ -44,30 +44,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_contentitem_layerview.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
 
+
 #include "amc_api_constants.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_parameterhandler.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "amc_statemachinedata.hpp"
+#include "Common/common_utils.hpp"
+
+#include "libmc_exceptiontypes.hpp"
 
 using namespace AMC;
 
-CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler)
-: CUIModule (getNameFromXML(xmlNode))
+CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, const std::string& sPath, PUIModuleEnvironment pUIModuleEnvironment)
+	: CUIModule(getNameFromXML(xmlNode)), m_nNamingIDCounter(1)
 {
+	LibMCAssertNotNull(pUIModuleEnvironment.get());
 
-	if (pParameterInstances.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pResourcePackage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pBuildJobHandler.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 	if (getTypeFromXML(xmlNode) != getStaticType())
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDMODULETYPE);
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULETYPE, "should be " + getStaticType ());
 
+	if (sPath.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDMODULEPATH, m_sName);
+
+	m_sModulePath = sPath + "." + m_sName;
+	
 	auto headlineAttrib = xmlNode.attribute("headline");
 	if (!headlineAttrib.empty ())
 		m_sHeadLine = headlineAttrib.as_string();
 
+	auto captionAttrib = xmlNode.attribute("caption");
+	if (!captionAttrib.empty())
+		m_sCaption = captionAttrib.as_string();
+	
 	auto titleAttrib = xmlNode.attribute("title");
 	if (!titleAttrib.empty())
 		m_sTitle = titleAttrib.as_string();
@@ -79,139 +88,29 @@ CUIModule_Content::CUIModule_Content(pugi::xml_node& xmlNode, PParameterInstance
 	auto children = xmlNode.children();
 	for (auto childNode : children) {
 		std::string sChildName = childNode.name();
-		if (sChildName == "paragraph") {
-			auto textAttrib = childNode.attribute("text");
-			addItem (std::make_shared <CUIModule_ContentParagraph> (textAttrib.as_string ()));
-		}
+		auto sItemName = readItemNameFromXML(childNode, sChildName);
 
-		if (sChildName == "image") {
-			auto resourceAttrib = childNode.attribute("resource");
-			auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
-			double dLogoAspectRatio = 1.0;
-			auto aspectratioAttrib = childNode.attribute("aspectratio");
-			if (!aspectratioAttrib.empty()) {
-				dLogoAspectRatio = aspectratioAttrib.as_double();
-			}
-
-			auto pItem = std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID(), dLogoAspectRatio);
-			addItem (pItem);
-
-			auto maxWidthAttrib = childNode.attribute("maxwidth");
-			if (!maxWidthAttrib.empty())
-				pItem->setMaxWidth (maxWidthAttrib.as_double ());
-			auto maxHeightAttrib = childNode.attribute("maxheight");
-			if (!maxHeightAttrib.empty())
-				pItem->setMaxHeight(maxHeightAttrib.as_double());
-
-		}
-
-		if (sChildName == "upload") {
-			auto classAttrib = childNode.attribute("class");
-			auto captionAttrib = childNode.attribute("caption");
-			auto successpageAttrib = childNode.attribute("successpage");
-			addItem (std::make_shared <CUIModule_ContentUpload>(classAttrib.as_string(), captionAttrib.as_string(), successpageAttrib.as_string ()));
-		}
-
-		if (sChildName == "layerview") {
-			addItem(std::make_shared <CUIModule_ContentLayerView>());
-		}
-
-		if (sChildName == "parameterlist") {
-			auto loadingtextAttrib = childNode.attribute("loadingtext");
-			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
-			std::string sLoadingText = loadingtextAttrib.as_string();
-
-			int nEntriesPerPage;
-			if (!entriesperpageAttrib.empty()) {
-				nEntriesPerPage = entriesperpageAttrib.as_int();
-				if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-				if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-			}
-			else {
-				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
-			}
-
-			auto pParameterList = std::make_shared <CUIModule_ContentParameterList>(sLoadingText, nEntriesPerPage, pParameterInstances);
-			addItem (pParameterList);
-
-			pParameterList->loadFromXML(childNode);
-		}
-
-		if (sChildName == "buttongroup") {
-
-			auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>();
-			addItem(pButtonGroup);
-
-			auto buttonsNodes = childNode.children("button");
-			for (auto buttonNode : buttonsNodes) {
-				auto captionAttrib = buttonNode.attribute("caption");
-				auto targetpageAttrib = buttonNode.attribute("targetpage");
-				auto eventAttrib = buttonNode.attribute("event");
-				pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string());
-			}
-
-		}
+		if (sChildName == "paragraph") 
+			addItem(CUIModule_ContentParagraph::makeFromXML(childNode, sItemName, m_sModulePath));
+		if (sChildName == "image") 
+			addItem(CUIModule_ContentImage::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "form")
+			addItem(CUIModule_ContentForm::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "buildlist")
+			addItem(CUIModule_ContentBuildList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "layerview")
+			addItem(CUIModule_ContentLayerView::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "buttongroup") 
+			addItem(CUIModule_ContentButtonGroup::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "upload")
+			addItem(CUIModule_ContentUpload::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
+		if (sChildName == "parameterlist")
+			addItem(CUIModule_ContentParameterList::makeFromXML(childNode, sItemName, m_sModulePath, pUIModuleEnvironment));
 
 
-		if (sChildName == "form") {
 
-			auto pForm = std::make_shared <CUIModule_ContentForm>();
-			addItem(pForm);
-
-			auto formNodes = childNode.children();
-			for (auto formNode : formNodes) {
-
-				std::string sNodeName = formNode.name();
-				auto captionAttrib = formNode.attribute("caption");
-
-				if (sNodeName == "edit") {
-					pForm->addEdit(captionAttrib.as_string());
-				}
-
-				if (sNodeName == "switch") {
-					pForm->addSwitch(captionAttrib.as_string());
-				}
-
-				if (sNodeName == "memo") {
-					pForm->addMemo(captionAttrib.as_string());
-				}
-
-				if (sNodeName == "combobox") {
-					pForm->addCombobox(captionAttrib.as_string());
-				}
-			}
-
-		}
-
-
-		if (sChildName == "buildlist") {
-			auto loadingtextAttrib = childNode.attribute("loadingtext");
-			auto entriesperpageAttrib = childNode.attribute("entriesperpage");
-			auto detailpageAttrib = childNode.attribute("detailpage");
-			std::string sLoadingText = loadingtextAttrib.as_string();
-			std::string sDetailPage = detailpageAttrib.as_string();
-
-			int nEntriesPerPage;
-			if (!entriesperpageAttrib.empty()) {
-				nEntriesPerPage = entriesperpageAttrib.as_int();
-				if (nEntriesPerPage < AMC_API_KEY_UI_ITEM_MINENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-				if (nEntriesPerPage > AMC_API_KEY_UI_ITEM_MAXENTRIESPERPAGE)
-					throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDENTRIESPERPAGE);
-			}
-			else {
-				nEntriesPerPage = AMC_API_KEY_UI_ITEM_DEFAULTENTRIESPERPAGE;
-			}
-
-			auto pBuildList = std::make_shared <CUIModule_ContentBuildList>(sLoadingText, nEntriesPerPage, sDetailPage, pBuildJobHandler);
-			addItem(pBuildList);
-			
-		}
 
 	}
-
 
 }
 
@@ -237,6 +136,12 @@ std::string CUIModule_Content::getHeadLine()
 	return m_sHeadLine;
 }
 
+std::string CUIModule_Content::getCaption()
+{
+	return m_sCaption;
+}
+
+
 std::string CUIModule_Content::getTitle()
 {
 	return m_sTitle;
@@ -247,18 +152,29 @@ std::string CUIModule_Content::getSubtitle()
 	return m_sSubtitle;
 }
 
-void CUIModule_Content::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject)
+void CUIModule_Content::populateClientVariables(CParameterHandler* pParameterHandler)
+{
+	LibMCAssertNotNull(pParameterHandler);
+
+	for (auto pItem : m_Items)
+		pItem->populateClientVariables(pParameterHandler);
+
+}
+
+void CUIModule_Content::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler)
 {
 	moduleObject.addString(AMC_API_KEY_UI_MODULENAME, getName());
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
+	moduleObject.addString(AMC_API_KEY_UI_MODULEUUID, getUUID());
 	moduleObject.addString(AMC_API_KEY_UI_HEADLINE, m_sHeadLine);
 	moduleObject.addString(AMC_API_KEY_UI_TITLE, m_sTitle);
 	moduleObject.addString(AMC_API_KEY_UI_SUBTITLE, m_sSubtitle);
+	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
 
 	CJSONWriterArray itemsNode(writer);
 	for (auto item : m_Items) {
 		CJSONWriterObject itemObject(writer);
-		item->addDefinitionToJSON(writer, itemObject);
+		item->addDefinitionToJSON(writer, itemObject, pClientVariableHandler);
 		itemsNode.addObject(itemObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);
@@ -276,11 +192,60 @@ PUIModuleItem CUIModule_Content::findItem(const std::string& sUUID)
 
 void CUIModule_Content::addItem(PUIModule_ContentItem pItem)
 {
-	if (pItem.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pItem.get());
 
 	m_Items.push_back(pItem);
-	m_ItemMap.insert(std::make_pair (pItem->getUUID (), pItem));
+
+	auto referenceList = pItem->getReferenceUUIDs();
+	for (auto sUUID : referenceList)
+		m_ItemMap.insert(std::make_pair (sUUID, pItem));
 
 }
+
+
+void CUIModule_Content::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
+{
+	for (auto item : m_Items) {
+		auto referenceList = item->getReferenceUUIDs();
+		for (auto sUUID : referenceList)
+			itemMap.insert(std::make_pair(sUUID, item));
+
+	}
+}
+
+void CUIModule_Content::configurePostLoading()
+{
+	for (auto item : m_Items)
+		item->configurePostLoading();
+}
+
+std::string CUIModule_Content::getDefaultContentName(const std::string& sPrefix)
+{
+	if (sPrefix.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_EMPTYITEMPREFIX, m_sModulePath);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sPrefix))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDITEMPREFIX, m_sModulePath + "." + sPrefix);
+
+
+	std::string sName = sPrefix + std::to_string(m_nNamingIDCounter);
+	m_nNamingIDCounter++;
+
+	return sName;
+}
+
+
+std::string CUIModule_Content::readItemNameFromXML(const pugi::xml_node& itemNode, const std::string& sPrefix)
+{
+	auto nameAttrib = itemNode.attribute("name");
+	std::string sItemName = nameAttrib.as_string();
+	if (sItemName.empty())
+		sItemName = getDefaultContentName(sPrefix);
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sItemName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDITEMPATH, m_sModulePath + "." + sItemName);
+
+	return sItemName;
+}
+
 

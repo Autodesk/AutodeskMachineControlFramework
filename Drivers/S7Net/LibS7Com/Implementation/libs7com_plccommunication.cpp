@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CPLCCommunication
 
 #include "libs7com_plccommunication.hpp"
 #include "libs7com_interfaceexception.hpp"
+#include "libs7com_commandparameters.hpp"
 
 // Include custom headers here.
 
@@ -40,46 +41,6 @@ Abstract: This is a stub class definition of CPLCCommunication
 using namespace LibS7Com::Impl;
 
 
-class CPLCWriteBuffer {
-private:
-    uint32_t m_nDBNo;
-    uint32_t m_nDBSize;
-    std::vector <uint8_t> m_Buffer;
-
-public:
-    CPLCWriteBuffer(const uint32_t nDBNo, const uint32_t nDBSize)
-        : m_nDBNo (nDBNo), m_nDBSize (nDBSize)
-    {
-        m_Buffer.resize(nDBSize);
-    }
-
-    void send(LibS7Net::CPLC* pPLC)
-    {
-        if (pPLC == nullptr)
-            throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
-
-        pPLC->WriteBytes(m_nDBNo, 0, m_Buffer);
-    }
-
-    void writeUint16(const uint32_t nAddress, const uint32_t nValue)
-    {
-        if ((uint64_t)nAddress + 2 <= m_Buffer.size()) {
-            m_Buffer[nAddress + 0] = (nValue >> 8) & 0xff;
-            m_Buffer[nAddress + 1] = nValue & 0xff;
-        }
-    }
-
-    void writeUint32(const uint32_t nAddress, const uint32_t nValue)
-    {
-        if ((uint64_t)nAddress + 4 <= m_Buffer.size()) {
-            m_Buffer[nAddress + 0] = (nValue >> 24) & 0xff;
-            m_Buffer[nAddress + 1] = (nValue >> 16) & 0xff;
-            m_Buffer[nAddress + 2] = (nValue >> 8) & 0xff;
-            m_Buffer[nAddress + 3] = nValue & 0xff;
-        }
-    }
-
-};
 
 /*************************************************************************************************************************
  Class definition of CPLCCommunication 
@@ -159,12 +120,22 @@ void CPLCCommunication::SetPLCToAMCOffsets(const LibS7Com_uint32 nMajorVersionAd
     m_nPLCtoAMC_SequenceErrorAddress = nSequenceErrorAddress;
 }
 
+ICommandParameters* CPLCCommunication::PrepareParameters()
+{
+    return new CCommandParameters(std::make_shared<CPLCWriteBuffer> (m_nAMCtoPLC_DBNo, m_nAMCtoPLC_Size));
+
+}
+
+
 void CPLCCommunication::StartCommunication(LibS7Net::PPLC pPLC)
 {
     if (pPLC.get() == nullptr)
         throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
 
     m_pPLC = pPLC;
+    RetrieveStatus();
+
+    m_nCmdCycleCounter = ReadVariableInt32(m_nPLCtoAMC_SequenceFinishedAddress) + 1;
 }
 
 void CPLCCommunication::RetrieveStatus()
@@ -176,6 +147,10 @@ void CPLCCommunication::RetrieveStatus()
         auto pReadData = m_pPLC->ReadBytes(m_nPLCtoAMC_DBNo, 0, m_nPLCtoAMC_Size);
         pReadData->GetData(m_PLCRecvBuffer);
 
+        if ((int32_t)ReadVariableInt16 (m_nPLCtoAMC_MajorVersionAddress) != (int32_t)m_nMajorVersion)
+            throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDMAJORVERSION);
+        if ((int32_t) ReadVariableInt16(m_nPLCtoAMC_MinorVersionAddress) > (int32_t) m_nMinorVersion)
+            throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDMINORVERSION);
 
     }
 
@@ -187,25 +162,31 @@ void CPLCCommunication::StopCommunication()
 }
 
 
-LibS7Com_uint32 CPLCCommunication::ExecuteCommand(const LibS7Com_uint32 nCommandID)
+LibS7Com_uint32 CPLCCommunication::ExecuteCommand(ICommandParameters* pParametersInstance, const LibS7Com_uint32 nCommandID)
 {
+    if (pParametersInstance == nullptr)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
     if (m_pPLC.get() == nullptr)
         throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTCONNECTED);
+
+    CCommandParameters* pCastedParameters = dynamic_cast<CCommandParameters*> (pParametersInstance);
+    if (pCastedParameters == nullptr)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDCAST);
 
     uint32_t nCycleID = m_nCmdCycleCounter;
     m_nCmdCycleCounter++;
 
-    CPLCWriteBuffer writeBuffer (m_nAMCtoPLC_DBNo, m_nAMCtoPLC_Size);
-    writeBuffer.writeUint16(m_nAMCtoPLC_MajorVersionAddress, m_nMajorVersion);
-    writeBuffer.writeUint16(m_nAMCtoPLC_MinorVersionAddress, m_nMinorVersion);
-    writeBuffer.writeUint16(m_nAMCtoPLC_PatchVersionAddress, m_nPatchVersion);
-    writeBuffer.writeUint32(m_nAMCtoPLC_CommandIDAddress, nCommandID);
-    writeBuffer.writeUint32(m_nAMCtoPLC_CommandSequenceAddress, nCycleID);
-    writeBuffer.send (m_pPLC.get());
+    auto pWriteBuffer = pCastedParameters->getWriteBuffer();
+    pWriteBuffer->writeUint16(m_nAMCtoPLC_MajorVersionAddress, m_nMajorVersion);
+    pWriteBuffer->writeUint16(m_nAMCtoPLC_MinorVersionAddress, m_nMinorVersion);
+    pWriteBuffer->writeUint16(m_nAMCtoPLC_PatchVersionAddress, m_nPatchVersion);
+    pWriteBuffer->writeUint32(m_nAMCtoPLC_CommandIDAddress, nCommandID);
+    pWriteBuffer->writeUint32(m_nAMCtoPLC_CommandSequenceAddress, nCycleID);
+    pWriteBuffer->send (m_pPLC.get());
 
-    if (nCommandID == 21) {
+/*    if (nCommandID == 21) {
         writeBuffer.writeUint32(48, 100);
-    }
+    } */
 
 /*    WriteData[262 + 0] = (nCycleID >> 24) & 0xff;
     WriteData[262 + 1] = (nCycleID >> 16) & 0xff;
@@ -252,7 +233,25 @@ void CPLCCommunication::CheckCommandExecution(const LibS7Com_uint32 nSequenceID,
 
 std::string CPLCCommunication::ReadVariableString(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nMaxLength)
 {
-    throw ELibS7ComInterfaceException(LIBS7COM_ERROR_NOTIMPLEMENTED);
+    if (nMaxLength >= 256)
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDPARAM);
+
+    if (((uint64_t)nAddress + nMaxLength + 2) >= m_PLCRecvBuffer.size())
+        throw ELibS7ComInterfaceException(LIBS7COM_ERROR_INVALIDREADADDRESS);
+
+    auto nLength = ReadVariableByte(nAddress);
+    if (nLength > nMaxLength)
+        nLength = nMaxLength;
+
+    std::vector<uint8_t> Bytes;
+    Bytes.resize((uint64_t) nMaxLength + 1);
+
+    for (uint32_t j = 0; j < nLength; j++) {
+        Bytes[j] = ReadVariableByte(nAddress + 2 + j);
+    }
+    Bytes[nMaxLength] = 0;
+
+    return std::string ((char*) Bytes.data());
 }
 
 bool CPLCCommunication::ReadVariableBool(const LibS7Com_uint32 nAddress, const LibS7Com_uint32 nBit)

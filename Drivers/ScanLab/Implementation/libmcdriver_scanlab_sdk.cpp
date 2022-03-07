@@ -145,6 +145,13 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_set_laser_delays = (PScanLabPtr_n_set_laser_delays)_loadScanLabAddress(hLibrary, "n_set_laser_delays");
 	this->n_set_start_list_pos = (PScanLabPtr_n_set_start_list_pos)_loadScanLabAddress(hLibrary, "n_set_start_list_pos");
 	this->n_set_defocus_list = (PScanLabPtr_n_set_defocus_list)_loadScanLabAddress(hLibrary, "n_set_defocus_list");
+	this->n_get_head_status = (PScanLabPtr_n_get_head_status)_loadScanLabAddress(hLibrary, "n_get_head_status");
+	this->n_get_value = (PScanLabPtr_n_get_value)_loadScanLabAddress(hLibrary, "n_get_value");
+	this->get_dll_version = (PScanLabPtr_get_dll_version)_loadScanLabAddress(hLibrary, "get_dll_version");
+	this->n_get_hex_version = (PScanLabPtr_n_get_hex_version)_loadScanLabAddress(hLibrary, "n_get_hex_version");
+	this->n_get_bios_version = (PScanLabPtr_n_get_bios_version)_loadScanLabAddress(hLibrary, "n_get_bios_version");
+	this->n_get_rtc_version = (PScanLabPtr_n_get_rtc_version)_loadScanLabAddress(hLibrary, "n_get_rtc_version");
+	this->n_get_card_type = (PScanLabPtr_n_get_card_type)_loadScanLabAddress(hLibrary, "n_get_card_type");
 
 	m_LibraryHandle = (void*) hLibrary;
 }

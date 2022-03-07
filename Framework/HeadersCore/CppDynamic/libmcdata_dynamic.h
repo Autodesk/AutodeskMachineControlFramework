@@ -278,6 +278,16 @@ typedef LibMCDataResult (*PLibMCDataStorage_StorePartialStreamPtr) (LibMCData_St
 typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamPtr) (LibMCData_Storage pStorage, const char * pUUID, const char * pSHA2);
 
 /**
+* Finishes storing a stream with a 64k-Blockwise calculated Checksum.
+*
+* @param[in] pStorage - Storage instance.
+* @param[in] pUUID - UUID of storage stream. MUST have been created with BeginPartialStream first.
+* @param[in] pBlockwiseSHA2 - 64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr) (LibMCData_Storage pStorage, const char * pUUID, const char * pBlockwiseSHA2);
+
+/**
 * Returns the maximum stream size that the data model allows.
 *
 * @param[in] pStorage - Storage instance.
@@ -714,6 +724,164 @@ typedef LibMCDataResult (*PLibMCDataLoginHandler_UserExistsPtr) (LibMCData_Login
 typedef LibMCDataResult (*PLibMCDataLoginHandler_GetUserDetailsPtr) (LibMCData_LoginHandler pLoginHandler, const char * pUsername, const LibMCData_uint32 nSaltBufferSize, LibMCData_uint32* pSaltNeededChars, char * pSaltBuffer, const LibMCData_uint32 nHashedPasswordBufferSize, LibMCData_uint32* pHashedPasswordNeededChars, char * pHashedPasswordBuffer);
 
 /*************************************************************************************************************************
+ Class definition for PersistencyHandler
+**************************************************************************************************************************/
+
+/**
+* Retrieves if a persistent parameter has been stored.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pParameterExists - returns if parameter exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_HasPersistentParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pParameterExists);
+
+/**
+* Retrieves details of a persistent parameter. Fails if parameter does not exist.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Returns name of the parameter, may be NULL
+* @param[out] pDataType - Returns data type of the parameter
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_GetPersistentParameterDetailsPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nNameBufferSize, LibMCData_uint32* pNameNeededChars, char * pNameBuffer, LibMCData::eParameterDataType * pDataType);
+
+/**
+* Removes a persistent parameter from database. Does nothing if parameter does not exist.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pParameterExisted - returns if parameter existed.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_DeletePersistentParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pParameterExisted);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] eDataType - Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type.
+* @param[in] pValue - Value of the parameter. MUST be of appropriate type.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_StorePersistentParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData::eParameterDataType eDataType, const char * pValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_StorePersistentStringParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] pValue - Value of the parameter. MUST be of appropriate type.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_StorePersistentUUIDParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, const char * pValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] dValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_StorePersistentDoubleParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_double dValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] nValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_StorePersistentIntegerParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, LibMCData_int64 nValue);
+
+/**
+* Stores a persistent parameter in the database. Creates a new parameter if not existing.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] pName - Name of the parameter. If parameter exists, MUST be the same as the stored parameter name.
+* @param[in] bValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_StorePersistentBoolParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const char * pName, bool bValue);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_RetrievePersistentStringParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[in] nValueBufferSize - size of the buffer (including trailing 0)
+* @param[out] pValueNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pValueBuffer -  buffer of Value of the parameter., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_RetrievePersistentUUIDParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, const LibMCData_uint32 nValueBufferSize, LibMCData_uint32* pValueNeededChars, char * pValueBuffer);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_RetrievePersistentDoubleParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, LibMCData_double * pValue);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_RetrievePersistentIntegerParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, LibMCData_int64 * pValue);
+
+/**
+* Retrieves a persistent parameter in the database. Fails if not existing or invalid type.
+*
+* @param[in] pPersistencyHandler - PersistencyHandler instance.
+* @param[in] pUUID - UUID of the parameter
+* @param[out] pValue - Value of the parameter.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataPersistencyHandler_RetrievePersistentBoolParameterPtr) (LibMCData_PersistencyHandler pPersistencyHandler, const char * pUUID, bool * pValue);
+
+/*************************************************************************************************************************
  Class definition for DataModel
 **************************************************************************************************************************/
 
@@ -786,6 +954,15 @@ typedef LibMCDataResult (*PLibMCDataDataModel_CreateNewLogSessionPtr) (LibMCData
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataDataModel_CreateLoginHandlerPtr) (LibMCData_DataModel pDataModel, LibMCData_LoginHandler * pLoginHandler);
+
+/**
+* creates a persistency handler instance.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pPersistencyHandler - PersistencyHandler instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_CreatePersistencyHandlerPtr) (LibMCData_DataModel pDataModel, LibMCData_PersistencyHandler * pPersistencyHandler);
 
 /*************************************************************************************************************************
  Global functions
@@ -871,6 +1048,7 @@ typedef struct {
 	PLibMCDataStorage_BeginPartialStreamPtr m_Storage_BeginPartialStream;
 	PLibMCDataStorage_StorePartialStreamPtr m_Storage_StorePartialStream;
 	PLibMCDataStorage_FinishPartialStreamPtr m_Storage_FinishPartialStream;
+	PLibMCDataStorage_FinishPartialStreamBlockwiseSHA256Ptr m_Storage_FinishPartialStreamBlockwiseSHA256;
 	PLibMCDataStorage_GetMaxStreamSizePtr m_Storage_GetMaxStreamSize;
 	PLibMCDataStorage_ContentTypeIsAcceptedPtr m_Storage_ContentTypeIsAccepted;
 	PLibMCDataStorage_StreamIsImagePtr m_Storage_StreamIsImage;
@@ -912,6 +1090,20 @@ typedef struct {
 	PLibMCDataBuildJobHandler_ConvertStringToBuildStatusPtr m_BuildJobHandler_ConvertStringToBuildStatus;
 	PLibMCDataLoginHandler_UserExistsPtr m_LoginHandler_UserExists;
 	PLibMCDataLoginHandler_GetUserDetailsPtr m_LoginHandler_GetUserDetails;
+	PLibMCDataPersistencyHandler_HasPersistentParameterPtr m_PersistencyHandler_HasPersistentParameter;
+	PLibMCDataPersistencyHandler_GetPersistentParameterDetailsPtr m_PersistencyHandler_GetPersistentParameterDetails;
+	PLibMCDataPersistencyHandler_DeletePersistentParameterPtr m_PersistencyHandler_DeletePersistentParameter;
+	PLibMCDataPersistencyHandler_StorePersistentParameterPtr m_PersistencyHandler_StorePersistentParameter;
+	PLibMCDataPersistencyHandler_StorePersistentStringParameterPtr m_PersistencyHandler_StorePersistentStringParameter;
+	PLibMCDataPersistencyHandler_StorePersistentUUIDParameterPtr m_PersistencyHandler_StorePersistentUUIDParameter;
+	PLibMCDataPersistencyHandler_StorePersistentDoubleParameterPtr m_PersistencyHandler_StorePersistentDoubleParameter;
+	PLibMCDataPersistencyHandler_StorePersistentIntegerParameterPtr m_PersistencyHandler_StorePersistentIntegerParameter;
+	PLibMCDataPersistencyHandler_StorePersistentBoolParameterPtr m_PersistencyHandler_StorePersistentBoolParameter;
+	PLibMCDataPersistencyHandler_RetrievePersistentStringParameterPtr m_PersistencyHandler_RetrievePersistentStringParameter;
+	PLibMCDataPersistencyHandler_RetrievePersistentUUIDParameterPtr m_PersistencyHandler_RetrievePersistentUUIDParameter;
+	PLibMCDataPersistencyHandler_RetrievePersistentDoubleParameterPtr m_PersistencyHandler_RetrievePersistentDoubleParameter;
+	PLibMCDataPersistencyHandler_RetrievePersistentIntegerParameterPtr m_PersistencyHandler_RetrievePersistentIntegerParameter;
+	PLibMCDataPersistencyHandler_RetrievePersistentBoolParameterPtr m_PersistencyHandler_RetrievePersistentBoolParameter;
 	PLibMCDataDataModel_InitialiseDatabasePtr m_DataModel_InitialiseDatabase;
 	PLibMCDataDataModel_GetDataModelVersionPtr m_DataModel_GetDataModelVersion;
 	PLibMCDataDataModel_GetInstallationInformationPtr m_DataModel_GetInstallationInformation;
@@ -919,6 +1111,7 @@ typedef struct {
 	PLibMCDataDataModel_CreateBuildJobHandlerPtr m_DataModel_CreateBuildJobHandler;
 	PLibMCDataDataModel_CreateNewLogSessionPtr m_DataModel_CreateNewLogSession;
 	PLibMCDataDataModel_CreateLoginHandlerPtr m_DataModel_CreateLoginHandler;
+	PLibMCDataDataModel_CreatePersistencyHandlerPtr m_DataModel_CreatePersistencyHandler;
 	PLibMCDataGetVersionPtr m_GetVersion;
 	PLibMCDataGetLastErrorPtr m_GetLastError;
 	PLibMCDataReleaseInstancePtr m_ReleaseInstance;

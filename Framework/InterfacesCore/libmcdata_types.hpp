@@ -355,6 +355,9 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDLAYERINDEX 328
 #define LIBMCDATA_ERROR_TEMPBASEPATHEMPTY 329
 #define LIBMCDATA_ERROR_BUILDJOBDATANOTFOUND 330
+#define LIBMCDATA_ERROR_INVALIDNAMESTRING 331
+#define LIBMCDATA_ERROR_NAMESTRINGMISMATCH 332
+#define LIBMCDATA_ERROR_DATATYPEMISMATCH 333
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -622,6 +625,9 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDLAYERINDEX: return "Invalid layer index";
     case LIBMCDATA_ERROR_TEMPBASEPATHEMPTY: return "Empty base path for temporary files";
     case LIBMCDATA_ERROR_BUILDJOBDATANOTFOUND: return "Build job data not found";
+    case LIBMCDATA_ERROR_INVALIDNAMESTRING: return "Invalid name string";
+    case LIBMCDATA_ERROR_NAMESTRINGMISMATCH: return "Name string mismatch";
+    case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
     default: return "unknown error";
   }
 }
@@ -641,6 +647,7 @@ typedef LibMCDataHandle LibMCData_BuildJob;
 typedef LibMCDataHandle LibMCData_BuildJobIterator;
 typedef LibMCDataHandle LibMCData_BuildJobHandler;
 typedef LibMCDataHandle LibMCData_LoginHandler;
+typedef LibMCDataHandle LibMCData_PersistencyHandler;
 typedef LibMCDataHandle LibMCData_DataModel;
 
 namespace LibMCData {
@@ -664,6 +671,15 @@ namespace LibMCData {
     SqLite = 1
   };
   
+  enum class eParameterDataType : LibMCData_int32 {
+    Unknown = 0,
+    String = 1,
+    UUID = 2,
+    Integer = 3,
+    Double = 4,
+    Bool = 5
+  };
+  
   enum class eBuildJobStatus : LibMCData_int32 {
     Created = 0,
     Validating = 100,
@@ -679,6 +695,7 @@ namespace LibMCData {
     JPEGImage = 3,
     Thumbnail = 4,
     Timeline = 5,
+    SVGImage = 6,
     CustomBinaryData = 100
   };
   
@@ -710,6 +727,7 @@ namespace LibMCData {
 // define legacy C-names for enums, structs and function types
 typedef LibMCData::eLogLevel eLibMCDataLogLevel;
 typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
+typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;

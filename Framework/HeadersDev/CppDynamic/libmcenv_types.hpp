@@ -118,6 +118,22 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME 20
 #define LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED 21
 #define LIBMCENV_ERROR_INVALIDITERATOR 22
+#define LIBMCENV_ERROR_FORMVALUENOTFOUND 23
+#define LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE 24
+#define LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE 25
+#define LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES 26
+#define LIBMCENV_ERROR_INVALIDPIXELCOUNT 27
+#define LIBMCENV_ERROR_INVALIDDPIVALUE 28
+#define LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE 29
+#define LIBMCENV_ERROR_COULDNOTSTOREPNGIMAGE 30
+#define LIBMCENV_ERROR_EMPTYPNGIMAGEDATA 31
+#define LIBMCENV_ERROR_INVALIDXCOORDINATE 32
+#define LIBMCENV_ERROR_INVALIDYCOORDINATE 33
+#define LIBMCENV_ERROR_INVALIDXCOORDINATERANGE 34
+#define LIBMCENV_ERROR_INVALIDYCOORDINATERANGE 35
+#define LIBMCENV_ERROR_INVALIDPIXELDATACOUNT 36
+#define LIBMCENV_ERROR_INVALIDIMAGEBUFFER 37
+#define LIBMCENV_ERROR_INVALIDPIXELFORMAT 38
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -148,6 +164,22 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDCHARACTERINFILENAME: return "invalid character in filename.";
     case LIBMCENV_ERROR_WORKINGDIRECTORYHASBEENCLEANED: return "working directory has been cleaned.";
     case LIBMCENV_ERROR_INVALIDITERATOR: return "invalid iterator.";
+    case LIBMCENV_ERROR_FORMVALUENOTFOUND: return "Form value not found.";
+    case LIBMCENV_ERROR_INVALIDDOUBLEFORMVALUE: return "Invalid double form value.";
+    case LIBMCENV_ERROR_INVALIDINTEGERFORMVALUE: return "Invalid integer form value.";
+    case LIBMCENV_ERROR_COULDNNOTACCESSCLIENTVARIABLES: return "Could not access client variables.";
+    case LIBMCENV_ERROR_INVALIDPIXELCOUNT: return "Invalid pixel count.";
+    case LIBMCENV_ERROR_INVALIDDPIVALUE: return "Invalid dpi value.";
+    case LIBMCENV_ERROR_COULDNOTCOMPRESSPNGIMAGE: return "Could not compress PNG image.";
+    case LIBMCENV_ERROR_COULDNOTSTOREPNGIMAGE: return "Could not store PNG image.";
+    case LIBMCENV_ERROR_EMPTYPNGIMAGEDATA: return "Empty PNG image data.";
+    case LIBMCENV_ERROR_INVALIDXCOORDINATE: return "Invalid X coordinate.";
+    case LIBMCENV_ERROR_INVALIDYCOORDINATE: return "Invalid Y coordinate.";
+    case LIBMCENV_ERROR_INVALIDXCOORDINATERANGE: return "Invalid X coordinate range.";
+    case LIBMCENV_ERROR_INVALIDYCOORDINATERANGE: return "Invalid Y coordinate range.";
+    case LIBMCENV_ERROR_INVALIDPIXELDATACOUNT: return "Invalid pixel data count.";
+    case LIBMCENV_ERROR_INVALIDIMAGEBUFFER: return "Invalid image buffer.";
+    case LIBMCENV_ERROR_INVALIDPIXELFORMAT: return "Invalid pixel format.";
     default: return "unknown error";
   }
 }
@@ -158,6 +190,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
+typedef LibMCEnvHandle LibMCEnv_ImageData;
+typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;
 typedef LibMCEnvHandle LibMCEnv_ToolpathAccessor;
 typedef LibMCEnvHandle LibMCEnv_Build;
@@ -176,6 +210,13 @@ namespace LibMCEnv {
   /*************************************************************************************************************************
    Declaration of enums
   **************************************************************************************************************************/
+  
+  enum class eImagePixelFormat : LibMCEnv_int32 {
+    Unknown = 0,
+    GreyScale8bit = 1,
+    RGB24bit = 2,
+    RGBA32bit = 3
+  };
   
   enum class eToolpathSegmentType : LibMCEnv_int32 {
     Unknown = 0,
@@ -211,13 +252,20 @@ namespace LibMCEnv {
       LibMCEnv_int32 m_Coordinates[2];
   } sPosition2D;
   
+  typedef struct {
+      LibMCEnv_double m_Matrix[3][3];
+      LibMCEnv_double m_Translation[3];
+  } sToolpathPartTransform;
+  
   #pragma pack ()
   
 } // namespace LibMCEnv;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
+typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP

@@ -61,8 +61,34 @@
 		<error name="INVALIDCHARACTERINFILENAME" code="20" description="invalid character in filename." />
 		<error name="WORKINGDIRECTORYHASBEENCLEANED" code="21" description="working directory has been cleaned." />
 		<error name="INVALIDITERATOR" code="22" description="invalid iterator." />
-			
+		<error name="FORMVALUENOTFOUND" code="23" description="Form value not found." />
+		<error name="INVALIDDOUBLEFORMVALUE" code="24" description="Invalid double form value." />
+		<error name="INVALIDINTEGERFORMVALUE" code="25" description="Invalid integer form value." />
+		<error name="COULDNNOTACCESSCLIENTVARIABLES" code="26" description="Could not access client variables." />
+		<error name="INVALIDPIXELCOUNT" code="27" description="Invalid pixel count." />
+		<error name="INVALIDDPIVALUE" code="28" description="Invalid dpi value." />
+		<error name="COULDNOTCOMPRESSPNGIMAGE" code="29" description="Could not compress PNG image." />
+		<error name="COULDNOTSTOREPNGIMAGE" code="30" description="Could not store PNG image." />
+		<error name="EMPTYPNGIMAGEDATA" code="31" description="Empty PNG image data." />
+		<error name="INVALIDXCOORDINATE" code="32" description="Invalid X coordinate." />
+		<error name="INVALIDYCOORDINATE" code="33" description="Invalid Y coordinate." />
+		<error name="INVALIDXCOORDINATERANGE" code="34" description="Invalid X coordinate range." />
+		<error name="INVALIDYCOORDINATERANGE" code="35" description="Invalid Y coordinate range." />
+		<error name="INVALIDPIXELDATACOUNT" code="36" description="Invalid pixel data count." />
+		<error name="INVALIDIMAGEBUFFER" code="37" description="Invalid image buffer." />
+		<error name="INVALIDPIXELFORMAT" code="38" description="Invalid pixel format." />
+		
+		
+					
 	</errors>
+
+
+	<enum name="ImagePixelFormat">
+		<option name="Unknown" value="0" />
+		<option name="GreyScale8bit" value="1" />
+		<option name="RGB24bit" value="2" />
+		<option name="RGBA32bit" value="3" />
+	</enum>
 	
 	<enum name="ToolpathSegmentType">
 		<option name="Unknown" value="0" />
@@ -91,12 +117,17 @@
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
+
+	<struct name="ToolpathPartTransform">
+		<member name="Matrix" type="double" rows="3" columns="3"/>
+		<member name="Translation" type="double" rows="3"/>
+	</struct>
 	
 	<class name="Base">
 	</class>
 
 
-	<class name="Iterator">
+	<class name="Iterator" parent="Base">
 		<method name="MoveNext" description="Iterates to the next object in the list.">
 			<param name="HasNext" type="bool" pass="return" description="Iterates to the next object in the list."/>
 		</method>
@@ -113,6 +144,112 @@
 			<param name="Count" type="uint64" pass="return" description="returns the number of objects the iterator captures."/>
 		</method>
 	</class>
+	
+	
+	<class name="ImageData" parent="Base" description="In memory representation of an image.">
+
+		<method name="GetPixelFormat" description="Returns Pixel format of the image.">
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="return" description="Pixel Format of image" />
+		</method>
+
+		<method name="ChangePixelFormat" description="Changes Pixel format of the image. Might lose alpha or color information during the process.">
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="new Pixel Format of image" />
+		</method>
+
+		<method name="GetDPI" description="Returns DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="out" description="DPI value in X" />
+			<param name="DPIValueY" type="double" pass="out" description="DPI value in Y" />
+		</method>
+
+		<method name="SetDPI" description="Sets DPI values in X and Y.">
+			<param name="DPIValueX" type="double" pass="in" description="new DPI value in X" />
+			<param name="DPIValueY" type="double" pass="in" description="new DPI value in Y" />
+		</method>
+		
+		<method name="GetSizeInMM" description="Returns image sizes inmm.">
+			<param name="SizeX" type="double" pass="out" description="Size in X in mm" />
+			<param name="SizeY" type="double" pass="out" description="Size in Y in mm" />
+		</method>
+
+		<method name="GetSizeInPixels" description="Returns image pixel sizes.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="ResizeImage" description="Resizes Image pixel data.">
+			<param name="PixelSizeX" type="uint32" pass="out" description="Number of pixels in X" />
+			<param name="PixelSizeY" type="uint32" pass="out" description="Number of pixels in Y" />
+		</method>		
+
+		<method name="LoadPNG" description="Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>		
+
+		<method name="EncodePNG" description="Encodes PNG and stores data stream in image object.">
+		</method>		
+
+		<method name="GetEncodedPNGData" description="Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="out" description="PNG Data stream." />
+		</method>		
+		
+		<method name="ClearEncodedPNGData" description="Releases encoded data stream of image object.">
+		</method>		
+		
+		<method name="Clear" description="Sets all pixels to a single value.">
+			<param name="Value" type="uint32" pass="in" description="Pixel value." />
+		</method>		
+
+		<method name="GetPixel" description="Returns one pixel of an image.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="uint32" pass="return" description="Pixel value at this position" />
+		</method>		
+
+		<method name="SetPixel" description="Sets one pixel of an image.">
+			<param name="X" type="uint32" pass="in" description="Pixel coordinate in X" />
+			<param name="Y" type="uint32" pass="in" description="Pixel coordinate in Y" />
+			<param name="Value" type="uint32" pass="in" description="New Pixel value at this position" />
+		</method>		
+
+		<method name="GetPixelRange" description="Returns a subset of an image or the whole image data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="uint8" pass="out" description="Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
+		</method>		
+
+		<method name="SetPixelRange" description="Exchanges a subset of an image or the whole image data.">
+			<param name="XMin" type="uint32" pass="in" description="Min Pixel coordinate in X. MUST be within image bounds." />
+			<param name="YMin" type="uint32" pass="in" description="Min Pixel coordinate in Y. MUST be within image bounds." />
+			<param name="XMax" type="uint32" pass="in" description="Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX" />
+			<param name="YMax" type="uint32" pass="in" description="Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY" />
+			<param name="Value" type="basicarray" class="uint8" pass="in" description="New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format." />
+		</method>
+	
+	</class>
+	
+
+	<class name="ToolpathPart" parent="Base">
+	
+		<method name="GetName" description="Returns Part Name.">
+			<param name="Name" type="string" pass="return" description="Returns toolpath part name." />
+		</method>
+	
+		<method name="GetUUID" description="Returns Part UUID.">
+			<param name="UUID" type="string" pass="return" description="Returns toolpath part uuid." />
+		</method>
+
+		<method name="GetMeshUUID" description="Returns Mesh UUID of the part.">
+			<param name="MeshUUID" type="string" pass="return" description="Returns toolpath part mesh uuid." />
+		</method>
+
+		<method name="GetTransform" description="Returns Mesh Transform of the part.">
+			<param name="MeshUUID" type="struct" class="ToolpathPartTransform" pass="return" description="Returns the mesh transform of the toolpath." />		
+		</method>
+	
+	</class>
+
 
 	<class name="ToolpathLayer" parent="Base">
 	  
@@ -152,7 +289,8 @@
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />
 		</method>
-		
+	
+
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array. Positions are absolute in units." />
@@ -187,7 +325,39 @@
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
 		</method>
+
+		<method name="HasMetaData" description="Checks if a metadata value exists for this toolpath model.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
+			<param name="Name" type="string" pass="in" description="Name of metadata." />
+			<param name="Exists" type="bool" pass="return" description="Returns if metadata exists." />
+		</method>
+
+		<method name="GetMetaDataValue" description="Returns the value of a metadata for this toolpath model.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
+			<param name="Name" type="string" pass="in" description="Name of metadata." />
+			<param name="MetaDataValue" type="string" pass="return" description="Returns the value" />
+		</method>
 			
+		<method name="GetMetaDataType" description="Returns the type of a metadata for this toolpath model.">
+			<param name="NameSpace" type="string" pass="in" description="Namespace of metadata." />
+			<param name="Name" type="string" pass="in" description="Name of metadata." />
+			<param name="MetaDataType" type="string" pass="return" description="Returns the type" />
+		</method>
+
+		<method name="GetPartCount" description="Retrieves the number of parts in the toolpath.">
+			<param name="PartCount" type="uint32" pass="return" description="Number of parts." />
+		</method>
+
+		<method name="GetPart" description="Retrieves the part information of a toolpath.">
+			<param name="PartIndex" type="uint32" pass="in" description="Index of part. MUST be between 0 and PartCount-1" />
+			<param name="Part" type="class" class="ToolpathPart" pass="return" description="Part Instance" />
+		</method>
+
+		<method name="FindPartByUUID" description="Finds the part information of a toolpath.">
+			<param name="PartUUID" type="string" pass="in" description="UUID of part." />
+			<param name="Part" type="optionalclass" class="ToolpathPart" pass="return" description="Part Instance. Returns null if part does not exist." />
+		</method>
+
 	</class>
 
 
@@ -283,7 +453,7 @@
 		<method name="DeleteFromDisk" description = "Deletes the temporary file.">
 			<param name="Success" type="bool" pass="return" description="returns if deletion was successful or file did not exist in the first place." />
 		</method>
-
+				
 	</class>
 
 	<class name="WorkingFileIterator" parent="Iterator">
@@ -306,6 +476,12 @@
 		<method name="StoreCustomData" description = "Stores a data buffer in a temporary file.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
 			<param name="DataBuffer" type="basicarray" class="uint8" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreCustomString" description = "Stores a string in a temporary file.">
+			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="DataString" type="string" pass="in" description="file data to store to." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
 		</method>
 
@@ -421,6 +597,35 @@
 
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
+		</method>
+
+		<method name="LogMessage" description="logs a string as message">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogWarning" description="logs a string as warning">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogInfo" description="logs a string as info">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+		
+		<method name="CreateEmptyImage" description="creates an empty image object.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
+		</method>		
+		
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
 		</method>
 
 	</class>
@@ -575,6 +780,12 @@
 
 
 	<class name="StateEnvironment" parent="Base" description="Environment of the state">
+
+		<method name="GetMachineState" description="Retrieves the machine state">
+			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
+			<param name="StateName" type="string" pass="return" description="Name of current state" />
+		</method>
+
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
@@ -612,7 +823,7 @@
 		<method name="SetNextState" description="sets the next state">
 			<param name="StateName" type="string" pass="in" description="Name of next state" />
 		</method>
-
+				
 		<method name="LogMessage" description="logs a string as message">
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
@@ -715,21 +926,50 @@
 			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
 		</method>
 
+		<method name="CreateEmptyImage" description="creates an empty image object.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
+		</method>		
+		
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
 
 	</class>
 
 
 
-
 	<class name="UIEnvironment" parent="Base" description="Environment of the UI">
+	  
+		<method name="ActivateModalDialog" description="activates a modal dialog on the client.">
+			<param name="DialogName" type="string" pass="in" description="Name of the dialog to activate." />
+		</method>
+
+		<method name="CloseModalDialog" description="closes the active modal dialog on the client.">
+		</method>
+	  
+		<method name="ActivatePage" description="changes the current page on the client.">
+			<param name="PageName" type="string" pass="in" description="Name of the page to activate." />
+		</method>
+	  
+		<method name="RetrieveEventSender" description="returns name of the UI control that triggered the event.">
+			<param name="SenderName" type="string" pass="return" description="Name of the sender element." />
+		</method>
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="SignalName" type="string" pass="in" description="Name Of signal channel." />
 			<param name="SignalInstance" type="class" class="SignalTrigger" pass="return" description="Signal trigger object." />
-		</method>
-	  
-		
+		</method>		
+	  		
 		<method name="GetMachineState" description="Retrieves the machine state">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="StateName" type="string" pass="return" description="Name of current state" />
@@ -746,47 +986,123 @@
 		<method name="LogInfo" description="logs a string as info">
 			<param name="LogString" type="string" pass="in" description="String to Log" />
 		</method>
-				
-		<method name="GetStringParameter" description="returns a string parameter">
+
+								
+		<method name="GetMachineParameter" description="returns a string parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="string" pass="return" description="Value to set" />
+			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetUUIDParameter" description="returns a uuid parameter">
+		<method name="GetMachineParameterAsUUID" description="returns a uuid parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="string" pass="return" description="Value to set" />
+			<param name="Value" type="string" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetDoubleParameter" description="returns a double parameter">
+		<method name="GetMachineParameterAsDouble" description="returns a double parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="double" pass="return" description="Value to set" />
+			<param name="Value" type="double" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetIntegerParameter" description="returns an int parameter">
+		<method name="GetMachineParameterAsInteger" description="returns an int parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="int64" pass="return" description="Value to set" />
+			<param name="Value" type="int64" pass="return" description="Current Parameter Value" />
 		</method>
 
-		<method name="GetBoolParameter" description="returns a bool parameter">
+		<method name="GetMachineParameterAsBool" description="returns a bool parameter of a state machine">
 			<param name="MachineInstance" type="string" pass="in" description="State machine instance name" />
 			<param name="ParameterGroup" type="string" pass="in" description="Parameter Group" />
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
-			<param name="Value" type="bool" pass="return" description="Value to set" />
+			<param name="Value" type="bool" pass="return" description="Current Parameter Value" />
+		</method>
+
+
+
+		<method name="GetUIProperty" description="returns a string property of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="string" pass="return" description="Current property Value" />
+		</method>
+
+		<method name="GetUIPropertyAsUUID" description="returns a uuid variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="string" pass="return" description="Current property Value" />
+		</method>
+
+		<method name="GetUIPropertyAsDouble" description="returns a double variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="double" pass="return" description="Current property Value" />
+		</method>
+
+		<method name="GetUIPropertyAsInteger" description="returns a integer variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="int64" pass="return" description="Current property Value" />
+		</method>
+
+		<method name="GetUIPropertyAsBool" description="returns a integer variable of a UI element on the client">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist." />
+			<param name="Value" type="bool" pass="return" description="Current property Value" />
+		</method>
+
+
+		<method name="SetUIProperty" description="sets a string property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="string" pass="in" description="New property Value" />
+		</method>
+
+		<method name="SetUIPropertyAsUUID" description="sets a uuid property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="string" pass="in" description="New property Value" />
+		</method>
+
+		<method name="SetUIPropertyAsDouble" description="sets a double property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="double" pass="in" description="New property Value" />
+		</method>
+
+		<method name="SetUIPropertyAsInteger" description="sets a integer property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="int64" pass="in" description="New property Value" />
+		</method>
+
+		<method name="SetUIPropertyAsBool" description="sets a bool property of a UI element on the client.">
+			<param name="ElementPath" type="string" pass="in" description="Path of UI Element. Fails if element does not exist." />
+			<param name="PropertyName" type="string" pass="in" description="Property name. Fails if property does not exist or is readonly." />
+			<param name="Value" type="bool" pass="in" description="New property Value" />
 		</method>
 		
-		<method name="GetEventContext" description="returns the event context uuid as string">
-			<param name="ContextUUID" type="string" pass="return" description="Context UUID" />
+		<method name="CreateEmptyImage" description="creates an empty image object.">
+			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
+			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Empty image instance." />
+		</method>		
+		
+		<method name="LoadPNGImage" description="creates an image object from a PNG data stream.">
+			<param name="PNGData" type="basicarray" class="uint8" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
+			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
+			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
 		</method>
 		
-
 	</class>
 
 

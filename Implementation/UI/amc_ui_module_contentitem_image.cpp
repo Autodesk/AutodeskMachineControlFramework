@@ -37,16 +37,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
 #include "amc_parameterhandler.hpp"
-#include "amc_parameterinstances.hpp"
+#include "libmc_exceptiontypes.hpp"
+#include "amc_ui_module.hpp"
+#include "amc_resourcepackage.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
 using namespace AMC;
 
+PUIModule_ContentImage CUIModule_ContentImage::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
+{
+	LibMCAssertNotNull(pUIModuleEnvironment);
+
+	auto resourceAttrib = xmlNode.attribute("resource");
+	auto pResourceEntry = pUIModuleEnvironment->resourcePackage()->findEntryByName(resourceAttrib.as_string(), true);
+	double dLogoAspectRatio = 1.0;
+	auto aspectratioAttrib = xmlNode.attribute("aspectratio");
+	if (!aspectratioAttrib.empty()) {
+		dLogoAspectRatio = aspectratioAttrib.as_double();
+	}
+
+	auto pItem = std::make_shared <CUIModule_ContentImage>(pResourceEntry->getUUID(), dLogoAspectRatio, sItemName, sModulePath);
+
+	auto maxWidthAttrib = xmlNode.attribute("maxwidth");
+	if (!maxWidthAttrib.empty())
+		pItem->setMaxWidth(maxWidthAttrib.as_double());
+	auto maxHeightAttrib = xmlNode.attribute("maxheight");
+	if (!maxHeightAttrib.empty())
+		pItem->setMaxHeight(maxHeightAttrib.as_double());
 
 
-CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID, double dAspectRatio)
-	: CUIModule_ContentItem(sUUID), 
+	return pItem;
+}
+
+
+CUIModule_ContentImage::CUIModule_ContentImage(const std::string& sUUID, double dAspectRatio, const std::string& sItemName, const std::string& sModulePath)
+	: CUIModule_ContentItem(sUUID, sItemName, sModulePath),
 	m_dAspectRatio(dAspectRatio),
 	m_dMaxWidth (0.0),
 	m_dMaxHeight (0.0),
@@ -64,7 +90,7 @@ CUIModule_ContentImage::~CUIModule_ContentImage()
 }
 
 
-void CUIModule_ContentImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object)
+void CUIModule_ContentImage::addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
 	object.addString(AMC_API_KEY_UI_ITEMTYPE, "image");
 	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);

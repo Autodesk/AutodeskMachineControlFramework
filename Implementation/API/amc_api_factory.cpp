@@ -51,7 +51,7 @@ CAPIFactory::CAPIFactory(PAPI pAPI, PSystemState pSystemState, std::vector <AMC:
 
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Logs>(pSystemState->getLoggerInstance()));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(MachineInstanceList));
-	pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(MachineInstanceList));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(MachineInstanceList, pSystemState->getStateMachineData ()));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(pSystemState));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(pSystemState));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_UI>(pSystemState));

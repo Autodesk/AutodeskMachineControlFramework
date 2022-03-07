@@ -31,13 +31,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __AMCIMPL_UI_MODULE
 
 #include "amc_ui_module.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
+#include "Common/common_utils.hpp"
 
 
 using namespace AMC;
 
+
+CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry)
+	: m_pStateMachineData(pStateMachineData), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pContentRegistry(pContentRegistry)
+{
+	LibMCAssertNotNull(pStateMachineData.get());
+	LibMCAssertNotNull(pResourcePackage.get());
+	LibMCAssertNotNull(pBuildJobHandler.get());
+	LibMCAssertNotNull(pContentRegistry);
+}
+
+PStateMachineData CUIModuleEnvironment::stateMachineData()
+{
+	return m_pStateMachineData;
+}
+
+PResourcePackage CUIModuleEnvironment::resourcePackage()
+{
+	return m_pResourcePackage;
+}
+
+LibMCData::PBuildJobHandler CUIModuleEnvironment::buildJobHandler()
+{
+	return m_pBuildJobHandler;
+}
+
+CUIModule_ContentRegistry* CUIModuleEnvironment::contentRegistry()
+{
+	return m_pContentRegistry;
+}
+
+
 CUIModule::CUIModule(const std::string& sName)
-	: m_sName (sName)
+	: m_sName (sName), m_sUUID (AMCCommon::CUtils::createUUID ())
 {
 
 }
@@ -52,6 +84,10 @@ std::string CUIModule::getName()
 	return m_sName;
 }
 
+std::string CUIModule::getUUID()
+{
+	return m_sUUID;
+}
 
 std::string CUIModule::getNameFromXML(pugi::xml_node& xmlNode)
 {

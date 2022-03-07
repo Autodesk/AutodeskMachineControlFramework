@@ -29,17 +29,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "amc_toolpathentity.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
 
-	CToolpathEntity::CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper)
-		: m_ReferenceCount (0), m_pStorageStream (pStorageStream)
+	CToolpathEntity::CToolpathEntity(LibMCData::PStorageStream pStorageStream, Lib3MF::PWrapper p3MFWrapper, const std::string& sDebugName)
+		: m_ReferenceCount (0), m_pStorageStream (pStorageStream), m_sDebugName (sDebugName)
 	{
-		if (pStorageStream.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-		if (p3MFWrapper.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pStorageStream.get());
+		LibMCAssertNotNull(p3MFWrapper.get());
 
 		void* pReadCallback = nullptr;
 		void* pSeekCallback = nullptr;
@@ -56,9 +54,16 @@ namespace AMC {
 
 		auto pToolpathIterator = m_p3MFModel->GetToolpaths();
 		if (!pToolpathIterator->MoveNext())
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYINVALIDFILE, m_sDebugName);
 
 		m_pToolpath = pToolpathIterator->GetCurrentToolpath();
+
+		auto pBuildItems = m_p3MFModel->GetBuildItems();
+		while (pBuildItems->MoveNext()) {
+			auto pPart = std::make_shared<CToolpathPart>(m_p3MFModel, pBuildItems->GetCurrent());
+			m_PartList.push_back(pPart);
+			m_PartMap.insert(std::make_pair (pPart->getUUID (), pPart));
+		}
 
 
 	}
@@ -71,7 +76,7 @@ namespace AMC {
 	void CToolpathEntity::IncRef()
 	{
 		if (m_ReferenceCount >= AMC_TOOLPATH_MAXREFCOUNT)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR, m_sDebugName);
 
 		m_ReferenceCount++;
 
@@ -80,7 +85,7 @@ namespace AMC {
 	bool CToolpathEntity::DecRef()
 	{
 		if (m_ReferenceCount == 0)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHENTITYREFERENCEERROR, m_sDebugName);
 
 		m_ReferenceCount--;
 		return (m_ReferenceCount == 0);
@@ -100,7 +105,7 @@ namespace AMC {
 
 		auto p3MFLayerData = m_pToolpath->ReadLayerData(nLayerIndex);
 		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
-		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue);
+		return std::make_shared<CToolpathLayerData> (m_pToolpath, p3MFLayerData, dUnits, nZValue, m_sDebugName);
 	}
 
 
@@ -112,6 +117,57 @@ namespace AMC {
 
 	}
 
+	std::string CToolpathEntity::getDebugName()
+	{
+		return m_sDebugName;
+	}
+
+	bool CToolpathEntity::hasMetaData (const std::string& sNameSpace, const std::string& sName)
+	{
+		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
+		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
+		return (pMetaData.get() != nullptr);
+	}
+
+	std::string CToolpathEntity::getMetaDataValue(const std::string& sNameSpace, const std::string& sName)
+	{
+		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
+		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
+		if (pMetaData.get() == nullptr)
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHMETADATANOTFOUND, sNameSpace + "#" + sName);
+		
+		return pMetaData->GetValue();
+	}
+
+	std::string CToolpathEntity::getMetaDataType(const std::string& sNameSpace, const std::string& sName)
+	{
+		auto pMetaDataGroup = m_p3MFModel->GetMetaDataGroup();
+		auto pMetaData = pMetaDataGroup->GetMetaDataByKey(sNameSpace, sName);
+		if (pMetaData.get() == nullptr)
+			throw ELibMCCustomException(LIBMC_ERROR_TOOLPATHMETADATANOTFOUND, sNameSpace + "#" + sName);
+
+		return pMetaData->GetType();
+	}
+
+
+	uint32_t CToolpathEntity::getPartCount()
+	{
+		return (uint32_t) m_PartList.size();
+	}
+
+	PToolpathPart CToolpathEntity::getPart(uint32_t nIndex)
+	{
+		return m_PartList[nIndex];
+	}
+
+	PToolpathPart CToolpathEntity::findPartByUUID(const std::string& sUUID)
+	{
+		auto iIter = m_PartMap.find(sUUID);
+		if (iIter == m_PartMap.end())
+			return nullptr;
+
+		return iIter->second;
+	}
 
 }
 

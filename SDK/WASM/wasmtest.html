@@ -1,0 +1,57 @@
+<!doctypehtml>
+<html lang=en-us>
+	<head>
+		<meta charset=utf-8>
+		<meta content="text/html; charset=utf-8"http-equiv=Content-Type>
+		<title>LibAMCF Test</title>
+	</head>
+
+	<body>
+ 
+		<script type="application/javascript" src="./libamcf_implementation.js"></script> 
+		<script type="application/javascript" src="./libamcf_header.js"></script> 
+		<script type="application/javascript" src="./libamcf_instance.js"></script> 
+				
+		<script type="application/javascript">
+		
+			function log (message)
+			{
+				console.log (message);
+				document.getElementById('log').innerHTML += "<br>" + message;
+			}
+		
+			function onConnectionTest ()
+			{
+				var Version = LibAMCFWrapper.GetVersion ();
+				
+				log ("Major: " + Version.MajorVersion);
+				log ("Minor: " + Version.MinorVersion);
+				log ("Micro: " + Version.MicroVersion);
+			
+				var Connection = LibAMCFWrapper.CreateConnection ("http://localhost:8869/");
+				
+				log ("Connection BaseURL: " + Connection.GetBaseURL ());
+				log ("Connection Timeout: " + Connection.GetTimeout ());
+				log ("Connection Retry Count: " + Connection.GetRetryCount ());
+				
+				var AuthenticationResult = Connection.AuthenticateWithPassword ("test", "test");
+				AuthenticationResult.release ();
+				
+				
+				//var OperationResult = Connection.Ping ();
+				//OperationResult.release ();
+							
+				//Connection.release ();
+			}
+		
+		</script> 
+		
+				
+		<div id="log">Console Output:</div>
+				
+		<button onclick="onConnectionTest()">Connection Test</button>
+		
+		
+			
+	</body>
+</html>

@@ -34,12 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter.hpp"
 #include "amc_parameter_valued.hpp"
 #include "amc_parameter_derived.hpp"
-#include "amc_parameter_instancestate.hpp"
 #include "amc_statejournal.hpp"
 
 #include "amc_jsonwriter.hpp"
+#include "common_utils.hpp"
 
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include "RapidJSON/document.h"
 #include "RapidJSON/stringbuffer.h"
 #include "RapidJSON/writer.h"
@@ -85,15 +85,18 @@ namespace AMC {
 	// No Mutex here!
 	void CParameterGroup::addParameterInternal(PParameter pParameter)
 	{
-		if (pParameter.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameter.get());
 
 		auto sName = pParameter->getName();
 		if (m_Parameters.find(sName) != m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_DUPLICATEPARAMETERNAME);
+			throw ELibMCCustomException(LIBMC_ERROR_DUPLICATEPARAMETERNAME, sName);
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sName))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERNAME, sName);
+
 
 		if (m_ParameterList.size() >= AMC_MAXPARAMETERCOUNT)
-			throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYPARAMETERS);
+			throw ELibMCCustomException(LIBMC_ERROR_TOOMANYPARAMETERS, sName);
 
 		m_Parameters.insert(std::make_pair(sName, pParameter));
 		m_ParameterList.push_back(pParameter);
@@ -111,7 +114,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		sName = pParameter->getName();
@@ -125,7 +128,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		sDescription = iIter->second->getDescription();
 		sDefaultValue = iIter->second->getDefaultValue();
@@ -137,7 +140,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		return pParameter->getStringValue();
@@ -149,7 +152,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		return iIter->second->getStringValue();
 	}
@@ -158,7 +161,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		return pParameter->getDoubleValue();
@@ -170,7 +173,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		return iIter->second->getDoubleValue();
 	}
@@ -179,7 +182,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		return pParameter->getIntValue();
@@ -191,7 +194,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		return iIter->second->getIntValue();
 	}
@@ -200,7 +203,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		return pParameter->getBoolValue();
@@ -212,9 +215,32 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		return iIter->second->getBoolValue();
+	}
+
+
+	eParameterDataType CParameterGroup::getParameterDataTypeByIndex(const uint32_t nIndex)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		if (nIndex >= m_ParameterList.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
+
+		auto pParameter = m_ParameterList[nIndex];
+		return pParameter->getDataType();
+
+	}
+
+	eParameterDataType CParameterGroup::getParameterDataTypeByName(const std::string& sName)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		auto iIter = m_Parameters.find(sName);
+
+		if (iIter == m_Parameters.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
+
+		return iIter->second->getDataType();
 	}
 
 
@@ -222,7 +248,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		pParameter->setStringValue(sValue);
@@ -234,7 +260,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		iIter->second->setStringValue(sValue);
 	}
@@ -243,7 +269,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		pParameter->setDoubleValue(dValue);
@@ -255,7 +281,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		iIter->second->setDoubleValue(dValue);
 
@@ -265,7 +291,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		pParameter->setIntValue(nValue);
@@ -278,7 +304,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		iIter->second->setIntValue(nValue);
 
@@ -288,7 +314,7 @@ namespace AMC {
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		if (nIndex >= m_ParameterList.size())
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDINDEX);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sName);
 
 		auto pParameter = m_ParameterList[nIndex];
 		pParameter->setBoolValue(bValue);
@@ -300,7 +326,7 @@ namespace AMC {
 		auto iIter = m_Parameters.find(sName);
 
 		if (iIter == m_Parameters.end())
-			throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 		iIter->second->setBoolValue(bValue);
 
@@ -326,20 +352,20 @@ namespace AMC {
 		document.Parse(sJSON.c_str ());
 
 		if (!document.IsObject())
-			throw ELibMCInterfaceException(LIBMC_ERROR_COULDNOTPARSEJSON);
+			throw ELibMCCustomException(LIBMC_ERROR_COULDNOTPARSEJSON, m_sName);
 
 		for (rapidjson::Value::ConstMemberIterator itr = document.MemberBegin();
 			itr != document.MemberEnd(); ++itr)
 		{
 			if (!itr->value.IsString()) 
-				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDJSONFORMAT);
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDJSONFORMAT, m_sName);
 
 			std::string sName = itr->name.GetString();
 			std::string sValue = itr->value.GetString();
 
 			auto iIter = m_Parameters.find(sName);
 			if (iIter == m_Parameters.end())
-				throw ELibMCInterfaceException(LIBMC_ERROR_PARAMETERNOTFOUND);
+				throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sName);
 
 			iIter->second->setStringValue(sValue);
 		}
@@ -347,8 +373,7 @@ namespace AMC {
 
 	void CParameterGroup::copyToGroup (CParameterGroup* pParameterGroup)
 	{
-		if (pParameterGroup == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterGroup);
 
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
 		for (auto pParameter : m_ParameterList) {
@@ -360,8 +385,7 @@ namespace AMC {
 
 	void CParameterGroup::addDerivativesFromGroup(PParameterGroup pParameterGroup)
 	{
-		if (pParameterGroup == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterGroup);
 
 		auto nCount = pParameterGroup->getParameterCount();
 
@@ -376,8 +400,7 @@ namespace AMC {
 
 	void CParameterGroup::addDuplicatesFromGroup(CParameterGroup* pParameterGroup)
 	{
-		if (pParameterGroup == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterGroup);
 
 		pParameterGroup->copyToGroup(this);
 
@@ -392,7 +415,7 @@ namespace AMC {
 		if (m_pStateJournal != nullptr)
 			nVariableID = m_pStateJournal->registerStringValue(m_sInstanceName + "." + m_sName + "." + sName, sDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued> (sName, sDescription, sDefaultValue, eParameterDataType::String, m_pStateJournal, nVariableID));
 	}
 
 	void CParameterGroup::addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits)
@@ -403,7 +426,7 @@ namespace AMC {
 		if (m_pStateJournal != nullptr)
 			nVariableID = m_pStateJournal->registerDoubleValue(m_sInstanceName + "." + m_sName + "." + sName, dDefaultValue, dUnits);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, dDefaultValue, eParameterDataType::Double, m_pStateJournal, nVariableID));
 	}
 
 	void CParameterGroup::addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue)
@@ -414,7 +437,7 @@ namespace AMC {
 		if (m_pStateJournal != nullptr)
 			nVariableID = m_pStateJournal->registerIntegerValue(m_sInstanceName + "." + m_sName + "." + sName, nDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, nDefaultValue, eParameterDataType::Integer, m_pStateJournal, nVariableID));
 	}
 
 	void CParameterGroup::addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue)
@@ -425,7 +448,18 @@ namespace AMC {
 		if (m_pStateJournal != nullptr)
 			nVariableID = m_pStateJournal->registerBooleanValue(m_sInstanceName + "." + m_sName + "." + sName, bDefaultValue);
 
-		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, m_pStateJournal, nVariableID));
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, bDefaultValue, eParameterDataType::Bool, m_pStateJournal, nVariableID));
+	}
+
+	void CParameterGroup::addNewUUIDParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		uint32_t nVariableID = 0;
+		if (m_pStateJournal != nullptr)
+			nVariableID = m_pStateJournal->registerStringValue(m_sInstanceName + "." + m_sName + "." + sName, sDefaultValue);
+
+		addParameterInternal(std::make_shared<CParameter_Valued>(sName, sDescription, AMCCommon::CUtils::normalizeUUIDString (sDefaultValue), eParameterDataType::UUID, m_pStateJournal, nVariableID));
 	}
 
 
@@ -436,11 +470,16 @@ namespace AMC {
 			addNewStringParameter(sName, sDescription, sDefaultValue);
 
 		}
-		else if (sType == "int") {
+		else if (sType == "uuid") {
+
+			addNewUUIDParameter(sName, sDescription, sDefaultValue);
+
+		}
+		else if ((sType == "int") || (sType == "integer")) {
 
 			int64_t nValue = 0;			
 			if (sDefaultValue.length() > 0)
-				nValue = std::stoll(sDefaultValue);
+				nValue = AMCCommon::CUtils::stringToInteger(sDefaultValue);
 
 			addNewIntParameter(sName, sDescription, nValue);
 
@@ -449,7 +488,7 @@ namespace AMC {
 
 			bool bValue = false;
 			if (sDefaultValue.length() > 0)
-				bValue = std::stoi(sDefaultValue) != 0;
+				bValue = AMCCommon::CUtils::stringToInteger(sDefaultValue) != 0;
 			addNewBoolParameter(sName, sDescription, bValue);
 
 		}
@@ -457,37 +496,27 @@ namespace AMC {
 
 			double dValue = 0.0;
 			if (sDefaultValue.length() > 0)
-				dValue = std::stod(sDefaultValue);
+				dValue = AMCCommon::CUtils::stringToDouble(sDefaultValue);
 
 			double dUnits = 0.0;
 			if (sUnits.length() > 0)
-				dUnits = std::stod(sUnits);
+				dUnits = AMCCommon::CUtils::stringToDouble(sUnits);
 
 			addNewDoubleParameter(sName, sDescription, dValue, dUnits);
 		}
 		else
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAMETERTYPE);
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERTYPE, sName);
 	}
 
 
 	void CParameterGroup::addNewDerivedParameter(const std::string& sName, AMC::PParameterGroup pParameterGroup, const std::string& sSourceParameterName)
 	{
 		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
-		if (pParameterGroup.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pParameterGroup.get());
 
 		addParameterInternal(std::make_shared<CParameter_Derived>(sName, pParameterGroup, sSourceParameterName));
 
 	}
-
-	void CParameterGroup::addNewInstanceStateParameter(const std::string& sName, const std::string& sDescription)
-	{
-		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
-
-		addParameterInternal(std::make_shared<CParameter_InstanceState>(sName, sDescription));
-
-	}
-
 
 
 	void CParameterGroup::removeValue(const std::string& sName)
@@ -509,6 +538,41 @@ namespace AMC {
 	{
 		m_pStateJournal = pStateJournal;
 		m_sInstanceName = sInstanceName;
+	}
+
+
+	void CParameterGroup::setParameterPersistentUUID(const std::string& sParameterName, const std::string& sPersistentUUID)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+
+		auto iIter = m_Parameters.find(sParameterName);
+		if (iIter == m_Parameters.end())
+			throw ELibMCCustomException(LIBMC_ERROR_PARAMETERNOTFOUND, m_sName + "/" + sParameterName);
+		auto pValuedParameter = std::dynamic_pointer_cast<CParameter_Valued> (iIter->second);
+		if (pValuedParameter.get() == nullptr)
+			throw ELibMCCustomException(LIBMC_ERROR_ONLYVALUEDPARAMETERSCANBEPERSISTENT, m_sName + "/" + sParameterName);
+
+		if (!sPersistentUUID.empty()) {
+			std::string sNormalizedUUID = AMCCommon::CUtils::normalizeUUIDString(sPersistentUUID);
+			pValuedParameter->enablePersistency(m_sName + "." + pValuedParameter->getName(), sNormalizedUUID);
+
+		}
+		else {
+
+			pValuedParameter->disablePersistency();
+		}
+
+	}
+
+	void CParameterGroup::updateParameterPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler)
+	{
+		std::lock_guard <std::mutex> lockGuard(m_GroupMutex);
+		for (auto pParameter : m_ParameterList) {
+			auto pValuedParameter = std::dynamic_pointer_cast<CParameter_Valued> (pParameter);
+			if (pValuedParameter.get() != nullptr)
+				pValuedParameter->setPersistencyHandler (pPersistencyHandler);
+		}
+
 	}
 
 

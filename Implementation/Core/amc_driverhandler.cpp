@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_toolpathhandler.hpp"
 
 #include "libmcenv_driverenvironment.hpp"
-#include "libmc_interfaceexception.hpp"
-
+#include "libmc_exceptiontypes.hpp"
+#include "amc_logger.hpp"
 
 #include <vector>
 #include <memory>
@@ -47,13 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler)
-	: m_pEnvironmentWrapper (pEnvironmentWrapper), m_pToolpathHandler (pToolpathHandler)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger)
+	: m_pEnvironmentWrapper (pEnvironmentWrapper), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger)
 {
-	if (pEnvironmentWrapper.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
-	if (pToolpathHandler.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+	LibMCAssertNotNull(pEnvironmentWrapper.get());
+	LibMCAssertNotNull(pToolpathHandler.get());
+	LibMCAssertNotNull(pLogger.get());
+	
 }
 
 
@@ -68,7 +68,7 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
 	if (findDriver(sName, false) != nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_DRIVERALREADYREGISTERED);
+		throw ELibMCCustomException(LIBMC_ERROR_DRIVERALREADYREGISTERED, sName);
 
 	if (m_sTempBasePath.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_TEMPBASEPATHEMPTY);
@@ -76,15 +76,15 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	PResourcePackage pResourcePackage;
 	if (!sResourcePath.empty()) {
 		auto pStream = std::make_shared <AMCCommon::CImportStream_Native> (sResourcePath);
-		pResourcePackage = CResourcePackage::makeFromStream(pStream);
+		pResourcePackage = CResourcePackage::makeFromStream(pStream, sResourcePath);
 	}
 	else {
-		pResourcePackage = CResourcePackage::makeEmpty();
+		pResourcePackage = CResourcePackage::makeEmpty(sResourcePath);
 	}
 
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_pToolpathHandler, m_sTempBasePath);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_pToolpathHandler, m_sTempBasePath, m_pLogger, sName);
 
 	pInternalEnvironment->setIsInitializing(true);
 
@@ -105,7 +105,7 @@ CDriver* CDriverHandler::findDriver(const std::string& sName, bool bFailIfNotExi
 		return iIterator->second.get();
 
 	if (bFailIfNotExisting)
-		throw ELibMCInterfaceException(LIBMC_ERROR_DRIVERNOTFOUND);
+		throw ELibMCCustomException(LIBMC_ERROR_DRIVERNOTFOUND, sName);
 
 	return nullptr;
 }

@@ -40,20 +40,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Libraries/PugiXML/pugixml.hpp"
 #include "Core/amc_jsonwriter.hpp"
+#include "amc_ui_interfaces.hpp"
+
+namespace LibMCData {
+	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
+}
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);
+	amcDeclareDependingClass(CUIModuleFactory, PUIModuleFactory);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+
+	class CUIModuleEnvironment {
+	private:
+		PStateMachineData m_pStateMachineData;
+		PResourcePackage m_pResourcePackage;
+		LibMCData::PBuildJobHandler m_pBuildJobHandler;
+		CUIModule_ContentRegistry* m_pContentRegistry;
+
+	public:
+		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry);
+
+		PStateMachineData stateMachineData();
+		PResourcePackage resourcePackage();
+		LibMCData::PBuildJobHandler buildJobHandler ();
+		CUIModule_ContentRegistry* contentRegistry ();
+
+	};
 
 	class CUIModule {
 	protected:
 		std::string m_sName;
+		std::string m_sUUID;
 		
-		static std::string getNameFromXML(pugi::xml_node& xmlNode);
-		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
-
 	public:
 
 		CUIModule(const std::string & sName);	
@@ -64,9 +89,23 @@ namespace AMC {
 
 		virtual std::string getType() = 0;
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject) = 0;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject & moduleObject, CParameterHandler* pClientVariableHandler) = 0;
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) = 0;
+
+		virtual std::string getCaption() = 0;
+
+		virtual std::string getUUID();
+
+		virtual void populateItemMap (std::map<std::string, PUIModuleItem> & itemMap) = 0;
+
+		static std::string getNameFromXML(pugi::xml_node& xmlNode);
+		static std::string getTypeFromXML(pugi::xml_node& xmlNode);
+
+		virtual void configurePostLoading() = 0;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler) = 0;
+
 
 	};
 

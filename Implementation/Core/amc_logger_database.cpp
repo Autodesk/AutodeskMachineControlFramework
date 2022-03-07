@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "amc_logger_database.hpp"
-#include "libmc_interfaceexception.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #define AMC_MAXLOGMESSAGE_REQUESTCOUNT 1024
 
@@ -40,9 +40,7 @@ namespace AMC {
 		: m_pLogSession (pLogSession),
 		m_MaxLogMessageRequestCount (AMC_MAXLOGMESSAGE_REQUESTCOUNT)
 	{
-
-		if (pLogSession.get() == nullptr)
-			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+		LibMCAssertNotNull(pLogSession.get());
 
 	}
 	

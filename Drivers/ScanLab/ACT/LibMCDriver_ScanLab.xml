@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
-	libraryname="MC Driver ScanLab RTC5" namespace="LibMCDriver_ScanLab" copyright="Autodesk Inc." year="2020" basename="libmcdriver_scanlab"
+	libraryname="MC Driver ScanLab RTC6" namespace="LibMCDriver_ScanLab" copyright="Autodesk Inc." year="2020" basename="libmcdriver_scanlab"
 	version="1.0.0">
 	<license>
 		<line value="All rights reserved." />
@@ -82,6 +82,10 @@
 		<error name="CARDNOTINITIALIZED" code="1029" description="Scanlab RTC card is not initialized" />		
 		<error name="INVALIDPOINTCOUNT" code="1030" description="Invalid point count" />
 		<error name="INVALIDMAXLASERPOWER" code="1031" description="Invalid max laser power." />
+		<error name="INVALIDLASERDELAY" code="1032" description="Invalid laser delay." />
+		<error name="INVALIDSCANNERDELAY" code="1033" description="Invalid scanner delay." />
+		
+		
 		
 		
 	</errors>
@@ -257,7 +261,7 @@ Custom implementation
 		
 
 
-		<method name="SetDelays" description="Sets the laser delays (on the list)">
+		<method name="SetDelays" description="Sets the laser delays">
 			<param name="MarkDelay" type="uint32" pass="in" description="Mark delay in microseconds (MUST be multiple of 10)" />
 			<param name="JumpDelay" type="uint32" pass="in" description="Jump delay in microseconds (MUST be multiple of 10)" />
 			<param name="PolygonDelay" type="uint32" pass="in" description="Polygon delay in microseconds (MUST be multiple of 10)" />
@@ -302,8 +306,36 @@ Custom implementation
 			<param name="Position" type="uint32" pass="out" description="Returns current executed position" />
 		</method>
 
+		<method name="GetHeadStatus" description="Returns status of scan head">
+			<param name="HeadNo" type="uint32" pass="in" description="Head Number" />
+			<param name="PositionXisOK" type="bool" pass="out" description="Position X is ok" />
+			<param name="PositionYisOK" type="bool" pass="out" description="Position Y is ok" />
+			<param name="TemperatureisOK" type="bool" pass="out" description="Temperature is ok" />
+			<param name="PowerisOK" type="bool" pass="out" description="Power is ok" />
+		</method>
+
+		<method name="GetStateValues" description="Returns status values of scan head">
+			<param name="LaserIsOn" type="bool" pass="out" description="Laser is on" />
+			<param name="PositionX" type="uint32" pass="out" description="Current Position X in Units" />
+			<param name="PositionY" type="uint32" pass="out" description="Current Position Y in Units" />
+			<param name="PositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
+			<param name="CorrectedPositionX" type="uint32" pass="out" description="Current Position X in Units" />
+			<param name="CorrectedPositionY" type="uint32" pass="out" description="Current Position Y in Units" />
+			<param name="CorrectedPositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
+			<param name="FocusShift" type="uint32" pass="out" description="Current Focus Shift in Units" />
+			<param name="MarkSpeed" type="uint32" pass="out" description="Current Mark Speed in Units" />
+		</method>
+
 		<method name="GetInputPointer" description="returns current input list position">
 			<param name="Position" type="uint32" pass="return" description="Returns current position of open list" />
+		</method>
+
+		<method name="GetRTCVersion" description="Returns version information of the RTC Card">
+			<param name="RTCVersion" type="uint32" pass="out" description="RTC Card Version" />
+			<param name="RTCType" type="uint32" pass="out" description="RTC Card Type" />
+			<param name="DLLVersion" type="uint32" pass="out" description="RTC DLL Version" />
+			<param name="HEXVersion" type="uint32" pass="out" description="RTC HEX Version" />
+			<param name="BIOSVersion" type="uint32" pass="out" description="RTC BIOS Version" />
 		</method>
 						
 	</class>
@@ -371,9 +403,16 @@ Custom implementation
 	</class>
 
 
-	<class name="Driver_ScanLab_RTC5" parent="Driver_ScanLab" description="A LaserScanner Driver for a single laser ScanLAB RTC5 card.">
+	<class name="Driver_ScanLab_RTC6" parent="Driver_ScanLab" description="A LaserScanner Driver for a single laser ScanLAB RTC6 card.">
 
-		<method name="Initialise" description="Initializes the RTC5 Scanner Driver.">
+		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
+		</method>
+		
+		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
+			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
+		</method>		
+
+		<method name="Initialise" description="Initializes the RTC6 Scanner Driver.">
 			<param name="IP" type="string" pass="in" description="IP Network Address. Empty string for local card." />
 			<param name="Netmask" type="string" pass="in" description="IP Netmask Address. Empty string for local card." />
 			<param name="Timeout" type="uint32" pass="in" description="Time out in microseconds." />
@@ -406,6 +445,15 @@ Custom implementation
 			<param name="SetDigitalInOneHighActive" type="bool" pass="in" description="Set Digital In 1 high Active" />
 			<param name="OutputSynchronizationActive" type="bool" pass="in" description="Output synchronization active" />
 		</method>
+
+		<method name="ConfigureDelays" description="Configures the default laser and scanner delays.">
+			<param name="LaserOnDelay" type="double" pass="in" description="Laser On Delay in Microseconds" />
+			<param name="LaserOffDelay" type="double" pass="in" description="Laser Off Delay in Microseconds" />
+			<param name="MarkDelay" type="double" pass="in" description="Mark delay in microseconds (will be rounded to a multiple of 10)" />
+			<param name="JumpDelay" type="double" pass="in" description="Jump delay in microseconds (will be rounded to a multiple of 10)" />
+			<param name="PolygonDelay" type="double" pass="in" description="Polygon delay in microseconds (will be rounded to a multiple of 10)" />		
+		</method>
+
 
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />

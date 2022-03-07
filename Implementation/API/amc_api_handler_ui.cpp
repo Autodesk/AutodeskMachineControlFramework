@@ -33,6 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_handler.hpp"
 #include "amc_ui_module_item.hpp"
 
+#define __AMCIMPL_UI_DIALOG
+#define __AMCIMPL_UI_PAGE
+#define __AMCIMPL_UI_MODULE
+
+#include "amc_ui_page.hpp"
+#include "amc_ui_dialog.hpp"
+#include "amc_ui_module.hpp"
+
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
 
@@ -115,7 +123,7 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 	std::string sParameterUUID;
 	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
 
-	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage) || (uiType == APIHandler_UIType::utContentItem)) {
+	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage)) {
 
 		bNeedsToBeAuthorized = false;
 		bCreateNewSession = false;
@@ -142,7 +150,7 @@ void CAPIHandler_UI::handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pA
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	m_pSystemState->uiHandler()->writeConfigurationToJSON(writer);
+	m_pSystemState->uiHandler()->writeConfigurationToJSON(writer, pAuth->getClientVariableHandler ().get());
 }
 
 void CAPIHandler_UI::handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth)
@@ -150,7 +158,7 @@ void CAPIHandler_UI::handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth)
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	m_pSystemState->uiHandler()->writeStateToJSON(writer);
+	m_pSystemState->uiHandler()->writeStateToJSON(writer, pAuth->getClientVariableHandler().get());
 }
 
 
@@ -199,7 +207,7 @@ void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::st
 		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND);
 
 	CJSONWriterObject object(writer);
-	pModuleItem->addContentToJSON(writer, object);
+	pModuleItem->addContentToJSON(writer, object, pAuth->getClientVariableHandler ().get());
 	writer.addString(AMC_API_KEY_UI_ITEMUUID, sParameterUUID);
 	writer.addObject(AMC_API_KEY_UI_CONTENT, object);
 }
@@ -215,9 +223,59 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 	CAPIJSONRequest apiRequest(pBodyData, nBodyDataSize);
 	auto sEventName = apiRequest.getNameString(AMC_API_KEY_UI_EVENTNAME, LIBMC_ERROR_EVENTNAMENOTFOUND);
 	auto sSenderUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTSENDER, LIBMC_ERROR_INVALIDEVENTSENDER);
-	auto sContextUUID = apiRequest.getUUID(AMC_API_KEY_UI_EVENTCONTEXT, LIBMC_ERROR_INVALIDEVENTCONTEXT);
 
-	m_pSystemState->uiHandler()->handleEvent(sEventName, sSenderUUID, sContextUUID);
+	std::string sFormValueJSON;
+	if (apiRequest.hasValue(AMC_API_KEY_UI_FORMVALUEJSON)) {
+		sFormValueJSON = apiRequest.getJSONObjectString(AMC_API_KEY_UI_FORMVALUEJSON, LIBMC_ERROR_INVALIDFORMVALUES);
+	}
+
+	auto pUIHandler = m_pSystemState->uiHandler();
+
+	auto pEventResult = pUIHandler->handleEvent(sEventName, sSenderUUID, sFormValueJSON, pAuth->getClientVariableHandler ());
+
+	CJSONWriterArray contentUpdateNode(writer);
+
+	if (pEventResult.getErrorCode())
+	{
+		writer.addInteger(AMC_API_KEY_UI_EVENTERRORCODE, pEventResult.getErrorCode ());
+		writer.addString(AMC_API_KEY_UI_EVENTERRORMESSAGE, pEventResult.getErrorMessage());
+	} 
+	else {
+		if (pEventResult.closeModalDialog()) {
+			writer.addInteger(AMC_API_KEY_UI_EVENTCLOSEDIALOGS, 1);
+		}
+		else {
+			if (pEventResult.hasDialogToShow()) {
+				std::string sDialogName = pEventResult.getDialogToShow();
+				writer.addString(AMC_API_KEY_UI_EVENTDIALOGTOSHOW, sDialogName);
+
+				// Update state of dialog to open
+				auto pDialog = pUIHandler->findDialog(sDialogName);
+				if (pDialog) {
+					pDialog->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
+				}
+			}
+		}
+		if (pEventResult.hasPageToActivate()) {
+			std::string sPageName = pEventResult.getPageToActivate();
+			writer.addString(AMC_API_KEY_UI_EVENTPAGETOACTIVATE, sPageName);
+
+			// Update state of page to open
+			auto pPage = pUIHandler->findPage(sPageName);
+			if (pPage) {
+				pPage->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
+			}
+
+		}
+
+		
+	}
+
+	if (!contentUpdateNode.isEmpty()) {
+		writer.addArray(AMC_API_KEY_UI_CONTENTUPDATE, contentUpdateNode);
+	}
+
+
 }
 
 

@@ -39,6 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <mutex>
 
+#include "amc_parametertype.hpp"
+
+namespace LibMCData {
+
+	class CPersistencyHandler;
+	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
+
+}
+
+
 namespace AMC {
 
 	class CParameter;
@@ -81,10 +91,10 @@ namespace AMC {
 		void addNewDoubleParameter(const std::string& sName, const std::string& sDescription, const double dDefaultValue, const double dUnits);
 		void addNewIntParameter(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue);
 		void addNewBoolParameter(const std::string& sName, const std::string& sDescription, const bool bDefaultValue);
-
+		void addNewUUIDParameter(const std::string& sName, const std::string& sDescription, const std::string& sDefaultValue);
 		void addNewTypedParameter(const std::string& sName, const std::string& sType, const std::string& sDescription, const std::string& sDefaultValue, const std::string& sUnits);
+
 		void addNewDerivedParameter(const std::string& sName, AMC::PParameterGroup pParameterGroup, const std::string& sSourceParameterName);
-		void addNewInstanceStateParameter(const std::string& sName, const std::string& m_sDescription);
 
 		uint32_t getParameterCount();
 		void getParameterInfo(const uint32_t nIndex, std::string & sName, std::string & sDescription, std::string & sDefaultValue);		
@@ -98,6 +108,9 @@ namespace AMC {
 		int64_t getIntParameterValueByName(const std::string& sName);
 		bool getBoolParameterValueByIndex(const uint32_t nIndex);
 		bool getBoolParameterValueByName(const std::string& sName);
+
+		eParameterDataType getParameterDataTypeByIndex(const uint32_t nIndex);
+		eParameterDataType getParameterDataTypeByName(const std::string& sName);
 
 		void setParameterValueByIndex(const uint32_t nIndex, const std::string & sValue);
 		void setParameterValueByName(const std::string& sName, const std::string& sValue);
@@ -119,6 +132,9 @@ namespace AMC {
 		void addDuplicatesFromGroup(CParameterGroup * pParameterGroup);
 
 		void setJournal(PStateJournal pStateJournal, const std::string & sInstanceName);
+
+		void setParameterPersistentUUID (const std::string& sParameterName, const std::string& sPersistentUUID);
+		void updateParameterPersistencyHandler (LibMCData::PPersistencyHandler pPersistencyHandler);
 
 	};
 
