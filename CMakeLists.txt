@@ -440,23 +440,23 @@ add_custom_command(
 endif()
 
 if(UNIX)
-if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*arm.*")
+  if (CMAKE_SYSTEM_PROCESSOR MATCHES ".*arm.*")
 
-add_custom_command(
-	TARGET copy_distribution_libraries POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Artifacts/lib3mf/lib3mf_arm32.so
-			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
+    add_custom_command(
+	    TARGET copy_distribution_libraries POST_BUILD
+	    COMMAND ${CMAKE_COMMAND} -E copy
+			  ${CMAKE_CURRENT_SOURCE_DIR}/Artifacts/lib3mf/lib3mf_arm32.so
+			  ${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
 
-else()
+  else()
 
-add_custom_command(
-	TARGET copy_distribution_libraries POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy
-			${CMAKE_CURRENT_SOURCE_DIR}/Artifacts/lib3mf/lib3mf_linux64.so
-			${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
+    add_custom_command(
+	    TARGET copy_distribution_libraries POST_BUILD
+	    COMMAND ${CMAKE_COMMAND} -E copy
+			  ${CMAKE_CURRENT_SOURCE_DIR}/Artifacts/lib3mf/lib3mf_linux64.so
+			  ${PROJECT_BINARY_DIR}/Output/${GLOBALGITHASH}_core_lib3mf.so)
 
-endif()
+  endif()
 endif()
 
 

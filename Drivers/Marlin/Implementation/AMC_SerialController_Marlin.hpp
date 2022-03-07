@@ -30,6 +30,8 @@ namespace AMC {
 		double m_dAxisStepsPerUnitZ;
 		double m_dAxisStepsPerUnitE;
 
+		double m_dExtruderSumE;
+
 		double m_dPidValueP;
 		double m_dPidValueI;
 		double m_dPidValueD;

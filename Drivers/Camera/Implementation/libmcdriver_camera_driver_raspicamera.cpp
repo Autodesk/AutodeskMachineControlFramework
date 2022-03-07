@@ -37,6 +37,9 @@ Abstract: This is a stub class definition of CDriver_RaspiCamera
 #include "libmcdriver_camera_pngimage.hpp"
 
 // Include custom headers here.
+#ifndef _WIN32
+#include "raspicamera.h"
+#endif
 
 
 using namespace LibMCDriver_Camera::Impl;
@@ -46,7 +49,7 @@ using namespace LibMCDriver_Camera::Impl;
 **************************************************************************************************************************/
 
 CDriver_RaspiCamera::CDriver_RaspiCamera(const std::string& sName, const std::string& sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : CDriver_Camera (sName, sType), m_pDriverEnvironment (pDriverEnvironment)
+    : CDriver_Camera (sName, sType), m_pDriverEnvironment (pDriverEnvironment), m_pCamera(NULL)
 {
     if (pDriverEnvironment.get() == nullptr)
         throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_INVALIDPARAM);
@@ -69,25 +72,29 @@ IRaspiCameraDeviceIterator* CDriver_RaspiCamera::QueryDevices()
 
 void CDriver_RaspiCamera::Initialize(const std::string & sDeviceString, const LibMCDriver_Camera_uint32 nWidth, const LibMCDriver_Camera_uint32 nHeight, const LibMCDriver_Camera::eImagePixelFormat ePixelformat)
 {
-    // Successful
+#ifndef _WIN32
+    // m_pCamera.reset();
+    m_pCamera = new RaspiCamera ();
+    m_pCamera->Settings.Width = 640;
+    m_pCamera->Settings.Height = 480;
+    m_pCamera->Initialize();
+#endif // _WIN32
 
 }
 
 IPNGImage* CDriver_RaspiCamera::CapturePNGImage()
 {
-    auto pImage = std::make_unique<CPNGImage>(400, 300, eImagePixelFormat::RGB32);
+#ifndef _WIN32
+    auto pImage = std::make_unique<CPNGImage>(m_pCamera->Settings.Width, m_pCamera->Settings.Height, eImagePixelFormat::RGB32);
 
-    std::vector <uint8_t>& pData = pImage->getBinaryData();
+    std::vector<uint8_t>& pData = pImage->getBinaryData();
 
-    pData.push_back('t');
-    pData.push_back('e');
-    pData.push_back('s');
-    pData.push_back('t');
-    pData.push_back('1');
-    pData.push_back('2');
-    pData.push_back('3');
+    m_pCamera->Capture(&pData);
 
     return pImage.release();
+#else
+    throw ELibMCDriver_CameraInterfaceException(LIBMCDRIVER_CAMERA_ERROR_NOTIMPLEMENTED);
+#endif // _WIN32
 }
 
 void CDriver_RaspiCamera::QueryParameters()

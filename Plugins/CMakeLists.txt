@@ -30,10 +30,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.5)
 
-project("SLMDemoSystem")
+project("AMCPlugins")
 
 add_subdirectory(Main)
 add_subdirectory(PLC)
 add_subdirectory(Laser)
+add_subdirectory(PIDControl)
+add_subdirectory(PrinterConnection)
 add_subdirectory(UI)
 

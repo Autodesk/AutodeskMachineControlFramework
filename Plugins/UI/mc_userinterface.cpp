@@ -116,296 +116,180 @@ public:
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
-		pUIEnvironment->LogMessage("Clicked on StartBuild Button");
-
-		auto sBuildUUID = pUIEnvironment->GetMachineParameterAsUUID("main", "jobinfo", "jobuuid");
-		pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);
-
-		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startbuild");
+		auto sJobUUID = pUIEnvironment->GetEventContext();
+		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startjob");
+		pSignal->SetString("jobuuid", sJobUUID);
 		pSignal->Trigger();
 
-		pUIEnvironment->ActivatePage("buildstatus");
+		if (!pSignal->WaitForHandling(2000))
+			pUIEnvironment->LogWarning("Could not start job");
 
 	}
 
 };
 
 
-/*************************************************************************************************************************
- Class declaration of CEvent_StartBuild
-**************************************************************************************************************************/
-
-class CEvent_NewLayerStarted : public virtual CEvent {
+class CEvent_Connect : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "newlayerstarted";
+		return "connect";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
-		auto nCurrentLayer = pUIEnvironment->GetMachineParameterAsInteger("main", "jobinfo", "currentlayer");
-
-		pUIEnvironment->LogMessage("New layer started: " + std::to_string (nCurrentLayer));
-		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", nCurrentLayer);
-
-	}
-
-};
-
-
-class CEvent_ChangeManualValues : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "changemanualvalues";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-
-		double dO2Value = pUIEnvironment->GetMachineParameterAsDouble("main", "processsettings", "targeto2");
-		double dGasFlowSpeed = pUIEnvironment->GetMachineParameterAsDouble("main", "processsettings", "gasflowspeed");
-		double dRecoaterSpeed = pUIEnvironment->GetMachineParameterAsDouble("main", "processsettings", "recoaterspeed");
-		pUIEnvironment->SetUIPropertyAsDouble("testdialog.infobox.processparameters.o2_value", "value", dO2Value);
-		pUIEnvironment->SetUIPropertyAsDouble("testdialog.infobox.processparameters.gasflowspeed", "value", dGasFlowSpeed);
-		pUIEnvironment->SetUIPropertyAsDouble("testdialog.infobox.processparameters.recoaterspeed", "value", dRecoaterSpeed);
-
-		pUIEnvironment->ActivateModalDialog("testdialog");
-
-	}
-
-};
-
-
-class CEvent_OnProcessParameterSave : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "onprocessparametersave";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-
-		auto dO2Value = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.o2_value", "value");
-		auto dGasFlowSpeed = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.gasflowspeed", "value");
-		auto dRecoaterSpeed = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.recoaterspeed", "value");
-
-		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_changeprocesssettings");
-		pSignal->SetDouble("targeto2", dO2Value);
-		pSignal->SetDouble("gasflowspeed", dGasFlowSpeed);
-		pSignal->SetDouble("recoaterspeed", dRecoaterSpeed);
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_connect");
 		pSignal->Trigger();
 
+		if (!pSignal->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not connect printer");
 
-		pUIEnvironment->CloseModalDialog();
-	}
-
-};
-
-class CEvent_OnProcessParameterCancel : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "onprocessparametercancel";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-
-		pUIEnvironment->CloseModalDialog();
-	}
-
-};
-
-class CEvent_OnUploadFinished : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "onuploadfinished";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-		auto sSender = pUIEnvironment->RetrieveEventSender();
-		pUIEnvironment->LogMessage("Uploaded success from " + sSender);
-
-		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "uploaduuid");
-		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
-
-		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 2);
-
-		pUIEnvironment->ActivatePage("previewbuild");
 	}
 
 };
 
 
-class CEvent_OnUnloadBuildPreview : public virtual CEvent {
+class CEvent_Disconnect : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "unloadbuildpreview";
+		return "disconnect";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
-		pUIEnvironment->LogMessage("Unloading build preview...");
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
-		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", "");
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
-	}
-
-};
-
-
-
-class CEvent_OnSelectBuild : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "onselectbuild";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-		auto sSender = pUIEnvironment->RetrieveEventSender();
-		pUIEnvironment->LogMessage("Build item selected from " + sSender);
-
-		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
-		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
-
-		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 2);
-
-		pUIEnvironment->ActivatePage("previewbuild");
-	}
-
-};
-
-
-class CEvent_OnChangeSimulationParameterEvent : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "changesimulationparameter";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-		auto sSender = pUIEnvironment->RetrieveEventSender();
-		pUIEnvironment->LogMessage("Change simulation parameter from " + sSender);
-
-		bool bValue = pUIEnvironment->GetUIPropertyAsBool(sSender, "value");
-		pUIEnvironment->LogMessage("Change " + sSender + " to " + std::to_string (bValue));
-
-		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_changesimulationparameters");
-		pSignal->SetBool("simulatelaser", pUIEnvironment->GetUIPropertyAsBool("main.infobox.simulationparameters.simulatelaser", "value"));
-		pSignal->SetBool("simulateplc", pUIEnvironment->GetUIPropertyAsBool("main.infobox.simulationparameters.simulateplc", "value"));
-		pSignal->Trigger();
-	}
-
-};
-
-
-class CEvent_TestMovement : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "testmovement";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-
-		pUIEnvironment->LogMessage("Clicked on TestMovement Button");
-
-		auto pSignal = pUIEnvironment->PrepareSignal("plc", "signal_recoatlayer");
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_disconnect");
 		pSignal->Trigger();
 
+		if (!pSignal->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not disconnect printer");
 
 	}
 
 };
 
 
-class CEvent_PauseBuild : public virtual CEvent {
+class CEvent_Home : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "pausebuild";
+		return "home";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
-		pUIEnvironment->LogMessage("Clicked on Pause Build");
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_dohoming");
+		pSignal->Trigger();
+
+		if (!pSignal->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not home printer");
 
 	}
 
 };
 
 
-class CEvent_CancelBuild : public virtual CEvent {
+class CEvent_EmergencyStop : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "cancelbuild";
+		return "emergencystop";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
-		pUIEnvironment->LogMessage("Clicked on Cancel Build");
+		auto pSignal = pUIEnvironment->PrepareSignal("printerconnection", "signal_emergencystop");
+		pSignal->Trigger();
+
+		if (!pSignal->WaitForHandling(1000))
+			pUIEnvironment->LogWarning("Could not perform emergency stop");
 
 	}
 
 };
 
-
-class CEvent_ResumeBuild : public virtual CEvent {
+class CEvent_ResetFatalError : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "resumebuild";
+		return "resetfatalerror";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
-		pUIEnvironment->LogMessage("Clicked on Resume Build");
+		auto pSignalMain = pUIEnvironment->PrepareSignal("main", "signal_resetfatalerror");
+		pSignalMain->Trigger();
+
+		if (!pSignalMain->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Could not reset state machine main after fatal error");
+
+		auto pSignalPrinterconnection = pUIEnvironment->PrepareSignal("printerconnection", "signal_resetfatalerror");
+		pSignalPrinterconnection->Trigger();
+
+		if (!pSignalPrinterconnection->WaitForHandling(10000))
+			pUIEnvironment->LogWarning("Culd not reset state machine printerconnection after fatal error");
 
 	}
 
 };
+
+class CEvent_ClearTemperatureAndFan : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "cleartemperatureandfan";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		if (pUIEnvironment.get() == nullptr)
+			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
+		
+		auto pSignalTemp = pUIEnvironment->PrepareSignal("main", "signal_cleartemperatureandfan");
+		pSignalTemp->Trigger();
+
+		if (pSignalTemp->WaitForHandling(10000)) {
+			if (pSignalTemp->GetBoolResult("success")) {
+				pUIEnvironment->LogMessage("Clear temperature and fan speed successful. ");
+			}
+			else {
+				pUIEnvironment->LogWarning("Clear temperature and fan speed failure. ");
+			}
+		}
+		else {
+			pUIEnvironment->LogWarning("Clear temperature and fan speed timeout!");
+		}
+	}
+
+};
+
 
 
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
@@ -443,7 +327,25 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;
 	
 
-	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
+	if (createEventInstanceByName<CEvent_Connect>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_Disconnect>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_Home>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_EmergencyStop>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_ResetFatalError>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	if (createEventInstanceByName<CEvent_ClearTemperatureAndFan>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
 }
 
 

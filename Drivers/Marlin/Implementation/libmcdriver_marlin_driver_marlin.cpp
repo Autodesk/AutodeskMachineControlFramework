@@ -57,6 +57,9 @@ CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sTyp
 	pDriverEnvironment->RegisterBoolParameter("isconnected", "Connected", false);
 	pDriverEnvironment->RegisterBoolParameter("bufferavailable", "Buffer is available", false);
 	pDriverEnvironment->RegisterDoubleParameter("statusupdateinterval", "Timer interval [ms] for updating status", 100.0);
+	// this driver supports just one extruder with id 0
+	pDriverEnvironment->RegisterDoubleParameter("currenttemperatureextruderid0", "Current temperature of extruder 1", 0.0);
+	pDriverEnvironment->RegisterDoubleParameter("currenttemperaturebed", "Current bed temperature", 0.0);
 	pDriverEnvironment->RegisterDoubleParameter("pidvaluep", "Printers PID, value P", 0.0);
 	pDriverEnvironment->RegisterDoubleParameter("pidvaluei", "Printers PID, value I", 0.0);
 	pDriverEnvironment->RegisterDoubleParameter("pidvalued", "Printers PID, value D", 0.0);
@@ -74,10 +77,33 @@ void CDriver_Marlin::QueryParameters()
 	
 	if (m_pSerialController.get() != nullptr) {
 		double dX, dY, dZ;
+		m_pSerialController->queryPositionState();
+
 		m_pSerialController->getCurrentPosition(dX, dY, dZ);
-		m_pDriverEnvironment->SetDoubleParameter("targetx", dX);
-		m_pDriverEnvironment->SetDoubleParameter("targety", dY);
-		m_pDriverEnvironment->SetDoubleParameter("targetz", dZ);
+		m_pDriverEnvironment->SetDoubleParameter("currentx", dX);
+		m_pDriverEnvironment->SetDoubleParameter("currenty", dY);
+		m_pDriverEnvironment->SetDoubleParameter("currentz", dZ);
+
+		double dTargetX, dTargetY, dTargetZ;
+		m_pSerialController->getTargetPosition(dTargetX, dTargetY, dTargetZ);
+		m_pDriverEnvironment->SetDoubleParameter("targetx", dTargetX);
+		m_pDriverEnvironment->SetDoubleParameter("targety", dTargetY);
+		m_pDriverEnvironment->SetDoubleParameter("targetz", dTargetZ);
+
+		m_pDriverEnvironment->SetBoolParameter("ishomed", m_pSerialController->isHomed());
+		m_pDriverEnvironment->SetBoolParameter("ismoving", m_pSerialController->isMoving());
+		m_pDriverEnvironment->SetBoolParameter("isconnected", m_pSerialController->isConnected());
+		m_pDriverEnvironment->SetBoolParameter("bufferavailable", m_pSerialController->canReceiveMovement());
+
+		double dExT, dBedT;
+		// this driver supports just one extruder with id 0
+		uint32_t nExtruderId = 0;
+		m_pSerialController->queryTemperatureState(nExtruderId);
+		m_pSerialController->getExtruderCurrentTemperature(nExtruderId, dExT);
+		m_pDriverEnvironment->SetDoubleParameter("currenttemperatureextruderid0", dExT);
+
+		m_pSerialController->getHeatedBedCurrentTemperature(dBedT);
+		m_pDriverEnvironment->SetDoubleParameter("currenttemperaturebed", dBedT);
 	}
 }
 
@@ -98,8 +124,15 @@ void CDriver_Marlin::Connect(const std::string& sCOMPort, const LibMCDriver_Marl
 
 void CDriver_Marlin::Disconnect()
 {
-	if (m_pSerialController.get() != nullptr)
+	if (m_pSerialController.get() != nullptr) {
 		m_pSerialController->disconnectController();
+		// rreset parameters directly, because of "disconnect" they can't be set by m_pSerialController properties anymore
+		m_pDriverEnvironment->SetBoolParameter("isconnected", false);
+		m_pDriverEnvironment->SetBoolParameter("ishomed", false);
+		m_pDriverEnvironment->SetBoolParameter("ismoving", false);
+		m_pDriverEnvironment->SetBoolParameter("bufferavailable", false);
+
+	}
 
 	m_pSerialController = nullptr;
 }
