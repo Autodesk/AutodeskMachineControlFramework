@@ -67,6 +67,14 @@ namespace AMCData {
 				break;
 			}
 
+
+			case 1: {
+				std::string sStreamsQuery = "ALTER TABLE `storage_streams` ";
+				sStreamsQuery += "ADD `sha256_block64k` varchar (64) DEFAULT ``;";
+				pTransaction->executeStatement(sStreamsQuery);
+
+			}
+
 		}
 	}
 

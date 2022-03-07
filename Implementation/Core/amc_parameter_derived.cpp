@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define _PARAMETER_HEADERPROTECTION
 
-#include "amc_parameter_derived.hpp"
 #include "amc_parametergroup.hpp"
+#include "amc_parameter_derived.hpp"
 #include "libmc_exceptiontypes.hpp"
 
 namespace AMC {
@@ -117,6 +117,11 @@ namespace AMC {
 	void CParameter_Derived::setBoolValue(const bool bValue)
 	{
 		throw ELibMCCustomException(LIBMC_ERROR_DERIVEDPARAMETERSREADONLY, m_sName);
+	}
+
+	eParameterDataType CParameter_Derived::getDataType() const
+	{
+		return m_pParameterGroup->getParameterDataTypeByName(m_sSourceParameterName);
 	}
 
 

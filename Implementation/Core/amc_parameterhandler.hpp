@@ -50,13 +50,11 @@ namespace AMC {
 	class CParameterHandler {
 	private:
 
-		PParameterGroup m_DataStore;
 		std::map<std::string, PParameterGroup> m_Groups;
 		std::vector<PParameterGroup> m_GroupList;
 
 		std::mutex m_Mutex;
 		std::string m_sDescription;
-		std::string m_sInstanceState;
 		
 	public:
 
@@ -72,13 +70,12 @@ namespace AMC {
 		PParameterGroup getGroup(const uint32_t nIndex);
 		PParameterGroup findGroup(const std::string& sName, const bool bFailIfNotExisting);
 
-		CParameterGroup * getDataStore ();
-
 		std::string getDescription();
 		void setDescription(const std::string & sDescription);
 
-		void setInstanceStateName(const std::string & sInstanceState);
-		std::string getInstanceStateName();
+		PParameterHandler duplicate();
+
+		void loadPersistentParameters(LibMCData::PPersistencyHandler pPersistencyHandler);
 
 	};
 

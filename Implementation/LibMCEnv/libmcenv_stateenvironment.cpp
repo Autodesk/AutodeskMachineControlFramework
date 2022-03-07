@@ -35,11 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
+#include "libmcenv_imagedata.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
 #include "amc_parameterhandler.hpp"
 #include "amc_ui_handler.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "common_chrono.hpp"
 #include <thread> 
@@ -62,6 +64,12 @@ CStateEnvironment::CStateEnvironment(AMC::PSystemState pSystemState, AMC::PParam
 	if (pParameterHandler.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
+}
+
+
+std::string CStateEnvironment::GetMachineState(const std::string& sMachineInstance)
+{
+	return m_pSystemState->stateMachineData()->getInstanceStateName(sMachineInstance);
 }
 
 
@@ -176,7 +184,7 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 	if (pHandler == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(m_sInstanceName);
 
 	if (!pGroup->hasParameter(sName)) {
 		pGroup->addNewStringParameter(sName, "", pHandler->GetSignalID());
@@ -189,7 +197,7 @@ void CStateEnvironment::StoreSignal(const std::string& sName, ISignalHandler* pH
 
 ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
 {
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(m_sInstanceName);
 
 	std::string sSignalID = pGroup->getParameterValueByName(sName);
 	return new CSignalHandler(m_pSystemState->getStateSignalHandlerInstance(), sSignalID);
@@ -198,7 +206,7 @@ ISignalHandler* CStateEnvironment::RetrieveSignal(const std::string& sName)
 
 void CStateEnvironment::ClearStoredValue(const std::string& sName)
 {
-	AMC::CParameterGroup* pGroup = m_pParameterHandler->getDataStore();
+	AMC::CParameterGroup* pGroup = m_pSystemState->stateMachineData()->getDataStore(m_sInstanceName);
 	pGroup->removeValue(sName);
 
 }
@@ -353,3 +361,15 @@ void CStateEnvironment::LoadResourceData(const std::string& sResourceName, LibMC
 
 }
 
+
+
+
+IImageData* CStateEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+	return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
+IImageData* CStateEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+	return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+}

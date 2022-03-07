@@ -32,31 +32,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __AMC_UI_MODULE_ITEM
 #define __AMC_UI_MODULE_ITEM
 
+#include "header_protection.hpp"
 #include "amc_jsonwriter.hpp"
 
 
 namespace AMC {
 
 	amcDeclareDependingClass(CUIModule_Item, PUIModule_Item);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
 	class CUIModuleItem {
 	protected:		
+
+		std::string m_sItemPath;
 	
 	public:
 
-		CUIModuleItem()
-		{
+		CUIModuleItem(const std::string& sItemPath);		
 
-		}
-		
-		virtual ~CUIModuleItem()
-		{
+		virtual ~CUIModuleItem();
 
-		}
+		virtual void configurePostLoading();
+	
+		virtual std::string getItemPath();
 
 		virtual std::string getUUID () = 0;
 
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object) = 0;
+		virtual std::string findElementPathByUUID(const std::string & sUUID);
+
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler * pClientVariableHandler) = 0;
+
+		virtual void setEventPayloadValue (const std::string & sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler);
 
 	};
 

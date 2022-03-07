@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "Libraries/PugiXML/pugixml.hpp"
+#include "amc_ui_module_contentitem_form.hpp"
+#include "amc_ui_interfaces.hpp"
 
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
@@ -50,8 +52,12 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModule_Content, PUIModule_Content);
 	amcDeclareDependingClass(CUIModule_ContentItem, PUIModule_ContentItem);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CUIModule_ContentForm, PUIModule_ContentForm);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CResourcePackage, PResourcePackage);
+	amcDeclareDependingClass(CUIModule_ContentFormRegistry, PUIModule_ContentFormRegistry);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+
 
 	class CUIModule_Content : public CUIModule {
 	protected:		
@@ -61,14 +67,21 @@ namespace AMC {
 		std::string m_sTitle;
 		std::string m_sSubtitle;
 
+		std::string m_sModulePath;
+
+		uint32_t m_nNamingIDCounter;
+
 		std::map<std::string, PUIModule_ContentItem> m_ItemMap;
 		std::vector<PUIModule_ContentItem> m_Items;
 
 		void addItem(PUIModule_ContentItem pItem);
 
+		std::string getDefaultContentName(const std::string & sPrefix);
+		std::string readItemNameFromXML (const pugi::xml_node & itemNode, const std::string & sPrefix);
+
 	public:
 
-		CUIModule_Content(pugi::xml_node & xmlNode, PParameterInstances pParameterInstances, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler);
+		CUIModule_Content(pugi::xml_node & xmlNode, const std::string & sPath, PUIModuleEnvironment pUIModuleEnvironment);
 		
 		virtual ~CUIModule_Content();
 
@@ -82,12 +95,16 @@ namespace AMC {
 		std::string getTitle ();
 		std::string getSubtitle ();
 
-		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject) override;
+		virtual void writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& moduleObject, CParameterHandler* pClientVariableHandler) override;
 
 		virtual void populateItemMap(std::map<std::string, PUIModuleItem>& itemMap) override;
 
 
 		virtual PUIModuleItem findItem(const std::string& sUUID) override;
+
+		void configurePostLoading() override;
+
+		virtual void populateClientVariables(CParameterHandler* pParameterHandler) override;
 
 	};
 

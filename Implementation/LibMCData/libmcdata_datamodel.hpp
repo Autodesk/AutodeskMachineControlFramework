@@ -69,7 +69,7 @@ public:
 
 	CDataModel();
 
-	void InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType eDataBaseType, const std::string & sConnectionString) override;
+	void InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType dataBaseType, const std::string & sConnectionString) override;
 
 	LibMCData_uint32 GetDataModelVersion() override;
 
@@ -82,6 +82,8 @@ public:
 	IBuildJobHandler* CreateBuildJobHandler() override;
 
 	ILoginHandler* CreateLoginHandler() override;
+
+	IPersistencyHandler* CreatePersistencyHandler() override;
 
 };
 
