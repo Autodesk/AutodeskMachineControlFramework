@@ -61,6 +61,7 @@ namespace LibMCEnv {
 class CWrapper;
 class CBase;
 class CIterator;
+class CImageData;
 class CToolpathPart;
 class CToolpathLayer;
 class CToolpathAccessor;
@@ -81,6 +82,7 @@ class CUIEnvironment;
 typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
+typedef CImageData CLibMCEnvImageData;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
 typedef CToolpathAccessor CLibMCEnvToolpathAccessor;
@@ -101,6 +103,7 @@ typedef CUIEnvironment CLibMCEnvUIEnvironment;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
+typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
 typedef std::shared_ptr<CToolpathAccessor> PToolpathAccessor;
@@ -121,6 +124,7 @@ typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
+typedef PImageData PLibMCEnvImageData;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
 typedef PToolpathAccessor PLibMCEnvToolpathAccessor;
@@ -307,6 +311,7 @@ private:
 
 	friend class CBase;
 	friend class CIterator;
+	friend class CImageData;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
 	friend class CToolpathAccessor;
@@ -399,6 +404,38 @@ public:
 	inline PBase GetCurrent();
 	inline PIterator Clone();
 	inline LibMCEnv_uint64 Count();
+};
+	
+/*************************************************************************************************************************
+ Class CImageData 
+**************************************************************************************************************************/
+class CImageData : public CBase {
+public:
+	
+	/**
+	* CImageData::CImageData - Constructor for ImageData class.
+	*/
+	CImageData(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline eImagePixelFormat GetPixelFormat();
+	inline void ChangePixelFormat(const eImagePixelFormat ePixelFormat);
+	inline void GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY);
+	inline void SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY);
+	inline void GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY);
+	inline void GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY);
+	inline void LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void EncodePNG();
+	inline void GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer);
+	inline void ClearEncodedPNGData();
+	inline void Clear(const LibMCEnv_uint32 nValue);
+	inline LibMCEnv_uint32 GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY);
+	inline void SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue);
+	inline void GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer);
+	inline void SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -614,6 +651,11 @@ public:
 	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
 	inline void Sleep(const LibMCEnv_uint32 nDelay);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
+	inline void LogMessage(const std::string & sLogString);
+	inline void LogWarning(const std::string & sLogString);
+	inline void LogInfo(const std::string & sLogString);
+	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 };
 	
 /*************************************************************************************************************************
@@ -691,6 +733,7 @@ public:
 	{
 	}
 	
+	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline bool WaitForSignal(const std::string & sSignalName, const LibMCEnv_uint32 nTimeOut, PSignalHandler & pHandlerInstance);
 	inline void GetDriverLibrary(const std::string & sDriverName, std::string & sDriverType, LibMCEnv_pvoid & pDriverLookup);
@@ -717,6 +760,8 @@ public:
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
+	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 };
 	
 /*************************************************************************************************************************
@@ -733,17 +778,32 @@ public:
 	{
 	}
 	
+	inline void ActivateModalDialog(const std::string & sDialogName);
+	inline void CloseModalDialog();
+	inline void ActivatePage(const std::string & sPageName);
+	inline std::string RetrieveEventSender();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline void LogMessage(const std::string & sLogString);
 	inline void LogWarning(const std::string & sLogString);
 	inline void LogInfo(const std::string & sLogString);
-	inline std::string GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
-	inline std::string GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
-	inline LibMCEnv_double GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
-	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
-	inline bool GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
-	inline std::string GetEventContext();
+	inline std::string GetMachineParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline std::string GetMachineParameterAsUUID(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_double GetMachineParameterAsDouble(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline LibMCEnv_int64 GetMachineParameterAsInteger(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline bool GetMachineParameterAsBool(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName);
+	inline std::string GetUIProperty(const std::string & sElementPath, const std::string & sPropertyName);
+	inline std::string GetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName);
+	inline LibMCEnv_double GetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName);
+	inline LibMCEnv_int64 GetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName);
+	inline bool GetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName);
+	inline void SetUIProperty(const std::string & sElementPath, const std::string & sPropertyName, const std::string & sValue);
+	inline void SetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName, const std::string & sValue);
+	inline void SetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_double dValue);
+	inline void SetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_int64 nValue);
+	inline void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue);
+	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 };
 	
 	/**
@@ -832,6 +892,22 @@ public:
 		pWrapperTable->m_Iterator_GetCurrent = nullptr;
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
+		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
+		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
+		pWrapperTable->m_ImageData_GetDPI = nullptr;
+		pWrapperTable->m_ImageData_SetDPI = nullptr;
+		pWrapperTable->m_ImageData_GetSizeInMM = nullptr;
+		pWrapperTable->m_ImageData_GetSizeInPixels = nullptr;
+		pWrapperTable->m_ImageData_ResizeImage = nullptr;
+		pWrapperTable->m_ImageData_LoadPNG = nullptr;
+		pWrapperTable->m_ImageData_EncodePNG = nullptr;
+		pWrapperTable->m_ImageData_GetEncodedPNGData = nullptr;
+		pWrapperTable->m_ImageData_ClearEncodedPNGData = nullptr;
+		pWrapperTable->m_ImageData_Clear = nullptr;
+		pWrapperTable->m_ImageData_GetPixel = nullptr;
+		pWrapperTable->m_ImageData_SetPixel = nullptr;
+		pWrapperTable->m_ImageData_GetPixelRange = nullptr;
+		pWrapperTable->m_ImageData_SetPixelRange = nullptr;
 		pWrapperTable->m_ToolpathPart_GetName = nullptr;
 		pWrapperTable->m_ToolpathPart_GetUUID = nullptr;
 		pWrapperTable->m_ToolpathPart_GetMeshUUID = nullptr;
@@ -903,6 +979,11 @@ public:
 		pWrapperTable->m_DriverEnvironment_SetBoolParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_Sleep = nullptr;
 		pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds = nullptr;
+		pWrapperTable->m_DriverEnvironment_LogMessage = nullptr;
+		pWrapperTable->m_DriverEnvironment_LogWarning = nullptr;
+		pWrapperTable->m_DriverEnvironment_LogInfo = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = nullptr;
+		pWrapperTable->m_DriverEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_SignalTrigger_CanTrigger = nullptr;
 		pWrapperTable->m_SignalTrigger_Trigger = nullptr;
 		pWrapperTable->m_SignalTrigger_WaitForHandling = nullptr;
@@ -932,6 +1013,7 @@ public:
 		pWrapperTable->m_SignalHandler_SetDoubleResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetIntegerResult = nullptr;
 		pWrapperTable->m_SignalHandler_SetBoolResult = nullptr;
+		pWrapperTable->m_StateEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_StateEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_WaitForSignal = nullptr;
 		pWrapperTable->m_StateEnvironment_GetDriverLibrary = nullptr;
@@ -958,17 +1040,34 @@ public:
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
+		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
+		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
+		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
 		pWrapperTable->m_UIEnvironment_LogWarning = nullptr;
 		pWrapperTable->m_UIEnvironment_LogInfo = nullptr;
-		pWrapperTable->m_UIEnvironment_GetStringParameter = nullptr;
-		pWrapperTable->m_UIEnvironment_GetUUIDParameter = nullptr;
-		pWrapperTable->m_UIEnvironment_GetDoubleParameter = nullptr;
-		pWrapperTable->m_UIEnvironment_GetIntegerParameter = nullptr;
-		pWrapperTable->m_UIEnvironment_GetBoolParameter = nullptr;
-		pWrapperTable->m_UIEnvironment_GetEventContext = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameter = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsUUID = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsDouble = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsInteger = nullptr;
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool = nullptr;
+		pWrapperTable->m_UIEnvironment_GetUIProperty = nullptr;
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID = nullptr;
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble = nullptr;
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsInteger = nullptr;
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsBool = nullptr;
+		pWrapperTable->m_UIEnvironment_SetUIProperty = nullptr;
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsUUID = nullptr;
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsDouble = nullptr;
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger = nullptr;
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = nullptr;
+		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
+		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1065,6 +1164,150 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Iterator_Count == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixelformat");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixelFormat = (PLibMCEnvImageData_GetPixelFormatPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixelformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixelFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ChangePixelFormat = (PLibMCEnvImageData_ChangePixelFormatPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_changepixelformat");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ChangePixelFormat = (PLibMCEnvImageData_ChangePixelFormatPtr) dlsym(hLibrary, "libmcenv_imagedata_changepixelformat");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ChangePixelFormat == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetDPI = (PLibMCEnvImageData_GetDPIPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getdpi");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetDPI = (PLibMCEnvImageData_GetDPIPtr) dlsym(hLibrary, "libmcenv_imagedata_getdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetDPI = (PLibMCEnvImageData_SetDPIPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setdpi");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetDPI = (PLibMCEnvImageData_SetDPIPtr) dlsym(hLibrary, "libmcenv_imagedata_setdpi");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetDPI == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetSizeInMM = (PLibMCEnvImageData_GetSizeInMMPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getsizeinmm");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetSizeInMM = (PLibMCEnvImageData_GetSizeInMMPtr) dlsym(hLibrary, "libmcenv_imagedata_getsizeinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetSizeInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetSizeInPixels = (PLibMCEnvImageData_GetSizeInPixelsPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getsizeinpixels");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetSizeInPixels = (PLibMCEnvImageData_GetSizeInPixelsPtr) dlsym(hLibrary, "libmcenv_imagedata_getsizeinpixels");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetSizeInPixels == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ResizeImage = (PLibMCEnvImageData_ResizeImagePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_resizeimage");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ResizeImage = (PLibMCEnvImageData_ResizeImagePtr) dlsym(hLibrary, "libmcenv_imagedata_resizeimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ResizeImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_LoadPNG = (PLibMCEnvImageData_LoadPNGPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_loadpng");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_LoadPNG = (PLibMCEnvImageData_LoadPNGPtr) dlsym(hLibrary, "libmcenv_imagedata_loadpng");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_LoadPNG == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_encodepng");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_EncodePNG = (PLibMCEnvImageData_EncodePNGPtr) dlsym(hLibrary, "libmcenv_imagedata_encodepng");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_EncodePNG == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getencodedpngdata");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetEncodedPNGData = (PLibMCEnvImageData_GetEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_getencodedpngdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_ClearEncodedPNGData = (PLibMCEnvImageData_ClearEncodedPNGDataPtr) dlsym(hLibrary, "libmcenv_imagedata_clearencodedpngdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_Clear = (PLibMCEnvImageData_ClearPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_clear");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_Clear = (PLibMCEnvImageData_ClearPtr) dlsym(hLibrary, "libmcenv_imagedata_clear");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_Clear == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixel = (PLibMCEnvImageData_GetPixelPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixel");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixel = (PLibMCEnvImageData_GetPixelPtr) dlsym(hLibrary, "libmcenv_imagedata_getpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixel = (PLibMCEnvImageData_SetPixelPtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixel");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixel = (PLibMCEnvImageData_SetPixelPtr) dlsym(hLibrary, "libmcenv_imagedata_setpixel");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixel == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_GetPixelRange = (PLibMCEnvImageData_GetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_getpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_GetPixelRange = (PLibMCEnvImageData_GetPixelRangePtr) dlsym(hLibrary, "libmcenv_imagedata_getpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_GetPixelRange == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ImageData_SetPixelRange = (PLibMCEnvImageData_SetPixelRangePtr) GetProcAddress(hLibrary, "libmcenv_imagedata_setpixelrange");
+		#else // _WIN32
+		pWrapperTable->m_ImageData_SetPixelRange = (PLibMCEnvImageData_SetPixelRangePtr) dlsym(hLibrary, "libmcenv_imagedata_setpixelrange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ImageData_SetPixelRange == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1707,6 +1950,51 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LogMessage = (PLibMCEnvDriverEnvironment_LogMessagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_logmessage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LogMessage = (PLibMCEnvDriverEnvironment_LogMessagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_logmessage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LogMessage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LogWarning = (PLibMCEnvDriverEnvironment_LogWarningPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_logwarning");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LogWarning = (PLibMCEnvDriverEnvironment_LogWarningPtr) dlsym(hLibrary, "libmcenv_driverenvironment_logwarning");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LogWarning == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LogInfo = (PLibMCEnvDriverEnvironment_LogInfoPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_loginfo");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LogInfo = (PLibMCEnvDriverEnvironment_LogInfoPtr) dlsym(hLibrary, "libmcenv_driverenvironment_loginfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LogInfo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = (PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createemptyimage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateEmptyImage = (PLibMCEnvDriverEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_createemptyimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateEmptyImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_LoadPNGImage = (PLibMCEnvDriverEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_driverenvironment_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) GetProcAddress(hLibrary, "libmcenv_signaltrigger_cantrigger");
 		#else // _WIN32
 		pWrapperTable->m_SignalTrigger_CanTrigger = (PLibMCEnvSignalTrigger_CanTriggerPtr) dlsym(hLibrary, "libmcenv_signaltrigger_cantrigger");
@@ -1968,6 +2256,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getmachinestate");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetMachineState = (PLibMCEnvStateEnvironment_GetMachineStatePtr) dlsym(hLibrary, "libmcenv_stateenvironment_getmachinestate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetMachineState == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_PrepareSignal = (PLibMCEnvStateEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_PrepareSignal = (PLibMCEnvStateEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_stateenvironment_preparesignal");
@@ -2202,6 +2499,60 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createemptyimage");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_createemptyimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_CreateEmptyImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadPNGImage = (PLibMCEnvStateEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CloseModalDialog = (PLibMCEnvUIEnvironment_CloseModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_closemodaldialog");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CloseModalDialog = (PLibMCEnvUIEnvironment_CloseModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_closemodaldialog");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CloseModalDialog == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ActivatePage = (PLibMCEnvUIEnvironment_ActivatePagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatepage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ActivatePage = (PLibMCEnvUIEnvironment_ActivatePagePtr) dlsym(hLibrary, "libmcenv_uienvironment_activatepage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ActivatePage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSender = (PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrieveeventsender");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSender = (PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) dlsym(hLibrary, "libmcenv_uienvironment_retrieveeventsender");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_preparesignal");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_PrepareSignal = (PLibMCEnvUIEnvironment_PrepareSignalPtr) dlsym(hLibrary, "libmcenv_uienvironment_preparesignal");
@@ -2247,57 +2598,156 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_GetStringParameter = (PLibMCEnvUIEnvironment_GetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getstringparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameter = (PLibMCEnvUIEnvironment_GetMachineParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparameter");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_GetStringParameter = (PLibMCEnvUIEnvironment_GetStringParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getstringparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameter = (PLibMCEnvUIEnvironment_GetMachineParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparameter");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_GetStringParameter == nullptr)
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameter == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_GetUUIDParameter = (PLibMCEnvUIEnvironment_GetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuuidparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsUUID = (PLibMCEnvUIEnvironment_GetMachineParameterAsUUIDPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparameterasuuid");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_GetUUIDParameter = (PLibMCEnvUIEnvironment_GetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getuuidparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsUUID = (PLibMCEnvUIEnvironment_GetMachineParameterAsUUIDPtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparameterasuuid");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_GetUUIDParameter == nullptr)
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterAsUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_GetDoubleParameter = (PLibMCEnvUIEnvironment_GetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getdoubleparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsDouble = (PLibMCEnvUIEnvironment_GetMachineParameterAsDoublePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparameterasdouble");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_GetDoubleParameter = (PLibMCEnvUIEnvironment_GetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getdoubleparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsDouble = (PLibMCEnvUIEnvironment_GetMachineParameterAsDoublePtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparameterasdouble");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_GetDoubleParameter == nullptr)
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterAsDouble == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_GetIntegerParameter = (PLibMCEnvUIEnvironment_GetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getintegerparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsInteger = (PLibMCEnvUIEnvironment_GetMachineParameterAsIntegerPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparameterasinteger");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_GetIntegerParameter = (PLibMCEnvUIEnvironment_GetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getintegerparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsInteger = (PLibMCEnvUIEnvironment_GetMachineParameterAsIntegerPtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparameterasinteger");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_GetIntegerParameter == nullptr)
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterAsInteger == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_GetBoolParameter = (PLibMCEnvUIEnvironment_GetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getboolparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool = (PLibMCEnvUIEnvironment_GetMachineParameterAsBoolPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getmachineparameterasbool");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_GetBoolParameter = (PLibMCEnvUIEnvironment_GetBoolParameterPtr) dlsym(hLibrary, "libmcenv_uienvironment_getboolparameter");
+		pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool = (PLibMCEnvUIEnvironment_GetMachineParameterAsBoolPtr) dlsym(hLibrary, "libmcenv_uienvironment_getmachineparameterasbool");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr)
+		if (pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_geteventcontext");
+		pWrapperTable->m_UIEnvironment_GetUIProperty = (PLibMCEnvUIEnvironment_GetUIPropertyPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuiproperty");
 		#else // _WIN32
-		pWrapperTable->m_UIEnvironment_GetEventContext = (PLibMCEnvUIEnvironment_GetEventContextPtr) dlsym(hLibrary, "libmcenv_uienvironment_geteventcontext");
+		pWrapperTable->m_UIEnvironment_GetUIProperty = (PLibMCEnvUIEnvironment_GetUIPropertyPtr) dlsym(hLibrary, "libmcenv_uienvironment_getuiproperty");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_UIEnvironment_GetEventContext == nullptr)
+		if (pWrapperTable->m_UIEnvironment_GetUIProperty == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID = (PLibMCEnvUIEnvironment_GetUIPropertyAsUUIDPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuipropertyasuuid");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID = (PLibMCEnvUIEnvironment_GetUIPropertyAsUUIDPtr) dlsym(hLibrary, "libmcenv_uienvironment_getuipropertyasuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble = (PLibMCEnvUIEnvironment_GetUIPropertyAsDoublePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuipropertyasdouble");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble = (PLibMCEnvUIEnvironment_GetUIPropertyAsDoublePtr) dlsym(hLibrary, "libmcenv_uienvironment_getuipropertyasdouble");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsInteger = (PLibMCEnvUIEnvironment_GetUIPropertyAsIntegerPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuipropertyasinteger");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsInteger = (PLibMCEnvUIEnvironment_GetUIPropertyAsIntegerPtr) dlsym(hLibrary, "libmcenv_uienvironment_getuipropertyasinteger");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetUIPropertyAsInteger == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsBool = (PLibMCEnvUIEnvironment_GetUIPropertyAsBoolPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getuipropertyasbool");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetUIPropertyAsBool = (PLibMCEnvUIEnvironment_GetUIPropertyAsBoolPtr) dlsym(hLibrary, "libmcenv_uienvironment_getuipropertyasbool");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetUIPropertyAsBool == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIProperty = (PLibMCEnvUIEnvironment_SetUIPropertyPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setuiproperty");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIProperty = (PLibMCEnvUIEnvironment_SetUIPropertyPtr) dlsym(hLibrary, "libmcenv_uienvironment_setuiproperty");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetUIProperty == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsUUID = (PLibMCEnvUIEnvironment_SetUIPropertyAsUUIDPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setuipropertyasuuid");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsUUID = (PLibMCEnvUIEnvironment_SetUIPropertyAsUUIDPtr) dlsym(hLibrary, "libmcenv_uienvironment_setuipropertyasuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetUIPropertyAsUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsDouble = (PLibMCEnvUIEnvironment_SetUIPropertyAsDoublePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setuipropertyasdouble");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsDouble = (PLibMCEnvUIEnvironment_SetUIPropertyAsDoublePtr) dlsym(hLibrary, "libmcenv_uienvironment_setuipropertyasdouble");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetUIPropertyAsDouble == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger = (PLibMCEnvUIEnvironment_SetUIPropertyAsIntegerPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setuipropertyasinteger");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger = (PLibMCEnvUIEnvironment_SetUIPropertyAsIntegerPtr) dlsym(hLibrary, "libmcenv_uienvironment_setuipropertyasinteger");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = (PLibMCEnvUIEnvironment_SetUIPropertyAsBoolPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_setuipropertyasbool");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = (PLibMCEnvUIEnvironment_SetUIPropertyAsBoolPtr) dlsym(hLibrary, "libmcenv_uienvironment_setuipropertyasbool");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_CreateEmptyImage = (PLibMCEnvUIEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_createemptyimage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_CreateEmptyImage = (PLibMCEnvUIEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_createemptyimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_CreateEmptyImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LoadPNGImage = (PLibMCEnvUIEnvironment_LoadPNGImagePtr) dlsym(hLibrary, "libmcenv_uienvironment_loadpngimage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2379,6 +2829,70 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_iterator_count", (void**)&(pWrapperTable->m_Iterator_Count));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Count == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixelFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_changepixelformat", (void**)&(pWrapperTable->m_ImageData_ChangePixelFormat));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ChangePixelFormat == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getdpi", (void**)&(pWrapperTable->m_ImageData_GetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setdpi", (void**)&(pWrapperTable->m_ImageData_SetDPI));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetDPI == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getsizeinmm", (void**)&(pWrapperTable->m_ImageData_GetSizeInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetSizeInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getsizeinpixels", (void**)&(pWrapperTable->m_ImageData_GetSizeInPixels));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetSizeInPixels == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_resizeimage", (void**)&(pWrapperTable->m_ImageData_ResizeImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ResizeImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_loadpng", (void**)&(pWrapperTable->m_ImageData_LoadPNG));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_LoadPNG == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_encodepng", (void**)&(pWrapperTable->m_ImageData_EncodePNG));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_EncodePNG == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getencodedpngdata", (void**)&(pWrapperTable->m_ImageData_GetEncodedPNGData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetEncodedPNGData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_clearencodedpngdata", (void**)&(pWrapperTable->m_ImageData_ClearEncodedPNGData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_ClearEncodedPNGData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_clear", (void**)&(pWrapperTable->m_ImageData_Clear));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_Clear == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixel", (void**)&(pWrapperTable->m_ImageData_GetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixel", (void**)&(pWrapperTable->m_ImageData_SetPixel));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixel == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelrange", (void**)&(pWrapperTable->m_ImageData_GetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_GetPixelRange == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_imagedata_setpixelrange", (void**)&(pWrapperTable->m_ImageData_SetPixelRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ImageData_SetPixelRange == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathpart_getname", (void**)&(pWrapperTable->m_ToolpathPart_GetName));
@@ -2665,6 +3179,26 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_logmessage", (void**)&(pWrapperTable->m_DriverEnvironment_LogMessage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogMessage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_logwarning", (void**)&(pWrapperTable->m_DriverEnvironment_LogWarning));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogWarning == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_loginfo", (void**)&(pWrapperTable->m_DriverEnvironment_LogInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LogInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createemptyimage", (void**)&(pWrapperTable->m_DriverEnvironment_CreateEmptyImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateEmptyImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_loadpngimage", (void**)&(pWrapperTable->m_DriverEnvironment_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_LoadPNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_signaltrigger_cantrigger", (void**)&(pWrapperTable->m_SignalTrigger_CanTrigger));
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalTrigger_CanTrigger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2781,6 +3315,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_SignalHandler_SetBoolResult == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getmachinestate", (void**)&(pWrapperTable->m_StateEnvironment_GetMachineState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetMachineState == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_preparesignal", (void**)&(pWrapperTable->m_StateEnvironment_PrepareSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_PrepareSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2885,6 +3423,30 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_createemptyimage", (void**)&(pWrapperTable->m_StateEnvironment_CreateEmptyImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_CreateEmptyImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadpngimage", (void**)&(pWrapperTable->m_StateEnvironment_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_closemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_CloseModalDialog));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CloseModalDialog == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_activatepage", (void**)&(pWrapperTable->m_UIEnvironment_ActivatePage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivatePage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsender", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSender));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_PrepareSignal == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -2905,28 +3467,72 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogInfo == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_getstringparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetStringParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetStringParameter == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameter == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_getuuidparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetUUIDParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUUIDParameter == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparameterasuuid", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterAsUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterAsUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_getdoubleparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetDoubleParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetDoubleParameter == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparameterasdouble", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterAsDouble));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterAsDouble == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_getintegerparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetIntegerParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetIntegerParameter == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparameterasinteger", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterAsInteger));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterAsInteger == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_getboolparameter", (void**)&(pWrapperTable->m_UIEnvironment_GetBoolParameter));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetBoolParameter == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getmachineparameterasbool", (void**)&(pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetMachineParameterAsBool == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcenv_uienvironment_geteventcontext", (void**)&(pWrapperTable->m_UIEnvironment_GetEventContext));
-		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetEventContext == nullptr) )
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getuiproperty", (void**)&(pWrapperTable->m_UIEnvironment_GetUIProperty));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUIProperty == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getuipropertyasuuid", (void**)&(pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUIPropertyAsUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getuipropertyasdouble", (void**)&(pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUIPropertyAsDouble == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getuipropertyasinteger", (void**)&(pWrapperTable->m_UIEnvironment_GetUIPropertyAsInteger));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUIPropertyAsInteger == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getuipropertyasbool", (void**)&(pWrapperTable->m_UIEnvironment_GetUIPropertyAsBool));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetUIPropertyAsBool == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setuiproperty", (void**)&(pWrapperTable->m_UIEnvironment_SetUIProperty));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetUIProperty == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setuipropertyasuuid", (void**)&(pWrapperTable->m_UIEnvironment_SetUIPropertyAsUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetUIPropertyAsUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setuipropertyasdouble", (void**)&(pWrapperTable->m_UIEnvironment_SetUIPropertyAsDouble));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetUIPropertyAsDouble == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setuipropertyasinteger", (void**)&(pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetUIPropertyAsInteger == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_setuipropertyasbool", (void**)&(pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_createemptyimage", (void**)&(pWrapperTable->m_UIEnvironment_CreateEmptyImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_CreateEmptyImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_loadpngimage", (void**)&(pWrapperTable->m_UIEnvironment_LoadPNGImage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -3026,6 +3632,187 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Count(m_pHandle, &resultCount));
 		
 		return resultCount;
+	}
+	
+	/**
+	 * Method definitions for class CImageData
+	 */
+	
+	/**
+	* CImageData::GetPixelFormat - Returns Pixel format of the image.
+	* @return Pixel Format of image
+	*/
+	eImagePixelFormat CImageData::GetPixelFormat()
+	{
+		eImagePixelFormat resultPixelFormat = (eImagePixelFormat) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixelFormat(m_pHandle, &resultPixelFormat));
+		
+		return resultPixelFormat;
+	}
+	
+	/**
+	* CImageData::ChangePixelFormat - Changes Pixel format of the image. Might lose alpha or color information during the process.
+	* @param[in] ePixelFormat - new Pixel Format of image
+	*/
+	void CImageData::ChangePixelFormat(const eImagePixelFormat ePixelFormat)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ChangePixelFormat(m_pHandle, ePixelFormat));
+	}
+	
+	/**
+	* CImageData::GetDPI - Returns DPI values in X and Y.
+	* @param[out] dDPIValueX - DPI value in X
+	* @param[out] dDPIValueY - DPI value in Y
+	*/
+	void CImageData::GetDPI(LibMCEnv_double & dDPIValueX, LibMCEnv_double & dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetDPI(m_pHandle, &dDPIValueX, &dDPIValueY));
+	}
+	
+	/**
+	* CImageData::SetDPI - Sets DPI values in X and Y.
+	* @param[in] dDPIValueX - new DPI value in X
+	* @param[in] dDPIValueY - new DPI value in Y
+	*/
+	void CImageData::SetDPI(const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetDPI(m_pHandle, dDPIValueX, dDPIValueY));
+	}
+	
+	/**
+	* CImageData::GetSizeInMM - Returns image sizes inmm.
+	* @param[out] dSizeX - Size in X in mm
+	* @param[out] dSizeY - Size in Y in mm
+	*/
+	void CImageData::GetSizeInMM(LibMCEnv_double & dSizeX, LibMCEnv_double & dSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetSizeInMM(m_pHandle, &dSizeX, &dSizeY));
+	}
+	
+	/**
+	* CImageData::GetSizeInPixels - Returns image pixel sizes.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CImageData::GetSizeInPixels(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetSizeInPixels(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CImageData::ResizeImage - Resizes Image pixel data.
+	* @param[out] nPixelSizeX - Number of pixels in X
+	* @param[out] nPixelSizeY - Number of pixels in Y
+	*/
+	void CImageData::ResizeImage(LibMCEnv_uint32 & nPixelSizeX, LibMCEnv_uint32 & nPixelSizeY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ResizeImage(m_pHandle, &nPixelSizeX, &nPixelSizeY));
+	}
+	
+	/**
+	* CImageData::LoadPNG - Loads a PNG from a binary array. Supports RGB, RGBA and Greyscale images.
+	* @param[out] PNGDataBuffer - PNG Data stream.
+	*/
+	void CImageData::LoadPNG(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPNGData = 0;
+		LibMCEnv_uint64 elementsWrittenPNGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, 0, &elementsNeededPNGData, nullptr));
+		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_LoadPNG(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
+	* CImageData::EncodePNG - Encodes PNG and stores data stream in image object.
+	*/
+	void CImageData::EncodePNG()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_EncodePNG(m_pHandle));
+	}
+	
+	/**
+	* CImageData::GetEncodedPNGData - Retrieves encoded data stream of image object. MUST have been encoded with EncodePNG before.
+	* @param[out] PNGDataBuffer - PNG Data stream.
+	*/
+	void CImageData::GetEncodedPNGData(std::vector<LibMCEnv_uint8> & PNGDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPNGData = 0;
+		LibMCEnv_uint64 elementsWrittenPNGData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, 0, &elementsNeededPNGData, nullptr));
+		PNGDataBuffer.resize((size_t) elementsNeededPNGData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetEncodedPNGData(m_pHandle, elementsNeededPNGData, &elementsWrittenPNGData, PNGDataBuffer.data()));
+	}
+	
+	/**
+	* CImageData::ClearEncodedPNGData - Releases encoded data stream of image object.
+	*/
+	void CImageData::ClearEncodedPNGData()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_ClearEncodedPNGData(m_pHandle));
+	}
+	
+	/**
+	* CImageData::Clear - Sets all pixels to a single value.
+	* @param[in] nValue - Pixel value.
+	*/
+	void CImageData::Clear(const LibMCEnv_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_Clear(m_pHandle, nValue));
+	}
+	
+	/**
+	* CImageData::GetPixel - Returns one pixel of an image.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @return Pixel value at this position
+	*/
+	LibMCEnv_uint32 CImageData::GetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY)
+	{
+		LibMCEnv_uint32 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixel(m_pHandle, nX, nY, &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CImageData::SetPixel - Sets one pixel of an image.
+	* @param[in] nX - Pixel coordinate in X
+	* @param[in] nY - Pixel coordinate in Y
+	* @param[in] nValue - New Pixel value at this position
+	*/
+	void CImageData::SetPixel(const LibMCEnv_uint32 nX, const LibMCEnv_uint32 nY, const LibMCEnv_uint32 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixel(m_pHandle, nX, nY, nValue));
+	}
+	
+	/**
+	* CImageData::GetPixelRange - Returns a subset of an image or the whole image data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
+	* @param[out] ValueBuffer - Pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	*/
+	void CImageData::GetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, std::vector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededValue = 0;
+		LibMCEnv_uint64 elementsWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, 0, &elementsNeededValue, nullptr));
+		ValueBuffer.resize((size_t) elementsNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_GetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, elementsNeededValue, &elementsWrittenValue, ValueBuffer.data()));
+	}
+	
+	/**
+	* CImageData::SetPixelRange - Exchanges a subset of an image or the whole image data.
+	* @param[in] nXMin - Min Pixel coordinate in X. MUST be within image bounds.
+	* @param[in] nYMin - Min Pixel coordinate in Y. MUST be within image bounds.
+	* @param[in] nXMax - Max Pixel coordinate in X. MUST be within image bounds. MUST be larger or equal than MinX
+	* @param[in] nYMax - Max Pixel coordinate in Y. MUST be within image bounds. MUST be larger or equal than MinY
+	* @param[in] ValueBuffer - New pixel values of the rectangle, rowwise array. MUST have the exact number of pixels in size and 1, 3 or 4 bytes per pixel, depending on pixel format.
+	*/
+	void CImageData::SetPixelRange(const LibMCEnv_uint32 nXMin, const LibMCEnv_uint32 nYMin, const LibMCEnv_uint32 nXMax, const LibMCEnv_uint32 nYMax, const CInputVector<LibMCEnv_uint8> & ValueBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ImageData_SetPixelRange(m_pHandle, nXMin, nYMin, nXMax, nYMax, (LibMCEnv_uint64)ValueBuffer.size(), ValueBuffer.data()));
 	}
 	
 	/**
@@ -4015,6 +4802,72 @@ public:
 	}
 	
 	/**
+	* CDriverEnvironment::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverEnvironment::LogMessage(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LogMessage(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverEnvironment::LogWarning(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LogWarning(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverEnvironment::LogInfo(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LogInfo(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	PImageData CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateEmptyImage(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CDriverEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
 	 * Method definitions for class CSignalTrigger
 	 */
 	
@@ -4385,6 +5238,22 @@ public:
 	 */
 	
 	/**
+	* CStateEnvironment::GetMachineState - Retrieves the machine state
+	* @param[in] sMachineInstance - State machine instance name
+	* @return Name of current state
+	*/
+	std::string CStateEnvironment::GetMachineState(const std::string & sMachineInstance)
+	{
+		LibMCEnv_uint32 bytesNeededStateName = 0;
+		LibMCEnv_uint32 bytesWrittenStateName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetMachineState(m_pHandle, sMachineInstance.c_str(), 0, &bytesNeededStateName, nullptr));
+		std::vector<char> bufferStateName(bytesNeededStateName);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetMachineState(m_pHandle, sMachineInstance.c_str(), bytesNeededStateName, &bytesWrittenStateName, &bufferStateName[0]));
+		
+		return std::string(&bufferStateName[0]);
+	}
+	
+	/**
 	* CStateEnvironment::PrepareSignal - prepares a signal object to trigger later.
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sSignalName - Name Of signal channel.
@@ -4711,8 +5580,88 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	PImageData CStateEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_CreateEmptyImage(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CStateEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CStateEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
 	 * Method definitions for class CUIEnvironment
 	 */
+	
+	/**
+	* CUIEnvironment::ActivateModalDialog - activates a modal dialog on the client.
+	* @param[in] sDialogName - Name of the dialog to activate.
+	*/
+	void CUIEnvironment::ActivateModalDialog(const std::string & sDialogName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ActivateModalDialog(m_pHandle, sDialogName.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::CloseModalDialog - closes the active modal dialog on the client.
+	*/
+	void CUIEnvironment::CloseModalDialog()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CloseModalDialog(m_pHandle));
+	}
+	
+	/**
+	* CUIEnvironment::ActivatePage - changes the current page on the client.
+	* @param[in] sPageName - Name of the page to activate.
+	*/
+	void CUIEnvironment::ActivatePage(const std::string & sPageName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ActivatePage(m_pHandle, sPageName.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
+	* @return Name of the sender element.
+	*/
+	std::string CUIEnvironment::RetrieveEventSender()
+	{
+		LibMCEnv_uint32 bytesNeededSenderName = 0;
+		LibMCEnv_uint32 bytesWrittenSenderName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, 0, &bytesNeededSenderName, nullptr));
+		std::vector<char> bufferSenderName(bytesNeededSenderName);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, bytesNeededSenderName, &bytesWrittenSenderName, &bufferSenderName[0]));
+		
+		return std::string(&bufferSenderName[0]);
+	}
 	
 	/**
 	* CUIEnvironment::PrepareSignal - prepares a signal object to trigger later.
@@ -4775,99 +5724,254 @@ public:
 	}
 	
 	/**
-	* CUIEnvironment::GetStringParameter - returns a string parameter
+	* CUIEnvironment::GetMachineParameter - returns a string parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	std::string CUIEnvironment::GetStringParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	std::string CUIEnvironment::GetMachineParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetStringParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetStringParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
-	* CUIEnvironment::GetUUIDParameter - returns a uuid parameter
+	* CUIEnvironment::GetMachineParameterAsUUID - returns a uuid parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	std::string CUIEnvironment::GetUUIDParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	std::string CUIEnvironment::GetMachineParameterAsUUID(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
 		LibMCEnv_uint32 bytesNeededValue = 0;
 		LibMCEnv_uint32 bytesWrittenValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUUIDParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterAsUUID(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), 0, &bytesNeededValue, nullptr));
 		std::vector<char> bufferValue(bytesNeededValue);
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUUIDParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterAsUUID(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
 		return std::string(&bufferValue[0]);
 	}
 	
 	/**
-	* CUIEnvironment::GetDoubleParameter - returns a double parameter
+	* CUIEnvironment::GetMachineParameterAsDouble - returns a double parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	LibMCEnv_double CUIEnvironment::GetDoubleParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	LibMCEnv_double CUIEnvironment::GetMachineParameterAsDouble(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
 		LibMCEnv_double resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetDoubleParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterAsDouble(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
-	* CUIEnvironment::GetIntegerParameter - returns an int parameter
+	* CUIEnvironment::GetMachineParameterAsInteger - returns an int parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	LibMCEnv_int64 CUIEnvironment::GetIntegerParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	LibMCEnv_int64 CUIEnvironment::GetMachineParameterAsInteger(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
 		LibMCEnv_int64 resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetIntegerParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterAsInteger(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
-	* CUIEnvironment::GetBoolParameter - returns a bool parameter
+	* CUIEnvironment::GetMachineParameterAsBool - returns a bool parameter of a state machine
 	* @param[in] sMachineInstance - State machine instance name
 	* @param[in] sParameterGroup - Parameter Group
 	* @param[in] sParameterName - Parameter Name
-	* @return Value to set
+	* @return Current Parameter Value
 	*/
-	bool CUIEnvironment::GetBoolParameter(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
+	bool CUIEnvironment::GetMachineParameterAsBool(const std::string & sMachineInstance, const std::string & sParameterGroup, const std::string & sParameterName)
 	{
 		bool resultValue = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetBoolParameter(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetMachineParameterAsBool(m_pHandle, sMachineInstance.c_str(), sParameterGroup.c_str(), sParameterName.c_str(), &resultValue));
 		
 		return resultValue;
 	}
 	
 	/**
-	* CUIEnvironment::GetEventContext - returns the event context uuid as string
-	* @return Context UUID
+	* CUIEnvironment::GetUIProperty - returns a string property of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
 	*/
-	std::string CUIEnvironment::GetEventContext()
+	std::string CUIEnvironment::GetUIProperty(const std::string & sElementPath, const std::string & sPropertyName)
 	{
-		LibMCEnv_uint32 bytesNeededContextUUID = 0;
-		LibMCEnv_uint32 bytesWrittenContextUUID = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetEventContext(m_pHandle, 0, &bytesNeededContextUUID, nullptr));
-		std::vector<char> bufferContextUUID(bytesNeededContextUUID);
-		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetEventContext(m_pHandle, bytesNeededContextUUID, &bytesWrittenContextUUID, &bufferContextUUID[0]));
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUIProperty(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUIProperty(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
 		
-		return std::string(&bufferContextUUID[0]);
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetUIPropertyAsUUID - returns a uuid variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
+	*/
+	std::string CUIEnvironment::GetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName)
+	{
+		LibMCEnv_uint32 bytesNeededValue = 0;
+		LibMCEnv_uint32 bytesWrittenValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUIPropertyAsUUID(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), 0, &bytesNeededValue, nullptr));
+		std::vector<char> bufferValue(bytesNeededValue);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUIPropertyAsUUID(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), bytesNeededValue, &bytesWrittenValue, &bufferValue[0]));
+		
+		return std::string(&bufferValue[0]);
+	}
+	
+	/**
+	* CUIEnvironment::GetUIPropertyAsDouble - returns a double variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
+	*/
+	LibMCEnv_double CUIEnvironment::GetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName)
+	{
+		LibMCEnv_double resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUIPropertyAsDouble(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetUIPropertyAsInteger - returns a integer variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
+	*/
+	LibMCEnv_int64 CUIEnvironment::GetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName)
+	{
+		LibMCEnv_int64 resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUIPropertyAsInteger(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetUIPropertyAsBool - returns a integer variable of a UI element on the client
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist.
+	* @return Current property Value
+	*/
+	bool CUIEnvironment::GetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetUIPropertyAsBool(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), &resultValue));
+		
+		return resultValue;
+	}
+	
+	/**
+	* CUIEnvironment::SetUIProperty - sets a string property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] sValue - New property Value
+	*/
+	void CUIEnvironment::SetUIProperty(const std::string & sElementPath, const std::string & sPropertyName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetUIProperty(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::SetUIPropertyAsUUID - sets a uuid property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] sValue - New property Value
+	*/
+	void CUIEnvironment::SetUIPropertyAsUUID(const std::string & sElementPath, const std::string & sPropertyName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetUIPropertyAsUUID(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CUIEnvironment::SetUIPropertyAsDouble - sets a double property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] dValue - New property Value
+	*/
+	void CUIEnvironment::SetUIPropertyAsDouble(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetUIPropertyAsDouble(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), dValue));
+	}
+	
+	/**
+	* CUIEnvironment::SetUIPropertyAsInteger - sets a integer property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] nValue - New property Value
+	*/
+	void CUIEnvironment::SetUIPropertyAsInteger(const std::string & sElementPath, const std::string & sPropertyName, const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetUIPropertyAsInteger(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), nValue));
+	}
+	
+	/**
+	* CUIEnvironment::SetUIPropertyAsBool - sets a bool property of a UI element on the client.
+	* @param[in] sElementPath - Path of UI Element. Fails if element does not exist.
+	* @param[in] sPropertyName - Property name. Fails if property does not exist or is readonly.
+	* @param[in] bValue - New property Value
+	*/
+	void CUIEnvironment::SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_SetUIPropertyAsBool(m_pHandle, sElementPath.c_str(), sPropertyName.c_str(), bValue));
+	}
+	
+	/**
+	* CUIEnvironment::CreateEmptyImage - creates an empty image object.
+	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
+	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use.
+	* @return Empty image instance.
+	*/
+	PImageData CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_CreateEmptyImage(m_pHandle, nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CUIEnvironment::LoadPNGImage - creates an image object from a PNG data stream.
+	* @param[in] PNGDataBuffer - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueX - DPI Value in X. MUST be positive.
+	* @param[in] dDPIValueY - DPI Value in Y. MUST be positive.
+	* @param[in] ePixelFormat - Pixel format to use. Might lose color and alpha information.
+	* @return Image instance containing the PNG image.
+	*/
+	PImageData CUIEnvironment::LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat)
+	{
+		LibMCEnvHandle hImageDataInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LoadPNGImage(m_pHandle, (LibMCEnv_uint64)PNGDataBuffer.size(), PNGDataBuffer.data(), dDPIValueX, dDPIValueY, ePixelFormat, &hImageDataInstance));
+		
+		if (!hImageDataInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
 	}
 
 } // namespace LibMCEnv

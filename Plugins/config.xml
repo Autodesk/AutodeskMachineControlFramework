@@ -1,251 +1,253 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02">
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/machinedefinitions/2020/02" xmlns:sync="http://schemas.autodesk.com/amc/synchronization/2020/02">
+	<services threadcount="32"/>
 
-  <services threadcount="32" />
-
-
-  <driver name="marlin" library="driver_marlin" type="marlin-2.0" />
-  <driver name="mqtt" library="driver_mqtt" type="mqtt" configurationresource="mqtt_config" />
+	<driver name="marlin" library="driver_marlin" type="marlin-ender-2.0" />
+	<driver name="mqtt" library="driver_mqtt" type="mqtt" configurationresource="mqtt_config" />
   
-    <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
-  	 	  		  
-  	  <parametergroup name="jobinfo" description="Job Information">
-  		<parameter name="jobname" description="Job Name" default="Job Name" type="string" />
-  		<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string" />
-  		<parameter name="layercount" description="Layer Count" default="0" type="int" />
-  		<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
-  		<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
-  		<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
-  	  </parametergroup>
+	<statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
-  	  <parametergroup name="temperaturecontrol" description="Temperature Control">
-  		<parameter name="fanid" description="Fan ID to set target speed" default="0" type="int" />
-  		<parameter name="fanspeed" description="Fan Speed" default="128" type="double" />
-  		<parameter name="extruderid" description="Extruder ID to set/get target temperature" default="0" type="int" />
-  		<parameter name="targetextrudertemperature" description="Target Extruder Temperature" default="25.0" type="double" />
-  		<parameter name="targetbedtemperature" description="Target Bed Temperature" default="25.0" type="double" />
-  	  </parametergroup>
+		<parametergroup name="jobinfo" description="Job Information">
+			<parameter name="jobname" description="Job Name" default="Job Name" type="string" />
+			<parameter name="jobuuid" description="Job UUID" default="00000000-0000-0000-0000-000000000000" type="string" />
+			<parameter name="layercount" description="Layer Count" default="0" type="int" />
+			<parameter name="currentlayer" description="Current Layer" default="0" type="int" />
+			<parameter name="autostart" description="Automatically start job after init" default="0" type="bool" />
+			<parameter name="printinprogress" description="Print is in progress" default="0" type="bool" />
+		</parametergroup>
 
-  	  <parametergroup name="timeoutdata" description="Timeouts for different processes">		
-  		<parameter name="layergracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
-		<parameter name="printerconnectandinitialise" type="int" default="20000" description="Timeout [ms] for connecting and initialising printer" />
-  	  </parametergroup>
+		<parametergroup name="temperaturecontrol" description="Temperature Control">
+			<parameter name="fanid" description="Fan ID to set target speed" default="0" type="int" />
+			<parameter name="fanspeed" description="Fan Speed" default="128" type="double" />
+			<parameter name="extruderid" description="Extruder ID to set/get target temperature" default="0" type="int" />
+			<parameter name="targetextrudertemperature" description="Target Extruder Temperature" default="25.0" type="double" />
+			<parameter name="targetbedtemperature" description="Target Bed Temperature" default="25.0" type="double" />
+		</parametergroup>
 
-  	  <signaldefinition name="signal_startjob">
-  		<parameter name="jobuuid" type="string" />
-  		<result name="success" type="bool" />		
-  	  </signaldefinition>	 	  	  	     
+		<parametergroup name="timeoutdata" description="Timeouts for different processes">		
+			<parameter name="layergracetime" description="Grace time [ms] added to calculated layer timeout" default="1000" type="int" />
+			<parameter name="printerconnectandinitialise" type="int" default="20000" description="Timeout [ms] for connecting and initialising printer" />
+		</parametergroup>
+
+		<signaldefinition name="signal_startjob">
+			<parameter name="jobuuid" type="string" />
+			<result name="success" type="bool" />		
+		</signaldefinition>	 	  	  	     
+
+		<signaldefinition name="signal_resetfatalerror">
+			<result name="success" type="bool" />		
+		</signaldefinition>	 	  	  	     
+
+		<signaldefinition name="signal_cleartemperatureandfan">
+			<result name="success" type="bool" />
+		</signaldefinition>	 
+
+		<signaldefinition name="signal_gettemperature">
+			<parameter name="extrudertemperature" type="double" />
+			<parameter name="bedtemperature" type="double" />
+			<result name="success" type="bool" />
+		</signaldefinition>	 
+
+		<state name="init" repeatdelay="100">
+			<outstate target="idle" />
+		</state>
+
+
+		<state name="idle" repeatdelay="50">
+			<outstate target="idle" />
+			<outstate target="startprocess" />
+		</state>
+
+		<state name="startprocess" repeatdelay="100">	  
+			<outstate target="extrudelayer" />
+		</state>
+
+
+		<state name="extrudelayer" repeatdelay="10">
+			<outstate target="nextlayer" />
+		</state>
+
+
+		<state name="nextlayer" repeatdelay="10">
+			<outstate target="extrudelayer" />
+			<outstate target="finishprocess" />
+		</state>
+
+
+		<state name="finishprocess" repeatdelay="100">	  
+			<outstate target="idle" />
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">	  
+			<outstate target="init" />
+			<outstate target="fatalerror" />
+		</state>
     
-  	  <signaldefinition name="signal_resetfatalerror">
-  		<result name="success" type="bool" />		
-  	  </signaldefinition>	 	  	  	     
-    
-  	  <signaldefinition name="signal_cleartemperatureandfan">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+	</statemachine>
 
-  	  <signaldefinition name="signal_gettemperature">
-  		<parameter name="extrudertemperature" type="double" />
-  		<parameter name="bedtemperature" type="double" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
 
-  	  <state name="init" repeatdelay="100">
-  			<outstate target="idle" />
-  	  </state>
-  
-  
-  	  <state name="idle" repeatdelay="50">
-  			<outstate target="idle" />
-  			<outstate target="startprocess" />
-  	  </state>
-  
-  	  <state name="startprocess" repeatdelay="100">	  
-  			<outstate target="extrudelayer" />
-  	  </state>
-  	  
-  
-  	  <state name="extrudelayer" repeatdelay="10">
-  			<outstate target="nextlayer" />
-  	  </state>
-  	  
-  
-  	  <state name="nextlayer" repeatdelay="10">
-  			<outstate target="extrudelayer" />
-  			<outstate target="finishprocess" />
-  	  </state>
-  
-  
-  	  <state name="finishprocess" repeatdelay="100">	  
-  			<outstate target="idle" />
-  	  </state>
-  		
-  	  <state name="fatalerror" repeatdelay="5000">	  
-  			<outstate target="init" />
-  			<outstate target="fatalerror" />
-  	  </state>
-    
-  	  
-    </statemachine>
-  
-  
-  
     <statemachine name="printerconnection" description="Printer Connection System" initstate="init" failedstate="fatalerror" library="plugin_printerconnection">
   	  
-  	  <signaldefinition name="signal_doextrudelayer">
-  		<parameter name="jobuuid" type="string" />
-   		<parameter name="layerindex" type="int" />
-   		<parameter name="layertimeout" type="double" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+		<signaldefinition name="signal_doextrudelayer">
+			<parameter name="jobuuid" type="string" />
+			<parameter name="layerindex" type="int" />
+			<parameter name="layertimeout" type="double" />
+			<result name="success" type="bool" />
+		</signaldefinition>	 
 
-  	  <signaldefinition name="signal_dohoming">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+		<signaldefinition name="signal_dohoming">
+			<result name="success" type="bool" />
+		</signaldefinition>	 
 
-  	  <signaldefinition name="signal_doextruderinit">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+		<signaldefinition name="signal_doextruderinit">
+			<result name="success" type="bool" />
+		</signaldefinition>	 
 
-	  <signaldefinition name="signal_setpidvalues">
-		<parameter name="dp" type="double" />
-		<parameter name="di" type="double" />
-		<parameter name="dd" type="double" />
-		<result name="success" type="bool" />	
-	  </signaldefinition>	  
+		<signaldefinition name="signal_setpidvalues">
+			<parameter name="dp" type="double" />
+			<parameter name="di" type="double" />
+			<parameter name="dd" type="double" />
+			<result name="success" type="bool" />	
+		</signaldefinition>	  
 
-	  <signaldefinition name="signal_disconnect">
-		<result name="success" type="bool" />	
-	  </signaldefinition>	  
+		<signaldefinition name="signal_disconnect">
+			<result name="success" type="bool" />	
+		</signaldefinition>	  
 
-	  <signaldefinition name="signal_connect">
-		<result name="success" type="bool" />	
-	  </signaldefinition>	  
+		<signaldefinition name="signal_connect">
+			<result name="success" type="bool" />	
+		</signaldefinition>	  
 
-	  <signaldefinition name="signal_emergencystop">
-		<result name="success" type="bool" />	
-	  </signaldefinition>	  
+		<signaldefinition name="signal_emergencystop">
+			<result name="success" type="bool" />	
+		</signaldefinition>	  
 
-  	  <signaldefinition name="signal_settemperature">
-  		<parameter name="extrudersetvalue" type="bool" />
-  		<parameter name="extruderid" type="int" />
-  		<parameter name="extrudertemperature" type="double" />
-  		<parameter name="extruderdowait" type="bool" />
-  		<parameter name="bedsetvalue" type="bool" />
-  		<parameter name="bedtemperature" type="double" />
-  		<parameter name="beddowait" type="bool" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+		<signaldefinition name="signal_settemperature">
+			<parameter name="extrudersetvalue" type="bool" />
+			<parameter name="extruderid" type="int" />
+			<parameter name="extrudertemperature" type="double" />
+			<parameter name="extruderdowait" type="bool" />
+			<parameter name="bedsetvalue" type="bool" />
+			<parameter name="bedtemperature" type="double" />
+			<parameter name="beddowait" type="bool" />
+			<result name="success" type="bool" />
+		</signaldefinition>	 
 
-  	  <signaldefinition name="signal_setfanspeed">
-  		<parameter name="fanid" type="int" />
-  		<parameter name="fanspeed" type="double" />
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+		<signaldefinition name="signal_setfanspeed">
+			<parameter name="fanid" type="int" />
+			<parameter name="fanspeed" type="double" />
+			<result name="success" type="bool" />
+		</signaldefinition>	 
 
-  	  <signaldefinition name="signal_dofinalizeextrude">
-  		<result name="success" type="bool" />
-  	  </signaldefinition>	 
+		<signaldefinition name="signal_dofinalizeextrude">
+			<result name="success" type="bool" />
+		</signaldefinition>	 
 
-  	  <signaldefinition name="signal_resetfatalerror">
-  		<result name="success" type="bool" />		
-  	  </signaldefinition>	 	  	  	     
-    
-	  <parametergroup name="extrudedata" description="Extruder settings">
-  		<parameter name="initialextrude" description="Value for initial extrusion" default="3" type="double" />
-  		<parameter name="retractextrude" description="Value for retract/restore extrusion after/before each layer" default="1" type="double" />
-	  </parametergroup>
+		<signaldefinition name="signal_resetfatalerror">
+			<result name="success" type="bool" />		
+		</signaldefinition>	 	  	  	     
 
-  	  <parametergroup name="comdata" description="COM Configuration">		
-  		<parameter name="port" description="COM Port" default="COM4" type="string" />
-  		<parameter name="baudrate" description="Baud rate" default="115200" type="int" />
-		<parameter name="connectinitialresponsetimeout" type="int" default="2000" description="Timeout [ms] for initial response of printer while connecting" />
-  	  </parametergroup>
+		<parametergroup name="extrudedata" description="Extruder settings">
+			<parameter name="initialextrude" description="Value for initial extrusion" default="3" type="double" />
+			<parameter name="retractextrude" description="Value for retract/restore extrusion after/before each layer" default="1" type="double" />
+		</parametergroup>
 
-  	  <driverparametergroup name="printerstate" description="Printer State Data" driver="marlin" /> 
-	  
-  	  <state name="init" repeatdelay="100">
-  			<outstate target="idle" />
-  	  </state>
-  
-  
-  	  <state name="idle" repeatdelay="10">	  	 
-  			<outstate target="idle" />
-  			<outstate target="doextrudelayer" />
-  	  </state>
-  
-  	  <state name="doextrudelayer" repeatdelay="10">
-  			<outstate target="idle" />
-  	  </state>
-  
-  	  <state name="fatalerror" repeatdelay="5000">	  
-  			<outstate target="init" />
-  			<outstate target="fatalerror" />
-  	  </state>
+		<parametergroup name="comdata" description="COM Configuration">		
+			<parameter name="port" description="COM Port" default="COM5" type="string" />
+			<parameter name="baudrate" description="Baud rate" default="115200" type="int" />
+			<parameter name="connectinitialresponsetimeout" type="int" default="2000" description="Timeout [ms] for initial response of printer while connecting" />
+		</parametergroup>
+
+		<driverparametergroup name="printerstate" description="Printer State Data" driver="marlin" /> 
+
+		<state name="init" repeatdelay="100">
+			<outstate target="idle" />
+		</state>
+
+
+		<state name="idle" repeatdelay="10">	  	 
+			<outstate target="idle" />
+			<outstate target="doextrudelayer" />
+		</state>
+
+		<state name="doextrudelayer" repeatdelay="10">
+			<outstate target="idle" />
+		</state>
+
+		<state name="fatalerror" repeatdelay="5000">	  
+			<outstate target="init" />
+			<outstate target="fatalerror" />
+		</state>
     
   	  
     </statemachine>
+	
+	<statemachine name="pidcontrol_extruder" description="Temperature PID Control System for Extruder" initstate="init" failedstate="fatalerror" library="plugin_pidcontrol">
+
+		<parametergroup name="status" description="Status of PID Control">
+			<parameter name="isactive" description="PID Control is active" default="0" type="bool" />
+			<parameter name="dp" description="dP Value" default="0" type="double" />
+			<parameter name="di" description="dI Value" default="0" type="double" />
+			<parameter name="dd" description="dD Value" default="0" type="double" />
+		</parametergroup>
 
 
+		<signaldefinition name="signal_startcontrolling">
+			<result name="success" type="bool" />		
+		</signaldefinition>
 
-  <statemachine name="pidcontrol_extruder" description="Temperature PID Control System for Extruder" initstate="init" failedstate="fatalerror" library="plugin_pidcontrol">
 
-	  <parametergroup name="status" description="Status of PID Control">
-		<parameter name="isactive" description="PID Control is active" default="0" type="bool" />
-		<parameter name="dp" description="dP Value" default="0" type="double" />
-		<parameter name="di" description="dI Value" default="0" type="double" />
-		<parameter name="dd" description="dD Value" default="0" type="double" />
-	  </parametergroup>
+		<signaldefinition name="signal_stopcontrolling">
+			<result name="success" type="bool" />		
+		</signaldefinition>	  	     	    
 
-	  
-	  <signaldefinition name="signal_startcontrolling">
-		<result name="success" type="bool" />		
-	  </signaldefinition>
-	  
-	  
-	  <signaldefinition name="signal_stopcontrolling">
-		<result name="success" type="bool" />		
-	  </signaldefinition>	  	     	    
-	  
 				
-	  <state name="init" repeatdelay="100">
+		<state name="init" repeatdelay="100">
 			<outstate target="idle" />
-	  </state>
+		</state>
 
 
-	  <state name="idle" repeatdelay="50">	  	 
-			<outstate target="idle" />
-			<outstate target="controlling" />
-	  </state>
-
-	  <state name="controlling" repeatdelay="50">	  	 
+		<state name="idle" repeatdelay="50">	  	 
 			<outstate target="idle" />
 			<outstate target="controlling" />
-	  </state>	  
+		</state>
 
-	  <state name="fatalerror" repeatdelay="5000">	  
+		<state name="controlling" repeatdelay="50">	  	 
+			<outstate target="idle" />
+			<outstate target="controlling" />
+		</state>	  
+
+		<state name="fatalerror" repeatdelay="5000">	  
 			<outstate target="init" />
 			<outstate target="idle" />
 			<outstate target="fatalerror" />
-	  </state>
-  
-	  
-  </statemachine>
+		</state>
+		  
+		  
+	</statemachine>
 
   
-    <userinterface appname="Autodesk Machine Control Framework" copyright="2020 Autodesk Inc." mainpage="main" library="plugin_userinterface">
-  
-		<logo resource="ui_logo" aspectratio="2.5" />
-		
+	
+
+
+
+	<userinterface appname="Autodesk Machine Control Framework" copyright="2021 Autodesk" mainpage="main" library="plugin_userinterface">
+
+		<logo resource="ui_logo" aspectratio="2.5"/>
+
+		<colors>
+			<color name="primary" red="0.024" green="0.588" blue="0.843"/>
+			<color name="secondary" red="0.529" green="0.737" blue="0.251"/>
+			<color name="accent" red="0.400" green="0.400" blue="0.400"/>
+			<color name="error" red="0.867" green="0.133" blue="0.133"/>
+		</colors>
+
 		<page name="main">
-
 			<content name="infobox" title="Welcome to AMdroid" headline="Autodesk Machine Control Framework" subtitle="Make Additive Manufacturing accessible">
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_logo" aspectratio="4.5" />
-				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
-				
-				<upload class="build" caption="Select 3MF files to upload" successpage="buildinfo" />
-				
+				<image resource="ui_machine" aspectratio="2.5" maxheight="400"/>
+				<paragraph text="This sample configuration serves as Laser Powderbed Fusion demo implementation."/>
+				<upload class="build" caption="Select 3MF files to upload" successevent="onuploadfinished"/>
+
 			
 				<buttongroup>
 					<button caption="Build Library" targetpage="buildlist" />
@@ -256,53 +258,97 @@
 
 		</page>
 
-		<page name="buildlist">
-		
-			<content name="buildlibrary" title="Build Library" subtitle="Make Additive Manufacturing accessible">
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<paragraph text="The Autodesk primary color is derived from our logo. It is where we start when introducing color into a communication. Our secondary palette gives you additional color options to round out your creative vision." />						
-				
-				<upload class="build" caption="Drag 3MF files here to upload" successpage="buildinfo" />
-				
-				<buildlist loadingtext="Loading builds" entriesperpage="20" detailpage="buildinfo" />
-				
-			</content>		
 
+		<page name="buildlist">
+			<content name="buildlibrary" title="Build Library">
+				<upload class="build" caption="Select 3MF files to upload" successevent="onuploadfinished"/>
+				<buildlist loadingtext="Loading builds" entriesperpage="20" selectevent="onselectbuild"/>
+			</content>
 		</page>
 
+		<page name="previewbuild">
 
-		<page name="buildinfo" onload="loadbuildinfo">
-		
-			<content name="buildinformation" title="Build Information" subtitle="Detailed information">
-				<paragraph text="Here you find more information about your build." />
+			<grid name="previewgrid">
+				<column width="180" unit="pt"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
 
-				<buttongroup>
-					<button caption="Start Build" event="startbuild" targetpage="systemstatus" />
-				</buttongroup>
-				
-				
-				<layerview>				
+				<row height="50" unit="pt"/>
+				<row height="50" unit="pt"/>
+				<row height="1" unit="free"/>
+
+
+				<content name="actions1" columnstart="5" rowstart="1" columnend="5" rowend="1" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Start Job" targetpage="buildstatus" event="startbuild"/>
+					</buttongroup>
+				</content>
+
+				<content name="actions2" columnstart="5" rowstart="2" columnend="5" rowend="2" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Close Preview" targetpage="buildlist" event="unloadbuildpreview"/>
+					</buttongroup>
+				</content>
+
+
+				<layerview name="preview" columnstart="1" rowstart="3" columnend="5" rowend="3">
+					<platform sizex="300" sizey="300" originx="150" originy="150" baseimage="buildplate"/>
+
 				</layerview>
 
-	
-				
-			</content>		
-
+			</grid>
 		</page>
 
-		<page name="systemstatus">
-			<content name="currentbuild" title="Current System Status" >
-			
-				<paragraph text="Our colors unite and enrich the Autodesk experience and solidify our brand." />
-				<image resource="ui_machine" aspectratio="2.5" maxheight="400" />
-				<paragraph text="This is the current machine state." />						
+
+		<page name="buildstatus">
+
+			<grid name="previewgrid">
+				<column width="180" unit="pt"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+				<column width="3" unit="free"/>
+
+				<row height="50" unit="pt"/>
+				<row height="50" unit="pt"/>
+				<row height="1" unit="free"/>
+
+
+				<content name="actions1" columnstart="5" rowstart="1" columnend="5" rowend="1" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Pause Build" event="pausebuild"/>
+					</buttongroup>
+				</content>
+
+				<content name="actions2" columnstart="5" rowstart="2" columnend="5" rowend="2" rowposition="centered">
+					<buttongroup distribution="equal">
+						<button caption="Cancel Build" event="cancelbuild"/>
+					</buttongroup>
+				</content>
+
+
+				<layerview name="preview" columnstart="1" rowstart="3" columnend="3" rowend="3">
+					<platform sizex="300" sizey="300" originx="150" originy="150" sync:layerindex="main.jobinfo.currentlayer"  baseimage="buildplate"/>
+				</layerview>
 				
-				<parameterlist loadingtext="Loading parameters">
-					<entry statemachine="main" group="jobinfo" />
-					<entry statemachine="printerconnection" group="printerstate" />
-				</parameterlist>	
-			</content>					
-			
+				
+				<tabs name="buildtabs"  columnstart="4" rowstart="3" columnend="5" rowend="3" >
+							
+					<content name="systemstate" caption="System State">
+					
+						<parameterlist loadingtext="Loading parameters">
+							<entry statemachine="main" group="jobinfo" />
+							<entry statemachine="printerconnection" group="printerstate" />
+						</parameterlist>	
+						
+					</content>		
+
+				</tabs>
+				
+
+			</grid>
 		</page>
 
 		<page name="manualcontrol">
@@ -319,53 +365,30 @@
 			</content>					
 		</page>
 
+		<page name="systemstatus">
 
-		<page name="settings">
-		
-			<content name="machinesettings" title="Machine Settings" >
-
-				<form name="form1">
-					<edit caption="Machine name" text="" />
-					<switch caption="Switch 1" value="1" />
-					<switch caption="Switch 2" value="0" />
-					<switch caption="Switch 3" value="0" />
-					<memo caption="Machine description" text="" />
-					<combobox caption="Combobox" value="0" />
-				</form>
-				
-				<buttongroup>
-					<button caption="Save" />
-					<button caption="Cancel" />
-				</buttongroup>
-						
-			</content>					
+			<content name="currentbuild" title="Current System Status">
+				<parameterlist loadingtext="Loading parameters">
+					<entry statemachine="main" group="jobinfo"/>
+					<entry statemachine="printerconnection" group="printerstate" />
+				</parameterlist>
+			</content>
 
 		</page>
 
 		<menu>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="build" icon="mdi-factory" caption="Build Library" targetpage="buildlist"/>
+			<item id="buildlist" icon="mdi-apps" caption="Build Library" targetpage="buildlist"/>
+			<item id="buildstatus" icon="mdi-apps" caption="Build Status" targetpage="buildstatus"/>
+			<item id="settings" icon="mdi-apps" caption="Manual Control" targetpage="manualcontrol"/>
 			<item id="systemstatus" icon="mdi-apps" caption="System Status" targetpage="systemstatus"/>
-			<item id="settings" icon="mdi-settings" caption="Manual Control" targetpage="manualcontrol"/>
-			<item id="settings" icon="mdi-settings" caption="Settings" targetpage="settings"/>
-
 		</menu>
+
 
 		<toolbar>
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="build" icon="mdi-factory" caption="Builds" targetpage="buildlist"/>
-
 		</toolbar>
 
 
 	</userinterface>
-
 </machinedefinition>
-
-
-
-
-
-
-
-

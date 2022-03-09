@@ -41,8 +41,10 @@ using namespace LibMCUI::Impl;
 
 
 
+
+
 /*************************************************************************************************************************
- Class declaration of CEventHandler
+ Class declaration of CEvent_StartBuild
 **************************************************************************************************************************/
 
 class CEvent_StartBuild : public virtual CEvent {
@@ -56,21 +58,133 @@ public:
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
-		if (pUIEnvironment.get() == nullptr)
-			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
 
-		auto sJobUUID = pUIEnvironment->GetEventContext();
+		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID("previewbuild.preview", "builduuid");
+		pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 1);
+
 		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startjob");
-		pSignal->SetString("jobuuid", sJobUUID);
+		pSignal->SetString("jobuuid", sBuildUUID);
 		pSignal->Trigger();
 
-		if (!pSignal->WaitForHandling(2000))
-			pUIEnvironment->LogWarning("Could not start job");
+		pUIEnvironment->ActivatePage("buildstatus");
 
 	}
 
 };
 
+
+
+class CEvent_OnUploadFinished : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onuploadfinished";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		auto sSender = pUIEnvironment->RetrieveEventSender();
+		pUIEnvironment->LogMessage("Uploaded success from " + sSender);
+
+		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "uploaduuid");
+		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
+
+		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
+
+		pUIEnvironment->ActivatePage("previewbuild");
+	}
+
+};
+
+
+class CEvent_OnUnloadBuildPreview : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "unloadbuildpreview";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		pUIEnvironment->LogMessage("Unloading build preview...");
+
+		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", "");
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 0);
+	}
+
+};
+
+
+
+class CEvent_OnSelectBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onselectbuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+		auto sSender = pUIEnvironment->RetrieveEventSender();
+		pUIEnvironment->LogMessage("Build item selected from " + sSender);
+
+		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
+		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
+
+		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
+
+		pUIEnvironment->ActivatePage("previewbuild");
+	}
+
+};
+
+
+
+class CEvent_PauseBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "pausebuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Pause Build");
+
+	}
+
+};
+
+
+class CEvent_CancelBuild : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "cancelbuild";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Cancel Build");
+
+	}
+
+};
 
 class CEvent_Connect : public virtual CEvent {
 
@@ -214,7 +328,7 @@ public:
 	{
 		if (pUIEnvironment.get() == nullptr)
 			throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDPARAM);
-		
+
 		auto pSignalTemp = pUIEnvironment->PrepareSignal("main", "signal_cleartemperatureandfan");
 		pSignalTemp->Trigger();
 
@@ -240,27 +354,35 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 	IEvent* pEventInstance = nullptr;
 	if (createEventInstanceByName<CEvent_StartBuild>(sEventName, pEventInstance))
 		return pEventInstance;
-
+	if (createEventInstanceByName<CEvent_OnUploadFinished>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnSelectBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_OnUnloadBuildPreview>(sEventName, pEventInstance))
+		return pEventInstance;	
+	if (createEventInstanceByName<CEvent_CancelBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_PauseBuild>(sEventName, pEventInstance))
+		return pEventInstance;
 	if (createEventInstanceByName<CEvent_Connect>(sEventName, pEventInstance))
 		return pEventInstance;
-
 	if (createEventInstanceByName<CEvent_Disconnect>(sEventName, pEventInstance))
 		return pEventInstance;
-
 	if (createEventInstanceByName<CEvent_Home>(sEventName, pEventInstance))
 		return pEventInstance;
-
 	if (createEventInstanceByName<CEvent_EmergencyStop>(sEventName, pEventInstance))
 		return pEventInstance;
-
 	if (createEventInstanceByName<CEvent_ResetFatalError>(sEventName, pEventInstance))
 		return pEventInstance;
-
 	if (createEventInstanceByName<CEvent_ClearTemperatureAndFan>(sEventName, pEventInstance))
 		return pEventInstance;
 
-	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME);
+
+	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);
 }
+
+
+
 
 #ifdef _MSC_VER
 #pragma warning(pop)

@@ -42,6 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameter.hpp"
 #include "amc_statejournal.hpp"
 
+namespace LibMCData {
+
+	class CPersistencyHandler;
+	typedef std::shared_ptr<CPersistencyHandler> PPersistencyHandler;
+
+}
+
 namespace AMC {
 
 	class CParameter_Valued : public CParameter {
@@ -49,16 +56,28 @@ namespace AMC {
 		std::string m_sName;
 		std::string m_sDescription;
 		std::string m_sDefaultValue;
+		
 		std::string m_sValue;
+		
+		// update value including persistency storage
+		void setValueEx(const std::string& sValue);
+
+		eParameterDataType m_DataType;
 		
 		PStateJournal m_pJournal;
 		uint32_t m_nJournalVariableID;
+
+		// For handling persistency, store Data Objects
+		std::string m_sPersistentName;
+		std::string m_sPersistentUUID;
+		LibMCData::PPersistencyHandler m_pPersistencyHandler;
+
 	public:
 
-		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
-		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string & sName, const std::string& sDescription, const std::string& sDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const double dDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const int64_t nDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
+		CParameter_Valued(const std::string& sName, const std::string& sDescription, const bool bDefaultValue, eParameterDataType eDataType, PStateJournal pJournal, uint32_t nJournalVariableID);
 
 		virtual ~CParameter_Valued();
 
@@ -67,6 +86,8 @@ namespace AMC {
 		std::string getName() const override;
 		std::string getDescription() const override;
 		std::string getDefaultValue() const override;
+
+		eParameterDataType getDataType() const override;
 
 		std::string getStringValue() const override;
 		void setStringValue(const std::string& sValue) override;
@@ -81,6 +102,10 @@ namespace AMC {
 		void setBoolValue(const bool bValue) override;
 
 		virtual PParameter duplicate() override;
+
+		void enablePersistency (const std::string& sPersistentName, const std::string& sPersistentUUID);
+		void disablePersistency();
+		void setPersistencyHandler(LibMCData::PPersistencyHandler pPersistencyHandler);
 
 	};
 	

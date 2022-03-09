@@ -463,6 +463,8 @@ public:
 	{
 	}
 	
+	inline void SetToSimulationMode();
+	inline bool IsSimulationMode();
 	inline void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber);
 	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
 	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
@@ -636,6 +638,8 @@ public:
 		pWrapperTable->m_RTCSelector_AcquireEthernetCardBySerial = nullptr;
 		pWrapperTable->m_Driver_ScanLab_LoadSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_Initialise = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_LoadFirmware = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetCorrectionFile = nullptr;
@@ -1094,6 +1098,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_Initialise = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_initialise");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_RTC6_Initialise = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_initialise");
@@ -1400,6 +1422,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_creatertcselector", (void**)&(pWrapperTable->m_Driver_ScanLab_CreateRTCSelector));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_CreateRTCSelector == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_issimulationmode", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_initialise", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_Initialise));
@@ -2014,6 +2044,26 @@ public:
 	/**
 	 * Method definitions for class CDriver_ScanLab_RTC6
 	 */
+	
+	/**
+	* CDriver_ScanLab_RTC6::SetToSimulationMode - Turns the driver into a simulation mode.
+	*/
+	void CDriver_ScanLab_RTC6::SetToSimulationMode()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_SetToSimulationMode(m_pHandle));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::IsSimulationMode - Returns if the driver is in simulation mode.
+	* @return Flag if driver is in simulation mode.
+	*/
+	bool CDriver_ScanLab_RTC6::IsSimulationMode()
+	{
+		bool resultSimulationModeEnabled = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_IsSimulationMode(m_pHandle, &resultSimulationModeEnabled));
+		
+		return resultSimulationModeEnabled;
+	}
 	
 	/**
 	* CDriver_ScanLab_RTC6::Initialise - Initializes the RTC6 Scanner Driver.

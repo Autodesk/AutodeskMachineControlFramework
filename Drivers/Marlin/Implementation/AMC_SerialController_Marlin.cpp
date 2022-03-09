@@ -155,6 +155,7 @@ namespace AMC {
 
 		if (!m_pConnection->isOpen()) {
 			m_pConnection.reset();
+			throw std::runtime_error("Could not connect to serial port");
 		}
 
 		// instead of waiting a fixed time wait until "start" or "" (after timeout) received from device??
@@ -184,7 +185,7 @@ namespace AMC {
 		setPositioningAbolute();
 		setAbsoluteExtrusion(true);
 		m_dExtruderSumE = 0.0; // reset var to store summed extrude values (E axis)
-		
+
 		if (m_nCurrentBufferSpace > 0) {
 			m_nMaxBufferSpace = m_nCurrentBufferSpace;
 		}

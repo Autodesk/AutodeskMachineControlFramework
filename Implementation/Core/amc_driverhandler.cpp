@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_driverenvironment.hpp"
 #include "libmc_exceptiontypes.hpp"
-
+#include "amc_logger.hpp"
 
 #include <vector>
 #include <memory>
@@ -47,11 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler)
-	: m_pEnvironmentWrapper (pEnvironmentWrapper), m_pToolpathHandler (pToolpathHandler)
+CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger)
+	: m_pEnvironmentWrapper (pEnvironmentWrapper), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger)
 {
 	LibMCAssertNotNull(pEnvironmentWrapper.get());
 	LibMCAssertNotNull(pToolpathHandler.get());
+	LibMCAssertNotNull(pLogger.get());
+	
 }
 
 
@@ -82,7 +84,7 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_pToolpathHandler, m_sTempBasePath);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_pToolpathHandler, m_sTempBasePath, m_pLogger, sName);
 
 	pInternalEnvironment->setIsInitializing(true);
 

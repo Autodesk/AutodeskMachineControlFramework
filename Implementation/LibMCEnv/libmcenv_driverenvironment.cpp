@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_interfaceexception.hpp"
 #include "libmcenv_workingdirectory.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
+#include "libmcenv_imagedata.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -48,8 +49,8 @@ using namespace LibMCEnv::Impl;
  Class definition of CDriverEnvironment
 **************************************************************************************************************************/
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath)
-    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler)
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, const std::string & sDriverName)
+    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -57,7 +58,11 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pToolpathHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pLogger.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (sBaseTempPath.empty ())
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (sDriverName.empty())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
 }
@@ -121,7 +126,7 @@ void CDriverEnvironment::RegisterUUIDParameter(const std::string& sParameterName
     if (!m_bIsInitializing)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_DRIVERISNOTINITIALISING);
 
-    m_pParameterGroup->addNewStringParameter(sParameterName, sDescription, AMCCommon::CUtils::normalizeUUIDString(sDefaultValue));
+    m_pParameterGroup->addNewUUIDParameter(sParameterName, sDescription, AMCCommon::CUtils::normalizeUUIDString(sDefaultValue));
 }
 
 void CDriverEnvironment::RegisterDoubleParameter(const std::string& sParameterName, const std::string& sDescription, const LibMCEnv_double dDefaultValue)
@@ -188,5 +193,31 @@ void CDriverEnvironment::Sleep(const LibMCEnv_uint32 nDelay)
 LibMCEnv_uint64 CDriverEnvironment::GetGlobalTimerInMilliseconds()
 {
     return m_Chrono.getExistenceTimeInMilliseconds();
+}
+
+void CDriverEnvironment::LogMessage(const std::string& sLogString)
+{
+    m_pLogger->logMessage(sLogString, m_sDriverName, AMC::eLogLevel::Message);
+}
+
+void CDriverEnvironment::LogWarning(const std::string& sLogString)
+{
+    m_pLogger->logMessage(sLogString, m_sDriverName, AMC::eLogLevel::Warning);
+}
+
+void CDriverEnvironment::LogInfo(const std::string& sLogString)
+{
+    m_pLogger->logMessage(sLogString, m_sDriverName, AMC::eLogLevel::Info);
+}
+
+
+IImageData* CDriverEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
+IImageData* CDriverEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
+{
+    return CImageData::createFromPNG (pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
 }
 

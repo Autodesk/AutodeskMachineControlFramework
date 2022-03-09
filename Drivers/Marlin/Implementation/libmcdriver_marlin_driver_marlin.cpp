@@ -56,7 +56,7 @@ CDriver_Marlin::CDriver_Marlin(const std::string& sName, const std::string& sTyp
 	pDriverEnvironment->RegisterBoolParameter("ishomed", "Homed", false);
 	pDriverEnvironment->RegisterBoolParameter("isconnected", "Connected", false);
 	pDriverEnvironment->RegisterBoolParameter("bufferavailable", "Buffer is available", false);
-	pDriverEnvironment->RegisterDoubleParameter("statusupdateinterval", "Timer interval [ms] for updating status", 100.0);
+	pDriverEnvironment->RegisterDoubleParameter("statusupdateinterval", "Timer interval [ms] for updating status", 250.0);
 	// this driver supports just one extruder with id 0
 	pDriverEnvironment->RegisterDoubleParameter("currenttemperatureextruderid0", "Current temperature of extruder 1", 0.0);
 	pDriverEnvironment->RegisterDoubleParameter("currenttemperaturebed", "Current bed temperature", 0.0);
@@ -73,8 +73,6 @@ void CDriver_Marlin::Configure(const std::string& sConfigurationString)
 
 void CDriver_Marlin::QueryParameters()
 {
-
-	
 	if (m_pSerialController.get() != nullptr) {
 		double dX, dY, dZ;
 		m_pSerialController->queryPositionState();
@@ -104,6 +102,7 @@ void CDriver_Marlin::QueryParameters()
 
 		m_pSerialController->getHeatedBedCurrentTemperature(dBedT);
 		m_pDriverEnvironment->SetDoubleParameter("currenttemperaturebed", dBedT);
+
 	}
 }
 

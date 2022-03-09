@@ -31,7 +31,6 @@ namespace AMC {
 		double m_dAxisStepsPerUnitE;
 
 		double m_dExtruderSumE;
-
 		double m_dPidValueP;
 		double m_dPidValueI;
 		double m_dPidValueD;
@@ -103,8 +102,8 @@ namespace AMC {
 
 		void setHeatedBedTargetTemperature(double nTemperatureInDegreeCelcius, bool bWait) override;
 		void setExtruderTargetTemperature(uint32_t nExtruderIndex, double nTemperatureInDegreeCelcius, bool bWait) override;
-		void setPidParameters(double dP, double dI, double dD) override;
 		void setFanSpeed(uint32_t nFanIndex, uint32_t nSpeed) override;
+		void setPidParameters(double dP, double dI, double dD) override;
 
 		void queryTemperatureState(uint32_t nExtruderIndex) override;
 		void queryPositionState() override;
