@@ -53,9 +53,7 @@ iMvfhzcF77z9EbRzjgwHblDzfg35vIlEYXk1pMEQtEm3HSfNJ/HF+KEIK3B2cw==
 		</certificate>
 		
 		<privatekey>	
------BEGIN RSA PRIVATE KEY-----
------END RSA PRIVATE KEY-----
-              </privatekey>
+             	</privatekey>
 	
 	</client>
 
