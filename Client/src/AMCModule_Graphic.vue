@@ -102,6 +102,25 @@
 					
 					}
 				
+				},
+
+				updateGraphicPositions: function () {
+					
+					if (this.glInstance && this.GraphicInstance && this.module && this.module.items)  {
+										
+						for (var item of this.module.items) {
+							if (item.imageuuid && item.name) {
+								this.GraphicInstance.SetElementTranslation (item.name, item.x, item.y);
+								this.GraphicInstance.SetElementScaling (item.name, item.scalex, item.scaley);
+																
+							}
+						}								
+
+						this.GraphicInstance.updateTransform ();
+						this.GraphicInstance.RenderScene (true);
+					
+					}
+				
 				}				
 				
 				
@@ -109,7 +128,7 @@
 		
 		
 		created () {
-			
+			this.module.onDataHasChanged = this.updateGraphicPositions;	
 			this.glInstance = this.Application.retrieveWebGLInstance (module.uuid);
 			if (!this.glInstance) {
 				this.glInstance = new WebGLImpl ();

@@ -373,3 +373,8 @@ IImageData* CStateEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBuffer
 {
 	return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
 }
+
+LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
+{
+	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+}

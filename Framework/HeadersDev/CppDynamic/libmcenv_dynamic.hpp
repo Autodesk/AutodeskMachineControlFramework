@@ -762,6 +762,7 @@ public:
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 };
 	
 /*************************************************************************************************************************
@@ -804,6 +805,7 @@ public:
 	inline void SetUIPropertyAsBool(const std::string & sElementPath, const std::string & sPropertyName, const bool bValue);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
+	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
 };
 	
 	/**
@@ -1042,6 +1044,7 @@ public:
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -1068,6 +1071,7 @@ public:
 		pWrapperTable->m_UIEnvironment_SetUIPropertyAsBool = nullptr;
 		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
+		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -2517,6 +2521,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_stateenvironment_getglobaltimerinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
@@ -2748,6 +2761,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvUIEnvironment_GetGlobalTimerInMillisecondsPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_getglobaltimerinmilliseconds");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = (PLibMCEnvUIEnvironment_GetGlobalTimerInMillisecondsPtr) dlsym(hLibrary, "libmcenv_uienvironment_getglobaltimerinmilliseconds");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3431,6 +3453,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadPNGImage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3533,6 +3559,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_loadpngimage", (void**)&(pWrapperTable->m_UIEnvironment_LoadPNGImage));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LoadPNGImage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_getglobaltimerinmilliseconds", (void**)&(pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -5619,6 +5649,18 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
+	}
+	
+	/**
 	 * Method definitions for class CUIEnvironment
 	 */
 	
@@ -5972,6 +6014,18 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CImageData>(m_pWrapper, hImageDataInstance);
+	}
+	
+	/**
+	* CUIEnvironment::GetGlobalTimerInMilliseconds - Returns the global timer in milliseconds.
+	* @return Timer value in Milliseconds
+	*/
+	LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
+	{
+		LibMCEnv_uint64 resultTimerValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
+		
+		return resultTimerValue;
 	}
 
 } // namespace LibMCEnv

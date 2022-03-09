@@ -131,7 +131,7 @@ public:
 
 	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-
+	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 };
 
 } // namespace Impl

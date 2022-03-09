@@ -940,7 +940,11 @@
 			<param name="DPIValueX" type="double" pass="in" description="DPI Value in X. MUST be positive." />
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
 			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
-			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />	
+		</method>
+
+		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
 	</class>
@@ -1101,6 +1105,10 @@
 			<param name="DPIValueY" type="double" pass="in" description="DPI Value in Y. MUST be positive." />
 			<param name="PixelFormat" type="enum" class="ImagePixelFormat" pass="in" description="Pixel format to use. Might lose color and alpha information." />
 			<param name="ImageDataInstance" type="class" class="ImageData" pass="return" description="Image instance containing the PNG image." />
+		</method>
+
+		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
+			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 		
 	</class>

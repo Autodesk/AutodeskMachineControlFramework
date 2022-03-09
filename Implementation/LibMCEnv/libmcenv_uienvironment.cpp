@@ -290,3 +290,8 @@ IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSiz
 {
     return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
 }
+
+LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
+{
+    return m_Chrono.getExistenceTimeInMilliseconds();
+}

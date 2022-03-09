@@ -1704,6 +1704,15 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_CreateEmptyImagePtr) (LibMCEn
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadPNGImagePtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
+/**
+* Returns the global timer in milliseconds.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -2001,6 +2010,15 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CreateEmptyImagePtr) (LibMCEnv_U
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadPNGImagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8 * pPNGDataBuffer, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, LibMCEnv::eImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance);
 
+/**
+* Returns the global timer in milliseconds.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pTimerValue - Timer value in Milliseconds
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetGlobalTimerInMillisecondsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 * pTimerValue);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -2212,6 +2230,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
 	PLibMCEnvStateEnvironment_CreateEmptyImagePtr m_StateEnvironment_CreateEmptyImage;
 	PLibMCEnvStateEnvironment_LoadPNGImagePtr m_StateEnvironment_LoadPNGImage;
+	PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr m_StateEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
@@ -2238,6 +2257,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_SetUIPropertyAsBoolPtr m_UIEnvironment_SetUIPropertyAsBool;
 	PLibMCEnvUIEnvironment_CreateEmptyImagePtr m_UIEnvironment_CreateEmptyImage;
 	PLibMCEnvUIEnvironment_LoadPNGImagePtr m_UIEnvironment_LoadPNGImage;
+	PLibMCEnvUIEnvironment_GetGlobalTimerInMillisecondsPtr m_UIEnvironment_GetGlobalTimerInMilliseconds;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

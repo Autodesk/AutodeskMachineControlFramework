@@ -72,6 +72,8 @@ private:
 	bool m_bCloseModalDialog;
 	std::string m_sPageToActivate;
 
+	AMCCommon::CChrono m_Chrono;
+
 protected:
 
 public:
@@ -136,6 +138,8 @@ public:
 	bool getCloseModalDialog();
 
 	std::string getPageToActivate();
+
+	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
 };
 

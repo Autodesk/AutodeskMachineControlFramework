@@ -452,6 +452,10 @@
 		<error name="MISSINGLIBRARYNAME" code="425" description="Missing library name" />
 		<error name="MISSINGLIBRARYIMPORTNAME" code="426" description="Missing library import name" />
 		<error name="DUPLICATELIBRARYNAME" code="427" description="Duplicate library name" />
+		
+		<error name="INVALIDTRANSFORMINTERVAL" code="428" description="Invalid transform interval" />
+		<error name="INVALIDTRANSFORMCOORDINATE" code="429" description="Invalid transform coordinate" />
+		
 
 		  
 	</errors>
