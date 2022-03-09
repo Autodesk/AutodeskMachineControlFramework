@@ -172,6 +172,19 @@ public:
 		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
 		pDriver->QueryParameters();
 
+		double dAxisValue;
+		uint64_t nTimer = pStateEnvironment->GetGlobalTimerInMilliseconds();
+		int nTimeInterval = (nTimer % 20000);
+		dAxisValue = sin((nTimeInterval / 10000.0) * 3.1415) * 50.0 + 50.0;
+		/*if (nTimeInterval < 10000)
+			dAxisValue = nTimeInterval * 0.01;
+		else
+			dAxisValue = 100.0 - (nTimeInterval - 10000) * 0.01; */
+
+
+		pStateEnvironment->SetDoubleParameter ("axisvalues", "recoateraxis", dAxisValue);
+
+
 
 		LibMCEnv::PSignalHandler pHandlerInstance;
 		if (pStateEnvironment->WaitForSignal("signal_recoatlayer", 0, pHandlerInstance)) {			

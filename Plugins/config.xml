@@ -183,6 +183,10 @@
 
 		<driverparametergroup name="plcstate" description="BuR State" driver="bur"/>
 
+		<parametergroup name="axisvalues" description="Axis Values">
+			<parameter name="recoateraxis" description="Recoateraxis" default="0" type="double"/>
+		</parametergroup>
+		
 		<signaldefinition name="signal_recoatlayer">
 			<result name="success" type="bool"/>
 		</signaldefinition>
@@ -191,7 +195,7 @@
 			<outstate target="idle"/>
 		</state>
 
-		<state name="idle" repeatdelay="50">
+		<state name="idle" repeatdelay="10">
 			<outstate target="idle"/>
 			<outstate target="recoating"/>
 		</state>
@@ -387,10 +391,19 @@
 				
 					<view minx="0" miny="0" maxx="160" maxy="110" showgrid="0" />
 										
-					<svgimage resource="machinesketch" x="0" y="0" z="45" scalex="1.0" scaley="1.0" angle="0.0" />
-					<svgimage name="platform" resource="platform" x="35" y="5" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
-					<svgimage name="powderreservoir" resource="platform" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
-					<svgimage name="recoater" resource="recoatersketch" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
+					<svgimage resource="machinesketch" x="0" y="0" z="45" scalex="1.0" scaley="1.0" angle="0.0">
+          </svgimage>
+					
+					<svgimage name="platform" resource="platform" x="35" y="5" z="50" scalex="1.0" scaley="1.0" angle="0.0">
+            <linearmotion parameter="plc.axisvalues.recoateraxis" from="0.0" to="100.0" deltax="0" deltay="50" />
+          </svgimage>
+
+          <svgimage name="powderreservoir" resource="platform" x="0" y="50" z="50" scalex="1.0" scaley="1.0" angle="0.0">
+            <linearmotion parameter="plc.axisvalues.recoateraxis" from="0.0" to="100.0" deltax="0" deltay="-50" />
+          </svgimage>
+          <svgimage name="recoater" resource="recoatersketch" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0">
+            <linearmotion parameter="plc.axisvalues.recoateraxis" from="0.0" to="100.0" deltax="100" deltay="0" />
+          </svgimage>
 					
 				</graphic>
 
@@ -541,6 +554,7 @@
 					<entry statemachine="main" group="ui"/>
 					<entry statemachine="plc" group="plcconfig"/>
 					<entry statemachine="plc" group="plcstate"/>
+					<entry statemachine="plc" group="axisvalues"/>
 
 					<entry statemachine="laser" group="sdkstate"/>
 
