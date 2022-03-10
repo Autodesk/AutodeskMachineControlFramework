@@ -45,7 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdata_dynamic.hpp"
 #include <cmath>
 
-#define SVGIMAGELINEARMOTION_MININTERVAL 0.0001
+#define SVGIMAGELINEARMOTION_MININTERVALRANGE 0.0001
+
 #define SVGIMAGELINEARMOTION_INVALIDINTERVAL -1E9
 #define SVGIMAGELINEARMOTION_MININTERVAL -1E8
 #define SVGIMAGELINEARMOTION_MAXINTERVAL +1E8
@@ -106,7 +107,7 @@ void CUIModule_GraphicSVGImageLinearMotion::transformPosition(double& dPositionX
 {
 	LibMCAssertNotNull(pMachineData);
 	double dInterval = (m_dTo - m_dFrom);
-	if (abs(dInterval) > SVGIMAGELINEARMOTION_MININTERVAL) {
+	if (abs(dInterval) > SVGIMAGELINEARMOTION_MININTERVALRANGE) {
 
 		double dValue = getParameterValue(pMachineData);
 		double dLambda = (dValue - m_dFrom) / dInterval;
@@ -140,7 +141,7 @@ PUIModule_GraphicSVGImage CUIModule_GraphicSVGImage::makeFromXML(const pugi::xml
 	for (auto xmlChild : children) {
 		std::string sChildName = xmlChild.name();
 		if (sChildName == "linearmotion")
-			pItem->addTransform(std::make_shared<CUIModule_GraphicSVGImageLinearMotion>(xmlChild, pUIModuleEnvironment->stateMachineData ()));
+			pItem->addTransform(std::make_shared<CUIModule_GraphicSVGImageLinearMotion>(xmlChild, pItem->getItemPath(), pUIModuleEnvironment->stateMachineData ()));
 	}
 
 	return pItem;
