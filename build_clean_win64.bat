@@ -1,4 +1,4 @@
-REM echo off
+echo off
 
 
 set GO111MODULE=off
@@ -42,10 +42,15 @@ git rev-parse --verify --short HEAD >"%builddir%\githash.txt"
 SET /p GITHASH=<"%builddir%\githash.txt"
 echo git hash: %GITHASH%
 
+git rev-parse --verify HEAD >"%builddir%\longgithash.txt"
+SET /p LONGGITHASH=<"%builddir%\longgithash.txt"
+echo long git hash: %LONGGITHASH%
+
 git log -n 1 --format="%%H" -- "%basepath%\Client" >"%builddir%\clientdirhash.txt"
 SET /p CLIENTDIRHASH=<"%builddir%\clientdirhash.txt"
 SET /p CLIENTDISTHASH=<"%basepath%\Artifacts\clientdist\_githash_client.txt"
 
+REM Trim Strings
 for /f "tokens=* delims= " %%a in ("%CLIENTDIRHASH%") do set CLIENTDIRHASH=%%a
 for /l %%a in (1,1,100) do if "!CLIENTDIRHASH:~-1!"==" " set CLIENTDIRHASH=!CLIENTDIRHASH:~0,-1! 
 for /f "tokens=* delims= " %%a in ("%CLIENTDISTHASH%") do set CLIENTDISTHASH=%%a
@@ -58,10 +63,6 @@ if "%CLIENTDIRHASH%" neq "%CLIENTDISTHASH%" (
 	echo "Please rebuild client!"
 	goto ERROR
 )
-
-git rev-parse --verify HEAD >"%builddir%\longgithash.txt"
-SET /p LONGGITHASH=<"%builddir%\longgithash.txt"
-echo long git hash: %LONGGITHASH%
 
 cd /d "%basepath%"
 

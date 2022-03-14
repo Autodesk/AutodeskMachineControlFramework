@@ -76,8 +76,19 @@ git rev-parse --verify HEAD > "$builddir/longgithash.txt"
 LONGGITHASH=$(<"$builddir/longgithash.txt")
 echo "long git hash: $LONGGITHASH"
 
-cd "$basepath"
+git log -n 1 --format="%H" -- "$basepath/Client" > "$builddir/clientdirhash.txt"
+CLIENTDIRHASH=$(<"$builddir/clientdirhash.txt")
+echo "client dir hash: $CLIENTDIRHASH"
 
+CLIENTDISTHASH=$(<"$basepath/Artifacts/clientdist/_githash_client.txt")
+echo "client dist hash: $CLIENTDISTHASH"
+
+if test $CLIENTDISTHASH != $CLIENTDIRHASH
+echo "Invalid client hash! Please rebuild client!"
+exit 1
+fi
+
+cd "$basepath"
 
 if test $PLATFORMNAME = "rpi"
 then
