@@ -90,7 +90,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 	log("Loading framework...");
 	m_pWrapper = LibMC::CWrapper::loadLibrary(m_pServerConfiguration->getLibraryPath ("core"));
 	m_pWrapper->GetVersion(nMajorFrameworkVersion, nMinorFrameworkVersion, nMicroFrameworkVersion);
-	log("Found data model interface " + std::to_string(nMajorFrameworkVersion) + "." + std::to_string(nMinorFrameworkVersion) + "." + std::to_string(nMicroFrameworkVersion));
+	log("Found framework interface " + std::to_string(nMajorFrameworkVersion) + "." + std::to_string(nMinorFrameworkVersion) + "." + std::to_string(nMicroFrameworkVersion));
 
 	m_pWrapper->InjectComponent("LibMCData", m_pDataWrapper->GetSymbolLookupMethod());
 

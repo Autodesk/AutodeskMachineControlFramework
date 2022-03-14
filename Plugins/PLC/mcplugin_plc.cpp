@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_bur_dynamic.hpp"
 #include "libmcenv_drivercast.hpp"
 
+#include <cmath>
+
 using namespace LibMCPlugin::Impl;
 
 #ifdef _MSC_VER

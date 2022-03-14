@@ -109,7 +109,7 @@
 					if (this.glInstance && this.GraphicInstance && this.module && this.module.items)  {
 										
 						for (var item of this.module.items) {
-							if (item.imageuuid && item.name) {
+							if (item.imageuuid && item.name) {							
 								this.GraphicInstance.SetElementTranslation (item.name, item.x, item.y);
 								this.GraphicInstance.SetElementScaling (item.name, item.scalex, item.scaley);
 																

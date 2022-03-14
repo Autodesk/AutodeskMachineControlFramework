@@ -28,4 +28,8 @@ cd build_client\Client
 
 go run ..\..\BuildScripts\createClientDist.go dist ..\..\Artifacts\clientdist\clientpackage.zip
 
-pause
+if "%1" neq "NOPAUSE" (
+	pause
+)
+
+exit 0

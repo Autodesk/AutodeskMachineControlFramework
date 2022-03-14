@@ -1,4 +1,9 @@
 REM echo off
+
+cd Artifacts
+call build_client_clean.bat NOPAUSE
+cd ..
+
 set GO111MODULE=off
 
 set basepath=%~dp0
