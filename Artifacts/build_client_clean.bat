@@ -22,8 +22,8 @@ call npm install
 call npm run build
 
 cd ..\..\
-git rev-parse --verify HEAD >"build_client\Client\dist\_githash_client.txt"
-git rev-parse --verify HEAD >"Artifacts\clientdist\_githash_client.txt"
+git log -n 1 --format="%%H" -- "Client" >"build_client\Client\dist\_githash_client.txt"
+git log -n 1 --format="%%H" -- "Client" >"Artifacts\clientdist\_githash_client.txt"
 cd build_client\Client
 
 go run ..\..\BuildScripts\createClientDist.go dist ..\..\Artifacts\clientdist\clientpackage.zip
