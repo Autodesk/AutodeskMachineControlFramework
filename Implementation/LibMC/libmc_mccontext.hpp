@@ -74,6 +74,8 @@ namespace Impl {
 class CMCContext : public virtual IMCContext, public virtual CBase {
 private:
 
+	bool m_bIsTestingEnvironment;
+
 	std::map <std::string, AMC::PStateMachineInstance> m_Instances;
 	std::vector <AMC::PStateMachineInstance> m_InstanceList;
 
@@ -105,6 +107,8 @@ protected:
 public:
 
 	CMCContext(LibMCData::PDataModel pDataModel);
+
+	virtual ~CMCContext();
 
 	void ParseConfiguration(const std::string & sXMLString) override;
 

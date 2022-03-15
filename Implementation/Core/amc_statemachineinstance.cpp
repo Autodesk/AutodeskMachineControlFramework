@@ -57,8 +57,18 @@ namespace AMC {
 	}
 
 
-	CStateMachineInstance::~CStateMachineInstance()
+	CStateMachineInstance::~CStateMachineInstance()	
 	{
+		m_pInitState = nullptr;
+		m_pCurrentState = nullptr;
+		m_pFailedState = nullptr;
+		m_pSystemState = nullptr;
+		m_ParameterHandler = nullptr;
+		m_pStateJournal = nullptr;
+		m_pEnvironmentWrapper = nullptr;
+
+		m_States.clear();
+		m_StateList.clear();
 		m_pStateFactory = nullptr;
 	}
 

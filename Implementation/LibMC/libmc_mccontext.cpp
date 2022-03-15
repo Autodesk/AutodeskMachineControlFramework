@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #define MACHINEDEFINITION_XMLSCHEMA "http://schemas.autodesk.com/amc/machinedefinitions/2020/02"
+#define MACHINEDEFINITIONTEST_XMLSCHEMA "http://schemas.autodesk.com/amc/testdefinitions/2020/02"
 
 using namespace LibMC::Impl;
 using namespace AMC;
@@ -65,6 +66,7 @@ using namespace AMC;
 **************************************************************************************************************************/
 
 CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
+    : m_bIsTestingEnvironment (false)
 {
     LibMCAssertNotNull(pDataModel.get());
 
@@ -106,6 +108,12 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 #endif
 }
 
+CMCContext::~CMCContext()
+{
+    m_Instances.clear();
+    m_InstanceList.clear();
+    m_Plugins.clear();
+}
 
 
 void CMCContext::ParseConfiguration(const std::string & sXMLString)
@@ -128,20 +136,26 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             throw ELibMCNoContextException(LIBMC_ERROR_MISSINGXMLSCHEMA);
 
         std::string xmlns(xmlnsAttrib.as_string());
-        if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
+        if ((xmlns != MACHINEDEFINITION_XMLSCHEMA) && (xmlns != MACHINEDEFINITIONTEST_XMLSCHEMA))
             throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLSCHEMA, xmlns);
 
-        auto servicesNode = machinedefinitionNode.child("services");
-        if (servicesNode.empty())
-            throw ELibMCNoContextException(LIBMC_ERROR_MISSINGSERVICESNODE);
+        if (xmlns == MACHINEDEFINITIONTEST_XMLSCHEMA)
+            m_bIsTestingEnvironment = true;
 
-        auto threadCountAttrib = servicesNode.attribute("threadcount");
-        if (threadCountAttrib.empty())
-            throw ELibMCNoContextException(LIBMC_ERROR_MISSINGTHREADCOUNT);
-        auto nMaxThreadCount = threadCountAttrib.as_uint();
-        if ((nMaxThreadCount < SERVICETHREADCOUNT_MIN) || (nMaxThreadCount > SERVICETHREADCOUNT_MAX))
-            throw ELibMCCustomException(LIBMC_ERROR_INVALIDTHREADCOUNT, threadCountAttrib.as_string());
-        m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t)nMaxThreadCount);
+        auto servicesNode = machinedefinitionNode.child("services");
+        if (!servicesNode.empty()) {
+
+            auto threadCountAttrib = servicesNode.attribute("threadcount");
+            if (threadCountAttrib.empty()) 
+                throw ELibMCNoContextException(LIBMC_ERROR_MISSINGTHREADCOUNT);
+            auto nMaxThreadCount = threadCountAttrib.as_uint(SERVICETHREADCOUNT_DEFAULT);
+            if ((nMaxThreadCount < SERVICETHREADCOUNT_MIN) || (nMaxThreadCount > SERVICETHREADCOUNT_MAX))
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDTHREADCOUNT, threadCountAttrib.as_string());
+            m_pSystemState->serviceHandler()->setMaxThreadCount((uint32_t)nMaxThreadCount);
+        }
+        else {
+            m_pSystemState->serviceHandler()->setMaxThreadCount(SERVICETHREADCOUNT_DEFAULT);            
+        }
 
         auto sCoreResourcePath = m_pSystemState->getLibraryResourcePath("core");
         m_pSystemState->logger()->logMessage("Loading core resources from " + sCoreResourcePath + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
@@ -370,11 +384,24 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
         if (stateNameAttrib.empty())
             throw ELibMCCustomException(LIBMC_ERROR_MISSINGSTATENAME, "statemachine " + sName);
 
-        auto repeatDelayAttrib = stateNode.attribute("repeatdelay");
-        if (repeatDelayAttrib.empty())
-            throw ELibMCCustomException(LIBMC_ERROR_MISSINGREPEATDELAY, stateNameAttrib.as_string ());
+        uint32_t nRepeatDelay;
 
-        auto pState = pInstance->addState(stateNameAttrib.as_string(), repeatDelayAttrib.as_int());
+        auto repeatDelayAttrib = stateNode.attribute("repeatdelay");
+        if (!repeatDelayAttrib.empty()) {
+            nRepeatDelay = repeatDelayAttrib.as_int();
+        }
+        else {
+            if (m_bIsTestingEnvironment) {
+                nRepeatDelay = AMC_DEFAULTREPEATDELAY_FOR_TESTING_MS;
+            }
+            else
+            {
+                throw ELibMCCustomException(LIBMC_ERROR_MISSINGREPEATDELAY, stateNameAttrib.as_string());
+            }
+            
+        }
+
+        auto pState = pInstance->addState(stateNameAttrib.as_string(), nRepeatDelay);
         
 
     }

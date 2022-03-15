@@ -56,7 +56,11 @@ namespace AMC {
 
 	CStateMachineState::~CStateMachineState()
 	{
-
+		m_OutStates.clear();
+		m_OutStateList.clear();
+		m_pGlobalChrono = nullptr;
+		m_pPluginState = nullptr;
+		m_pEnvironmentWrapper = nullptr;
 	}
 
 	std::string CStateMachineState::getName() const

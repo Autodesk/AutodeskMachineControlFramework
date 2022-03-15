@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define AMC_MINREPEATDELAY_MS 1 // 1 milliseconds minimum repeat delay
 #define AMC_MAXREPEATDELAY_MS 10000 // 10000 milliseconds maximum repeat delay
+#define AMC_DEFAULTREPEATDELAY_FOR_TESTING_MS 100 // for test environment: 100 milliseconds default repeat delay
 #define AMC_REPEATDELAYCHUNK_MS 10 // 10 milliseconds sleep if waiting for repeat
 
 namespace AMC {

@@ -175,6 +175,11 @@ bool CPLCCommandList::WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS
 
     int statusValue = 255;
     while (statusValue != 6) {
+
+        uint64_t nCurrentTime = m_pTimeStampGenerator->generateTimeStamp();
+        if (nCurrentTime > nStartTime + nWaitForTimeInMS)
+            return false;
+
         auto futureListStatus = receiveListStatus();
         futureListStatus.wait_for(std::chrono::milliseconds(nReactionTimeInMS));
         
@@ -184,12 +189,7 @@ bool CPLCCommandList::WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS
         }
         else {
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COMMANDREACTIONTIMEOUT);
-        }
-
-        uint64_t nCurrentTime = m_pTimeStampGenerator->generateTimeStamp();
-        if (nCurrentTime > nStartTime + nWaitForTimeInMS)
-            return false;
-        
+        }        
 
     }
     return true;
