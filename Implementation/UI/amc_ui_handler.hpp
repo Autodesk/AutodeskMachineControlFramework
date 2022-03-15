@@ -107,10 +107,10 @@ namespace AMC {
 		std::string m_sCopyrightString;
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
+		std::string m_sMainPageName;
 
 		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
-		PResourcePackage m_pCoreResourcePackage;
 		PLogger m_pLogger;
 
 		std::vector <PUIMenuItem> m_MenuItems;
@@ -118,7 +118,8 @@ namespace AMC {
 
 		std::map <std::string, PUIPage> m_Pages;
 		std::map <std::string, PUIDialog> m_Dialogs;
-		PUIPage m_pMainPage;
+		
+		PResourcePackage m_pCoreResourcePackage; // Might be null!
 
 		LibMCUI::PWrapper m_pUIPluginWrapper;
 		LibMCUI::PEventHandler m_pUIEventHandler;

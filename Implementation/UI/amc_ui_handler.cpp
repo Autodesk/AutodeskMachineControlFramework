@@ -176,7 +176,8 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler
 {
     writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
     writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
-    writer.addString(AMC_API_KEY_UI_MAINPAGE, m_pMainPage->getName());
+    writer.addString(AMC_API_KEY_UI_MAINPAGE, m_sMainPageName);
+
     writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
     writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
 
@@ -509,7 +510,8 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
     }
 
-    m_pMainPage = findPage (sMainPage);
+    auto pMainPage = findPage (sMainPage);
+    m_sMainPageName = pMainPage->getName();
 
     // Update all cross-references!
     for (auto pPage : m_Pages)

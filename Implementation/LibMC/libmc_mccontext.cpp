@@ -178,15 +178,6 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             addMachineInstance(instanceNode);
         }
 
-        // Load User Interface
-        auto userInterfaceNode = machinedefinitionNode.child("userinterface");
-        if (userInterfaceNode.empty())
-            throw ELibMCNoContextException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
-
-        // Load user interface
-        auto uiLibraryAttrib = userInterfaceNode.attribute("library");
-        if (uiLibraryAttrib.empty())
-            throw ELibMCNoContextException(LIBMC_ERROR_NOUSERINTERFACEPLUGIN);
 
         m_pSystemState->logger()->logMessage("Starting Journal recording...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
         // Start journal recording
@@ -196,10 +187,27 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         for (auto pStateMachineInstance : m_InstanceList)
             pStateMachineInstance->getParameterHandler()->loadPersistentParameters(m_pSystemState->getPersistencyHandler ());
 
-        auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string());
+        // Load User Interface
+        auto userInterfaceNode = machinedefinitionNode.child("userinterface");
+        if (userInterfaceNode.empty()) {
 
-        m_pSystemState->logger()->logMessage("Loading UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-        m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
+            if (!m_bIsTestingEnvironment)
+                throw ELibMCNoContextException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
+
+            m_pSystemState->logger()->logMessage("Using default testing UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+        }
+        else {
+
+            // Load user interface
+            auto uiLibraryAttrib = userInterfaceNode.attribute("library");
+            if (uiLibraryAttrib.empty())
+                throw ELibMCNoContextException(LIBMC_ERROR_NOUSERINTERFACEPLUGIN);
+
+            auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string());
+
+            m_pSystemState->logger()->logMessage("Loading UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+            m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
+        }
 
     }
     catch (std::exception& E) {
