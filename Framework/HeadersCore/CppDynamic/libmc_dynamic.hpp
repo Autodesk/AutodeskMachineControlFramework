@@ -367,6 +367,10 @@ public:
 	inline void ParseConfiguration(const std::string & sXMLString);
 	inline void StartAllThreads();
 	inline void TerminateAllThreads();
+	inline void StartInstanceThread(const std::string & sInstanceName);
+	inline void TerminateInstanceThread(const std::string & sInstanceName);
+	inline std::string GetInstanceThreadState(const std::string & sInstanceName);
+	inline bool InstanceStateIsSuccessful(const std::string & sInstanceName);
 	inline void LoadClientPackage(const std::string & sResourcePath);
 	inline void Log(const std::string & sMessage, const eLogSubSystem eSubsystem, const eLogLevel eLogLevel);
 	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization);
@@ -491,6 +495,10 @@ public:
 		pWrapperTable->m_MCContext_ParseConfiguration = nullptr;
 		pWrapperTable->m_MCContext_StartAllThreads = nullptr;
 		pWrapperTable->m_MCContext_TerminateAllThreads = nullptr;
+		pWrapperTable->m_MCContext_StartInstanceThread = nullptr;
+		pWrapperTable->m_MCContext_TerminateInstanceThread = nullptr;
+		pWrapperTable->m_MCContext_GetInstanceThreadState = nullptr;
+		pWrapperTable->m_MCContext_InstanceStateIsSuccessful = nullptr;
 		pWrapperTable->m_MCContext_LoadClientPackage = nullptr;
 		pWrapperTable->m_MCContext_Log = nullptr;
 		pWrapperTable->m_MCContext_CreateAPIRequestHandler = nullptr;
@@ -657,6 +665,42 @@ public:
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MCContext_StartInstanceThread = (PLibMCMCContext_StartInstanceThreadPtr) GetProcAddress(hLibrary, "libmc_mccontext_startinstancethread");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_StartInstanceThread = (PLibMCMCContext_StartInstanceThreadPtr) dlsym(hLibrary, "libmc_mccontext_startinstancethread");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_StartInstanceThread == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MCContext_TerminateInstanceThread = (PLibMCMCContext_TerminateInstanceThreadPtr) GetProcAddress(hLibrary, "libmc_mccontext_terminateinstancethread");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_TerminateInstanceThread = (PLibMCMCContext_TerminateInstanceThreadPtr) dlsym(hLibrary, "libmc_mccontext_terminateinstancethread");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_TerminateInstanceThread == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MCContext_GetInstanceThreadState = (PLibMCMCContext_GetInstanceThreadStatePtr) GetProcAddress(hLibrary, "libmc_mccontext_getinstancethreadstate");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_GetInstanceThreadState = (PLibMCMCContext_GetInstanceThreadStatePtr) dlsym(hLibrary, "libmc_mccontext_getinstancethreadstate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_GetInstanceThreadState == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_MCContext_InstanceStateIsSuccessful = (PLibMCMCContext_InstanceStateIsSuccessfulPtr) GetProcAddress(hLibrary, "libmc_mccontext_instancestateissuccessful");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_InstanceStateIsSuccessful = (PLibMCMCContext_InstanceStateIsSuccessfulPtr) dlsym(hLibrary, "libmc_mccontext_instancestateissuccessful");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_InstanceStateIsSuccessful == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_MCContext_LoadClientPackage = (PLibMCMCContext_LoadClientPackagePtr) GetProcAddress(hLibrary, "libmc_mccontext_loadclientpackage");
 		#else // _WIN32
 		pWrapperTable->m_MCContext_LoadClientPackage = (PLibMCMCContext_LoadClientPackagePtr) dlsym(hLibrary, "libmc_mccontext_loadclientpackage");
@@ -799,6 +843,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmc_mccontext_terminateallthreads", (void**)&(pWrapperTable->m_MCContext_TerminateAllThreads));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_TerminateAllThreads == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_startinstancethread", (void**)&(pWrapperTable->m_MCContext_StartInstanceThread));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_StartInstanceThread == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_terminateinstancethread", (void**)&(pWrapperTable->m_MCContext_TerminateInstanceThread));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_TerminateInstanceThread == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_getinstancethreadstate", (void**)&(pWrapperTable->m_MCContext_GetInstanceThreadState));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_GetInstanceThreadState == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_instancestateissuccessful", (void**)&(pWrapperTable->m_MCContext_InstanceStateIsSuccessful));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_InstanceStateIsSuccessful == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_mccontext_loadclientpackage", (void**)&(pWrapperTable->m_MCContext_LoadClientPackage));
@@ -988,6 +1048,53 @@ public:
 	void CMCContext::TerminateAllThreads()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_TerminateAllThreads(m_pHandle));
+	}
+	
+	/**
+	* CMCContext::StartInstanceThread - starts a single instance thread.
+	* @param[in] sInstanceName - Instance name of state machine to start.
+	*/
+	void CMCContext::StartInstanceThread(const std::string & sInstanceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_StartInstanceThread(m_pHandle, sInstanceName.c_str()));
+	}
+	
+	/**
+	* CMCContext::TerminateInstanceThread - terminates a single instance thread.
+	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	*/
+	void CMCContext::TerminateInstanceThread(const std::string & sInstanceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_TerminateInstanceThread(m_pHandle, sInstanceName.c_str()));
+	}
+	
+	/**
+	* CMCContext::GetInstanceThreadState - returns current state of a instance thread.
+	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @return State of state machine.
+	*/
+	std::string CMCContext::GetInstanceThreadState(const std::string & sInstanceName)
+	{
+		LibMC_uint32 bytesNeededStateName = 0;
+		LibMC_uint32 bytesWrittenStateName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_GetInstanceThreadState(m_pHandle, sInstanceName.c_str(), 0, &bytesNeededStateName, nullptr));
+		std::vector<char> bufferStateName(bytesNeededStateName);
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_GetInstanceThreadState(m_pHandle, sInstanceName.c_str(), bytesNeededStateName, &bytesWrittenStateName, &bufferStateName[0]));
+		
+		return std::string(&bufferStateName[0]);
+	}
+	
+	/**
+	* CMCContext::InstanceStateIsSuccessful - returns if an instance thread is in success state.
+	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @return State of state machine is in success state.
+	*/
+	bool CMCContext::InstanceStateIsSuccessful(const std::string & sInstanceName)
+	{
+		bool resultIsSuccessful = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_InstanceStateIsSuccessful(m_pHandle, sInstanceName.c_str(), &resultIsSuccessful));
+		
+		return resultIsSuccessful;
 	}
 	
 	/**

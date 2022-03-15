@@ -61,6 +61,7 @@ namespace AMC {
 		PStateMachineState m_pInitState;
 		PStateMachineState m_pFailedState;
 		PStateMachineState m_pCurrentState;
+		PStateMachineState m_pSuccessState;
 
 		AMC::PSystemState m_pSystemState;
 		AMC::PParameterHandler m_ParameterHandler;
@@ -101,6 +102,8 @@ namespace AMC {
 		// Initialization functions (call before startThread)
 		void setInitState(std::string sStateName);
 		void setFailedState(std::string sStateName);
+		void setSuccessState(std::string sStateName);
+
 		void setStateFactory (LibMCPlugin::PStateFactory pStateFactory);		
 		PStateMachineState addState(std::string sStateName, uint32_t nRepeatDelayInMS);
 		PStateMachineState findState(std::string sStateName, bool bFailIfNotExisting);
@@ -118,6 +121,9 @@ namespace AMC {
 		// External methods
 		void startThread();
 		void terminateThread();
+
+		std::string getCurrentStateName ();
+		bool currentStateIsSuccessState();
 	};
 
 	

@@ -340,6 +340,32 @@ public:
 	virtual void TerminateAllThreads() = 0;
 
 	/**
+	* IMCContext::StartInstanceThread - starts a single instance thread.
+	* @param[in] sInstanceName - Instance name of state machine to start.
+	*/
+	virtual void StartInstanceThread(const std::string & sInstanceName) = 0;
+
+	/**
+	* IMCContext::TerminateInstanceThread - terminates a single instance thread.
+	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	*/
+	virtual void TerminateInstanceThread(const std::string & sInstanceName) = 0;
+
+	/**
+	* IMCContext::GetInstanceThreadState - returns current state of a instance thread.
+	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @return State of state machine.
+	*/
+	virtual std::string GetInstanceThreadState(const std::string & sInstanceName) = 0;
+
+	/**
+	* IMCContext::InstanceStateIsSuccessful - returns if an instance thread is in success state.
+	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @return State of state machine is in success state.
+	*/
+	virtual bool InstanceStateIsSuccessful(const std::string & sInstanceName) = 0;
+
+	/**
 	* IMCContext::LoadClientPackage - load a client package to serve the client website.
 	* @param[in] sResourcePath - Path to the resource package.
 	*/

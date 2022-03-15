@@ -62,6 +62,7 @@ namespace AMC {
 		m_pInitState = nullptr;
 		m_pCurrentState = nullptr;
 		m_pFailedState = nullptr;
+		m_pSuccessState = nullptr;
 		m_pSystemState = nullptr;
 		m_ParameterHandler = nullptr;
 		m_pStateJournal = nullptr;
@@ -145,6 +146,21 @@ namespace AMC {
 		}
 
 		m_pFailedState = iter->second;
+
+	}
+
+	void CStateMachineInstance::setSuccessState(std::string sStateName)
+	{
+		// Only accessible if thread is not running
+		if (threadIsRunning())
+			throw ELibMCCustomException(LIBMC_ERROR_THREADISRUNNING, m_sName + "/" + sStateName);
+
+		auto iter = m_States.find(sStateName);
+		if (iter == m_States.end()) {
+			throw ELibMCCustomException(LIBMC_ERROR_SUCCESSSTATENOTFOUND, m_sName + "/" + sStateName);
+		}
+
+		m_pSuccessState = iter->second;
 
 	}
 
@@ -262,6 +278,26 @@ namespace AMC {
 		// Start Thread
 		m_Thread = std::thread(&CStateMachineInstance::executeThread, this);
 
+	}
+
+
+	std::string CStateMachineInstance::getCurrentStateName()
+	{
+		if (m_pCurrentState.get() != nullptr) {
+			return m_pCurrentState->getName();
+		}
+		else
+			return "";
+
+	}
+
+	bool CStateMachineInstance::currentStateIsSuccessState()
+	{
+		if (m_pCurrentState.get() != nullptr) {
+			if (m_pCurrentState.get() == m_pSuccessState.get())
+				return true;
+		}
+		return false;
 	}
 
 

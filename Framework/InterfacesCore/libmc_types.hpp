@@ -454,6 +454,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_DUPLICATELIBRARYNAME 427
 #define LIBMC_ERROR_INVALIDTRANSFORMINTERVAL 428
 #define LIBMC_ERROR_INVALIDTRANSFORMCOORDINATE 429
+#define LIBMC_ERROR_SUCCESSSTATENOTFOUND 430
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -820,6 +821,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_DUPLICATELIBRARYNAME: return "Duplicate library name";
     case LIBMC_ERROR_INVALIDTRANSFORMINTERVAL: return "Invalid transform interval";
     case LIBMC_ERROR_INVALIDTRANSFORMCOORDINATE: return "Invalid transform coordinate";
+    case LIBMC_ERROR_SUCCESSSTATENOTFOUND: return "success state not found";
     default: return "unknown error";
   }
 }

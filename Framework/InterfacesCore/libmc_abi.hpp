@@ -194,6 +194,46 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_startallthreads(LibMC_MCContext pMCCo
 LIBMC_DECLSPEC LibMCResult libmc_mccontext_terminateallthreads(LibMC_MCContext pMCContext);
 
 /**
+* starts a single instance thread.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to start.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_startinstancethread(LibMC_MCContext pMCContext, const char * pInstanceName);
+
+/**
+* terminates a single instance thread.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_terminateinstancethread(LibMC_MCContext pMCContext, const char * pInstanceName);
+
+/**
+* returns current state of a instance thread.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStateNameBuffer -  buffer of State of state machine., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_getinstancethreadstate(LibMC_MCContext pMCContext, const char * pInstanceName, const LibMC_uint32 nStateNameBufferSize, LibMC_uint32* pStateNameNeededChars, char * pStateNameBuffer);
+
+/**
+* returns if an instance thread is in success state.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[out] pIsSuccessful - State of state machine is in success state.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_instancestateissuccessful(LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful);
+
+/**
 * load a client package to serve the client website.
 *
 * @param[in] pMCContext - MCContext instance.

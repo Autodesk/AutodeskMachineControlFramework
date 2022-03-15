@@ -181,6 +181,46 @@ typedef LibMCResult (*PLibMCMCContext_StartAllThreadsPtr) (LibMC_MCContext pMCCo
 typedef LibMCResult (*PLibMCMCContext_TerminateAllThreadsPtr) (LibMC_MCContext pMCContext);
 
 /**
+* starts a single instance thread.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to start.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_StartInstanceThreadPtr) (LibMC_MCContext pMCContext, const char * pInstanceName);
+
+/**
+* terminates a single instance thread.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_TerminateInstanceThreadPtr) (LibMC_MCContext pMCContext, const char * pInstanceName);
+
+/**
+* returns current state of a instance thread.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pStateNameBuffer -  buffer of State of state machine., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_GetInstanceThreadStatePtr) (LibMC_MCContext pMCContext, const char * pInstanceName, const LibMC_uint32 nStateNameBufferSize, LibMC_uint32* pStateNameNeededChars, char * pStateNameBuffer);
+
+/**
+* returns if an instance thread is in success state.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[out] pIsSuccessful - State of state machine is in success state.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_InstanceStateIsSuccessfulPtr) (LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful);
+
+/**
 * load a client package to serve the client website.
 *
 * @param[in] pMCContext - MCContext instance.
@@ -290,6 +330,10 @@ typedef struct {
 	PLibMCMCContext_ParseConfigurationPtr m_MCContext_ParseConfiguration;
 	PLibMCMCContext_StartAllThreadsPtr m_MCContext_StartAllThreads;
 	PLibMCMCContext_TerminateAllThreadsPtr m_MCContext_TerminateAllThreads;
+	PLibMCMCContext_StartInstanceThreadPtr m_MCContext_StartInstanceThread;
+	PLibMCMCContext_TerminateInstanceThreadPtr m_MCContext_TerminateInstanceThread;
+	PLibMCMCContext_GetInstanceThreadStatePtr m_MCContext_GetInstanceThreadState;
+	PLibMCMCContext_InstanceStateIsSuccessfulPtr m_MCContext_InstanceStateIsSuccessful;
 	PLibMCMCContext_LoadClientPackagePtr m_MCContext_LoadClientPackage;
 	PLibMCMCContext_LogPtr m_MCContext_Log;
 	PLibMCMCContext_CreateAPIRequestHandlerPtr m_MCContext_CreateAPIRequestHandler;

@@ -465,6 +465,140 @@ LibMCResult libmc_mccontext_terminateallthreads(LibMC_MCContext pMCContext)
 	}
 }
 
+LibMCResult libmc_mccontext_startinstancethread(LibMC_MCContext pMCContext, const char * pInstanceName)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pInstanceName == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sInstanceName(pInstanceName);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIMCContext->StartInstanceThread(sInstanceName);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_mccontext_terminateinstancethread(LibMC_MCContext pMCContext, const char * pInstanceName)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pInstanceName == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sInstanceName(pInstanceName);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		pIMCContext->TerminateInstanceThread(sInstanceName);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_mccontext_getinstancethreadstate(LibMC_MCContext pMCContext, const char * pInstanceName, const LibMC_uint32 nStateNameBufferSize, LibMC_uint32* pStateNameNeededChars, char * pStateNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pInstanceName == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if ( (!pStateNameBuffer) && !(pStateNameNeededChars) )
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sInstanceName(pInstanceName);
+		std::string sStateName("");
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pStateNameBuffer == nullptr);
+		if (isCacheCall) {
+			sStateName = pIMCContext->GetInstanceThreadState(sInstanceName);
+
+			pIMCContext->_setCache (new ParameterCache_1<std::string> (sStateName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIMCContext->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+			cache->retrieveData (sStateName);
+			pIMCContext->_setCache (nullptr);
+		}
+		
+		if (pStateNameNeededChars)
+			*pStateNameNeededChars = (LibMC_uint32) (sStateName.size()+1);
+		if (pStateNameBuffer) {
+			if (sStateName.size() >= nStateNameBufferSize)
+				throw ELibMCInterfaceException (LIBMC_ERROR_BUFFERTOOSMALL);
+			for (size_t iStateName = 0; iStateName < sStateName.size(); iStateName++)
+				pStateNameBuffer[iStateName] = sStateName[iStateName];
+			pStateNameBuffer[sStateName.size()] = 0;
+		}
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCResult libmc_mccontext_instancestateissuccessful(LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pInstanceName == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pIsSuccessful == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sInstanceName(pInstanceName);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		*pIsSuccessful = pIMCContext->InstanceStateIsSuccessful(sInstanceName);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCResult libmc_mccontext_loadclientpackage(LibMC_MCContext pMCContext, const char * pResourcePath)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
@@ -595,6 +729,14 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_mccontext_startallthreads;
 	if (sProcName == "libmc_mccontext_terminateallthreads") 
 		*ppProcAddress = (void*) &libmc_mccontext_terminateallthreads;
+	if (sProcName == "libmc_mccontext_startinstancethread") 
+		*ppProcAddress = (void*) &libmc_mccontext_startinstancethread;
+	if (sProcName == "libmc_mccontext_terminateinstancethread") 
+		*ppProcAddress = (void*) &libmc_mccontext_terminateinstancethread;
+	if (sProcName == "libmc_mccontext_getinstancethreadstate") 
+		*ppProcAddress = (void*) &libmc_mccontext_getinstancethreadstate;
+	if (sProcName == "libmc_mccontext_instancestateissuccessful") 
+		*ppProcAddress = (void*) &libmc_mccontext_instancestateissuccessful;
 	if (sProcName == "libmc_mccontext_loadclientpackage") 
 		*ppProcAddress = (void*) &libmc_mccontext_loadclientpackage;
 	if (sProcName == "libmc_mccontext_log") 

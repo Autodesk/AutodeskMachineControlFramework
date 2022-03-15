@@ -677,6 +677,49 @@ void CMCContext::TerminateAllThreads()
 
 }
 
+
+void CMCContext::StartInstanceThread(const std::string& sInstanceName)
+{
+    if (sInstanceName.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATEMACHINENAME);
+
+    m_pSystemState->logger()->logMessage("starting thread " + sInstanceName + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+
+    auto pInstance = findMachineInstance(sInstanceName, true);
+    pInstance->startThread();
+
+}
+
+void CMCContext::TerminateInstanceThread(const std::string& sInstanceName) 
+{
+    if (sInstanceName.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATEMACHINENAME);
+
+    m_pSystemState->logger()->logMessage("starting thread " + sInstanceName + "...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+
+    auto pInstance = findMachineInstance(sInstanceName, true);
+    pInstance->terminateThread();
+}
+
+std::string CMCContext::GetInstanceThreadState(const std::string& sInstanceName)
+{
+    if (sInstanceName.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATEMACHINENAME);
+
+    auto pInstance = findMachineInstance(sInstanceName, true);
+    return pInstance->getCurrentStateName ();
+
+}
+
+bool CMCContext::InstanceStateIsSuccessful(const std::string& sInstanceName)
+{
+    if (sInstanceName.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATEMACHINENAME);
+
+    auto pInstance = findMachineInstance(sInstanceName, true);
+    return pInstance->currentStateIsSuccessState();
+}
+
 void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSubsystem, const LibMC::eLogLevel eLogLevel)
 {
     std::string sSubSystem;

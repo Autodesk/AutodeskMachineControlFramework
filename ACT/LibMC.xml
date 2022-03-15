@@ -454,8 +454,8 @@
 		<error name="DUPLICATELIBRARYNAME" code="427" description="Duplicate library name" />
 		
 		<error name="INVALIDTRANSFORMINTERVAL" code="428" description="Invalid transform interval" />
-		<error name="INVALIDTRANSFORMCOORDINATE" code="429" description="Invalid transform coordinate" />
-		
+		<error name="INVALIDTRANSFORMCOORDINATE" code="429" description="Invalid transform coordinate" />		
+		<error name="SUCCESSSTATENOTFOUND" code="430" description="success state not found" />
 
 		  
 	</errors>
@@ -547,6 +547,24 @@
 		</method>
 
 		<method name="TerminateAllThreads" description="terminates the threads for all the state machines.">
+		</method>
+
+		<method name="StartInstanceThread" description="starts a single instance thread.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to start." />
+		</method>
+
+		<method name="TerminateInstanceThread" description="terminates a single instance thread.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
+		</method>
+
+		<method name="GetInstanceThreadState" description="returns current state of a instance thread.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
+			<param name="StateName" type="string" pass="return" description="State of state machine." />
+		</method>
+
+		<method name="InstanceStateIsSuccessful" description="returns if an instance thread is in success state.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
+			<param name="IsSuccessful" type="bool" pass="return" description="State of state machine is in success state." />
 		</method>
 		
 		<method name="LoadClientPackage" description="load a client package to serve the client website.">
