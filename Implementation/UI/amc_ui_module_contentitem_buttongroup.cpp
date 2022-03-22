@@ -41,8 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIModule_ContentButton::CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sEventFormValueSetting)
-	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption), m_sTargetPage(sTargetPage), m_sEvent(sEvent), m_sEventFormValueSetting(sEventFormValueSetting), m_sButtonName (sButtonName)
+CUIModule_ContentButton::CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sIconName, const std::string& sEventFormValueSetting)
+	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption), m_sTargetPage(sTargetPage), m_sEvent(sEvent), m_sEventFormValueSetting(sEventFormValueSetting), m_sButtonName(sButtonName),
+	m_sIconName(sIconName)
 {
 }
 
@@ -83,6 +84,11 @@ std::string CUIModule_ContentButton::getButtonName()
 }
 
 
+std::string CUIModule_ContentButton::getIconName()
+{
+	return m_sIconName;
+}
+
 void CUIModule_ContentButton::addFormFieldValue(PUIModule_ContentFormEntity pEntity)
 {
 	LibMCAssertNotNull(pEntity.get());
@@ -120,6 +126,8 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 		auto eventAttrib = buttonNode.attribute("event");
 		auto formvaluesAttrib = buttonNode.attribute("formvalues");
 		auto buttonNameAttrib = buttonNode.attribute("name");
+		auto buttonIconAttrib = buttonNode.attribute("icon");
+
 		std::string sButtonName = buttonNameAttrib.as_string ();
 		if (sButtonName.empty ())
 		{
@@ -139,7 +147,7 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 
 		buttonNameMap.insert(sButtonName);
 
-		auto pButton = pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string(), sButtonName, formvaluesAttrib.as_string());
+		auto pButton = pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string(), sButtonName, buttonIconAttrib.as_string (), formvaluesAttrib.as_string());
 	}
 
 	return pButtonGroup;
@@ -172,6 +180,7 @@ void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSO
 		buttonobject.addString(AMC_API_KEY_UI_BUTTONCAPTION, pButton->getCaption ());
 		buttonobject.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pButton->getTargetPage ());
 		buttonobject.addString(AMC_API_KEY_UI_BUTTONEVENT, pButton->getEvent());
+		buttonobject.addString(AMC_API_KEY_UI_BUTTONICON, pButton->getIconName());
 
 		CJSONWriterArray buttonEventFormValues (writer);
 		pButton->writeFormValuesToJSON(buttonEventFormValues);
@@ -187,9 +196,9 @@ void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSO
 
 
 
-PUIModule_ContentButton CUIModule_ContentButtonGroup::addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sEventFormValues)
+PUIModule_ContentButton CUIModule_ContentButtonGroup::addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sIconName, const std::string& sEventFormValues)
 {
-	auto pButton = std::make_shared<CUIModule_ContentButton>(sCaption, sTargetPage, sEvent, sButtonName, sEventFormValues);
+	auto pButton = std::make_shared<CUIModule_ContentButton>(sCaption, sTargetPage, sEvent, sButtonName, sIconName, sEventFormValues);
 	m_Buttons.push_back(pButton);
 	m_ButtonMap.insert(std::make_pair (pButton->getUUID (), pButton));
 

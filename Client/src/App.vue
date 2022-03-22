@@ -88,7 +88,7 @@
 				v-model="uiDialog.dialogIsActive"
 				transition="dialog-bottom-transition"
 				max-width="50vw"
-				min-height="50vh"
+				height="80vh"
 			>
 			
 			<v-card> 
@@ -97,6 +97,7 @@
           </v-card-title>
 		  
 		  <v-card-text>
+			<div style="overflow:auto">
 			
 			<template v-for="uiModule in uiDialog.modules">
 					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
@@ -106,10 +107,11 @@
 					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
 					<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
 				</template>										
+
+			</div>
 				
 		   </v-card-text>
-			</v-card>
-			
+			</v-card>			
 				
         </v-dialog>		
 		</template>
