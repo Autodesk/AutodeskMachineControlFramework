@@ -229,10 +229,17 @@
 					<edit name="o2_value" caption="Target Oxygen Value" suffix="ppm"/>
 					<edit name="recoaterspeed" caption="Recoater Speed" suffix="mm/s"/>
 					<edit name="gasflowspeed" caption="Gas flow speed" suffix="m/s"/>
-				</form>
+          <edit name="o2_value3" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value4" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value5" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value6" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value7" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value8" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value9" caption="Target Oxygen Value" suffix="ppm"/>
+        </form>
 
 				<buttongroup distribution="equal">
-					<button caption="Save" event="onprocessparametersave" formvalues="processparameters"/>
+					<button caption="Save" event="onprocessparametersave" formvalues="processparameters" icon="mdi-refresh" />
 					<button caption="Cancel" event="onprocessparametercancel"/>
 				</buttongroup>
 
