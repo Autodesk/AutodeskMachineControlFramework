@@ -292,6 +292,26 @@ typedef LibMCDriver_RasterizerResult (*PLibMCDriver_RasterizerRasterizer_SetSubs
 typedef LibMCDriver_RasterizerResult (*PLibMCDriver_RasterizerRasterizer_GetSubsamplingPtr) (LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 * pSubsamplingX, LibMCDriver_Rasterizer_uint32 * pSubsamplingY);
 
 /**
+* Set sampling parameters of algorithm.
+*
+* @param[in] pRasterizer - Rasterizer instance.
+* @param[in] nUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+* @param[in] nPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RasterizerResult (*PLibMCDriver_RasterizerRasterizer_SetSamplingParametersPtr) (LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 nPixelsPerBlock);
+
+/**
+* Returns sampling parameters of algorithm.
+*
+* @param[in] pRasterizer - Rasterizer instance.
+* @param[out] pUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+* @param[out] pPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RasterizerResult (*PLibMCDriver_RasterizerRasterizer_GetSamplingParametersPtr) (LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 * pUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 * pPixelsPerBlock);
+
+/**
 * Adds a layer object to subsample.
 *
 * @param[in] pRasterizer - Rasterizer instance.
@@ -526,6 +546,8 @@ typedef struct {
 	PLibMCDriver_RasterizerRasterizer_SetPositionPtr m_Rasterizer_SetPosition;
 	PLibMCDriver_RasterizerRasterizer_SetSubsamplingPtr m_Rasterizer_SetSubsampling;
 	PLibMCDriver_RasterizerRasterizer_GetSubsamplingPtr m_Rasterizer_GetSubsampling;
+	PLibMCDriver_RasterizerRasterizer_SetSamplingParametersPtr m_Rasterizer_SetSamplingParameters;
+	PLibMCDriver_RasterizerRasterizer_GetSamplingParametersPtr m_Rasterizer_GetSamplingParameters;
 	PLibMCDriver_RasterizerRasterizer_AddLayerPtr m_Rasterizer_AddLayer;
 	PLibMCDriver_RasterizerRasterizer_CalculateImagePtr m_Rasterizer_CalculateImage;
 	PLibMCDriver_RasterizerSliceStack_GetLayerCountPtr m_SliceStack_GetLayerCount;

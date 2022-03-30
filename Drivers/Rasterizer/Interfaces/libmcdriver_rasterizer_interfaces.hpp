@@ -446,6 +446,20 @@ public:
 	virtual void GetSubsampling(LibMCDriver_Rasterizer_uint32 & nSubsamplingX, LibMCDriver_Rasterizer_uint32 & nSubsamplingY) = 0;
 
 	/**
+	* IRasterizer::SetSamplingParameters - Set sampling parameters of algorithm.
+	* @param[in] nUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+	* @param[in] nPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+	*/
+	virtual void SetSamplingParameters(const LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, const LibMCDriver_Rasterizer_uint32 nPixelsPerBlock) = 0;
+
+	/**
+	* IRasterizer::GetSamplingParameters - Returns sampling parameters of algorithm.
+	* @param[out] nUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+	* @param[out] nPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+	*/
+	virtual void GetSamplingParameters(LibMCDriver_Rasterizer_uint32 & nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 & nPixelsPerBlock) = 0;
+
+	/**
 	* IRasterizer::AddLayer - Adds a layer object to subsample.
 	* @param[in] pLayerObject - Layer object instance.
 	*/

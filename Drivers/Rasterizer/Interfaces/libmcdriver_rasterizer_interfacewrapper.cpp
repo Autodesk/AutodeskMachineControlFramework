@@ -791,6 +791,58 @@ LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_getsubsampling(Li
 	}
 }
 
+LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_setsamplingparameters(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 nPixelsPerBlock)
+{
+	IBase* pIBaseClass = (IBase *)pRasterizer;
+
+	try {
+		IRasterizer* pIRasterizer = dynamic_cast<IRasterizer*>(pIBaseClass);
+		if (!pIRasterizer)
+			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
+		
+		pIRasterizer->SetSamplingParameters(nUnitsPerSubpixel, nPixelsPerBlock);
+
+		return LIBMCDRIVER_RASTERIZER_SUCCESS;
+	}
+	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
+		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_getsamplingparameters(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 * pUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 * pPixelsPerBlock)
+{
+	IBase* pIBaseClass = (IBase *)pRasterizer;
+
+	try {
+		if (!pUnitsPerSubpixel)
+			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+		if (!pPixelsPerBlock)
+			throw ELibMCDriver_RasterizerInterfaceException (LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+		IRasterizer* pIRasterizer = dynamic_cast<IRasterizer*>(pIBaseClass);
+		if (!pIRasterizer)
+			throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDCAST);
+		
+		pIRasterizer->GetSamplingParameters(*pUnitsPerSubpixel, *pPixelsPerBlock);
+
+		return LIBMCDRIVER_RASTERIZER_SUCCESS;
+	}
+	catch (ELibMCDriver_RasterizerInterfaceException & Exception) {
+		return handleLibMCDriver_RasterizerException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_addlayer(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_LayerObject pLayerObject)
 {
 	IBase* pIBaseClass = (IBase *)pRasterizer;
@@ -1222,6 +1274,10 @@ LibMCDriver_RasterizerResult LibMCDriver_Rasterizer::Impl::LibMCDriver_Rasterize
 		*ppProcAddress = (void*) &libmcdriver_rasterizer_rasterizer_setsubsampling;
 	if (sProcName == "libmcdriver_rasterizer_rasterizer_getsubsampling") 
 		*ppProcAddress = (void*) &libmcdriver_rasterizer_rasterizer_getsubsampling;
+	if (sProcName == "libmcdriver_rasterizer_rasterizer_setsamplingparameters") 
+		*ppProcAddress = (void*) &libmcdriver_rasterizer_rasterizer_setsamplingparameters;
+	if (sProcName == "libmcdriver_rasterizer_rasterizer_getsamplingparameters") 
+		*ppProcAddress = (void*) &libmcdriver_rasterizer_rasterizer_getsamplingparameters;
 	if (sProcName == "libmcdriver_rasterizer_rasterizer_addlayer") 
 		*ppProcAddress = (void*) &libmcdriver_rasterizer_rasterizer_addlayer;
 	if (sProcName == "libmcdriver_rasterizer_rasterizer_calculateimage") 

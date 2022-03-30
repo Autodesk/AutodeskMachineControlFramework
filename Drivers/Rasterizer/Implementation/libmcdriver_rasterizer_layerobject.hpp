@@ -36,6 +36,7 @@ Abstract: This is the class declaration of CLayerObject
 #define __LIBMCDRIVER_RASTERIZER_LAYEROBJECT
 
 #include "libmcdriver_rasterizer_interfaces.hpp"
+#include "libmcdriver_rasterizer_algorithm.hpp"
 
 // Parent classes
 #include "libmcdriver_rasterizer_base.hpp"
@@ -53,6 +54,8 @@ namespace Impl {
 
 typedef std::shared_ptr<ClipperLib::Paths> PClipperPaths;
 
+#define RASTERER_MINSUBSAMPLING 1
+#define RASTERER_MAXSUBSAMPLING 32
 
 class CLayerDataEntity {
 private:
@@ -63,6 +66,10 @@ public:
 
 	eGeometryType getGeometryType();
 	std::vector<sPosition2D>& getPoints();
+
+	uint64_t calculateClosedPolygonLineCount();
+
+	void addClosedPolygonsToAlgorithm(CRasterizationAlgorithm* pAlgorithm, double dUnitsX, double dUnitsY);
 };
 
 
@@ -84,7 +91,12 @@ public:
 	PClipperPaths createPathsFromGeometry(double& dUnits);
 
 	void mergeInto(CLayerDataObject* pOtherDataObject);
+
+	uint64_t calculateClosedPolygonLineCount();
+
+	void addClosedPolygonsToAlgorithm(CRasterizationAlgorithm * pAlgorithm, double dUnitsX, double dUnitsY);
 };
+
 
 
 typedef std::shared_ptr<CLayerDataObject> PLayerDataObject;

@@ -305,6 +305,26 @@ LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasteri
 LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_getsubsampling(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 * pSubsamplingX, LibMCDriver_Rasterizer_uint32 * pSubsamplingY);
 
 /**
+* Set sampling parameters of algorithm.
+*
+* @param[in] pRasterizer - Rasterizer instance.
+* @param[in] nUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+* @param[in] nPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_setsamplingparameters(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 nPixelsPerBlock);
+
+/**
+* Returns sampling parameters of algorithm.
+*
+* @param[in] pRasterizer - Rasterizer instance.
+* @param[out] pUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+* @param[out] pPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RASTERIZER_DECLSPEC LibMCDriver_RasterizerResult libmcdriver_rasterizer_rasterizer_getsamplingparameters(LibMCDriver_Rasterizer_Rasterizer pRasterizer, LibMCDriver_Rasterizer_uint32 * pUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 * pPixelsPerBlock);
+
+/**
 * Adds a layer object to subsample.
 *
 * @param[in] pRasterizer - Rasterizer instance.

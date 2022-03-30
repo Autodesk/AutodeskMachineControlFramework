@@ -409,6 +409,8 @@ public:
 	inline void SetPosition(const LibMCDriver_Rasterizer_double dPositionX, const LibMCDriver_Rasterizer_double dPositionY);
 	inline void SetSubsampling(const LibMCDriver_Rasterizer_uint32 nSubsamplingX, const LibMCDriver_Rasterizer_uint32 nSubsamplingY);
 	inline void GetSubsampling(LibMCDriver_Rasterizer_uint32 & nSubsamplingX, LibMCDriver_Rasterizer_uint32 & nSubsamplingY);
+	inline void SetSamplingParameters(const LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, const LibMCDriver_Rasterizer_uint32 nPixelsPerBlock);
+	inline void GetSamplingParameters(LibMCDriver_Rasterizer_uint32 & nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 & nPixelsPerBlock);
 	inline void AddLayer(classParam<CLayerObject> pLayerObject);
 	inline void CalculateImage(classParam<LibMCEnv::CImageData> pImageObject, const bool bAntialiased);
 };
@@ -599,6 +601,8 @@ public:
 		pWrapperTable->m_Rasterizer_SetPosition = nullptr;
 		pWrapperTable->m_Rasterizer_SetSubsampling = nullptr;
 		pWrapperTable->m_Rasterizer_GetSubsampling = nullptr;
+		pWrapperTable->m_Rasterizer_SetSamplingParameters = nullptr;
+		pWrapperTable->m_Rasterizer_GetSamplingParameters = nullptr;
 		pWrapperTable->m_Rasterizer_AddLayer = nullptr;
 		pWrapperTable->m_Rasterizer_CalculateImage = nullptr;
 		pWrapperTable->m_SliceStack_GetLayerCount = nullptr;
@@ -863,6 +867,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Rasterizer_GetSubsampling == nullptr)
+			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Rasterizer_SetSamplingParameters = (PLibMCDriver_RasterizerRasterizer_SetSamplingParametersPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_rasterizer_setsamplingparameters");
+		#else // _WIN32
+		pWrapperTable->m_Rasterizer_SetSamplingParameters = (PLibMCDriver_RasterizerRasterizer_SetSamplingParametersPtr) dlsym(hLibrary, "libmcdriver_rasterizer_rasterizer_setsamplingparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Rasterizer_SetSamplingParameters == nullptr)
+			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Rasterizer_GetSamplingParameters = (PLibMCDriver_RasterizerRasterizer_GetSamplingParametersPtr) GetProcAddress(hLibrary, "libmcdriver_rasterizer_rasterizer_getsamplingparameters");
+		#else // _WIN32
+		pWrapperTable->m_Rasterizer_GetSamplingParameters = (PLibMCDriver_RasterizerRasterizer_GetSamplingParametersPtr) dlsym(hLibrary, "libmcdriver_rasterizer_rasterizer_getsamplingparameters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Rasterizer_GetSamplingParameters == nullptr)
 			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1147,6 +1169,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_rasterizer_rasterizer_getsubsampling", (void**)&(pWrapperTable->m_Rasterizer_GetSubsampling));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Rasterizer_GetSubsampling == nullptr) )
+			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_rasterizer_rasterizer_setsamplingparameters", (void**)&(pWrapperTable->m_Rasterizer_SetSamplingParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Rasterizer_SetSamplingParameters == nullptr) )
+			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_rasterizer_rasterizer_getsamplingparameters", (void**)&(pWrapperTable->m_Rasterizer_GetSamplingParameters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Rasterizer_GetSamplingParameters == nullptr) )
 			return LIBMCDRIVER_RASTERIZER_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_rasterizer_rasterizer_addlayer", (void**)&(pWrapperTable->m_Rasterizer_AddLayer));
@@ -1533,6 +1563,26 @@ public:
 	void CRasterizer::GetSubsampling(LibMCDriver_Rasterizer_uint32 & nSubsamplingX, LibMCDriver_Rasterizer_uint32 & nSubsamplingY)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Rasterizer_GetSubsampling(m_pHandle, &nSubsamplingX, &nSubsamplingY));
+	}
+	
+	/**
+	* CRasterizer::SetSamplingParameters - Set sampling parameters of algorithm.
+	* @param[in] nUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+	* @param[in] nPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+	*/
+	void CRasterizer::SetSamplingParameters(const LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, const LibMCDriver_Rasterizer_uint32 nPixelsPerBlock)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Rasterizer_SetSamplingParameters(m_pHandle, nUnitsPerSubpixel, nPixelsPerBlock));
+	}
+	
+	/**
+	* CRasterizer::GetSamplingParameters - Returns sampling parameters of algorithm.
+	* @param[out] nUnitsPerSubpixel - Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even.
+	* @param[out] nPixelsPerBlock - Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024.
+	*/
+	void CRasterizer::GetSamplingParameters(LibMCDriver_Rasterizer_uint32 & nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32 & nPixelsPerBlock)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Rasterizer_GetSamplingParameters(m_pHandle, &nUnitsPerSubpixel, &nPixelsPerBlock));
 	}
 	
 	/**

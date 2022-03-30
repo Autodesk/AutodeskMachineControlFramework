@@ -46,7 +46,8 @@ using namespace LibMCDriver_Rasterizer::Impl;
 
 CImageObject::CImageObject(const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY)
 	: m_nPixelCountX(nPixelCountX), m_nPixelCountY(nPixelCountY), m_dDPIValueX(dDPIValueX), m_dDPIValueY(dDPIValueY),
-	m_dPositionX(0.0), m_dPositionY(0.0)
+	m_dPositionX(0.0), m_dPositionY(0.0), m_nBlockCountX(0), m_nBlockCountY(0), m_nUnitsPerSubPixel(0),
+	m_nSubSamplingX (0), m_nSubSamplingY (0), m_dUnitsX (0.0), m_dUnitsY (0.0), m_nPixelsPerBlock (0)
 {
 	if (nPixelCountX <= 0)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPIXELCOUNT);
@@ -192,3 +193,135 @@ std::vector<uint8_t>& CImageObject::getBuffer()
 {
 	return m_PixelData;
 }
+
+
+void CImageObject::initRasterizationAlgorithms(uint32_t nUnitsPerSubPixel, uint32_t nPixelsPerBlock, uint32_t nSubSamplingX, uint32_t nSubSamplingY)
+{
+	if (nSubSamplingX < RASTERER_MINSUBSAMPLING)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDSUBSAMPLING);
+	if (nSubSamplingY < RASTERER_MINSUBSAMPLING)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDSUBSAMPLING);
+	if (nSubSamplingX > RASTERER_MAXSUBSAMPLING)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDSUBSAMPLING);
+	if (nSubSamplingY > RASTERER_MAXSUBSAMPLING)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDSUBSAMPLING);
+
+	m_nBlockCountX = (m_nPixelCountX + nPixelsPerBlock - 1) / nPixelsPerBlock;
+	m_nBlockCountY = (m_nPixelCountY + nPixelsPerBlock - 1) / nPixelsPerBlock;
+	m_nUnitsPerSubPixel = nUnitsPerSubPixel;
+	m_nPixelsPerBlock = nPixelsPerBlock;
+
+	m_dUnitsX = (25.4 / m_dDPIValueX) / (double)nSubSamplingX;
+	m_dUnitsY = (25.4 / m_dDPIValueY) / (double)nSubSamplingY;
+
+	m_nSubSamplingX = nSubSamplingX;
+	m_nSubSamplingY = nSubSamplingY;
+
+	m_Algorithms.clear();
+
+}
+
+void CImageObject::addRasterizationLayer(CLayerDataObject* pLayer)
+{
+	if (pLayer == nullptr)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+
+	if ((m_nBlockCountX == 0) || (m_nBlockCountY == 0))
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_RASTERIZATIONNOTINITIALIZED);
+
+	uint32_t nExpectedLineCount = (uint32_t) pLayer->calculateClosedPolygonLineCount();
+	auto pAlgorithm = std::make_shared<CRasterizationAlgorithm>(m_nUnitsPerSubPixel, m_nSubSamplingX, m_nSubSamplingY, m_nPixelsPerBlock, m_nBlockCountX, m_nBlockCountY, nExpectedLineCount);
+
+	pLayer->addClosedPolygonsToAlgorithm(pAlgorithm.get(), m_dUnitsX, m_dUnitsY);
+	pAlgorithm->buildBlocks();
+
+	m_Algorithms.push_back(pAlgorithm);
+
+}
+
+void CImageObject::calculateRasterizationImage(bool bAntiAliased)
+{
+	if ((m_nBlockCountX == 0) || (m_nBlockCountY == 0))
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_RASTERIZATIONNOTINITIALIZED);
+	if (m_Algorithms.empty ()) 
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDSUBSAMPLING);
+
+	uint32_t nNumberOfZSamples = (uint32_t) m_Algorithms.size();
+	uint32_t nValueRange = 255;
+	uint32_t nValueBWThreshold = nValueRange / 2;
+
+	std::vector<CRasterizationAlgorithm*> m_ActiveAlgorithms;
+	m_ActiveAlgorithms.resize (nNumberOfZSamples);
+
+	std::vector<uint32_t> m_BlockBuffer;
+	m_BlockBuffer.resize((size_t)m_nPixelsPerBlock * (size_t)m_nPixelsPerBlock);
+
+	for (uint32_t nBlockX = 0; nBlockX < m_nBlockCountX; nBlockX++) {
+		for (uint32_t nBlockY = 0; nBlockY < m_nBlockCountY; nBlockY++) {
+			
+			uint32_t nBaseValue = 0;
+			uint32_t nActiveLayerCount = 0;
+			for (auto algorithm : m_Algorithms) {
+				auto blockInfo = algorithm->getBlockInfo(nBlockX, nBlockY);
+				if (blockInfo == eBlockType::btCompleteInside)
+					nBaseValue += nValueRange;
+				if (blockInfo == eBlockType::btBorder) {
+					m_ActiveAlgorithms[nActiveLayerCount] = algorithm.get();
+					nActiveLayerCount++;
+				}
+			}
+
+			if (nActiveLayerCount == 0) {
+				uint32_t nValueNormalized = nBaseValue / nNumberOfZSamples;
+				if (!bAntiAliased) {
+					if (nValueNormalized > nValueBWThreshold)
+						nValueNormalized = nValueRange;
+					else
+						nValueNormalized = 0;
+				}
+
+				for (uint32_t dY = 0; dY < m_nPixelsPerBlock; dY++) {
+					uint32_t nY = nBlockY * m_nPixelsPerBlock + dY;
+					uint32_t nX = nBlockX * m_nPixelsPerBlock;
+					for (uint32_t dX = 0; dX < m_nPixelsPerBlock; dX++) {
+						setPixel(nX, nY, (uint8_t)nValueNormalized);
+						nX++;
+					}
+				}
+			}
+			else {
+				for (auto it = m_BlockBuffer.begin(); it != m_BlockBuffer.end(); it++)
+					*it = nBaseValue;
+
+				for (uint32_t nSampleIndex = 0; nSampleIndex < nActiveLayerCount; nSampleIndex++) {
+					m_ActiveAlgorithms[nActiveLayerCount]->addBlockToBuffer (nBlockX, nBlockY, m_BlockBuffer);
+				}
+
+				for (uint32_t dY = 0; dY < m_nPixelsPerBlock; dY++) {
+					uint32_t nY = nBlockY * m_nPixelsPerBlock + dY;
+					uint32_t nX = nBlockX * m_nPixelsPerBlock;
+					for (uint32_t dX = 0; dX < m_nPixelsPerBlock; dX++) {
+						uint32_t nValueNormalized = m_BlockBuffer[(size_t)dX + (size_t)dY * m_nPixelsPerBlock] / nNumberOfZSamples;
+						if (!bAntiAliased) {
+							if (nValueNormalized > nValueBWThreshold)
+								nValueNormalized = nValueRange;
+							else
+								nValueNormalized = 0;
+						}
+
+						setPixel(nX, nY, (uint8_t)nValueNormalized);
+						nX++;
+					}
+				}
+
+			}
+
+		}
+	}
+
+	m_nBlockCountX = 0;
+	m_nBlockCountY = 0;
+	m_Algorithms.clear();
+
+}
+
