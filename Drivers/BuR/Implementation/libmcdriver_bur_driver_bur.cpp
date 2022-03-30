@@ -288,17 +288,15 @@ void CDriver_BuR::QueryParameters()
 {
 
     if (m_bIsQueryingParameters)
-        return;
-
-    uint64_t nTimeStamp = generateTimeStamp ();
+        return;   
 
     if (!m_SimulationMode) {
 
         if (m_pConnector.get() != nullptr) {
             m_bIsQueryingParameters = true;
 
-            m_pConnector->queryParameters(nTimeStamp,
-                [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
+            m_pConnector->queryParameters(
+                [this](CDriver_BuRPacket* pPacket) {
 
                 m_bIsQueryingParameters = false;
 

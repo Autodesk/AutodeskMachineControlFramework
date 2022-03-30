@@ -41,6 +41,48 @@ using namespace LibMCDriver_BuR::Impl;
 #define PACKET_SIGNATURE 0xAB
 
 
+#pragma pack(push)
+#pragma pack(1)
+
+
+struct sAMCFToPLCPacket {
+    uint32_t m_nSignature;
+    uint8_t m_nMajorVersion;
+    uint8_t m_nMinorVersion;
+    uint8_t m_nPatchVersion;
+    uint8_t m_nBuildVersion;
+    uint32_t m_nClientID;
+    uint32_t m_nSequenceID;
+    uint32_t m_nCommandID;
+    sAMCFToPLCPacketPayload m_Payload;
+    uint32_t m_nChecksum;
+};
+
+
+struct sPLCToAMCFPacket {
+    uint32_t m_nSignature;
+    uint8_t m_nMajorVersion;
+    uint8_t m_nMinorVersion;
+    uint8_t m_nPatchVersion;
+    uint8_t m_nBuildVersion;
+    uint32_t m_nClientID;
+    uint32_t m_nSequenceID;
+    uint32_t m_nErrorCode;
+    uint32_t m_nCommandID;
+    uint32_t m_nMessageLen;
+    uint32_t m_nHeaderChecksum;
+    uint32_t m_nDataChecksum;
+};
+
+struct sAMCFToPLCPacketSendInfo {
+    uint32_t m_CommandID;
+    uint32_t m_SequenceID;
+    uint32_t m_ClientID;
+};
+
+#pragma pack(pop)
+
+
 
 CDriver_BuRPacket::CDriver_BuRPacket(uint32_t nCommandID, uint32_t nStatusCode)
     : m_nCommandID (nCommandID), m_nStatusCode (nStatusCode)
@@ -128,50 +170,6 @@ std::vector<uint8_t>& CDriver_BuRPacket::getDataBuffer()
     return m_Data;
 }
 
-CDriver_BuRSendInfo::CDriver_BuRSendInfo(uint32_t nCommandID, uint32_t nSequenceID, uint32_t nClientID, uint64_t nTimeStamp, BurSendCallback sendCallback)
-    : m_nCommandID (nCommandID), m_nSequenceID (nSequenceID), m_nClientID (nClientID), m_nTimeStamp (nTimeStamp), m_Callback (sendCallback)
-{
-
-}
-
-CDriver_BuRSendInfo::~CDriver_BuRSendInfo()
-{
-
-}
-
-uint32_t CDriver_BuRSendInfo::getCommandID()
-{
-    return m_nCommandID;
-}
-
-uint32_t CDriver_BuRSendInfo::getSequenceID()
-{
-    return m_nSequenceID;
-}
-
-uint32_t CDriver_BuRSendInfo::getClientID()
-{
-    return m_nClientID;
-}
-
-uint64_t CDriver_BuRSendInfo::getTimeStamp()
-{
-    return m_nTimeStamp;
-}
-
-void CDriver_BuRSendInfo::resetCallback()
-{
-    m_Callback = nullptr;
-}
-
-void CDriver_BuRSendInfo::triggerCallback(CDriver_BuRPacket* pPacket)
-{
-    if (pPacket == nullptr)
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
-    if (m_Callback)
-        m_Callback(this, pPacket);
-}
-
 
 CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize)
     : m_nWorkerThreadCount(nWorkerThreadCount),
@@ -190,9 +188,7 @@ CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t
 
 
 
-
-
-void CDriver_BuRConnector::queryParameters(uint64_t nTimeStamp, BurSendCallback pCallback)
+void CDriver_BuRConnector::queryParameters(BurPacketCallback callback)
 {    
     std::shared_ptr<CDriver_BuRSocketConnection> pConnection;
     {
@@ -200,22 +196,183 @@ void CDriver_BuRConnector::queryParameters(uint64_t nTimeStamp, BurSendCallback 
         pConnection = m_pCurrentConnection;
     }
 
-    if (pConnection.get() != nullptr) {
-        sAMCFToPLCPacketPayload payLoad;
-        for (uint32_t nIndex = 0; nIndex < 24; nIndex++)
-            payLoad.m_nData[nIndex] = 0;
-
-        sendCommandToPLC(BUR_COMMAND_DIRECT_MACHINESTATUS, payLoad, nTimeStamp, pCallback);
-
-        
-            
+    if (pConnection.get() != nullptr) {        
+        sendCommandToPLC(BUR_COMMAND_DIRECT_MACHINESTATUS, callback);
     }
-
 }
 
 
+void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>& packetList)
+{
+    if (packetList.empty())
+        return;
 
-uint32_t CDriver_BuRConnector::sendSimpleCommandToPLC(uint32_t nCommandID, uint64_t nTimeStamp, BurSendCallback pCallback, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2)
+    if (m_pCurrentConnection == nullptr)
+        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTCONNECTED);
+
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(1, 1024 * 1024 * 1024);
+
+    std::vector<sAMCFToPLCPacket> TCPPacketList;
+    std::vector<sAMCFToPLCPacketSendInfo> SendInfoList;
+
+    for (auto& packet : packetList) {
+        uint32_t nClientID = distribution(generator);
+
+        sAMCFToPLCPacket TCPpacket;
+        TCPpacket.m_nSignature = PACKET_SIGNATURE;
+        TCPpacket.m_nCommandID = packet.m_CommandID;
+        TCPpacket.m_nMajorVersion = m_nMajorVersion;
+        TCPpacket.m_nMinorVersion = m_nMinorVersion;
+        TCPpacket.m_nPatchVersion = m_nPatchVersion;
+        TCPpacket.m_nBuildVersion = m_nBuildVersion;
+        TCPpacket.m_nClientID = nClientID;
+        TCPpacket.m_nSequenceID = m_nSequenceID;
+        TCPpacket.m_Payload = packet.m_Payload;
+        TCPpacket.m_nChecksum = CRC::Calculate(&TCPpacket, ((intptr_t)(&TCPpacket.m_nChecksum) - (intptr_t)(&TCPpacket)), CRC::CRC_32());
+        TCPPacketList.push_back(TCPpacket);
+
+        // Store send info
+        sAMCFToPLCPacketSendInfo sendInfo;
+        sendInfo.m_CommandID = TCPpacket.m_nCommandID;
+        sendInfo.m_SequenceID = TCPpacket.m_nSequenceID;
+        sendInfo.m_ClientID = TCPpacket.m_nClientID;
+        SendInfoList.push_back(sendInfo);
+
+        m_nSequenceID++;
+    }
+
+    if (TCPPacketList.empty())
+        throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+    m_pCurrentConnection->sendBuffer((uint8_t*)TCPPacketList.data(), sizeof(sAMCFToPLCPacket) * TCPPacketList.size ());
+
+    for (auto& sendInfo : SendInfoList) {
+
+        std::vector<uint8_t> recvBuffer;
+        m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacket), true);
+
+        if (recvBuffer.size() != sizeof(sPLCToAMCFPacket))
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR);
+
+        const sPLCToAMCFPacket* receivedPacket = (const sPLCToAMCFPacket*)recvBuffer.data();
+        if (receivedPacket->m_nSignature != PACKET_SIGNATURE) {
+            m_pCurrentConnection->disconnect();
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETSIGNATURE);
+        }
+
+        auto pPacket = std::make_shared<CDriver_BuRPacket>(receivedPacket->m_nCommandID, receivedPacket->m_nErrorCode);
+
+        if (receivedPacket->m_nMessageLen < sizeof(sPLCToAMCFPacket))
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH);
+
+        uint32_t nDataLen = (receivedPacket->m_nMessageLen - sizeof(sPLCToAMCFPacket));
+        if (nDataLen > 0) {
+            m_pCurrentConnection->receiveBuffer(pPacket->getDataBuffer(), nDataLen, true);
+        }
+
+        if (sendInfo.m_SequenceID != receivedPacket->m_nSequenceID)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTSEQUENCEID);
+        if (sendInfo.m_ClientID != receivedPacket->m_nClientID)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTID); 
+
+    }
+}
+
+sAMCFToPLCPacketToSend CDriver_BuRConnector::makePacket(uint32_t nCommandID, BurPacketCallback callback)
+{
+    return makePacket(nCommandID, 0, 0, 0, 0, 0, callback);
+}
+
+sAMCFToPLCPacketToSend CDriver_BuRConnector::makePacket(uint32_t nCommandID, uint32_t nParameter0, BurPacketCallback callback)
+{
+    return makePacket(nCommandID, nParameter0, 0, 0, 0, 0, callback);
+}
+
+sAMCFToPLCPacketToSend CDriver_BuRConnector::makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, BurPacketCallback callback)
+{
+    return makePacket(nCommandID, nParameter0, nParameter1, 0, 0, 0, callback);
+}
+
+
+sAMCFToPLCPacketToSend CDriver_BuRConnector::makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, BurPacketCallback callback)
+{
+    return makePacket(nCommandID, nParameter0, nParameter1, nParameter2, 0, 0, callback);
+}
+
+sAMCFToPLCPacketToSend CDriver_BuRConnector::makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, BurPacketCallback callback)
+{
+    return makePacket(nCommandID, nParameter0, nParameter1, nParameter2, nParameter3, 0, callback);
+}
+
+sAMCFToPLCPacketToSend CDriver_BuRConnector::makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, uint32_t nParameter4, BurPacketCallback callback)
+{
+    sAMCFToPLCPacketToSend packetToSend;
+    for (uint32_t nIndex = 0; nIndex < 24; nIndex++)
+        packetToSend.m_Payload.m_nData[nIndex] = 0;
+    packetToSend.m_CommandID = nCommandID;
+    packetToSend.m_Callback = callback;
+
+    uint32_t* pParameter = (uint32_t*)&packetToSend.m_Payload.m_nData[0];
+    pParameter[0] = nParameter0;
+    pParameter[1] = nParameter1;
+    pParameter[2] = nParameter2;
+    pParameter[3] = nParameter3;
+    pParameter[4] = nParameter4;
+
+    return packetToSend;
+}
+
+sAMCFToPLCPacketToSend CDriver_BuRConnector::makePacket(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, BurPacketCallback callback)
+{
+    sAMCFToPLCPacketToSend packetToSend;
+    packetToSend.m_CommandID = nCommandID;
+    packetToSend.m_Payload = payLoad;
+    packetToSend.m_Callback = callback;
+    return packetToSend;
+}
+
+
+void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, BurPacketCallback callback)
+{
+    sendCommandToPLC(nCommandID, 0, 0, 0, 0, 0, callback);
+}
+
+void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, BurPacketCallback callback)
+{
+    sendCommandToPLC(nCommandID, nParameter0, 0, 0, 0, 0, callback);
+}
+void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, BurPacketCallback callback)
+{
+    sendCommandToPLC(nCommandID, nParameter0, nParameter1, 0, 0, 0, callback);
+}
+
+void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, BurPacketCallback callback)
+{
+    sendCommandToPLC(nCommandID, nParameter0, nParameter1, nParameter2, 0, 0, callback);
+}
+
+void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, BurPacketCallback callback)
+{
+    sendCommandToPLC(nCommandID, nParameter0, nParameter1, nParameter2, nParameter3, 0, callback);
+}
+
+void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, uint32_t nParameter4, BurPacketCallback callback)
+{
+    std::vector<sAMCFToPLCPacketToSend> packetList;
+    packetList.push_back(makePacket(nCommandID, nParameter0, nParameter1, nParameter2, nParameter3, nParameter4, callback));
+    sendCommandsToPLC(packetList);
+}
+
+void CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, BurPacketCallback callback)
+{
+    std::vector<sAMCFToPLCPacketToSend> packetList;
+    packetList.push_back(makePacket(nCommandID, payLoad, callback));
+    sendCommandsToPLC(packetList);
+}
+
+
+/*uint32_t CDriver_BuRConnector::sendSimpleCommandToPLC(uint32_t nCommandID, uint64_t nTimeStamp, BurSendCallback pCallback, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2)
 {
     sAMCFToPLCPacketPayload payLoad;
     for (uint32_t nIndex = 0; nIndex < 24; nIndex++)
@@ -228,10 +385,10 @@ uint32_t CDriver_BuRConnector::sendSimpleCommandToPLC(uint32_t nCommandID, uint6
 
     return sendCommandToPLC(nCommandID, payLoad, nTimeStamp, pCallback);
 
-}
+} */
 
 
-uint32_t CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, uint64_t nTimeStamp, BurSendCallback pCallback)
+/*uint32_t CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, uint64_t nTimeStamp, BurSendCallback pCallback)
 {
 
     if (m_SentPacketQueue.size () >= m_nMaxPacketQueueSize)
@@ -268,60 +425,11 @@ uint32_t CDriver_BuRConnector::sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCP
 
     return pSendInfo->getSequenceID(); 
 
-}
+} */
 
 
 
-PDriver_BuRPacket CDriver_BuRConnector::receiveCommandFromPLCEx(CDriver_BuRSocketConnection* pConnection)
-{
-    if (pConnection == nullptr)
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDTCPCONNECTIONPOINTER);
 
-    std::vector<uint8_t> Buffer;
-    pConnection->receiveBuffer(Buffer, sizeof(sPLCToAMCFPacket), true);
-
-    if (Buffer.size () != sizeof(sPLCToAMCFPacket))
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEERROR);
-
-    const sPLCToAMCFPacket* receivedPacket = (const sPLCToAMCFPacket*)Buffer.data ();
-    if (receivedPacket->m_nSignature != PACKET_SIGNATURE) {
-        pConnection->disconnect();
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETSIGNATURE);   
-    }
-
-    auto pPacket = std::make_shared<CDriver_BuRPacket>(receivedPacket->m_nCommandID, receivedPacket->m_nErrorCode);
-
-    if (receivedPacket->m_nMessageLen < sizeof(sPLCToAMCFPacket))
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH);
-
-    uint32_t nDataLen = (receivedPacket->m_nMessageLen - sizeof(sPLCToAMCFPacket));
-    if (nDataLen > 0) {
-        pConnection->receiveBuffer(pPacket->getDataBuffer(), nDataLen, true);
-    }
-    uint32_t nSequenceID = receivedPacket->m_nSequenceID;
-    uint32_t nClientID = receivedPacket->m_nClientID;
-
-    PDriver_BuRSendInfo pSendInfo;
-    {
-        std::lock_guard<std::mutex> lockGuard(m_SequenceMapMutex);
-        auto iIter = m_SentPacketQueue.find(nSequenceID);
-        if (iIter != m_SentPacketQueue.end()) {
-            pSendInfo = iIter->second;
-            m_SentPacketQueue.erase(nSequenceID);
-        }
-    }
-
-    if (pSendInfo.get() == nullptr)
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTSEQUENCEID);
-    if (pSendInfo->getSequenceID() != nSequenceID)
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTSEQUENCEID);
-    if (pSendInfo->getClientID() != nClientID)
-        throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTID);
-
-    pSendInfo->triggerCallback(pPacket.get()); 
-
-    return pPacket;
-}
 
 
 
@@ -370,7 +478,7 @@ PDriver_BuRPacket CDriver_BuRConnector::receiveCommandFromPLCEx(CDriver_BuRSocke
     
 } */
 
-void CDriver_BuRConnector::handlePacket()
+/*void CDriver_BuRConnector::handlePacket()
 {
     if (m_pCurrentConnection.get() == nullptr)
         return;
@@ -383,7 +491,7 @@ void CDriver_BuRConnector::handlePacket()
         receiveCommandFromPLCEx(m_pCurrentConnection.get());
     }
 
-}
+} */
 
 void CDriver_BuRConnector::connect(const std::string& sIPAddress, const uint32_t nPort, const uint32_t nTimeout)
 {
@@ -443,11 +551,4 @@ void CDriver_BuRConnector::refreshJournal()
 
 }
 
-void CDriver_BuRConnector::unregisterSendCallback(uint32_t nSequenceID)
-{
-    std::lock_guard<std::mutex> lockGuard(m_ConnectionMutex);
-    auto iIter = m_SentPacketQueue.find(nSequenceID);
-    if (iIter != m_SentPacketQueue.end())
-        iIter->second->resetCallback();
 
-}

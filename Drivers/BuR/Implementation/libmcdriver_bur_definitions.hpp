@@ -44,9 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Include custom headers here.
 #include <map>
 #include <memory>
+#include <functional>
 
 namespace LibMCDriver_BuR {
 namespace Impl {
+
+    class CDriver_BuRPacket;
+    typedef std::function<void(CDriver_BuRPacket* pPacket)> BurPacketCallback;
 
 #pragma pack(push)
 #pragma pack(1)
@@ -54,6 +58,14 @@ namespace Impl {
     struct sAMCFToPLCPacketPayload {
         uint8_t m_nData[24];
     };
+
+    struct sAMCFToPLCPacketToSend {
+        uint32_t m_CommandID;
+        BurPacketCallback m_Callback;
+        sAMCFToPLCPacketPayload m_Payload;
+    };
+
+
 
 #pragma pack(pop)
 
