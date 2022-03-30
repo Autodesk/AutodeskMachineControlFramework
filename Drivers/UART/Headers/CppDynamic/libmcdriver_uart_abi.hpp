@@ -258,13 +258,25 @@ LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_is
 *
 * @param[in] pDriver_UART - Driver_UART instance.
 * @param[in] pLineToSend - Line to send
+* @param[in] nTimeout - Timeout in milliseconds.
 * @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
 * @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
-* @param[in] nTimeout - Timeout in milliseconds.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_sendline(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer, LibMCDriver_UART_uint32 nTimeout);
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_sendline(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
+
+/**
+* Waits for a received string.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] nTimeout - Timeout in milliseconds.
+* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_receiveline(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
 
 /*************************************************************************************************************************
  Global functions

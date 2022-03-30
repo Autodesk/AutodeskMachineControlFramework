@@ -396,10 +396,17 @@ public:
 	/**
 	* IDriver_UART::SendLine - Sends a string over UART and waits for a returning string.
 	* @param[in] sLineToSend - Line to send
-	* @return Received line
 	* @param[in] nTimeout - Timeout in milliseconds.
+	* @return Received line
 	*/
 	virtual std::string SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout) = 0;
+
+	/**
+	* IDriver_UART::ReceiveLine - Waits for a received string.
+	* @param[in] nTimeout - Timeout in milliseconds.
+	* @return Received line
+	*/
+	virtual std::string ReceiveLine(const LibMCDriver_UART_uint32 nTimeout) = 0;
 
 };
 

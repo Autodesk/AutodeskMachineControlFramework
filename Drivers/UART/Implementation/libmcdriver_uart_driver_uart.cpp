@@ -183,6 +183,14 @@ std::string CDriver_UART::SendLine(const std::string& sLineToSend, const LibMCDr
 	return m_pConnection->readline();
 }
 
+std::string CDriver_UART::ReceiveLine(const LibMCDriver_UART_uint32 nTimeout)
+{
+	if (m_pConnection.get() == nullptr)
+		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED);
+
+	return m_pConnection->readline();
+}
+
 
 void CDriver_UART::SetParity(const LibMCDriver_UART::eUARTParity eParity)
 {

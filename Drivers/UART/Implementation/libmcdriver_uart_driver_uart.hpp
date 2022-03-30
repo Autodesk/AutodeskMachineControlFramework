@@ -107,6 +107,8 @@ public:
 
 	std::string SendLine(const std::string& sLineToSend, const LibMCDriver_UART_uint32 nTimeout) override;
 
+	std::string ReceiveLine(const LibMCDriver_UART_uint32 nTimeout) override;
+
 	void SetParity(const LibMCDriver_UART::eUARTParity eParity) override;
 
 	LibMCDriver_UART::eUARTParity GetParity() override;

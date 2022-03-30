@@ -203,8 +203,13 @@ Custom implementation
 
 		<method name="SendLine" description= "Sends a string over UART and waits for a returning string.">
 			<param name="LineToSend" type="string" pass="in" description="Line to send" />
-			<param name="ReceivedLine" type="string" pass="return" description="Received line" />
 			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+			<param name="ReceivedLine" type="string" pass="return" description="Received line" />
+		</method>		
+
+		<method name="ReceiveLine" description= "Waits for a received string.">
+			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
+			<param name="ReceivedLine" type="string" pass="return" description="Received line" />
 		</method>		
 
 	</class>

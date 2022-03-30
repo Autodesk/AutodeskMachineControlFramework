@@ -376,6 +376,7 @@ public:
 	inline void Disconnect();
 	inline bool IsConnected();
 	inline std::string SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout);
+	inline std::string ReceiveLine(const LibMCDriver_UART_uint32 nTimeout);
 };
 	
 	/**
@@ -519,6 +520,7 @@ public:
 		pWrapperTable->m_Driver_UART_Disconnect = nullptr;
 		pWrapperTable->m_Driver_UART_IsConnected = nullptr;
 		pWrapperTable->m_Driver_UART_SendLine = nullptr;
+		pWrapperTable->m_Driver_UART_ReceiveLine = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -755,6 +757,15 @@ public:
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_ReceiveLine = (PLibMCDriver_UARTDriver_UART_ReceiveLinePtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_receiveline");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_ReceiveLine = (PLibMCDriver_UARTDriver_UART_ReceiveLinePtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_receiveline");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_ReceiveLine == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_UARTGetVersionPtr) GetProcAddress(hLibrary, "libmcdriver_uart_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDriver_UARTGetVersionPtr) dlsym(hLibrary, "libmcdriver_uart_getversion");
@@ -911,6 +922,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_sendline", (void**)&(pWrapperTable->m_Driver_UART_SendLine));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SendLine == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_receiveline", (void**)&(pWrapperTable->m_Driver_UART_ReceiveLine));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_ReceiveLine == nullptr) )
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_uart_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1179,16 +1194,32 @@ public:
 	/**
 	* CDriver_UART::SendLine - Sends a string over UART and waits for a returning string.
 	* @param[in] sLineToSend - Line to send
-	* @return Received line
 	* @param[in] nTimeout - Timeout in milliseconds.
+	* @return Received line
 	*/
 	std::string CDriver_UART::SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout)
 	{
 		LibMCDriver_UART_uint32 bytesNeededReceivedLine = 0;
 		LibMCDriver_UART_uint32 bytesWrittenReceivedLine = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), 0, &bytesNeededReceivedLine, nullptr, nTimeout));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), nTimeout, 0, &bytesNeededReceivedLine, nullptr));
 		std::vector<char> bufferReceivedLine(bytesNeededReceivedLine);
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), bytesNeededReceivedLine, &bytesWrittenReceivedLine, &bufferReceivedLine[0], nTimeout));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), nTimeout, bytesNeededReceivedLine, &bytesWrittenReceivedLine, &bufferReceivedLine[0]));
+		
+		return std::string(&bufferReceivedLine[0]);
+	}
+	
+	/**
+	* CDriver_UART::ReceiveLine - Waits for a received string.
+	* @param[in] nTimeout - Timeout in milliseconds.
+	* @return Received line
+	*/
+	std::string CDriver_UART::ReceiveLine(const LibMCDriver_UART_uint32 nTimeout)
+	{
+		LibMCDriver_UART_uint32 bytesNeededReceivedLine = 0;
+		LibMCDriver_UART_uint32 bytesWrittenReceivedLine = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_ReceiveLine(m_pHandle, nTimeout, 0, &bytesNeededReceivedLine, nullptr));
+		std::vector<char> bufferReceivedLine(bytesNeededReceivedLine);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_ReceiveLine(m_pHandle, nTimeout, bytesNeededReceivedLine, &bytesWrittenReceivedLine, &bufferReceivedLine[0]));
 		
 		return std::string(&bufferReceivedLine[0]);
 	}

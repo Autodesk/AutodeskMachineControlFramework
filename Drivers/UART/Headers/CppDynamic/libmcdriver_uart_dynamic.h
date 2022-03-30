@@ -245,13 +245,25 @@ typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_IsConnectedPtr) (L
 *
 * @param[in] pDriver_UART - Driver_UART instance.
 * @param[in] pLineToSend - Line to send
+* @param[in] nTimeout - Timeout in milliseconds.
 * @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
 * @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
-* @param[in] nTimeout - Timeout in milliseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SendLinePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer, LibMCDriver_UART_uint32 nTimeout);
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SendLinePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
+
+/**
+* Waits for a received string.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] nTimeout - Timeout in milliseconds.
+* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_ReceiveLinePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
 
 /*************************************************************************************************************************
  Global functions
@@ -349,6 +361,7 @@ typedef struct {
 	PLibMCDriver_UARTDriver_UART_DisconnectPtr m_Driver_UART_Disconnect;
 	PLibMCDriver_UARTDriver_UART_IsConnectedPtr m_Driver_UART_IsConnected;
 	PLibMCDriver_UARTDriver_UART_SendLinePtr m_Driver_UART_SendLine;
+	PLibMCDriver_UARTDriver_UART_ReceiveLinePtr m_Driver_UART_ReceiveLine;
 	PLibMCDriver_UARTGetVersionPtr m_GetVersion;
 	PLibMCDriver_UARTGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_UARTReleaseInstancePtr m_ReleaseInstance;
