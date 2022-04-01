@@ -30,4 +30,5 @@ add_subdirectory(ADS)
 add_subdirectory(UART)
 add_subdirectory(TCPIP)
 add_subdirectory(Rasterizer)
+add_subdirectory(RayLase)
 
