@@ -33,5 +33,5 @@ cmake_minimum_required(VERSION 3.5)
 project("AMC Unit Tests")
 
 add_subdirectory(RayLaseTest)
-add_subdirectory(BurAutomationTest1)
+add_subdirectory(BuRTest)
 
