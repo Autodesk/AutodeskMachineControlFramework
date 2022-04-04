@@ -306,6 +306,9 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
     if (sFailedState.length() == 0)
         throw ELibMCCustomException(LIBMC_ERROR_EMPTYFAILEDSTATE, sName);
 
+    auto successstateAttrib = xmlNode.attribute("successstate");
+    std::string sSuccessState = successstateAttrib.as_string ();
+
     auto libraryAttrib = xmlNode.attribute("library");
     if (libraryAttrib.empty())
         throw ELibMCCustomException(LIBMC_ERROR_MISSINGPLUGINNAME, sName);
@@ -443,6 +446,9 @@ AMC::PStateMachineInstance CMCContext::addMachineInstance(const pugi::xml_node& 
 
     pInstance->setInitState(sInitState);
     pInstance->setFailedState(sFailedState);
+    if (!sSuccessState.empty()) {
+        pInstance->setSuccessState(sSuccessState);
+    }
 
     // load Plugin DLLs
     auto pPlugin = loadPlugin (m_pSystemState->getLibraryPath (slibraryName));

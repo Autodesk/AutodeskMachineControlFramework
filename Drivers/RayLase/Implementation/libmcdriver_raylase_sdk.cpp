@@ -92,7 +92,7 @@ CRaylaseSDK::CRaylaseSDK(const std::string& sDLLNameUTF8)
 	void* hLibrary = dlopen(sDLLNameUTF8.c_str(), RTLD_LAZY);
 	if (hLibrary == 0) {
 		dlerror();
-		throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTLOADLIBRARY);
+		throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_COULDNOTLOADLIBRARY);
 	}
 #endif // _WIN32
 
