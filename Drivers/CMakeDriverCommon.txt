@@ -77,7 +77,7 @@ else()
 endif()
 
 file(STRINGS ${PROJECT_BINARY_DIR}/../../githash.txt GLOBALGITHASH)
-message(STATUS "Global git hash: \"${GLOBALGITHASH}\"")
+message(STATUS "Driver \"${DRIVERPROJECT}\" git hash: \"${GLOBALGITHASH}\"")
 
 
 file(GLOB LIBMCDRIVER_SRC

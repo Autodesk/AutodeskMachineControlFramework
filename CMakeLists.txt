@@ -35,6 +35,7 @@ project(LibMC)
 
 add_subdirectory(Drivers)
 add_subdirectory(Plugins)
+add_subdirectory(Tests)
 
 set (CMAKE_CXX_STANDARD 17)
 
@@ -494,40 +495,40 @@ file(GLOB SERVER_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
 )
 
-add_executable(server ${SERVER_SRC})
+add_executable(amc_server ${SERVER_SRC})
 
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_HEADERS_CORE_DIR})
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/)
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib)
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
-target_include_directories(server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
-target_compile_options(server PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
-target_compile_options(server PRIVATE "-DLIBUS_NO_SSL")
+target_include_directories(amc_server PRIVATE ${CMAKE_CURRENT_HEADERS_CORE_DIR})
+target_include_directories(amc_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
+target_include_directories(amc_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/)
+target_include_directories(amc_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib)
+target_include_directories(amc_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(amc_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_compile_options(amc_server PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
+target_compile_options(amc_server PRIVATE "-DLIBUS_NO_SSL")
 
 if(WIN32)
 
-	target_link_libraries(server shlwapi.lib)
-	target_link_libraries(server ws2_32.lib)
-	target_link_libraries(server userenv.lib)
-	target_link_libraries(server psapi.lib)
-	target_link_libraries(server iphlpapi.lib)
+	target_link_libraries(amc_server shlwapi.lib)
+	target_link_libraries(amc_server ws2_32.lib)
+	target_link_libraries(amc_server userenv.lib)
+	target_link_libraries(amc_server psapi.lib)
+	target_link_libraries(amc_server iphlpapi.lib)
 	
 else()
 
 	find_package(Threads REQUIRED)
 	if(THREADS_HAVE_PTHREAD_ARG)
-	  target_compile_options(server PUBLIC "-pthread")
+	  target_compile_options(amc_server PUBLIC "-pthread")
 	endif()
 	if(CMAKE_THREAD_LIBS_INIT)
-	  target_link_libraries(server "${CMAKE_THREAD_LIBS_INIT}")
+	  target_link_libraries(amc_server "${CMAKE_THREAD_LIBS_INIT}")
 	endif()
 
-	target_link_libraries(server dl)
+	target_link_libraries(amc_server dl)
 
 endif(WIN32)
 
-set_target_properties(server
+set_target_properties(amc_server
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Output"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/Output"
@@ -541,3 +542,66 @@ set_target_properties(server
 )
 
 
+
+
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ AMC Test Target
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+
+file(GLOB TEST_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_configuration.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_console.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_definition.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_io.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML/pugixml.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+)
+
+add_executable(amc_test ${TEST_SRC})
+
+target_include_directories(amc_test PRIVATE ${CMAKE_CURRENT_HEADERS_CORE_DIR})
+target_include_directories(amc_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
+target_include_directories(amc_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/)
+target_include_directories(amc_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib)
+target_include_directories(amc_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(amc_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_compile_options(amc_test PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
+
+if(WIN32)
+	target_link_libraries(amc_test shlwapi.lib)
+	target_link_libraries(amc_test ws2_32.lib)
+else()
+
+	find_package(Threads REQUIRED)
+	if(THREADS_HAVE_PTHREAD_ARG)
+	  target_compile_options(amc_test PUBLIC "-pthread")
+	endif()
+	if(CMAKE_THREAD_LIBS_INIT)
+	  target_link_libraries(amc_test "${CMAKE_THREAD_LIBS_INIT}")
+	endif()
+
+	target_link_libraries(amc_test dl)
+
+endif(WIN32)
+
+set_target_properties(amc_test
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Output"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/Output"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Output"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Output"
+	
+	OUTPUT_NAME "amc_test"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	
+    
+)

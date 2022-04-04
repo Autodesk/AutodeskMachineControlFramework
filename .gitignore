@@ -12,6 +12,7 @@ build
 build_win64
 build_linux64
 build_rpi
+build_client
 ACT/LibMC_component
 ACT/LibMCDriverEnv_component
 ACT/LibMCDriver_component
