@@ -371,6 +371,7 @@ public:
 	inline void TerminateInstanceThread(const std::string & sInstanceName);
 	inline std::string GetInstanceThreadState(const std::string & sInstanceName);
 	inline bool InstanceStateIsSuccessful(const std::string & sInstanceName);
+	inline bool InstanceStateHasFailed(const std::string & sInstanceName);
 	inline void LoadClientPackage(const std::string & sResourcePath);
 	inline void Log(const std::string & sMessage, const eLogSubSystem eSubsystem, const eLogLevel eLogLevel);
 	inline PAPIRequestHandler CreateAPIRequestHandler(const std::string & sURI, const std::string & sRequestMethod, const std::string & sAuthorization);
@@ -499,6 +500,7 @@ public:
 		pWrapperTable->m_MCContext_TerminateInstanceThread = nullptr;
 		pWrapperTable->m_MCContext_GetInstanceThreadState = nullptr;
 		pWrapperTable->m_MCContext_InstanceStateIsSuccessful = nullptr;
+		pWrapperTable->m_MCContext_InstanceStateHasFailed = nullptr;
 		pWrapperTable->m_MCContext_LoadClientPackage = nullptr;
 		pWrapperTable->m_MCContext_Log = nullptr;
 		pWrapperTable->m_MCContext_CreateAPIRequestHandler = nullptr;
@@ -701,6 +703,15 @@ public:
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_MCContext_InstanceStateHasFailed = (PLibMCMCContext_InstanceStateHasFailedPtr) GetProcAddress(hLibrary, "libmc_mccontext_instancestatehasfailed");
+		#else // _WIN32
+		pWrapperTable->m_MCContext_InstanceStateHasFailed = (PLibMCMCContext_InstanceStateHasFailedPtr) dlsym(hLibrary, "libmc_mccontext_instancestatehasfailed");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_MCContext_InstanceStateHasFailed == nullptr)
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_MCContext_LoadClientPackage = (PLibMCMCContext_LoadClientPackagePtr) GetProcAddress(hLibrary, "libmc_mccontext_loadclientpackage");
 		#else // _WIN32
 		pWrapperTable->m_MCContext_LoadClientPackage = (PLibMCMCContext_LoadClientPackagePtr) dlsym(hLibrary, "libmc_mccontext_loadclientpackage");
@@ -859,6 +870,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmc_mccontext_instancestateissuccessful", (void**)&(pWrapperTable->m_MCContext_InstanceStateIsSuccessful));
 		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_InstanceStateIsSuccessful == nullptr) )
+			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmc_mccontext_instancestatehasfailed", (void**)&(pWrapperTable->m_MCContext_InstanceStateHasFailed));
+		if ( (eLookupError != 0) || (pWrapperTable->m_MCContext_InstanceStateHasFailed == nullptr) )
 			return LIBMC_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmc_mccontext_loadclientpackage", (void**)&(pWrapperTable->m_MCContext_LoadClientPackage));
@@ -1070,7 +1085,7 @@ public:
 	
 	/**
 	* CMCContext::GetInstanceThreadState - returns current state of a instance thread.
-	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @param[in] sInstanceName - Instance name of state machine.
 	* @return State of state machine.
 	*/
 	std::string CMCContext::GetInstanceThreadState(const std::string & sInstanceName)
@@ -1086,13 +1101,26 @@ public:
 	
 	/**
 	* CMCContext::InstanceStateIsSuccessful - returns if an instance thread is in success state.
-	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @param[in] sInstanceName - Instance name of state machine.
 	* @return State of state machine is in success state.
 	*/
 	bool CMCContext::InstanceStateIsSuccessful(const std::string & sInstanceName)
 	{
 		bool resultIsSuccessful = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_InstanceStateIsSuccessful(m_pHandle, sInstanceName.c_str(), &resultIsSuccessful));
+		
+		return resultIsSuccessful;
+	}
+	
+	/**
+	* CMCContext::InstanceStateHasFailed - returns if an instance thread is in failure state.
+	* @param[in] sInstanceName - Instance name of state machine.
+	* @return State of state machine is in failure state.
+	*/
+	bool CMCContext::InstanceStateHasFailed(const std::string & sInstanceName)
+	{
+		bool resultIsSuccessful = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_MCContext_InstanceStateHasFailed(m_pHandle, sInstanceName.c_str(), &resultIsSuccessful));
 		
 		return resultIsSuccessful;
 	}

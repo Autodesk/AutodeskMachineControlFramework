@@ -124,6 +124,7 @@ namespace AMC {
 
 		std::string getCurrentStateName ();
 		bool currentStateIsSuccessState();
+		bool currentStateIsFailureState();
 	};
 
 	

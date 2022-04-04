@@ -202,7 +202,7 @@ typedef LibMCResult (*PLibMCMCContext_TerminateInstanceThreadPtr) (LibMC_MCConte
 * returns current state of a instance thread.
 *
 * @param[in] pMCContext - MCContext instance.
-* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[in] pInstanceName - Instance name of state machine.
 * @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
 * @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pStateNameBuffer -  buffer of State of state machine., may be NULL
@@ -214,11 +214,21 @@ typedef LibMCResult (*PLibMCMCContext_GetInstanceThreadStatePtr) (LibMC_MCContex
 * returns if an instance thread is in success state.
 *
 * @param[in] pMCContext - MCContext instance.
-* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[in] pInstanceName - Instance name of state machine.
 * @param[out] pIsSuccessful - State of state machine is in success state.
 * @return error code or 0 (success)
 */
 typedef LibMCResult (*PLibMCMCContext_InstanceStateIsSuccessfulPtr) (LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful);
+
+/**
+* returns if an instance thread is in failure state.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine.
+* @param[out] pIsSuccessful - State of state machine is in failure state.
+* @return error code or 0 (success)
+*/
+typedef LibMCResult (*PLibMCMCContext_InstanceStateHasFailedPtr) (LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful);
 
 /**
 * load a client package to serve the client website.
@@ -334,6 +344,7 @@ typedef struct {
 	PLibMCMCContext_TerminateInstanceThreadPtr m_MCContext_TerminateInstanceThread;
 	PLibMCMCContext_GetInstanceThreadStatePtr m_MCContext_GetInstanceThreadState;
 	PLibMCMCContext_InstanceStateIsSuccessfulPtr m_MCContext_InstanceStateIsSuccessful;
+	PLibMCMCContext_InstanceStateHasFailedPtr m_MCContext_InstanceStateHasFailed;
 	PLibMCMCContext_LoadClientPackagePtr m_MCContext_LoadClientPackage;
 	PLibMCMCContext_LogPtr m_MCContext_Log;
 	PLibMCMCContext_CreateAPIRequestHandlerPtr m_MCContext_CreateAPIRequestHandler;

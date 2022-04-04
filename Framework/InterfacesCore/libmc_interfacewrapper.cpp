@@ -599,6 +599,35 @@ LibMCResult libmc_mccontext_instancestateissuccessful(LibMC_MCContext pMCContext
 	}
 }
 
+LibMCResult libmc_mccontext_instancestatehasfailed(LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful)
+{
+	IBase* pIBaseClass = (IBase *)pMCContext;
+
+	try {
+		if (pInstanceName == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		if (pIsSuccessful == nullptr)
+			throw ELibMCInterfaceException (LIBMC_ERROR_INVALIDPARAM);
+		std::string sInstanceName(pInstanceName);
+		IMCContext* pIMCContext = dynamic_cast<IMCContext*>(pIBaseClass);
+		if (!pIMCContext)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDCAST);
+		
+		*pIsSuccessful = pIMCContext->InstanceStateHasFailed(sInstanceName);
+
+		return LIBMC_SUCCESS;
+	}
+	catch (ELibMCInterfaceException & Exception) {
+		return handleLibMCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCResult libmc_mccontext_loadclientpackage(LibMC_MCContext pMCContext, const char * pResourcePath)
 {
 	IBase* pIBaseClass = (IBase *)pMCContext;
@@ -737,6 +766,8 @@ LibMCResult LibMC::Impl::LibMC_GetProcAddress (const char * pProcName, void ** p
 		*ppProcAddress = (void*) &libmc_mccontext_getinstancethreadstate;
 	if (sProcName == "libmc_mccontext_instancestateissuccessful") 
 		*ppProcAddress = (void*) &libmc_mccontext_instancestateissuccessful;
+	if (sProcName == "libmc_mccontext_instancestatehasfailed") 
+		*ppProcAddress = (void*) &libmc_mccontext_instancestatehasfailed;
 	if (sProcName == "libmc_mccontext_loadclientpackage") 
 		*ppProcAddress = (void*) &libmc_mccontext_loadclientpackage;
 	if (sProcName == "libmc_mccontext_log") 

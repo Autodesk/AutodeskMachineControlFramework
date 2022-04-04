@@ -353,17 +353,24 @@ public:
 
 	/**
 	* IMCContext::GetInstanceThreadState - returns current state of a instance thread.
-	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @param[in] sInstanceName - Instance name of state machine.
 	* @return State of state machine.
 	*/
 	virtual std::string GetInstanceThreadState(const std::string & sInstanceName) = 0;
 
 	/**
 	* IMCContext::InstanceStateIsSuccessful - returns if an instance thread is in success state.
-	* @param[in] sInstanceName - Instance name of state machine to terminate.
+	* @param[in] sInstanceName - Instance name of state machine.
 	* @return State of state machine is in success state.
 	*/
 	virtual bool InstanceStateIsSuccessful(const std::string & sInstanceName) = 0;
+
+	/**
+	* IMCContext::InstanceStateHasFailed - returns if an instance thread is in failure state.
+	* @param[in] sInstanceName - Instance name of state machine.
+	* @return State of state machine is in failure state.
+	*/
+	virtual bool InstanceStateHasFailed(const std::string & sInstanceName) = 0;
 
 	/**
 	* IMCContext::LoadClientPackage - load a client package to serve the client website.

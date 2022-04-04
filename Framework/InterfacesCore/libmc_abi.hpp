@@ -215,7 +215,7 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_terminateinstancethread(LibMC_MCConte
 * returns current state of a instance thread.
 *
 * @param[in] pMCContext - MCContext instance.
-* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[in] pInstanceName - Instance name of state machine.
 * @param[in] nStateNameBufferSize - size of the buffer (including trailing 0)
 * @param[out] pStateNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
 * @param[out] pStateNameBuffer -  buffer of State of state machine., may be NULL
@@ -227,11 +227,21 @@ LIBMC_DECLSPEC LibMCResult libmc_mccontext_getinstancethreadstate(LibMC_MCContex
 * returns if an instance thread is in success state.
 *
 * @param[in] pMCContext - MCContext instance.
-* @param[in] pInstanceName - Instance name of state machine to terminate.
+* @param[in] pInstanceName - Instance name of state machine.
 * @param[out] pIsSuccessful - State of state machine is in success state.
 * @return error code or 0 (success)
 */
 LIBMC_DECLSPEC LibMCResult libmc_mccontext_instancestateissuccessful(LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful);
+
+/**
+* returns if an instance thread is in failure state.
+*
+* @param[in] pMCContext - MCContext instance.
+* @param[in] pInstanceName - Instance name of state machine.
+* @param[out] pIsSuccessful - State of state machine is in failure state.
+* @return error code or 0 (success)
+*/
+LIBMC_DECLSPEC LibMCResult libmc_mccontext_instancestatehasfailed(LibMC_MCContext pMCContext, const char * pInstanceName, bool * pIsSuccessful);
 
 /**
 * load a client package to serve the client website.

@@ -134,6 +134,8 @@ public:
 
 	bool InstanceStateIsSuccessful(const std::string& sInstanceName) override;
 
+	bool InstanceStateHasFailed(const std::string& sInstanceName) override;
+
 	AMC::PStateMachineInstance addMachineInstance (const pugi::xml_node & xmlNode);
 	AMC::PStateMachineInstance findMachineInstance (std::string sName, bool bFailIfNotExisting);	
 

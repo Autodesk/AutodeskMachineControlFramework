@@ -300,6 +300,15 @@ namespace AMC {
 		return false;
 	}
 
+	bool CStateMachineInstance::currentStateIsFailureState()
+	{
+		if (m_pCurrentState.get() != nullptr) {
+			if (m_pCurrentState.get() == m_pFailedState.get())
+				return true;
+		}
+		return false;
+	}
+
 
 	void CStateMachineInstance::terminateThread()
 	{

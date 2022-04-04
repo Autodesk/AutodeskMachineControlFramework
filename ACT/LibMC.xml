@@ -558,13 +558,18 @@
 		</method>
 
 		<method name="GetInstanceThreadState" description="returns current state of a instance thread.">
-			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
 			<param name="StateName" type="string" pass="return" description="State of state machine." />
 		</method>
 
 		<method name="InstanceStateIsSuccessful" description="returns if an instance thread is in success state.">
-			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
 			<param name="IsSuccessful" type="bool" pass="return" description="State of state machine is in success state." />
+		</method>
+
+		<method name="InstanceStateHasFailed" description="returns if an instance thread is in failure state.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
+			<param name="IsSuccessful" type="bool" pass="return" description="State of state machine is in failure state." />
 		</method>
 		
 		<method name="LoadClientPackage" description="load a client package to serve the client website.">

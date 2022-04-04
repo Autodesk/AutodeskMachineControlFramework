@@ -726,6 +726,16 @@ bool CMCContext::InstanceStateIsSuccessful(const std::string& sInstanceName)
     return pInstance->currentStateIsSuccessState();
 }
 
+bool CMCContext::InstanceStateHasFailed(const std::string& sInstanceName)
+{
+    if (sInstanceName.empty())
+        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDSTATEMACHINENAME);
+
+    auto pInstance = findMachineInstance(sInstanceName, true);
+    return pInstance->currentStateIsFailureState();
+}
+
+
 void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSubsystem, const LibMC::eLogLevel eLogLevel)
 {
     std::string sSubSystem;
