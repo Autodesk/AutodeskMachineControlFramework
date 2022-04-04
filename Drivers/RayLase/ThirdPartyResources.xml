@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns="http://schemas.autodesk.com/amc/thirdpartyresources/2022/04">
+
+  <source 
+        name="raylase_sp_ice_v204"
+        url="https://www.raylase.de/_Resources/Persistent/9/f/e/0/9fe04c98af8921fb37a4d9a426d725f51138e204/SP-ICE-3-v2.0.4.7z"
+		sha256="ba61990532f5f0cc13966da9724ddbfcfbdc665c64d30ca00dc01618d102b05b"
+		type="7z">
+		
+		<content filename="Software v2.0.4/Native ClientLib/windows/lib/x64/RAYLASE.SPICE3.Native.ClientLib.dll" resourcename="raylase_clientlib_win64.dll" />
+		<content filename="Software v2.0.4/Native ClientLib/windows/lib/Win32/RAYLASE.SPICE3.Native.ClientLib.dll" resourcename="raylase_clientlib_win32.dll" />
+		<content filename="Software v2.0.4/Native ClientLib/linux/libx86_64/libRAYLASE.SPICE3.Native.ClientLib-2.0.4.so" resourcename="raylase_clientlib_linux64.so" />
+		<content filename="Software v2.0.4/Native ClientLib/linux/libx86/libRAYLASE.SPICE3.Native.ClientLib-2.0.4.so" resourcename="raylase_clientlib_linux32.so" />
+		
+  </source>
+
+
+</resources>
+
