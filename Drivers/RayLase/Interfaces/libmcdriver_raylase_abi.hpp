@@ -137,6 +137,23 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 **************************************************************************************************************************/
 
 /**
+* Checks if the card is connected.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pIsConnected - Flag if the card is disconnected.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_isconnected(LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected);
+
+/**
+* Disconnects and unregisters the card.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_raylasecard_disconnect(LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
 * Resets the card settings to system defaults.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
@@ -222,6 +239,23 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_rayla
 **************************************************************************************************************************/
 
 /**
+* Sets the driver in Simulation mode.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_settosimulationmode(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase);
+
+/**
+* Returns if the driver is in Simulation mode.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[out] pIsSimulationMode - Simulation mode is active.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_issimulationmode(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, bool * pIsSimulationMode);
+
+/**
 * Initializes the Raylase SDK.
 *
 * @param[in] pDriver_Raylase - Driver_Raylase instance.
@@ -236,10 +270,11 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 * @param[in] pCardName - Name of scanner to be connected to. MUST not be in use.
 * @param[in] pCardIP - IP Address to connect to.
 * @param[in] nPort - Port to connect to.
+* @param[in] dMaxLaserPowerInWatts - Maximum laser power in Watts.
 * @param[out] pRaylaseCardInstance - Instance of connected card.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_connectbyip(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, const char * pCardIP, LibMCDriver_Raylase_uint32 nPort, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_connectbyip(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, const char * pCardIP, LibMCDriver_Raylase_uint32 nPort, LibMCDriver_Raylase_double dMaxLaserPowerInWatts, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
 
 /**
 * Retrieves a connected card instance.

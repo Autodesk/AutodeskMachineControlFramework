@@ -317,6 +317,17 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IRaylaseCard : public virtual IBase {
 public:
 	/**
+	* IRaylaseCard::IsConnected - Checks if the card is connected.
+	* @return Flag if the card is disconnected.
+	*/
+	virtual bool IsConnected() = 0;
+
+	/**
+	* IRaylaseCard::Disconnect - Disconnects and unregisters the card.
+	*/
+	virtual void Disconnect() = 0;
+
+	/**
 	* IRaylaseCard::ResetToSystemDefaults - Resets the card settings to system defaults.
 	*/
 	virtual void ResetToSystemDefaults() = 0;
@@ -382,6 +393,17 @@ typedef IBaseSharedPtr<IRaylaseCard> PIRaylaseCard;
 class IDriver_Raylase : public virtual IDriver {
 public:
 	/**
+	* IDriver_Raylase::SetToSimulationMode - Sets the driver in Simulation mode.
+	*/
+	virtual void SetToSimulationMode() = 0;
+
+	/**
+	* IDriver_Raylase::IsSimulationMode - Returns if the driver is in Simulation mode.
+	* @return Simulation mode is active.
+	*/
+	virtual bool IsSimulationMode() = 0;
+
+	/**
 	* IDriver_Raylase::LoadSDK - Initializes the Raylase SDK.
 	*/
 	virtual void LoadSDK() = 0;
@@ -391,9 +413,10 @@ public:
 	* @param[in] sCardName - Name of scanner to be connected to. MUST not be in use.
 	* @param[in] sCardIP - IP Address to connect to.
 	* @param[in] nPort - Port to connect to.
+	* @param[in] dMaxLaserPowerInWatts - Maximum laser power in Watts.
 	* @return Instance of connected card.
 	*/
-	virtual IRaylaseCard * ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort) = 0;
+	virtual IRaylaseCard * ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts) = 0;
 
 	/**
 	* IDriver_Raylase::GetConnectedCard - Retrieves a connected card instance.

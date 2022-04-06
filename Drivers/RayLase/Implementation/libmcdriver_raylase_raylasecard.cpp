@@ -37,68 +37,106 @@ Abstract: This is a stub class definition of CRaylaseCard
 
 using namespace LibMCDriver_Raylase::Impl;
 
-PRaylaseCardImpl CRaylaseCardImpl::connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort)
+#define MINLASERPOWER 0.1
+
+PRaylaseCardImpl CRaylaseCardImpl::connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-    return std::make_shared<CRaylaseCardImpl>(pSDK, sCardName, sCardIP, nPort);
+    return std::make_shared<CRaylaseCardImpl>(pSDK, sCardName, sCardIP, nPort, dMaxLaserPowerInWatts,  bSimulationMode, pDriverEnvironment);
 }
 
-CRaylaseCardImpl::CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort)
-    : m_pSDK (pSDK), m_sCardName (sCardName), m_sCardIP (sCardIP), m_nPort (nPort), m_Handle (0)
-{
-    if (pSDK.get() == nullptr)
-        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SDKNOTINITIALIZED);
+CRaylaseCardImpl::CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+    : m_pSDK (pSDK), m_sCardName (sCardName), m_sCardIP (sCardIP), m_nPort (nPort), m_Handle (0), m_bSimulationMode (bSimulationMode),
+        m_bSimulatedPilotIsEnabled (false), m_bSimulatedPilotIsArmed (false), m_bSimulatedPilotIsAlarm (false),
+        m_pDriverEnvironment (pDriverEnvironment), m_dMaxLaserPowerInWatts (dMaxLaserPowerInWatts)
 
-    m_Handle = m_pSDK->rlConnect(sCardIP.c_str(), nPort);
-    if (m_Handle < 0)
-        m_pSDK->checkError (m_Handle);
+{
+    if (pDriverEnvironment.get () == nullptr)
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+
+    if (dMaxLaserPowerInWatts < MINLASERPOWER)
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER);
+
+    if (!m_bSimulationMode) {
+        if (pSDK.get() == nullptr)
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_SDKNOTINITIALIZED);
+
+        m_Handle = m_pSDK->rlConnect(sCardIP.c_str(), nPort);
+        if (m_Handle < 0)
+            m_pSDK->checkError(m_Handle);
+    }
 }
 
 CRaylaseCardImpl::~CRaylaseCardImpl()
 {
-    if (m_pSDK.get() != nullptr) {
-        if (m_Handle > 0)
-            m_pSDK->rlDisconnect(m_Handle);
-    }
+    Disconnect();
 
 }
 
 void CRaylaseCardImpl::ResetToSystemDefaults()
 {
+    if (m_bSimulationMode)
+        return;
+
     m_pSDK->checkError(m_pSDK->rlSystemResetToDefaults(m_Handle));
 }
 
 void CRaylaseCardImpl::LaserOn()
 {
+    if (m_bSimulationMode)
+        return;
+
     m_pSDK->checkError(m_pSDK->rlLaserLaserOn(m_Handle));
 }
 
 void CRaylaseCardImpl::LaserOff()
 {
+    if (m_bSimulationMode)
+        return;
+
     m_pSDK->checkError(m_pSDK->rlLaserLaserOff(m_Handle));
 }
 
 void CRaylaseCardImpl::ArmLaser(const bool bShallBeArmed)
 {
-    m_pSDK->checkError(m_pSDK->rlLaserArmLaser(m_Handle, bShallBeArmed));
+    if (m_bSimulationMode) {
+        m_bSimulatedPilotIsArmed = bShallBeArmed;
+    }
+    else {
+        m_pSDK->checkError(m_pSDK->rlLaserArmLaser(m_Handle, bShallBeArmed));
+    }
 
 }
 
 bool CRaylaseCardImpl::IsLaserArmed()
 {
-    bool bIsArmed = false;
-    m_pSDK->checkError(m_pSDK->rlLaserArmLaser(m_Handle, bIsArmed));
+    if (m_bSimulationMode) {
+        return m_bSimulatedPilotIsArmed;
+    }
+    else {
+        bool bIsArmed = false;
+        m_pSDK->checkError(m_pSDK->rlLaserArmLaser(m_Handle, bIsArmed));
 
-    return bIsArmed;
+        return bIsArmed;
+    }
 }
 
 void CRaylaseCardImpl::EnablePilot(const bool bShallBeEnabled)
 {
-    m_pSDK->checkError(m_pSDK->rlLaserEnablePilot(m_Handle, bShallBeEnabled));
+    if (m_bSimulationMode) {
+        m_bSimulatedPilotIsEnabled = bShallBeEnabled;
+    }
+    else {
+
+        m_pSDK->checkError(m_pSDK->rlLaserEnablePilot(m_Handle, bShallBeEnabled));
+    }
 
 }
 
 bool CRaylaseCardImpl::PilotIsEnabled()
 {
+    if (m_bSimulationMode)
+        return m_bSimulatedPilotIsEnabled;
+
     bool bPilotIsEnabled = false;
     m_pSDK->checkError(m_pSDK->rlLaserIsPilotEnabled(m_Handle, bPilotIsEnabled));
 
@@ -107,6 +145,13 @@ bool CRaylaseCardImpl::PilotIsEnabled()
 
 void CRaylaseCardImpl::GetLaserStatus(bool& bPilotIsEnabled, bool& bLaserIsArmed, bool& bLaserAlarm)
 {
+
+    if (m_bSimulationMode) {
+        bPilotIsEnabled = m_bSimulatedPilotIsEnabled;
+        bLaserIsArmed = m_bSimulatedPilotIsArmed;
+        bLaserAlarm = m_bSimulatedPilotIsAlarm;
+        return;
+    }
 
     uint32_t nStatusFlag = 0;
     m_pSDK->checkError(m_pSDK->rlLaserReadLaserStatus(m_Handle, nStatusFlag));
@@ -119,6 +164,122 @@ void CRaylaseCardImpl::GetLaserStatus(bool& bPilotIsEnabled, bool& bLaserIsArmed
 
 void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex)
 {
+    if (m_bSimulationMode)
+        return;
+
+    auto pToolpathAccessor = m_pDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
+    auto pLayer = pToolpathAccessor->LoadLayer(nLayerIndex);
+
+    double dUnits = pToolpathAccessor->GetUnits();
+
+    rlListHandle listHandle = m_pSDK->rlListAllocate(m_Handle);
+    m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(listHandle));
+
+    uint32_t nSegmentCount = pLayer->GetSegmentCount();
+    for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
+
+        LibMCEnv::eToolpathSegmentType eSegmentType;
+        uint32_t nPointCount;
+        pLayer->GetSegmentInfo(nSegmentIndex, eSegmentType, nPointCount);
+
+        if (nPointCount >= 2) {
+
+            double dJumpSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::JumpSpeed);
+            double dMarkSpeedInMMPerSecond = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::Speed);
+            double dPowerInWatts = pLayer->GetSegmentProfileTypedValue(nSegmentIndex, LibMCEnv::eToolpathProfileValueType::LaserPower);
+            double dPowerFactor = (dPowerInWatts / m_dMaxLaserPowerInWatts);
+            int32_t nPowerInUnits = (int32_t)(dPowerFactor * 65535.0);
+            if (nPowerInUnits < 0)
+                nPowerInUnits = 0;
+            if (nPowerInUnits > 65535)
+                nPowerInUnits = 65535;
+
+            double dJumpSpeedInMeterPerSecond = dJumpSpeedInMMPerSecond * 0.001;
+            double dMarkSpeedInMeterPerSecond = dMarkSpeedInMMPerSecond * 0.001;
+
+            m_pSDK->checkError(m_pSDK->rlListAppendJumpSpeed(listHandle, dJumpSpeedInMeterPerSecond));
+            m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(listHandle, dMarkSpeedInMeterPerSecond));
+            m_pSDK->checkError(m_pSDK->rlListAppendPower(listHandle, nPowerInUnits));
+
+
+            std::vector<LibMCEnv::sPosition2D> Points;
+            pLayer->GetSegmentPointData(nSegmentIndex, Points);
+
+            if (nPointCount != Points.size())
+                throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
+
+            switch (eSegmentType) {
+            case LibMCEnv::eToolpathSegmentType::Loop:
+            case LibMCEnv::eToolpathSegmentType::Polyline:
+            {
+
+                for (uint32_t nPointIndex = 0; nPointIndex < nPointCount; nPointIndex++) {
+                    double dXinMM = (Points[nPointIndex].m_Coordinates[0] * dUnits);
+                    double dYinMM = (Points[nPointIndex].m_Coordinates[1] * dUnits);
+
+                    double dXinMicron = dXinMM * 1000.0;
+                    double dYinMicron = dYinMM * 1000.0;
+
+                    if (nPointIndex == 0) {
+                        m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(listHandle, dXinMicron, dYinMicron));
+                    }
+                    else {
+                        m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, dXinMicron, dYinMicron));
+                    }
+
+                }
+
+
+                break;
+            }
+
+            case LibMCEnv::eToolpathSegmentType::Hatch:
+            {
+                if (nPointCount % 2 == 1)
+                    throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT);
+
+                uint64_t nHatchCount = nPointCount / 2;
+                std::vector<sHatch2D> Hatches;
+                Hatches.resize(nHatchCount);
+
+                for (uint64_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+                    double dX1inMM = (float)(Points[nHatchIndex * 2].m_Coordinates[0] * dUnits);
+                    double dY1inMM = (float)(Points[nHatchIndex * 2].m_Coordinates[1] * dUnits);
+                    double dX2inMM = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[0] * dUnits);
+                    double dY2inMM = (float)(Points[nHatchIndex * 2 + 1].m_Coordinates[1] * dUnits);
+
+                    double dX1inMicron = dX1inMM * 1000.0;
+                    double dY1inMicron = dY1inMM * 1000.0;
+                    double dX2inMicron = dX2inMM * 1000.0;
+                    double dY2inMicron = dY2inMM * 1000.0;
+
+                    m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(listHandle, dX1inMicron, dY1inMicron));
+                    m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, dX2inMicron, dY2inMicron));
+                }
+
+                break;
+            }
+
+            }
+
+        }
+
+    }
+
+    m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle));
+
+    m_pSDK->checkError(m_pSDK->rlListSet(m_Handle, 0, listHandle, false, -1));
+    m_pSDK->checkError(m_pSDK->rlListExecute(m_Handle, 0));
+    int timeoutMs = 30000;
+    bool done = false;
+    int32_t listID = 0;
+    m_pSDK->checkError(m_pSDK->rlListWaitForListDone(m_Handle, timeoutMs, done, listID));
+    m_pSDK->checkError(m_pSDK->rlListDelete(m_Handle, 0, true));
+    m_pSDK->checkError(m_pSDK->rlListReleaseHandle(listHandle));
+
+
+    /*
+
     double squareSize = 50000.0;
 
     for (uint32_t nIndex = 0; nIndex < 100; nIndex++) {
@@ -131,7 +292,6 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
         m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, squareSize, squareSize));
         m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, -squareSize, squareSize));
         m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, -squareSize, -squareSize));
-        m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle));
         m_pSDK->checkError(m_pSDK->rlListSet(m_Handle, 0, listHandle, false, -1));
         m_pSDK->checkError(m_pSDK->rlListExecute(m_Handle, 0));
         int timeoutMs = 30000;
@@ -143,8 +303,33 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
 
     }
 
+    */
+
 
 }
+
+
+bool CRaylaseCardImpl::IsConnected()
+{
+    if (m_bSimulationMode)
+        return true;
+
+    return (m_Handle > 0);
+}
+
+void CRaylaseCardImpl::Disconnect()
+{
+    if (m_bSimulationMode)
+        return;
+
+    if (m_pSDK.get() != nullptr) {
+        if (m_Handle > 0)
+            m_pSDK->rlDisconnect(m_Handle);
+        m_Handle = 0;
+    }
+
+}
+
 
 
 /*************************************************************************************************************************
@@ -211,3 +396,13 @@ void CRaylaseCard::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_
     m_pRaylaseCardImpl->DrawLayer(sStreamUUID, nLayerIndex);
 }
 
+bool CRaylaseCard::IsConnected()
+{
+    return m_pRaylaseCardImpl->IsConnected();
+}
+
+void CRaylaseCard::Disconnect()
+{
+    m_pRaylaseCardImpl->Disconnect();
+
+}

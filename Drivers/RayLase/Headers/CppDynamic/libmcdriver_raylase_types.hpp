@@ -112,6 +112,8 @@ typedef void * LibMCDriver_Raylase_pvoid;
 #define LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDPORT 1004
 #define LIBMCDRIVER_RAYLASE_ERROR_CARDALREADYREGISTERED 1005
 #define LIBMCDRIVER_RAYLASE_ERROR_CARDNOTREGISTERED 1006
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT 1007
+#define LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER 1008
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_Raylase
@@ -136,6 +138,8 @@ inline const char * LIBMCDRIVER_RAYLASE_GETERRORSTRING (LibMCDriver_RaylaseResul
     case LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDPORT: return "Invalid card port";
     case LIBMCDRIVER_RAYLASE_ERROR_CARDALREADYREGISTERED: return "Card already registered";
     case LIBMCDRIVER_RAYLASE_ERROR_CARDNOTREGISTERED: return "Card not registered";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
+    case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER: return "Invalid laser power";
     default: return "unknown error";
   }
 }

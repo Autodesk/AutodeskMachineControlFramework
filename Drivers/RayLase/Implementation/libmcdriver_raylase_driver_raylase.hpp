@@ -64,6 +64,8 @@ protected:
     std::string m_sName;
     PRaylaseSDK m_pRayLaseSDK;
 
+    bool m_bSimulationMode;
+
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
     LibMCEnv::PWorkingDirectory m_pSDKWorkingDirectory;
@@ -90,9 +92,13 @@ public:
 
 	void LoadSDK() override;
 
-    IRaylaseCard* ConnectByIP(const std::string& sCardName, const std::string& sCardIP, const LibMCDriver_Raylase_uint32 nPort) override;
+    IRaylaseCard* ConnectByIP(const std::string& sCardName, const std::string& sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts) override;
 
     IRaylaseCard* GetConnectedCard(const std::string& sCardName) override;
+
+    void SetToSimulationMode() override;
+
+    bool IsSimulationMode() override;
 
 
 };

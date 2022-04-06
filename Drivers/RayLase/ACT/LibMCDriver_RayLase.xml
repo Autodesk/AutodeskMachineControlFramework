@@ -56,10 +56,10 @@
 		<error name="INVALIDCARDIP" code="1003" description="Invalid card IP" />
 		<error name="INVALIDCARDPORT" code="1004" description="Invalid card port" />
 		<error name="CARDALREADYREGISTERED" code="1005" description="Card already registered" />
-		<error name="CARDNOTREGISTERED" code="1006" description="Card not registered" />
-		
-						
-		
+		<error name="CARDNOTREGISTERED" code="1006" description="Card not registered" />	
+		<error name="INVALIDPOINTCOUNT" code="1007" description="Invalid point count" />
+		<error name="INVALIDLASERPOWER" code="1008" description="Invalid laser power" />
+				
 	</errors>
 
 
@@ -183,6 +183,13 @@ Custom implementation
 
 	<class name="Driver_Raylase" parent="Driver" description="A LaserScanner Driver for a Raylase card.">
 
+		<method name="SetToSimulationMode" description="Sets the driver in Simulation mode.">
+		</method>
+
+		<method name="IsSimulationMode" description="Returns if the driver is in Simulation mode.">
+			<param name="IsSimulationMode" type="bool" pass="return" description="Simulation mode is active." />
+		</method>
+
 		<method name="LoadSDK" description="Initializes the Raylase SDK.">
 		</method>
 
@@ -190,6 +197,7 @@ Custom implementation
 			<param name="CardName" type="string" pass="in" description="Name of scanner to be connected to. MUST not be in use." />
 			<param name="CardIP" type="string" pass="in" description="IP Address to connect to." />
 			<param name="Port" type="uint32" pass="in" description="Port to connect to." />
+			<param name="MaxLaserPowerInWatts" type="double" pass="in" description="Maximum laser power in Watts." />
 			<param name="RaylaseCardInstance" type="class" class="RaylaseCard" pass="return" description="Instance of connected card." />
 		</method>
 

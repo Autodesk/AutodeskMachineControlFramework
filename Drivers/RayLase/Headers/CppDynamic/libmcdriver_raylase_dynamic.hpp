@@ -367,6 +367,8 @@ public:
 	{
 	}
 	
+	inline bool IsConnected();
+	inline void Disconnect();
 	inline void ResetToSystemDefaults();
 	inline void LaserOn();
 	inline void LaserOff();
@@ -392,8 +394,10 @@ public:
 	{
 	}
 	
+	inline void SetToSimulationMode();
+	inline bool IsSimulationMode();
 	inline void LoadSDK();
-	inline PRaylaseCard ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort);
+	inline PRaylaseCard ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts);
 	inline PRaylaseCard GetConnectedCard(const std::string & sCardName);
 };
 	
@@ -524,6 +528,8 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_RaylaseCard_IsConnected = nullptr;
+		pWrapperTable->m_RaylaseCard_Disconnect = nullptr;
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOn = nullptr;
 		pWrapperTable->m_RaylaseCard_LaserOff = nullptr;
@@ -533,6 +539,8 @@ public:
 		pWrapperTable->m_RaylaseCard_PilotIsEnabled = nullptr;
 		pWrapperTable->m_RaylaseCard_GetLaserStatus = nullptr;
 		pWrapperTable->m_RaylaseCard_DrawLayer = nullptr;
+		pWrapperTable->m_Driver_Raylase_SetToSimulationMode = nullptr;
+		pWrapperTable->m_Driver_Raylase_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_Raylase_LoadSDK = nullptr;
 		pWrapperTable->m_Driver_Raylase_ConnectByIP = nullptr;
 		pWrapperTable->m_Driver_Raylase_GetConnectedCard = nullptr;
@@ -646,6 +654,24 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_IsConnected = (PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_isconnected");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_IsConnected == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RaylaseCard_Disconnect = (PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_disconnect");
+		#else // _WIN32
+		pWrapperTable->m_RaylaseCard_Disconnect = (PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_disconnect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RaylaseCard_Disconnect == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = (PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_raylasecard_resettosystemdefaults");
 		#else // _WIN32
 		pWrapperTable->m_RaylaseCard_ResetToSystemDefaults = (PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr) dlsym(hLibrary, "libmcdriver_raylase_raylasecard_resettosystemdefaults");
@@ -724,6 +750,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_RaylaseCard_DrawLayer == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Raylase_SetToSimulationMode = (PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_settosimulationmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Raylase_SetToSimulationMode = (PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_settosimulationmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Raylase_SetToSimulationMode == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_Raylase_IsSimulationMode = (PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_issimulationmode");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Raylase_IsSimulationMode = (PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_issimulationmode");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Raylase_IsSimulationMode == nullptr)
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -856,6 +900,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_isconnected", (void**)&(pWrapperTable->m_RaylaseCard_IsConnected));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_IsConnected == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_disconnect", (void**)&(pWrapperTable->m_RaylaseCard_Disconnect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_Disconnect == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_resettosystemdefaults", (void**)&(pWrapperTable->m_RaylaseCard_ResetToSystemDefaults));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_ResetToSystemDefaults == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -890,6 +942,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_raylasecard_drawlayer", (void**)&(pWrapperTable->m_RaylaseCard_DrawLayer));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RaylaseCard_DrawLayer == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_settosimulationmode", (void**)&(pWrapperTable->m_Driver_Raylase_SetToSimulationMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_SetToSimulationMode == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_issimulationmode", (void**)&(pWrapperTable->m_Driver_Raylase_IsSimulationMode));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_IsSimulationMode == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_loadsdk", (void**)&(pWrapperTable->m_Driver_Raylase_LoadSDK));
@@ -1033,6 +1093,26 @@ public:
 	 */
 	
 	/**
+	* CRaylaseCard::IsConnected - Checks if the card is connected.
+	* @return Flag if the card is disconnected.
+	*/
+	bool CRaylaseCard::IsConnected()
+	{
+		bool resultIsConnected = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_IsConnected(m_pHandle, &resultIsConnected));
+		
+		return resultIsConnected;
+	}
+	
+	/**
+	* CRaylaseCard::Disconnect - Disconnects and unregisters the card.
+	*/
+	void CRaylaseCard::Disconnect()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RaylaseCard_Disconnect(m_pHandle));
+	}
+	
+	/**
 	* CRaylaseCard::ResetToSystemDefaults - Resets the card settings to system defaults.
 	*/
 	void CRaylaseCard::ResetToSystemDefaults()
@@ -1124,6 +1204,26 @@ public:
 	 */
 	
 	/**
+	* CDriver_Raylase::SetToSimulationMode - Sets the driver in Simulation mode.
+	*/
+	void CDriver_Raylase::SetToSimulationMode()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_SetToSimulationMode(m_pHandle));
+	}
+	
+	/**
+	* CDriver_Raylase::IsSimulationMode - Returns if the driver is in Simulation mode.
+	* @return Simulation mode is active.
+	*/
+	bool CDriver_Raylase::IsSimulationMode()
+	{
+		bool resultIsSimulationMode = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_IsSimulationMode(m_pHandle, &resultIsSimulationMode));
+		
+		return resultIsSimulationMode;
+	}
+	
+	/**
 	* CDriver_Raylase::LoadSDK - Initializes the Raylase SDK.
 	*/
 	void CDriver_Raylase::LoadSDK()
@@ -1136,12 +1236,13 @@ public:
 	* @param[in] sCardName - Name of scanner to be connected to. MUST not be in use.
 	* @param[in] sCardIP - IP Address to connect to.
 	* @param[in] nPort - Port to connect to.
+	* @param[in] dMaxLaserPowerInWatts - Maximum laser power in Watts.
 	* @return Instance of connected card.
 	*/
-	PRaylaseCard CDriver_Raylase::ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort)
+	PRaylaseCard CDriver_Raylase::ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts)
 	{
 		LibMCDriver_RaylaseHandle hRaylaseCardInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_ConnectByIP(m_pHandle, sCardName.c_str(), sCardIP.c_str(), nPort, &hRaylaseCardInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_ConnectByIP(m_pHandle, sCardName.c_str(), sCardIP.c_str(), nPort, dMaxLaserPowerInWatts, &hRaylaseCardInstance));
 		
 		if (!hRaylaseCardInstance) {
 			CheckError(LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);

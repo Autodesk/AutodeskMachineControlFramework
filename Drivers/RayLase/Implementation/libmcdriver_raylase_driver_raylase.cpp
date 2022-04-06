@@ -45,7 +45,7 @@ using namespace LibMCDriver_Raylase::Impl;
  Class definition of CDriver_Raylase 
 **************************************************************************************************************************/
 CDriver_Raylase::CDriver_Raylase(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_pDriverEnvironment (pDriverEnvironment), m_sName (sName)
+    : m_pDriverEnvironment (pDriverEnvironment), m_sName (sName), m_bSimulationMode (false)
 {
 
 }
@@ -111,7 +111,7 @@ void CDriver_Raylase::LoadSDK()
 
 }
 
-IRaylaseCard* CDriver_Raylase::ConnectByIP(const std::string& sCardName, const std::string& sCardIP, const LibMCDriver_Raylase_uint32 nPort)
+IRaylaseCard* CDriver_Raylase::ConnectByIP(const std::string& sCardName, const std::string& sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts)
 {
     if (sCardName.empty())
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCARDNAME);
@@ -124,7 +124,7 @@ IRaylaseCard* CDriver_Raylase::ConnectByIP(const std::string& sCardName, const s
     if (iIter != m_CardInstances.end ())
         throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_CARDALREADYREGISTERED, "card already registered: " + sCardName);
 
-    auto pCard = CRaylaseCardImpl::connectByIP(m_pRayLaseSDK, sCardName, sCardIP, nPort);
+    auto pCard = CRaylaseCardImpl::connectByIP(m_pRayLaseSDK, sCardName, sCardIP, nPort, dMaxLaserPowerInWatts, m_bSimulationMode, m_pDriverEnvironment);
     m_CardInstances.insert(std::make_pair (sCardName, pCard));
 
     return new CRaylaseCard (pCard);
@@ -144,3 +144,12 @@ IRaylaseCard* CDriver_Raylase::GetConnectedCard(const std::string& sCardName)
 }
 
 
+void CDriver_Raylase::SetToSimulationMode()
+{
+    m_bSimulationMode = true;
+}
+
+bool CDriver_Raylase::IsSimulationMode()
+{
+    return m_bSimulationMode;
+}

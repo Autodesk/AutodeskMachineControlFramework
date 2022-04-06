@@ -124,6 +124,23 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_QueryParametersPt
 **************************************************************************************************************************/
 
 /**
+* Checks if the card is connected.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @param[out] pIsConnected - Flag if the card is disconnected.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard, bool * pIsConnected);
+
+/**
+* Disconnects and unregisters the card.
+*
+* @param[in] pRaylaseCard - RaylaseCard instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr) (LibMCDriver_Raylase_RaylaseCard pRaylaseCard);
+
+/**
 * Resets the card settings to system defaults.
 *
 * @param[in] pRaylaseCard - RaylaseCard instance.
@@ -209,6 +226,23 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr
 **************************************************************************************************************************/
 
 /**
+* Sets the driver in Simulation mode.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase);
+
+/**
+* Returns if the driver is in Simulation mode.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[out] pIsSimulationMode - Simulation mode is active.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, bool * pIsSimulationMode);
+
+/**
 * Initializes the Raylase SDK.
 *
 * @param[in] pDriver_Raylase - Driver_Raylase instance.
@@ -223,10 +257,11 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPt
 * @param[in] pCardName - Name of scanner to be connected to. MUST not be in use.
 * @param[in] pCardIP - IP Address to connect to.
 * @param[in] nPort - Port to connect to.
+* @param[in] dMaxLaserPowerInWatts - Maximum laser power in Watts.
 * @param[out] pRaylaseCardInstance - Instance of connected card.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_ConnectByIPPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, const char * pCardIP, LibMCDriver_Raylase_uint32 nPort, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_ConnectByIPPtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pCardName, const char * pCardIP, LibMCDriver_Raylase_uint32 nPort, LibMCDriver_Raylase_double dMaxLaserPowerInWatts, LibMCDriver_Raylase_RaylaseCard * pRaylaseCardInstance);
 
 /**
 * Retrieves a connected card instance.
@@ -320,6 +355,8 @@ typedef struct {
 	PLibMCDriver_RaylaseDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_RaylaseDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_RaylaseDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_RaylaseRaylaseCard_IsConnectedPtr m_RaylaseCard_IsConnected;
+	PLibMCDriver_RaylaseRaylaseCard_DisconnectPtr m_RaylaseCard_Disconnect;
 	PLibMCDriver_RaylaseRaylaseCard_ResetToSystemDefaultsPtr m_RaylaseCard_ResetToSystemDefaults;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOnPtr m_RaylaseCard_LaserOn;
 	PLibMCDriver_RaylaseRaylaseCard_LaserOffPtr m_RaylaseCard_LaserOff;
@@ -329,6 +366,8 @@ typedef struct {
 	PLibMCDriver_RaylaseRaylaseCard_PilotIsEnabledPtr m_RaylaseCard_PilotIsEnabled;
 	PLibMCDriver_RaylaseRaylaseCard_GetLaserStatusPtr m_RaylaseCard_GetLaserStatus;
 	PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr m_RaylaseCard_DrawLayer;
+	PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr m_Driver_Raylase_SetToSimulationMode;
+	PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr m_Driver_Raylase_IsSimulationMode;
 	PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPtr m_Driver_Raylase_LoadSDK;
 	PLibMCDriver_RaylaseDriver_Raylase_ConnectByIPPtr m_Driver_Raylase_ConnectByIP;
 	PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr m_Driver_Raylase_GetConnectedCard;

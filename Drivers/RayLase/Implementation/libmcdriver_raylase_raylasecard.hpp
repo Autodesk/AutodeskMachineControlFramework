@@ -57,18 +57,27 @@ typedef std::shared_ptr<CRaylaseCardImpl> PRaylaseCardImpl;
 class CRaylaseCardImpl {
 private:
 
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+
 	PRaylaseSDK m_pSDK;
 	std::string m_sCardName;
 	std::string m_sCardIP;
 	uint32_t m_nPort;
 
+	double m_dMaxLaserPowerInWatts;
+
 	rlHandle m_Handle;
+	bool m_bSimulationMode;
+
+	bool m_bSimulatedPilotIsEnabled;
+	bool m_bSimulatedPilotIsArmed;
+	bool m_bSimulatedPilotIsAlarm;
 
 public:
 	
-	static PRaylaseCardImpl connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort);
+	static PRaylaseCardImpl connectByIP(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-	CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort);
+	CRaylaseCardImpl(PRaylaseSDK pSDK, const std::string& sCardName, const std::string& sCardIP, uint32_t nPort, double dMaxLaserPowerInWatts, bool bSimulationMode, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 	virtual ~CRaylaseCardImpl();
 
 	void ResetToSystemDefaults();
@@ -89,6 +98,11 @@ public:
 
 	void DrawLayer(const std::string& sStreamUUID, const LibMCDriver_Raylase_uint32 nLayerIndex);
 
+	bool IsConnected();
+
+	void Disconnect();
+
+
 };
 
 
@@ -106,6 +120,10 @@ public:
 	CRaylaseCard(PRaylaseCardImpl pRaylaseCardImpl);
 
 	virtual ~CRaylaseCard();
+
+	bool IsConnected() override;
+
+	void Disconnect() override;
 
 	void ResetToSystemDefaults() override;
 
