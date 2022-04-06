@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMCTest;
 
-#define __STRINGIZE(x) #x
-#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 CTest::CTest(PTestIO pTestIO)
 	: m_pTestIO (pTestIO)
@@ -44,12 +42,7 @@ CTest::CTest(PTestIO pTestIO)
 	if (pTestIO.get() == nullptr)
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "invalid parameter");
 
-	m_sVersionString = std::to_string (LIBMC_VERSION_MAJOR) + "." + std::to_string(LIBMC_VERSION_MINOR) + "." + std::to_string(LIBMC_VERSION_MICRO);
-	m_sGitHash = __STRINGIZE_VALUE_OF(__GITHASH);
 
-	log("----------------------------------------------------------------------------------");
-	log("Autodesk Machine Control Testing Framework v" + m_sVersionString + " (" + m_sGitHash + ")");
-	log("----------------------------------------------------------------------------------");
 
 
 }

@@ -32,20 +32,71 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <iostream>
 #include <memory>
+#include <vector>
 
 #include "amc_test.hpp"
+#include "common_utils.hpp"
+
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 using namespace AMCTest;
 
-int main ()
+int main(int argc, char* argv[])
 {
 
 	try
 	{
 
-		auto pTest = std::make_shared <CTest> (std::make_shared <CTestStdIO>());
+		std::string sGitHash = __STRINGIZE_VALUE_OF(__GITHASH);
+		std::vector<std::string> testDefinitions;
 
-		pTest->executeBlocking();
+		std::vector<std::string> commandArguments;
+		for (int idx = 1; idx < argc; idx++)
+			commandArguments.push_back(argv[idx]);
+
+		for (size_t nIndex = 0; nIndex < commandArguments.size(); nIndex++) {
+			std::string sArgument = commandArguments[nIndex];
+
+
+			if (sArgument == "--githash") {
+				nIndex++;
+				if (nIndex >= commandArguments.size())
+					throw std::runtime_error("missing --githash value");
+
+				sGitHash = commandArguments[nIndex];				
+			}
+
+			if (sArgument == "--testdefinition") {
+				nIndex++;
+				if (nIndex >= commandArguments.size())
+					throw std::runtime_error("missing --testdefinition path");
+
+				testDefinitions.push_back (commandArguments[nIndex]);
+			}
+
+		}
+
+		std::string sVersionString = std::to_string(LIBMC_VERSION_MAJOR) + "." + std::to_string(LIBMC_VERSION_MINOR) + "." + std::to_string(LIBMC_VERSION_MICRO);
+
+		auto pTestIO = std::make_shared <CTestStdIO>();
+		pTestIO->logMessageString("----------------------------------------------------------------------------------");
+		pTestIO->logMessageString("Autodesk Machine Control Testing Framework v" + sVersionString);
+		pTestIO->logMessageString("----------------------------------------------------------------------------------");
+		pTestIO->logMessageString("Using core git hash " + sGitHash + "...");
+
+		if (testDefinitions.empty ())
+			throw std::runtime_error("no testdefinitions given");
+
+		for (auto testDefinitionFile : testDefinitions) {
+			auto sFullPathName = AMCCommon::CUtils::getFullPathName(testDefinitionFile, true);
+			pTestIO->logMessageString("loading tests in " + sFullPathName + "...");
+
+			std::string sTestDefinition = pTestIO->readConfigurationXMLString(sFullPathName);
+
+			auto pTest = std::make_shared <CTest>(pTestIO);
+			pTest->executeBlocking();
+		}
 
 
 	}
