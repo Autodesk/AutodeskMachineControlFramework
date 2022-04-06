@@ -103,7 +103,7 @@ public:
 		pDriver->LoadSDK();
 
 		pStateEnvironment->LogMessage("Connecting to Card");
-		auto pCard = pDriver->ConnectByIP("card1", "169.254.70.75", 49374);
+		auto pCard = pDriver->ConnectByIP("card1", "169.254.70.75", 49374, 1000.0);
 		pStateEnvironment->LogMessage("Resetting to system defaults");
 		pCard->ResetToSystemDefaults();
 		pStateEnvironment->LogMessage("Enabling pilot");

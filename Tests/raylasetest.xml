@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<machinedefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+	<driver name="raylase" library="driver_raylase" type="raylase" />
+
+	<statemachine name="raylasetest" description="Raylase Test" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_raylasetest">
+	
+		<parametergroup name="plcconfig" description="PLC Config">
+		</parametergroup>
+
+		<driverparametergroup name="raylasestate" description="Raylase State" driver="raylase"/>
+	
+		<state name="init" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="success" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="100">
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+	
+	
+	<test description="Raylase Connection Test">	
+	
+		<instance name="raylasetest" />
+	
+	</test>
+	
+	
+
+</machinedefinition>
