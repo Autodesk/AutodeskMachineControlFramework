@@ -181,6 +181,9 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler
     writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
     writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
 
+    if (!m_sLoginBackgroundUUID.empty ())
+        writer.addString(AMC_API_KEY_UI_LOGINBACKGROUNDUUID, m_sLoginBackgroundUUID);
+
     CJSONWriterObject colorsObject(writer);
     for (auto color : m_Colors) {
 
@@ -386,6 +389,16 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
             uint32_t nColor = (nRed + nGreen * 256 + nBlue * 65536);
             m_Colors.insert(std::make_pair (sColorName, nColor));
 
+        }
+
+    }
+
+    auto loginNode = xmlNode.child("login");
+    if (!loginNode.empty()) {
+        auto backgroundResource = loginNode.attribute("backgroundresource");
+        if (!backgroundResource.empty()) {
+            auto pResourceEntry = pResourcePackage->findEntryByName(backgroundResource.as_string(), true);
+            m_sLoginBackgroundUUID = pResourceEntry->getUUID();
         }
 
     }

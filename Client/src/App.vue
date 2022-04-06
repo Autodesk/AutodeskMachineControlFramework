@@ -53,7 +53,8 @@
         </template>
     </v-app-bar>
 
-    <v-main>
+    <v-main v-bind:style="appMainStyle">
+	
         <v-container class="fill-height" fluid v-if="appIsLoading">
             <v-row align="center" justify="center">
                 <v-progress-circular :value="20" indeterminate></v-progress-circular>
@@ -211,7 +212,23 @@
 					return false;
 
 				return (this.Application.AppState.currentStatus === "login") || (this.Application.AppState.currentStatus === "ready");
-			} 
+			},
+			
+			appMainStyle() {
+			
+				let mainStyle = "";
+			
+				if (this.appIsLogin) {
+				
+					if (this.Application.AppDefinition.LoginBackgroundImageUUID) {
+						let imageurl = this.Application.getImageURL (this.Application.AppDefinition.LoginBackgroundImageUUID);
+						mainStyle = mainStyle + "background-image: url(\"" + imageurl + "\");"
+					}					
+					
+				}
+				return mainStyle;
+
+			}
 			
 		},
 		

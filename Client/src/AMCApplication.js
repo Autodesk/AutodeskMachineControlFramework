@@ -72,6 +72,7 @@ export default class AMCApplication extends Common.AMCObject {
             MainPage: "",
             LogoUUID: "",
             LogoAspectRatio: 1.0,
+			LoginBackgroundImageUUID: "",
             Colors: {}
         }
 
@@ -153,6 +154,8 @@ export default class AMCApplication extends Common.AMCObject {
             this.AppDefinition.TextCopyRight = resultJSON.data.copyright;
             this.AppDefinition.MainPage = resultJSON.data.mainpage;
             this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
+            this.AppDefinition.LoginBackgroundImageUUID = resultJSON.data.loginbackgrounduuid;
+			
             this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
             if (resultJSON.data.colors) {
                 this.AppDefinition.Colors = resultJSON.data.colors;

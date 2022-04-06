@@ -107,6 +107,7 @@ namespace AMC {
 		std::string m_sCopyrightString;
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
+		std::string m_sLoginBackgroundUUID;
 		std::string m_sMainPageName;
 
 		PStateMachineData m_pStateMachineData;

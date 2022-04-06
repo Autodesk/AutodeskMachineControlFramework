@@ -100,6 +100,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define AMC_API_KEY_UI_COPYRIGHT "copyright"
 #define AMC_API_KEY_UI_MAINPAGE "mainpage"
 #define AMC_API_KEY_UI_LOGOUUID "logouuid"
+#define AMC_API_KEY_UI_LOGINBACKGROUNDUUID "loginbackgrounduuid"
 #define AMC_API_KEY_UI_COLORS "colors"
 #define AMC_API_KEY_UI_LOGOASPECTRATIO "logoaspectratio"
 #define AMC_API_KEY_UI_SESSIONID "sessionid"
