@@ -24,14 +24,6 @@ THE SOFTWARE.
 
 #pragma once
 
-#ifdef _WIN32
-#define GUID_WINDOWS
-#endif
-
-#ifdef __linux__
-#define GUID_LIBUUID
-#endif
-
 #ifdef GUID_ANDROID
 #include <thread>
 #include <jni.h>
@@ -41,7 +33,7 @@ THE SOFTWARE.
 #include <iostream>
 #include <array>
 #include <sstream>
-#include <string>
+#include <string_view>
 #include <utility>
 #include <iomanip>
 
@@ -60,7 +52,7 @@ public:
 	explicit Guid(const std::array<unsigned char, 16> &bytes);
 	explicit Guid(std::array<unsigned char, 16> &&bytes);
 
-	explicit Guid(std::string fromString);
+	explicit Guid(std::string_view fromString);
 	Guid();
 	
 	Guid(const Guid &other) = default;
@@ -155,3 +147,12 @@ namespace std
 		}
 	};
 }
+
+#ifdef _WIN32 
+#define GUID_WINDOWS
+#endif
+
+#ifdef __linux__ 
+#define GUID_LIBUUID 
+#endif 
+

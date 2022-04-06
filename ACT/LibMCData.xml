@@ -325,6 +325,11 @@
 		<error name="INVALIDLAYERINDEX" code="328" description="Invalid layer index" />
 		<error name="TEMPBASEPATHEMPTY" code="329" description="Empty base path for temporary files" />
 		<error name="BUILDJOBDATANOTFOUND" code="330" description="Build job data not found" />
+		<error name="INVALIDNAMESTRING" code="331" description="Invalid name string" />
+		<error name="NAMESTRINGMISMATCH" code="332" description="Name string mismatch" />
+		<error name="DATATYPEMISMATCH" code="333" description="Datatype mismatch" />		
+		
+		
 								
 	</errors>
 	
@@ -344,6 +349,15 @@
 		<option name="Unknown" value="0"/>
 		<option name="SqLite" value="1"/>
 	</enum>	
+
+	<enum name="ParameterDataType">
+		<option name="Unknown" value="0"/>
+		<option name="String" value="1"/>
+		<option name="UUID" value="2"/>
+		<option name="Integer" value="3"/>
+		<option name="Double" value="4"/>
+		<option name="Bool" value="5"/>
+	</enum>	
 	
 	<enum name="BuildJobStatus">
 		<option name="Created" value="0"/>
@@ -360,6 +374,7 @@
 		<option name="JPEGImage" value="3"/>
 		<option name="Thumbnail" value="4"/>
 		<option name="Timeline" value="5"/>
+		<option name="SVGImage" value="6"/>
 		<option name="CustomBinaryData" value="100"/>
 	</enum>		
 	
@@ -488,6 +503,11 @@
 		<method name="FinishPartialStream" description="Finishes storing a stream.">
 			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
 			<param name="SHA2" type="string" pass="in" description="SHA256 of the uploaded data. If given initially, MUST be identical." />
+		</method>	
+
+		<method name="FinishPartialStreamBlockwiseSHA256" description="Finishes storing a stream with a 64k-Blockwise calculated Checksum.">
+			<param name="UUID" type="string" pass="in" description="UUID of storage stream. MUST have been created with BeginPartialStream first." />	
+			<param name="BlockwiseSHA2" type="string" pass="in" description="64kB hashlist SHA256 checksum of the uploaded data. If given initially, MUST be identical." />
 		</method>	
 		
 		<method name="GetMaxStreamSize" description="Returns the maximum stream size that the data model allows.">
@@ -699,6 +719,90 @@
 	</class>
 
 
+	<class name="PersistencyHandler" parent="Base" description="Persistent parameter handler instance">
+		
+		<method name="HasPersistentParameter" description="Retrieves if a persistent parameter has been stored.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="ParameterExists" type="bool" pass="return" description="returns if parameter exists." />
+		</method>
+
+		<method name="GetPersistentParameterDetails" description="Retrieves details of a persistent parameter. Fails if parameter does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Name" type="string" pass="out" description="Returns name of the parameter" />
+			<param name="DataType" type="enum" class="ParameterDataType" pass="out" description="Returns data type of the parameter" />
+		</method>
+
+		<method name="DeletePersistentParameter" description="Removes a persistent parameter from database. Does nothing if parameter does not exist.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="ParameterExisted" type="bool" pass="return" description="returns if parameter existed." />
+		</method>
+
+		<method name="StorePersistentParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
+			<param name="DataType" type="enum" class="ParameterDataType" pass="in" description="Data type of the parameter. If parameter exists, MUST be the same as the stored parameter data type." />
+			<param name="Value" type="string" pass="in" description="Value of the parameter. MUST be of appropriate type." />
+		</method>
+
+		<method name="StorePersistentStringParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
+			<param name="Value" type="string" pass="in" description="Value of the parameter." />
+		</method>
+
+		<method name="StorePersistentUUIDParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
+			<param name="Value" type="string" pass="in" description="Value of the parameter. MUST be of appropriate type." />
+		</method>
+
+		<method name="StorePersistentDoubleParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
+			<param name="Value" type="double" pass="in" description="Value of the parameter." />
+		</method>
+
+		<method name="StorePersistentIntegerParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
+			<param name="Value" type="int64" pass="in" description="Value of the parameter." />
+		</method>
+
+		<method name="StorePersistentBoolParameter" description="Stores a persistent parameter in the database. Creates a new parameter if not existing.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Name" type="string" pass="in" description="Name of the parameter. If parameter exists, MUST be the same as the stored parameter name." />
+			<param name="Value" type="bool" pass="in" description="Value of the parameter." />
+		</method>
+
+
+		<method name="RetrievePersistentStringParameter" description="Retrieves a persistent parameter in the database. Fails if not existing or invalid type.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Value" type="string" pass="return" description="Value of the parameter." />
+		</method>
+
+		<method name="RetrievePersistentUUIDParameter" description="Retrieves a persistent parameter in the database. Fails if not existing or invalid type.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Value" type="string" pass="return" description="Value of the parameter." />
+		</method>
+
+		<method name="RetrievePersistentDoubleParameter" description="Retrieves a persistent parameter in the database. Fails if not existing or invalid type.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Value" type="double" pass="return" description="Value of the parameter." />
+		</method>
+
+		<method name="RetrievePersistentIntegerParameter" description="Retrieves a persistent parameter in the database. Fails if not existing or invalid type.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Value" type="int64" pass="return" description="Value of the parameter." />
+		</method>
+
+		<method name="RetrievePersistentBoolParameter" description="Retrieves a persistent parameter in the database. Fails if not existing or invalid type.">
+			<param name="UUID" type="string" pass="in" description="UUID of the parameter" />
+			<param name="Value" type="bool" pass="return" description="Value of the parameter." />
+		</method>
+
+
+	</class>
+
 
 	<class name="DataModel" parent="Base" description="MC DataModel Instance">
 
@@ -732,6 +836,11 @@
 		<method name="CreateLoginHandler" description="creates a login handler instance.">
 			<param name="LoginHandler" type="class" class="LoginHandler" pass="return" description="LoginHandler instance." />	
 		</method>
+		
+		<method name="CreatePersistencyHandler" description="creates a persistency handler instance.">
+			<param name="PersistencyHandler" type="class" class="PersistencyHandler" pass="return" description="PersistencyHandler instance." />	
+		</method>
+		
 				
 	</class>
 

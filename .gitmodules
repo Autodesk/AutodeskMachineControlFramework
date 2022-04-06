@@ -1,0 +1,39 @@
+[submodule "submodules/cppcodec"]
+	path = submodules/cppcodec
+	url = https://github.com/tplgy/cppcodec.git
+[submodule "submodules/crossguid"]
+	path = submodules/crossguid
+	url = https://github.com/graeme-hill/crossguid.git
+[submodule "submodules/libzip"]
+	path = submodules/libzip
+	url = https://github.com/nih-at/libzip.git
+[submodule "submodules/lodepng"]
+	path = submodules/lodepng
+	url = https://github.com/lvandeve/lodepng.git
+[submodule "submodules/PicoSHA2"]
+	path = submodules/PicoSHA2
+	url = https://github.com/okdshin/PicoSHA2.git
+[submodule "submodules/pugixml"]
+	path = submodules/pugixml
+	url = https://github.com/zeux/pugixml.git
+[submodule "submodules/rapidjson"]
+	path = submodules/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "submodules/sqlite"]
+	path = submodules/sqlite
+	url = https://github.com/sqlite/sqlite.git
+[submodule "submodules/zlib"]
+	path = submodules/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "submodules/AutomaticComponentToolkit"]
+	path = submodules/AutomaticComponentToolkit
+	url = https://github.com/Autodesk/AutomaticComponentToolkit.git
+[submodule "submodules/lib3mf"]
+	path = submodules/lib3mf
+	url = https://github.com/3MFConsortium/lib3mf.git
+[submodule "submodules/curl"]
+	path = submodules/curl
+	url = https://github.com/curl/curl.git
+[submodule "submodules/cpp-httplib"]
+	path = submodules/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git

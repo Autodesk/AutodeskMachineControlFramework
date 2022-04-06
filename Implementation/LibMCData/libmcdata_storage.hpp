@@ -78,6 +78,8 @@ private:
 
 protected:
 
+    void FinishPartialStreamEx(const std::string& sUUID, const std::string& sSHA2, const std::string& sBlockwiseSHA2);
+
 public:
 
     CStorage(AMCData::PSQLHandler pSQLHandler, AMCData::PStoragePath pStoragePath);
@@ -93,6 +95,8 @@ public:
 	void StorePartialStream(const std::string & sUUID, const LibMCData_uint64 nOffset, const LibMCData_uint64 nContentBufferSize, const LibMCData_uint8 * pContentBuffer) override;
 
 	void FinishPartialStream(const std::string & sUUID, const std::string& sSHA2) override;
+
+    void FinishPartialStreamBlockwiseSHA256(const std::string& sUUID, const std::string& sBlockwiseSHA2) override;
 
     LibMCData_uint64 GetMaxStreamSize() override;
 

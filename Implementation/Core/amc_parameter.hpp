@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include <string>
 
+#include "amc_parametertype.hpp"
+
 namespace AMC {
 
 	class CParameter;
@@ -53,6 +55,8 @@ namespace AMC {
 		virtual std::string getName() const = 0;
 		virtual std::string getDescription() const = 0;
 		virtual std::string getDefaultValue() const = 0;
+
+		virtual eParameterDataType getDataType() const = 0;
 
 		virtual std::string getStringValue() const = 0;
 		virtual void setStringValue(const std::string& sValue) = 0;

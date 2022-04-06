@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_toolpathhandler.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
-#include "amc_parameterinstances.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "libmcdata_dynamic.hpp"
 
@@ -69,13 +69,14 @@ namespace AMC {
 		m_pStorage = m_pDataModel->CreateStorage();
 		m_pBuildJobHandler = m_pDataModel->CreateBuildJobHandler();
 		m_pLoginHandler = m_pDataModel->CreateLoginHandler();
+		m_pPersistencyHandler = m_pDataModel->CreatePersistencyHandler();
 
 		m_pToolpathHandler = std::make_shared<CToolpathHandler>(m_pStorage, m_pBuildJobHandler);
-		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler);
+		m_pDriverHandler = std::make_shared<CDriverHandler>(pEnvWrapper, m_pToolpathHandler, m_pLogger);
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
-		m_pParameterInstances = std::make_shared<CParameterInstances>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pParameterInstances, m_pSignalHandler,  pEnvWrapper, m_pLogger);
+		m_pStateMachineData = std::make_shared<CStateMachineData>();
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger);
 
 	}
 
@@ -114,9 +115,9 @@ namespace AMC {
 		return m_pUIHandler.get();
 	}
 
-	CParameterInstances* CSystemState::parameterInstances()
+	CStateMachineData* CSystemState::stateMachineData()
 	{
-		return m_pParameterInstances.get();
+		return m_pStateMachineData.get();
 
 	}
 
@@ -142,9 +143,9 @@ namespace AMC {
 		return m_pToolpathHandler;
 	}
 
-	PParameterInstances CSystemState::getParameterInstances()
+	PStateMachineData CSystemState::getStateMachineData()
 	{
-		return m_pParameterInstances;
+		return m_pStateMachineData;
 	}
 
 
@@ -156,6 +157,11 @@ namespace AMC {
 	LibMCData::PBuildJobHandler CSystemState::getBuildJobHandlerInstance()
 	{
 		return m_pBuildJobHandler;
+	}
+
+	LibMCData::PPersistencyHandler CSystemState::getPersistencyHandler()
+	{
+		return m_pPersistencyHandler;
 	}
 
 	AMCCommon::PChrono CSystemState::getGlobalChronoInstance()

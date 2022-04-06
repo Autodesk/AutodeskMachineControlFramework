@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "header_protection.hpp"
 #include "header_pugixml.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_ui_interfaces.hpp"
 
 #include <memory>
 #include <vector>
@@ -65,24 +66,49 @@ namespace AMC {
 	amcDeclareDependingClass(CUIToolbarItem, PUIToolbarItem);
 	amcDeclareDependingClass(CJSONWriter, PJSONWriter);
 	amcDeclareDependingClass(CUIPage, PUIPage);
+	amcDeclareDependingClass(CUIDialog, PUIDialog);
 	amcDeclareDependingClass(CLogger, PLogger);
 	amcDeclareDependingClass(CStateSignalHandler, PStateSignalHandler);
 	amcDeclareDependingClass(CUIModule, PUIModule);
 	amcDeclareDependingClass(CUIModuleItem, PUIModuleItem);	
 	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
-	amcDeclareDependingClass(CParameterInstances, PParameterInstances);
+	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
+	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
 
-	class CUIHandler {
+
+	class CUIHandleEventResponse {
+	private:
+		uint32_t m_nErrorCode;
+		std::string m_sErrorMessage;
+		std::string m_sPageToActivate;
+		std::string m_sDialogToShow;
+		bool m_bCloseModalDialog;
+	public:
+		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, bool bCloseModalDialog, const std::string& sDialogToShow);
+
+		uint32_t getErrorCode();
+		std::string getErrorMessage ();
+		std::string getPageToActivate();
+		std::string getDialogToShow();
+
+		bool hasPageToActivate();
+		bool hasDialogToShow();
+		bool closeModalDialog();
+
+	};
+
+	class CUIHandler : public CUIModule_UIEventHandler {
 	protected:
 
 		std::mutex m_Mutex;
+		std::map<std::string, uint32_t> m_Colors;
 
 		std::string m_sAppName;
 		std::string m_sCopyrightString;
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
 
-		PParameterInstances m_pParameterInstances;
+		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
 		PResourcePackage m_pCoreResourcePackage;
 		PLogger m_pLogger;
@@ -91,6 +117,7 @@ namespace AMC {
 		std::vector <PUIToolbarItem> m_ToolbarItems;
 
 		std::map <std::string, PUIPage> m_Pages;
+		std::map <std::string, PUIDialog> m_Dialogs;
 		PUIPage m_pMainPage;
 
 		LibMCUI::PWrapper m_pUIPluginWrapper;
@@ -99,21 +126,22 @@ namespace AMC {
 
 		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
 		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+
 		PUIPage addPage_Unsafe (const std::string& sName);
 
-		PUIPage findPage(const std::string& sName);
+		PUIDialog addDialog_Unsafe(const std::string& sName, const std::string& sTitle);
 
 	public:
 
-		CUIHandler(PParameterInstances pParameterInstances, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
+		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
 		
 		virtual ~CUIHandler();
 		
 		std::string getAppName();
 		std::string getCopyrightString();
 
-		void writeConfigurationToJSON (CJSONWriter & writer);
-		void writeStateToJSON(CJSONWriter& writer);
+		void writeConfigurationToJSON (CJSONWriter & writer, CParameterHandler* pClientVariableHandler);
+		void writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler);
 
 		void loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pCoreResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
 
@@ -121,7 +149,16 @@ namespace AMC {
 
 		PUIModuleItem findModuleItem(const std::string & sUUID);
 
-		void handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sContextUUID);
+		PUIPage findPageOfModuleItem(const std::string& sUUID);
+
+		CUIHandleEventResponse handleEvent(const std::string & sEventName, const std::string & sSenderUUID, const std::string& sEventPayloadJSON, PParameterHandler pClientVariableHandler);
+
+		virtual void ensureUIEventExists(const std::string& sEventName) override;
+
+		virtual void populateClientVariables(CParameterHandler * pClientVariableHandler);
+
+		PUIPage findPage(const std::string& sName);
+		PUIDialog findDialog(const std::string& sName);
 	};
 	
 	typedef std::shared_ptr<CUIHandler> PUIHandler;

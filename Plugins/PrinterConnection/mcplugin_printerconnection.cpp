@@ -511,7 +511,7 @@ private:
 			pStateEnvironment->Sleep((uint32_t) dStatusUpdateInterval);
 			// call updatePositionStateFromDriver to update current planner buffer state (needed by CanExecuteMovement)
 			pDriver->QueryParameters();
-			m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+			m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 			if (timeElapsed(nLayerTimeout, tStart)) {
 				bSucces = false;
 				break;
@@ -630,7 +630,7 @@ public:
 								if (bSucces) {
 									pDriver->MoveFastToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
 									pDriver->QueryParameters();
-									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+									m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 
 									// move to second hatch coord with extrusion (second of a pair of coord)
 									bSucces = canExecuteMovement(pStateEnvironment, dStatusUpdateInterval, pDriver, nLayerTimeout, tStart);
@@ -641,7 +641,7 @@ public:
 										dE = dDistance * dExtrusionFactor * dLayerThickness;
 										pDriver->MoveToXY(PointData[i + 1].m_Coordinates[0] * dUnit, PointData[i + (int)1].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 										pDriver->QueryParameters();
-										m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+										m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 									}
 									else {
 										sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Hatch of layer " << nLayerIndex;
@@ -668,7 +668,7 @@ public:
 						if (bSucces) {
 							pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
 							pDriver->QueryParameters();
-							m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+							m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 
 							for (uint32_t i = 1; i < nPointCount; i++) {
 								// move to rest of points of loop (with extrusion)
@@ -680,7 +680,7 @@ public:
 									dE = dDistance * dExtrusionFactor * dLayerThickness;
 									pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 									pDriver->QueryParameters();
-									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+									m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 								}
 								else {
 									sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop of layer " << nLayerIndex;
@@ -698,7 +698,7 @@ public:
 								dE = dDistance * dExtrusionFactor * dLayerThickness;
 								pDriver->MoveToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 								pDriver->QueryParameters();
-								m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+								m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 							}
 							else {
 								sNoSuccessMsg << "Timeout while extruding segment " << nSegmentIndex << " of type Loop to close loop of layer " << nLayerIndex;
@@ -715,7 +715,7 @@ public:
 						if (bSucces) {
 							pDriver->MoveFastToXY(PointData[0].m_Coordinates[0] * dUnit, PointData[0].m_Coordinates[1] * dUnit, dSpeedFastMmPerSecond);
 							pDriver->QueryParameters();
-							m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+							m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 
 
 							for (uint32_t i = 1; i < nPointCount; i++) {
@@ -728,7 +728,7 @@ public:
 									dE = dDistance * dExtrusionFactor * dLayerThickness;
 									pDriver->MoveToXY(PointData[i].m_Coordinates[0] * dUnit, PointData[i].m_Coordinates[1] * dUnit, dE, dSpeedMmPerSecond);
 									pDriver->QueryParameters();
-									m_pPluginData->handleSignals(pDriver, pStateEnvironment, true, true, true, true);
+									m_pPluginData->handleSignals(pDriver, pStateEnvironment, false, true, true, true);
 
 								}
 								else {

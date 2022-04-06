@@ -44,6 +44,7 @@ using namespace LibMCPlugin::Impl;
 #pragma warning(disable : 4250)
 #endif
 
+
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
@@ -64,7 +65,6 @@ protected:
 //	PDriverCast_MQTT m_DriverCast_MQTT;
 
 public:
-
 	// TODO uncomment to activate camera/MQTT driver
 	//PDriver_RaspiCamera acquireCameraDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
 	//{
@@ -74,6 +74,168 @@ public:
 	//{
 	//	return m_DriverCast_MQTT.acquireDriver(pStateEnvironment, "mqtt");
 	//}
+
+	struct OperationSetup {
+		std::string operationId;
+		std::string operationName;
+		std::string setupId;
+		std::string setupName;
+	};
+
+	struct MetaData3mf {
+		std::string sAppVersion;
+		std::string sAppUserName;
+		std::string sAppUserId;
+		std::string sProjectName;
+		std::string sProjectId;
+		std::string sDataFileName;
+		std::string sDataFileId;
+		std::string sDataFileVersionId;
+		std::string sDataFileVersionNr;
+		std::string sDocName;
+		std::string sDocVersion;
+		std::string sDocId;
+		std::string sMachineName;
+		std::string sMachineUUID;
+		std::vector<OperationSetup> sOperationSetups;
+
+		std::string sBedTemp;
+		std::string sExt1Temp;
+		std::string sPartId;
+		std::string sPartUrl;
+		std::string sToolpathUrl;
+		std::string sToolpathId;
+	};
+
+	MetaData3mf read3mfMetaData(LibMCEnv::PStateEnvironment pStateEnvironment, std::string sJobUUID)
+	{
+		MetaData3mf jobMeataData3mf;
+		const std::string s3mfNamespace = "http://autodesk.com/fusion360/amcf/";
+
+		auto pToolpathAccessor = pStateEnvironment->GetBuildJob(sJobUUID)->CreateToolpathAccessor();
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationVersion")) {
+			jobMeataData3mf.sAppVersion = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationVersion");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationUserName")) {
+			jobMeataData3mf.sAppUserName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationUserName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationUserId")) {
+			jobMeataData3mf.sAppUserId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationUserId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ProjectName")) {
+			jobMeataData3mf.sProjectName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ProjectName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ProjectId")) {
+			jobMeataData3mf.sProjectId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ProjectId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileName")) {
+			jobMeataData3mf.sDataFileName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileId")) {
+			jobMeataData3mf.sDataFileId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileVersionId")) {
+			jobMeataData3mf.sDataFileVersionId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileVersionId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileVersionNr")) {
+			jobMeataData3mf.sDataFileVersionNr = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileVersionNr");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DocumentName")) {
+			jobMeataData3mf.sDocName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DocumentName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DocumentVersion")) {
+			jobMeataData3mf.sDocVersion = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DocumentVersion");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-document-id")) {
+			jobMeataData3mf.sDocId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-document-id");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "MachineName")) {
+			jobMeataData3mf.sMachineName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "MachineName");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "MachineUUID")) {
+			jobMeataData3mf.sMachineUUID = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "MachineUUID");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PartUrl")) {
+			jobMeataData3mf.sPartUrl = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PartUrl");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PartId")) {
+			jobMeataData3mf.sPartId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PartId");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ToolpathUrl")) {
+			jobMeataData3mf.sToolpathUrl = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ToolpathUrl");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ToolpathId")) {
+			jobMeataData3mf.sToolpathId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ToolpathId");
+		}
+		// TODO remove hard coded id (when 3mf contains correct set toolpathId - created after ulpoading toolpath to bucket, set by Fusion add-in)
+		jobMeataData3mf.sToolpathId = "https://git.autodesk.com/Research/IntrepidOntology/manufacturing#caf424b9-faa6-4ff8-9ee4-ccedc23db2fd";
+
+		int opIndex = 0;
+		bool doLoop = true;
+		while (doLoop) {
+			if (pToolpathAccessor->HasMetaData(s3mfNamespace, "OperationId" + std::to_string(opIndex))) {
+				OperationSetup opSetup;
+				opSetup.operationId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "OperationId" + std::to_string(opIndex));
+				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "OperationName" + std::to_string(opIndex))) {
+					opSetup.operationName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "OperationName" + std::to_string(opIndex));
+				}
+				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "SetupId" + std::to_string(opIndex))) {
+					opSetup.setupId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "SetupId" + std::to_string(opIndex));
+				}
+				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "setupName" + std::to_string(opIndex))) {
+					opSetup.setupName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "setupName" + std::to_string(opIndex));
+				}
+				jobMeataData3mf.sOperationSetups.push_back(opSetup);
+
+				opIndex++;
+				// TODO HasMetaData doesn't work => as a workaround, do loop just once => remove following line when HasMetaData works as expected
+				doLoop = false;
+			}
+			else {
+				doLoop = false;
+			}
+		}
+
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-bed-temp")) {
+			jobMeataData3mf.sBedTemp = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-bed-temp");
+		}
+		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-ext1-temp")) {
+			jobMeataData3mf.sExt1Temp = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-ext1-temp");
+		}
+
+		//pStateEnvironment->LogMessage("AppVersion: " + jobMeataData3mf.sAppVersion);
+		//pStateEnvironment->LogMessage("AppUserName: " + jobMeataData3mf.sAppUserName);
+		//pStateEnvironment->LogMessage("AppUserId: " + jobMeataData3mf.sAppUserId);
+		//pStateEnvironment->LogMessage("ProjectName: " + jobMeataData3mf.sProjectName);
+		//pStateEnvironment->LogMessage("ProjectId: " + jobMeataData3mf.sProjectId);
+		//pStateEnvironment->LogMessage("DataFileName: " + jobMeataData3mf.sDataFileName);
+		//pStateEnvironment->LogMessage("DataFileId: " + jobMeataData3mf.sDataFileId);
+		//pStateEnvironment->LogMessage("DataFileVersionId: " + jobMeataData3mf.sDataFileVersionId);
+		//pStateEnvironment->LogMessage("DataFileVersionNr: " + jobMeataData3mf.sDataFileVersionNr);
+		//pStateEnvironment->LogMessage("DocName: " + jobMeataData3mf.sDocName);
+		//pStateEnvironment->LogMessage("DocVersion: " + jobMeataData3mf.sDocVersion);
+		//pStateEnvironment->LogMessage("DocId: " + jobMeataData3mf.sDocId);
+		//pStateEnvironment->LogMessage("MachineName: " + jobMeataData3mf.sMachineName);
+		//pStateEnvironment->LogMessage("MachineUUID: " + jobMeataData3mf.sMachineUUID);
+		//pStateEnvironment->LogMessage("PartId: " + jobMeataData3mf.sPartId);
+		//pStateEnvironment->LogMessage("PartUrl: " + jobMeataData3mf.sPartUrl);
+		//pStateEnvironment->LogMessage("ToolpathUrl: " + jobMeataData3mf.sToolpathUrl);
+
+		//opIndex = 0;
+		//for (const auto& sOperationSetups : jobMeataData3mf.sOperationSetups) {
+		//	pStateEnvironment->LogMessage("OperationId" + std::to_string(opIndex) + ": " + sOperationSetups.operationId);
+		//	pStateEnvironment->LogMessage("OperationName" + std::to_string(opIndex) + ": " + sOperationSetups.operationName);
+		//	pStateEnvironment->LogMessage("SetupId" + std::to_string(opIndex) + ": " + sOperationSetups.setupId);
+		//	pStateEnvironment->LogMessage("SetupName" + std::to_string(opIndex) + ": " + sOperationSetups.setupName);
+		//	opIndex++;
+		//}
+
+		//pStateEnvironment->LogMessage("BedTemp: " + jobMeataData3mf.sBedTemp);
+		//pStateEnvironment->LogMessage("Ext1Temp: " + jobMeataData3mf.sExt1Temp);
+
+		return jobMeataData3mf;
+	}
+
 
 	bool deviceSetFanSpeed(LibMCEnv::PStateEnvironment pStateEnvironment, uint32_t nFanId, double dFanSpeed)
 	{
@@ -235,7 +397,6 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
@@ -253,6 +414,7 @@ public:
 		//pCameraDriver->Initialize("", 600, 400, LibMCDriver_Camera::eImagePixelFormat::RGB32);
 
 		pStateEnvironment->SetNextState("idle");
+
 	}
 
 };
@@ -261,7 +423,6 @@ public:
 /*************************************************************************************************************************
  Class definition of CMainState_Idle
 **************************************************************************************************************************/
-
 class CMainState_Idle : public virtual CMainState {
 public:
 
@@ -278,6 +439,7 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
+
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
@@ -298,7 +460,6 @@ public:
 				pStateEnvironment->LogMessage("Starting job..");
 				try {
 					auto sJobUUID = pHandlerInstance->GetString("jobuuid");
-
 					if (sJobUUID.empty())
 						throw std::runtime_error ("empty job UUID!");
 
@@ -306,6 +467,10 @@ public:
 					pStateEnvironment->GetBuildJob(sJobUUID);
 
 					pStateEnvironment->SetUUIDParameter("jobinfo", "jobuuid", sJobUUID);
+					CMainData::MetaData3mf  jobMetaData3mf = m_pPluginData->read3mfMetaData(pStateEnvironment, sJobUUID);
+					// jobname not sent by UI (together with UUID) => so we need to set parameter jobname by reading it from 3mf file (meta data)
+					pStateEnvironment->SetStringParameter("jobinfo", "jobname", jobMetaData3mf.sDocName);
+
 					pHandlerInstance->SetBoolResult("success", true);
 
 					pStateEnvironment->SetNextState("startprocess");
@@ -348,18 +513,13 @@ public:
 
 
 
+
 /*************************************************************************************************************************
  Class definition of CMainState_StartProcess
 **************************************************************************************************************************/
 
 class CMainState_StartProcess : public virtual CMainState {
 private:
-	struct OperationSetup {   
-		std::string operationId;
-		std::string operationName;
-		std::string setupId;
-		std::string setupName;
-	};
 	
 public:
 
@@ -374,133 +534,6 @@ public:
 	}
 
 
-	void read3mfMetaData(LibMCEnv::PStateEnvironment pStateEnvironment, std::string sJobUUID)
-	{
-		const std::string s3mfNamespace = "http://autodesk.com/fusion360/amcf/";
-		std::string sAppVersion = "";
-		std::string sAppUserName = "";
-		std::string sAppUserId = "";
-		std::string sProjectName = "";
-		std::string sProjectId = "";
-		std::string sDataFileName = "";
-		std::string sDataFileId = "";
-		std::string sDataFileVersionId = "";
-		std::string sDataFileVersionNr = "";
-		std::string sDocName = "";
-		std::string sDocVersion = "";
-		std::string sDocId = "";
-		std::string sMachineName = "";
-		std::string sMachineUUID = "";
-		std::vector<OperationSetup> sOperationSetups;
-
-		std::string sBedTemp = "";
-		std::string sExt1Temp = "";
-
-		auto pToolpathAccessor = pStateEnvironment->GetBuildJob(sJobUUID)->CreateToolpathAccessor();
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationVersion")) {
-			sAppVersion = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationVersion");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationUserName")) {
-			sAppUserName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationUserName");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ApplicationUserId")) {
-			sAppUserId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ApplicationUserId");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ProjectName")) {
-			sProjectName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ProjectName");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "ProjectId")) {
-			sProjectId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "ProjectId");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileName")) {
-			sDataFileName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileName");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileId")) {
-			sDataFileId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileId");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileVersionId")) {
-			sDataFileVersionId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileVersionId");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DataFileVersionNr")) {
-			sDataFileVersionNr = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DataFileVersionNr");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DocumentName")) {
-			sDocName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DocumentName");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "DocumentVersion")) {
-			sDocVersion = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "DocumentVersion");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-document-id")) {
-			sDocId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-document-id");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "MachineName")) {
-			sMachineName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "MachineName");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "MachineUUID")) {
-			sMachineUUID = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "MachineUUID");
-		}
-		int opIndex = 0;
-		bool doLoop = true;
-		while (doLoop) {
-			if (pToolpathAccessor->HasMetaData(s3mfNamespace, "OperationId" + std::to_string(opIndex))) {
-				OperationSetup opSetup;
-				opSetup.operationId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "OperationId" + std::to_string(opIndex));
-				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "OperationName" + std::to_string(opIndex))) {
-					opSetup.operationName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "OperationName" + std::to_string(opIndex));
-				}
-				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "SetupId" + std::to_string(opIndex))) {
-					opSetup.setupId = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "SetupId" + std::to_string(opIndex));
-				}
-				if (pToolpathAccessor->HasMetaData(s3mfNamespace, "setupName" + std::to_string(opIndex))) {
-					opSetup.setupName = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "setupName" + std::to_string(opIndex));
-				}
-				sOperationSetups.push_back(opSetup);
-			
-				opIndex++;
-				// TODO HasMetaData doesn't work => as a workaround, do loop just once => remove following line when HasMetaData works as expected
-				doLoop = false;
-			}
-			else {
-				doLoop = false;
-			}
-		}
-
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-bed-temp")) {
-			sBedTemp = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-bed-temp");
-		}
-		if (pToolpathAccessor->HasMetaData(s3mfNamespace, "PostProcessorParameter-ext1-temp")) {
-			sExt1Temp = pToolpathAccessor->GetMetaDataValue(s3mfNamespace, "PostProcessorParameter-ext1-temp");
-		}
-
-		pStateEnvironment->LogMessage("AppVersion: " + sAppVersion);
-		pStateEnvironment->LogMessage("AppUserName: " + sAppUserName);
-		pStateEnvironment->LogMessage("AppUserId: " + sAppUserId);
-		pStateEnvironment->LogMessage("ProjectName: " + sProjectName);
-		pStateEnvironment->LogMessage("ProjectId: " + sProjectId);
-		pStateEnvironment->LogMessage("DataFileName: " + sDataFileName);
-		pStateEnvironment->LogMessage("DataFileId: " + sDataFileId);
-		pStateEnvironment->LogMessage("DataFileVersionId: " + sDataFileVersionId);
-		pStateEnvironment->LogMessage("DataFileVersionNr: " + sDataFileVersionNr);
-		pStateEnvironment->LogMessage("DocName: " + sDocName);
-		pStateEnvironment->LogMessage("DocVersion: " + sDocVersion);
-		pStateEnvironment->LogMessage("DocId: " + sDocId);
-		pStateEnvironment->LogMessage("MachineName: " + sMachineName);
-		pStateEnvironment->LogMessage("MachineUUID: " + sMachineUUID);
-
-		opIndex = 0;
-		for (const auto& sOperationSetups : sOperationSetups) {
-			pStateEnvironment->LogMessage("OperationId" + std::to_string(opIndex) + ": " + sOperationSetups.operationId);
-			pStateEnvironment->LogMessage("OperationName" + std::to_string(opIndex) + ": " + sOperationSetups.operationName);
-			pStateEnvironment->LogMessage("SetupId" + std::to_string(opIndex) + ": " + sOperationSetups.setupId);
-			pStateEnvironment->LogMessage("SetupName" + std::to_string(opIndex) + ": " + sOperationSetups.setupName);
-			opIndex++;
-		}
-
-		pStateEnvironment->LogMessage("BedTemp: " + sBedTemp);
-		pStateEnvironment->LogMessage("Ext1Temp: " + sExt1Temp);
-		// jobname not sent by UI (together with UUID) => so we need to set parameter jobname by reading it from 3mf file (meta data)
-		pStateEnvironment->SetStringParameter("jobinfo", "jobname", sDocName);
-	}
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
@@ -513,8 +546,6 @@ public:
 		auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
 		pBuildJob->LoadToolpath();
-		
-		read3mfMetaData(pStateEnvironment, sJobUUID);
 
 		// Find out layer count
 		auto nLayerCount = pBuildJob->GetLayerCount();
@@ -523,7 +554,7 @@ public:
 		//auto pSignal = pStateEnvironment->PrepareSignal("pidcontrol_extruder", "signal_startcontrolling");
 		//pSignal->Trigger();
 		//pSignal->WaitForHandling(1000);
-		
+
 		pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
 		pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
 		pStateEnvironment->SetBoolParameter("jobinfo", "autostart", false);
@@ -588,8 +619,6 @@ public:
 			pStateEnvironment->LogWarning("Signal 'Printer is connected' timeout. ");
 			pStateEnvironment->SetNextState("fatalerror");
 		}
-
-
 	}
 
 };
@@ -785,6 +814,34 @@ public:
 
 
 /*************************************************************************************************************************
+ Class definition of CMainState_BuildPaused
+**************************************************************************************************************************/
+class CMainState_BuildPaused : public virtual CMainState {
+public:
+
+	CMainState_BuildPaused(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "buildpaused";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Build paused");
+		pStateEnvironment->Sleep(3000);
+
+		pStateEnvironment->SetNextState("pausebuild");
+	}
+
+};
+
+
+/*************************************************************************************************************************
  Class definition of CMainState_FatalError
 **************************************************************************************************************************/
 class CMainState_FatalError : public virtual CMainState {
@@ -803,31 +860,40 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		LibMCEnv::PSignalHandler pHandlerInstance;
-		if (pStateEnvironment->WaitForSignal("signal_resetfatalerror", 0, pHandlerInstance)) {
+		// Unload all toolpathes that might be in memory
+		pStateEnvironment->UnloadAllToolpathes();
 
-			pStateEnvironment->LogMessage("Reset state machine main after fatal error");
-			try {
-				pStateEnvironment->SetNextState("init");
-				pHandlerInstance->SetBoolResult("success", true);
-			}
-			catch (std::exception& E) {
-				pStateEnvironment->LogWarning(std::string("Could not reset: ") + E.what());
-				pHandlerInstance->SetBoolResult("success", false);
-				pStateEnvironment->SetNextState("fatalerror");
-			}
-			pHandlerInstance->SignalHandled();
+		pStateEnvironment->SetNextState("fatalerror");
+	}
 
-		}
-		else {
-			// Unload all toolpathes that might be in memory
-			pStateEnvironment->UnloadAllToolpathes();
+};
 
-			pStateEnvironment->SetNextState("fatalerror");
-		}
+
+/*************************************************************************************************************************
+ Class definition of CMainState_CancelBuild
+**************************************************************************************************************************/
+class CMainState_CancelBuild : public virtual CMainState {
+public:
+
+	CMainState_CancelBuild(const std::string& sStateName, PPluginData pPluginData)
+		: CMainState(getStateName(), sStateName, pPluginData)
+	{
+	}
+
+	static const std::string getStateName()
+	{
+		return "cancelbuild";
+	}
+
+
+	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Canceling Build...");
+		pStateEnvironment->LogMessage("Turning laser off...");
+		pStateEnvironment->Sleep(1000);
+
+		pStateEnvironment->SetNextState("idle");
 	}
 
 };
@@ -835,7 +901,7 @@ public:
 
 
 /*************************************************************************************************************************
- Class definition of CStateFactory 
+ Class definition of CStateFactory
 **************************************************************************************************************************/
 
 CStateFactory::CStateFactory(const std::string& sInstanceName)
@@ -855,6 +921,12 @@ IState * CStateFactory::CreateState(const std::string & sStateName)
 		return pStateInstance;
 
 	if (createStateInstanceByName<CMainState_FatalError>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_BuildPaused>(sStateName, pStateInstance, m_pPluginData))
+		return pStateInstance;
+
+	if (createStateInstanceByName<CMainState_CancelBuild>(sStateName, pStateInstance, m_pPluginData))
 		return pStateInstance;
 
 	if (createStateInstanceByName<CMainState_StartProcess>(sStateName, pStateInstance, m_pPluginData))

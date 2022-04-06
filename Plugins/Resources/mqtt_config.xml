@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mqttconfig xmlns="http://schemas.autodesk.com/amcf/mqttconfig/2021/01" >
 
-	<iot_endpoint url="XXXXXXXXXXXXX.iot.eu-west-1.amazonaws.com" port="8883">
+	<iot_endpoint url="a149utcxzuxuzf-ats.iot.eu-west-1.amazonaws.com" port="8883">
 		<certificate>
 -----BEGIN CERTIFICATE-----
 MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF
@@ -27,7 +27,7 @@ rqXRfboQnoZsG4q5WTP468SQvvG5
 	</iot_endpoint>
 	
 	
-	<client name="CLIENTNAME" topic="TOPICNAME">
+	<client name="CLIENTNAME" topic="iot/from_fff_printers_to_timestream">
 	
 		<certificate>
 -----BEGIN CERTIFICATE-----
@@ -53,7 +53,7 @@ iMvfhzcF77z9EbRzjgwHblDzfg35vIlEYXk1pMEQtEm3HSfNJ/HF+KEIK3B2cw==
 		</certificate>
 		
 		<privatekey>	
-		</privatekey>
+             	</privatekey>
 	
 	</client>
 

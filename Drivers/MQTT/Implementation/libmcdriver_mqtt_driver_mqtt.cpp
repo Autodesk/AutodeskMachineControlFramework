@@ -136,8 +136,9 @@ void CDriver_MQTT::Configure(const std::string& sConfigurationString)
     m_pLibCryptoDLL = m_pWorkingDirectory->StoreDriverData("libcrypto-1_1-x64.dll", "libcrypto-1_1-x64");
     m_pOpenSSLDLL = m_pWorkingDirectory->StoreDriverData("libssl-1_1-x64.dll", "libssl-1_1-x64");
 
+#ifdef _WIN32
     SetDllDirectory(m_pWorkingDirectory->GetAbsoluteFilePath ().c_str());
-
+#endif
     m_pLibMQTTWrapper = LibMQTT::CWrapper::loadLibrary(m_pLibMQTTDLL->GetAbsoluteFileName ());
     m_pMQTTContext = m_pLibMQTTWrapper->CreateContext("");
 
