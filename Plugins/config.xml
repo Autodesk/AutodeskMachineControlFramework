@@ -4,9 +4,9 @@
 
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol"/>
 	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
-	<driver name="opcua" library="driver_opcua" type="opcua" configurationresource="opcuaprotocol"/>
+  <driver name="raylase" library="driver_raylase" type="raylase"/>
 
-	<statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
+  <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
 		<parametergroup name="jobinfo" description="Job Information">
 			<parameter name="jobname" description="Job Name" default="Job Name" type="string"/>
@@ -120,10 +120,11 @@
 
 		<parametergroup name="cardconfig" description="Scanlab Card Config">
 			<parameter name="serial" description="Serial" default="1000" type="int"/>
-			<parameter name="ipaddress" description="Scanlab Ethernet Address" default="" type="string"/>
+			<parameter name="ipaddress" description="Scanlab Ethernet Address" default="169.254.70.75" type="string"/>
 			<parameter name="netmask" description="Scanlab Netmask" default="" type="string"/>
-			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
-			<parameter name="maxlaserpower" description="Max. laser power (W)" default="400" type="double"/>
+      <parameter name="port" description="Port" default="49374" type="int"/>
+      <parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
+			<parameter name="maxlaserpower" description="Max. laser power (W)" default="1000" type="double"/>
 			<parameter name="laserondelay" description="Laser On Delay in microseconds" default="100" type="double"/>
 			<parameter name="laseroffdelay" description="Laser Off Delay in microseconds" default="100" type="double"/>
 			<parameter name="markdelay" description="Mark Delay in microseconds" default="570" type="double"/>
@@ -216,8 +217,10 @@
 
 		<logo resource="ui_logo" aspectratio="2.5"/>
 
+    <login backgroundresource="login_background" />
+
 		<colors>
-			<color name="primary" red="0.024" green="0.588" blue="0.843"/>
+			<color name="primary" red="0.00" green="0.0" blue="0.0"/>
 			<color name="secondary" red="0.529" green="0.737" blue="0.251"/>
 			<color name="accent" red="0.400" green="0.400" blue="0.400"/>
 			<color name="error" red="0.867" green="0.133" blue="0.133"/>
