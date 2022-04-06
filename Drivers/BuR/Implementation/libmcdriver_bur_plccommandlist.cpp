@@ -53,14 +53,17 @@ CPLCCommandList::CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGene
     if (pTimeStampGenerator == nullptr)
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
 
-    if (m_pConnector.get() != nullptr) {
+    if (!m_bIsSimulationMode) {
 
-        m_pConnector->sendCommandToPLC(BUR_COMMAND_DIRECT_BEGINLIST,
-            [this](CDriver_BuRPacket* pPacket) {
+        if (m_pConnector.get() != nullptr) {
 
-            m_ListIdentifier = pPacket->readUInt32(0);
-        });
+            m_pConnector->sendCommandToPLC(BUR_COMMAND_DIRECT_BEGINLIST,
+                [this](CDriver_BuRPacket* pPacket) {
 
+                m_ListIdentifier = pPacket->readUInt32(0);
+            });
+
+        }
     }
 
 }
@@ -93,23 +96,27 @@ void CPLCCommandList::ExecuteList()
     if (m_pConnector == nullptr)
         return;
 
-    std::vector <sAMCFToPLCPacketToSend> packetList;
-    packetList.reserve(m_pCommandQueue.size ());
-    for (auto pCommand : m_pCommandQueue) {
-        sAMCFToPLCPacketPayload payLoad;
-        for (uint32_t nIndex = 0; nIndex < 24; nIndex++)
-            payLoad.m_nData[nIndex] = 0;
+    if (!m_bIsSimulationMode) {
 
-        auto pParameterNames = pCommand->getParameterNames();
-        for (auto sParameterName : pParameterNames) {
-            auto pParameter = pCommand->findParameter(sParameterName);
-            pParameter->writeToPayload(payLoad);
+        std::vector <sAMCFToPLCPacketToSend> packetList;
+        packetList.reserve(m_pCommandQueue.size());
+        for (auto pCommand : m_pCommandQueue) {
+            sAMCFToPLCPacketPayload payLoad;
+            for (uint32_t nIndex = 0; nIndex < 24; nIndex++)
+                payLoad.m_nData[nIndex] = 0;
+
+            auto pParameterNames = pCommand->getParameterNames();
+            for (auto sParameterName : pParameterNames) {
+                auto pParameter = pCommand->findParameter(sParameterName);
+                pParameter->writeToPayload(payLoad);
+            }
+
+            packetList.push_back(m_pConnector->makePacket(pCommand->getCommandID(), nullptr));
         }
 
-        packetList.push_back (m_pConnector->makePacket(pCommand->getCommandID(), nullptr));
-    }
+        m_pConnector->sendCommandsToPLC(packetList);
 
-    m_pConnector->sendCommandsToPLC(packetList);
+    }
 
 }
 
@@ -118,23 +125,29 @@ uint8_t CPLCCommandList::receiveListStatus()
 {
     uint8_t receivedListStatus = 0;
 
-    if (m_pConnector != nullptr) {
-        m_pConnector->sendCommandToPLC(BUR_COMMAND_DIRECT_LISTSTATUS, m_ListIdentifier,
-            [&receivedListStatus](CDriver_BuRPacket* pPacket) {
+    if (!m_bIsSimulationMode) {
+
+        if (m_pConnector != nullptr) {
+            m_pConnector->sendCommandToPLC(BUR_COMMAND_DIRECT_LISTSTATUS, m_ListIdentifier,
+                [&receivedListStatus](CDriver_BuRPacket* pPacket) {
                 receivedListStatus = pPacket->readUInt8(0);
             });
+        }
+
+        return receivedListStatus;
     }
 
-    return receivedListStatus;
+    return 0;
 
 }
 
 bool CPLCCommandList::WaitForList(const LibMCDriver_BuR_uint32 nReactionTimeInMS, const LibMCDriver_BuR_uint32 nWaitForTimeInMS)
 {
-    uint64_t nStartTime = m_pTimeStampGenerator->generateTimeStamp();
     if (m_bIsSimulationMode) {
         return true;
     }
+
+    uint64_t nStartTime = m_pTimeStampGenerator->generateTimeStamp();
 
     int statusValue = 255;
     while (statusValue != 6) {
@@ -165,9 +178,11 @@ void CPLCCommandList::ResumeList()
 void CPLCCommandList::FinishList()
 {
 
-    if (m_pConnector.get() != nullptr) {
+    if (!m_bIsSimulationMode) {
+        if (m_pConnector.get() != nullptr) {
 
-        m_pConnector->sendCommandToPLC (BUR_COMMAND_DIRECT_FINISHLIST, m_ListIdentifier, nullptr);
+            m_pConnector->sendCommandToPLC(BUR_COMMAND_DIRECT_FINISHLIST, m_ListIdentifier, nullptr);
+        }
     }
 
 }
