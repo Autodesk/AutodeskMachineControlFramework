@@ -237,5 +237,9 @@ namespace AMC {
 		return __STRINGIZE_VALUE_OF(__GITHASH);
 	}
 
+	std::string CSystemState::getClientHash()
+	{
+		return __STRINGIZE_VALUE_OF(__CLIENTHASH);
+	}
 
 }

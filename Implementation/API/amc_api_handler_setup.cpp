@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Setup::CAPIHandler_Setup(std::vector <AMC::PStateMachineInstance>& Instances)
-	: m_Instances (Instances)
+CAPIHandler_Setup::CAPIHandler_Setup(std::vector <AMC::PStateMachineInstance>& Instances, const std::string& sClientHash)
+	: CAPIHandler (sClientHash), m_Instances (Instances)
 {
 	
 }

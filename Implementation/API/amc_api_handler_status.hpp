@@ -47,7 +47,7 @@ namespace AMC {
 
 	public:
 
-		CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances, PStateMachineData pStateMachineData);
+		CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances, PStateMachineData pStateMachineData, const std::string & sClientHash);
 
 		virtual ~CAPIHandler_Status();
 				

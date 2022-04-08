@@ -49,13 +49,13 @@ CAPIFactory::CAPIFactory(PAPI pAPI, PSystemState pSystemState, std::vector <AMC:
 	if (pSystemState.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-	pAPI->registerHandler(std::make_shared <CAPIHandler_Logs>(pSystemState->getLoggerInstance()));
-	pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(MachineInstanceList));
-	pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(MachineInstanceList, pSystemState->getStateMachineData ()));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Logs>(pSystemState->getLoggerInstance(), pSystemState->getClientHash()));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Setup>(MachineInstanceList, pSystemState->getClientHash()));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Status>(MachineInstanceList, pSystemState->getStateMachineData (), pSystemState->getClientHash()));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Upload>(pSystemState));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_Build>(pSystemState));
 	pAPI->registerHandler(std::make_shared <CAPIHandler_UI>(pSystemState));
-	pAPI->registerHandler(std::make_shared <CAPIHandler_Auth>(pAPI->getSessionHandler (), pSystemState->getLoginHandlerInstance(), pSystemState->getInstallationSecret (), pSystemState->getGitHash ()));
+	pAPI->registerHandler(std::make_shared <CAPIHandler_Auth>(pAPI->getSessionHandler (), pSystemState->getLoginHandlerInstance(), pSystemState->getInstallationSecret (), pSystemState->getGitHash (), pSystemState->getClientHash ()));
 	
 }
 

@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 CAPIHandler_Build::CAPIHandler_Build(PSystemState pSystemState)
-	: m_pSystemState(pSystemState)
+	: CAPIHandler(pSystemState->getClientHash ()), m_pSystemState(pSystemState)
 {
 	if (pSystemState.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);

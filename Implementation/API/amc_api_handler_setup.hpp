@@ -44,7 +44,7 @@ namespace AMC {
 
 	public:
 
-		CAPIHandler_Setup(std::vector <AMC::PStateMachineInstance>& Instances);
+		CAPIHandler_Setup(std::vector <AMC::PStateMachineInstance>& Instances, const std::string& sClientHash);
 
 		virtual ~CAPIHandler_Setup();
 

@@ -87,7 +87,7 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     CAPIFactory factory (m_pAPI, m_pSystemState, m_InstanceList);
 
     // Create Client Dist Handler
-    m_pClientDistHandler = std::make_shared <CAPIHandler_Root>();
+    m_pClientDistHandler = std::make_shared <CAPIHandler_Root>(m_pSystemState->getClientHash ());
     m_pAPI->registerHandler (m_pClientDistHandler);
 
 

@@ -62,7 +62,7 @@ namespace AMC {
 
 	public:
 
-		CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string & sInstallationSecret, const std::string& sGitHash);
+		CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string & sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash);
 
 		virtual ~CAPIHandler_Auth();
 				

@@ -101,11 +101,21 @@ void CDriver_Raylase::LoadSDK()
     m_pSDKWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
     std::string sDLLFileName = "RAYLASE.SPICE3.Native.ClientLib.dll";
 
+    
 #ifdef _WIN32
-    m_pSDKClientLib = m_pSDKWorkingDirectory->StoreDriverData(sDLLFileName, "raylase_clientlib_win_x64");
+    std::string sResourceName = "raylase_clientlib_win";
 #else
-    m_pSDKClientLib = m_pSDKWorkingDirectory->StoreDriverData("sDLLFileName", "raylase_clientlib_linux_x64");
+    std::string sResourceName = "raylase_clientlib_linux";
 #endif
+
+    if (sizeof(size_t) == sizeof(uint64_t)) {
+        sResourceName += "64";
+    }
+    else {
+        sResourceName += "32";
+    }
+
+    m_pSDKClientLib = m_pSDKWorkingDirectory->StoreDriverData(sDLLFileName, sResourceName);
 
     m_pRayLaseSDK = std::make_shared<CRaylaseSDK>(m_pSDKClientLib->GetAbsoluteFileName());
 
