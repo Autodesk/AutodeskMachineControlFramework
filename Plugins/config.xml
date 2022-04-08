@@ -118,10 +118,11 @@
 
 	<statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
 
-		<parametergroup name="cardconfig" description="Scanlab Card Config">
-			<parameter name="serial" description="Serial" default="1000" type="int"/>
-			<parameter name="ipaddress" description="Scanlab Ethernet Address" default="169.254.70.75" type="string"/>
-			<parameter name="netmask" description="Scanlab Netmask" default="" type="string"/>
+		<parametergroup name="cardconfig" description="Scanner Card Config">
+      <parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="raylase" type="string"/>
+      <parameter name="serial" description="Serial" default="1000" type="int"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="169.254.70.75" type="string"/>
+			<parameter name="netmask" description="Scanner Netmask" default="" type="string"/>
       <parameter name="port" description="Port" default="49374" type="int"/>
       <parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
 			<parameter name="maxlaserpower" description="Max. laser power (W)" default="1000" type="double"/>
@@ -213,15 +214,15 @@
 	</statemachine>
 
 
-	<userinterface appname="SLM Demo System" copyright="2021 Autodesk" mainpage="main" library="plugin_userinterface">
+	<userinterface appname="Autodesk Machine Control Framework" copyright="2022 Autodesk Inc." mainpage="main" library="plugin_userinterface">
 
-		<logo resource="ui_logo" aspectratio="2.5"/>
+		<logo resource="ui_logo" aspectratio="3.0"/>
 
     <login backgroundresource="login_background" />
 
 		<colors>
 			<color name="primary" red="0.00" green="0.0" blue="0.0"/>
-			<color name="secondary" red="0.529" green="0.737" blue="0.251"/>
+			<color name="secondary" red="0.3" green="0.3" blue="0.3"/>
 			<color name="accent" red="0.400" green="0.400" blue="0.400"/>
 			<color name="error" red="0.867" green="0.133" blue="0.133"/>
 		</colors>
