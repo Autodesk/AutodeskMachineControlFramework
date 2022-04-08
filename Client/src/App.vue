@@ -1,5 +1,5 @@
 <template>
-<v-app id="AMCApp">
+<v-app id="AMCApp" app>
     <v-navigation-drawer v-if="appIsReady" v-model="ShowDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app>
         <v-list dense>
             <template v-for="item in Application.AppContent.MenuItems">
@@ -53,8 +53,7 @@
         </template>
     </v-app-bar>
 
-    <v-main v-bind:style="appMainStyle">
-	
+	<v-main app v-bind:style="appMainStyle">
         <v-container class="fill-height" fluid v-if="appIsLoading">
             <v-row align="center" justify="center">
                 <v-progress-circular :value="20" indeterminate></v-progress-circular>
@@ -68,21 +67,26 @@
 		<v-container class="fill-height" fluid v-if="appIsError">
 			<Dialog_Error :Application="Application" />
         </v-container>		
-		
-		<template v-for="uiPage in Application.AppContent.Pages">
-			<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:100%; display:block">
+
+		<div v-bind:style="appContentDivStyle" v-if="appIsReady">
+			<v-card v-bind:style="appContentCardStyle" elevation="2" class="pa-3" width="90%" > 
+				<template v-for="uiPage in Application.AppContent.Pages">
+					<v-container :key="uiPage.name" v-if="appIsReady && (Application.AppState.activePage == uiPage.name)" style="width:100%; height:100%; display:block;">
+										
+						<template v-for="uiModule in uiPage.modules">
+							<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
+							<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
+							<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
+							<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
+							<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
+							<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
+						</template>										
 								
-				<template v-for="uiModule in uiPage.modules">
-					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
-					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
-					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
-					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
-					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
-					<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
-				</template>										
-						
-			</v-container>		
-		</template>
+					</v-container>		
+				</template>
+			</v-card>
+		</div>
+		
 		
 		<template v-for="uiDialog in Application.AppContent.Dialogs">
 			<v-dialog :key="uiDialog.name"						
@@ -116,9 +120,8 @@
 				
         </v-dialog>		
 		</template>
-        
     </v-main>
-
+	
     <v-footer color="primary" class="text-right" min-height="30" app >
         <v-spacer />
         <span class="caption white--text" v-if="appHasInformation">&copy; {{ Application.AppDefinition.TextCopyRight }}</span>		
@@ -218,16 +221,34 @@
 			
 				let mainStyle = "";
 			
-				if (this.appIsLogin) {
+				//if (this.appIsLogin) {
 				
 					if (this.Application.AppDefinition.LoginBackgroundImageUUID) {
 						let imageurl = this.Application.getImageURL (this.Application.AppDefinition.LoginBackgroundImageUUID);
-						mainStyle = mainStyle + "background-image: url(\"" + imageurl + "\");"
+						mainStyle = mainStyle + "background-image: url(\"" + imageurl + "\"); background-size: cover; "
 					}					
 					
-				}
+				//}
 				return mainStyle;
 
+			},
+			
+			appContentHeight() {
+				return window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top;
+			},
+			
+			appContentDivStyle ()
+			{
+				let height = window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top;
+				let style = "height: " + height + "px; padding-top: 20px;";
+				return style;
+			},
+			
+			appContentCardStyle ()
+			{
+				let height = window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top - 40;
+				let style = "height: " + height + "px; background: rgba(255.0, 255.0, 255.0, 0.9); overflow:auto; margin:auto";
+				return style;
 			}
 			
 		},
