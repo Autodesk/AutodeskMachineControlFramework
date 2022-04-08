@@ -72,6 +72,96 @@ public:
 		return m_DriverCast_Raylase.acquireDriver(pStateEnvironment, "raylase");
 	}
 
+	void InitialiseRaylaseDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Initialising Raylase Driver");
+
+		auto pDriver = acquireRaylaseDriver(pStateEnvironment);
+		if (pStateEnvironment->GetBoolParameter("cardconfig", "simulatelaser")) {
+			pStateEnvironment->LogMessage("Laser Simulation enabled!...");
+			pDriver->SetToSimulationMode();
+		}
+
+		if (!pDriver->IsSimulationMode()) {
+			pDriver->LoadSDK();
+		}
+
+		auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
+		auto nPort = pStateEnvironment->GetIntegerParameter("cardconfig", "port");
+		auto dMaxLaserPower = pStateEnvironment->GetDoubleParameter("cardconfig", "maxlaserpower");
+
+		pStateEnvironment->LogMessage("Connecting to Raylase card " + sIP + ":" + std::to_string(nPort));
+		auto pCard = pDriver->ConnectByIP("card1", sIP, (uint32_t)nPort, dMaxLaserPower);
+		pCard->ResetToSystemDefaults();
+		pCard->EnablePilot(true);
+
+	}
+
+	void InitialiseScanlabDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	{
+		pStateEnvironment->LogMessage("Initialising Scanlab Driver");
+
+		auto pDriver = acquireScanLabDriver(pStateEnvironment);
+		if (pStateEnvironment->GetBoolParameter("cardconfig", "simulatelaser")) {
+			pStateEnvironment->LogMessage("Laser Simulation enabled!...");
+			pDriver->SetToSimulationMode();
+		}
+
+		if (!pDriver->IsSimulationMode()) {
+			pDriver->LoadSDK("rtc6dllx64");
+		}
+
+		auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
+		auto sNetmask = pStateEnvironment->GetStringParameter("cardconfig", "netmask");
+		auto nTimeout = pStateEnvironment->GetIntegerParameter("cardconfig", "timeout");
+		auto nSerial = pStateEnvironment->GetIntegerParameter("cardconfig", "serial");
+		auto dMaxLaserPower = pStateEnvironment->GetDoubleParameter("cardconfig", "maxlaserpower");
+		auto dLaserOnDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "laserondelay");
+		auto dLaserOffDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "laseroffdelay");
+		auto dMarkDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "markdelay");
+		auto dJumpDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "jumpdelay");
+		auto dPolygonDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "polygondelay");
+
+		auto sCorrectionResourceName = pStateEnvironment->GetStringParameter("correction", "resourcename");
+		auto nTableIndex = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tableindex");
+		auto nDimension = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "dimension");
+		auto nTableNumberHeadA = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tablenumbera");
+		auto nTableNumberHeadB = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tablenumberb");
+
+		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
+		pDriver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
+
+		std::string sFirmwareResource;
+		if (sIP.empty()) {
+			pStateEnvironment->LogMessage("Loading RTC PCI firmware...");
+			sFirmwareResource = "rtc6out";
+		}
+		else {
+			pStateEnvironment->LogMessage("Loading RTC Ethernet firmware...");
+			sFirmwareResource = "rtc6eth";
+		}
+
+		pDriver->LoadFirmware(sFirmwareResource, "rtc6rbf", "rtc6dat");
+
+		if (!pDriver->IsSimulationMode()) {
+			std::vector<uint8_t> CorrectionFileBuffer;
+			pStateEnvironment->LogMessage("Loading correction file...");
+			pStateEnvironment->LoadResourceData(sCorrectionResourceName, CorrectionFileBuffer);
+
+			pDriver->SetCorrectionFile(CorrectionFileBuffer, nTableIndex, nDimension, nTableNumberHeadA, nTableNumberHeadB);
+		}
+
+
+		pStateEnvironment->LogMessage("Configuring laser...");
+		pDriver->ConfigureLaserMode(LibMCDriver_ScanLab::eLaserMode::YAG1, LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1, dMaxLaserPower, false, false, true, true, false, false);
+
+		pStateEnvironment->LogMessage("Configuring delays...");
+		pDriver->ConfigureDelays(dLaserOnDelay, dLaserOffDelay, dMarkDelay, dJumpDelay, dPolygonDelay);
+		pStateEnvironment->LogMessage("Initialising done..");
+
+
+	}
+
 };
 
 /*************************************************************************************************************************
@@ -99,67 +189,16 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		pStateEnvironment->LogMessage("Initialising Raylase Driver");
-
-		auto pDriver = m_pPluginData->acquireRaylaseDriver(pStateEnvironment);
-		if (pStateEnvironment->GetBoolParameter("cardconfig", "simulatelaser")) {
-			pStateEnvironment->LogMessage("Laser Simulation enabled!...");
-			pDriver->SetToSimulationMode();
+		std::string sCardType = pStateEnvironment->GetStringParameter("cardconfig", "cardtype");
+		if (sCardType == "scanlab")
+		{
+			m_pPluginData->InitialiseScanlabDriver(pStateEnvironment);
 		}
-
-		if (!pDriver->IsSimulationMode()) {
-			pDriver->LoadSDK();
+		else if (sCardType == "raylase") {
+			m_pPluginData->InitialiseRaylaseDriver(pStateEnvironment);
 		}
-
-		auto sIP = pStateEnvironment->GetStringParameter("cardconfig", "ipaddress");
-		auto nPort = pStateEnvironment->GetIntegerParameter("cardconfig", "port");
-		auto sNetmask = pStateEnvironment->GetStringParameter("cardconfig", "netmask");
-		auto nTimeout = pStateEnvironment->GetIntegerParameter("cardconfig", "timeout");
-		auto nSerial = pStateEnvironment->GetIntegerParameter("cardconfig", "serial");
-		auto dMaxLaserPower = pStateEnvironment->GetDoubleParameter("cardconfig", "maxlaserpower");
-		auto dLaserOnDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "laserondelay");
-		auto dLaserOffDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "laseroffdelay");
-		auto dMarkDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "markdelay");
-		auto dJumpDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "jumpdelay");
-		auto dPolygonDelay = pStateEnvironment->GetDoubleParameter("cardconfig", "polygondelay");
-
-		pStateEnvironment->LogMessage("Connecting to Raylase card " + sIP + ":" +  std::to_string(nPort));
-		auto pCard = pDriver->ConnectByIP("card1", sIP, (uint32_t)nPort, dMaxLaserPower);
-
-/*		auto sCorrectionResourceName = pStateEnvironment->GetStringParameter("correction", "resourcename");
-		auto nTableIndex = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tableindex");
-		auto nDimension = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "dimension");
-		auto nTableNumberHeadA = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tablenumbera");
-		auto nTableNumberHeadB = (uint32_t)pStateEnvironment->GetIntegerParameter("correction", "tablenumberb");
-
-		pDriver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
-
-		std::string sFirmwareResource;
-		if (sIP.empty()) {
-			pStateEnvironment->LogMessage("Loading RTC PCI firmware...");
-			sFirmwareResource = "rtc6out";
-		}
-		else {
-			pStateEnvironment->LogMessage("Loading RTC Ethernet firmware...");
-			sFirmwareResource = "rtc6eth";
-		}
-
-		pDriver->LoadFirmware(sFirmwareResource, "rtc6rbf", "rtc6dat");
-
-		if (!pDriver->IsSimulationMode()) {
-			std::vector<uint8_t> CorrectionFileBuffer;
-			pStateEnvironment->LogMessage("Loading correction file...");
-			pStateEnvironment->LoadResourceData(sCorrectionResourceName, CorrectionFileBuffer);
-
-			pDriver->SetCorrectionFile(CorrectionFileBuffer, nTableIndex, nDimension, nTableNumberHeadA, nTableNumberHeadB);
-		}
-
-
-		pStateEnvironment->LogMessage("Configuring laser...");
-
-		pStateEnvironment->LogMessage("Configuring delays...");
-		pDriver->ConfigureDelays(dLaserOnDelay, dLaserOffDelay, dMarkDelay, dJumpDelay, dPolygonDelay);
-		pStateEnvironment->LogMessage("Initialising done.."); */
+		else
+			throw std::runtime_error("invalid scanner card type: " + sCardType);
 
 		pStateEnvironment->SetNextState("idle");
 
@@ -188,8 +227,17 @@ public:
 
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
-		auto pDriver = m_pPluginData->acquireRaylaseDriver(pStateEnvironment);
-		pDriver->QueryParameters();
+		std::string sCardType = pStateEnvironment->GetStringParameter("cardconfig", "cardtype");
+		if (sCardType == "scanlab")
+		{
+			auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
+			pDriver->QueryParameters();
+		}
+		else if (sCardType == "raylase") {
+			auto pDriver = m_pPluginData->acquireRaylaseDriver(pStateEnvironment);
+			pDriver->QueryParameters();
+		}
+
 		
 		LibMCEnv::PSignalHandler pHandlerInstance;
 		if (pStateEnvironment->WaitForSignal("signal_exposure", 0, pHandlerInstance)) {
@@ -233,10 +281,17 @@ public:
 		auto pBuildJob = pStateEnvironment->GetBuildJob(pSignalHandler->GetString("jobuuid"));
 		auto nLayerIndex = (uint32_t)pSignalHandler->GetInteger("layerindex");
 
-		auto pDriver = m_pPluginData->acquireRaylaseDriver(pStateEnvironment);
-		auto pCard = pDriver->GetConnectedCard("card1");
-
-		pCard->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		std::string sCardType = pStateEnvironment->GetStringParameter("cardconfig", "cardtype");
+		if (sCardType == "scanlab")
+		{
+			auto pDriver = m_pPluginData->acquireScanLabDriver(pStateEnvironment);
+			pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		}
+		else if (sCardType == "raylase") {
+			auto pDriver = m_pPluginData->acquireRaylaseDriver(pStateEnvironment);
+			auto pCard = pDriver->GetConnectedCard("card1");
+			pCard->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		}
 
 		pSignalHandler->SetBoolResult("success", true);
 		pSignalHandler->SignalHandled();
