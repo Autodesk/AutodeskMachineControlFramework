@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_ui_expression.hpp"
 
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
@@ -145,20 +146,24 @@ std::string CUIHandler::getCopyrightString()
     return m_sCopyrightString;
 }
 
-void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
+void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sDescription, const std::string& sTargetPage, const std::string& sEventName)
 {
     std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-    auto pPage = findPage (sTargetPage);    
-    m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption, pPage));
+    PUIPage pPage;
+    if (!sTargetPage.empty ())
+        pPage = findPage(sTargetPage);
+    m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption, sDescription, sTargetPage, sEventName));
 }
 
-void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
+void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName)
 {
     std::lock_guard<std::mutex> lockGuard(m_Mutex);
     
-    auto pPage = findPage(sTargetPage);
-    m_ToolbarItems.push_back(std::make_shared<CUIToolbarItem> (sID, sIcon, sCaption, pPage));
+    PUIPage pPage;
+    if (!sTargetPage.empty())
+        pPage = findPage(sTargetPage);
+    m_ToolbarItems.push_back(std::make_shared<CUIToolbarItem> (sID, sIcon, sCaption, sTargetPage, sEventName));
 }
 
 PUIPage CUIHandler::findPage(const std::string& sName)
@@ -181,8 +186,16 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler
     writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
     writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
 
-    if (!m_sLoginBackgroundUUID.empty ())
-        writer.addString(AMC_API_KEY_UI_LOGINBACKGROUNDUUID, m_sLoginBackgroundUUID);
+    if (!m_ToolbarLogoResourceName.empty()) {
+        auto pToolbarLogoResource = m_pCoreResourcePackage->findEntryByName(m_ToolbarLogoResourceName, true);
+        writer.addString(AMC_API_KEY_UI_TOOLBARLOGOUUID, pToolbarLogoResource->getUUID());
+    }
+
+    if (!m_LoginBackgroundUUID.isEmpty(m_pStateMachineData)) {
+        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(m_LoginBackgroundUUID.evaluateStringValue (m_pStateMachineData), true);
+        writer.addString(AMC_API_KEY_UI_LOGINBACKGROUNDUUID, pResourceEntry->getUUID ());
+    }
+    writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(m_pStateMachineData));
 
     CJSONWriterObject colorsObject(writer);
     for (auto color : m_Colors) {
@@ -210,8 +223,10 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClien
 		menuItem.addString(AMC_API_KEY_UI_ID, iter->getID ());
 		menuItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon ());
 		menuItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption ());
-		menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPage()->getName ());
-		menuItems.addObject(menuItem);
+        menuItem.addString(AMC_API_KEY_UI_DESCRIPTION, iter->getDescription());
+        menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
+        menuItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
+        menuItems.addObject(menuItem);
 	}
 
 	writer.addArray(AMC_API_KEY_UI_MENUITEMS, menuItems);
@@ -223,10 +238,12 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClien
 		toolbarItem.addString(AMC_API_KEY_UI_ID, iter->getID());
 		toolbarItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon());
 		toolbarItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption());
-        toolbarItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPage()->getName());
+        toolbarItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
+        toolbarItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
         toolbarItems.addObject(toolbarItem);
 	}
 	writer.addArray(AMC_API_KEY_UI_TOOLBARITEMS, toolbarItems);
+
 
     CJSONWriterArray pages(writer);
     for (auto iter : m_Pages) {
@@ -395,12 +412,8 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
 
     auto loginNode = xmlNode.child("login");
     if (!loginNode.empty()) {
-        auto backgroundResource = loginNode.attribute("backgroundresource");
-        if (!backgroundResource.empty()) {
-            auto pResourceEntry = pResourcePackage->findEntryByName(backgroundResource.as_string(), true);
-            m_sLoginBackgroundUUID = pResourceEntry->getUUID();
-        }
-
+        m_LoginBackgroundUUID = CUIExpression(loginNode, "backgroundresource", "");
+        m_LoginWelcomeMessage = CUIExpression(loginNode, "welcomemessage", "");
     }
 
 
@@ -491,16 +504,20 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         if (captionAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMCAPTION);
 
-        auto targetPageAttrib = menuItem.attribute("targetpage");
-        if (targetPageAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
+        auto descriptionAttrib = menuItem.attribute("description");
 
-        addMenuItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
+        auto targetPageAttrib = menuItem.attribute("targetpage");
+        auto eventNameAttrib = menuItem.attribute("event");
+
+        addMenuItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), descriptionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string ());
     }
 
     auto toolbarNode = xmlNode.child("toolbar");
     if (toolbarNode.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARNODE);
+
+    auto toolbarLogoResourceAttrib = toolbarNode.attribute("logoresource");
+    m_ToolbarLogoResourceName = toolbarLogoResourceAttrib.as_string();
 
     auto toolbarItems = toolbarNode.children("item");
     for (pugi::xml_node toolbarItem : toolbarItems) {
@@ -517,10 +534,9 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION);
 
         auto targetPageAttrib = toolbarItem.attribute("targetpage");
-        if (targetPageAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
+        auto eventNameAttrib = toolbarItem.attribute("event");
 
-        addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
+        addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string());
     }
 
     auto pMainPage = findPage (sMainPage);

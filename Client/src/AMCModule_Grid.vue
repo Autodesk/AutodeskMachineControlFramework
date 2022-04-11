@@ -10,6 +10,7 @@
 					<Module_GLScene :key="moduleSection.name" v-if="(moduleSection.type == 'glscene')" :module="moduleSection" :Application="Application" />
 					<Module_Graphic :key="moduleSection.name" v-if="(moduleSection.type == 'graphic')" :module="moduleSection" :Application="Application" />
 					<Module_LayerView :key="moduleSection.name" v-if="(moduleSection.type == 'layerview')" :module="moduleSection" :Application="Application" />
+					<Module_Logs :key="moduleSection.name" v-if="(moduleSection.type == 'logs')" :module="moduleSection" :Application="Application" />
 				</div>
 						
 			</template>	
@@ -24,6 +25,7 @@
 	import Module_Tabs from "./AMCModule_Tabs.vue";
 	import Module_GLScene from "./AMCModule_GLScene.vue";
 	import Module_Graphic from "./AMCModule_Graphic.vue";
+	import Module_Logs from "./AMCModule_Logs.vue";
 	import Module_LayerView from "./AMCModule_LayerView.vue";
 
 	export default {
@@ -31,6 +33,7 @@
 	  
 		components: {
 			Module_Content,
+			Module_Logs,
 			Module_Tabs,
 			Module_GLScene,
 			Module_Graphic,

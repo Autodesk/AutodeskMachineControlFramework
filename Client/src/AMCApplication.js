@@ -39,6 +39,7 @@ import AMCApplicationModule_GLScene from "./AMCModule_GLScene.js"
 import AMCApplicationModule_Graphic from "./AMCModule_Graphic.js"
 import AMCApplicationModule_Grid from "./AMCModule_Grid.js"
 import AMCApplicationModule_Tabs from "./AMCModule_Tabs.js"
+import AMCApplicationModule_Logs from "./AMCModule_Logs.js"
 import AMCApplicationModule_LayerView from "./AMCModule_LayerView.js"
 
 import AMCApplicationPage from "./AMCPage.js"
@@ -48,7 +49,7 @@ import AMCUpload from "./AMCImplementation_Upload.js"
 
 export default class AMCApplication extends Common.AMCObject {
 
-    constructor(apiBaseURL) {
+    constructor(apiBaseURL, uiResizeEvent) {
 		
 		super ();
 		this.registerClass ("amcApplication");
@@ -63,16 +64,19 @@ export default class AMCApplication extends Common.AMCObject {
             currentStatus: "initial", // one of "initial" / "login" / "ready" / "error",
             currentError: "",
             activePage: "",
+			appResizeEvent: uiResizeEvent,
             WebGLInstances: new Map()
         }
 
         this.AppDefinition = {
             TextApplicationName: "",
+			ToolbarLogoUUID: "",
             TextCopyRight: "",
             MainPage: "",
             LogoUUID: "",
             LogoAspectRatio: 1.0,
 			LoginBackgroundImageUUID: "",
+			LoginWelcomeMessage: "",
             Colors: {}
         }
 
@@ -93,6 +97,8 @@ export default class AMCApplication extends Common.AMCObject {
     setStatus(newStatus) {
         this.AppState.currentStatus = newStatus;
         this.AppState.currentError = "";
+		if (this.AppState.appResizeEvent)
+			this.AppState.appResizeEvent ();
     }
 
     setStatusToError(message) {
@@ -155,7 +161,9 @@ export default class AMCApplication extends Common.AMCObject {
             this.AppDefinition.MainPage = resultJSON.data.mainpage;
             this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
             this.AppDefinition.LoginBackgroundImageUUID = resultJSON.data.loginbackgrounduuid;
-			
+			this.AppDefinition.ToolbarLogoUUID = resultJSON.data.toolbarlogouuid;
+			this.AppDefinition.LoginWelcomeMessage = resultJSON.data.loginwelcomemessage;
+
             this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
             if (resultJSON.data.colors) {
                 this.AppDefinition.Colors = resultJSON.data.colors;
@@ -256,6 +264,9 @@ export default class AMCApplication extends Common.AMCObject {
 
 		if (moduleDefinitionJSON.type === "tabs") 
 			return new AMCApplicationModule_Tabs (page, moduleDefinitionJSON);
+
+		if (moduleDefinitionJSON.type === "logs") 
+			return new AMCApplicationModule_Logs (page, moduleDefinitionJSON);
 
 		if (moduleDefinitionJSON.type === "layerview") 
 			return new AMCApplicationModule_LayerView (page, moduleDefinitionJSON);
@@ -527,6 +538,9 @@ export default class AMCApplication extends Common.AMCObject {
 
         let pageString = String(page);
         this.AppState.activePage = pageString;
+		
+		if (this.AppState.appResizeEvent)
+			this.AppState.appResizeEvent ();
 
     }
 
@@ -548,6 +562,10 @@ export default class AMCApplication extends Common.AMCObject {
                 dialogObject.dialogIsActive = true;
             }
         }
+		
+		if (this.AppState.appResizeEvent)
+			this.AppState.appResizeEvent ();
+		
 
     }
 

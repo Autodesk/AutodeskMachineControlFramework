@@ -68,7 +68,7 @@ std::string CUIModule_LayerViewPlatformItem::findElementPathByUUID(const std::st
 	if (sUUID == getUUID())
 		return getItemPath();
 
-	return nullptr;
+	return "";
 }
 
 void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)

@@ -48,20 +48,23 @@ namespace AMC {
 		std::string m_sIcon;
 		std::string m_sCaption;
 
-		PUIPage m_pPage;
+		std::string m_sPageName;
+		std::string m_sEventName;
 		
+		std::string m_sDescription;
+
 	public:
 
-		CUIMenuItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption, PUIPage pPage);
+		CUIMenuItem(const std::string & sID, const std::string & sIcon, const std::string & sCaption, const std::string & sDescription, const std::string& sPageName, const std::string & sEventName);
 		
 		virtual ~CUIMenuItem();
 						
 		std::string getID ();
 		std::string getIcon ();
 		std::string getCaption ();
-
-		PUIPage getPage();
-
+		std::string getDescription();
+		std::string getEventName();
+		std::string getPageName();
 	};
 	
 	typedef std::shared_ptr<CUIMenuItem> PUIMenuItem;

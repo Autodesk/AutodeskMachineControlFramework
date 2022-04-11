@@ -38,11 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage (pPage)
+CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sDescription, const std::string& sPageName, const std::string& sEventName)
+	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_sDescription (sDescription), m_sPageName (sPageName), m_sEventName (sEventName)
 {
-	if (pPage.get() == nullptr)
-		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
 }
 
@@ -66,7 +64,17 @@ std::string CUIMenuItem::getCaption()
 	return m_sCaption;
 }
 
-PUIPage CUIMenuItem::getPage()
+std::string CUIMenuItem::getDescription()
 {
-	return m_pPage;
+	return m_sDescription;
+}
+
+std::string CUIMenuItem::getEventName()
+{
+	return m_sEventName;
+}
+
+std::string CUIMenuItem::getPageName()
+{
+	return m_sPageName;
 }

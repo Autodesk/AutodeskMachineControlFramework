@@ -1,47 +1,32 @@
 <template>
 <v-app id="AMCApp" app>
-    <v-navigation-drawer v-if="appIsReady" v-model="ShowDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app>
-        <v-list dense>
-            <template v-for="item in Application.AppContent.MenuItems">
-                <v-list-group v-if="item.children" :key="item.caption" v-model="item.model" :prepend-icon="item.model ? item.icon : item['icon-alt']">
-                    <template v-slot:activator>
-                        <v-list-item-content>
-                            <v-list-item-title v-on:click.stop="Application.changePage(item.targetpage)">
-                                {{ item.caption }}
-                            </v-list-item-title>
-                        </v-list-item-content>
-                    </template>
-
-                    <v-list-item v-for="(child, i) in item.children" :key="i" link v-on:click.stop="Application.changePage(child.targetPage)">
-                        <v-list-item-action v-if="child.icon">
-                            <v-icon>{{ child.icon }}</v-icon>
-                        </v-list-item-action>
-                        <v-list-item-content>
-                            <v-list-item-title>
-                                {{ child.text }}
-                            </v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                </v-list-group>
-
-                <v-list-item v-else :key="item.caption" link v-on:click.stop="Application.changePage(item.targetpage)">
-                    <v-list-item-action>
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>
-                            {{ item.caption }}
-                        </v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+    <v-navigation-drawer v-if="appIsReady" v-model="ShowDrawer" clipped :clipped-left="$vuetify.breakpoint.lgAndUp" disable-resize-watcher app style="opacity:90%">
+        <v-list three-line dense>
+            <template v-for="(item, index) in Application.AppContent.MenuItems">                
+									  
+						  <v-list-item :key="item.uuid" v-on:click="Application.changePage(item.targetpage)"
+						  >
+							<v-list-item-avatar >
+							  <v-icon>{{ item.icon }}</v-icon>
+							</v-list-item-avatar>
+				  
+							<v-list-item-content>
+							  <v-list-item-title v-html="item.caption"></v-list-item-title>
+							  <v-list-item-subtitle v-html="item.description"></v-list-item-subtitle>
+							</v-list-item-content>
+						  </v-list-item>
+						  						  
+						  <v-divider
+							:key="index"
+						  ></v-divider>
             </template>
         </v-list>
     </v-navigation-drawer>
 
     <v-app-bar app color="primary" dark v-if="appIsReady" :clipped-left="$vuetify.breakpoint.lgAndUp">
-        <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />
-        <v-btn text large  dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
-            {{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }} 
+        <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />		
+        <v-btn text large dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
+            <v-img v-if="Application.AppDefinition.ToolbarLogoUUID != ''" width="150" v-bind:src="Application.getImageURL (Application.AppDefinition.ToolbarLogoUUID)"></v-img>
         </v-btn>
 
         <v-spacer />
@@ -53,7 +38,7 @@
         </template>
     </v-app-bar>
 
-	<v-main app v-bind:style="appMainStyle">
+	<v-main app v-bind:style="appMainStyle" v-resize="uiUpdateAppSize">
         <v-container class="fill-height" fluid v-if="appIsLoading">
             <v-row align="center" justify="center">
                 <v-progress-circular :value="20" indeterminate></v-progress-circular>
@@ -77,6 +62,7 @@
 							<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
 							<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 							<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
+							<Module_Logs :key="uiModule.name" v-if="(uiModule.type == 'logs')" :module="uiModule" :Application="Application" />							
 							<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
 							<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
 							<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
@@ -108,6 +94,7 @@
 					<Module_Content :key="uiModule.name" v-if="(uiModule.type == 'content')" :module="uiModule" :Application="Application" />					
 					<Module_Tabs :key="uiModule.name" v-if="(uiModule.type == 'tabs')" :module="uiModule" :Application="Application" />							
 					<Module_Grid :key="uiModule.name" v-if="(uiModule.type == 'grid')" :module="uiModule" :Application="Application" />							
+					<Module_Logs :key="uiModule.name" v-if="(uiModule.type == 'logs')" :module="uiModule" :Application="Application" />							
 					<Module_GLScene :key="uiModule.name" v-if="(uiModule.type == 'glscene')" :module="uiModule" :Application="Application" />
 					<Module_Graphic :key="uiModule.name" v-if="(uiModule.type == 'graphic')" :module="uiModule" :Application="Application" />
 					<Module_LayerView :key="uiModule.name" v-if="(uiModule.type == 'layerview')" :module="uiModule" :Application="Application" />
@@ -143,6 +130,7 @@
 	import Module_GLScene from "./AMCModule_GLScene.vue";
 	import Module_Graphic from "./AMCModule_Graphic.vue";
 	import Module_LayerView from "./AMCModule_LayerView.vue";
+	import Module_Logs from "./AMCModule_Logs.vue";
 	
 	export default {
 
@@ -154,11 +142,16 @@
 				baseURL = "http://localhost:8869/api";
 			}
 			
-			this.Application = new AMCApplication (baseURL);
+			this.Application = new AMCApplication (baseURL, this.uiUpdateAppSizeDeferred);
 			this.Application.retrieveConfiguration(this.$vuetify.theme.themes);
-						
+								
 		},
 		
+		mounted() 
+		{
+			this.uiUpdateAppSizeDeferred ();
+		},
+				
 
 		beforeDestroy() {
 			if (this.GlobalTimer) {
@@ -231,25 +224,8 @@
 				//}
 				return mainStyle;
 
-			},
+			}					
 			
-			appContentHeight() {
-				return window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top;
-			},
-			
-			appContentDivStyle ()
-			{
-				let height = window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top;
-				let style = "height: " + height + "px; padding-top: 20px;";
-				return style;
-			},
-			
-			appContentCardStyle ()
-			{
-				let height = window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top - 40;
-				let style = "height: " + height + "px; background: rgba(255.0, 255.0, 255.0, 0.9); overflow:auto; margin:auto";
-				return style;
-			}
 			
 		},
 		
@@ -258,6 +234,7 @@
 			Dialog_Error,
 			Module_Content,
 			Module_Tabs,
+			Module_Logs,
 			Module_GLScene,
 			Module_Graphic,
 			Module_Grid,
@@ -266,7 +243,6 @@
 
 		methods: {
 			
-
 
 			uiButtonCaptionCheck(caption) {
 				var size = this.$vuetify.breakpoint.name;
@@ -285,6 +261,28 @@
 				if (this.Application) {
 					this.Application.updateContentItems ();			
 				}													
+			},
+			
+			uiUpdateAppSizeDeferred() {
+				setTimeout(() => {
+					this.uiUpdateAppSize ();			
+				})
+			},
+
+			uiUpdateAppSize () {
+
+				let height = window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top;
+				let style = "height: " + height + "px; padding-top: 20px;";
+				if (style != this.appContentDivStyle) {
+					this.appContentDivStyle = style;
+				}
+
+				height = window.innerHeight - this.$vuetify.application.footer - this.$vuetify.application.top - 40;
+				style = "height: " + height + "px; background: rgba(255.0, 255.0, 255.0, 0.9); overflow:auto; margin:auto";
+				if (style != this.appContentCardStyle) {
+					this.appContentCardStyle = style;
+				}
+				
 			}
 						
 		},
@@ -294,6 +292,9 @@
 			Application: null,
 			GlobalTimer: null,
 			ShowDrawer: true,
+			appContentDivStyle: "",
+			appContentCardStyle: ""
+			
 		
 		})
 	};

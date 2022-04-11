@@ -12,16 +12,13 @@
 							<div class="text-right" style="width:90%; margin:auto; ">
 
 							<div class="text-center">
-								<p style="padding:20px">Welcome to the Autodesk Machine Control Framework.
-								This is SLM Test Machine 1. Please enter your account credential to log into the system.
+								<p style="padding:20px">{{ Application.AppDefinition.LoginWelcomeMessage }}
 								</p>
 							</div>
 
 							<v-sheet v-if="uiUserSheet">
 														
-								<v-form>
-									<v-text-field ref="edit_login" label="User name" prepend-icon="mdi-account" type="text" v-model="uiLoginUser" autofocus clearable @keydown.enter="uiNextClick" />
-								</v-form>
+								<v-text-field ref="edit_login" label="User name" prepend-icon="mdi-account" type="text" v-model="uiLoginUser" autofocus clearable @keydown.enter="uiNextClick" />
 						
 								<v-btn v-on:click="uiNextClick"
 								class="ma-1"
@@ -33,9 +30,8 @@
 							</v-sheet>
 							<v-sheet v-if="!uiUserSheet">
 														
-								<v-form>
-									<v-text-field ref="edit_password" label="Password" prepend-icon="mdi-lock" type="password" clearable v-model="uiLoginPassword" @keydown.enter="uiLoginClick" />
-								</v-form>
+								<v-text-field ref="edit_password" label="Password" prepend-icon="mdi-lock" type="password" clearable v-model="uiLoginPassword" @keydown.enter="uiLoginClick" />
+
 								<v-btn class="ma-1"
 								color="primary"
 								plain v-on:click="uiBackClick">
@@ -80,7 +76,7 @@ export default {
 	
 
   methods: {
-  
+
 		uiResetClick () {
 			this.uiLoginUser = "";
 			this.uiLoginPassword = "";

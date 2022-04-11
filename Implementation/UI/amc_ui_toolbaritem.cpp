@@ -38,10 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIToolbarItem::CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_pPage(pPage)
+CUIToolbarItem::CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sPageName, const std::string& sEventName)
+	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_sPageName(sPageName), m_sEventName (sEventName)
 {
-	LibMCAssertNotNull(pPage.get());
 
 }
 
@@ -65,7 +64,13 @@ std::string CUIToolbarItem::getCaption()
 	return m_sCaption;
 }
 
-PUIPage CUIToolbarItem::getPage()
+
+std::string CUIToolbarItem::getEventName()
 {
-	return m_pPage;
+	return m_sEventName;
+}
+
+std::string CUIToolbarItem::getPageName()
+{
+	return m_sPageName;
 }

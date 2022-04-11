@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "header_pugixml.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_ui_interfaces.hpp"
+#include "amc_ui_expression.hpp"
 
 #include <memory>
 #include <vector>
@@ -107,7 +108,10 @@ namespace AMC {
 		std::string m_sCopyrightString;
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
-		std::string m_sLoginBackgroundUUID;
+
+		CUIExpression m_LoginBackgroundUUID;
+		CUIExpression m_LoginWelcomeMessage;
+
 		std::string m_sMainPageName;
 
 		PStateMachineData m_pStateMachineData;
@@ -116,6 +120,7 @@ namespace AMC {
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
+		std::string m_ToolbarLogoResourceName;
 
 		std::map <std::string, PUIPage> m_Pages;
 		std::map <std::string, PUIDialog> m_Dialogs;
@@ -126,8 +131,8 @@ namespace AMC {
 		LibMCUI::PEventHandler m_pUIEventHandler;
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
-		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
-		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string & sDescription, const std::string& sTargetPage, const std::string & sEventName);
+		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName);
 
 		PUIPage addPage_Unsafe (const std::string& sName);
 
