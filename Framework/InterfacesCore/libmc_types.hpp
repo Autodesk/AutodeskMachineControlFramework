@@ -455,6 +455,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDTRANSFORMINTERVAL 428
 #define LIBMC_ERROR_INVALIDTRANSFORMCOORDINATE 429
 #define LIBMC_ERROR_SUCCESSSTATENOTFOUND 430
+#define LIBMC_ERROR_DUPLICATESERVERPRIVATEKEY 431
+#define LIBMC_ERROR_DUPLICATESERVERCERTIFICATE 432
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -822,6 +824,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDTRANSFORMINTERVAL: return "Invalid transform interval";
     case LIBMC_ERROR_INVALIDTRANSFORMCOORDINATE: return "Invalid transform coordinate";
     case LIBMC_ERROR_SUCCESSSTATENOTFOUND: return "success state not found";
+    case LIBMC_ERROR_DUPLICATESERVERPRIVATEKEY: return "duplicate server private key";
+    case LIBMC_ERROR_DUPLICATESERVERCERTIFICATE: return "duplicate server certificate";
     default: return "unknown error";
   }
 }

@@ -28,6 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifdef _WIN32
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#endif
+
 #include "Libraries/cpp-httplib/httplib.h"
 
 #include "amc_server.hpp"
@@ -38,7 +42,123 @@ using namespace AMC;
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
+#define PEMMAXLENGTH (1024 * 1024)
 
+#ifdef _WIN32
+class CX509Certificate {
+private:
+	BIO * m_pIOObject;
+	X509* m_pX509Object;
+public:
+	CX509Certificate()
+		: m_pIOObject (nullptr), m_pX509Object (nullptr)
+	{
+
+	}
+
+	CX509Certificate::~CX509Certificate()
+	{
+		clear();
+	}
+
+	void clear()
+	{
+		if (m_pX509Object != nullptr) {
+			X509_free(m_pX509Object);
+			m_pX509Object = nullptr;
+		}
+
+		if (m_pIOObject != nullptr) {
+			BIO_free(m_pIOObject);
+			m_pIOObject = nullptr;
+		}
+
+	}
+
+	void setPEM(const std::string& sPEMString)
+	{
+		if (sPEMString.length() > PEMMAXLENGTH)
+			throw std::runtime_error("invalid PEM string");
+
+		clear();
+
+		m_pIOObject = BIO_new(BIO_s_mem());
+		BIO_write(m_pIOObject, sPEMString.c_str (), (int32_t) sPEMString.length ());
+		BIO_seek(m_pIOObject, 0);
+
+		m_pX509Object = PEM_read_bio_X509(m_pIOObject, nullptr, 0, 0);
+	}
+
+	X509* getCertificate()
+	{
+		if (m_pX509Object == nullptr)
+			throw std::runtime_error("invalid X509 Certificate");
+
+		return m_pX509Object;
+	}
+	
+
+};
+
+
+
+class CServerPrivateKey {
+private:
+	BIO* m_pIOObject;
+	EVP_PKEY* m_pPKeyObject;
+public:
+	CServerPrivateKey()
+		: m_pIOObject(nullptr), m_pPKeyObject(nullptr)
+	{
+
+	}
+
+	CServerPrivateKey::~CServerPrivateKey()
+	{
+		clear();
+	}
+
+	void clear()
+	{
+		if (m_pPKeyObject != nullptr) {
+			EVP_PKEY_free(m_pPKeyObject);
+			m_pPKeyObject = nullptr;
+		}
+
+		if (m_pIOObject != nullptr) {
+			BIO_free(m_pIOObject);
+			m_pIOObject = nullptr;
+		}
+
+	}
+
+	void setPEM(const std::string& sPEMString)
+	{
+		if (sPEMString.length() > PEMMAXLENGTH)
+			throw std::runtime_error("invalid PEM string");
+
+		clear();
+
+		m_pIOObject = BIO_new(BIO_s_mem());
+		BIO_write(m_pIOObject, sPEMString.c_str(), (int32_t)sPEMString.length());
+		BIO_seek(m_pIOObject, 0);
+
+		m_pPKeyObject = PEM_read_bio_PrivateKey(m_pIOObject, nullptr, 0, 0);
+
+	}
+
+	EVP_PKEY* getPrivateKey()
+	{
+		if (m_pPKeyObject == nullptr)
+			throw std::runtime_error("invalid Private Key");
+
+		return m_pPKeyObject;
+	}
+
+
+};
+
+#endif // _WIN32
 
 CServer::CServer(PServerIO pServerIO)
 	: m_pServerIO (pServerIO)
@@ -83,8 +203,8 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 		log("Loading server configuration...");
 
-		std::string sConfigurationXML = m_pServerIO->readConfigurationXMLString(sConfigurationFileName);
-		m_pServerConfiguration = std::make_shared<CServerConfiguration>(sConfigurationXML);
+		std::string sConfigurationXML = m_pServerIO->readConfigurationString(sConfigurationFileName);
+		m_pServerConfiguration = std::make_shared<CServerConfiguration>(sConfigurationXML, m_pServerIO);
 
 		log("Loading data model...");
 
@@ -114,7 +234,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 		}
 
 		m_pContext->Log("Loading " + m_pServerConfiguration->getPackageName() + " (" + m_pServerConfiguration->getPackageConfig() + ")", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
-		std::string sPackageConfigurationXML = m_pServerIO->readConfigurationXMLString(m_pServerConfiguration->getPackageConfig());
+		std::string sPackageConfigurationXML = m_pServerIO->readConfigurationString(m_pServerConfiguration->getPackageConfig());
 
 		m_pContext->Log("Parsing package configuration", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
 		m_pContext->ParseConfiguration(sPackageConfigurationXML);
@@ -123,18 +243,12 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 		m_pContext->LoadClientPackage(m_pServerConfiguration->getPackageCoreClient());
 
 
-		m_pContext->StartAllThreads();
-
-
 		std::string sHostName = m_pServerConfiguration->getHostName();
 		uint32_t nPort = m_pServerConfiguration->getPort();
 
 
 
 		try {
-
-			httplib::Server svr;
-
 
 			auto requestHandler = [this](const httplib::Request& req, httplib::Response& res) {
 				try {
@@ -209,16 +323,55 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 			};
 
 
+			if (m_pServerConfiguration->useSSL()) {
 
-			svr.Get("(.*?)", requestHandler);
-			svr.Post("(.*?)", requestHandler);
-			svr.Put("(.*?)", requestHandler);
+#ifdef _WIN32
 
-			svr.listen(sHostName.c_str(), nPort);
+				CX509Certificate serverCertificate;
+				CServerPrivateKey privateKey;
+
+				try {
+					serverCertificate.setPEM(m_pServerConfiguration->getServerCertificatePEM());
+					privateKey.setPEM(m_pServerConfiguration->getServerPrivateKeyPEM());
+
+					httplib::SSLServer sslsvr(serverCertificate.getCertificate(), privateKey.getPrivateKey());
+
+					sslsvr.Get("(.*?)", requestHandler);
+					sslsvr.Post("(.*?)", requestHandler);
+					sslsvr.Put("(.*?)", requestHandler);
+					sslsvr.listen(sHostName.c_str(), nPort);
+					m_pContext->TerminateAllThreads();
+
+				}
+				catch (std::exception & E) {
+					this->log("Fatal error: " + std::string(E.what()));
+
+					m_pContext->TerminateAllThreads();
+					throw;
+				}
+#else
+				throw std::runtime_error("SSL support is not implemented on this platform!");
+
+#endif // _WIN32
+			}
+			else {
+
+				httplib::Server svr;
+				svr.Get("(.*?)", requestHandler);
+				svr.Post("(.*?)", requestHandler);
+				svr.Put("(.*?)", requestHandler);
+				svr.listen(sHostName.c_str(), nPort);
+
+				m_pContext->TerminateAllThreads();
+			}
+
+			
 
 			this->log("Failed to listen on " + sHostName + ":" + std::to_string(nPort));
+
 		}
 		catch (std::exception& E) {
+
 			this->log("Fatal error while listening on " + sHostName + ":" + std::to_string(nPort));
 			this->log(E.what());
 		}

@@ -53,7 +53,7 @@ void CServerStdIO::logMessageString(const std::string& sMessage)
 }
 
 
-std::string CServerStdIO::readConfigurationXMLString(const std::string& sFileName)
+std::string CServerStdIO::readConfigurationString(const std::string& sFileName)
 {
 	AMCCommon::CImportStream_Native importStream(sFileName);
 	return importStream.readAsString();

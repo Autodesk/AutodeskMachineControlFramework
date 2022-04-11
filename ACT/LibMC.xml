@@ -456,6 +456,10 @@
 		<error name="INVALIDTRANSFORMINTERVAL" code="428" description="Invalid transform interval" />
 		<error name="INVALIDTRANSFORMCOORDINATE" code="429" description="Invalid transform coordinate" />		
 		<error name="SUCCESSSTATENOTFOUND" code="430" description="success state not found" />
+		
+		<error name="DUPLICATESERVERPRIVATEKEY" code="431" description="duplicate server private key" />
+		<error name="DUPLICATESERVERCERTIFICATE" code="432" description="duplicate server certificate" />
+		
 
 		  
 	</errors>

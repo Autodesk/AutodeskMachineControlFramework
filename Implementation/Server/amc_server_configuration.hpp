@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 
 #include "libmcdata_dynamic.hpp"
+#include "amc_server_io.hpp"
 
 
 namespace AMC {
@@ -71,11 +72,15 @@ namespace AMC {
 		std::string m_sPackageCoreClient;
 		std::string m_sPackageConfig;
 
+		bool m_bUseSSL;
+		std::string m_sServerCertificatePEM;
+		std::string m_sServerPrivateKeyPEM;
+
 		std::map<std::string, PServerLibrary> m_Libraries;
 
 	public:
 
-		CServerConfiguration(const std::string & configurationXMLString);
+		CServerConfiguration(const std::string & configurationXMLString, PServerIO pServerIO);
 		virtual ~CServerConfiguration();
 
 		std::string getHostName ();
@@ -89,6 +94,10 @@ namespace AMC {
 
 		std::string getLibraryPath(const std::string & sLibraryName);
 		std::string getResourcePath(const std::string& sLibraryName);
+
+		bool useSSL();
+		std::string getServerCertificatePEM();
+		std::string getServerPrivateKeyPEM();
 
 		std::set<std::string> getLibraryNames ();
 
