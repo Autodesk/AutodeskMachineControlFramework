@@ -218,7 +218,10 @@
 
 		<logo resource="ui_logo" aspectratio="3.0"/>
 
-    <login backgroundresource="login_background" />
+    <login 
+				backgroundresource="login_background" 
+        welcomemessage="Welcome to the Autodesk Machine Control Framework. This is SLM Test Machine 1. Please enter your account credential to log into the system."        
+		/>
 
 		<colors>
 			<color name="primary" red="0.00" green="0.0" blue="0.0"/>
@@ -535,11 +538,10 @@
 
 					<content name="part list" caption="Part List">
 					
-					</content>	
+					</content>
 
-					<content name="systemstate" caption="Log Messages">
-					
-					</content>					
+          <logs name="systemlog" caption="Log Messages">
+          </logs>
 				
 				</tabs>
 				
@@ -547,6 +549,14 @@
 			</grid>
 		</page>
 
+
+    <page name="manualcontrol">
+
+      <content name="control" title="Manual control">
+      </content>
+
+    </page>
+    
 		<page name="buildreport">
 
 			<glscene name="manualcontrol3">
@@ -570,23 +580,40 @@
 					<entry statemachine="laser" group="sdkstate"/>
 
 				</parameterlist>
-			</content>
+
+      </content>
 
 		</page>
 
-		<menu>
-			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="buildlist" icon="mdi-apps" caption="Build Library" targetpage="buildlist"/>
-			<item id="preparebuild" icon="mdi-apps" caption="Prepare Build" targetpage="preparebuild"/>
-			<item id="buildstatus" icon="mdi-apps" caption="Build Status" targetpage="buildstatus"/>
-			<item id="buildreport" icon="mdi-apps" caption="Build Report" targetpage="buildreport"/>
-			<item id="systemstatus" icon="mdi-apps" caption="System Status" targetpage="systemstatus"/>
-		</menu>
+    <page name="systemlog">
+
+      <content name="logs" title="System Logs">
+      </content>
+
+    </page>
+
+    <page name="settings">
+
+      <content name="settings" title="System Settings">
+      </content>
+
+    </page>
+
+    <menu>
+			<item id="buildlist" icon="mdi-library" description= "Upload build files and start build jobs." caption="Build Library" targetpage="buildlist"/>
+			<item id="buildprocess" icon="mdi-printer-3d" caption="Build Process" description="Manage and monitor current build process"  targetpage="buildstatus"/>
+      <item id="buildreport" icon="mdi-printer" caption="Build Reports" description="Browse and investigate build job history." targetpage="buildreport"/>
+      <item id="manualcontrol" icon="mdi-gamepad-variant" caption="Manual control" description="Manually control machine behaviour." targetpage="manualcontrol"/>
+      <item id="systemstatus" icon="mdi-factory" caption="Current Status" description="Display current machine status." targetpage="systemstatus"/>
+      <item id="systemlog" icon="mdi-book-open-variant" caption="System Logs" description="Browse and display stored system log files." targetpage="systemlog"/>
+      <item id="system settings" icon="mdi-wrench" caption="Settings" description="Change machine configuration details." targetpage="settings"/>
+    </menu>
 
 
-		<toolbar>
+		<toolbar logoresource="ui_toolbarlogo">
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-		</toolbar>
+      <item id="logout" icon="mdi-logout" caption="Log out"/>
+    </toolbar>
 
 
 	</userinterface>
