@@ -24,6 +24,14 @@ call npm run build
 cd ..\..\
 git log -n 1 --format="%%H" -- "Client" >"build_client\Client\dist\_githash_client.txt"
 git log -n 1 --format="%%H" -- "Client" >"Artifacts\clientdist\_githash_client.txt"
+SET /p CLIENTDIRHASH=<"build_client\Client\dist\_githash_client.txt"
+
+echo export function getClientGitHash ()> build_client\Client\src\AMCGitHash.js
+echo {>> build_client\Client\src\AMCGitHash.js
+echo   return "%CLIENTDIRHASH%";>> build_client\Client\src\AMCGitHash.js
+echo }>> build_client\Client\src\AMCGitHash.js
+
+
 cd build_client\Client
 
 go run ..\..\BuildScripts\createClientDist.go dist ..\..\Artifacts\clientdist\clientpackage.zip
