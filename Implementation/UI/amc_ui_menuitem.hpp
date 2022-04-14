@@ -45,6 +45,7 @@ namespace AMC {
 	class CUIMenuItem {
 	protected:
 		std::string m_sID;
+		std::string m_sUUID;
 		std::string m_sIcon;
 		std::string m_sCaption;
 
@@ -60,6 +61,7 @@ namespace AMC {
 		virtual ~CUIMenuItem();
 						
 		std::string getID ();
+		std::string getUUID();
 		std::string getIcon ();
 		std::string getCaption ();
 		std::string getDescription();

@@ -782,7 +782,13 @@ public:
 	inline void ActivateModalDialog(const std::string & sDialogName);
 	inline void CloseModalDialog();
 	inline void ActivatePage(const std::string & sPageName);
+	inline void LogOut();
+	inline void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS);
+	inline void ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const sColorRGB & Color, const sColorRGB & FontColor);
+	inline void HideHint();
+	inline std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent);
 	inline std::string RetrieveEventSender();
+	inline std::string RetrieveEventSenderUUID();
 	inline PSignalTrigger PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName);
 	inline std::string GetMachineState(const std::string & sMachineInstance);
 	inline void LogMessage(const std::string & sLogString);
@@ -1048,7 +1054,13 @@ public:
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
+		pWrapperTable->m_UIEnvironment_LogOut = nullptr;
+		pWrapperTable->m_UIEnvironment_ShowHint = nullptr;
+		pWrapperTable->m_UIEnvironment_ShowHintColored = nullptr;
+		pWrapperTable->m_UIEnvironment_HideHint = nullptr;
+		pWrapperTable->m_UIEnvironment_ShowMessageDlg = nullptr;
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = nullptr;
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = nullptr;
 		pWrapperTable->m_UIEnvironment_PrepareSignal = nullptr;
 		pWrapperTable->m_UIEnvironment_GetMachineState = nullptr;
 		pWrapperTable->m_UIEnvironment_LogMessage = nullptr;
@@ -2557,12 +2569,66 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_LogOut = (PLibMCEnvUIEnvironment_LogOutPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_logout");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_LogOut = (PLibMCEnvUIEnvironment_LogOutPtr) dlsym(hLibrary, "libmcenv_uienvironment_logout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_LogOut == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ShowHint = (PLibMCEnvUIEnvironment_ShowHintPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_showhint");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ShowHint = (PLibMCEnvUIEnvironment_ShowHintPtr) dlsym(hLibrary, "libmcenv_uienvironment_showhint");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ShowHint == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ShowHintColored = (PLibMCEnvUIEnvironment_ShowHintColoredPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_showhintcolored");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ShowHintColored = (PLibMCEnvUIEnvironment_ShowHintColoredPtr) dlsym(hLibrary, "libmcenv_uienvironment_showhintcolored");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ShowHintColored == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_HideHint = (PLibMCEnvUIEnvironment_HideHintPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_hidehint");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_HideHint = (PLibMCEnvUIEnvironment_HideHintPtr) dlsym(hLibrary, "libmcenv_uienvironment_hidehint");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_HideHint == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_ShowMessageDlg = (PLibMCEnvUIEnvironment_ShowMessageDlgPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_showmessagedlg");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_ShowMessageDlg = (PLibMCEnvUIEnvironment_ShowMessageDlgPtr) dlsym(hLibrary, "libmcenv_uienvironment_showmessagedlg");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_ShowMessageDlg == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = (PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrieveeventsender");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_RetrieveEventSender = (PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) dlsym(hLibrary, "libmcenv_uienvironment_retrieveeventsender");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = (PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_retrieveeventsenderuuid");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID = (PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr) dlsym(hLibrary, "libmcenv_uienvironment_retrieveeventsenderuuid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3469,8 +3535,32 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivatePage == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_logout", (void**)&(pWrapperTable->m_UIEnvironment_LogOut));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_LogOut == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_showhint", (void**)&(pWrapperTable->m_UIEnvironment_ShowHint));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ShowHint == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_showhintcolored", (void**)&(pWrapperTable->m_UIEnvironment_ShowHintColored));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ShowHintColored == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_hidehint", (void**)&(pWrapperTable->m_UIEnvironment_HideHint));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_HideHint == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_showmessagedlg", (void**)&(pWrapperTable->m_UIEnvironment_ShowMessageDlg));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ShowMessageDlg == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsender", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSender));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSender == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_retrieveeventsenderuuid", (void**)&(pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_RetrieveEventSenderUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_preparesignal", (void**)&(pWrapperTable->m_UIEnvironment_PrepareSignal));
@@ -5691,6 +5781,65 @@ public:
 	}
 	
 	/**
+	* CUIEnvironment::LogOut - Logs out the client session.
+	*/
+	void CUIEnvironment::LogOut()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_LogOut(m_pHandle));
+	}
+	
+	/**
+	* CUIEnvironment::ShowHint - Shows a hint message in the user interface.
+	* @param[in] sHint - Hint to show.
+	* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
+	*/
+	void CUIEnvironment::ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ShowHint(m_pHandle, sHint.c_str(), nTimeoutInMS));
+	}
+	
+	/**
+	* CUIEnvironment::ShowHintColored - Shows a hint message in the user interface in a certain color.
+	* @param[in] sHint - Hint to show.
+	* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
+	* @param[in] Color - Background color of hint.
+	* @param[in] FontColor - Font color of hint.
+	*/
+	void CUIEnvironment::ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const sColorRGB & Color, const sColorRGB & FontColor)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ShowHintColored(m_pHandle, sHint.c_str(), nTimeoutInMS, &Color, &FontColor));
+	}
+	
+	/**
+	* CUIEnvironment::HideHint - Hides hint if any is displayed.
+	*/
+	void CUIEnvironment::HideHint()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_HideHint(m_pHandle));
+	}
+	
+	/**
+	* CUIEnvironment::ShowMessageDlg - Shows a message dialog in the user interface.
+	* @param[in] sCaption - Caption of the dialog
+	* @param[in] sTitle - Title of the dialog
+	* @param[in] eDialogType - Which dialog type shall be shown.
+	* @param[in] sYesEvent - Event to be called when clicked yes or ok.
+	* @param[in] sNoEvent - Event to be called when clicked no.
+	* @param[in] sCancelEvent - Event to be called when dialog is closed or cancel is pressed.
+	* @return Dialog UUID. Will be set as sender for triggered events.
+	*/
+	std::string CUIEnvironment::ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent)
+	{
+		LibMCEnv_uint32 bytesNeededDialogUUID = 0;
+		LibMCEnv_uint32 bytesWrittenDialogUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ShowMessageDlg(m_pHandle, sCaption.c_str(), sTitle.c_str(), eDialogType, sYesEvent.c_str(), sNoEvent.c_str(), sCancelEvent.c_str(), 0, &bytesNeededDialogUUID, nullptr));
+		std::vector<char> bufferDialogUUID(bytesNeededDialogUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_ShowMessageDlg(m_pHandle, sCaption.c_str(), sTitle.c_str(), eDialogType, sYesEvent.c_str(), sNoEvent.c_str(), sCancelEvent.c_str(), bytesNeededDialogUUID, &bytesWrittenDialogUUID, &bufferDialogUUID[0]));
+		
+		return std::string(&bufferDialogUUID[0]);
+	}
+	
+	/**
 	* CUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
 	* @return Name of the sender element.
 	*/
@@ -5703,6 +5852,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSender(m_pHandle, bytesNeededSenderName, &bytesWrittenSenderName, &bufferSenderName[0]));
 		
 		return std::string(&bufferSenderName[0]);
+	}
+	
+	/**
+	* CUIEnvironment::RetrieveEventSenderUUID - returns uuid of the UI control that triggered the event.
+	* @return Name of the sender uuid.
+	*/
+	std::string CUIEnvironment::RetrieveEventSenderUUID()
+	{
+		LibMCEnv_uint32 bytesNeededSenderUUID = 0;
+		LibMCEnv_uint32 bytesWrittenSenderUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSenderUUID(m_pHandle, 0, &bytesNeededSenderUUID, nullptr));
+		std::vector<char> bufferSenderUUID(bytesNeededSenderUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_RetrieveEventSenderUUID(m_pHandle, bytesNeededSenderUUID, &bytesWrittenSenderUUID, &bufferSenderUUID[0]));
+		
+		return std::string(&bufferSenderUUID[0]);
 	}
 	
 	/**

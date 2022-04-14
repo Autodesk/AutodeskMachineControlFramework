@@ -33,13 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_toolbaritem.hpp"
 #include "amc_ui_page.hpp"
+#include "common_utils.hpp"
 #include "libmc_exceptiontypes.hpp"
 
 
 using namespace AMC;
 
 CUIToolbarItem::CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sPageName, const std::string& sEventName)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_sPageName(sPageName), m_sEventName (sEventName)
+	: m_sID(sID), m_sIcon(sIcon), m_sCaption(sCaption), m_sPageName(sPageName), m_sEventName(sEventName),
+	m_sUUID(AMCCommon::CUtils::createUUID ())
 {
 
 }
@@ -57,6 +59,11 @@ std::string CUIToolbarItem::getID()
 std::string CUIToolbarItem::getIcon()
 {
 	return m_sIcon;
+}
+
+std::string CUIToolbarItem::getUUID()
+{
+	return m_sUUID;
 }
 
 std::string CUIToolbarItem::getCaption()

@@ -1744,6 +1744,61 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_CloseModalDialogPtr) (LibMCEnv_U
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ActivatePagePtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pPageName);
 
 /**
+* Logs out the client session.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LogOutPtr) (LibMCEnv_UIEnvironment pUIEnvironment);
+
+/**
+* Shows a hint message in the user interface.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pHint - Hint to show.
+* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ShowHintPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pHint, LibMCEnv_uint32 nTimeoutInMS);
+
+/**
+* Shows a hint message in the user interface in a certain color.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pHint - Hint to show.
+* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
+* @param[in] pColor - Background color of hint.
+* @param[in] pFontColor - Font color of hint.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ShowHintColoredPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pHint, LibMCEnv_uint32 nTimeoutInMS, const LibMCEnv::sColorRGB * pColor, const LibMCEnv::sColorRGB * pFontColor);
+
+/**
+* Hides hint if any is displayed.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_HideHintPtr) (LibMCEnv_UIEnvironment pUIEnvironment);
+
+/**
+* Shows a message dialog in the user interface.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] pCaption - Caption of the dialog
+* @param[in] pTitle - Title of the dialog
+* @param[in] eDialogType - Which dialog type shall be shown.
+* @param[in] pYesEvent - Event to be called when clicked yes or ok.
+* @param[in] pNoEvent - Event to be called when clicked no.
+* @param[in] pCancelEvent - Event to be called when dialog is closed or cancel is pressed.
+* @param[in] nDialogUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDialogUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDialogUUIDBuffer -  buffer of Dialog UUID. Will be set as sender for triggered events., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ShowMessageDlgPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const char * pCaption, const char * pTitle, LibMCEnv::eMessageDialogType eDialogType, const char * pYesEvent, const char * pNoEvent, const char * pCancelEvent, const LibMCEnv_uint32 nDialogUUIDBufferSize, LibMCEnv_uint32* pDialogUUIDNeededChars, char * pDialogUUIDBuffer);
+
+/**
 * returns name of the UI control that triggered the event.
 *
 * @param[in] pUIEnvironment - UIEnvironment instance.
@@ -1753,6 +1808,17 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_ActivatePagePtr) (LibMCEnv_UIEnv
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer);
+
+/**
+* returns uuid of the UI control that triggered the event.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[in] nSenderUUIDBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSenderUUIDNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSenderUUIDBuffer -  buffer of Name of the sender uuid., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr) (LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderUUIDBufferSize, LibMCEnv_uint32* pSenderUUIDNeededChars, char * pSenderUUIDBuffer);
 
 /**
 * prepares a signal object to trigger later.
@@ -2234,7 +2300,13 @@ typedef struct {
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
+	PLibMCEnvUIEnvironment_LogOutPtr m_UIEnvironment_LogOut;
+	PLibMCEnvUIEnvironment_ShowHintPtr m_UIEnvironment_ShowHint;
+	PLibMCEnvUIEnvironment_ShowHintColoredPtr m_UIEnvironment_ShowHintColored;
+	PLibMCEnvUIEnvironment_HideHintPtr m_UIEnvironment_HideHint;
+	PLibMCEnvUIEnvironment_ShowMessageDlgPtr m_UIEnvironment_ShowMessageDlg;
 	PLibMCEnvUIEnvironment_RetrieveEventSenderPtr m_UIEnvironment_RetrieveEventSender;
+	PLibMCEnvUIEnvironment_RetrieveEventSenderUUIDPtr m_UIEnvironment_RetrieveEventSenderUUID;
 	PLibMCEnvUIEnvironment_PrepareSignalPtr m_UIEnvironment_PrepareSignal;
 	PLibMCEnvUIEnvironment_GetMachineStatePtr m_UIEnvironment_GetMachineState;
 	PLibMCEnvUIEnvironment_LogMessagePtr m_UIEnvironment_LogMessage;

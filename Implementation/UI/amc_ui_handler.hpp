@@ -75,27 +75,24 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
 
 
 	class CUIHandleEventResponse {
 	private:
 		uint32_t m_nErrorCode;
 		std::string m_sErrorMessage;
-		std::string m_sPageToActivate;
-		std::string m_sDialogToShow;
-		bool m_bCloseModalDialog;
+
+		std::vector<PUIClientAction> m_clientActions;
+		
 	public:
-		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, bool bCloseModalDialog, const std::string& sDialogToShow);
+		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::vector<PUIClientAction> & clientActions);
 
 		uint32_t getErrorCode();
-		std::string getErrorMessage ();
-		std::string getPageToActivate();
-		std::string getDialogToShow();
 
-		bool hasPageToActivate();
-		bool hasDialogToShow();
-		bool closeModalDialog();
+		std::string getErrorMessage();
 
+		std::vector<PUIClientAction> & getClientActions ();
 	};
 
 	class CUIHandler : public CUIModule_UIEventHandler {
@@ -120,6 +117,7 @@ namespace AMC {
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
+		std::map<std::string, PUIToolbarItem> m_ToolbarItemUUIDMap;
 		std::string m_ToolbarLogoResourceName;
 
 		std::map <std::string, PUIPage> m_Pages;

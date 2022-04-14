@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_page.hpp"
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module.hpp"
+#include "amc_ui_clientaction.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -241,7 +242,17 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 		writer.addString(AMC_API_KEY_UI_EVENTERRORMESSAGE, pEventResult.getErrorMessage());
 	} 
 	else {
-		if (pEventResult.closeModalDialog()) {
+
+		AMC::CJSONWriterArray actionsArray(writer);
+		for (auto pAction : pEventResult.getClientActions()) {
+			AMC::CJSONWriterObject actionObject(writer);
+			pAction->writeToJSON(writer, actionObject);
+			actionsArray.addObject(actionObject);
+		}
+		
+		writer.addArray(AMC_API_KEY_UI_EVENTACTIONS, actionsArray);
+
+		/*if (pEventResult.closeModalDialog()) {
 			writer.addInteger(AMC_API_KEY_UI_EVENTCLOSEDIALOGS, 1);
 		}
 		else {
@@ -266,7 +277,7 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 				pPage->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
 			}
 
-		}
+		} */
 
 		
 	}

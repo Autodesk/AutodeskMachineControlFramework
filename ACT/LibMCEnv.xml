@@ -96,7 +96,7 @@
 		<option name="Loop" value="2" />
 		<option name="Polyline" value="3" />
 	</enum>
-
+	
 	<enum name="ToolpathProfileValueType">
 		<option name="Custom" value="0" />
 		<option name="Speed" value="1" />
@@ -114,6 +114,15 @@
 		<option name="LaserFocus" value="13" />
 	</enum>
 	
+	<enum name="MessageDialogType">
+		<option name="Unknown" value="0" />
+		<option name="DialogOK" value="1" />
+		<option name="DialogOKCancel" value="2" />
+		<option name="DialogYesNo" value="3" />
+		<option name="DialogYesNoCancel" value="4" />
+	</enum>
+	
+	
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
@@ -122,6 +131,13 @@
 		<member name="Matrix" type="double" rows="3" columns="3"/>
 		<member name="Translation" type="double" rows="3"/>
 	</struct>
+
+	<struct name="ColorRGB">
+		<member name="Red" type="double" />
+		<member name="Green" type="double" />
+		<member name="Blue" type="double" />
+	</struct>
+
 	
 	<class name="Base">
 	</class>
@@ -963,9 +979,41 @@
 		<method name="ActivatePage" description="changes the current page on the client.">
 			<param name="PageName" type="string" pass="in" description="Name of the page to activate." />
 		</method>
-	  
+
+	  	<method name="LogOut" description="Logs out the client session.">
+		</method>
+
+		<method name="ShowHint" description="Shows a hint message in the user interface.">
+			<param name="Hint" type="string" pass="in" description="Hint to show." />
+			<param name="TimeoutInMS" type="uint32" pass="in" description="How many milliseconds the snackbar should be shown." />
+		</method>
+
+		<method name="ShowHintColored" description="Shows a hint message in the user interface in a certain color.">
+			<param name="Hint" type="string" pass="in" description="Hint to show." />
+			<param name="TimeoutInMS" type="uint32" pass="in" description="How many milliseconds the snackbar should be shown." />
+			<param name="Color" type="struct" class="ColorRGB" pass="in" description="Background color of hint." />
+			<param name="FontColor" type="struct" class="ColorRGB" pass="in" description="Font color of hint." />
+		</method>
+
+		<method name="HideHint" description="Hides hint if any is displayed.">
+		</method>
+
+		<method name="ShowMessageDlg" description="Shows a message dialog in the user interface.">
+			<param name="Caption" type="string" pass="in" description="Caption of the dialog" />
+			<param name="Title" type="string" pass="in" description="Title of the dialog" />
+			<param name="DialogType" type="enum" class="MessageDialogType" pass="in" description="Which dialog type shall be shown." />
+			<param name="YesEvent" type="string" pass="in" description="Event to be called when clicked yes or ok." />
+			<param name="NoEvent" type="string" pass="in" description="Event to be called when clicked no." />
+			<param name="CancelEvent" type="string" pass="in" description="Event to be called when dialog is closed or cancel is pressed." />
+			<param name="DialogUUID" type="string" pass="return" description="Dialog UUID. Will be set as sender for triggered events." />
+		</method>
+
 		<method name="RetrieveEventSender" description="returns name of the UI control that triggered the event.">
 			<param name="SenderName" type="string" pass="return" description="Name of the sender element." />
+		</method>
+
+		<method name="RetrieveEventSenderUUID" description="returns uuid of the UI control that triggered the event.">
+			<param name="SenderUUID" type="string" pass="return" description="Name of the sender uuid." />
 		</method>
 	  
 		<method name="PrepareSignal" description="prepares a signal object to trigger later.">

@@ -33,6 +33,7 @@ import * as asmCrypto from "asmcrypto-lite";
 
 import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
+import * as GitHash from "./AMCGitHash.js"
 
 import AMCApplicationModule_Content from "./AMCModule_Content.js"
 import AMCApplicationModule_GLScene from "./AMCModule_GLScene.js"
@@ -46,7 +47,6 @@ import AMCApplicationPage from "./AMCPage.js"
 import AMCApplicationDialog from "./AMCDialog.js"
 import AMCUpload from "./AMCImplementation_Upload.js"
 
-
 export default class AMCApplication extends Common.AMCObject {
 
     constructor(apiBaseURL, uiResizeEvent) {
@@ -54,6 +54,8 @@ export default class AMCApplication extends Common.AMCObject {
 		super ();
 		this.registerClass ("amcApplication");
 		
+		console.log ("AMC Client git hash: " + GitHash.getClientGitHash ());
+				
         this.API = {
             baseURL: apiBaseURL,
             authToken: Common.nullToken (),
@@ -91,6 +93,14 @@ export default class AMCApplication extends Common.AMCObject {
 			ItemMap: new Map(),			
             FormEntityMap: new Map()
         }
+		
+		this.SnackBar = {
+			Visible: false,
+			Timeout: -1,
+			Text: "",
+			Color: "secondary",
+			FontColor: "white"			
+		}
 
     }
 

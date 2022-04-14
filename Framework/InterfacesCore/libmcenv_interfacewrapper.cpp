@@ -5259,6 +5259,171 @@ LibMCEnvResult libmcenv_uienvironment_activatepage(LibMCEnv_UIEnvironment pUIEnv
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_logout(LibMCEnv_UIEnvironment pUIEnvironment)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUIEnvironment->LogOut();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_showhint(LibMCEnv_UIEnvironment pUIEnvironment, const char * pHint, LibMCEnv_uint32 nTimeoutInMS)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pHint == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sHint(pHint);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUIEnvironment->ShowHint(sHint, nTimeoutInMS);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_showhintcolored(LibMCEnv_UIEnvironment pUIEnvironment, const char * pHint, LibMCEnv_uint32 nTimeoutInMS, const sLibMCEnvColorRGB * pColor, const sLibMCEnvColorRGB * pFontColor)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pHint == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sHint(pHint);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUIEnvironment->ShowHintColored(sHint, nTimeoutInMS, *pColor, *pFontColor);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_hidehint(LibMCEnv_UIEnvironment pUIEnvironment)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIUIEnvironment->HideHint();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_showmessagedlg(LibMCEnv_UIEnvironment pUIEnvironment, const char * pCaption, const char * pTitle, eLibMCEnvMessageDialogType eDialogType, const char * pYesEvent, const char * pNoEvent, const char * pCancelEvent, const LibMCEnv_uint32 nDialogUUIDBufferSize, LibMCEnv_uint32* pDialogUUIDNeededChars, char * pDialogUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pCaption == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pTitle == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pYesEvent == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pNoEvent == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pCancelEvent == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDialogUUIDBuffer) && !(pDialogUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sCaption(pCaption);
+		std::string sTitle(pTitle);
+		std::string sYesEvent(pYesEvent);
+		std::string sNoEvent(pNoEvent);
+		std::string sCancelEvent(pCancelEvent);
+		std::string sDialogUUID("");
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pDialogUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sDialogUUID = pIUIEnvironment->ShowMessageDlg(sCaption, sTitle, eDialogType, sYesEvent, sNoEvent, sCancelEvent);
+
+			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sDialogUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sDialogUUID);
+			pIUIEnvironment->_setCache (nullptr);
+		}
+		
+		if (pDialogUUIDNeededChars)
+			*pDialogUUIDNeededChars = (LibMCEnv_uint32) (sDialogUUID.size()+1);
+		if (pDialogUUIDBuffer) {
+			if (sDialogUUID.size() >= nDialogUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iDialogUUID = 0; iDialogUUID < sDialogUUID.size(); iDialogUUID++)
+				pDialogUUIDBuffer[iDialogUUID] = sDialogUUID[iDialogUUID];
+			pDialogUUIDBuffer[sDialogUUID.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderNameBufferSize, LibMCEnv_uint32* pSenderNameNeededChars, char * pSenderNameBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pUIEnvironment;
@@ -5293,6 +5458,54 @@ LibMCEnvResult libmcenv_uienvironment_retrieveeventsender(LibMCEnv_UIEnvironment
 			for (size_t iSenderName = 0; iSenderName < sSenderName.size(); iSenderName++)
 				pSenderNameBuffer[iSenderName] = sSenderName[iSenderName];
 			pSenderNameBuffer[sSenderName.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_uienvironment_retrieveeventsenderuuid(LibMCEnv_UIEnvironment pUIEnvironment, const LibMCEnv_uint32 nSenderUUIDBufferSize, LibMCEnv_uint32* pSenderUUIDNeededChars, char * pSenderUUIDBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if ( (!pSenderUUIDBuffer) && !(pSenderUUIDNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sSenderUUID("");
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pSenderUUIDBuffer == nullptr);
+		if (isCacheCall) {
+			sSenderUUID = pIUIEnvironment->RetrieveEventSenderUUID();
+
+			pIUIEnvironment->_setCache (new ParameterCache_1<std::string> (sSenderUUID));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIUIEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sSenderUUID);
+			pIUIEnvironment->_setCache (nullptr);
+		}
+		
+		if (pSenderUUIDNeededChars)
+			*pSenderUUIDNeededChars = (LibMCEnv_uint32) (sSenderUUID.size()+1);
+		if (pSenderUUIDBuffer) {
+			if (sSenderUUID.size() >= nSenderUUIDBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iSenderUUID = 0; iSenderUUID < sSenderUUID.size(); iSenderUUID++)
+				pSenderUUIDBuffer[iSenderUUID] = sSenderUUID[iSenderUUID];
+			pSenderUUIDBuffer[sSenderUUID.size()] = 0;
 		}
 		return LIBMCENV_SUCCESS;
 	}
@@ -6469,8 +6682,20 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_closemodaldialog;
 	if (sProcName == "libmcenv_uienvironment_activatepage") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_activatepage;
+	if (sProcName == "libmcenv_uienvironment_logout") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_logout;
+	if (sProcName == "libmcenv_uienvironment_showhint") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_showhint;
+	if (sProcName == "libmcenv_uienvironment_showhintcolored") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_showhintcolored;
+	if (sProcName == "libmcenv_uienvironment_hidehint") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_hidehint;
+	if (sProcName == "libmcenv_uienvironment_showmessagedlg") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_showmessagedlg;
 	if (sProcName == "libmcenv_uienvironment_retrieveeventsender") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_retrieveeventsender;
+	if (sProcName == "libmcenv_uienvironment_retrieveeventsenderuuid") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_retrieveeventsenderuuid;
 	if (sProcName == "libmcenv_uienvironment_preparesignal") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_preparesignal;
 	if (sProcName == "libmcenv_uienvironment_getmachinestate") 

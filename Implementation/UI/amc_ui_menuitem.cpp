@@ -34,12 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_menuitem.hpp"
 #include "amc_ui_page.hpp"
 #include "libmc_interfaceexception.hpp"
-
+#include "common_utils.hpp"
 
 using namespace AMC;
 
 CUIMenuItem::CUIMenuItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sDescription, const std::string& sPageName, const std::string& sEventName)
-	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_sDescription (sDescription), m_sPageName (sPageName), m_sEventName (sEventName)
+	: m_sID (sID), m_sIcon (sIcon), m_sCaption (sCaption), m_sDescription (sDescription), m_sPageName (sPageName), m_sEventName (sEventName),
+	m_sUUID (AMCCommon::CUtils::createUUID ())
 {
 
 }
@@ -52,6 +53,11 @@ CUIMenuItem::~CUIMenuItem()
 std::string CUIMenuItem::getID()
 {
 	return m_sID;
+}
+
+std::string CUIMenuItem::getUUID()
+{
+	return m_sUUID;
 }
 
 std::string CUIMenuItem::getIcon()

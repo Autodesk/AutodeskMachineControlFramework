@@ -1506,10 +1506,54 @@ public:
 	virtual void ActivatePage(const std::string & sPageName) = 0;
 
 	/**
+	* IUIEnvironment::LogOut - Logs out the client session.
+	*/
+	virtual void LogOut() = 0;
+
+	/**
+	* IUIEnvironment::ShowHint - Shows a hint message in the user interface.
+	* @param[in] sHint - Hint to show.
+	* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
+	*/
+	virtual void ShowHint(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS) = 0;
+
+	/**
+	* IUIEnvironment::ShowHintColored - Shows a hint message in the user interface in a certain color.
+	* @param[in] sHint - Hint to show.
+	* @param[in] nTimeoutInMS - How many milliseconds the snackbar should be shown.
+	* @param[in] Color - Background color of hint.
+	* @param[in] FontColor - Font color of hint.
+	*/
+	virtual void ShowHintColored(const std::string & sHint, const LibMCEnv_uint32 nTimeoutInMS, const LibMCEnv::sColorRGB Color, const LibMCEnv::sColorRGB FontColor) = 0;
+
+	/**
+	* IUIEnvironment::HideHint - Hides hint if any is displayed.
+	*/
+	virtual void HideHint() = 0;
+
+	/**
+	* IUIEnvironment::ShowMessageDlg - Shows a message dialog in the user interface.
+	* @param[in] sCaption - Caption of the dialog
+	* @param[in] sTitle - Title of the dialog
+	* @param[in] eDialogType - Which dialog type shall be shown.
+	* @param[in] sYesEvent - Event to be called when clicked yes or ok.
+	* @param[in] sNoEvent - Event to be called when clicked no.
+	* @param[in] sCancelEvent - Event to be called when dialog is closed or cancel is pressed.
+	* @return Dialog UUID. Will be set as sender for triggered events.
+	*/
+	virtual std::string ShowMessageDlg(const std::string & sCaption, const std::string & sTitle, const LibMCEnv::eMessageDialogType eDialogType, const std::string & sYesEvent, const std::string & sNoEvent, const std::string & sCancelEvent) = 0;
+
+	/**
 	* IUIEnvironment::RetrieveEventSender - returns name of the UI control that triggered the event.
 	* @return Name of the sender element.
 	*/
 	virtual std::string RetrieveEventSender() = 0;
+
+	/**
+	* IUIEnvironment::RetrieveEventSenderUUID - returns uuid of the UI control that triggered the event.
+	* @return Name of the sender uuid.
+	*/
+	virtual std::string RetrieveEventSenderUUID() = 0;
 
 	/**
 	* IUIEnvironment::PrepareSignal - prepares a signal object to trigger later.

@@ -56,7 +56,7 @@ public:
 
 	}
 
-	CX509Certificate::~CX509Certificate()
+	~CX509Certificate()
 	{
 		clear();
 	}
@@ -113,7 +113,7 @@ public:
 
 	}
 
-	CServerPrivateKey::~CServerPrivateKey()
+	~CServerPrivateKey()
 	{
 		clear();
 	}
@@ -246,7 +246,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 		std::string sHostName = m_pServerConfiguration->getHostName();
 		uint32_t nPort = m_pServerConfiguration->getPort();
 
-
+		m_pContext->StartAllThreads();
 
 		try {
 

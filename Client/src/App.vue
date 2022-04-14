@@ -4,7 +4,7 @@
         <v-list three-line dense>
             <template v-for="(item, index) in Application.AppContent.MenuItems">                
 									  
-						  <v-list-item :key="item.uuid" v-on:click="Application.changePage(item.targetpage)"
+						  <v-list-item :key="item.uuid" v-on:click="uiMenuClicked(item)"
 						  >
 							<v-list-item-avatar >
 							  <v-icon>{{ item.icon }}</v-icon>
@@ -27,12 +27,13 @@
         <v-app-bar-nav-icon v-on:click.stop="uiToggleDrawer" />		
         <v-btn text large dark v-on:click.stop="Application.changePage(Application.AppDefinition.MainPage)">
             <v-img v-if="Application.AppDefinition.ToolbarLogoUUID != ''" width="150" v-bind:src="Application.getImageURL (Application.AppDefinition.ToolbarLogoUUID)"></v-img>
+			<p v-else>{{ uiButtonCaptionCheck(Application.AppDefinition.TextApplicationName) }}</p>
         </v-btn>
 
         <v-spacer />
 
         <template v-for="toolbaritem in Application.AppContent.ToolbarItems">
-            <v-btn :key="toolbaritem.id" text large v-on:click.stop="Application.changePage(toolbaritem.targetpage)">
+            <v-btn :key="toolbaritem.id" text large v-on:click.stop="uiToolbarClicked (toolbaritem)">
                 <v-icon left>{{ toolbaritem.icon }}</v-icon>{{ uiButtonCaptionCheck(toolbaritem.caption) }}
             </v-btn>
         </template>
@@ -113,6 +114,25 @@
         <v-spacer />
         <span class="caption white--text" v-if="appHasInformation">&copy; {{ Application.AppDefinition.TextCopyRight }}</span>		
     </v-footer>
+	
+	<v-snackbar
+        v-model="snackBarVisible"
+        :timeout="snackBarTimeout"
+		:color="snackbarColor"
+      >
+        <div>{{ snackBarText }}</div>
+  
+        <template v-slot:action="{ attrs }">
+          <v-btn
+			text
+			:color="snackbarFontColor"
+            v-bind="attrs"
+            @click="snackBarVisible = false"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </template>
+      </v-snackbar>
 	
 </v-app>
 </template>
@@ -212,7 +232,7 @@
 			
 			appMainStyle() {
 			
-				let mainStyle = "";
+				let mainStyle = "overflow: none;";
 			
 				//if (this.appIsLogin) {
 				
@@ -224,7 +244,38 @@
 				//}
 				return mainStyle;
 
-			}					
+			},
+
+			snackBarVisible () {
+				if (!this.Application)
+					return false;
+				return this.Application.SnackBar.Visible;
+			},
+			
+			snackBarTimeout () {
+				if (!this.Application)
+					return 0;
+				return this.Application.SnackBar.Timeout;
+			},
+			
+			snackBarText () {
+				if (!this.Application)
+					return 0;
+				return this.Application.SnackBar.Text;
+			},
+						
+			snackbarColor () {
+				if (!this.Application)
+					return 0;
+				return this.Application.SnackBar.Color;
+			},
+			
+			snackbarFontColor () {
+				if (!this.Application)
+					return 0;
+				return this.Application.SnackBar.FontColor;
+			}
+			
 			
 			
 		},
@@ -268,6 +319,26 @@
 					this.uiUpdateAppSize ();			
 				})
 			},
+			
+			uiToolbarClicked(toolbaritem) {
+			
+				if (toolbaritem.targetpage)
+					this.Application.changePage(toolbaritem.targetpage);
+					
+				if (toolbaritem.eventname) 
+					this.Application.triggerUIEvent(toolbaritem.eventname, toolbaritem.uuid, {});
+					
+			},
+			
+			uiMenuClicked(menuitem) {
+			
+				if (menuitem.targetpage)
+					this.Application.changePage(menuitem.targetpage);
+					
+				if (menuitem.eventname) 
+					this.Application.triggerUIEvent(menuitem.eventname, menuitem.uuid, {});
+					
+			},			
 
 			uiUpdateAppSize () {
 
@@ -293,10 +364,22 @@
 			GlobalTimer: null,
 			ShowDrawer: true,
 			appContentDivStyle: "",
-			appContentCardStyle: ""
-			
-		
+			appContentCardStyle: "",
+								
 		})
 	};
 </script>
 
+
+<style>
+html {
+  overflow: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+</style>

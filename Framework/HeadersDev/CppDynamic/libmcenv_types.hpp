@@ -242,6 +242,14 @@ namespace LibMCEnv {
     LaserFocus = 13
   };
   
+  enum class eMessageDialogType : LibMCEnv_int32 {
+    Unknown = 0,
+    DialogOK = 1,
+    DialogOKCancel = 2,
+    DialogYesNo = 3,
+    DialogYesNoCancel = 4
+  };
+  
   /*************************************************************************************************************************
    Declaration of structs
   **************************************************************************************************************************/
@@ -257,6 +265,12 @@ namespace LibMCEnv {
       LibMCEnv_double m_Translation[3];
   } sToolpathPartTransform;
   
+  typedef struct {
+      LibMCEnv_double m_Red;
+      LibMCEnv_double m_Green;
+      LibMCEnv_double m_Blue;
+  } sColorRGB;
+  
   #pragma pack ()
   
 } // namespace LibMCEnv;
@@ -265,7 +279,9 @@ namespace LibMCEnv {
 typedef LibMCEnv::eImagePixelFormat eLibMCEnvImagePixelFormat;
 typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
+typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
 typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
+typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
 
 #endif // __LIBMCENV_TYPES_HEADER_CPP
