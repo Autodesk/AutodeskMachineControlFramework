@@ -612,7 +612,7 @@
 
 		<toolbar logoresource="ui_toolbarlogo">
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-      <item id="logout" icon="mdi-logout" caption="Log out"/>
+      <item id="logout" icon="mdi-logout" caption="Log out" event="logout"/>
     </toolbar>
 
 
