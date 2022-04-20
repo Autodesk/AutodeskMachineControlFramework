@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcplugin_impl.hpp"
 #include "libmcdriver_bur_dynamic.hpp"
 
+#include <cmath>
 
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
