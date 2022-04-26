@@ -87,7 +87,7 @@ std::string CUIClientAction_ActivatePage::getPage()
 void CUIClientAction_ActivatePage::writeToJSON(CJSONWriter& writer, CJSONWriterObject& object)
 {
 	object.addString("action", "activatepage");
-	object.addString("dialogname", m_sPage);
+	object.addString("pagename", m_sPage);
 
 }
 
