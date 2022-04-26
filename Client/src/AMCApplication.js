@@ -591,25 +591,26 @@ export default class AMCApplication extends Common.AMCObject {
             "formvalues": eventValues
         })
         .then(resultHandleEvent => {
-            if (resultHandleEvent.data.pagetoactivate) {
-                this.changePage(resultHandleEvent.data.pagetoactivate);
-            }
-            if (resultHandleEvent.data.dialogtoshow) {
-                this.showDialog(resultHandleEvent.data.dialogtoshow);
-            }
-            if (resultHandleEvent.data.closedialogs) {
-                this.closeAllDialogs();
-            }
-            if (resultHandleEvent.data.contentupdate) {
-                for (let item of resultHandleEvent.data.contentupdate) {
-                    if (item.uuid) {
-                        if (item.entries) {
-                            this.updateContentItemResult(item.uuid, item);
-                        }
-                    }
-                }
-            }
-
+			
+			if (resultHandleEvent.data.actions) {
+				if (Array.isArray(resultHandleEvent.data.actions)) {
+					let action;
+					for (action of resultHandleEvent.data.actions) {
+						if (action.action === "activatemodaldialog") {
+							this.showDialog(action.dialogname);
+						}
+						if (action.action === "activatepage") {
+							this.changePage(action.pagename);
+						}
+						if (action.action === "closemodaldialog") {
+							this.closeAllDialogs();
+						}
+						
+						//this.updateContentItemResult(item.uuid, item);
+					}
+				}
+			}
+			
         })
         .catch(err => {
             console.log(err);
