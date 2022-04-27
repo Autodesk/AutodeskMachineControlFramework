@@ -174,25 +174,36 @@ bool CDriver_UART::IsConnected()
 	return false;
 }
 
-std::string CDriver_UART::SendLine(const std::string& sLineToSend, const LibMCDriver_UART_uint32 nTimeout)
+void CDriver_UART::SendString(const std::string& sStringToSend, const LibMCDriver_UART_uint32 nTimeout)
 {
-	if (m_pConnection.get() == nullptr) 
+	if (m_pConnection.get() == nullptr)
 		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED);
 	serial::Timeout timeout;
 
-	m_pConnection->setTimeout(serial::Timeout::simpleTimeout (nTimeout));
-	m_pConnection->write(sLineToSend);
-	return m_pConnection->readline();
+	m_pConnection->setTimeout(serial::Timeout::simpleTimeout(nTimeout));
+	m_pConnection->write(sStringToSend);
+
 }
 
-std::string CDriver_UART::ReceiveLine(const LibMCDriver_UART_uint32 nTimeout)
+std::string CDriver_UART::ReceiveString(const LibMCDriver_UART_uint32 nTimeout, const std::string& sReceiveStringTermination)
 {
 	if (m_pConnection.get() == nullptr)
 		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED);
 
 	m_pConnection->setTimeout(serial::Timeout::simpleTimeout(nTimeout));
-	return m_pConnection->readline();
+	return m_pConnection->readline(65536, sReceiveStringTermination);
 }
+
+std::string CDriver_UART::SendAndReceiveString(const std::string& sStringToSend, const std::string& sReceiveStringTermination, const LibMCDriver_UART_uint32 nTimeout)
+{
+	if (m_pConnection.get() == nullptr)
+		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED);
+
+	m_pConnection->setTimeout(serial::Timeout::simpleTimeout(nTimeout));
+	m_pConnection->write(sStringToSend);
+	return m_pConnection->readline(65536, sReceiveStringTermination);
+}
+
 
 
 void CDriver_UART::SetParity(const LibMCDriver_UART::eUARTParity eParity)

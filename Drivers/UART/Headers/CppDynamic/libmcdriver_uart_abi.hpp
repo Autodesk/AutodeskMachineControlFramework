@@ -254,29 +254,41 @@ LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_di
 LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_isconnected(LibMCDriver_UART_Driver_UART pDriver_UART, bool * pIsConnected);
 
 /**
-* Sends a string over UART and waits for a returning string.
+* Sends a string over UART.
 *
 * @param[in] pDriver_UART - Driver_UART instance.
-* @param[in] pLineToSend - Line to send
+* @param[in] pStringToSend - String to send
 * @param[in] nTimeout - Timeout in milliseconds.
-* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
-* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_sendline(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_sendstring(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pStringToSend, LibMCDriver_UART_uint32 nTimeout);
 
 /**
 * Waits for a received string.
 *
 * @param[in] pDriver_UART - Driver_UART instance.
 * @param[in] nTimeout - Timeout in milliseconds.
-* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
-* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
+* @param[in] pReceiveStringTermination - Termination String for retrieval ending before timeout.
+* @param[in] nReceivedStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedStringBuffer -  buffer of Received string. Maximum string length is 64kB., may be NULL
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_receiveline(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_receivestring(LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART_uint32 nTimeout, const char * pReceiveStringTermination, const LibMCDriver_UART_uint32 nReceivedStringBufferSize, LibMCDriver_UART_uint32* pReceivedStringNeededChars, char * pReceivedStringBuffer);
+
+/**
+* Sends a string over UART and waits for a returning string.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] pStringToSend - String to send
+* @param[in] pReceiveStringTermination - Termination String for retrieval ending before timeout.
+* @param[in] nTimeout - Timeout in milliseconds.
+* @param[in] nReceivedStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedStringBuffer -  buffer of Received string. Maximum string length is 64kB., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_UART_DECLSPEC LibMCDriver_UARTResult libmcdriver_uart_driver_uart_sendandreceivestring(LibMCDriver_UART_Driver_UART pDriver_UART, const char * pStringToSend, const char * pReceiveStringTermination, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedStringBufferSize, LibMCDriver_UART_uint32* pReceivedStringNeededChars, char * pReceivedStringBuffer);
 
 /*************************************************************************************************************************
  Global functions

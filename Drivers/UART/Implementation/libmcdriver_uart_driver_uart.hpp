@@ -105,9 +105,11 @@ public:
 
 	bool IsConnected() override;
 
-	std::string SendLine(const std::string& sLineToSend, const LibMCDriver_UART_uint32 nTimeout) override;
+	void SendString(const std::string& sStringToSend, const LibMCDriver_UART_uint32 nTimeout) override;
 
-	std::string ReceiveLine(const LibMCDriver_UART_uint32 nTimeout) override;
+	std::string ReceiveString(const LibMCDriver_UART_uint32 nTimeout, const std::string& sReceiveStringTermination) override;
+
+	std::string SendAndReceiveString(const std::string& sStringToSend, const std::string& sReceiveStringTermination, const LibMCDriver_UART_uint32 nTimeout) override;
 
 	void SetParity(const LibMCDriver_UART::eUARTParity eParity) override;
 

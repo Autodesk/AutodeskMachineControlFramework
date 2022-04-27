@@ -394,19 +394,28 @@ public:
 	virtual bool IsConnected() = 0;
 
 	/**
-	* IDriver_UART::SendLine - Sends a string over UART and waits for a returning string.
-	* @param[in] sLineToSend - Line to send
+	* IDriver_UART::SendString - Sends a string over UART.
+	* @param[in] sStringToSend - String to send
 	* @param[in] nTimeout - Timeout in milliseconds.
-	* @return Received line
 	*/
-	virtual std::string SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout) = 0;
+	virtual void SendString(const std::string & sStringToSend, const LibMCDriver_UART_uint32 nTimeout) = 0;
 
 	/**
-	* IDriver_UART::ReceiveLine - Waits for a received string.
+	* IDriver_UART::ReceiveString - Waits for a received string.
 	* @param[in] nTimeout - Timeout in milliseconds.
-	* @return Received line
+	* @param[in] sReceiveStringTermination - Termination String for retrieval ending before timeout.
+	* @return Received string. Maximum string length is 64kB.
 	*/
-	virtual std::string ReceiveLine(const LibMCDriver_UART_uint32 nTimeout) = 0;
+	virtual std::string ReceiveString(const LibMCDriver_UART_uint32 nTimeout, const std::string & sReceiveStringTermination) = 0;
+
+	/**
+	* IDriver_UART::SendAndReceiveString - Sends a string over UART and waits for a returning string.
+	* @param[in] sStringToSend - String to send
+	* @param[in] sReceiveStringTermination - Termination String for retrieval ending before timeout.
+	* @param[in] nTimeout - Timeout in milliseconds.
+	* @return Received string. Maximum string length is 64kB.
+	*/
+	virtual std::string SendAndReceiveString(const std::string & sStringToSend, const std::string & sReceiveStringTermination, const LibMCDriver_UART_uint32 nTimeout) = 0;
 
 };
 

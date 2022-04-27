@@ -375,8 +375,9 @@ public:
 	inline void Connect(const std::string & sDeviceAddress, const LibMCDriver_UART_uint32 nBaudRate, const LibMCDriver_UART_uint32 nTimeout);
 	inline void Disconnect();
 	inline bool IsConnected();
-	inline std::string SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout);
-	inline std::string ReceiveLine(const LibMCDriver_UART_uint32 nTimeout);
+	inline void SendString(const std::string & sStringToSend, const LibMCDriver_UART_uint32 nTimeout);
+	inline std::string ReceiveString(const LibMCDriver_UART_uint32 nTimeout, const std::string & sReceiveStringTermination);
+	inline std::string SendAndReceiveString(const std::string & sStringToSend, const std::string & sReceiveStringTermination, const LibMCDriver_UART_uint32 nTimeout);
 };
 	
 	/**
@@ -519,8 +520,9 @@ public:
 		pWrapperTable->m_Driver_UART_Connect = nullptr;
 		pWrapperTable->m_Driver_UART_Disconnect = nullptr;
 		pWrapperTable->m_Driver_UART_IsConnected = nullptr;
-		pWrapperTable->m_Driver_UART_SendLine = nullptr;
-		pWrapperTable->m_Driver_UART_ReceiveLine = nullptr;
+		pWrapperTable->m_Driver_UART_SendString = nullptr;
+		pWrapperTable->m_Driver_UART_ReceiveString = nullptr;
+		pWrapperTable->m_Driver_UART_SendAndReceiveString = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -748,21 +750,30 @@ public:
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_UART_SendLine = (PLibMCDriver_UARTDriver_UART_SendLinePtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_sendline");
+		pWrapperTable->m_Driver_UART_SendString = (PLibMCDriver_UARTDriver_UART_SendStringPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_sendstring");
 		#else // _WIN32
-		pWrapperTable->m_Driver_UART_SendLine = (PLibMCDriver_UARTDriver_UART_SendLinePtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_sendline");
+		pWrapperTable->m_Driver_UART_SendString = (PLibMCDriver_UARTDriver_UART_SendStringPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_sendstring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_UART_SendLine == nullptr)
+		if (pWrapperTable->m_Driver_UART_SendString == nullptr)
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_UART_ReceiveLine = (PLibMCDriver_UARTDriver_UART_ReceiveLinePtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_receiveline");
+		pWrapperTable->m_Driver_UART_ReceiveString = (PLibMCDriver_UARTDriver_UART_ReceiveStringPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_receivestring");
 		#else // _WIN32
-		pWrapperTable->m_Driver_UART_ReceiveLine = (PLibMCDriver_UARTDriver_UART_ReceiveLinePtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_receiveline");
+		pWrapperTable->m_Driver_UART_ReceiveString = (PLibMCDriver_UARTDriver_UART_ReceiveStringPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_receivestring");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_UART_ReceiveLine == nullptr)
+		if (pWrapperTable->m_Driver_UART_ReceiveString == nullptr)
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_UART_SendAndReceiveString = (PLibMCDriver_UARTDriver_UART_SendAndReceiveStringPtr) GetProcAddress(hLibrary, "libmcdriver_uart_driver_uart_sendandreceivestring");
+		#else // _WIN32
+		pWrapperTable->m_Driver_UART_SendAndReceiveString = (PLibMCDriver_UARTDriver_UART_SendAndReceiveStringPtr) dlsym(hLibrary, "libmcdriver_uart_driver_uart_sendandreceivestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_UART_SendAndReceiveString == nullptr)
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -920,12 +931,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_IsConnected == nullptr) )
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_sendline", (void**)&(pWrapperTable->m_Driver_UART_SendLine));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SendLine == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_sendstring", (void**)&(pWrapperTable->m_Driver_UART_SendString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SendString == nullptr) )
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_receiveline", (void**)&(pWrapperTable->m_Driver_UART_ReceiveLine));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_ReceiveLine == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_receivestring", (void**)&(pWrapperTable->m_Driver_UART_ReceiveString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_ReceiveString == nullptr) )
+			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_uart_driver_uart_sendandreceivestring", (void**)&(pWrapperTable->m_Driver_UART_SendAndReceiveString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_UART_SendAndReceiveString == nullptr) )
 			return LIBMCDRIVER_UART_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_uart_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1192,36 +1207,48 @@ public:
 	}
 	
 	/**
-	* CDriver_UART::SendLine - Sends a string over UART and waits for a returning string.
-	* @param[in] sLineToSend - Line to send
+	* CDriver_UART::SendString - Sends a string over UART.
+	* @param[in] sStringToSend - String to send
 	* @param[in] nTimeout - Timeout in milliseconds.
-	* @return Received line
 	*/
-	std::string CDriver_UART::SendLine(const std::string & sLineToSend, const LibMCDriver_UART_uint32 nTimeout)
+	void CDriver_UART::SendString(const std::string & sStringToSend, const LibMCDriver_UART_uint32 nTimeout)
 	{
-		LibMCDriver_UART_uint32 bytesNeededReceivedLine = 0;
-		LibMCDriver_UART_uint32 bytesWrittenReceivedLine = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), nTimeout, 0, &bytesNeededReceivedLine, nullptr));
-		std::vector<char> bufferReceivedLine(bytesNeededReceivedLine);
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendLine(m_pHandle, sLineToSend.c_str(), nTimeout, bytesNeededReceivedLine, &bytesWrittenReceivedLine, &bufferReceivedLine[0]));
-		
-		return std::string(&bufferReceivedLine[0]);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendString(m_pHandle, sStringToSend.c_str(), nTimeout));
 	}
 	
 	/**
-	* CDriver_UART::ReceiveLine - Waits for a received string.
+	* CDriver_UART::ReceiveString - Waits for a received string.
 	* @param[in] nTimeout - Timeout in milliseconds.
-	* @return Received line
+	* @param[in] sReceiveStringTermination - Termination String for retrieval ending before timeout.
+	* @return Received string. Maximum string length is 64kB.
 	*/
-	std::string CDriver_UART::ReceiveLine(const LibMCDriver_UART_uint32 nTimeout)
+	std::string CDriver_UART::ReceiveString(const LibMCDriver_UART_uint32 nTimeout, const std::string & sReceiveStringTermination)
 	{
-		LibMCDriver_UART_uint32 bytesNeededReceivedLine = 0;
-		LibMCDriver_UART_uint32 bytesWrittenReceivedLine = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_ReceiveLine(m_pHandle, nTimeout, 0, &bytesNeededReceivedLine, nullptr));
-		std::vector<char> bufferReceivedLine(bytesNeededReceivedLine);
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_ReceiveLine(m_pHandle, nTimeout, bytesNeededReceivedLine, &bytesWrittenReceivedLine, &bufferReceivedLine[0]));
+		LibMCDriver_UART_uint32 bytesNeededReceivedString = 0;
+		LibMCDriver_UART_uint32 bytesWrittenReceivedString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_ReceiveString(m_pHandle, nTimeout, sReceiveStringTermination.c_str(), 0, &bytesNeededReceivedString, nullptr));
+		std::vector<char> bufferReceivedString(bytesNeededReceivedString);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_ReceiveString(m_pHandle, nTimeout, sReceiveStringTermination.c_str(), bytesNeededReceivedString, &bytesWrittenReceivedString, &bufferReceivedString[0]));
 		
-		return std::string(&bufferReceivedLine[0]);
+		return std::string(&bufferReceivedString[0]);
+	}
+	
+	/**
+	* CDriver_UART::SendAndReceiveString - Sends a string over UART and waits for a returning string.
+	* @param[in] sStringToSend - String to send
+	* @param[in] sReceiveStringTermination - Termination String for retrieval ending before timeout.
+	* @param[in] nTimeout - Timeout in milliseconds.
+	* @return Received string. Maximum string length is 64kB.
+	*/
+	std::string CDriver_UART::SendAndReceiveString(const std::string & sStringToSend, const std::string & sReceiveStringTermination, const LibMCDriver_UART_uint32 nTimeout)
+	{
+		LibMCDriver_UART_uint32 bytesNeededReceivedString = 0;
+		LibMCDriver_UART_uint32 bytesWrittenReceivedString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendAndReceiveString(m_pHandle, sStringToSend.c_str(), sReceiveStringTermination.c_str(), nTimeout, 0, &bytesNeededReceivedString, nullptr));
+		std::vector<char> bufferReceivedString(bytesNeededReceivedString);
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_UART_SendAndReceiveString(m_pHandle, sStringToSend.c_str(), sReceiveStringTermination.c_str(), nTimeout, bytesNeededReceivedString, &bytesWrittenReceivedString, &bufferReceivedString[0]));
+		
+		return std::string(&bufferReceivedString[0]);
 	}
 
 } // namespace LibMCDriver_UART

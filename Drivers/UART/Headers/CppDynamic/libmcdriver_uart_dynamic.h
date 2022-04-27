@@ -241,29 +241,41 @@ typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_DisconnectPtr) (Li
 typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_IsConnectedPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, bool * pIsConnected);
 
 /**
-* Sends a string over UART and waits for a returning string.
+* Sends a string over UART.
 *
 * @param[in] pDriver_UART - Driver_UART instance.
-* @param[in] pLineToSend - Line to send
+* @param[in] pStringToSend - String to send
 * @param[in] nTimeout - Timeout in milliseconds.
-* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
-* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SendLinePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pLineToSend, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SendStringPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pStringToSend, LibMCDriver_UART_uint32 nTimeout);
 
 /**
 * Waits for a received string.
 *
 * @param[in] pDriver_UART - Driver_UART instance.
 * @param[in] nTimeout - Timeout in milliseconds.
-* @param[in] nReceivedLineBufferSize - size of the buffer (including trailing 0)
-* @param[out] pReceivedLineNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pReceivedLineBuffer -  buffer of Received line, may be NULL
+* @param[in] pReceiveStringTermination - Termination String for retrieval ending before timeout.
+* @param[in] nReceivedStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedStringBuffer -  buffer of Received string. Maximum string length is 64kB., may be NULL
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_ReceiveLinePtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedLineBufferSize, LibMCDriver_UART_uint32* pReceivedLineNeededChars, char * pReceivedLineBuffer);
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_ReceiveStringPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, LibMCDriver_UART_uint32 nTimeout, const char * pReceiveStringTermination, const LibMCDriver_UART_uint32 nReceivedStringBufferSize, LibMCDriver_UART_uint32* pReceivedStringNeededChars, char * pReceivedStringBuffer);
+
+/**
+* Sends a string over UART and waits for a returning string.
+*
+* @param[in] pDriver_UART - Driver_UART instance.
+* @param[in] pStringToSend - String to send
+* @param[in] pReceiveStringTermination - Termination String for retrieval ending before timeout.
+* @param[in] nTimeout - Timeout in milliseconds.
+* @param[in] nReceivedStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pReceivedStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pReceivedStringBuffer -  buffer of Received string. Maximum string length is 64kB., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_UARTResult (*PLibMCDriver_UARTDriver_UART_SendAndReceiveStringPtr) (LibMCDriver_UART_Driver_UART pDriver_UART, const char * pStringToSend, const char * pReceiveStringTermination, LibMCDriver_UART_uint32 nTimeout, const LibMCDriver_UART_uint32 nReceivedStringBufferSize, LibMCDriver_UART_uint32* pReceivedStringNeededChars, char * pReceivedStringBuffer);
 
 /*************************************************************************************************************************
  Global functions
@@ -360,8 +372,9 @@ typedef struct {
 	PLibMCDriver_UARTDriver_UART_ConnectPtr m_Driver_UART_Connect;
 	PLibMCDriver_UARTDriver_UART_DisconnectPtr m_Driver_UART_Disconnect;
 	PLibMCDriver_UARTDriver_UART_IsConnectedPtr m_Driver_UART_IsConnected;
-	PLibMCDriver_UARTDriver_UART_SendLinePtr m_Driver_UART_SendLine;
-	PLibMCDriver_UARTDriver_UART_ReceiveLinePtr m_Driver_UART_ReceiveLine;
+	PLibMCDriver_UARTDriver_UART_SendStringPtr m_Driver_UART_SendString;
+	PLibMCDriver_UARTDriver_UART_ReceiveStringPtr m_Driver_UART_ReceiveString;
+	PLibMCDriver_UARTDriver_UART_SendAndReceiveStringPtr m_Driver_UART_SendAndReceiveString;
 	PLibMCDriver_UARTGetVersionPtr m_GetVersion;
 	PLibMCDriver_UARTGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_UARTReleaseInstancePtr m_ReleaseInstance;
