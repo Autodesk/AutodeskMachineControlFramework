@@ -178,7 +178,9 @@ std::string CDriver_UART::SendLine(const std::string& sLineToSend, const LibMCDr
 {
 	if (m_pConnection.get() == nullptr) 
 		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED);
+	serial::Timeout timeout;
 
+	m_pConnection->setTimeout(serial::Timeout::simpleTimeout (nTimeout));
 	m_pConnection->write(sLineToSend);
 	return m_pConnection->readline();
 }
@@ -188,6 +190,7 @@ std::string CDriver_UART::ReceiveLine(const LibMCDriver_UART_uint32 nTimeout)
 	if (m_pConnection.get() == nullptr)
 		throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERNOTCONNECTED);
 
+	m_pConnection->setTimeout(serial::Timeout::simpleTimeout(nTimeout));
 	return m_pConnection->readline();
 }
 
