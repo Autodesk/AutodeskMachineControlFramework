@@ -28,38 +28,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMCTEST_CONFIGURATION
-#define __AMCTEST_CONFIGURATION
+#include "amc_test_library.hpp"
+#include <iostream>
+#include <regex>
 
+using namespace AMCTest;
 
-#include <string>
-#include <memory>
-#include <map>
-#include <set>
-
-#include "libmcdata_dynamic.hpp"
-
-
-namespace AMCTest {
-	
-
-	class CTestConfiguration {
-	private:
-	
-	public:
-
-		CTestConfiguration();
-		virtual ~CTestConfiguration();
-
-	};
-
-	typedef std::shared_ptr<CTestConfiguration> PTestConfiguration;
-		
-
-	
-	
-	
+CTestLibrary::CTestLibrary(const std::string& sName, const std::string& sDLLFileName, const std::string& sResourceFileName)
+	: m_sName (sName), m_sDLLFileName (sDLLFileName), m_sResourceFileName (sResourceFileName)
+{
+#ifdef _WIN32
+	m_sDLLExtension = ".dll";
+#else
+	m_sDLLExtension = ".so";
+#endif
 }
 
-#endif //__AMCTEST_CONFIGURATION
+CTestLibrary::~CTestLibrary()
+{
 
+}
+
+std::string CTestLibrary::getName()
+{
+	return m_sName;
+}
+
+std::string CTestLibrary::getDLLFileName(const std::string& sGitHash)
+{	
+	return std::regex_replace(m_sDLLFileName, std::regex("\\%githash%"), sGitHash) + m_sDLLExtension;
+}
+
+std::string CTestLibrary::getResourceFileName(const std::string& sGitHash)
+{
+	if (m_sResourceFileName.empty())
+		return "";
+
+	return std::regex_replace(m_sResourceFileName, std::regex("\\%githash%"), sGitHash) + m_sDLLExtension;
+}

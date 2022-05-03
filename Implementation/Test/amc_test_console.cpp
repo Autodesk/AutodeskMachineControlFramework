@@ -92,9 +92,9 @@ int main(int argc, char* argv[])
 			auto sFullPathName = AMCCommon::CUtils::getFullPathName(testDefinitionFile, true);
 			pTestIO->logMessageString("loading tests in " + sFullPathName + "...");
 
-			std::string sTestDefinition = pTestIO->readConfigurationXMLString(sFullPathName);
-
-			auto pTest = std::make_shared <CTest>(pTestIO);
+			std::string sTestDefinitionXML = pTestIO->readConfigurationXMLString(sFullPathName);
+			
+			auto pTest = std::make_shared <CTest>(pTestIO, sTestDefinitionXML, sGitHash);
 			pTest->executeBlocking();
 		}
 

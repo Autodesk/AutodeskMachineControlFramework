@@ -34,4 +34,5 @@ project("AMC Unit Tests")
 
 add_subdirectory(RayLaseTest)
 add_subdirectory(BuRTest)
+add_subdirectory(RasterizerTest)
 

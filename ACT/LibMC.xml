@@ -460,7 +460,20 @@
 		<error name="DUPLICATESERVERPRIVATEKEY" code="431" description="duplicate server private key" />
 		<error name="DUPLICATESERVERCERTIFICATE" code="432" description="duplicate server certificate" />
 		
-
+		<error name="INVALIDGITHASH" code="433" description="Invalid git hash" />
+		<error name="COULDNOTPARSETESTDEFINITION" code="434" description="Could not parse test definition." />
+		<error name="MISSINGTESTDEFINITIONNODE" code="435" description="Missing test definition node." />
+		
+		<error name="AMBIGIOUSMAINNODE" code="436" description="Ambigious main node" />
+		<error name="MISSINGMAINNODE" code="437" description="Missing main node" />
+		<error name="MISSINGLIBRARIESNODE" code="438" description="Missing libraries node" />
+		<error name="MISSINGLIBRARYDLLFILENAME" code="439" description="Missing library dll filename" />
+		<error name="MISSINGTESTDESCRIPTION" code="440" description="Missing test description" />
+		<error name="MISSINGTESTINSTANCENAME" code="441" description="Missing test instance name" />
+		<error name="TESTDEFINITIONHASNOINSTANCES" code="442" description="Test definition has no instances" />
+		
+		
+		
 		  
 	</errors>
 	
@@ -479,6 +492,7 @@
 	<enum name="LogSubSystem">
 		<option name="System" value="1"/>
 		<option name="Network" value="2"/>
+		<option name="Testing" value="3"/>
 	</enum>	
 
 

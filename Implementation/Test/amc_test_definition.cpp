@@ -28,13 +28,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amc_test_configuration.hpp"
-#include "libmc_dynamic.hpp"
-#include "common_utils.hpp"
-#include "common_importstream_native.hpp"
-
-#include <iostream>
-#include <pugixml.hpp>
+#include "amc_test_definition.hpp"
 
 using namespace AMCTest;
 
+CTestDefinition::CTestDefinition(const std::string& sDescription)
+	: m_sDescription (sDescription)
+{
+
+}
+
+CTestDefinition::~CTestDefinition()
+{
+
+}
+
+void CTestDefinition::addInstance(const std::string& sInstanceName)
+{
+	m_Instances.push_back(sInstanceName);
+}
+
+bool CTestDefinition::hasInstances()
+{
+	return !m_Instances.empty();
+}
+
+std::string CTestDefinition::getDescription()
+{
+	return m_sDescription;
+}
+
+std::vector<std::string>& CTestDefinition::getInstances()
+{
+	return m_Instances;
+}

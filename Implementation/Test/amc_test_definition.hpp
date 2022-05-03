@@ -45,12 +45,19 @@ namespace AMCTest {
 
 	class CTestDefinition {
 	private:
-	
+		std::string m_sDescription;
+		std::vector<std::string> m_Instances;
 	public:
 
-		CTestDefinition();
+		CTestDefinition(const std::string & sDescription);
 		virtual ~CTestDefinition();
 
+		void addInstance(const std::string & sInstanceName);
+
+		bool hasInstances();
+
+		std::string getDescription ();
+		std::vector<std::string> & getInstances ();
 	};
 
 	typedef std::shared_ptr<CTestDefinition> PTestDefinition;

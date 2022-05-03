@@ -28,13 +28,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "amc_test_configuration.hpp"
-#include "libmc_dynamic.hpp"
-#include "common_utils.hpp"
-#include "common_importstream_native.hpp"
+#ifndef __AMCTEST_TEST_LIBRARY
+#define __AMCTEST_TEST_LIBRARY
 
-#include <iostream>
-#include <pugixml.hpp>
 
-using namespace AMCTest;
+#include <string>
+#include <memory>
 
+
+namespace AMCTest {
+	
+	class CTestLibrary {
+	private:
+		std::string m_sName;
+		std::string m_sDLLFileName;
+		std::string m_sResourceFileName;
+		std::string m_sDLLExtension;
+	public:
+		CTestLibrary(const std::string & sName, const std::string & sDLLFileName, const std::string & sResourceFileName);
+		virtual ~CTestLibrary();
+
+		std::string getName();
+		std::string getDLLFileName(const std::string & sGitHash);
+		std::string getResourceFileName(const std::string& sGitHash);
+	};
+
+	typedef std::shared_ptr<CTestLibrary> PTestLibrary;
+	
+
+}
+
+#endif //__AMCTEST_TEST_LIBRARY

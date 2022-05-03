@@ -567,7 +567,7 @@ set_target_properties(amc_server
 
 file(GLOB TEST_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_configuration.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_library.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_console.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_definition.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Test/amc_test_io.cpp

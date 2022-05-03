@@ -457,6 +457,16 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_SUCCESSSTATENOTFOUND 430
 #define LIBMC_ERROR_DUPLICATESERVERPRIVATEKEY 431
 #define LIBMC_ERROR_DUPLICATESERVERCERTIFICATE 432
+#define LIBMC_ERROR_INVALIDGITHASH 433
+#define LIBMC_ERROR_COULDNOTPARSETESTDEFINITION 434
+#define LIBMC_ERROR_MISSINGTESTDEFINITIONNODE 435
+#define LIBMC_ERROR_AMBIGIOUSMAINNODE 436
+#define LIBMC_ERROR_MISSINGMAINNODE 437
+#define LIBMC_ERROR_MISSINGLIBRARIESNODE 438
+#define LIBMC_ERROR_MISSINGLIBRARYDLLFILENAME 439
+#define LIBMC_ERROR_MISSINGTESTDESCRIPTION 440
+#define LIBMC_ERROR_MISSINGTESTINSTANCENAME 441
+#define LIBMC_ERROR_TESTDEFINITIONHASNOINSTANCES 442
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -826,6 +836,16 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_SUCCESSSTATENOTFOUND: return "success state not found";
     case LIBMC_ERROR_DUPLICATESERVERPRIVATEKEY: return "duplicate server private key";
     case LIBMC_ERROR_DUPLICATESERVERCERTIFICATE: return "duplicate server certificate";
+    case LIBMC_ERROR_INVALIDGITHASH: return "Invalid git hash";
+    case LIBMC_ERROR_COULDNOTPARSETESTDEFINITION: return "Could not parse test definition.";
+    case LIBMC_ERROR_MISSINGTESTDEFINITIONNODE: return "Missing test definition node.";
+    case LIBMC_ERROR_AMBIGIOUSMAINNODE: return "Ambigious main node";
+    case LIBMC_ERROR_MISSINGMAINNODE: return "Missing main node";
+    case LIBMC_ERROR_MISSINGLIBRARIESNODE: return "Missing libraries node";
+    case LIBMC_ERROR_MISSINGLIBRARYDLLFILENAME: return "Missing library dll filename";
+    case LIBMC_ERROR_MISSINGTESTDESCRIPTION: return "Missing test description";
+    case LIBMC_ERROR_MISSINGTESTINSTANCENAME: return "Missing test instance name";
+    case LIBMC_ERROR_TESTDEFINITIONHASNOINSTANCES: return "Test definition has no instances";
     default: return "unknown error";
   }
 }
@@ -857,7 +877,8 @@ namespace LibMC {
   
   enum class eLogSubSystem : LibMC_int32 {
     System = 1,
-    Network = 2
+    Network = 2,
+    Testing = 3
   };
   
 } // namespace LibMC;

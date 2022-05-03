@@ -37,15 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 #include "amc_test_io.hpp"
-#include "amc_test_configuration.hpp"
+#include "amc_test_library.hpp"
+#include "amc_test_definition.hpp"
 
 #include "libmcdata_dynamic.hpp"
 #include "libmc_dynamic.hpp"
 
-
 namespace AMCTest {
 
-		
+
+
 	class CTest {
 		
 		private:
@@ -53,6 +54,10 @@ namespace AMCTest {
 
 			std::string m_sVersionString;
 			std::string m_sGitHash;
+			std::string m_sPackageConfigurationXML;
+
+			std::string m_sDescription;
+
 
 			LibMCData::PWrapper m_pDataWrapper;
 			LibMCData::PDataModel m_pDataModel;
@@ -60,10 +65,12 @@ namespace AMCTest {
 			LibMC::PWrapper m_pWrapper;
 			LibMC::PMCContext m_pContext;
 
+			std::vector<PTestDefinition> m_TestDefinitions;
+			std::vector<PTestLibrary> m_TestLibraries;
+
+	public:
 		
-		public:
-		
-			CTest(PTestIO pTestIO);
+			CTest(PTestIO pTestIO, const std::string& sPackageConfigurationXML, const std::string& sGitHash);
 
 			virtual ~CTest();
 						
