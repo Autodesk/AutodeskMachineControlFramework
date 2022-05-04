@@ -28,21 +28,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmcplugin_statefactory.hpp"
-#include "libmcplugin_interfaceexception.hpp"
-#include "libmcplugin_state.hpp"
-
+#include "libmcplugin_impl.hpp"
 #include "libmcdriver_rasterizer_dynamic.hpp"
-#include "libmcenv_drivercast.hpp"
 
 using namespace LibMCPlugin::Impl;
 
 #include <iostream>
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
+#include <fstream>
 
 
 /*************************************************************************************************************************
@@ -61,7 +53,7 @@ protected:
 
 public:
 
-	PDriver_Rasterizer acquireRaylaseDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
+	PDriver_Rasterizer acquireRasterizer (LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 		return m_DriverCast_Rasterizer.acquireDriver(pStateEnvironment, "rasterizer");
 	}
@@ -97,7 +89,35 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 
-		
+		auto pDriver = m_pPluginData->acquireRasterizer(pStateEnvironment);
+		auto pLayer = pDriver->CreateEmptyLayer();
+
+		std::vector<LibMCDriver_Rasterizer::sPosition2D> PointsBuffer;
+		PointsBuffer.push_back({ 324.0, 248.0});
+		PointsBuffer.push_back({ 860.0, 290.0 });
+		PointsBuffer.push_back({ 1038.0, 703.0 });
+		//PointsBuffer.push_back({ 235.0, 684.0 });
+
+
+		pLayer->AddEntity(PointsBuffer, LibMCDriver_Rasterizer::eGeometryType::SolidGeometry);
+
+		auto pRasterizer = pDriver->RegisterInstance("rasterizer", 1920, 1080, 20, 20);
+		pRasterizer->SetSamplingParameters(128, 4);
+		pRasterizer->SetSubsampling(1, 1);
+		pRasterizer->AddLayer(pLayer);
+
+		auto pImage = pStateEnvironment->CreateEmptyImage(1920, 1080, 20, 20, LibMCEnv::eImagePixelFormat::GreyScale8bit);
+
+		pRasterizer->CalculateImage(pImage, true);
+
+		pImage->EncodePNG();
+		std::vector<uint8_t> pngData;
+		pImage->GetEncodedPNGData (pngData);
+
+		std::ofstream pngStream("output.png", std::ios::binary | std::ios::out);
+		if (pngData.size() > 0)
+			pngStream.write((const char*)pngData.data(), pngData.size());
+		pngStream.close();
 
 		pStateEnvironment->SetNextState("success");
 	}
@@ -191,6 +211,3 @@ IState* CStateFactory::CreateState(const std::string& sStateName)
 }
 
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif

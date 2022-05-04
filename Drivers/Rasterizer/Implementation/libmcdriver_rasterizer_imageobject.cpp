@@ -80,9 +80,9 @@ void CImageObject::clear(uint8_t nValue)
 void CImageObject::setPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue)
 {
 	if (nX >= m_nPixelCountX)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDXCOORDINATE);
+		return;
 	if (nY >= m_nPixelCountY)
-		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDYCOORDINATE);
+		return;
 
 	size_t nAddress = (size_t)nX + (size_t)nY * (size_t)m_nPixelCountX;
 	m_PixelData[nAddress] = nValue;
@@ -211,8 +211,8 @@ void CImageObject::initRasterizationAlgorithms(uint32_t nUnitsPerSubPixel, uint3
 	m_nUnitsPerSubPixel = nUnitsPerSubPixel;
 	m_nPixelsPerBlock = nPixelsPerBlock;
 
-	m_dUnitsX = (25.4 / m_dDPIValueX) / (double)nSubSamplingX;
-	m_dUnitsY = (25.4 / m_dDPIValueY) / (double)nSubSamplingY;
+	m_dUnitsX = (25.4 / m_dDPIValueX) / (double)(nSubSamplingX * m_nUnitsPerSubPixel);
+	m_dUnitsY = (25.4 / m_dDPIValueY) / (double)(nSubSamplingY * m_nUnitsPerSubPixel);
 
 	m_nSubSamplingX = nSubSamplingX;
 	m_nSubSamplingY = nSubSamplingY;
@@ -234,6 +234,12 @@ void CImageObject::addRasterizationLayer(CLayerDataObject* pLayer)
 
 	pLayer->addClosedPolygonsToAlgorithm(pAlgorithm.get(), m_dUnitsX, m_dUnitsY);
 	pAlgorithm->buildBlocks();
+	for (uint32_t nBlockY = 0; nBlockY < m_nBlockCountY; nBlockY++) {
+		for (uint32_t nBlockX = 0; nBlockX < m_nBlockCountX; nBlockX++) {
+			pAlgorithm->buildBlockScanLines (nBlockX, nBlockY);
+		}
+	}
+			
 
 	m_Algorithms.push_back(pAlgorithm);
 
@@ -294,7 +300,7 @@ void CImageObject::calculateRasterizationImage(bool bAntiAliased)
 					*it = nBaseValue;
 
 				for (uint32_t nSampleIndex = 0; nSampleIndex < nActiveLayerCount; nSampleIndex++) {
-					m_ActiveAlgorithms[nActiveLayerCount]->addBlockToBuffer (nBlockX, nBlockY, m_BlockBuffer);
+					m_ActiveAlgorithms[nSampleIndex]->addBlockToBuffer (nBlockX, nBlockY, m_BlockBuffer);
 				}
 
 				for (uint32_t dY = 0; dY < m_nPixelsPerBlock; dY++) {

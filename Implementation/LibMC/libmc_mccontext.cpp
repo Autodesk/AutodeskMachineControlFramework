@@ -126,23 +126,44 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
         if (!result)
             throw ELibMCNoContextException(LIBMC_ERROR_COULDNOTPARSECONFIGURATION);
 
+        pugi::xml_node mainNode;
 
         auto machinedefinitionNode = doc.child("machinedefinition");
-        if (machinedefinitionNode.empty())
-            throw ELibMCNoContextException(LIBMC_ERROR_MISSINGMACHINEDEFINITION);
+        auto testdefinitionNode = doc.child("testdefinition");
 
-        auto xmlnsAttrib = machinedefinitionNode.attribute("xmlns");
+        if (!machinedefinitionNode.empty()) {
+            mainNode = machinedefinitionNode;
+            m_bIsTestingEnvironment = false;
+        }
+
+        if (!testdefinitionNode.empty()) {
+            if (!mainNode.empty ())
+                throw ELibMCNoContextException(LIBMC_ERROR_AMBIGIOUSMAINNODE);
+            mainNode = testdefinitionNode;
+            m_bIsTestingEnvironment = true;
+        } 
+
+
+        if (mainNode.empty()) {
+            throw ELibMCNoContextException(LIBMC_ERROR_MISSINGMAINNODE);
+        }
+
+        auto xmlnsAttrib = mainNode.attribute("xmlns");
         if (xmlnsAttrib.empty())
             throw ELibMCNoContextException(LIBMC_ERROR_MISSINGXMLSCHEMA);
 
         std::string xmlns(xmlnsAttrib.as_string());
-        if ((xmlns != MACHINEDEFINITION_XMLSCHEMA) && (xmlns != MACHINEDEFINITIONTEST_XMLSCHEMA))
-            throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLSCHEMA, xmlns);
+        if (m_bIsTestingEnvironment) {
+            if (xmlns != MACHINEDEFINITIONTEST_XMLSCHEMA)
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLSCHEMA, xmlns);
+        }
+        else {
+            if (xmlns != MACHINEDEFINITION_XMLSCHEMA)
+                throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLSCHEMA, xmlns);
 
-        if (xmlns == MACHINEDEFINITIONTEST_XMLSCHEMA)
-            m_bIsTestingEnvironment = true;
+        }
 
-        auto servicesNode = machinedefinitionNode.child("services");
+        auto servicesNode = mainNode.child("services");
         if (!servicesNode.empty()) {
 
             auto threadCountAttrib = servicesNode.attribute("threadcount");
@@ -164,7 +185,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
 
 
         m_pSystemState->logger()->logMessage("Loading drivers...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-        auto driversNodes = machinedefinitionNode.children("driver");
+        auto driversNodes = mainNode.children("driver");
         for (pugi::xml_node driversNode : driversNodes)
         {
             addDriver(driversNode);
@@ -172,7 +193,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
 
 
         m_pSystemState->logger()->logMessage("Initializing state machines...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-        auto statemachinesNodes = machinedefinitionNode.children("statemachine");
+        auto statemachinesNodes = mainNode.children("statemachine");
         for (pugi::xml_node instanceNode : statemachinesNodes)
         {
             addMachineInstance(instanceNode);
@@ -188,7 +209,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             pStateMachineInstance->getParameterHandler()->loadPersistentParameters(m_pSystemState->getPersistencyHandler ());
 
         // Load User Interface
-        auto userInterfaceNode = machinedefinitionNode.child("userinterface");
+        auto userInterfaceNode = mainNode.child("userinterface");
         if (userInterfaceNode.empty()) {
 
             if (!m_bIsTestingEnvironment)
@@ -743,6 +764,7 @@ void CMCContext::Log(const std::string& sMessage, const LibMC::eLogSubSystem eSu
     switch (eSubsystem) {
     case LibMC::eLogSubSystem::Network: sSubSystem = LOG_SUBSYSTEM_NETWORK; break;
     case LibMC::eLogSubSystem::System: sSubSystem = LOG_SUBSYSTEM_SYSTEM; break;
+    case LibMC::eLogSubSystem::Testing: sSubSystem = LOG_SUBSYSTEM_TESTING; break;
     default:
         sSubSystem = LOG_SUBSYSTEM_UNKNOWN;
     }

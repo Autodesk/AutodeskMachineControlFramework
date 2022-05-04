@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_rasterizer_interfaceexception.hpp"
 
 #include <cmath>
+#include <map>
 
 using namespace LibMCDriver_Rasterizer::Impl;
 
@@ -45,6 +46,12 @@ using namespace LibMCDriver_Rasterizer::Impl;
 #define MAXLINECOUNT (512 * 1024 * 1024)
 
 #define __RASTERASSERT(X,Y) { if (!(X)) throw std::runtime_error (Y); }
+
+struct sFractional {
+    int32_t nIntegerValue;
+    int32_t nNumerator;
+    int32_t nDenominator;
+};
 
 
 int32_t intFloorDiv(int32_t nDivident, int32_t nDivisor)
@@ -84,6 +91,42 @@ int32_t intFloorDiv(int32_t nDivident, int32_t nDivisor)
     }
 }
 
+int64_t intFloorDiv64(int64_t nDivident, int64_t nDivisor)
+{
+    if (nDivident == 0)
+        return 0;
+    if (nDivisor == 0)
+        throw std::runtime_error("division by zero!");
+
+    if (nDivident < 0) {
+        if (nDivisor < 0) {
+            // Positive division
+            return ((uint64_t)(-nDivident) / (uint64_t)(-nDivisor));
+        }
+        else {
+            uint64_t nUnsignedDivident = (uint64_t)(-nDivident);
+            uint64_t nUnsignedDivisor = (uint64_t)(nDivisor);
+
+            // Round division up in this case!
+            uint64_t nUnsignedResult = (nUnsignedDivident + nUnsignedDivisor - 1) / nUnsignedDivisor;
+            return -((int64_t)nUnsignedResult);
+        }
+    }
+    else {
+        if (nDivisor < 0) {
+            uint64_t nUnsignedDivident = (uint64_t)(nDivident);
+            uint64_t nUnsignedDivisor = (uint64_t)(-nDivisor);
+
+            // Round division up in this case!
+            uint64_t nUnsignedResult = (nUnsignedDivident + nUnsignedDivisor - 1) / nUnsignedDivisor;
+            return -((int64_t)nUnsignedResult);
+        }
+        else {
+
+            return ((uint64_t)(nDivident) / (uint64_t)(nDivisor));
+        }
+    }
+}
 
 CRasterizationAlgorithm::CRasterizationAlgorithm(uint32_t nUnitsPerSubPixel, uint32_t nSubPixelsPerPixelX, uint32_t nSubPixelsPerPixelY, uint32_t nPixelsPerBlock, uint32_t nBlockCountX, uint32_t nBlockCountY, uint32_t nExpectedLineCount)
     : m_nUnitsPerSubPixel (nUnitsPerSubPixel), 
@@ -96,7 +139,8 @@ CRasterizationAlgorithm::CRasterizationAlgorithm(uint32_t nUnitsPerSubPixel, uin
     m_nNegativeHalfPlaneLineCount (0),
     m_nDisregardedLineCount (0),
     m_LineItemBufferCapacity (0),
-    m_LineItemBufferIndex (0)
+    m_LineItemBufferIndex (0),
+    m_nBlocksInUse (0)
 
 {
     if ((nUnitsPerSubPixel < RASTERALGORITHM_MINUNITSPERSUBPIXEL) || (nUnitsPerSubPixel > RASTERALGORITHM_MAXUNITSPERSUBPIXEL) || ((nUnitsPerSubPixel % 2) != 0))
@@ -118,6 +162,7 @@ CRasterizationAlgorithm::CRasterizationAlgorithm(uint32_t nUnitsPerSubPixel, uin
     m_nUnitsPerPixelY = nUnitsPerSubPixel * nSubPixelsPerPixelY;
     m_nUnitsPerBlockX = m_nUnitsPerPixelX * nPixelsPerBlock;
     m_nUnitsPerBlockY = m_nUnitsPerPixelY * nPixelsPerBlock;
+    m_nScanLinesPerBlock = nPixelsPerBlock * nSubPixelsPerPixelY;
 
     m_nTotalSizeInUnitsX = (uint64_t) m_nUnitsPerBlockX * (uint64_t)m_nBlockCountX;
     m_nTotalSizeInUnitsY = (uint64_t) m_nUnitsPerBlockY * (uint64_t)m_nBlockCountY;
@@ -125,10 +170,21 @@ CRasterizationAlgorithm::CRasterizationAlgorithm(uint32_t nUnitsPerSubPixel, uin
     m_Lines.reserve(m_nExpectedLineCount);
 
     m_Blocks.resize((uint64_t)nBlockCountX * (uint64_t)nBlockCountY);
+    m_ScanSeedValueBuffer.resize(m_Blocks.size() * m_nScanLinesPerBlock);
+
+    int32_t* pCurrentSeedValueBuffer = m_ScanSeedValueBuffer.data ();
+    for (auto& value : m_ScanSeedValueBuffer) 
+        value = 0;
+    
+
     for (auto& block : m_Blocks) {
         block.m_pFirstItem = nullptr;
+        block.m_nLineCount = 0;
         block.m_Type = eBlockType::btUnknown;
+        block.m_pScanSeedValues = pCurrentSeedValueBuffer;
+        pCurrentSeedValueBuffer += m_nScanLinesPerBlock;
     }
+    m_nBlocksInUse = 0;
 
 }
 
@@ -213,17 +269,19 @@ void CRasterizationAlgorithm::addLineInternal(int32_t nX1units, int32_t nY1units
     uint32_t nMaxDeltaBlocksY = (nDeltaY / m_nUnitsPerBlockY) + 1;
 
     if (nMaxDeltaBlocksX > nMaxDeltaBlocksY)
-        m_LineItemBufferCapacity += (uint64_t)nMaxDeltaBlocksX * 2;  
+        m_LineItemBufferCapacity += (uint64_t)nMaxDeltaBlocksX * 4;  
     else
-        m_LineItemBufferCapacity += (uint64_t)nMaxDeltaBlocksY * 2;
+        m_LineItemBufferCapacity += (uint64_t)nMaxDeltaBlocksY * 4;
 }
 
 void CRasterizationAlgorithm::buildBlocks()
 {
     for (auto& block : m_Blocks) {
         block.m_pFirstItem = nullptr;
+        block.m_nLineCount = 0;
         block.m_Type = eBlockType::btUnknown;
     }
+    m_nBlocksInUse = 0;
 
     m_LineListItemBuffer.resize(m_LineItemBufferCapacity);
     m_LineItemBufferIndex = 0;
@@ -273,6 +331,14 @@ eBlockType CRasterizationAlgorithm::getBlockInfo(int32_t nBlockX, int32_t nBlock
     sRasterBlockStructure* pBlock = getBlock(nBlockX, nBlockY);
     if (pBlock == nullptr)
         return eBlockType::btOutsideRange;
+
+    if (pBlock->m_pFirstItem == nullptr) {
+        if (pBlock->m_pScanSeedValues[0] > 0)
+            return eBlockType::btCompleteInside;
+    }
+    else {
+        return eBlockType::btBorder;
+    }
 
     return pBlock->m_Type;
 
@@ -346,6 +412,40 @@ void CRasterizationAlgorithm::buildBlocksVertical(int nBlockX, int nBlockY1, int
 
 }
 
+sFractional calculateYBlockBorderCrossPoint(int32_t basePointX, int32_t basePointY, int32_t deltaX, int32_t deltaY, int32_t crossLineX)
+{
+    sFractional qResult;
+
+    // calculate crossing point of a line with vertical block border and return 
+    int32_t dX = crossLineX - basePointX;
+    __RASTERASSERT(dX >= 0, "dX assumption wrong");
+    __RASTERASSERT(deltaX > 0, "line incorrectly oriented");
+
+    int64_t nNumerator = (int64_t)dX * (int64_t)deltaY;
+    int32_t nDenominator = deltaX;
+
+    if ((nNumerator % nDenominator) != 0) { // We have a fractional y
+        int64_t nRoundedY = intFloorDiv64(nNumerator, nDenominator);
+        int64_t nFractionalY = nNumerator - (nRoundedY * (int64_t) nDenominator);
+        __RASTERASSERT(nFractionalY > 0, "fractional Y division assumption wrong");
+
+        qResult.nIntegerValue = (int32_t)nRoundedY + basePointY;
+        qResult.nNumerator = (int32_t)nFractionalY;
+        qResult.nDenominator = nDenominator;
+
+    }
+    else {
+        int64_t nExactY = (nNumerator / nDenominator);
+        qResult.nIntegerValue = (int32_t)nExactY + basePointY;
+        qResult.nNumerator = 0;
+        qResult.nDenominator = 1;
+    }
+
+    return qResult;
+
+}
+
+
 void CRasterizationAlgorithm::buildBlocksRational(sRasterLine* pLine)
 {
     __RASTERASSERT(pLine != nullptr, "unassigned raster line");
@@ -365,8 +465,8 @@ void CRasterizationAlgorithm::buildBlocksRational(sRasterLine* pLine)
         nY2 = pLine->m_nY2;
     }
 
-    int64_t nDeltaX = (int64_t)nX2 - (int64_t)nX1;
-    int64_t nDeltaY = (int64_t)nY2 - (int64_t)nY1;
+    int32_t nDeltaX = nX2 - nX1;
+    int32_t nDeltaY = nY2 - nY1;
     __RASTERASSERT(nDeltaX > 0, "Delta X assumption wrong");
     __RASTERASSERT(nDeltaY != 0, "Delta Y assumption wrong");
 
@@ -397,34 +497,22 @@ void CRasterizationAlgorithm::buildBlocksRational(sRasterLine* pLine)
 
             int32_t startX = nBlockX * m_nUnitsPerBlockX;
             if (startX < nX1) {
-                startX = nX1;
+                __RASTERASSERT((nY1 % m_nUnitsPerBlockY) != 0, "Y Coordinate on block border!");
                 nBlockY1 = intFloorDiv(nY1, m_nUnitsPerBlockY);
             }
             else {
-                                
-                // calculate nBlockY1
-                int32_t dX = startX - nX1;
-
-                __RASTERASSERT(dX > 0, "dX assumption wrong");
-                int64_t nNumerator = (int64_t) dX * (int64_t)nDeltaY;
-                int64_t nDenominator = nDeltaX;                      
-                
+                auto qCrossPoint = calculateYBlockBorderCrossPoint (nX1, nY1, nDeltaX, nDeltaY, startX);
+                nBlockY1 = intFloorDiv(qCrossPoint.nIntegerValue, m_nUnitsPerBlockY);
             }
 
             int32_t endX = (nBlockX + 1) * m_nUnitsPerBlockX;
             if (endX > nX2) {
-                endX = nX2;
+                __RASTERASSERT((nY2 % m_nUnitsPerBlockY) != 0, "Y Coordinate on block border!");
                 nBlockY2 = intFloorDiv(nY2, m_nUnitsPerBlockY);
             }
             else {
-                                
-                // calculate nBlockY1
-                int32_t dX = startX - nX1;
-
-                __RASTERASSERT(dX > 0, "dX assumption wrong");
-                int64_t nNumerator = (int64_t)dX * (int64_t)nDeltaY;
-                int64_t nDenominator = nDeltaX;                
-
+                auto qCrossPoint = calculateYBlockBorderCrossPoint(nX1, nY1, nDeltaX, nDeltaY, endX);
+                nBlockY2 = intFloorDiv(qCrossPoint.nIntegerValue, m_nUnitsPerBlockY);
             }
 
             buildBlocksVertical(nBlockX, nBlockY1, nBlockY2, pLine);
@@ -442,14 +530,88 @@ void CRasterizationAlgorithm::addLineToBlock(sRasterLine* pLine, _sRasterBlockSt
 
     sRasterLineListItem* pItem = &m_LineListItemBuffer.at(m_LineItemBufferIndex);
     pItem->m_pLine = pLine;
-    pItem->m_pNextItem = pBlock->m_pFirstItem;
+    pItem->m_pNextItem = pBlock->m_pFirstItem;    
     pBlock->m_pFirstItem = pItem;
+
+    if (pBlock->m_nLineCount == 0)
+        m_nBlocksInUse++;
+
+
+    pBlock->m_nLineCount++;
 
     m_LineItemBufferIndex++;
 
 
-    
+  
+}
+
+
+bool lineIsOnScanline (int32_t nYValue, sRasterLine * pLine, double & dXValue)
+{
+    if (pLine == nullptr)
+        return false;
+
+    __RASTERASSERT(pLine->m_nY1 != nYValue, "point is on scanline!");
+    __RASTERASSERT(pLine->m_nY2 != nYValue, "point is on scanline!");
+
+    bool bLineIsOnScanLine = ((pLine->m_nY1 < nYValue) && (pLine->m_nY2 > nYValue)) || ((pLine->m_nY1 > nYValue) && (pLine->m_nY2 < nYValue));
+    if (bLineIsOnScanLine) {
+
+        double deltaX = (double)((int64_t)pLine->m_nX2 - (int64_t)pLine->m_nX1);
+        double deltaY = (double) ((int64_t)pLine->m_nY2 - (int64_t)pLine->m_nY1);
+        dXValue = ((double)((int64_t)nYValue - (int64_t)pLine->m_nY1) / deltaY) * deltaX + (double) pLine->m_nX1;
+
+        return true;
+    }
+    else {
+        dXValue = 0.0;
+        return false;
+    }
 
 }
+
+void CRasterizationAlgorithm::buildBlockScanLines(uint32_t nBlockIndexX, uint32_t nBlockIndexY)
+{
+    auto pBlock = getBlock(nBlockIndexX, nBlockIndexY);
+    if (pBlock == nullptr)
+        return;
+
+    auto pNextBlock = getBlock(nBlockIndexX + 1, nBlockIndexY);
+    for (uint32_t nScanLineIndex = 0; nScanLineIndex < m_nScanLinesPerBlock; nScanLineIndex++) {
+        int32_t nSeedWindingNumber = pBlock->m_pScanSeedValues[nScanLineIndex];
+        int32_t nYValue = nBlockIndexY * m_nUnitsPerBlockY + nScanLineIndex * m_nUnitsPerSubPixel + m_nUnitsPerHalfSubPixel;
+
+        std::map<double, sRasterLine *> linesOnScanline;
+
+        auto pItem = pBlock->m_pFirstItem;
+        while (pItem) {
+            double dXValue;
+            auto pLine = pItem->m_pLine;
+            if (lineIsOnScanline(nYValue, pLine, dXValue)) {
+                linesOnScanline.insert(std::make_pair (dXValue, pLine));
+            }
+
+            pItem = pItem->m_pNextItem;
+        }
+
+        int32_t nCurrentWindingNumber = nSeedWindingNumber;
+
+        for (auto iIter : linesOnScanline) {
+            if (iIter.second->m_nY1 > iIter.second->m_nY2)
+                nCurrentWindingNumber++;
+            else
+                nCurrentWindingNumber--;
+        } 
+
+        if (pNextBlock != nullptr) {
+            pNextBlock->m_pScanSeedValues[nScanLineIndex] = nCurrentWindingNumber;
+        } 
+
+    }
+    
+
+
+}
+
 
 

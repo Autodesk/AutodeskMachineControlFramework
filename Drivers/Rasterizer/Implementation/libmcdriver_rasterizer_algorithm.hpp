@@ -80,6 +80,8 @@ namespace LibMCDriver_Rasterizer {
         typedef struct _sRasterBlockStructure
         {
             sRasterLineListItem * m_pFirstItem;
+            uint32_t m_nLineCount;
+            int32_t * m_pScanSeedValues;
             eBlockType m_Type;
         } sRasterBlockStructure;
 
@@ -101,12 +103,14 @@ namespace LibMCDriver_Rasterizer {
                 uint32_t m_nPixelsPerBlock;
                 uint32_t m_nUnitsPerBlockX;
                 uint32_t m_nUnitsPerBlockY;
+                uint32_t m_nScanLinesPerBlock;
 
                 // Block count must be positive
                 uint32_t m_nBlockCountX;
                 uint32_t m_nBlockCountY;
                 uint64_t m_nTotalSizeInUnitsX;
                 uint64_t m_nTotalSizeInUnitsY;
+                uint64_t m_nBlocksInUse;
 
                 // Expected Line Count is just for memory preallocation
                 uint32_t m_nExpectedLineCount;
@@ -125,6 +129,7 @@ namespace LibMCDriver_Rasterizer {
                 // Block and Line arrays
                 std::vector<sRasterBlockStructure> m_Blocks;
                 std::vector<sRasterLine> m_Lines;
+                std::vector<int32_t> m_ScanSeedValueBuffer;
 
                 bool isOnScanLineX(int32_t nXunits);
                 bool isOnScanLineY(int32_t nYunits);
@@ -144,6 +149,7 @@ namespace LibMCDriver_Rasterizer {
                 void addLine(int32_t nX1units, int32_t nY1units, int32_t nX2units, int32_t nY2units, int32_t nMetaData);
 
                 void buildBlocks();
+                void buildBlockScanLines(uint32_t nBlockIndexX, uint32_t nBlockIndexY);
 
                 sRasterBlockStructure* getBlock(uint32_t nBlockIndexX, uint32_t nBlockIndexY);
                 eBlockType getBlockInfoAtXY (int32_t nXunits, int32_t nYunits);
