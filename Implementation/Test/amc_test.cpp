@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_test.hpp"
 #include <iostream>
+#include <chrono>
 #include <pugixml.hpp>
 
 using namespace AMCTest;
@@ -213,7 +214,7 @@ void CTest::executeBlocking()
 					bAllInstancesAreSuccessful = bAllInstancesAreSuccessful && bInstanceIsSuccessful;
 				}
 
-				Sleep(100);
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			}
 
 			for (std::string sInstanceName : instanceNames) {
