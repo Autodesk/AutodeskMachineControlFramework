@@ -96,7 +96,7 @@ public:
 		PointsBuffer.push_back({ 324.0, 248.0});
 		PointsBuffer.push_back({ 860.0, 290.0 });
 		PointsBuffer.push_back({ 1038.0, 703.0 });
-		//PointsBuffer.push_back({ 235.0, 684.0 });
+		PointsBuffer.push_back({ 235.0, 684.0 });
 
 
 		pLayer->AddEntity(PointsBuffer, LibMCDriver_Rasterizer::eGeometryType::SolidGeometry);

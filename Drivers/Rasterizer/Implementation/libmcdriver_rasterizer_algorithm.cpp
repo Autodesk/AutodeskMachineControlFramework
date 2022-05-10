@@ -348,6 +348,12 @@ void CRasterizationAlgorithm::addBlockToBuffer(int32_t nBlockX, int32_t nBlockY,
 {
     __RASTERASSERT(buffer.size () == ((size_t)m_nPixelsPerBlock * m_nPixelsPerBlock), "invalid buffer block size");
 
+    // Todo: Fine rasterization
+    for (auto& pixel : buffer) {
+        pixel = 128;
+    }
+
+
 }
 
 
@@ -588,7 +594,10 @@ void CRasterizationAlgorithm::buildBlockScanLines(uint32_t nBlockIndexX, uint32_
             double dXValue;
             auto pLine = pItem->m_pLine;
             if (lineIsOnScanline(nYValue, pLine, dXValue)) {
-                linesOnScanline.insert(std::make_pair (dXValue, pLine));
+
+                if ((dXValue > nBlockIndexX * (double)m_nUnitsPerBlockX) && ((dXValue < ((int64_t)nBlockIndexX+1) * (double)m_nUnitsPerBlockX))) {
+                    linesOnScanline.insert(std::make_pair(dXValue, pLine));
+                }
             }
 
             pItem = pItem->m_pNextItem;
