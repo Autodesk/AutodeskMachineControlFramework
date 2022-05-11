@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "amc_systemstate.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_testenvironment.hpp"
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_ui_handler.hpp"
@@ -75,7 +76,7 @@ uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
 }
 
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler *pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler)
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string& sTestEnvironmentPath)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
@@ -375,3 +376,8 @@ std::vector<AMC::PUIClientAction>& CUIEnvironment::getClientActions()
     return m_ClientActions;
 }
 
+
+ITestEnvironment* CUIEnvironment::GetTestEnvironment()
+{
+    return new CTestEnvironment(m_sTestEnvironmentPath);
+}

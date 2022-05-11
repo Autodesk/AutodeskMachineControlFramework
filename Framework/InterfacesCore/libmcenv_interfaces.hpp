@@ -56,6 +56,7 @@ namespace Impl {
 */
 class IBase;
 class IIterator;
+class ITestEnvironment;
 class IImageData;
 class IToolpathPart;
 class IToolpathLayer;
@@ -289,6 +290,25 @@ public:
 };
 
 typedef IBaseSharedPtr<IIterator> PIIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for TestEnvironment 
+**************************************************************************************************************************/
+
+class ITestEnvironment : public virtual IBase {
+public:
+	/**
+	* ITestEnvironment::WriteTestOutput - Write output file to test directory.
+	* @param[in] sOutputName - Output file name. Only alphanumeric characters, point, underscore and hypen are allowed.
+	* @param[in] nDataBufferSize - Number of elements in buffer
+	* @param[in] pDataBuffer - Test data to write into output directory.
+	*/
+	virtual void WriteTestOutput(const std::string & sOutputName, const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITestEnvironment> PITestEnvironment;
 
 
 /*************************************************************************************************************************
@@ -1477,6 +1497,12 @@ public:
 	*/
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
 
+	/**
+	* IStateEnvironment::GetTestEnvironment - Returns a test environment instance.
+	* @return Test Environment Instance
+	*/
+	virtual ITestEnvironment * GetTestEnvironment() = 0;
+
 };
 
 typedef IBaseSharedPtr<IStateEnvironment> PIStateEnvironment;
@@ -1740,6 +1766,12 @@ public:
 	* @return Timer value in Milliseconds
 	*/
 	virtual LibMCEnv_uint64 GetGlobalTimerInMilliseconds() = 0;
+
+	/**
+	* IUIEnvironment::GetTestEnvironment - Returns a test environment instance.
+	* @return Test Environment Instance
+	*/
+	virtual ITestEnvironment * GetTestEnvironment() = 0;
 
 };
 

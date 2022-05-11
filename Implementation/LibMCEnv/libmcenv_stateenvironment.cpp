@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_testenvironment.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -377,4 +378,9 @@ IImageData* CStateEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBuffer
 LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
 {
 	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+}
+
+ITestEnvironment* CStateEnvironment::GetTestEnvironment()
+{
+	return new CTestEnvironment(m_pSystemState->getTestEnvironmentPath ());
 }

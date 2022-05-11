@@ -134,6 +134,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDPIXELDATACOUNT 36
 #define LIBMCENV_ERROR_INVALIDIMAGEBUFFER 37
 #define LIBMCENV_ERROR_INVALIDPIXELFORMAT 38
+#define LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME 39
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -180,6 +181,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDPIXELDATACOUNT: return "Invalid pixel data count.";
     case LIBMCENV_ERROR_INVALIDIMAGEBUFFER: return "Invalid image buffer.";
     case LIBMCENV_ERROR_INVALIDPIXELFORMAT: return "Invalid pixel format.";
+    case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "Invalid test output name.";
     default: return "unknown error";
   }
 }
@@ -190,6 +192,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
 
 typedef LibMCEnvHandle LibMCEnv_Base;
 typedef LibMCEnvHandle LibMCEnv_Iterator;
+typedef LibMCEnvHandle LibMCEnv_TestEnvironment;
 typedef LibMCEnvHandle LibMCEnv_ImageData;
 typedef LibMCEnvHandle LibMCEnv_ToolpathPart;
 typedef LibMCEnvHandle LibMCEnv_ToolpathLayer;

@@ -110,6 +110,7 @@ namespace AMC {
 		CUIExpression m_LoginWelcomeMessage;
 
 		std::string m_sMainPageName;
+		std::string m_sTestOutputPath;
 
 		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
@@ -138,7 +139,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
+		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, const std::string & sTestOutputPath);
 		
 		virtual ~CUIHandler();
 		

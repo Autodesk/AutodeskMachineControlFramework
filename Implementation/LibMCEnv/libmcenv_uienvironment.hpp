@@ -76,6 +76,7 @@ private:
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
+	std::string m_sTestEnvironmentPath;
 
 	AMCCommon::CChrono m_Chrono;
 
@@ -85,7 +86,7 @@ protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string & sTestEnvironmentPath);
 
 	virtual ~CUIEnvironment();
 
@@ -157,6 +158,8 @@ public:
 	std::string ShowMessageDlg(const std::string& sCaption, const std::string& sTitle, const LibMCEnv::eMessageDialogType eDialogType, const std::string& sYesEvent, const std::string& sNoEvent, const std::string& sCancelEvent) override;
 
 	std::vector<AMC::PUIClientAction>& getClientActions();
+
+	ITestEnvironment* GetTestEnvironment() override;
 
 
 };

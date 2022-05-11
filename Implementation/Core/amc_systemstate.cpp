@@ -51,7 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace AMC {
 
-	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper)
+	CSystemState::CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, const std::string& sTestEnvironmentPath)
+		: m_sTestEnvironmentPath (sTestEnvironmentPath)
 	{
 		LibMCAssertNotNull(pLogger.get());
 		LibMCAssertNotNull(pDataModel.get());
@@ -76,7 +77,7 @@ namespace AMC {
 		m_pSignalHandler = std::make_shared<CStateSignalHandler>();
 		m_pServiceHandler = std::make_shared<CServiceHandler>(m_pLogger);
 		m_pStateMachineData = std::make_shared<CStateMachineData>();
-		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger);
+		m_pUIHandler = std::make_shared<CUIHandler>(m_pStateMachineData, m_pSignalHandler,  pEnvWrapper, m_pLogger, getTestEnvironmentPath ());
 
 	}
 
@@ -242,4 +243,8 @@ namespace AMC {
 		return __STRINGIZE_VALUE_OF(__CLIENTHASH);
 	}
 
+	std::string CSystemState::getTestEnvironmentPath()
+	{
+		return m_sTestEnvironmentPath;
+	}
 }

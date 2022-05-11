@@ -110,6 +110,21 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_clone(LibMCEnv_Iterator pIter
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_iterator_count(LibMCEnv_Iterator pIterator, LibMCEnv_uint64 * pCount);
 
 /*************************************************************************************************************************
+ Class definition for TestEnvironment
+**************************************************************************************************************************/
+
+/**
+* Write output file to test directory.
+*
+* @param[in] pTestEnvironment - TestEnvironment instance.
+* @param[in] pOutputName - Output file name. Only alphanumeric characters, point, underscore and hypen are allowed.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[in] pDataBuffer - uint8 buffer of Test data to write into output directory.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_testenvironment_writetestoutput(LibMCEnv_TestEnvironment pTestEnvironment, const char * pOutputName, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for ImageData
 **************************************************************************************************************************/
 
@@ -1726,6 +1741,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadpngimage(LibMCEnv
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilliseconds(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
+/**
+* Returns a test environment instance.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTestEnvironment - Test Environment Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_gettestenvironment(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -2097,6 +2121,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_loadpngimage(LibMCEnv_UI
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_getglobaltimerinmilliseconds(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 * pTimerValue);
+
+/**
+* Returns a test environment instance.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pTestEnvironment - Test Environment Instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_uienvironment_gettestenvironment(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment);
 
 /*************************************************************************************************************************
  Global functions

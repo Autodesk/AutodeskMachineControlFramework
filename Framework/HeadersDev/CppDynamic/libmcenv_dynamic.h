@@ -97,6 +97,21 @@ typedef LibMCEnvResult (*PLibMCEnvIterator_ClonePtr) (LibMCEnv_Iterator pIterato
 typedef LibMCEnvResult (*PLibMCEnvIterator_CountPtr) (LibMCEnv_Iterator pIterator, LibMCEnv_uint64 * pCount);
 
 /*************************************************************************************************************************
+ Class definition for TestEnvironment
+**************************************************************************************************************************/
+
+/**
+* Write output file to test directory.
+*
+* @param[in] pTestEnvironment - TestEnvironment instance.
+* @param[in] pOutputName - Output file name. Only alphanumeric characters, point, underscore and hypen are allowed.
+* @param[in] nDataBufferSize - Number of elements in buffer
+* @param[in] pDataBuffer - uint8 buffer of Test data to write into output directory.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvTestEnvironment_WriteTestOutputPtr) (LibMCEnv_TestEnvironment pTestEnvironment, const char * pOutputName, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer);
+
+/*************************************************************************************************************************
  Class definition for ImageData
 **************************************************************************************************************************/
 
@@ -1713,6 +1728,15 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadPNGImagePtr) (LibMCEnv_St
 */
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint64 * pTimerValue);
 
+/**
+* Returns a test environment instance.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[out] pTestEnvironment - Test Environment Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetTestEnvironmentPtr) (LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment);
+
 /*************************************************************************************************************************
  Class definition for UIEnvironment
 **************************************************************************************************************************/
@@ -2085,6 +2109,15 @@ typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_LoadPNGImagePtr) (LibMCEnv_UIEnv
 */
 typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetGlobalTimerInMillisecondsPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_uint64 * pTimerValue);
 
+/**
+* Returns a test environment instance.
+*
+* @param[in] pUIEnvironment - UIEnvironment instance.
+* @param[out] pTestEnvironment - Test Environment Instance
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvUIEnvironment_GetTestEnvironmentPtr) (LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -2146,6 +2179,7 @@ typedef struct {
 	PLibMCEnvIterator_GetCurrentPtr m_Iterator_GetCurrent;
 	PLibMCEnvIterator_ClonePtr m_Iterator_Clone;
 	PLibMCEnvIterator_CountPtr m_Iterator_Count;
+	PLibMCEnvTestEnvironment_WriteTestOutputPtr m_TestEnvironment_WriteTestOutput;
 	PLibMCEnvImageData_GetPixelFormatPtr m_ImageData_GetPixelFormat;
 	PLibMCEnvImageData_ChangePixelFormatPtr m_ImageData_ChangePixelFormat;
 	PLibMCEnvImageData_GetDPIPtr m_ImageData_GetDPI;
@@ -2297,6 +2331,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_CreateEmptyImagePtr m_StateEnvironment_CreateEmptyImage;
 	PLibMCEnvStateEnvironment_LoadPNGImagePtr m_StateEnvironment_LoadPNGImage;
 	PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr m_StateEnvironment_GetGlobalTimerInMilliseconds;
+	PLibMCEnvStateEnvironment_GetTestEnvironmentPtr m_StateEnvironment_GetTestEnvironment;
 	PLibMCEnvUIEnvironment_ActivateModalDialogPtr m_UIEnvironment_ActivateModalDialog;
 	PLibMCEnvUIEnvironment_CloseModalDialogPtr m_UIEnvironment_CloseModalDialog;
 	PLibMCEnvUIEnvironment_ActivatePagePtr m_UIEnvironment_ActivatePage;
@@ -2330,6 +2365,7 @@ typedef struct {
 	PLibMCEnvUIEnvironment_CreateEmptyImagePtr m_UIEnvironment_CreateEmptyImage;
 	PLibMCEnvUIEnvironment_LoadPNGImagePtr m_UIEnvironment_LoadPNGImage;
 	PLibMCEnvUIEnvironment_GetGlobalTimerInMillisecondsPtr m_UIEnvironment_GetGlobalTimerInMilliseconds;
+	PLibMCEnvUIEnvironment_GetTestEnvironmentPtr m_UIEnvironment_GetTestEnvironment;
 	PLibMCEnvGetVersionPtr m_GetVersion;
 	PLibMCEnvGetLastErrorPtr m_GetLastError;
 	PLibMCEnvReleaseInstancePtr m_ReleaseInstance;

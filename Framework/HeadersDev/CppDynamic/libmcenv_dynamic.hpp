@@ -61,6 +61,7 @@ namespace LibMCEnv {
 class CWrapper;
 class CBase;
 class CIterator;
+class CTestEnvironment;
 class CImageData;
 class CToolpathPart;
 class CToolpathLayer;
@@ -82,6 +83,7 @@ class CUIEnvironment;
 typedef CWrapper CLibMCEnvWrapper;
 typedef CBase CLibMCEnvBase;
 typedef CIterator CLibMCEnvIterator;
+typedef CTestEnvironment CLibMCEnvTestEnvironment;
 typedef CImageData CLibMCEnvImageData;
 typedef CToolpathPart CLibMCEnvToolpathPart;
 typedef CToolpathLayer CLibMCEnvToolpathLayer;
@@ -103,6 +105,7 @@ typedef CUIEnvironment CLibMCEnvUIEnvironment;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
+typedef std::shared_ptr<CTestEnvironment> PTestEnvironment;
 typedef std::shared_ptr<CImageData> PImageData;
 typedef std::shared_ptr<CToolpathPart> PToolpathPart;
 typedef std::shared_ptr<CToolpathLayer> PToolpathLayer;
@@ -124,6 +127,7 @@ typedef std::shared_ptr<CUIEnvironment> PUIEnvironment;
 typedef PWrapper PLibMCEnvWrapper;
 typedef PBase PLibMCEnvBase;
 typedef PIterator PLibMCEnvIterator;
+typedef PTestEnvironment PLibMCEnvTestEnvironment;
 typedef PImageData PLibMCEnvImageData;
 typedef PToolpathPart PLibMCEnvToolpathPart;
 typedef PToolpathLayer PLibMCEnvToolpathLayer;
@@ -311,6 +315,7 @@ private:
 
 	friend class CBase;
 	friend class CIterator;
+	friend class CTestEnvironment;
 	friend class CImageData;
 	friend class CToolpathPart;
 	friend class CToolpathLayer;
@@ -404,6 +409,23 @@ public:
 	inline PBase GetCurrent();
 	inline PIterator Clone();
 	inline LibMCEnv_uint64 Count();
+};
+	
+/*************************************************************************************************************************
+ Class CTestEnvironment 
+**************************************************************************************************************************/
+class CTestEnvironment : public CBase {
+public:
+	
+	/**
+	* CTestEnvironment::CTestEnvironment - Constructor for TestEnvironment class.
+	*/
+	CTestEnvironment(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void WriteTestOutput(const std::string & sOutputName, const CInputVector<LibMCEnv_uint8> & DataBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -763,6 +785,7 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
+	inline PTestEnvironment GetTestEnvironment();
 };
 	
 /*************************************************************************************************************************
@@ -812,6 +835,7 @@ public:
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
+	inline PTestEnvironment GetTestEnvironment();
 };
 	
 	/**
@@ -900,6 +924,7 @@ public:
 		pWrapperTable->m_Iterator_GetCurrent = nullptr;
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
+		pWrapperTable->m_TestEnvironment_WriteTestOutput = nullptr;
 		pWrapperTable->m_ImageData_GetPixelFormat = nullptr;
 		pWrapperTable->m_ImageData_ChangePixelFormat = nullptr;
 		pWrapperTable->m_ImageData_GetDPI = nullptr;
@@ -1051,6 +1076,7 @@ public:
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
+		pWrapperTable->m_StateEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_CloseModalDialog = nullptr;
 		pWrapperTable->m_UIEnvironment_ActivatePage = nullptr;
@@ -1084,6 +1110,7 @@ public:
 		pWrapperTable->m_UIEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_UIEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds = nullptr;
+		pWrapperTable->m_UIEnvironment_GetTestEnvironment = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1180,6 +1207,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Iterator_Count == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TestEnvironment_WriteTestOutput = (PLibMCEnvTestEnvironment_WriteTestOutputPtr) GetProcAddress(hLibrary, "libmcenv_testenvironment_writetestoutput");
+		#else // _WIN32
+		pWrapperTable->m_TestEnvironment_WriteTestOutput = (PLibMCEnvTestEnvironment_WriteTestOutputPtr) dlsym(hLibrary, "libmcenv_testenvironment_writetestoutput");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TestEnvironment_WriteTestOutput == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2542,6 +2578,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_GetTestEnvironment = (PLibMCEnvStateEnvironment_GetTestEnvironmentPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_gettestenvironment");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_GetTestEnvironment = (PLibMCEnvStateEnvironment_GetTestEnvironmentPtr) dlsym(hLibrary, "libmcenv_stateenvironment_gettestenvironment");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_GetTestEnvironment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
 		#else // _WIN32
 		pWrapperTable->m_UIEnvironment_ActivateModalDialog = (PLibMCEnvUIEnvironment_ActivateModalDialogPtr) dlsym(hLibrary, "libmcenv_uienvironment_activatemodaldialog");
@@ -2839,6 +2884,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_UIEnvironment_GetTestEnvironment = (PLibMCEnvUIEnvironment_GetTestEnvironmentPtr) GetProcAddress(hLibrary, "libmcenv_uienvironment_gettestenvironment");
+		#else // _WIN32
+		pWrapperTable->m_UIEnvironment_GetTestEnvironment = (PLibMCEnvUIEnvironment_GetTestEnvironmentPtr) dlsym(hLibrary, "libmcenv_uienvironment_gettestenvironment");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_UIEnvironment_GetTestEnvironment == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) GetProcAddress(hLibrary, "libmcenv_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCEnvGetVersionPtr) dlsym(hLibrary, "libmcenv_getversion");
@@ -2917,6 +2971,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_iterator_count", (void**)&(pWrapperTable->m_Iterator_Count));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Count == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_testenvironment_writetestoutput", (void**)&(pWrapperTable->m_TestEnvironment_WriteTestOutput));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TestEnvironment_WriteTestOutput == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_imagedata_getpixelformat", (void**)&(pWrapperTable->m_ImageData_GetPixelFormat));
@@ -3523,6 +3581,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_gettestenvironment", (void**)&(pWrapperTable->m_StateEnvironment_GetTestEnvironment));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_GetTestEnvironment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_uienvironment_activatemodaldialog", (void**)&(pWrapperTable->m_UIEnvironment_ActivateModalDialog));
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_ActivateModalDialog == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3655,6 +3717,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetGlobalTimerInMilliseconds == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_uienvironment_gettestenvironment", (void**)&(pWrapperTable->m_UIEnvironment_GetTestEnvironment));
+		if ( (eLookupError != 0) || (pWrapperTable->m_UIEnvironment_GetTestEnvironment == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_getversion", (void**)&(pWrapperTable->m_GetVersion));
 		if ( (eLookupError != 0) || (pWrapperTable->m_GetVersion == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3752,6 +3818,20 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Count(m_pHandle, &resultCount));
 		
 		return resultCount;
+	}
+	
+	/**
+	 * Method definitions for class CTestEnvironment
+	 */
+	
+	/**
+	* CTestEnvironment::WriteTestOutput - Write output file to test directory.
+	* @param[in] sOutputName - Output file name. Only alphanumeric characters, point, underscore and hypen are allowed.
+	* @param[in] DataBuffer - Test data to write into output directory.
+	*/
+	void CTestEnvironment::WriteTestOutput(const std::string & sOutputName, const CInputVector<LibMCEnv_uint8> & DataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TestEnvironment_WriteTestOutput(m_pHandle, sOutputName.c_str(), (LibMCEnv_uint64)DataBuffer.size(), DataBuffer.data()));
 	}
 	
 	/**
@@ -5751,6 +5831,21 @@ public:
 	}
 	
 	/**
+	* CStateEnvironment::GetTestEnvironment - Returns a test environment instance.
+	* @return Test Environment Instance
+	*/
+	PTestEnvironment CStateEnvironment::GetTestEnvironment()
+	{
+		LibMCEnvHandle hTestEnvironment = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_GetTestEnvironment(m_pHandle, &hTestEnvironment));
+		
+		if (!hTestEnvironment) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTestEnvironment>(m_pWrapper, hTestEnvironment);
+	}
+	
+	/**
 	 * Method definitions for class CUIEnvironment
 	 */
 	
@@ -6190,6 +6285,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetGlobalTimerInMilliseconds(m_pHandle, &resultTimerValue));
 		
 		return resultTimerValue;
+	}
+	
+	/**
+	* CUIEnvironment::GetTestEnvironment - Returns a test environment instance.
+	* @return Test Environment Instance
+	*/
+	PTestEnvironment CUIEnvironment::GetTestEnvironment()
+	{
+		LibMCEnvHandle hTestEnvironment = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_UIEnvironment_GetTestEnvironment(m_pHandle, &hTestEnvironment));
+		
+		if (!hTestEnvironment) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTestEnvironment>(m_pWrapper, hTestEnvironment);
 	}
 
 } // namespace LibMCEnv

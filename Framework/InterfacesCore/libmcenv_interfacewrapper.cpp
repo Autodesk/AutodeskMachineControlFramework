@@ -219,6 +219,39 @@ LibMCEnvResult libmcenv_iterator_count(LibMCEnv_Iterator pIterator, LibMCEnv_uin
 
 
 /*************************************************************************************************************************
+ Class implementation for TestEnvironment
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_testenvironment_writetestoutput(LibMCEnv_TestEnvironment pTestEnvironment, const char * pOutputName, LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTestEnvironment;
+
+	try {
+		if (pOutputName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDataBuffer) && (nDataBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sOutputName(pOutputName);
+		ITestEnvironment* pITestEnvironment = dynamic_cast<ITestEnvironment*>(pIBaseClass);
+		if (!pITestEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pITestEnvironment->WriteTestOutput(sOutputName, nDataBufferSize, pDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for ImageData
 **************************************************************************************************************************/
 LibMCEnvResult libmcenv_imagedata_getpixelformat(LibMCEnv_ImageData pImageData, eLibMCEnvImagePixelFormat * pPixelFormat)
@@ -5177,6 +5210,34 @@ LibMCEnvResult libmcenv_stateenvironment_getglobaltimerinmilliseconds(LibMCEnv_S
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_gettestenvironment(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pTestEnvironment == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseTestEnvironment(nullptr);
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseTestEnvironment = pIStateEnvironment->GetTestEnvironment();
+
+		*pTestEnvironment = (IBase*)(pBaseTestEnvironment);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for UIEnvironment
@@ -6349,6 +6410,34 @@ LibMCEnvResult libmcenv_uienvironment_getglobaltimerinmilliseconds(LibMCEnv_UIEn
 	}
 }
 
+LibMCEnvResult libmcenv_uienvironment_gettestenvironment(LibMCEnv_UIEnvironment pUIEnvironment, LibMCEnv_TestEnvironment * pTestEnvironment)
+{
+	IBase* pIBaseClass = (IBase *)pUIEnvironment;
+
+	try {
+		if (pTestEnvironment == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseTestEnvironment(nullptr);
+		IUIEnvironment* pIUIEnvironment = dynamic_cast<IUIEnvironment*>(pIBaseClass);
+		if (!pIUIEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseTestEnvironment = pIUIEnvironment->GetTestEnvironment();
+
+		*pTestEnvironment = (IBase*)(pBaseTestEnvironment);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -6374,6 +6463,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_iterator_clone;
 	if (sProcName == "libmcenv_iterator_count") 
 		*ppProcAddress = (void*) &libmcenv_iterator_count;
+	if (sProcName == "libmcenv_testenvironment_writetestoutput") 
+		*ppProcAddress = (void*) &libmcenv_testenvironment_writetestoutput;
 	if (sProcName == "libmcenv_imagedata_getpixelformat") 
 		*ppProcAddress = (void*) &libmcenv_imagedata_getpixelformat;
 	if (sProcName == "libmcenv_imagedata_changepixelformat") 
@@ -6676,6 +6767,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadpngimage;
 	if (sProcName == "libmcenv_stateenvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getglobaltimerinmilliseconds;
+	if (sProcName == "libmcenv_stateenvironment_gettestenvironment") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_gettestenvironment;
 	if (sProcName == "libmcenv_uienvironment_activatemodaldialog") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_activatemodaldialog;
 	if (sProcName == "libmcenv_uienvironment_closemodaldialog") 
@@ -6742,6 +6835,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_loadpngimage;
 	if (sProcName == "libmcenv_uienvironment_getglobaltimerinmilliseconds") 
 		*ppProcAddress = (void*) &libmcenv_uienvironment_getglobaltimerinmilliseconds;
+	if (sProcName == "libmcenv_uienvironment_gettestenvironment") 
+		*ppProcAddress = (void*) &libmcenv_uienvironment_gettestenvironment;
 	if (sProcName == "libmcenv_getversion") 
 		*ppProcAddress = (void*) &libmcenv_getversion;
 	if (sProcName == "libmcenv_getlasterror") 

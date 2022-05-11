@@ -77,7 +77,8 @@
 		<error name="INVALIDPIXELDATACOUNT" code="36" description="Invalid pixel data count." />
 		<error name="INVALIDIMAGEBUFFER" code="37" description="Invalid image buffer." />
 		<error name="INVALIDPIXELFORMAT" code="38" description="Invalid pixel format." />
-		
+		<error name="INVALIDTESTOUTPUTNAME" code="39" description="Invalid test output name." />
+			
 		
 					
 	</errors>
@@ -160,7 +161,17 @@
 			<param name="Count" type="uint64" pass="return" description="returns the number of objects the iterator captures."/>
 		</method>
 	</class>
+
 	
+	<class name="TestEnvironment" parent="Base">
+	
+		<method name="WriteTestOutput" description="Write output file to test directory.">
+			<param name="OutputName" type="string" pass="in" description="Output file name. Only alphanumeric characters, point, underscore and hypen are allowed."/>
+			<param name="Data" type="basicarray" class="uint8" pass="in" description="Test data to write into output directory."/>
+		</method>
+		
+	</class>
+
 	
 	<class name="ImageData" parent="Base" description="In memory representation of an image.">
 
@@ -963,6 +974,10 @@
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
 
+		<method name="GetTestEnvironment" description="Returns a test environment instance.">
+			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
+		</method>
+
 	</class>
 
 
@@ -1158,6 +1173,11 @@
 		<method name="GetGlobalTimerInMilliseconds" description="Returns the global timer in milliseconds.">
 			<param name="TimerValue" type="uint64" pass="return" description="Timer value in Milliseconds" />
 		</method>
+		
+		<method name="GetTestEnvironment" description="Returns a test environment instance.">
+			<param name="TestEnvironment" type="class" class="TestEnvironment" pass="return" description="Test Environment Instance" />
+		</method>
+		
 		
 	</class>
 
