@@ -152,7 +152,6 @@ void CDriver_UART::Connect(const std::string& sDeviceAddress, const LibMCDriver_
 	}
 
 	auto timeOut = serial::Timeout::simpleTimeout(nTimeout);
-	m_pConnection->setTimeout(timeOut);
 	m_pConnection.reset(new serial::Serial(sDeviceAddress, nBaudRate, timeOut, byteSize, parity, stopBits, flowControl));
 
 	if (!m_pConnection->isOpen()) {
