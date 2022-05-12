@@ -48,7 +48,7 @@ using namespace LibMCDriver_BuR::Impl;
 
 CPLCCommandList::CPLCCommandList(PDriver_BuRConnector pConnector, ITimeStampGenerator* pTimeStampGenerator, bool bIsSimulationMode)
     : m_pConnector(pConnector),  m_ListIdentifier(PLC_INVALID_LISTIDENTIFIER),
-    m_bIsSimulationMode (bIsSimulationMode)
+    m_bIsSimulationMode (bIsSimulationMode), m_pTimeStampGenerator (pTimeStampGenerator)
 {
     if (pTimeStampGenerator == nullptr)
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDPARAM);
@@ -114,7 +114,11 @@ void CPLCCommandList::ExecuteList()
             packetList.push_back(m_pConnector->makePacket(pCommand->getCommandID(), nullptr));
         }
 
+        packetList.push_back(m_pConnector->makePacket(BUR_COMMAND_DIRECT_FINISHLIST, m_ListIdentifier, nullptr));
+        packetList.push_back(m_pConnector->makePacket(BUR_COMMAND_DIRECT_EXECUTELIST, m_ListIdentifier, nullptr));
+
         m_pConnector->sendCommandsToPLC(packetList);
+
 
     }
 
@@ -177,12 +181,5 @@ void CPLCCommandList::ResumeList()
 
 void CPLCCommandList::FinishList()
 {
-
-    if (!m_bIsSimulationMode) {
-        if (m_pConnector.get() != nullptr) {
-
-            m_pConnector->sendCommandToPLC(BUR_COMMAND_DIRECT_FINISHLIST, m_ListIdentifier, nullptr);
-        }
-    }
 
 }

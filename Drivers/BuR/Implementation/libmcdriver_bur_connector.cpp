@@ -78,6 +78,7 @@ struct sAMCFToPLCPacketSendInfo {
     uint32_t m_CommandID;
     uint32_t m_SequenceID;
     uint32_t m_ClientID;
+    BurPacketCallback m_Callback;
 };
 
 #pragma pack(pop)
@@ -178,6 +179,7 @@ CDriver_BuRConnector::CDriver_BuRConnector(uint32_t nWorkerThreadCount, uint32_t
     m_nMinorVersion(nMinorVersion),
     m_nPatchVersion(nPatchVersion),
     m_nBuildVersion (nBuildVersion),
+    m_StartJournaling (false),
     m_nSequenceID (1),
     m_nMaxPacketQueueSize (nMaxPacketQueueSize)
 
@@ -237,6 +239,7 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
         sendInfo.m_CommandID = TCPpacket.m_nCommandID;
         sendInfo.m_SequenceID = TCPpacket.m_nSequenceID;
         sendInfo.m_ClientID = TCPpacket.m_nClientID;
+        sendInfo.m_Callback = packet.m_Callback;
         SendInfoList.push_back(sendInfo);
 
         m_nSequenceID++;
@@ -245,9 +248,11 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
     if (TCPPacketList.empty())
         throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-    m_pCurrentConnection->sendBuffer((uint8_t*)TCPPacketList.data(), sizeof(sAMCFToPLCPacket) * TCPPacketList.size ());
+    int index = 0;
+    for (auto& packetToSend : TCPPacketList) {
+        m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacket));
 
-    for (auto& sendInfo : SendInfoList) {
+        auto sendInfo = SendInfoList.at(index);
 
         std::vector<uint8_t> recvBuffer;
         m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacket), true);
@@ -274,7 +279,18 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
         if (sendInfo.m_SequenceID != receivedPacket->m_nSequenceID)
             throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTSEQUENCEID);
         if (sendInfo.m_ClientID != receivedPacket->m_nClientID)
-            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTID); 
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCLIENTID);
+
+        if (sendInfo.m_Callback != nullptr) {
+            auto callback = sendInfo.m_Callback;
+            callback(pPacket.get());
+        }
+
+        index++;
+    }
+
+    for (auto& sendInfo : SendInfoList) {
+
 
     }
 }
