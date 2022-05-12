@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+	<driver name="bur" library="driver_bur" type="bur" />
+
+	<statemachine name="burtest" description="BuR Test 1" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_burtest">
+	
+		<state name="init" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="success" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="100">
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+	<libraries>
+		<library name="plugin_burtest" dll="%githash%_test_burtest" />
+		<library name="driver_bur" dll="%githash%_driver_bur" />
+	</libraries>
+		
+	<test description="BuR Test">			
+	
+		<instance name="burtest" />
+		
+	</test>
+		
+
+</testdefinition>
