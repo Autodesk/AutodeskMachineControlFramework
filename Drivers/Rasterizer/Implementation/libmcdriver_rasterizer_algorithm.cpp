@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_rasterizer_interfaceexception.hpp"
 
 #include <cmath>
+#include <string>
 #include <map>
 
 using namespace LibMCDriver_Rasterizer::Impl;
@@ -140,6 +141,7 @@ CRasterizationAlgorithm::CRasterizationAlgorithm(uint32_t nUnitsPerSubPixel, uin
     m_nDisregardedLineCount (0),
     m_LineItemBufferCapacity (0),
     m_LineItemBufferIndex (0),
+    m_nCurrentDrawLineBufferIndex (0),
     m_nBlocksInUse (0)
 
 {
@@ -171,6 +173,7 @@ CRasterizationAlgorithm::CRasterizationAlgorithm(uint32_t nUnitsPerSubPixel, uin
 
     m_Blocks.resize((uint64_t)nBlockCountX * (uint64_t)nBlockCountY);
     m_ScanSeedValueBuffer.resize(m_Blocks.size() * m_nScanLinesPerBlock);
+    m_DrawLineBuffer.resize(1024 * 1024 * 16);
 
     int32_t* pCurrentSeedValueBuffer = m_ScanSeedValueBuffer.data ();
     for (auto& value : m_ScanSeedValueBuffer) 
@@ -181,6 +184,7 @@ CRasterizationAlgorithm::CRasterizationAlgorithm(uint32_t nUnitsPerSubPixel, uin
         block.m_pFirstItem = nullptr;
         block.m_nLineCount = 0;
         block.m_Type = eBlockType::btUnknown;
+        block.m_pDrawLineRoot = nullptr;
         block.m_pScanSeedValues = pCurrentSeedValueBuffer;
         pCurrentSeedValueBuffer += m_nScanLinesPerBlock;
     }
@@ -279,9 +283,11 @@ void CRasterizationAlgorithm::buildBlocks()
     for (auto& block : m_Blocks) {
         block.m_pFirstItem = nullptr;
         block.m_nLineCount = 0;
+        block.m_pDrawLineRoot = nullptr;
         block.m_Type = eBlockType::btUnknown;
     }
     m_nBlocksInUse = 0;
+    m_nCurrentDrawLineBufferIndex = 0;
 
     m_LineListItemBuffer.resize(m_LineItemBufferCapacity);
     m_LineItemBufferIndex = 0;
@@ -348,10 +354,45 @@ void CRasterizationAlgorithm::addBlockToBuffer(int32_t nBlockX, int32_t nBlockY,
 {
     __RASTERASSERT(buffer.size () == ((size_t)m_nPixelsPerBlock * m_nPixelsPerBlock), "invalid buffer block size");
 
-    // Todo: Fine rasterization
-    for (auto& pixel : buffer) {
-        pixel = 128;
+    auto pBlock = getBlock(nBlockX, nBlockY);
+    if (pBlock != nullptr) {
+
+        auto pDrawLine = pBlock->m_pDrawLineRoot;
+        while (pDrawLine != nullptr) {
+
+            int32_t nYInUnits = pDrawLine->m_nYInUnits;
+            int32_t nStartXInUnits = pDrawLine->m_nStartXInUnits;
+            int32_t nEndXInUnits = pDrawLine->m_nEndXInUnits;
+
+            if (nStartXInUnits == m_nUnitsPerBlockX)
+                nStartXInUnits = m_nUnitsPerBlockX - 1;
+            if (nEndXInUnits == m_nUnitsPerBlockX)
+                nEndXInUnits = m_nUnitsPerBlockX - 1;
+
+            __RASTERASSERT((nYInUnits >= 0) && (nYInUnits < (int32_t)m_nUnitsPerBlockY), "invalid draw line y value");
+            __RASTERASSERT((nStartXInUnits >= 0) && (nStartXInUnits < (int32_t)m_nUnitsPerBlockX), "invalid draw line start x value: " + std::to_string (nStartXInUnits));
+            __RASTERASSERT((nEndXInUnits >= 0) && (nEndXInUnits < (int32_t)m_nUnitsPerBlockX), "invalid draw line end x value");
+
+            uint32_t nYInPixels = (uint32_t) nYInUnits / m_nUnitsPerPixelY;
+            uint32_t nStartXInPixels = (uint32_t) nStartXInUnits / m_nUnitsPerPixelX;
+            uint32_t nEndXInPixels = (uint32_t) nEndXInUnits / m_nUnitsPerPixelX;
+
+            __RASTERASSERT((nYInPixels >= 0) && (nYInPixels < (int32_t)m_nPixelsPerBlock), "invalid draw line y pixel value");
+            __RASTERASSERT((nStartXInPixels >= 0) && (nStartXInPixels < (int32_t)m_nPixelsPerBlock), "invalid draw line start x pixel value");
+            __RASTERASSERT((nEndXInPixels >= 0) && (nEndXInPixels < (int32_t)m_nPixelsPerBlock), "invalid draw line end x pixel value");
+
+            for (int nX = nStartXInPixels; nX <= nEndXInPixels; nX++)
+                buffer[(size_t)nX + nYInPixels * (size_t)m_nPixelsPerBlock] = 255;
+
+            pDrawLine = pDrawLine->m_pNext;
+        }
+
     }
+
+    // Todo: Fine rasterization
+    /*for (auto& pixel : buffer) {
+        pixel = 128;
+    }*/
 
 
 }
@@ -585,7 +626,10 @@ void CRasterizationAlgorithm::buildBlockScanLines(uint32_t nBlockIndexX, uint32_
     auto pNextBlock = getBlock(nBlockIndexX + 1, nBlockIndexY);
     for (uint32_t nScanLineIndex = 0; nScanLineIndex < m_nScanLinesPerBlock; nScanLineIndex++) {
         int32_t nSeedWindingNumber = pBlock->m_pScanSeedValues[nScanLineIndex];
-        int32_t nYValue = nBlockIndexY * m_nUnitsPerBlockY + nScanLineIndex * m_nUnitsPerSubPixel + m_nUnitsPerHalfSubPixel;
+        int32_t nYRelativeToBlock = nScanLineIndex * m_nUnitsPerSubPixel + m_nUnitsPerHalfSubPixel;
+        int32_t nYValue = nBlockIndexY * m_nUnitsPerBlockY + nYRelativeToBlock;
+
+        double dBlockStartX = nBlockIndexX * (double)m_nUnitsPerBlockX;
 
         std::map<double, sRasterLine *> linesOnScanline;
 
@@ -594,9 +638,8 @@ void CRasterizationAlgorithm::buildBlockScanLines(uint32_t nBlockIndexX, uint32_
             double dXValue;
             auto pLine = pItem->m_pLine;
             if (lineIsOnScanline(nYValue, pLine, dXValue)) {
-
-                if ((dXValue > nBlockIndexX * (double)m_nUnitsPerBlockX) && ((dXValue < ((int64_t)nBlockIndexX+1) * (double)m_nUnitsPerBlockX))) {
-                    linesOnScanline.insert(std::make_pair(dXValue, pLine));
+                if ((dXValue > dBlockStartX) && (dXValue < (dBlockStartX + (double)m_nUnitsPerBlockX))) {
+                    linesOnScanline.insert(std::make_pair(dXValue - dBlockStartX, pLine));
                 }
             }
 
@@ -604,13 +647,35 @@ void CRasterizationAlgorithm::buildBlockScanLines(uint32_t nBlockIndexX, uint32_
         }
 
         int32_t nCurrentWindingNumber = nSeedWindingNumber;
+        bool bIsInside = nCurrentWindingNumber > 0;
+
+        double dStartX = 0.0;
+        double dEndX = 0.0;
 
         for (auto iIter : linesOnScanline) {
-            if (iIter.second->m_nY1 > iIter.second->m_nY2)
+            if (iIter.second->m_nY1 > iIter.second->m_nY2) {
                 nCurrentWindingNumber++;
-            else
+            }
+            else {
                 nCurrentWindingNumber--;
-        } 
+            }
+            bool bIsOldInside = bIsInside;
+            bIsInside = nCurrentWindingNumber > 0;
+
+            if (bIsInside && !bIsOldInside) {
+                dStartX = iIter.first;
+            }
+            if (bIsOldInside && !bIsInside) {
+                dEndX = iIter.first;
+
+                addDrawLineToBlock (pBlock, (int32_t) round(dStartX), (int32_t) round(dEndX), nYRelativeToBlock);
+            }
+
+        }
+
+        if (bIsInside) {
+            addDrawLineToBlock(pBlock, (int32_t)round(dStartX), m_nUnitsPerBlockX - 1, nYRelativeToBlock);
+        }
 
         if (pNextBlock != nullptr) {
             pNextBlock->m_pScanSeedValues[nScanLineIndex] = nCurrentWindingNumber;
@@ -622,5 +687,21 @@ void CRasterizationAlgorithm::buildBlockScanLines(uint32_t nBlockIndexX, uint32_
 
 }
 
+void CRasterizationAlgorithm::addDrawLineToBlock(_sRasterBlockStructure* pBlock, int32_t nStartXInUnits, int32_t nEndXInUnits, int32_t nYValueInUnits)
+{
+    __RASTERASSERT(pBlock != nullptr, "invalid block parameter");
+    if (m_nCurrentDrawLineBufferIndex >= m_DrawLineBuffer.size())
+        throw std::runtime_error("draw line buffer overflow!");
+
+    sRasterBlockDrawLine* pDrawLine = &m_DrawLineBuffer.at(m_nCurrentDrawLineBufferIndex);
+    m_nCurrentDrawLineBufferIndex++;
+
+    pDrawLine->m_nStartXInUnits = nStartXInUnits;
+    pDrawLine->m_nEndXInUnits = nEndXInUnits;
+    pDrawLine->m_nYInUnits = nYValueInUnits;
+
+    pDrawLine->m_pNext = pBlock->m_pDrawLineRoot;
+    pBlock->m_pDrawLineRoot = pDrawLine;
+}
 
 

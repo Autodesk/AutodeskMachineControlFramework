@@ -77,13 +77,24 @@ namespace LibMCDriver_Rasterizer {
 
         };
 
+        typedef struct _sRasterBlockDrawLine
+        {
+            int32_t m_nStartXInUnits;
+            int32_t m_nEndXInUnits;
+            int32_t m_nYInUnits;
+            _sRasterBlockDrawLine* m_pNext;
+        } sRasterBlockDrawLine;
+
+
         typedef struct _sRasterBlockStructure
         {
             sRasterLineListItem * m_pFirstItem;
             uint32_t m_nLineCount;
             int32_t * m_pScanSeedValues;
             eBlockType m_Type;
+            sRasterBlockDrawLine * m_pDrawLineRoot;
         } sRasterBlockStructure;
+
 
         class CRasterizationAlgorithm {
             private:
@@ -131,6 +142,9 @@ namespace LibMCDriver_Rasterizer {
                 std::vector<sRasterLine> m_Lines;
                 std::vector<int32_t> m_ScanSeedValueBuffer;
 
+                uint64_t m_nCurrentDrawLineBufferIndex;
+                std::vector<sRasterBlockDrawLine> m_DrawLineBuffer;
+
                 bool isOnScanLineX(int32_t nXunits);
                 bool isOnScanLineY(int32_t nYunits);
 
@@ -139,7 +153,9 @@ namespace LibMCDriver_Rasterizer {
                 void buildBlocksVertical(int nBlockX, int nBlockY1, int nBlockY2, sRasterLine* pLine);
                 void buildBlocksHorizontal (int nBlockY, int nBlockX1, int nBlockX2, sRasterLine* pLine);
                 void buildBlocksRational (sRasterLine* pLine);
+
                 void addLineToBlock(sRasterLine* pLine, _sRasterBlockStructure* pBlock);
+                void addDrawLineToBlock(_sRasterBlockStructure* pBlock, int32_t nStartXInUnits, int32_t nEndXInUnits, int32_t nYValueInUnits);
 
             public:
 
