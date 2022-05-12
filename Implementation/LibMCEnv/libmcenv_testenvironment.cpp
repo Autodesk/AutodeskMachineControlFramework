@@ -44,7 +44,7 @@ using namespace LibMCEnv::Impl;
 
 CTestEnvironment::CTestEnvironment(const std::string& sTestOutputDirectory)
 {
-    std::string sFullPath = AMCCommon::CUtils::getFullPathName(sTestOutputDirectory, true);
+    std::string sFullPath = AMCCommon::CUtils::getFullPathName(sTestOutputDirectory, false);
     if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sFullPath))
         AMCCommon::CUtils::createDirectoryOnDisk(sFullPath);
 
@@ -58,6 +58,7 @@ CTestEnvironment::~CTestEnvironment()
 
 void CTestEnvironment::WriteTestOutput(const std::string & sOutputName, const LibMCEnv_uint64 nDataBufferSize, const LibMCEnv_uint8 * pDataBuffer)
 {
+
     for (auto ch : sOutputName) {
         bool bIsValid = ((ch >= 'a') && (ch <= 'z')) ||
             ((ch >= 'A') && (ch <= 'Z')) ||
@@ -68,7 +69,7 @@ void CTestEnvironment::WriteTestOutput(const std::string & sOutputName, const Li
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME, "invalid test output name: " + sOutputName);
     }
 
-    AMCCommon::CExportStream_Native exportStream(sOutputName);
+    AMCCommon::CExportStream_Native exportStream(m_sTestOutputDirectory + sOutputName);
     if (nDataBufferSize > 0) {
         exportStream.writeBuffer((void*)pDataBuffer, nDataBufferSize);
     }
