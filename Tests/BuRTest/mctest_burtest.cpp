@@ -155,17 +155,17 @@ public:
 		for (int moveIndex = 0; moveIndex < 20; moveIndex++) {
 			pStateEnvironment->LogMessage("Adding Move #" + std::to_string (moveIndex));
 			auto pPLCCommand_Move1 = pDriver->CreateCommand("move");
-			pPLCCommand_Move1->SetIntegerParameter("targetx", 10000);
-			pPLCCommand_Move1->SetIntegerParameter("targety", 0);
-			pPLCCommand_Move1->SetIntegerParameter("targetz", 0);
+			pPLCCommand_Move1->SetIntegerParameter("targetx", 50000);
+			pPLCCommand_Move1->SetIntegerParameter("targety", 10000);
+			pPLCCommand_Move1->SetIntegerParameter("targetz", 2000);
 			pPLCCommand_Move1->SetIntegerParameter("targete", 0);
 			pPLCCommand_Move1->SetIntegerParameter("velocity", 5000);
 			pPLCMoveCommandList->AddCommand(pPLCCommand_Move1);
 
 			auto pPLCCommand_Move2 = pDriver->CreateCommand("move");
-			pPLCCommand_Move2->SetIntegerParameter("targetx", 0);
-			pPLCCommand_Move2->SetIntegerParameter("targety", 0);
-			pPLCCommand_Move2->SetIntegerParameter("targetz", 0);
+			pPLCCommand_Move2->SetIntegerParameter("targetx", 60000);
+			pPLCCommand_Move2->SetIntegerParameter("targety", 20000);
+			pPLCCommand_Move2->SetIntegerParameter("targetz", 2000);
 			pPLCCommand_Move2->SetIntegerParameter("targete", 0);
 			pPLCCommand_Move2->SetIntegerParameter("velocity", 5000);
 			pPLCMoveCommandList->AddCommand(pPLCCommand_Move2);
