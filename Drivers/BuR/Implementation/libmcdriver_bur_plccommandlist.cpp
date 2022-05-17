@@ -111,7 +111,7 @@ void CPLCCommandList::ExecuteList()
                 pParameter->writeToPayload(payLoad);
             }
 
-            packetList.push_back(m_pConnector->makePacket(pCommand->getCommandID(), nullptr));
+            packetList.push_back(m_pConnector->makePacket(pCommand->getCommandID(), payLoad, nullptr));
         }
 
         packetList.push_back(m_pConnector->makePacket(BUR_COMMAND_DIRECT_FINISHLIST, m_ListIdentifier, nullptr));
