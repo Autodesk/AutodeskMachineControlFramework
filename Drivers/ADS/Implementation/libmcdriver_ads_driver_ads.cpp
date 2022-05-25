@@ -33,9 +33,8 @@ Abstract: This is a stub class definition of CDriver_ADS
 
 #include "libmcdriver_ads_driver_ads.hpp"
 #include "libmcdriver_ads_interfaceexception.hpp"
-
-// Include custom headers here.
-
+#include "libmcdriver_ads_plccommand.hpp"
+#include "libmcdriver_ads_plccommandlist.hpp"
 
 using namespace LibMCDriver_ADS::Impl;
 
@@ -43,48 +42,58 @@ using namespace LibMCDriver_ADS::Impl;
  Class definition of CDriver_ADS 
 **************************************************************************************************************************/
 
+CDriver_ADS::CDriver_ADS(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
+	: m_bSimulationMode (false),
+	m_sName(sName),
+	m_pDriverEnvironment(pDriverEnvironment)
+{
+
+}
+
+CDriver_ADS::~CDriver_ADS()
+{
+
+}
+
 void CDriver_ADS::SetToSimulationMode()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	m_bSimulationMode = true;
 }
 
 bool CDriver_ADS::IsSimulationMode()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	return m_bSimulationMode;
 }
 
 void CDriver_ADS::Connect(const std::string & sIPAddress, const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout)
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	
 }
 
 void CDriver_ADS::Disconnect()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	
 }
 
 IPLCCommandList * CDriver_ADS::CreateCommandList()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	return new CPLCCommandList ();
 }
 
 IPLCCommand * CDriver_ADS::CreateCommand(const std::string & sCommandName)
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	return new CPLCCommand ();
 }
 
 void CDriver_ADS::StartJournaling()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
 }
 
 void CDriver_ADS::StopJournaling()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
 }
 
 void CDriver_ADS::RefreshJournal()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
 }
 

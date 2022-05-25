@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CDriver_ADS
 #endif
 
 // Include custom headers here.
-
+#include <mutex>
 
 namespace LibMCDriver_ADS {
 namespace Impl {
@@ -58,26 +58,19 @@ namespace Impl {
 class CDriver_ADS : public virtual IDriver_ADS, public virtual CDriver {
 private:
 
-	/**
-	* Put private members here.
-	*/
+	bool m_bSimulationMode;
+
+	std::string m_sName;
+	std::mutex m_driverEnvironmentMutex;
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
 protected:
 
-	/**
-	* Put protected members here.
-	*/
 
 public:
+	CDriver_ADS(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
-
-
-	/**
-	* Public member functions to implement.
-	*/
+	virtual ~CDriver_ADS();
 
 	void SetToSimulationMode() override;
 
