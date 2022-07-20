@@ -261,10 +261,10 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
         
     }
 
-    index = 0;
+    //index = 0;
     for (auto& sendInfo : SendInfoList) {
 
-        auto sendInfo = SendInfoList.at(index);
+        //auto sendInfo = SendInfoList.at(index);
 
         std::vector<uint8_t> recvBuffer;
         m_pCurrentConnection->receiveBuffer(recvBuffer, sizeof(sPLCToAMCFPacket), true);
@@ -298,7 +298,7 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
             callback(pPacket.get());
         }
 
-        index++;
+        //index++;
     }
 }
 
