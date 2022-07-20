@@ -60,7 +60,7 @@ else()
 			set(BUILDRESOURCES_EXECUTABLE ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.arm)
 						
 		else()
-			set(BUILDRESOURCES_EXECUTABLE ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.linux)
+			set(BUILDRESOURCES_EXECUTABLE ${PROJECT_BINARY_DIR}/DevPackage/Framework/buildresources.linux64)
 						
 		endif()
 	endif()
