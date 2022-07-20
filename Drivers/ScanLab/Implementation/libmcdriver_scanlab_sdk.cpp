@@ -111,6 +111,9 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->eth_search_cards = (PScanLabPtr_eth_search_cards)_loadScanLabAddress(hLibrary, "eth_search_cards");
 	this->n_load_correction_file = (PScanLabPtr_n_load_correction_file)_loadScanLabAddress(hLibrary, "n_load_correction_file");
 	this->n_select_cor_table = (PScanLabPtr_n_select_cor_table)_loadScanLabAddress(hLibrary, "n_select_cor_table");
+	this->n_eth_set_com_timeouts_auto = (PScanLabPtr_n_eth_set_com_timeouts_auto)_loadScanLabAddress(hLibrary, "n_eth_set_com_timeouts_auto");
+	this->n_eth_get_com_timeouts_auto = (PScanLabPtr_n_eth_get_com_timeouts_auto)_loadScanLabAddress(hLibrary, "n_eth_get_com_timeouts_auto");
+
 	this->n_config_list = (PScanLabPtr_n_config_list)_loadScanLabAddress(hLibrary, "n_config_list");
 	this->n_set_laser_mode = (PScanLabPtr_n_set_laser_mode)_loadScanLabAddress(hLibrary, "n_set_laser_mode");
 	this->n_set_laser_control = (PScanLabPtr_n_set_laser_control)_loadScanLabAddress(hLibrary, "n_set_laser_control");
@@ -209,6 +212,9 @@ void CScanLabSDK::resetFunctionPtrs()
 	eth_search_cards = nullptr;
 	n_load_correction_file = nullptr;
 	n_select_cor_table = nullptr;
+	n_eth_set_com_timeouts_auto = nullptr;
+	n_eth_get_com_timeouts_auto = nullptr;
+
 	n_config_list = nullptr;
 	n_set_laser_mode = nullptr;
 	n_set_laser_control = nullptr;

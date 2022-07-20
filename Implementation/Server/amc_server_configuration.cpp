@@ -105,6 +105,9 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 	if ((m_nPort < 0x0400) || (m_nPort > 0xBFFF)) 
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPORT, "Invalid port: " + std::string (portAttrib.as_string ()));
 
+	auto tempFolderAttrib = serverNode.attribute("tempfolder");
+	m_sBaseTempDirectory = tempFolderAttrib.as_string();
+
 	auto sslAttrib = serverNode.attribute("ssl");
 	m_bUseSSL = sslAttrib.as_bool(false);
 
@@ -225,6 +228,11 @@ std::string CServerConfiguration::getPackageCoreClient()
 std::string CServerConfiguration::getPackageConfig()
 {
 	return m_sPackageConfig;
+}
+
+std::string CServerConfiguration::getBaseTempDirectory()
+{
+	return m_sBaseTempDirectory;
 }
 
 std::string CServerConfiguration::getLibraryPath(const std::string& sLibraryName)

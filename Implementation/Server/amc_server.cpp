@@ -214,6 +214,8 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 
 		m_pDataModel = m_pDataWrapper->CreateDataModelInstance();
 
+		m_pDataModel->SetBaseTempDirectory(m_pServerConfiguration->getBaseTempDirectory ());
+
 		log("Initialising Database...");
 		m_pDataModel->InitialiseDatabase(m_pServerConfiguration->getDataDirectory(), m_pServerConfiguration->getDataBaseType(), m_pServerConfiguration->getConnectionString());
 

@@ -136,3 +136,21 @@ IPersistencyHandler* CDataModel::CreatePersistencyHandler()
     return new CPersistencyHandler(m_pSQLHandler);
 }
 
+void CDataModel::SetBaseTempDirectory(const std::string& sTempDirectory)
+{
+    if (!sTempDirectory.empty()) {
+        if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sTempDirectory))
+            AMCCommon::CUtils::createDirectoryOnDisk(sTempDirectory);
+
+        m_sTempBasePath = AMCCommon::CUtils::getFullPathName (sTempDirectory, true);
+    }
+    else {
+        m_sTempBasePath = "";
+    }
+}
+
+std::string CDataModel::GetBaseTempDirectory()
+{
+    return m_sTempBasePath;
+}
+

@@ -841,7 +841,14 @@
 			<param name="PersistencyHandler" type="class" class="PersistencyHandler" pass="return" description="PersistencyHandler instance." />	
 		</method>
 		
-				
+		<method name="SetBaseTempDirectory" description="Sets a custom base temp directory. An empty string defaults to the system temp directory.">
+			<param name="TempDirectory" type="string" pass="in" description="Temp directory path to use. SHOULD be an absolute path, if not empty. Directory MUST exist, if not empty." />	
+		</method>
+
+		<method name="GetBaseTempDirectory" description="Returns a custom base temp directory. An empty string defaults to the system temp directory.">
+			<param name="TempDirectory" type="string" pass="return" description="Temp directory path." />	
+		</method>
+		
 	</class>
 
 		

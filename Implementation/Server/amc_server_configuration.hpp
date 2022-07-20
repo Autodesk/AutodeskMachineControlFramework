@@ -76,6 +76,8 @@ namespace AMC {
 		std::string m_sServerCertificatePEM;
 		std::string m_sServerPrivateKeyPEM;
 
+		std::string m_sBaseTempDirectory;
+
 		std::map<std::string, PServerLibrary> m_Libraries;
 
 	public:
@@ -91,6 +93,7 @@ namespace AMC {
 		std::string getPackageName ();
 		std::string getPackageCoreClient ();
 		std::string getPackageConfig ();
+		std::string getBaseTempDirectory ();
 
 		std::string getLibraryPath(const std::string & sLibraryName);
 		std::string getResourcePath(const std::string& sLibraryName);

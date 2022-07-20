@@ -645,6 +645,8 @@ public:
 	inline PLogSession CreateNewLogSession();
 	inline PLoginHandler CreateLoginHandler();
 	inline PPersistencyHandler CreatePersistencyHandler();
+	inline void SetBaseTempDirectory(const std::string & sTempDirectory);
+	inline std::string GetBaseTempDirectory();
 };
 	
 	/**
@@ -827,6 +829,8 @@ public:
 		pWrapperTable->m_DataModel_CreateNewLogSession = nullptr;
 		pWrapperTable->m_DataModel_CreateLoginHandler = nullptr;
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
+		pWrapperTable->m_DataModel_SetBaseTempDirectory = nullptr;
+		pWrapperTable->m_DataModel_GetBaseTempDirectory = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1638,6 +1642,24 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataModel_SetBaseTempDirectory = (PLibMCDataDataModel_SetBaseTempDirectoryPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_setbasetempdirectory");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_SetBaseTempDirectory = (PLibMCDataDataModel_SetBaseTempDirectoryPtr) dlsym(hLibrary, "libmcdata_datamodel_setbasetempdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_SetBaseTempDirectory == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_GetBaseTempDirectory = (PLibMCDataDataModel_GetBaseTempDirectoryPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_getbasetempdirectory");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_GetBaseTempDirectory = (PLibMCDataDataModel_GetBaseTempDirectoryPtr) dlsym(hLibrary, "libmcdata_datamodel_getbasetempdirectory");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_GetBaseTempDirectory == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDataGetVersionPtr) GetProcAddress(hLibrary, "libmcdata_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDataGetVersionPtr) dlsym(hLibrary, "libmcdata_getversion");
@@ -2041,6 +2063,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_createpersistencyhandler", (void**)&(pWrapperTable->m_DataModel_CreatePersistencyHandler));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_CreatePersistencyHandler == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_setbasetempdirectory", (void**)&(pWrapperTable->m_DataModel_SetBaseTempDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_SetBaseTempDirectory == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_getbasetempdirectory", (void**)&(pWrapperTable->m_DataModel_GetBaseTempDirectory));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_GetBaseTempDirectory == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -3264,6 +3294,30 @@ public:
 			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CPersistencyHandler>(m_pWrapper, hPersistencyHandler);
+	}
+	
+	/**
+	* CDataModel::SetBaseTempDirectory - Sets a custom base temp directory. An empty string defaults to the system temp directory.
+	* @param[in] sTempDirectory - Temp directory path to use. SHOULD be an absolute path, if not empty. Directory MUST exist, if not empty.
+	*/
+	void CDataModel::SetBaseTempDirectory(const std::string & sTempDirectory)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_SetBaseTempDirectory(m_pHandle, sTempDirectory.c_str()));
+	}
+	
+	/**
+	* CDataModel::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* @return Temp directory path.
+	*/
+	std::string CDataModel::GetBaseTempDirectory()
+	{
+		LibMCData_uint32 bytesNeededTempDirectory = 0;
+		LibMCData_uint32 bytesWrittenTempDirectory = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetBaseTempDirectory(m_pHandle, 0, &bytesNeededTempDirectory, nullptr));
+		std::vector<char> bufferTempDirectory(bytesNeededTempDirectory);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetBaseTempDirectory(m_pHandle, bytesNeededTempDirectory, &bytesWrittenTempDirectory, &bufferTempDirectory[0]));
+		
+		return std::string(&bufferTempDirectory[0]);
 	}
 
 } // namespace LibMCData

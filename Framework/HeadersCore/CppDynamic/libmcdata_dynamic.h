@@ -964,6 +964,26 @@ typedef LibMCDataResult (*PLibMCDataDataModel_CreateLoginHandlerPtr) (LibMCData_
 */
 typedef LibMCDataResult (*PLibMCDataDataModel_CreatePersistencyHandlerPtr) (LibMCData_DataModel pDataModel, LibMCData_PersistencyHandler * pPersistencyHandler);
 
+/**
+* Sets a custom base temp directory. An empty string defaults to the system temp directory.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pTempDirectory - Temp directory path to use. SHOULD be an absolute path, if not empty. Directory MUST exist, if not empty.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_SetBaseTempDirectoryPtr) (LibMCData_DataModel pDataModel, const char * pTempDirectory);
+
+/**
+* Returns a custom base temp directory. An empty string defaults to the system temp directory.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] nTempDirectoryBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTempDirectoryNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTempDirectoryBuffer -  buffer of Temp directory path., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_GetBaseTempDirectoryPtr) (LibMCData_DataModel pDataModel, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -1112,6 +1132,8 @@ typedef struct {
 	PLibMCDataDataModel_CreateNewLogSessionPtr m_DataModel_CreateNewLogSession;
 	PLibMCDataDataModel_CreateLoginHandlerPtr m_DataModel_CreateLoginHandler;
 	PLibMCDataDataModel_CreatePersistencyHandlerPtr m_DataModel_CreatePersistencyHandler;
+	PLibMCDataDataModel_SetBaseTempDirectoryPtr m_DataModel_SetBaseTempDirectory;
+	PLibMCDataDataModel_GetBaseTempDirectoryPtr m_DataModel_GetBaseTempDirectory;
 	PLibMCDataGetVersionPtr m_GetVersion;
 	PLibMCDataGetLastErrorPtr m_GetLastError;
 	PLibMCDataReleaseInstancePtr m_ReleaseInstance;

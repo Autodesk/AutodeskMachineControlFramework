@@ -3013,6 +3013,81 @@ LibMCDataResult libmcdata_datamodel_createpersistencyhandler(LibMCData_DataModel
 	}
 }
 
+LibMCDataResult libmcdata_datamodel_setbasetempdirectory(LibMCData_DataModel pDataModel, const char * pTempDirectory)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pTempDirectory == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTempDirectory(pTempDirectory);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIDataModel->SetBaseTempDirectory(sTempDirectory);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_getbasetempdirectory(LibMCData_DataModel pDataModel, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if ( (!pTempDirectoryBuffer) && !(pTempDirectoryNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sTempDirectory("");
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pTempDirectoryBuffer == nullptr);
+		if (isCacheCall) {
+			sTempDirectory = pIDataModel->GetBaseTempDirectory();
+
+			pIDataModel->_setCache (new ParameterCache_1<std::string> (sTempDirectory));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIDataModel->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sTempDirectory);
+			pIDataModel->_setCache (nullptr);
+		}
+		
+		if (pTempDirectoryNeededChars)
+			*pTempDirectoryNeededChars = (LibMCData_uint32) (sTempDirectory.size()+1);
+		if (pTempDirectoryBuffer) {
+			if (sTempDirectory.size() >= nTempDirectoryBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTempDirectory = 0; iTempDirectory < sTempDirectory.size(); iTempDirectory++)
+				pTempDirectoryBuffer[iTempDirectory] = sTempDirectory[iTempDirectory];
+			pTempDirectoryBuffer[sTempDirectory.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -3196,6 +3271,10 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_datamodel_createloginhandler;
 	if (sProcName == "libmcdata_datamodel_createpersistencyhandler") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_createpersistencyhandler;
+	if (sProcName == "libmcdata_datamodel_setbasetempdirectory") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_setbasetempdirectory;
+	if (sProcName == "libmcdata_datamodel_getbasetempdirectory") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_getbasetempdirectory;
 	if (sProcName == "libmcdata_getversion") 
 		*ppProcAddress = (void*) &libmcdata_getversion;
 	if (sProcName == "libmcdata_getlasterror") 

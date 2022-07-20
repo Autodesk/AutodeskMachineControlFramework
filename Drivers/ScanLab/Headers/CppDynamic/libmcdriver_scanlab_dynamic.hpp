@@ -405,6 +405,8 @@ public:
 	inline void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed);
 	inline LibMCDriver_ScanLab_uint32 GetInputPointer();
 	inline void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion);
+	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
+	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 };
 	
 /*************************************************************************************************************************
@@ -471,6 +473,8 @@ public:
 	inline void ConfigureLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
 	inline void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay);
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
+	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
+	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
 };
 	
 	/**
@@ -628,6 +632,8 @@ public:
 		pWrapperTable->m_RTCContext_GetStateValues = nullptr;
 		pWrapperTable->m_RTCContext_GetInputPointer = nullptr;
 		pWrapperTable->m_RTCContext_GetRTCVersion = nullptr;
+		pWrapperTable->m_RTCContext_SetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_RTCContext_GetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -646,6 +652,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureLaserMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureDelays = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1008,6 +1016,24 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_SetCommunicationTimeouts = (PLibMCDriver_ScanLabRTCContext_SetCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_setcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_SetCommunicationTimeouts = (PLibMCDriver_ScanLabRTCContext_SetCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_setcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_SetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_GetCommunicationTimeouts = (PLibMCDriver_ScanLabRTCContext_GetCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_getcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_GetCommunicationTimeouts = (PLibMCDriver_ScanLabRTCContext_GetCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_getcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_GetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
 		#else // _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
@@ -1167,6 +1193,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_SetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_setcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_SetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1384,6 +1428,14 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetRTCVersion == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_setcommunicationtimeouts", (void**)&(pWrapperTable->m_RTCContext_SetCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_SetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_getcommunicationtimeouts", (void**)&(pWrapperTable->m_RTCContext_GetCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCSelector_SearchCards == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1454,6 +1506,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_drawlayer", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_setcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_SetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1892,6 +1952,28 @@ public:
 	}
 	
 	/**
+	* CRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	void CRTCContext::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_SetCommunicationTimeouts(m_pHandle, dInitialTimeout, dMaxTimeout, dMultiplier));
+	}
+	
+	/**
+	* CRTCContext::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	void CRTCContext::GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
+	}
+	
+	/**
 	 * Method definitions for class CRTCSelector
 	 */
 	
@@ -2139,6 +2221,28 @@ public:
 	void CDriver_ScanLab_RTC6::DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_DrawLayer(m_pHandle, sStreamUUID.c_str(), nLayerIndex));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_SetCommunicationTimeouts(m_pHandle, dInitialTimeout, dMaxTimeout, dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_GetCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
 	}
 
 } // namespace LibMCDriver_ScanLab

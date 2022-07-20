@@ -490,3 +490,27 @@ void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_uint32& n
 	nFocusShift = m_pScanLabSDK->n_get_value(m_CardNo, 32); // Focus shift
 	nMarkSpeed = m_pScanLabSDK->n_get_value(m_CardNo, 45); // Mark Speed
 }
+
+void CRTCContext::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+{
+	double dOldInitialTimeout = 0.0;
+	double dOldMaxTimeout = 0.0;
+	double dOldMultiplier = 0.0;
+	uint32_t nOldMode = 0;
+	m_pScanLabSDK->n_eth_get_com_timeouts_auto(m_CardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
+	m_pScanLabSDK->n_eth_set_com_timeouts_auto(m_CardNo, dInitialTimeout, dMaxTimeout, dMultiplier, nOldMode);
+}
+
+void CRTCContext::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier)
+{
+	double dRetrievedInitialTimeout = 0.0;
+	double dRetrievedMaxTimeout = 0.0;
+	double dRetrievedMultiplier = 0.0;
+	uint32_t nRetrievedMode = 0;
+	m_pScanLabSDK->n_eth_get_com_timeouts_auto(m_CardNo, &dRetrievedInitialTimeout, &dRetrievedMaxTimeout, &dRetrievedMultiplier, &nRetrievedMode);
+
+	dInitialTimeout = dRetrievedInitialTimeout;
+	dMaxTimeout = dRetrievedMaxTimeout;
+	dMultiplier = dRetrievedMultiplier;
+}
+

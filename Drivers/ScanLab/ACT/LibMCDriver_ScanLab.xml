@@ -337,7 +337,19 @@ Custom implementation
 			<param name="HEXVersion" type="uint32" pass="out" description="RTC HEX Version" />
 			<param name="BIOSVersion" type="uint32" pass="out" description="RTC BIOS Version" />
 		</method>
+		
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
 						
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+		
 	</class>
 
 	
@@ -458,6 +470,18 @@ Custom implementation
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
+						
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 		
 	</class>

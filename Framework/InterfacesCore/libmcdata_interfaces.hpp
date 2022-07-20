@@ -943,6 +943,18 @@ public:
 	*/
 	virtual IPersistencyHandler * CreatePersistencyHandler() = 0;
 
+	/**
+	* IDataModel::SetBaseTempDirectory - Sets a custom base temp directory. An empty string defaults to the system temp directory.
+	* @param[in] sTempDirectory - Temp directory path to use. SHOULD be an absolute path, if not empty. Directory MUST exist, if not empty.
+	*/
+	virtual void SetBaseTempDirectory(const std::string & sTempDirectory) = 0;
+
+	/**
+	* IDataModel::GetBaseTempDirectory - Returns a custom base temp directory. An empty string defaults to the system temp directory.
+	* @return Temp directory path.
+	*/
+	virtual std::string GetBaseTempDirectory() = 0;
+
 };
 
 typedef IBaseSharedPtr<IDataModel> PIDataModel;

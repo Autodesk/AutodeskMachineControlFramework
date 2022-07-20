@@ -670,6 +670,22 @@ public:
 	*/
 	virtual void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion) = 0;
 
+	/**
+	* IRTCContext::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
+
+	/**
+	* IRTCContext::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	virtual void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
+
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;
@@ -842,6 +858,22 @@ public:
 	* @param[in] nLayerIndex - Layer index of the build file.
 	*/
 	virtual void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::SetCommunicationTimeouts - Set RTC Ethernet communication timeouts
+	* @param[in] dInitialTimeout - Initial timeout in ms
+	* @param[in] dMaxTimeout - Max timeout in ms
+	* @param[in] dMultiplier - Multiplier
+	*/
+	virtual void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::GetCommunicationTimeouts - Get RTC Ethernet communication timeouts
+	* @param[out] dInitialTimeout - Initial timeout in ms
+	* @param[out] dMaxTimeout - Max timeout in ms
+	* @param[out] dMultiplier - Multiplier
+	*/
+	virtual void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
 
 };
 

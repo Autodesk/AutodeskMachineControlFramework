@@ -391,3 +391,29 @@ void CDriver_ScanLab_RTC6::updateCardStatus()
 
 }
 
+void CDriver_ScanLab_RTC6::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->SetCommunicationTimeouts (dInitialTimeout, dMaxTimeout, dMultiplier);
+    }
+}
+
+void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier)
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->GetCommunicationTimeouts (dInitialTimeout, dMaxTimeout, dMultiplier);
+
+    }
+    else {
+        dInitialTimeout = 0.75;
+        dMaxTimeout = 20.0;
+        dMultiplier = 1.3;
+    }
+
+}

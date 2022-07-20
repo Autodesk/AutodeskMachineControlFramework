@@ -250,7 +250,19 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
 
     int index = 0;
     for (auto& packetToSend : TCPPacketList) {
+        auto sendInfo = SendInfoList.at(index);
+
+        if (packetToSend.m_nSequenceID != sendInfo.m_SequenceID)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
         m_pCurrentConnection->sendBuffer((uint8_t*)&packetToSend, sizeof(sAMCFToPLCPacket));
+        index++;
+
+        
+    }
+
+    index = 0;
+    for (auto& sendInfo : SendInfoList) {
 
         auto sendInfo = SendInfoList.at(index);
 
@@ -287,11 +299,6 @@ void CDriver_BuRConnector::sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>
         }
 
         index++;
-    }
-
-    for (auto& sendInfo : SendInfoList) {
-
-
     }
 }
 

@@ -424,6 +424,28 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetInputPoint
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint32 * pRTCVersion, LibMCDriver_ScanLab_uint32 * pRTCType, LibMCDriver_ScanLab_uint32 * pDLLVersion, LibMCDriver_ScanLab_uint32 * pHEXVersion, LibMCDriver_ScanLab_uint32 * pBIOSVersion);
 
+/**
+* Set RTC Ethernet communication timeouts
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] dInitialTimeout - Initial timeout in ms
+* @param[in] dMaxTimeout - Max timeout in ms
+* @param[in] dMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier);
+
+/**
+* Get RTC Ethernet communication timeouts
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[out] pInitialTimeout - Initial timeout in ms
+* @param[out] pMaxTimeout - Max timeout in ms
+* @param[out] pMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -630,6 +652,28 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Conf
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pStreamUUID, LibMCDriver_ScanLab_uint32 nLayerIndex);
 
+/**
+* Set RTC Ethernet communication timeouts
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] dInitialTimeout - Initial timeout in ms
+* @param[in] dMaxTimeout - Max timeout in ms
+* @param[in] dMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double dInitialTimeout, LibMCDriver_ScanLab_double dMaxTimeout, LibMCDriver_ScanLab_double dMultiplier);
+
+/**
+* Get RTC Ethernet communication timeouts
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[out] pInitialTimeout - Initial timeout in ms
+* @param[out] pMaxTimeout - Max timeout in ms
+* @param[out] pMultiplier - Multiplier
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -740,6 +784,8 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_GetStateValuesPtr m_RTCContext_GetStateValues;
 	PLibMCDriver_ScanLabRTCContext_GetInputPointerPtr m_RTCContext_GetInputPointer;
 	PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr m_RTCContext_GetRTCVersion;
+	PLibMCDriver_ScanLabRTCContext_SetCommunicationTimeoutsPtr m_RTCContext_SetCommunicationTimeouts;
+	PLibMCDriver_ScanLabRTCContext_GetCommunicationTimeoutsPtr m_RTCContext_GetCommunicationTimeouts;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;
@@ -758,6 +804,8 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureLaserModePtr m_Driver_ScanLab_RTC6_ConfigureLaserMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureDelaysPtr m_Driver_ScanLab_RTC6_ConfigureDelays;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr m_Driver_ScanLab_RTC6_DrawLayer;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_SetCommunicationTimeouts;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_GetCommunicationTimeouts;
 	PLibMCDriver_ScanLabGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabReleaseInstancePtr m_ReleaseInstance;

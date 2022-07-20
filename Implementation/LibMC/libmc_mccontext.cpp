@@ -90,22 +90,27 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
     m_pClientDistHandler = std::make_shared <CAPIHandler_Root>(m_pSystemState->getClientHash ());
     m_pAPI->registerHandler (m_pClientDistHandler);
 
+    std::string sTempPath = pDataModel->GetBaseTempDirectory();
 
-    // Set Temporary Path (as default value)
+    if (sTempPath.empty()) {
+        // Set Temporary Path (as default value)
 #ifdef _WIN32
-    std::vector<wchar_t> TempPathBuffer;
-    TempPathBuffer.resize(MAX_PATH + 1);
-    auto nSize = GetTempPathW(MAX_PATH, TempPathBuffer.data ());
-    if (nSize == 0)
-        throw ELibMCNoContextException(LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS);
+        std::vector<wchar_t> TempPathBuffer;
+        TempPathBuffer.resize(MAX_PATH + 1);
+        auto nSize = GetTempPathW(MAX_PATH, TempPathBuffer.data());
+        if (nSize == 0)
+            throw ELibMCNoContextException(LIBMC_ERROR_COULDNOTGETTEMPPATHFROMWINDOWS);
 
-    TempPathBuffer[MAX_PATH] = 0;
-    std::string sTempPathUTF8 = AMCCommon::CUtils::UTF16toUTF8(TempPathBuffer.data());
-    m_pSystemState->driverHandler()->setTempBasePath(sTempPathUTF8);
+        TempPathBuffer[MAX_PATH] = 0;
+        sTempPath = AMCCommon::CUtils::UTF16toUTF8(TempPathBuffer.data());
+        m_pSystemState->driverHandler()->setTempBasePath(sTempPath);
 
 #else
-    m_pSystemState->driverHandler()->setTempBasePath("/tmp");
+        sTempPath = "/tmp";
 #endif
+    }
+
+    m_pSystemState->driverHandler()->setTempBasePath(sTempPath);
 }
 
 CMCContext::~CMCContext()
