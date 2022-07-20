@@ -69,7 +69,7 @@ else()
 			set(BUILDRESOURCES_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.arm)
 						
 		else()
-			set(BUILDRESOURCES_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.linux)
+			set(BUILDRESOURCES_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.linux64)
 						
 		endif()
 	endif()
