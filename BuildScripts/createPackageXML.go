@@ -64,6 +64,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_raylase\" import=\"%s_driver_raylase.%s\" resources=\"%s_driver_raylase.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_ximc\" import=\"%s_driver_ximc.%s\" resources=\"%s_driver_ximc.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_bur\" import=\"%s_driver_bur.%s\" resources=\"%s_driver_bur.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_ads\" import=\"%s_driver_ads.%s\" resources=\"%s_driver_ads.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_opcua\" import=\"%s_driver_opcua.%s\" resources=\"%s_driver_opcua.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_tcpip\" import=\"%s_driver_tcpip.%s\" resources=\"%s_driver_tcpip.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_uart\" import=\"%s_driver_uart.%s\" resources=\"%s_driver_uart.data\"  />\n", gitHash, dllExtension, gitHash);
