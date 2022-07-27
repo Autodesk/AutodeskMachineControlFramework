@@ -33,8 +33,7 @@ Abstract: This is a stub class definition of CDriver_ADS
 
 #include "libmcdriver_ads_driver_ads.hpp"
 #include "libmcdriver_ads_interfaceexception.hpp"
-#include "libmcdriver_ads_plccommand.hpp"
-#include "libmcdriver_ads_plccommandlist.hpp"
+#include "pugixml.hpp"
 
 using namespace LibMCDriver_ADS::Impl;
 
@@ -45,7 +44,10 @@ using namespace LibMCDriver_ADS::Impl;
 CDriver_ADS::CDriver_ADS(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: m_bSimulationMode (false),
 	m_sName(sName),
-	m_pDriverEnvironment(pDriverEnvironment)
+	m_pDriverEnvironment(pDriverEnvironment),
+    m_nMajorVersion (0),
+    m_nMinorVersion (0),
+    m_nPatchVersion (0)
 {
 
 }
@@ -54,6 +56,85 @@ CDriver_ADS::~CDriver_ADS()
 {
 
 }
+
+void CDriver_ADS::Configure(const std::string& sConfigurationString)
+{
+
+    if (sConfigurationString.length() == 0)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDDRIVERPROTOCOL);
+
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(sConfigurationString.c_str());
+    if (!result)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTPARSEDRIVERPROTOCOL);
+
+    pugi::xml_node adsprotocolNode = doc.child("adsprotocol");
+    if (adsprotocolNode.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDDRIVERPROTOCOL);
+
+    pugi::xml_node versionNode = adsprotocolNode.child("version");
+    if (versionNode.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOVERSIONDEFINITION);
+
+    pugi::xml_attribute majorversionAttrib = versionNode.attribute("major");
+    if (majorversionAttrib.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOMAJORVERSION);
+    m_nMajorVersion = majorversionAttrib.as_uint(0);
+
+    pugi::xml_attribute minorversionAttrib = versionNode.attribute("minor");
+    if (minorversionAttrib.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOMINORVERSION);
+    m_nMinorVersion = minorversionAttrib.as_uint(0);
+
+    pugi::xml_attribute patchversionAttrib = versionNode.attribute("patch");
+    if (patchversionAttrib.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOPATCHVERSION);
+    m_nPatchVersion = patchversionAttrib.as_uint(0);
+
+    pugi::xml_node variablesNode = adsprotocolNode.child("variables");
+    if (variablesNode.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOVARIABLEDEFINITION);
+
+    m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcsadsdll_win64.dll", "tcsadsdll_win64");
+
+    m_pADSSDK = std::make_shared<CADSSDK>(m_pADSDLLFile->GetAbsoluteFileName ());
+    m_pADSClient = std::make_shared<CADSClient>(m_pADSSDK);
+
+    m_pADSClient->registerInt16Variable("nSchichthohe");
+
+    auto statusNodes = variablesNode.children();
+    for (pugi::xml_node childNode : statusNodes)
+    {
+        /*auto pValue = readParameterFromXMLNode(childNode);
+
+        if (dynamic_cast<CDriver_BuRBoolValue*> (pValue.get()) != nullptr)
+            m_pDriverEnvironment->RegisterBoolParameter(pValue->getName(), pValue->getDescription(), false);
+
+        if (dynamic_cast<CDriver_BuRStringValue*> (pValue.get()) != nullptr)
+            m_pDriverEnvironment->RegisterStringParameter(pValue->getName(), pValue->getDescription(), "");
+
+        if (dynamic_cast<CDriver_BuRLRealValue*> (pValue.get()) != nullptr)
+            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+
+        if (dynamic_cast<CDriver_BuRRealValue*> (pValue.get()) != nullptr)
+            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+
+        if (dynamic_cast<CDriver_BuRIntValue*> (pValue.get()) != nullptr)
+            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+
+        if (dynamic_cast<CDriver_BuRDIntValue*> (pValue.get()) != nullptr)
+            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+
+        m_DriverParameters.push_back(pValue);
+        m_DriverParameterMap.insert(std::make_pair(pValue->getName(), pValue)); */
+
+    }
+
+
+
+}
+
 
 void CDriver_ADS::SetToSimulationMode()
 {
@@ -65,35 +146,78 @@ bool CDriver_ADS::IsSimulationMode()
 	return m_bSimulationMode;
 }
 
-void CDriver_ADS::Connect(const std::string & sIPAddress, const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout)
+void CDriver_ADS::Connect(const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout)
 {
-	
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    m_pADSClient->connect(nPort);
 }
 
 void CDriver_ADS::Disconnect()
 {
-	
+    m_pADSClient->disconnect();
 }
 
-IPLCCommandList * CDriver_ADS::CreateCommandList()
+
+bool CDriver_ADS::VariableExists(const std::string& sVariableName)
 {
-	return new CPLCCommandList ();
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pVariable = m_pADSClient->findVariable(sVariableName);
+
+    return (pVariable != nullptr);    
+
 }
 
-IPLCCommand * CDriver_ADS::CreateCommand(const std::string & sCommandName)
+LibMCDriver_ADS_int64 CDriver_ADS::ReadIntegerValue(const std::string& sVariableName)
 {
-	return new CPLCCommand ();
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pVariable = m_pADSClient->findVariable(sVariableName);
+
+    if (pVariable == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found: " + sVariableName);
+
+    auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
+    if (pIntegerVariable == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER, "variable is not of integer value: " + sVariableName);
+
+    return pIntegerVariable->readValueFromPLC();
+
 }
 
-void CDriver_ADS::StartJournaling()
+void CDriver_ADS::WriteIntegerValue(const std::string& sVariableName, const LibMCDriver_ADS_int64 nValue)
 {
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pVariable = m_pADSClient->findVariable(sVariableName);
+
+    if (pVariable == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found: " + sVariableName);
+
+    auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
+    if (pIntegerVariable == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER, "variable is not of integer value: " + sVariableName);
+
+    pIntegerVariable->writeValueToPLC(nValue);
+
+
 }
 
-void CDriver_ADS::StopJournaling()
+void CDriver_ADS::GetVariableBounds(const std::string& sVariableName, LibMCDriver_ADS_int64& nMinValue, LibMCDriver_ADS_int64& nMaxValue)
 {
-}
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
 
-void CDriver_ADS::RefreshJournal()
-{
-}
+    auto pVariable = m_pADSClient->findVariable(sVariableName);
 
+    if (pVariable == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found: " + sVariableName);
+
+    nMinValue = -100000;
+    nMaxValue = +100000;
+}

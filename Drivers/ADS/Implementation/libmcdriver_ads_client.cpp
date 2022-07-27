@@ -333,21 +333,22 @@ CADSClient::~CADSClient()
 
 }
 
-void CADSClient::connect()
+void CADSClient::connect(uint32_t nPortNumber)
 {
 	if (m_pCurrentConnection.get() != nullptr)
 		disconnect();
 
 	m_pCurrentConnection = nullptr;
-	AdsPort nPort = m_pSDK->AdsPortOpenEx();
+	AdsPort nPortHandle = m_pSDK->AdsPortOpenEx();
 
 	sAmsAddr localAddress;
 	memset(&localAddress, sizeof(localAddress), 0);
-	m_pSDK->checkError (m_pSDK->AdsGetLocalAddressEx(nPort, &localAddress));
+	m_pSDK->checkError (m_pSDK->AdsGetLocalAddressEx(nPortHandle, &localAddress));
 
-	localAddress.m_Port = AMSPORT_R0_PLC_TC3;
+	// AMSPORT_R0_PLC_TC3 = 851;
+	localAddress.m_Port = nPortNumber; 
 
-	m_pCurrentConnection = std::make_shared<CADSClientConnection> (m_pSDK, nPort, localAddress);
+	m_pCurrentConnection = std::make_shared<CADSClientConnection> (m_pSDK, nPortNumber, localAddress);
 }
 
 void CADSClient::disconnect()
@@ -436,3 +437,20 @@ PADSClientUint32Variable CADSClient::registerUint32Variable(const std::string& s
 }
 
 
+void CADSClient::registerVariable(PADSClientVariable pVariable)
+{
+	if (pVariable.get () == nullptr)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDPARAM);
+
+	m_Variables.push_back(pVariable);
+	m_VariableMap.insert(std::make_pair(pVariable->getName (), pVariable));
+}
+
+CADSClientVariable* CADSClient::findVariable(const std::string& sName)
+{
+	auto iIter = m_VariableMap.find(sName);
+	if (iIter == m_VariableMap.end())
+		return nullptr;
+
+	return iIter->second.get();
+}

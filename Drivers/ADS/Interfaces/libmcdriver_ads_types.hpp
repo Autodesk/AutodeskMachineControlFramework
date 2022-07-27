@@ -115,6 +115,15 @@ typedef void * LibMCDriver_ADS_pvoid;
 #define LIBMCDRIVER_ADS_ERROR_COULDNOTREADDATA 1007
 #define LIBMCDRIVER_ADS_ERROR_COULDNOTREADHANDLEVALUE 1008
 #define LIBMCDRIVER_ADS_ERROR_NAMELENGTHEXCEEDSMAXIMUM 1009
+#define LIBMCDRIVER_ADS_ERROR_NOVERSIONDEFINITION 1010
+#define LIBMCDRIVER_ADS_ERROR_NOMAJORVERSION 1011
+#define LIBMCDRIVER_ADS_ERROR_NOMINORVERSION 1012
+#define LIBMCDRIVER_ADS_ERROR_NOPATCHVERSION 1013
+#define LIBMCDRIVER_ADS_ERROR_NOVARIABLEDEFINITION 1014
+#define LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED 1015
+#define LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER 1016
+#define LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTBOOLEAN 1017
+#define LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND 1018
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ADS
@@ -142,6 +151,15 @@ inline const char * LIBMCDRIVER_ADS_GETERRORSTRING (LibMCDriver_ADSResult nError
     case LIBMCDRIVER_ADS_ERROR_COULDNOTREADDATA: return "Could not read data";
     case LIBMCDRIVER_ADS_ERROR_COULDNOTREADHANDLEVALUE: return "Could not read handle value";
     case LIBMCDRIVER_ADS_ERROR_NAMELENGTHEXCEEDSMAXIMUM: return "Name length exceeds maximum";
+    case LIBMCDRIVER_ADS_ERROR_NOVERSIONDEFINITION: return "No version definition";
+    case LIBMCDRIVER_ADS_ERROR_NOMAJORVERSION: return "No major version";
+    case LIBMCDRIVER_ADS_ERROR_NOMINORVERSION: return "No minor version";
+    case LIBMCDRIVER_ADS_ERROR_NOPATCHVERSION: return "No patch version";
+    case LIBMCDRIVER_ADS_ERROR_NOVARIABLEDEFINITION: return "No variable definition";
+    case LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED: return "Driver not configured";
+    case LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER: return "Variable is not integer";
+    case LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTBOOLEAN: return "Variable is not a boolean";
+    case LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND: return "Variable not found";
     default: return "unknown error";
   }
 }
@@ -152,8 +170,6 @@ inline const char * LIBMCDRIVER_ADS_GETERRORSTRING (LibMCDriver_ADSResult nError
 
 typedef LibMCDriver_ADSHandle LibMCDriver_ADS_Base;
 typedef LibMCDriver_ADSHandle LibMCDriver_ADS_Driver;
-typedef LibMCDriver_ADSHandle LibMCDriver_ADS_PLCCommand;
-typedef LibMCDriver_ADSHandle LibMCDriver_ADS_PLCCommandList;
 typedef LibMCDriver_ADSHandle LibMCDriver_ADS_Driver_ADS;
 
 namespace LibMCDriver_ADS {

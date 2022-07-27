@@ -120,96 +120,6 @@ typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_GetHeaderInformationPtr) 
 typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_QueryParametersPtr) (LibMCDriver_ADS_Driver pDriver);
 
 /*************************************************************************************************************************
- Class definition for PLCCommand
-**************************************************************************************************************************/
-
-/**
-* Sets an integer parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] nValue - Parameter Value
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommand_SetIntegerParameterPtr) (LibMCDriver_ADS_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_ADS_int64 nValue);
-
-/**
-* Sets a bool parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] bValue - Parameter Value
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommand_SetBoolParameterPtr) (LibMCDriver_ADS_PLCCommand pPLCCommand, const char * pParameterName, bool bValue);
-
-/**
-* Sets a double parameter of the command
-*
-* @param[in] pPLCCommand - PLCCommand instance.
-* @param[in] pParameterName - Parameter Value
-* @param[in] dValue - Parameter Value
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommand_SetDoubleParameterPtr) (LibMCDriver_ADS_PLCCommand pPLCCommand, const char * pParameterName, LibMCDriver_ADS_double dValue);
-
-/*************************************************************************************************************************
- Class definition for PLCCommandList
-**************************************************************************************************************************/
-
-/**
-* Adds a command to the list. List must not be executed before.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @param[in] pCommandInstance - Add a command instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommandList_AddCommandPtr) (LibMCDriver_ADS_PLCCommandList pPLCCommandList, LibMCDriver_ADS_PLCCommand pCommandInstance);
-
-/**
-* Finish command list.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommandList_FinishListPtr) (LibMCDriver_ADS_PLCCommandList pPLCCommandList);
-
-/**
-* Execute command list.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommandList_ExecuteListPtr) (LibMCDriver_ADS_PLCCommandList pPLCCommandList);
-
-/**
-* Wait for command list to finish executing
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @param[in] nReactionTimeInMS - How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time.
-* @param[in] nWaitForTimeInMS - How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished.
-* @param[out] pCommandSuccess - Returns true if the command was finished successfully.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommandList_WaitForListPtr) (LibMCDriver_ADS_PLCCommandList pPLCCommandList, LibMCDriver_ADS_uint32 nReactionTimeInMS, LibMCDriver_ADS_uint32 nWaitForTimeInMS, bool * pCommandSuccess);
-
-/**
-* Pause command list. Must be executed or resumed before.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommandList_PauseListPtr) (LibMCDriver_ADS_PLCCommandList pPLCCommandList);
-
-/**
-* Resume command list. Must be paused before.
-*
-* @param[in] pPLCCommandList - PLCCommandList instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSPLCCommandList_ResumeListPtr) (LibMCDriver_ADS_PLCCommandList pPLCCommandList);
-
-/*************************************************************************************************************************
  Class definition for Driver_ADS
 **************************************************************************************************************************/
 
@@ -234,12 +144,11 @@ typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_IsSimulationModePtr) 
 * Connects to a ADS PLC Controller.
 *
 * @param[in] pDriver_ADS - Driver_ADS instance.
-* @param[in] pIPAddress - IP Address of PLC Service.
 * @param[in] nPort - Port of PLC Service.
 * @param[in] nTimeout - Timeout in milliseconds.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_ConnectPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pIPAddress, LibMCDriver_ADS_uint32 nPort, LibMCDriver_ADS_uint32 nTimeout);
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_ConnectPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, LibMCDriver_ADS_uint32 nPort, LibMCDriver_ADS_uint32 nTimeout);
 
 /**
 * Disconnects from the ADS PLC Controller.
@@ -250,47 +159,45 @@ typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_ConnectPtr) (LibMCDri
 typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_DisconnectPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS);
 
 /**
-* Create Command
+* Returns if a variable exists.
 *
 * @param[in] pDriver_ADS - Driver_ADS instance.
-* @param[out] pListInstance - Command list instance
+* @param[in] pVariableName - Name of variable.
+* @param[out] pVariableExists - Flag if value exists.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_CreateCommandListPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, LibMCDriver_ADS_PLCCommandList * pListInstance);
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_VariableExistsPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pVariableName, bool * pVariableExists);
 
 /**
-* Creates a command instance.
+* Reads a value from an integer Variable.
 *
 * @param[in] pDriver_ADS - Driver_ADS instance.
-* @param[in] pCommandName - Command Name.
-* @param[out] pCommandInstance - Returns a command instance.
+* @param[in] pVariableName - Name of variable.
+* @param[out] pValue - Result value.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_CreateCommandPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pCommandName, LibMCDriver_ADS_PLCCommand * pCommandInstance);
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_ReadIntegerValuePtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pVariableName, LibMCDriver_ADS_int64 * pValue);
 
 /**
-* Start Journaling.
+* Reads a value from an integer Variable. Fails if value is not within the bounds of the variable.
 *
 * @param[in] pDriver_ADS - Driver_ADS instance.
+* @param[in] pVariableName - Name of variable.
+* @param[in] nValue - Value to set.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_StartJournalingPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS);
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_WriteIntegerValuePtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pVariableName, LibMCDriver_ADS_int64 nValue);
 
 /**
-* Stop Journaling.
+* Returns the min and max value an integer variable can hold.
 *
 * @param[in] pDriver_ADS - Driver_ADS instance.
+* @param[in] pVariableName - Name of variable.
+* @param[out] pMinValue - Minimum value.
+* @param[out] pMaxValue - Minimum value.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_StopJournalingPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS);
-
-/**
-* Refresh Journal.
-*
-* @param[in] pDriver_ADS - Driver_ADS instance.
-* @return error code or 0 (success)
-*/
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_RefreshJournalPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS);
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_GetVariableBoundsPtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pVariableName, LibMCDriver_ADS_int64 * pMinValue, LibMCDriver_ADS_int64 * pMaxValue);
 
 /*************************************************************************************************************************
  Global functions
@@ -374,24 +281,14 @@ typedef struct {
 	PLibMCDriver_ADSDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_ADSDriver_GetHeaderInformationPtr m_Driver_GetHeaderInformation;
 	PLibMCDriver_ADSDriver_QueryParametersPtr m_Driver_QueryParameters;
-	PLibMCDriver_ADSPLCCommand_SetIntegerParameterPtr m_PLCCommand_SetIntegerParameter;
-	PLibMCDriver_ADSPLCCommand_SetBoolParameterPtr m_PLCCommand_SetBoolParameter;
-	PLibMCDriver_ADSPLCCommand_SetDoubleParameterPtr m_PLCCommand_SetDoubleParameter;
-	PLibMCDriver_ADSPLCCommandList_AddCommandPtr m_PLCCommandList_AddCommand;
-	PLibMCDriver_ADSPLCCommandList_FinishListPtr m_PLCCommandList_FinishList;
-	PLibMCDriver_ADSPLCCommandList_ExecuteListPtr m_PLCCommandList_ExecuteList;
-	PLibMCDriver_ADSPLCCommandList_WaitForListPtr m_PLCCommandList_WaitForList;
-	PLibMCDriver_ADSPLCCommandList_PauseListPtr m_PLCCommandList_PauseList;
-	PLibMCDriver_ADSPLCCommandList_ResumeListPtr m_PLCCommandList_ResumeList;
 	PLibMCDriver_ADSDriver_ADS_SetToSimulationModePtr m_Driver_ADS_SetToSimulationMode;
 	PLibMCDriver_ADSDriver_ADS_IsSimulationModePtr m_Driver_ADS_IsSimulationMode;
 	PLibMCDriver_ADSDriver_ADS_ConnectPtr m_Driver_ADS_Connect;
 	PLibMCDriver_ADSDriver_ADS_DisconnectPtr m_Driver_ADS_Disconnect;
-	PLibMCDriver_ADSDriver_ADS_CreateCommandListPtr m_Driver_ADS_CreateCommandList;
-	PLibMCDriver_ADSDriver_ADS_CreateCommandPtr m_Driver_ADS_CreateCommand;
-	PLibMCDriver_ADSDriver_ADS_StartJournalingPtr m_Driver_ADS_StartJournaling;
-	PLibMCDriver_ADSDriver_ADS_StopJournalingPtr m_Driver_ADS_StopJournaling;
-	PLibMCDriver_ADSDriver_ADS_RefreshJournalPtr m_Driver_ADS_RefreshJournal;
+	PLibMCDriver_ADSDriver_ADS_VariableExistsPtr m_Driver_ADS_VariableExists;
+	PLibMCDriver_ADSDriver_ADS_ReadIntegerValuePtr m_Driver_ADS_ReadIntegerValue;
+	PLibMCDriver_ADSDriver_ADS_WriteIntegerValuePtr m_Driver_ADS_WriteIntegerValue;
+	PLibMCDriver_ADSDriver_ADS_GetVariableBoundsPtr m_Driver_ADS_GetVariableBounds;
 	PLibMCDriver_ADSGetVersionPtr m_GetVersion;
 	PLibMCDriver_ADSGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ADSReleaseInstancePtr m_ReleaseInstance;

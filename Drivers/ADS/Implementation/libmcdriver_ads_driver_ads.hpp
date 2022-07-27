@@ -36,6 +36,8 @@ Abstract: This is the class declaration of CDriver_ADS
 #define __LIBMCDRIVER_ADS_DRIVER_ADS
 
 #include "libmcdriver_ads_interfaces.hpp"
+#include "libmcdriver_ads_client.hpp"
+#include "libmcdriver_ads_sdk.hpp"
 
 // Parent classes
 #include "libmcdriver_ads_driver.hpp"
@@ -64,6 +66,16 @@ private:
 	std::mutex m_driverEnvironmentMutex;
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
+	PADSSDK m_pADSSDK;
+	PADSClient m_pADSClient;
+
+	uint32_t m_nMajorVersion;
+	uint32_t m_nMinorVersion;
+	uint32_t m_nPatchVersion;
+
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	LibMCEnv::PWorkingFile m_pADSDLLFile;
+
 protected:
 
 
@@ -72,23 +84,23 @@ public:
 
 	virtual ~CDriver_ADS();
 
+	void Configure(const std::string& sConfigurationString) override;
+
 	void SetToSimulationMode() override;
 
 	bool IsSimulationMode() override;
 
-	void Connect(const std::string & sIPAddress, const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout) override;
+	void Connect(const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout) override;
 
 	void Disconnect() override;
+	
+	bool VariableExists(const std::string & sVariableName) override;
 
-	IPLCCommandList * CreateCommandList() override;
+	LibMCDriver_ADS_int64 ReadIntegerValue(const std::string& sVariableName) override;
 
-	IPLCCommand * CreateCommand(const std::string & sCommandName) override;
+	void WriteIntegerValue(const std::string& sVariableName, const LibMCDriver_ADS_int64 nValue) override;
 
-	void StartJournaling() override;
-
-	void StopJournaling() override;
-
-	void RefreshJournal() override;
+	void GetVariableBounds(const std::string& sVariableName, LibMCDriver_ADS_int64& nMinValue, LibMCDriver_ADS_int64& nMaxValue) override;
 
 };
 

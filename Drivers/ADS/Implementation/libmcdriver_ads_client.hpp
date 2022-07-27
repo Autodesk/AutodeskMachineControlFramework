@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <string>
+#include <map>
+#include <vector>
 
 
 namespace LibMCDriver_ADS {
@@ -151,16 +153,19 @@ namespace LibMCDriver_ADS {
 		private:
 			PADSSDK m_pSDK;
 			AdsVersion m_Version;
+			std::vector<PADSClientVariable> m_Variables;
+			std::map<std::string, PADSClientVariable> m_VariableMap;
 
 			PADSClientConnection m_pCurrentConnection;
 
 			uint32_t getVariableHandle(const std::string & sName);
+			void registerVariable(PADSClientVariable pVariable);
 
 		public:
 			CADSClient (PADSSDK pSDK);
 			virtual ~CADSClient();
 
-			void connect();
+			void connect(uint32_t nPortNumber);
 			void disconnect();
 
 			std::string getVersionString();
@@ -171,6 +176,8 @@ namespace LibMCDriver_ADS {
 			PADSClientUint16Variable registerUint16Variable(const std::string& sName);
 			PADSClientInt32Variable registerInt32Variable(const std::string& sName);
 			PADSClientUint32Variable registerUint32Variable(const std::string& sName);
+
+			CADSClientVariable* findVariable(const std::string& sName);
 
 		};
 
