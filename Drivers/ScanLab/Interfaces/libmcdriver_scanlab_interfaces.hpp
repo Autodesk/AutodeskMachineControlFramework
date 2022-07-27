@@ -455,11 +455,14 @@ class IRTCContext : public virtual IBase {
 public:
 	/**
 	* IRTCContext::LoadFirmware - Loads card firmware from resource files.
-	* @param[in] sFirmwareResource - resource name of the firmware program file.
-	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
-	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] nFPGADataBufferSize - Number of elements in buffer
+	* @param[in] pFPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+	* @param[in] pAuxiliaryDataBuffer - byte array of the binary auxiliary file.
 	*/
-	virtual void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
+	virtual void LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer) = 0;
 
 	/**
 	* IRTCContext::LoadCorrectionFile - Loads card calibration file from given resource file.
@@ -652,7 +655,7 @@ public:
 	* @param[out] nFocusShift - Current Focus Shift in Units
 	* @param[out] nMarkSpeed - Current Mark Speed in Units
 	*/
-	virtual void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed) = 0;
+	virtual void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY, LibMCDriver_ScanLab_int32 & nPositionZ, LibMCDriver_ScanLab_int32 & nCorrectedPositionX, LibMCDriver_ScanLab_int32 & nCorrectedPositionY, LibMCDriver_ScanLab_int32 & nCorrectedPositionZ, LibMCDriver_ScanLab_int32 & nFocusShift, LibMCDriver_ScanLab_int32 & nMarkSpeed) = 0;
 
 	/**
 	* IRTCContext::GetInputPointer - returns current input list position
@@ -773,6 +776,13 @@ public:
 	virtual void LoadSDK(const std::string & sResourceName) = 0;
 
 	/**
+	* IDriver_ScanLab::LoadCustomSDK - Initializes the ScanLab SDK from an external source.
+	* @param[in] nScanlabDLLBufferSize - Number of elements in buffer
+	* @param[in] pScanlabDLLBuffer - Byte array of Scanlab DLL
+	*/
+	virtual void LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8 * pScanlabDLLBuffer) = 0;
+
+	/**
 	* IDriver_ScanLab::CreateRTCSelector - Creates and initializes a new RTC selector singleton. Should only be called once per Process.
 	* @return New Selector instance
 	*/
@@ -816,6 +826,17 @@ public:
 	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
 	*/
 	virtual void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource) = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources.
+	* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+	* @param[in] pFirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] nFPGADataBufferSize - Number of elements in buffer
+	* @param[in] pFPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+	* @param[in] pAuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	virtual void LoadCustomFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer) = 0;
 
 	/**
 	* IDriver_ScanLab_RTC6::SetCorrectionFile - Sets the correction file stream.

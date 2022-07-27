@@ -148,10 +148,25 @@ void CDriver_ScanLab_RTC6::LoadFirmware(const std::string& sFirmwareResource, co
         if (m_pRTCContext.get() == nullptr)
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
-        m_pRTCContext->LoadFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
+        std::vector<uint8_t> FirmwareData;
+        m_pDriverEnvironment->RetrieveDriverData(sFirmwareResource, FirmwareData);
+
+        std::vector<uint8_t> FPGAData;
+        m_pDriverEnvironment->RetrieveDriverData(sFPGAResource, FPGAData);
+
+        std::vector<uint8_t> AuxiliaryData;
+        m_pDriverEnvironment->RetrieveDriverData(sAuxiliaryResource, AuxiliaryData);
+
+        m_pRTCContext->LoadFirmware (FirmwareData.size (), FirmwareData.data (), FPGAData.size (), FPGAData.data(), AuxiliaryData.size (), AuxiliaryData.data ());
 
     }
 }
+
+void CDriver_ScanLab_RTC6::LoadCustomFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer)
+{
+
+}
+
 
 void CDriver_ScanLab_RTC6::SetCorrectionFile(const LibMCDriver_ScanLab_uint64 nCorrectionFileBufferSize, const LibMCDriver_ScanLab_uint8* pCorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB) 
 {
@@ -372,9 +387,9 @@ void CDriver_ScanLab_RTC6::updateCardStatus()
         m_pDriverEnvironment->SetBoolParameter("card_busy", Busy);
 
         bool bLaserIsOn;
-        uint32_t nPositionX, nPositionY, nPositionZ;
-        uint32_t nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ;
-        uint32_t nFocusShift, nMarkSpeed;
+        int32_t nPositionX, nPositionY, nPositionZ;
+        int32_t nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ;
+        int32_t nFocusShift, nMarkSpeed;
 
         m_pRTCContext->GetStateValues(bLaserIsOn, nPositionX, nPositionY, nPositionZ, nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ, nFocusShift, nMarkSpeed);
         m_pDriverEnvironment->SetBoolParameter("laser_on", bLaserIsOn);

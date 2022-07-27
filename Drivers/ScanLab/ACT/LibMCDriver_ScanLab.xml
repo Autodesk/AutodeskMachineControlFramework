@@ -179,9 +179,9 @@ Custom implementation
 	<class name="RTCContext" parent="Base" description="Selector of the RTC Controller Card">
 
 		<method name="LoadFirmware" description="Loads card firmware from resource files.">
-			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
-			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
-			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
 		</method>
 
 		<method name="LoadCorrectionFile" description="Loads card calibration file from given resource file.">
@@ -316,14 +316,14 @@ Custom implementation
 
 		<method name="GetStateValues" description="Returns status values of scan head">
 			<param name="LaserIsOn" type="bool" pass="out" description="Laser is on" />
-			<param name="PositionX" type="uint32" pass="out" description="Current Position X in Units" />
-			<param name="PositionY" type="uint32" pass="out" description="Current Position Y in Units" />
-			<param name="PositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
-			<param name="CorrectedPositionX" type="uint32" pass="out" description="Current Position X in Units" />
-			<param name="CorrectedPositionY" type="uint32" pass="out" description="Current Position Y in Units" />
-			<param name="CorrectedPositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
-			<param name="FocusShift" type="uint32" pass="out" description="Current Focus Shift in Units" />
-			<param name="MarkSpeed" type="uint32" pass="out" description="Current Mark Speed in Units" />
+			<param name="PositionX" type="int32" pass="out" description="Current Position X in Units" />
+			<param name="PositionY" type="int32" pass="out" description="Current Position Y in Units" />
+			<param name="PositionZ" type="int32" pass="out" description="Current Position Z in Units" />
+			<param name="CorrectedPositionX" type="int32" pass="out" description="Current Position X in Units" />
+			<param name="CorrectedPositionY" type="int32" pass="out" description="Current Position Y in Units" />
+			<param name="CorrectedPositionZ" type="int32" pass="out" description="Current Position Z in Units" />
+			<param name="FocusShift" type="int32" pass="out" description="Current Focus Shift in Units" />
+			<param name="MarkSpeed" type="int32" pass="out" description="Current Mark Speed in Units" />
 		</method>
 
 		<method name="GetInputPointer" description="returns current input list position">
@@ -408,6 +408,10 @@ Custom implementation
 			<param name="ResourceName" type="string" pass="in" description="Resource name of Scanlab DLL" />
 		</method>
 
+		<method name="LoadCustomSDK" description="Initializes the ScanLab SDK from an external source.">
+			<param name="ScanlabDLL" type="basicarray" class="uint8" pass="in" description="Byte array of Scanlab DLL" />
+		</method>
+		
 		<method name="CreateRTCSelector" description="Creates and initializes a new RTC selector singleton. Should only be called once per Process.">
 			<param name="Instance" type="class" class="RTCSelector" pass="return" description="New Selector instance" />
 		</method>
@@ -436,6 +440,12 @@ Custom implementation
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
 			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
 			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
 		</method>		
 		
 		<method name="SetCorrectionFile" description="Sets the correction file stream.">

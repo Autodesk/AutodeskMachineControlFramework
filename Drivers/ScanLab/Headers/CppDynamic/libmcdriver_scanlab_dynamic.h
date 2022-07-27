@@ -127,12 +127,15 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_QueryParametersPt
 * Loads card firmware from resource files.
 *
 * @param[in] pRTCContext - RTCContext instance.
-* @param[in] pFirmwareResource - resource name of the firmware program file.
-* @param[in] pFPGAResource - resource name of the firmware FPGA file.
-* @param[in] pAuxiliaryResource - resource name of the binary auxiliary file.
+* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
+* @param[in] nFPGADataBufferSize - Number of elements in buffer
+* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
+* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_LoadFirmwarePtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer);
 
 /**
 * Loads card calibration file from given resource file.
@@ -400,7 +403,7 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetHeadStatus
 * @param[out] pMarkSpeed - Current Mark Speed in Units
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetStateValuesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserIsOn, LibMCDriver_ScanLab_uint32 * pPositionX, LibMCDriver_ScanLab_uint32 * pPositionY, LibMCDriver_ScanLab_uint32 * pPositionZ, LibMCDriver_ScanLab_uint32 * pCorrectedPositionX, LibMCDriver_ScanLab_uint32 * pCorrectedPositionY, LibMCDriver_ScanLab_uint32 * pCorrectedPositionZ, LibMCDriver_ScanLab_uint32 * pFocusShift, LibMCDriver_ScanLab_uint32 * pMarkSpeed);
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetStateValuesPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserIsOn, LibMCDriver_ScanLab_int32 * pPositionX, LibMCDriver_ScanLab_int32 * pPositionY, LibMCDriver_ScanLab_int32 * pPositionZ, LibMCDriver_ScanLab_int32 * pCorrectedPositionX, LibMCDriver_ScanLab_int32 * pCorrectedPositionY, LibMCDriver_ScanLab_int32 * pCorrectedPositionZ, LibMCDriver_ScanLab_int32 * pFocusShift, LibMCDriver_ScanLab_int32 * pMarkSpeed);
 
 /**
 * returns current input list position
@@ -546,6 +549,16 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCSelector_AcquireEther
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, const char * pResourceName);
 
 /**
+* Initializes the ScanLab SDK from an external source.
+*
+* @param[in] pDriver_ScanLab - Driver_ScanLab instance.
+* @param[in] nScanlabDLLBufferSize - Number of elements in buffer
+* @param[in] pScanlabDLLBuffer - uint8 buffer of Byte array of Scanlab DLL
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_LoadCustomSDKPtr) (LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8 * pScanlabDLLBuffer);
+
+/**
 * Creates and initializes a new RTC selector singleton. Should only be called once per Process.
 *
 * @param[in] pDriver_ScanLab - Driver_ScanLab instance.
@@ -597,6 +610,20 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_Init
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadFirmwarePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource);
+
+/**
+* Loads the firmware from custom resources.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nFirmwareDataBufferSize - Number of elements in buffer
+* @param[in] pFirmwareDataBuffer - uint8 buffer of byte array of the firmware program file.
+* @param[in] nFPGADataBufferSize - Number of elements in buffer
+* @param[in] pFPGADataBuffer - uint8 buffer of byte array of the firmware FPGA file.
+* @param[in] nAuxiliaryDataBufferSize - Number of elements in buffer
+* @param[in] pAuxiliaryDataBuffer - uint8 buffer of byte array of the binary auxiliary file.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadCustomFirmwarePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer);
 
 /**
 * Sets the correction file stream.
@@ -795,11 +822,13 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCSelector_AcquireEthernetCardPtr m_RTCSelector_AcquireEthernetCard;
 	PLibMCDriver_ScanLabRTCSelector_AcquireEthernetCardBySerialPtr m_RTCSelector_AcquireEthernetCardBySerial;
 	PLibMCDriver_ScanLabDriver_ScanLab_LoadSDKPtr m_Driver_ScanLab_LoadSDK;
+	PLibMCDriver_ScanLabDriver_ScanLab_LoadCustomSDKPtr m_Driver_ScanLab_LoadCustomSDK;
 	PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr m_Driver_ScanLab_CreateRTCSelector;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr m_Driver_ScanLab_RTC6_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr m_Driver_ScanLab_RTC6_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr m_Driver_ScanLab_RTC6_Initialise;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadFirmwarePtr m_Driver_ScanLab_RTC6_LoadFirmware;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadCustomFirmwarePtr m_Driver_ScanLab_RTC6_LoadCustomFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCorrectionFilePtr m_Driver_ScanLab_RTC6_SetCorrectionFile;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureLaserModePtr m_Driver_ScanLab_RTC6_ConfigureLaserMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_ConfigureDelaysPtr m_Driver_ScanLab_RTC6_ConfigureDelays;

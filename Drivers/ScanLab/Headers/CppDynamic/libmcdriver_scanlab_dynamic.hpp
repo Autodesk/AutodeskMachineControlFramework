@@ -377,7 +377,7 @@ public:
 	{
 	}
 	
-	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
+	inline void LoadFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer);
 	inline void LoadCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension);
 	inline void SelectCorrectionTable(const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 	inline void ConfigureLists(const LibMCDriver_ScanLab_uint32 nSizeListA, const LibMCDriver_ScanLab_uint32 nSizeListB);
@@ -402,7 +402,7 @@ public:
 	inline LibMCDriver_ScanLab_double GetCorrectionFactor();
 	inline void GetStatus(bool & bBusy, LibMCDriver_ScanLab_uint32 & nPosition);
 	inline void GetHeadStatus(const LibMCDriver_ScanLab_uint32 nHeadNo, bool & bPositionXisOK, bool & bPositionYisOK, bool & bTemperatureisOK, bool & bPowerisOK);
-	inline void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed);
+	inline void GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY, LibMCDriver_ScanLab_int32 & nPositionZ, LibMCDriver_ScanLab_int32 & nCorrectedPositionX, LibMCDriver_ScanLab_int32 & nCorrectedPositionY, LibMCDriver_ScanLab_int32 & nCorrectedPositionZ, LibMCDriver_ScanLab_int32 & nFocusShift, LibMCDriver_ScanLab_int32 & nMarkSpeed);
 	inline LibMCDriver_ScanLab_uint32 GetInputPointer();
 	inline void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
@@ -448,6 +448,7 @@ public:
 	}
 	
 	inline void LoadSDK(const std::string & sResourceName);
+	inline void LoadCustomSDK(const CInputVector<LibMCDriver_ScanLab_uint8> & ScanlabDLLBuffer);
 	inline PRTCSelector CreateRTCSelector();
 };
 	
@@ -469,6 +470,7 @@ public:
 	inline bool IsSimulationMode();
 	inline void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber);
 	inline void LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource);
+	inline void LoadCustomFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer);
 	inline void SetCorrectionFile(const CInputVector<LibMCDriver_ScanLab_uint8> & CorrectionFileBuffer, const LibMCDriver_ScanLab_uint32 nTableNumber, const LibMCDriver_ScanLab_uint32 nDimension, const LibMCDriver_ScanLab_uint32 nTableNumberHeadA, const LibMCDriver_ScanLab_uint32 nTableNumberHeadB);
 	inline void ConfigureLaserMode(const eLaserMode eLaserMode, const eLaserPort eLaserPort, const LibMCDriver_ScanLab_double dMaxLaserPower, const bool bFinishLaserPulseAfterOn, const bool bPhaseShiftOfLaserSignal, const bool bLaserOnSignalLowActive, const bool bLaserHalfSignalsLowActive, const bool bSetDigitalInOneHighActive, const bool bOutputSynchronizationActive);
 	inline void ConfigureDelays(const LibMCDriver_ScanLab_double dLaserOnDelay, const LibMCDriver_ScanLab_double dLaserOffDelay, const LibMCDriver_ScanLab_double dMarkDelay, const LibMCDriver_ScanLab_double dJumpDelay, const LibMCDriver_ScanLab_double dPolygonDelay);
@@ -643,11 +645,13 @@ public:
 		pWrapperTable->m_RTCSelector_AcquireEthernetCard = nullptr;
 		pWrapperTable->m_RTCSelector_AcquireEthernetCardBySerial = nullptr;
 		pWrapperTable->m_Driver_ScanLab_LoadSDK = nullptr;
+		pWrapperTable->m_Driver_ScanLab_LoadCustomSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_Initialise = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_LoadFirmware = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_LoadCustomFirmware = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetCorrectionFile = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureLaserMode = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_ConfigureDelays = nullptr;
@@ -1115,6 +1119,15 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_LoadCustomSDK = (PLibMCDriver_ScanLabDriver_ScanLab_LoadCustomSDKPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_loadcustomsdk");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_LoadCustomSDK = (PLibMCDriver_ScanLabDriver_ScanLab_LoadCustomSDKPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_loadcustomsdk");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_LoadCustomSDK == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = (PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_creatertcselector");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_CreateRTCSelector = (PLibMCDriver_ScanLabDriver_ScanLab_CreateRTCSelectorPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_creatertcselector");
@@ -1157,6 +1170,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6_LoadFirmware == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_LoadCustomFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadCustomFirmwarePtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_loadcustomfirmware");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_LoadCustomFirmware = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadCustomFirmwarePtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_loadcustomfirmware");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_LoadCustomFirmware == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1472,6 +1494,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_LoadSDK == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_loadcustomsdk", (void**)&(pWrapperTable->m_Driver_ScanLab_LoadCustomSDK));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_LoadCustomSDK == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_creatertcselector", (void**)&(pWrapperTable->m_Driver_ScanLab_CreateRTCSelector));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_CreateRTCSelector == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1490,6 +1516,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_loadfirmware", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_LoadFirmware));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_LoadFirmware == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_loadcustomfirmware", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_LoadCustomFirmware));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_LoadCustomFirmware == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_setcorrectionfile", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_SetCorrectionFile));
@@ -1646,13 +1676,13 @@ public:
 	
 	/**
 	* CRTCContext::LoadFirmware - Loads card firmware from resource files.
-	* @param[in] sFirmwareResource - resource name of the firmware program file.
-	* @param[in] sFPGAResource - resource name of the firmware FPGA file.
-	* @param[in] sAuxiliaryResource - resource name of the binary auxiliary file.
+	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
 	*/
-	void CRTCContext::LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource)
+	void CRTCContext::LoadFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_LoadFirmware(m_pHandle, sFirmwareResource.c_str(), sFPGAResource.c_str(), sAuxiliaryResource.c_str()));
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_LoadFirmware(m_pHandle, (LibMCDriver_ScanLab_uint64)FirmwareDataBuffer.size(), FirmwareDataBuffer.data(), (LibMCDriver_ScanLab_uint64)FPGADataBuffer.size(), FPGADataBuffer.data(), (LibMCDriver_ScanLab_uint64)AuxiliaryDataBuffer.size(), AuxiliaryDataBuffer.data()));
 	}
 	
 	/**
@@ -1921,7 +1951,7 @@ public:
 	* @param[out] nFocusShift - Current Focus Shift in Units
 	* @param[out] nMarkSpeed - Current Mark Speed in Units
 	*/
-	void CRTCContext::GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_uint32 & nPositionX, LibMCDriver_ScanLab_uint32 & nPositionY, LibMCDriver_ScanLab_uint32 & nPositionZ, LibMCDriver_ScanLab_uint32 & nCorrectedPositionX, LibMCDriver_ScanLab_uint32 & nCorrectedPositionY, LibMCDriver_ScanLab_uint32 & nCorrectedPositionZ, LibMCDriver_ScanLab_uint32 & nFocusShift, LibMCDriver_ScanLab_uint32 & nMarkSpeed)
+	void CRTCContext::GetStateValues(bool & bLaserIsOn, LibMCDriver_ScanLab_int32 & nPositionX, LibMCDriver_ScanLab_int32 & nPositionY, LibMCDriver_ScanLab_int32 & nPositionZ, LibMCDriver_ScanLab_int32 & nCorrectedPositionX, LibMCDriver_ScanLab_int32 & nCorrectedPositionY, LibMCDriver_ScanLab_int32 & nCorrectedPositionZ, LibMCDriver_ScanLab_int32 & nFocusShift, LibMCDriver_ScanLab_int32 & nMarkSpeed)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_GetStateValues(m_pHandle, &bLaserIsOn, &nPositionX, &nPositionY, &nPositionZ, &nCorrectedPositionX, &nCorrectedPositionY, &nCorrectedPositionZ, &nFocusShift, &nMarkSpeed));
 	}
@@ -2109,6 +2139,15 @@ public:
 	}
 	
 	/**
+	* CDriver_ScanLab::LoadCustomSDK - Initializes the ScanLab SDK from an external source.
+	* @param[in] ScanlabDLLBuffer - Byte array of Scanlab DLL
+	*/
+	void CDriver_ScanLab::LoadCustomSDK(const CInputVector<LibMCDriver_ScanLab_uint8> & ScanlabDLLBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_LoadCustomSDK(m_pHandle, (LibMCDriver_ScanLab_uint64)ScanlabDLLBuffer.size(), ScanlabDLLBuffer.data()));
+	}
+	
+	/**
 	* CDriver_ScanLab::CreateRTCSelector - Creates and initializes a new RTC selector singleton. Should only be called once per Process.
 	* @return New Selector instance
 	*/
@@ -2168,6 +2207,17 @@ public:
 	void CDriver_ScanLab_RTC6::LoadFirmware(const std::string & sFirmwareResource, const std::string & sFPGAResource, const std::string & sAuxiliaryResource)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_LoadFirmware(m_pHandle, sFirmwareResource.c_str(), sFPGAResource.c_str(), sAuxiliaryResource.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::LoadCustomFirmware - Loads the firmware from custom resources.
+	* @param[in] FirmwareDataBuffer - byte array of the firmware program file.
+	* @param[in] FPGADataBuffer - byte array of the firmware FPGA file.
+	* @param[in] AuxiliaryDataBuffer - byte array of the binary auxiliary file.
+	*/
+	void CDriver_ScanLab_RTC6::LoadCustomFirmware(const CInputVector<LibMCDriver_ScanLab_uint8> & FirmwareDataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & FPGADataBuffer, const CInputVector<LibMCDriver_ScanLab_uint8> & AuxiliaryDataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_LoadCustomFirmware(m_pHandle, (LibMCDriver_ScanLab_uint64)FirmwareDataBuffer.size(), FirmwareDataBuffer.data(), (LibMCDriver_ScanLab_uint64)FPGADataBuffer.size(), FPGADataBuffer.data(), (LibMCDriver_ScanLab_uint64)AuxiliaryDataBuffer.size(), AuxiliaryDataBuffer.data()));
 	}
 	
 	/**

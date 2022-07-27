@@ -348,25 +348,22 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_queryparameters(LibMCDriver
 /*************************************************************************************************************************
  Class implementation for RTCContext
 **************************************************************************************************************************/
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadfirmware(LibMCDriver_ScanLab_RTCContext pRTCContext, const char * pFirmwareResource, const char * pFPGAResource, const char * pAuxiliaryResource)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_loadfirmware(LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
 	try {
-		if (pFirmwareResource == nullptr)
+		if ( (!pFirmwareDataBuffer) && (nFirmwareDataBufferSize>0))
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		if (pFPGAResource == nullptr)
+		if ( (!pFPGADataBuffer) && (nFPGADataBufferSize>0))
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		if (pAuxiliaryResource == nullptr)
+		if ( (!pAuxiliaryDataBuffer) && (nAuxiliaryDataBufferSize>0))
 			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
-		std::string sFirmwareResource(pFirmwareResource);
-		std::string sFPGAResource(pFPGAResource);
-		std::string sAuxiliaryResource(pAuxiliaryResource);
 		IRTCContext* pIRTCContext = dynamic_cast<IRTCContext*>(pIBaseClass);
 		if (!pIRTCContext)
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
-		pIRTCContext->LoadFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
+		pIRTCContext->LoadFirmware(nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -979,7 +976,7 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getheadstatus(LibMCDriv
 	}
 }
 
-LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getstatevalues(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserIsOn, LibMCDriver_ScanLab_uint32 * pPositionX, LibMCDriver_ScanLab_uint32 * pPositionY, LibMCDriver_ScanLab_uint32 * pPositionZ, LibMCDriver_ScanLab_uint32 * pCorrectedPositionX, LibMCDriver_ScanLab_uint32 * pCorrectedPositionY, LibMCDriver_ScanLab_uint32 * pCorrectedPositionZ, LibMCDriver_ScanLab_uint32 * pFocusShift, LibMCDriver_ScanLab_uint32 * pMarkSpeed)
+LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_getstatevalues(LibMCDriver_ScanLab_RTCContext pRTCContext, bool * pLaserIsOn, LibMCDriver_ScanLab_int32 * pPositionX, LibMCDriver_ScanLab_int32 * pPositionY, LibMCDriver_ScanLab_int32 * pPositionZ, LibMCDriver_ScanLab_int32 * pCorrectedPositionX, LibMCDriver_ScanLab_int32 * pCorrectedPositionY, LibMCDriver_ScanLab_int32 * pCorrectedPositionZ, LibMCDriver_ScanLab_int32 * pFocusShift, LibMCDriver_ScanLab_int32 * pMarkSpeed)
 {
 	IBase* pIBaseClass = (IBase *)pRTCContext;
 
@@ -1398,6 +1395,32 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_loadsdk(LibMCDriver
 	}
 }
 
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_loadcustomsdk(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8 * pScanlabDLLBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab;
+
+	try {
+		if ( (!pScanlabDLLBuffer) && (nScanlabDLLBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab* pIDriver_ScanLab = dynamic_cast<IDriver_ScanLab*>(pIBaseClass);
+		if (!pIDriver_ScanLab)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab->LoadCustomSDK(nScanlabDLLBufferSize, pScanlabDLLBuffer);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_creatertcselector(LibMCDriver_ScanLab_Driver_ScanLab pDriver_ScanLab, LibMCDriver_ScanLab_RTCSelector * pInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ScanLab;
@@ -1529,6 +1552,36 @@ LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_loadfirmware(L
 			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
 		
 		pIDriver_ScanLab_RTC6->LoadFirmware(sFirmwareResource, sFPGAResource, sAuxiliaryResource);
+
+		return LIBMCDRIVER_SCANLAB_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_loadcustomfirmware(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8 * pFirmwareDataBuffer, LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8 * pFPGADataBuffer, LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8 * pAuxiliaryDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ScanLab_RTC6;
+
+	try {
+		if ( (!pFirmwareDataBuffer) && (nFirmwareDataBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if ( (!pFPGADataBuffer) && (nFPGADataBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		if ( (!pAuxiliaryDataBuffer) && (nAuxiliaryDataBufferSize>0))
+			throw ELibMCDriver_ScanLabInterfaceException (LIBMCDRIVER_SCANLAB_ERROR_INVALIDPARAM);
+		IDriver_ScanLab_RTC6* pIDriver_ScanLab_RTC6 = dynamic_cast<IDriver_ScanLab_RTC6*>(pIBaseClass);
+		if (!pIDriver_ScanLab_RTC6)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDCAST);
+		
+		pIDriver_ScanLab_RTC6->LoadCustomFirmware(nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer);
 
 		return LIBMCDRIVER_SCANLAB_SUCCESS;
 	}
@@ -1803,6 +1856,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_rtcselector_acquireethernetcardbyserial;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_loadsdk") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_loadsdk;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_loadcustomsdk") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_loadcustomsdk;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_creatertcselector") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_creatertcselector;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_settosimulationmode") 
@@ -1813,6 +1868,8 @@ LibMCDriver_ScanLabResult LibMCDriver_ScanLab::Impl::LibMCDriver_ScanLab_GetProc
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_initialise;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_loadfirmware") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_loadfirmware;
+	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_loadcustomfirmware") 
+		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_loadcustomfirmware;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_setcorrectionfile") 
 		*ppProcAddress = (void*) &libmcdriver_scanlab_driver_scanlab_rtc6_setcorrectionfile;
 	if (sProcName == "libmcdriver_scanlab_driver_scanlab_rtc6_configurelasermode") 

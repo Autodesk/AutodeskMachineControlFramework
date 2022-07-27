@@ -73,6 +73,9 @@ public:
 
     void LoadSDK(const std::string& sResourceName) override;
 
+    void LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8* pScanlabDLLBuffer) override;
+
+
 };
 
 } // namespace Impl

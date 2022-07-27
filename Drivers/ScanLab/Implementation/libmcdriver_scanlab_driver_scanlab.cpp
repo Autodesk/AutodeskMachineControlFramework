@@ -80,3 +80,20 @@ void CDriver_ScanLab::LoadSDK(const std::string& sResourceName)
 
 }
 
+void CDriver_ScanLab::LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLLBufferSize, const LibMCDriver_ScanLab_uint8* pScanlabDLLBuffer)
+{
+    if (m_pScanLabSDK.get() != nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKALREADYLOADED);
+
+    std::string sFileName;
+#ifdef _WIN32
+    sFileName = "RTC.dll";
+#else
+    sFileName = "RTC.so";
+#endif
+
+    m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+    m_pSDKLibraryFile = m_pWorkingDirectory->StoreCustomData(sFileName, LibMCEnv::CInputVector<uint8_t> (pScanlabDLLBuffer, nScanlabDLLBufferSize));
+    m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
+
+}
