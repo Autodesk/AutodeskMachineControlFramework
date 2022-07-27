@@ -40,6 +40,9 @@ using namespace LibMCDriver_ADS::Impl;
 /*************************************************************************************************************************
  Class definition of CDriver_ADS 
 **************************************************************************************************************************/
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
+
 
 CDriver_ADS::CDriver_ADS(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: m_bSimulationMode (false),
@@ -59,6 +62,7 @@ CDriver_ADS::~CDriver_ADS()
 
 void CDriver_ADS::Configure(const std::string& sConfigurationString)
 {
+    m_pDriverEnvironment->LogMessage("Configuring ADS driver!");
 
     if (sConfigurationString.length() == 0)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDDRIVERPROTOCOL);
@@ -96,12 +100,11 @@ void CDriver_ADS::Configure(const std::string& sConfigurationString)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOVARIABLEDEFINITION);
 
     m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcsadsdll_win64.dll", "tcsadsdll_win64");
+    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcadsdll_win64.dll", "tcadsdll_win64");
 
     m_pADSSDK = std::make_shared<CADSSDK>(m_pADSDLLFile->GetAbsoluteFileName ());
     m_pADSClient = std::make_shared<CADSClient>(m_pADSSDK);
 
-    m_pADSClient->registerInt16Variable("nSchichthohe");
 
     auto statusNodes = variablesNode.children();
     for (pugi::xml_node childNode : statusNodes)
@@ -132,6 +135,35 @@ void CDriver_ADS::Configure(const std::string& sConfigurationString)
     }
 
 
+
+}
+
+
+std::string CDriver_ADS::GetName()
+{
+    return m_sName;
+}
+
+std::string CDriver_ADS::GetType()
+{
+    return "ads-1.0";
+}
+
+void CDriver_ADS::GetVersion(LibMCDriver_ADS_uint32& nMajor, LibMCDriver_ADS_uint32& nMinor, LibMCDriver_ADS_uint32& nMicro, std::string& sBuild)
+{
+    nMajor = 1;
+    nMinor = 0;
+    nMicro = 0;
+}
+
+void CDriver_ADS::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
+{
+    sNameSpace = "LibMCDriver_ADS";
+    sBaseName = "libmcdriver_ads";
+}
+
+void CDriver_ADS::QueryParameters()
+{
 
 }
 

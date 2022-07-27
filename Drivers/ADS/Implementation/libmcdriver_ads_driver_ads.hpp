@@ -86,6 +86,16 @@ public:
 
 	void Configure(const std::string& sConfigurationString) override;
 
+	std::string GetName() override;
+
+	std::string GetType() override;
+
+	void GetVersion(LibMCDriver_ADS_uint32& nMajor, LibMCDriver_ADS_uint32& nMinor, LibMCDriver_ADS_uint32& nMicro, std::string& sBuild) override;
+
+	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
+
+	void QueryParameters() override;
+
 	void SetToSimulationMode() override;
 
 	bool IsSimulationMode() override;
