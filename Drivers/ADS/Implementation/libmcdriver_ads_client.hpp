@@ -86,6 +86,7 @@ namespace LibMCDriver_ADS {
 			virtual void writeValueToPLC(const int64_t nValue) = 0;
 		};
 
+
 		class CADSClientInt8Variable : public CADSClientIntegerVariable {
 		public:
 			CADSClientInt8Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
@@ -94,6 +95,19 @@ namespace LibMCDriver_ADS {
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
 		};
+
+		class CADSClientBoolVariable : public CADSClientIntegerVariable {
+		public:
+			CADSClientBoolVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
+			virtual ~CADSClientBoolVariable();
+
+			virtual int64_t readValueFromPLC() override;
+			virtual void writeValueToPLC(const int64_t nValue) override;
+
+			virtual bool readBooleanValueFromPLC();
+			virtual void writeBooleanValueToPLC(const bool bValue);
+		};
+
 
 		class CADSClientUint8Variable : public CADSClientIntegerVariable {
 		public:
@@ -141,13 +155,43 @@ namespace LibMCDriver_ADS {
 			virtual void writeValueToPLC(const int64_t nValue) override;
 		};
 
+		class CADSClientFloatVariable : public CADSClientVariable {
+		public:
+			CADSClientFloatVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
+			virtual ~CADSClientFloatVariable();
+
+			virtual double readValueFromPLC() = 0;
+			virtual void writeValueToPLC(const double nValue) = 0;
+		};
+
+		class CADSClientFloat32Variable : public CADSClientFloatVariable {
+		public:
+			CADSClientFloat32Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
+			virtual ~CADSClientFloat32Variable();
+
+			virtual double readValueFromPLC() override;
+			virtual void writeValueToPLC(const double nValue) override;
+		};
+
+		class CADSClientFloat64Variable : public CADSClientFloatVariable {
+		public:
+			CADSClientFloat64Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
+			virtual ~CADSClientFloat64Variable();
+
+			virtual double readValueFromPLC() override;
+			virtual void writeValueToPLC(const double nValue) override;
+		};
+
 		typedef std::shared_ptr<CADSClientVariable> PADSClientVariable;
+		typedef std::shared_ptr<CADSClientBoolVariable> PADSClientBoolVariable;
 		typedef std::shared_ptr<CADSClientInt8Variable> PADSClientInt8Variable;
 		typedef std::shared_ptr<CADSClientUint8Variable> PADSClientUint8Variable;
 		typedef std::shared_ptr<CADSClientInt16Variable> PADSClientInt16Variable;
 		typedef std::shared_ptr<CADSClientUint16Variable> PADSClientUint16Variable;
 		typedef std::shared_ptr<CADSClientInt32Variable> PADSClientInt32Variable;
 		typedef std::shared_ptr<CADSClientUint32Variable> PADSClientUint32Variable;
+		typedef std::shared_ptr<CADSClientFloat32Variable> PADSClientFloat32Variable;
+		typedef std::shared_ptr<CADSClientFloat64Variable> PADSClientFloat64Variable;
 
 		class CADSClient {
 		private:
@@ -170,6 +214,7 @@ namespace LibMCDriver_ADS {
 
 			std::string getVersionString();
 
+			PADSClientBoolVariable registerBoolVariable(const std::string& sName);
 			PADSClientInt8Variable registerInt8Variable(const std::string & sName);
 			PADSClientUint8Variable registerUint8Variable(const std::string& sName);
 			PADSClientInt16Variable registerInt16Variable(const std::string& sName);
@@ -177,7 +222,13 @@ namespace LibMCDriver_ADS {
 			PADSClientInt32Variable registerInt32Variable(const std::string& sName);
 			PADSClientUint32Variable registerUint32Variable(const std::string& sName);
 
-			CADSClientVariable* findVariable(const std::string& sName);
+			PADSClientFloat32Variable registerFloat32Variable(const std::string& sName);
+			PADSClientFloat64Variable registerFloat64Variable(const std::string& sName);
+
+			CADSClientVariable* findVariable(const std::string& sName, bool bFailIfNotExisting);
+			CADSClientIntegerVariable* findIntegerVariable(const std::string& sName, bool bFailIfNotExisting);
+			CADSClientBoolVariable* findBoolVariable(const std::string& sName, bool bFailIfNotExisting);
+			CADSClientFloatVariable* findFloatVariable(const std::string& sName, bool bFailIfNotExisting);
 
 		};
 

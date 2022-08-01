@@ -143,6 +143,19 @@ CADSClientIntegerVariable::~CADSClientIntegerVariable()
 
 }
 
+CADSClientFloatVariable::CADSClientFloatVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
+	: CADSClientVariable(pConnection, sName, Handle)
+{
+
+}
+
+CADSClientFloatVariable::~CADSClientFloatVariable()
+{
+
+}
+
+
+
 CADSClientInt8Variable::CADSClientInt8Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
 	: CADSClientIntegerVariable (pConnection, sName, Handle)
 {
@@ -153,6 +166,52 @@ CADSClientInt8Variable::~CADSClientInt8Variable()
 {
 
 }
+
+CADSClientBoolVariable::CADSClientBoolVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
+	: CADSClientIntegerVariable(pConnection, sName, Handle)
+{
+
+}
+	
+CADSClientBoolVariable::~CADSClientBoolVariable()
+{
+
+}
+
+int64_t CADSClientBoolVariable::readValueFromPLC()
+{
+	bool nValue = 0;
+	readBuffer((void*)&nValue, sizeof(nValue));
+	if (nValue != 0) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+void CADSClientBoolVariable::writeValueToPLC(const int64_t nValue)
+{
+	int8_t nValueToWrite = (nValue != 0) ? 1 : 0;
+	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
+}
+
+bool CADSClientBoolVariable::readBooleanValueFromPLC()
+{
+	return readValueFromPLC() != 0;
+}
+
+void CADSClientBoolVariable::writeBooleanValueToPLC(const bool bValue)
+{
+	if (bValue) {
+		writeValueToPLC(1);
+	}
+	else
+	{
+		writeValueToPLC(0);
+	}
+}
+
 
 int64_t CADSClientInt8Variable::readValueFromPLC()
 {
@@ -315,6 +374,57 @@ void CADSClientUint32Variable::writeValueToPLC(const int64_t nValue)
 	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
 }
 
+CADSClientFloat32Variable::CADSClientFloat32Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
+	: CADSClientFloatVariable(pConnection, sName, Handle)
+{
+
+}
+
+CADSClientFloat32Variable::~CADSClientFloat32Variable()
+{
+
+}
+
+
+double CADSClientFloat32Variable::readValueFromPLC()
+{
+	float fValue = 0.0;
+	readBuffer((void*)&fValue, sizeof(fValue));
+	return (double)fValue;
+}
+
+void CADSClientFloat32Variable::writeValueToPLC(const double dValue)
+{
+	float fValueToWrite = (float)dValue;
+	writeBuffer((void*)&fValueToWrite, sizeof(fValueToWrite));
+}
+
+CADSClientFloat64Variable::CADSClientFloat64Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
+	: CADSClientFloatVariable(pConnection, sName, Handle)
+{
+
+}
+
+CADSClientFloat64Variable::~CADSClientFloat64Variable()
+{
+
+}
+
+
+double CADSClientFloat64Variable::readValueFromPLC()
+{
+	double dValue = 0.0;
+	readBuffer((void*)&dValue, sizeof(dValue));
+	return (double)dValue;
+}
+
+void CADSClientFloat64Variable::writeValueToPLC(const double dValue)
+{
+	double dValueToWrite = (double)dValue;
+	writeBuffer((void*)&dValueToWrite, sizeof(dValueToWrite));
+}
+
+
 
 
 CADSClient::CADSClient(PADSSDK pSDK)
@@ -335,6 +445,7 @@ CADSClient::~CADSClient()
 
 void CADSClient::connect(uint32_t nPortNumber)
 {
+
 	if (m_pCurrentConnection.get() != nullptr)
 		disconnect();
 
@@ -343,12 +454,13 @@ void CADSClient::connect(uint32_t nPortNumber)
 
 	sAmsAddr localAddress;
 	memset(&localAddress, sizeof(localAddress), 0);
-	m_pSDK->checkError (m_pSDK->AdsGetLocalAddressEx(nPortHandle, &localAddress));
 
-	// AMSPORT_R0_PLC_TC3 = 851;
+
+	m_pSDK->checkError (m_pSDK->AdsGetLocalAddressEx(nPortHandle, &localAddress));
+	 
 	localAddress.m_Port = nPortNumber; 
 
-	m_pCurrentConnection = std::make_shared<CADSClientConnection> (m_pSDK, nPortNumber, localAddress);
+	m_pCurrentConnection = std::make_shared<CADSClientConnection> (m_pSDK, nPortHandle, localAddress);
 }
 
 void CADSClient::disconnect()
@@ -387,13 +499,25 @@ uint32_t CADSClient::getVariableHandle(const std::string& sName)
 
 }
 
+PADSClientBoolVariable CADSClient::registerBoolVariable(const std::string& sName)
+{
+	if (m_pCurrentConnection.get() == nullptr)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
+
+	auto pVariable = std::make_shared<CADSClientBoolVariable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
+}
+
 
 PADSClientInt8Variable CADSClient::registerInt8Variable(const std::string& sName)
 {
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	return std::make_shared<CADSClientInt8Variable>(m_pCurrentConnection, sName, getVariableHandle (sName));
+	auto pVariable = std::make_shared<CADSClientInt8Variable>(m_pCurrentConnection, sName, getVariableHandle (sName));
+	registerVariable(pVariable);
+	return pVariable;
 }
 
 PADSClientUint8Variable CADSClient::registerUint8Variable(const std::string& sName)
@@ -401,7 +525,9 @@ PADSClientUint8Variable CADSClient::registerUint8Variable(const std::string& sNa
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	return std::make_shared<CADSClientUint8Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	auto pVariable = std::make_shared<CADSClientUint8Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
 }
 
 PADSClientInt16Variable CADSClient::registerInt16Variable(const std::string& sName)
@@ -409,7 +535,9 @@ PADSClientInt16Variable CADSClient::registerInt16Variable(const std::string& sNa
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	return std::make_shared<CADSClientInt16Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	auto pVariable = std::make_shared<CADSClientInt16Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
 }
 
 PADSClientUint16Variable CADSClient::registerUint16Variable(const std::string& sName)
@@ -417,7 +545,9 @@ PADSClientUint16Variable CADSClient::registerUint16Variable(const std::string& s
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	return std::make_shared<CADSClientUint16Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	auto pVariable = std::make_shared<CADSClientUint16Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
 }
 
 PADSClientInt32Variable CADSClient::registerInt32Variable(const std::string& sName)
@@ -425,7 +555,9 @@ PADSClientInt32Variable CADSClient::registerInt32Variable(const std::string& sNa
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	return std::make_shared<CADSClientInt32Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	auto pVariable = std::make_shared<CADSClientInt32Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
 }
 
 PADSClientUint32Variable CADSClient::registerUint32Variable(const std::string& sName)
@@ -433,7 +565,31 @@ PADSClientUint32Variable CADSClient::registerUint32Variable(const std::string& s
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	return std::make_shared<CADSClientUint32Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	auto pVariable = std::make_shared<CADSClientUint32Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
+
+}
+
+PADSClientFloat32Variable CADSClient::registerFloat32Variable(const std::string& sName)
+{
+	if (m_pCurrentConnection.get() == nullptr)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
+
+	auto pVariable = std::make_shared<CADSClientFloat32Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
+}
+
+PADSClientFloat64Variable CADSClient::registerFloat64Variable(const std::string& sName)
+{
+	if (m_pCurrentConnection.get() == nullptr)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
+
+	auto pVariable = std::make_shared<CADSClientFloat64Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
+
 }
 
 
@@ -446,11 +602,56 @@ void CADSClient::registerVariable(PADSClientVariable pVariable)
 	m_VariableMap.insert(std::make_pair(pVariable->getName (), pVariable));
 }
 
-CADSClientVariable* CADSClient::findVariable(const std::string& sName)
+CADSClientVariable* CADSClient::findVariable(const std::string& sName, bool bFailIfNotExisting)
 {
 	auto iIter = m_VariableMap.find(sName);
-	if (iIter == m_VariableMap.end())
+	if (iIter == m_VariableMap.end()) {
+		if (bFailIfNotExisting)
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND);
+
 		return nullptr;
+	}
 
 	return iIter->second.get();
+}
+
+
+CADSClientIntegerVariable* CADSClient::findIntegerVariable(const std::string& sName, bool bFailIfNotExisting)
+{
+	auto pVariable = findVariable(sName, bFailIfNotExisting);
+	auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
+	if (pIntegerVariable == nullptr) {
+		if (bFailIfNotExisting)
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER);
+	}
+
+	return pIntegerVariable;
+
+}
+
+
+CADSClientBoolVariable* CADSClient::findBoolVariable(const std::string& sName, bool bFailIfNotExisting)
+{
+	auto pVariable = findVariable(sName, bFailIfNotExisting);
+	auto pBoolVariable = dynamic_cast<CADSClientBoolVariable*> (pVariable);
+	if (pBoolVariable == nullptr) {
+		if (bFailIfNotExisting)
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER);
+	}
+
+	return pBoolVariable;
+
+}
+
+CADSClientFloatVariable* CADSClient::findFloatVariable(const std::string& sName, bool bFailIfNotExisting)
+{
+	auto pVariable = findVariable(sName, bFailIfNotExisting);
+	auto pFloatVariable = dynamic_cast<CADSClientFloatVariable*> (pVariable);
+	if (pFloatVariable == nullptr) {
+		if (bFailIfNotExisting)
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER);
+	}
+
+	return pFloatVariable;
+
 }

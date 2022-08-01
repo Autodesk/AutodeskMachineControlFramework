@@ -44,7 +44,7 @@ using namespace LibMCDriver_ADS::Impl;
 #define ADS_MAXDLLNAMELENGTH 1024 * 1024
 
 #ifdef _WIN32
-void* _loadADSAddress(HMODULE hLibrary, const std::string& sSymbolName, uint32_t nParameterByteCount) {
+void* _loadADSAddress (HMODULE hLibrary, const std::string & sSymbolName, uint32_t nParameterByteCount) {
 
 	std::string sAnnotatedSymbolName;
 	if (sizeof(uint32_t) == sizeof(intptr_t)) { // On 32 Bit Windows, DLL names are annotated
@@ -54,15 +54,15 @@ void* _loadADSAddress(HMODULE hLibrary, const std::string& sSymbolName, uint32_t
 		sAnnotatedSymbolName = sSymbolName;
 	}
 
-	void* pFuncPtr = (void*)GetProcAddress(hLibrary, sAnnotatedSymbolName.c_str());
+	void * pFuncPtr = (void*) GetProcAddress(hLibrary, sAnnotatedSymbolName.c_str ());
 	if (pFuncPtr == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTFINDLIBRARYEXPORT);
 
 	return pFuncPtr;
 }
 #else
-void* _loadADSAddress(void* hLibrary, const char* pSymbolName, uint32_t nParameterByteCount) {
-	void* pFuncPtr = (void*)dlsym(hLibrary, pSymbolName);
+void* _loadADSAddress(void * hLibrary, const char* pSymbolName, uint32_t nParameterByteCount) {
+	void* pFuncPtr = (void*) dlsym(hLibrary, pSymbolName);
 	dlerror();
 	if (pFuncPtr == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTFINDLIBRARYEXPORT);
@@ -75,7 +75,7 @@ void* _loadADSAddress(void* hLibrary, const char* pSymbolName, uint32_t nParamet
 
 
 CADSSDK::CADSSDK(const std::string& sDLLNameUTF8)
-	: m_LibraryHandle(nullptr)
+	: m_LibraryHandle (nullptr)
 {
 
 	resetFunctionPtrs();
@@ -86,7 +86,7 @@ CADSSDK::CADSSDK(const std::string& sDLLNameUTF8)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDPARAM);
 
 	// Convert filename to UTF16-string
-	int nLength = (int)sDLLNameUTF8.length();
+	int nLength = (int)sDLLNameUTF8.length ();
 	int nBufferSize = nLength * 2 + 2;
 	std::vector<wchar_t> wsLibraryFileName(nBufferSize);
 	int nResult = MultiByteToWideChar(CP_UTF8, 0, sDLLNameUTF8.c_str(), nLength, &wsLibraryFileName[0], nBufferSize);
@@ -112,7 +112,7 @@ CADSSDK::CADSSDK(const std::string& sDLLNameUTF8)
 	this->AdsSyncReadReqEx2 = (PAdsSyncReadReqEx2)_loadADSAddress(hLibrary, "AdsSyncReadReqEx2", 28);
 	this->AdsSyncReadWriteReqEx2 = (PAdsSyncReadWriteReqEx2)_loadADSAddress(hLibrary, "AdsSyncReadWriteReqEx2", 36);
 
-	m_LibraryHandle = (void*)hLibrary;
+	m_LibraryHandle = (void*) hLibrary;
 }
 
 
@@ -136,7 +136,7 @@ CADSSDK::~CADSSDK()
 void CADSSDK::checkError(int32_t statusCode)
 {
 	if (statusCode != 0)
-		throw std::runtime_error("ADS Error: " + std::to_string(statusCode));
+		throw std::runtime_error("ADS Error: " + std::to_string (statusCode));
 }
 
 void CADSSDK::resetFunctionPtrs()
