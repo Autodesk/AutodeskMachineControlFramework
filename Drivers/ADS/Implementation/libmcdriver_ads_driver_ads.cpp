@@ -44,6 +44,82 @@ using namespace LibMCDriver_ADS::Impl;
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 
+CDriver_ADSParameter::CDriver_ADSParameter(const std::string& sName, const std::string& sDescription, const std::string& sADSName, const eDriver_ADSParameterType eType, const eDriver_ADSParameterAccess eAccess, const uint32_t nFieldSize, const std::string& sClassName)
+    : m_sName (sName), m_sDescription (sDescription), m_sADSName (sADSName), m_eAccess (eAccess), m_eType (eType), m_nFieldSize (nFieldSize), m_sClassName (sClassName)
+{
+
+}
+
+CDriver_ADSParameter::~CDriver_ADSParameter()
+{
+
+}
+
+std::string CDriver_ADSParameter::getName()
+{
+    return m_sName;
+}
+
+std::string CDriver_ADSParameter::getADSName()
+{
+    return m_sADSName;
+}
+
+eDriver_ADSParameterType CDriver_ADSParameter::getType()
+{
+    return m_eType;
+}
+
+eDriver_ADSParameterAccess CDriver_ADSParameter::getAccess()
+{
+    return m_eAccess;
+}
+
+
+uint32_t CDriver_ADSParameter::getFieldSize()
+{
+    return m_nFieldSize;
+}
+
+std::string CDriver_ADSParameter::getClassName()
+{
+    return m_sClassName;
+}
+
+std::string CDriver_ADSParameter::getDescription()
+{
+    return m_sDescription;
+}
+
+
+CDriver_ADSStruct::CDriver_ADSStruct(const std::string& sName, const std::string& sDescription, const std::string& sADSName)
+    : m_sName (sName), m_sDescription(sDescription), m_sADSName (sADSName)
+{
+
+}
+
+CDriver_ADSStruct::~CDriver_ADSStruct()
+{
+
+}
+
+std::string CDriver_ADSStruct::getName()
+{
+    return m_sName;
+}
+
+std::string CDriver_ADSStruct::getADSName()
+{
+    return m_sADSName;
+}
+
+std::string CDriver_ADSStruct::getDescription()
+{
+    return m_sDescription;
+}
+
+
+
 CDriver_ADS::CDriver_ADS(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 	: m_bSimulationMode (false),
 	m_sName(sName),
@@ -59,6 +135,65 @@ CDriver_ADS::~CDriver_ADS()
 {
 
 }
+
+PDriver_ADSParameter readParameterFromXMLNode(pugi::xml_node& node)
+{
+    std::string sNodeName = node.name();
+
+    auto attribName = node.attribute("name");
+    std::string sName = attribName.as_string();
+    if (sName.empty ())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENAMEMISSING);
+
+    auto attribDescription = node.attribute("description");
+    std::string sDescription = attribDescription.as_string();
+    if (sDescription.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEDESCRIPTIONMISSING, "variable description missing: " + sName);
+
+    auto attribADSName = node.attribute("adsname");
+    std::string sADSName = attribADSName.as_string();
+    if (sADSName.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEADSNAMEMISSING, "variable ads name missing: " + sName);
+
+    auto attribAccess = node.attribute("access");
+    std::string sAccess = attribAccess.as_string();
+    if (sAccess.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEACCESSMISSING, "variable access missing: " + sName);
+
+    eDriver_ADSParameterAccess eAccess = eDriver_ADSParameterAccess::ADSParameterAccess_Unknown;
+    if (sAccess == "read")
+        eAccess = eDriver_ADSParameterAccess::ADSParameterAccess_Read;
+    if (sAccess == "write")
+        eAccess = eDriver_ADSParameterAccess::ADSParameterAccess_Write;
+    if (sAccess == "readwrite")
+        eAccess = eDriver_ADSParameterAccess::ADSParameterAccess_ReadWrite;
+
+    if (eAccess == eDriver_ADSParameterAccess::ADSParameterAccess_Unknown)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLEACCESS, "invalid variable access: " + sName + "/" + sAccess);
+
+    if (sNodeName == "sint")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_SINT, eAccess);
+    if (sNodeName == "int")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_INT, eAccess);
+    if (sNodeName == "dint")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_DINT, eAccess);
+    if (sNodeName == "usint")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_USINT, eAccess);
+    if (sNodeName == "uint")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_UINT, eAccess);
+    if (sNodeName == "udint")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_UDINT, eAccess);
+    if (sNodeName == "bool")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_BOOL, eAccess);
+    if (sNodeName == "real")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_REAL, eAccess);
+    if (sNodeName == "lreal")
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_LREAL, eAccess);
+
+    throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLETYPE, "invalid variable type: " + sNodeName);
+
+}
+
 
 void CDriver_ADS::Configure(const std::string& sConfigurationString)
 {
@@ -99,38 +234,42 @@ void CDriver_ADS::Configure(const std::string& sConfigurationString)
     if (variablesNode.empty())
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOVARIABLEDEFINITION);
 
-    m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcadsdll_win64.dll", "tcadsdll_win64");
-
-    m_pADSSDK = std::make_shared<CADSSDK>(m_pADSDLLFile->GetAbsoluteFileName ());
-    m_pADSClient = std::make_shared<CADSClient>(m_pADSSDK);
-
-
     auto statusNodes = variablesNode.children();
     for (pugi::xml_node childNode : statusNodes)
     {
-        /*auto pValue = readParameterFromXMLNode(childNode);
+        PDriver_ADSParameter pParameter = readParameterFromXMLNode(childNode);
 
-        if (dynamic_cast<CDriver_BuRBoolValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterBoolParameter(pValue->getName(), pValue->getDescription(), false);
+        if (pParameter.get() != nullptr) {
 
-        if (dynamic_cast<CDriver_BuRStringValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterStringParameter(pValue->getName(), pValue->getDescription(), "");
+            m_Parameters.push_back(pParameter);
+            m_ParameterMap.insert(std::make_pair (pParameter->getName (), pParameter));
 
-        if (dynamic_cast<CDriver_BuRLRealValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+            switch (pParameter->getType()) {
+                case eDriver_ADSParameterType::ADSParameter_BOOL:
+                    m_pDriverEnvironment->RegisterBoolParameter(pParameter->getName(), pParameter->getDescription(), false);
+                    break;
 
-        if (dynamic_cast<CDriver_BuRRealValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterDoubleParameter(pValue->getName(), pValue->getDescription(), 0.0);
+                case eDriver_ADSParameterType::ADSParameter_INT:
+                case eDriver_ADSParameterType::ADSParameter_SINT:
+                case eDriver_ADSParameterType::ADSParameter_DINT:
+                case eDriver_ADSParameterType::ADSParameter_UINT:
+                case eDriver_ADSParameterType::ADSParameter_USINT:
+                case eDriver_ADSParameterType::ADSParameter_UDINT:
+                    m_pDriverEnvironment->RegisterIntegerParameter(pParameter->getName(), pParameter->getDescription(), 0);
+                    break;
 
-        if (dynamic_cast<CDriver_BuRIntValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+                case eDriver_ADSParameterType::ADSParameter_REAL:
+                case eDriver_ADSParameterType::ADSParameter_LREAL:
+                    m_pDriverEnvironment->RegisterDoubleParameter(pParameter->getName(), pParameter->getDescription(), 0.0);
+                    break;
 
-        if (dynamic_cast<CDriver_BuRDIntValue*> (pValue.get()) != nullptr)
-            m_pDriverEnvironment->RegisterIntegerParameter(pValue->getName(), pValue->getDescription(), 0);
+                case eDriver_ADSParameterType::ADSParameter_STRING:
+                    m_pDriverEnvironment->RegisterStringParameter(pParameter->getName(), pParameter->getDescription(), "");
+                    break;
 
-        m_DriverParameters.push_back(pValue);
-        m_DriverParameterMap.insert(std::make_pair(pValue->getName(), pValue)); */
+            }
+
+        }
 
     }
 
@@ -164,6 +303,65 @@ void CDriver_ADS::GetHeaderInformation(std::string& sNameSpace, std::string& sBa
 
 void CDriver_ADS::QueryParameters()
 {
+    if (m_bSimulationMode)
+        return;
+
+    if (m_pADSClient.get() != nullptr) {
+
+        for (auto pParameter : m_Parameters) {
+
+            auto eAccessType = pParameter->getAccess();
+            if ((eAccessType == eDriver_ADSParameterAccess::ADSParameterAccess_Read) ||
+                (eAccessType == eDriver_ADSParameterAccess::ADSParameterAccess_ReadWrite)) {
+
+                auto pVariable = m_pADSClient->findVariable(pParameter->getADSName(), false);
+                if (pVariable != nullptr) {
+
+                    switch (pParameter->getType()) {
+                    case eDriver_ADSParameterType::ADSParameter_BOOL: {
+                        auto pBoolVariable = dynamic_cast<CADSClientBoolVariable*> (pVariable);
+                        if (pBoolVariable != nullptr)
+                            m_pDriverEnvironment->SetBoolParameter(pParameter->getName(), pBoolVariable->readBooleanValueFromPLC());
+                        break;
+                    }
+
+                    case eDriver_ADSParameterType::ADSParameter_INT:
+                    case eDriver_ADSParameterType::ADSParameter_SINT:
+                    case eDriver_ADSParameterType::ADSParameter_DINT:
+                    case eDriver_ADSParameterType::ADSParameter_UINT:
+                    case eDriver_ADSParameterType::ADSParameter_USINT:
+                    case eDriver_ADSParameterType::ADSParameter_UDINT: {
+                        auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
+                        if (pIntegerVariable != nullptr)
+                            m_pDriverEnvironment->SetIntegerParameter(pParameter->getName(), pIntegerVariable->readValueFromPLC());
+                        break;
+                    }
+
+                    case eDriver_ADSParameterType::ADSParameter_REAL:
+                    case eDriver_ADSParameterType::ADSParameter_LREAL: {
+                        auto pFloatVariable = dynamic_cast<CADSClientFloatVariable*> (pVariable);
+                        if (pFloatVariable != nullptr)
+                            m_pDriverEnvironment->SetDoubleParameter(pParameter->getName(), pFloatVariable->readValueFromPLC());
+                        break;
+                    }
+
+                    case eDriver_ADSParameterType::ADSParameter_STRING: {
+                        auto pStringVariable = dynamic_cast<CADSClientStringVariable*> (pVariable);
+                        if (pStringVariable != nullptr)
+                            m_pDriverEnvironment->SetStringParameter(pParameter->getName(), pStringVariable->readValueFromPLC());
+                        break;
+                    }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
 
 }
 
@@ -180,76 +378,227 @@ bool CDriver_ADS::IsSimulationMode()
 
 void CDriver_ADS::Connect(const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout)
 {
-    if (m_pADSClient.get() == nullptr)
-        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+    Disconnect();
+
+    if (m_bSimulationMode)
+        return;
+
+    m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+
+#ifdef _WIN32
+    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcadsdll_win64.dll", "tcadsdll_win64");
+#else
+    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcadsdll_linux64.so", "tcadsdll_linux64");
+#endif
+
+    m_pADSSDK = std::make_shared<CADSSDK>(m_pADSDLLFile->GetAbsoluteFileName());
+    m_pADSClient = std::make_shared<CADSClient>(m_pADSSDK);
 
     m_pADSClient->connect(nPort);
+
+    for (auto pParameter : m_Parameters) {
+        auto eAccessType = pParameter->getAccess();
+
+        if ((eAccessType == eDriver_ADSParameterAccess::ADSParameterAccess_Read) ||
+            (eAccessType == eDriver_ADSParameterAccess::ADSParameterAccess_ReadWrite)) {
+
+                switch (pParameter->getType()) {
+                case eDriver_ADSParameterType::ADSParameter_BOOL:
+                    m_pADSClient->registerBoolVariable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_SINT:
+                    m_pADSClient->registerInt8Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_USINT:
+                    m_pADSClient->registerUint8Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_INT:
+                    m_pADSClient->registerInt16Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_UINT:
+                    m_pADSClient->registerUint16Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_DINT:
+                    m_pADSClient->registerInt32Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_UDINT:
+                    m_pADSClient->registerUint32Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_REAL:
+                    m_pADSClient->registerFloat32Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_LREAL:
+                    m_pADSClient->registerFloat64Variable(pParameter->getADSName());
+                    break;
+                case eDriver_ADSParameterType::ADSParameter_STRING:
+                    m_pADSClient->registerStringVariable(pParameter->getADSName());
+                    break;
+                default:
+                    throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLETYPE, "invalid variable type: " + pParameter->getName());
+
+            }
+
+        }
+
+    }
 }
 
 void CDriver_ADS::Disconnect()
 {
-    m_pADSClient->disconnect();
+    if (m_pADSClient != nullptr) {
+        m_pADSClient->disconnect();
+    }
+
+    m_pADSClient = nullptr;
+    m_pADSSDK = nullptr;
+    m_pADSDLLFile = nullptr;
+}
+
+PDriver_ADSParameter CDriver_ADS::findParameter(const std::string& sVariableName, bool bFailIfNotExisting)
+{
+    auto iIter = m_ParameterMap.find(sVariableName);
+    if (iIter == m_ParameterMap.end()) {
+        if (bFailIfNotExisting)
+            throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found:" + sVariableName);
+
+        return nullptr;
+    }
+
+    return iIter->second;
 }
 
 
 bool CDriver_ADS::VariableExists(const std::string& sVariableName)
 {
-    if (m_pADSClient.get() == nullptr)
-        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+    auto iIter = m_ParameterMap.find(sVariableName);
+    if (iIter == m_ParameterMap.end()) {
+        return false;
+    }
 
-    auto pVariable = m_pADSClient->findVariable(sVariableName);
-
-    return (pVariable != nullptr);    
-
+    return true;
 }
 
 LibMCDriver_ADS_int64 CDriver_ADS::ReadIntegerValue(const std::string& sVariableName)
 {
+    if (m_bSimulationMode) 
+        return 0;
+
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
 
-    auto pVariable = m_pADSClient->findVariable(sVariableName);
-
-    if (pVariable == nullptr)
-        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found: " + sVariableName);
-
-    auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
-    if (pIntegerVariable == nullptr)
-        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER, "variable is not of integer value: " + sVariableName);
-
+    auto pParameter = findParameter(sVariableName, true);
+    auto pIntegerVariable = m_pADSClient->findIntegerVariable(pParameter->getADSName (), true);
     return pIntegerVariable->readValueFromPLC();
 
 }
 
 void CDriver_ADS::WriteIntegerValue(const std::string& sVariableName, const LibMCDriver_ADS_int64 nValue)
 {
+    if (m_bSimulationMode)
+        return;
+    
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
 
-    auto pVariable = m_pADSClient->findVariable(sVariableName);
-
-    if (pVariable == nullptr)
-        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found: " + sVariableName);
-
-    auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
-    if (pIntegerVariable == nullptr)
-        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER, "variable is not of integer value: " + sVariableName);
-
+    auto pParameter = findParameter(sVariableName, true);
+    auto pIntegerVariable = m_pADSClient->findIntegerVariable(pParameter->getADSName (), true);
     pIntegerVariable->writeValueToPLC(nValue);
+}
+
+
+LibMCDriver_ADS_double CDriver_ADS::ReadFloatValue(const std::string& sVariableName)
+{
+    if (m_bSimulationMode)
+        return 0;
+
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pParameter = findParameter(sVariableName, true);
+    auto pFloatVariable = m_pADSClient->findFloatVariable(pParameter->getADSName(), true);
+    return pFloatVariable->readValueFromPLC();
 
 
 }
 
-void CDriver_ADS::GetVariableBounds(const std::string& sVariableName, LibMCDriver_ADS_int64& nMinValue, LibMCDriver_ADS_int64& nMaxValue)
+void CDriver_ADS::WriteFloatValue(const std::string& sVariableName, const LibMCDriver_ADS_double dValue)
 {
+    if (m_bSimulationMode)
+        return;
+
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
 
-    auto pVariable = m_pADSClient->findVariable(sVariableName);
+    auto pParameter = findParameter(sVariableName, true);
+    auto pFloatVariable = m_pADSClient->findFloatVariable(pParameter->getADSName(), true);
+    pFloatVariable->writeValueToPLC(dValue);
+}
 
-    if (pVariable == nullptr)
-        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found: " + sVariableName);
+bool CDriver_ADS::ReadBoolValue(const std::string& sVariableName)
+{
+    if (m_bSimulationMode)
+        return 0;
 
-    nMinValue = -100000;
-    nMaxValue = +100000;
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pParameter = findParameter(sVariableName, true);
+    auto pBoolVariable = m_pADSClient->findBoolVariable(pParameter->getADSName(), true);
+    return pBoolVariable->readBooleanValueFromPLC();
+}
+
+void CDriver_ADS::WriteBoolValue(const std::string& sVariableName, const bool bValue)
+{
+    if (m_bSimulationMode)
+        return;
+
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pParameter = findParameter(sVariableName, true);
+    auto pBoolVariable = m_pADSClient->findBoolVariable(pParameter->getADSName(), true);
+    pBoolVariable->writeBooleanValueToPLC(bValue);
+}
+
+std::string CDriver_ADS::ReadStringValue(const std::string& sVariableName)
+{
+    if (m_bSimulationMode)
+        return 0;
+
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pParameter = findParameter(sVariableName, true);
+    auto pStringVariable = m_pADSClient->findStringVariable(pParameter->getADSName(), true);
+    return pStringVariable->readValueFromPLC();
+}
+
+void CDriver_ADS::WriteStringValue(const std::string& sVariableName, const std::string& sValue)
+{
+    if (m_bSimulationMode)
+        return;
+
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pParameter = findParameter(sVariableName, true);
+    auto pStringVariable = m_pADSClient->findStringVariable(pParameter->getADSName(), true);
+    pStringVariable->writeValueToPLC(sValue);
+}
+
+
+void CDriver_ADS::GetVariableBounds(const std::string& sVariableName, LibMCDriver_ADS_int64& nMinValue, LibMCDriver_ADS_int64& nMaxValue)
+{
+    if (m_bSimulationMode) {
+        nMinValue = INT32_MIN;
+        nMaxValue = INT32_MAX;
+        return;
+    }
+
+    if (m_pADSClient.get() == nullptr)
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
+
+    auto pIntegerVariable = m_pADSClient->findIntegerVariable(sVariableName, true);
+    pIntegerVariable->getBounds(nMinValue, nMaxValue);
+
 }

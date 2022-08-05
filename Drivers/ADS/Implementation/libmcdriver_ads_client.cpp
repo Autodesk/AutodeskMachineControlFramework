@@ -130,6 +130,25 @@ void CADSClientVariable::writeBuffer(void* pData, uint32_t nLength)
 	pSDK->checkError(pSDK->AdsSyncWriteReqEx(m_pConnection->getPort(), m_pConnection->getAddressP(), ADSIGRP_SYM_VALBYHND, m_Handle, nLength, pData));
 }
 
+CADSClientStringVariable::CADSClientStringVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
+	: CADSClientVariable(pConnection, sName, Handle)
+{
+
+}
+
+CADSClientStringVariable::~CADSClientStringVariable()
+{
+}
+
+std::string CADSClientStringVariable::readValueFromPLC()
+{
+	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+}
+
+void CADSClientStringVariable::writeValueToPLC(const std::string& sValue)
+{
+	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+}
 
 
 CADSClientIntegerVariable::CADSClientIntegerVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
@@ -196,6 +215,13 @@ void CADSClientBoolVariable::writeValueToPLC(const int64_t nValue)
 	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
 }
 
+void CADSClientBoolVariable::getBounds(int64_t& minValue, int64_t& maxValue)
+{
+	minValue = 0;
+	maxValue = 1;
+}
+
+
 bool CADSClientBoolVariable::readBooleanValueFromPLC()
 {
 	return readValueFromPLC() != 0;
@@ -230,6 +256,11 @@ void CADSClientInt8Variable::writeValueToPLC(const int64_t nValue)
 }
 
 
+void CADSClientInt8Variable::getBounds(int64_t& minValue, int64_t& maxValue)
+{
+	minValue = INT8_MIN;
+	maxValue = INT8_MAX;
+}
 
 CADSClientUint8Variable::CADSClientUint8Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
 	: CADSClientIntegerVariable(pConnection, sName, Handle)
@@ -256,6 +287,12 @@ void CADSClientUint8Variable::writeValueToPLC(const int64_t nValue)
 
 	uint8_t nValueToWrite = (uint8_t)nValue;
 	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
+}
+
+void CADSClientUint8Variable::getBounds(int64_t& minValue, int64_t& maxValue)
+{
+	minValue = 0;
+	maxValue = UINT8_MAX;
 }
 
 CADSClientInt16Variable::CADSClientInt16Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
@@ -286,7 +323,11 @@ void CADSClientInt16Variable::writeValueToPLC(const int64_t nValue)
 	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
 }
 
-
+void CADSClientInt16Variable::getBounds(int64_t& minValue, int64_t& maxValue)
+{
+	minValue = INT16_MIN;
+	maxValue = INT16_MAX;
+}
 
 CADSClientUint16Variable::CADSClientUint16Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
 	: CADSClientIntegerVariable(pConnection, sName, Handle)
@@ -315,7 +356,11 @@ void CADSClientUint16Variable::writeValueToPLC(const int64_t nValue)
 	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
 }
 
-
+void CADSClientUint16Variable::getBounds(int64_t& minValue, int64_t& maxValue)
+{
+	minValue = 0;
+	maxValue = UINT16_MAX;
+}
 
 CADSClientInt32Variable::CADSClientInt32Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
 	: CADSClientIntegerVariable(pConnection, sName, Handle)
@@ -345,7 +390,11 @@ void CADSClientInt32Variable::writeValueToPLC(const int64_t nValue)
 	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
 }
 
-
+void CADSClientInt32Variable::getBounds(int64_t& minValue, int64_t& maxValue)
+{
+	minValue = INT32_MIN;
+	maxValue = INT32_MAX;
+}
 
 CADSClientUint32Variable::CADSClientUint32Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
 	: CADSClientIntegerVariable(pConnection, sName, Handle)
@@ -365,6 +414,7 @@ int64_t CADSClientUint32Variable::readValueFromPLC()
 	return (int64_t)nValue;
 }
 
+
 void CADSClientUint32Variable::writeValueToPLC(const int64_t nValue)
 {
 	if ((nValue < 0) || (nValue > UINT32_MAX))
@@ -373,6 +423,13 @@ void CADSClientUint32Variable::writeValueToPLC(const int64_t nValue)
 	uint32_t nValueToWrite = (uint32_t)nValue;
 	writeBuffer((void*)&nValueToWrite, sizeof(nValueToWrite));
 }
+
+void CADSClientUint32Variable::getBounds(int64_t& minValue, int64_t& maxValue)
+{
+	minValue = 0;
+	maxValue = UINT32_MAX;
+}
+
 
 CADSClientFloat32Variable::CADSClientFloat32Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
 	: CADSClientFloatVariable(pConnection, sName, Handle)
@@ -510,6 +567,17 @@ PADSClientBoolVariable CADSClient::registerBoolVariable(const std::string& sName
 }
 
 
+PADSClientStringVariable CADSClient::registerStringVariable(const std::string& sName)
+{
+	if (m_pCurrentConnection.get() == nullptr)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
+
+	auto pVariable = std::make_shared<CADSClientStringVariable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	registerVariable(pVariable);
+	return pVariable;
+}
+
+
 PADSClientInt8Variable CADSClient::registerInt8Variable(const std::string& sName)
 {
 	if (m_pCurrentConnection.get() == nullptr)
@@ -607,7 +675,7 @@ CADSClientVariable* CADSClient::findVariable(const std::string& sName, bool bFai
 	auto iIter = m_VariableMap.find(sName);
 	if (iIter == m_VariableMap.end()) {
 		if (bFailIfNotExisting)
-			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND);
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLENOTFOUND, "variable not found:" + sName);
 
 		return nullptr;
 	}
@@ -622,7 +690,7 @@ CADSClientIntegerVariable* CADSClient::findIntegerVariable(const std::string& sN
 	auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
 	if (pIntegerVariable == nullptr) {
 		if (bFailIfNotExisting)
-			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER);
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER, "variable is not a integer: " + sName);
 	}
 
 	return pIntegerVariable;
@@ -636,7 +704,7 @@ CADSClientBoolVariable* CADSClient::findBoolVariable(const std::string& sName, b
 	auto pBoolVariable = dynamic_cast<CADSClientBoolVariable*> (pVariable);
 	if (pBoolVariable == nullptr) {
 		if (bFailIfNotExisting)
-			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER);
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTBOOLEAN, "variable is not a boolean: " + sName);
 	}
 
 	return pBoolVariable;
@@ -649,9 +717,22 @@ CADSClientFloatVariable* CADSClient::findFloatVariable(const std::string& sName,
 	auto pFloatVariable = dynamic_cast<CADSClientFloatVariable*> (pVariable);
 	if (pFloatVariable == nullptr) {
 		if (bFailIfNotExisting)
-			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTINTEGER);
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTFLOAT, "variable is not a float: " + sName);
 	}
 
 	return pFloatVariable;
+
+}
+
+CADSClientStringVariable* CADSClient::findStringVariable(const std::string& sName, bool bFailIfNotExisting)
+{
+	auto pVariable = findVariable(sName, bFailIfNotExisting);
+	auto pStringVariable = dynamic_cast<CADSClientStringVariable*> (pVariable);
+	if (pStringVariable == nullptr) {
+		if (bFailIfNotExisting)
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_VARIABLEISNOTSTRING, "variable is not a string: " + sName);
+	}
+
+	return pStringVariable;
 
 }

@@ -77,6 +77,16 @@ namespace LibMCDriver_ADS {
 			std::string getName();
 		};
 
+		class CADSClientStringVariable : public CADSClientVariable {
+		public:
+			CADSClientStringVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
+			virtual ~CADSClientStringVariable();
+
+			virtual std::string readValueFromPLC();
+			virtual void writeValueToPLC(const std::string & sValue);
+
+		};
+
 		class CADSClientIntegerVariable : public CADSClientVariable {
 		public:
 			CADSClientIntegerVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
@@ -84,6 +94,8 @@ namespace LibMCDriver_ADS {
 
 			virtual int64_t readValueFromPLC() = 0;
 			virtual void writeValueToPLC(const int64_t nValue) = 0;
+
+			virtual void getBounds (int64_t & minValue, int64_t & maxValue) = 0;
 		};
 
 
@@ -94,6 +106,8 @@ namespace LibMCDriver_ADS {
 
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
+
+			virtual void getBounds(int64_t& minValue, int64_t & maxValue) override;
 		};
 
 		class CADSClientBoolVariable : public CADSClientIntegerVariable {
@@ -106,6 +120,8 @@ namespace LibMCDriver_ADS {
 
 			virtual bool readBooleanValueFromPLC();
 			virtual void writeBooleanValueToPLC(const bool bValue);
+
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) override;
 		};
 
 
@@ -116,6 +132,8 @@ namespace LibMCDriver_ADS {
 
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
+
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) override;
 		};
 
 		class CADSClientInt16Variable : public CADSClientIntegerVariable {
@@ -125,6 +143,8 @@ namespace LibMCDriver_ADS {
 
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
+
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) override;
 		};
 
 		class CADSClientUint16Variable : public CADSClientIntegerVariable {
@@ -134,6 +154,8 @@ namespace LibMCDriver_ADS {
 
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
+
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) override;
 		};
 
 
@@ -144,6 +166,8 @@ namespace LibMCDriver_ADS {
 
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
+
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) override;
 		};
 
 		class CADSClientUint32Variable : public CADSClientIntegerVariable {
@@ -153,6 +177,8 @@ namespace LibMCDriver_ADS {
 
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
+
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) override;
 		};
 
 		class CADSClientFloatVariable : public CADSClientVariable {
@@ -184,6 +210,7 @@ namespace LibMCDriver_ADS {
 
 		typedef std::shared_ptr<CADSClientVariable> PADSClientVariable;
 		typedef std::shared_ptr<CADSClientBoolVariable> PADSClientBoolVariable;
+		typedef std::shared_ptr<CADSClientStringVariable> PADSClientStringVariable;
 		typedef std::shared_ptr<CADSClientInt8Variable> PADSClientInt8Variable;
 		typedef std::shared_ptr<CADSClientUint8Variable> PADSClientUint8Variable;
 		typedef std::shared_ptr<CADSClientInt16Variable> PADSClientInt16Variable;
@@ -225,10 +252,13 @@ namespace LibMCDriver_ADS {
 			PADSClientFloat32Variable registerFloat32Variable(const std::string& sName);
 			PADSClientFloat64Variable registerFloat64Variable(const std::string& sName);
 
+			PADSClientStringVariable registerStringVariable(const std::string& sName);
+
 			CADSClientVariable* findVariable(const std::string& sName, bool bFailIfNotExisting);
 			CADSClientIntegerVariable* findIntegerVariable(const std::string& sName, bool bFailIfNotExisting);
 			CADSClientBoolVariable* findBoolVariable(const std::string& sName, bool bFailIfNotExisting);
 			CADSClientFloatVariable* findFloatVariable(const std::string& sName, bool bFailIfNotExisting);
+			CADSClientStringVariable* findStringVariable(const std::string& sName, bool bFailIfNotExisting);
 
 		};
 

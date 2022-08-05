@@ -71,13 +71,17 @@
 		<error name="VARIABLEISNOTINTEGER" code="1016" description="Variable is not integer" />
 		<error name="VARIABLEISNOTBOOLEAN" code="1017" description="Variable is not a boolean" />
 		<error name="VARIABLENOTFOUND" code="1018" description="Variable not found" />
+		<error name="VARIABLEISNOTFLOAT" code="1019" description="Variable is not a float" />
+		<error name="VARIABLEISNOTSTRING" code="1020" description="Variable is not a string" />
+		<error name="VARIABLEISNOTSTRUCT" code="1021" description="Variable is not a struct" />
 		
-		
-		
-		
-		
-		
-		
+		<error name="VARIABLENAMEMISSING" code="1022" description="Variable name missing" />
+		<error name="VARIABLEDESCRIPTIONMISSING" code="1023" description="Variable description missing" />
+		<error name="VARIABLEADSNAMEMISSING" code="1024" description="variable ads name missing" />
+		<error name="VARIABLEACCESSMISSING" code="1025" description="variable access missing" />
+		<error name="INVALIDVARIABLEACCESS" code="1026" description="invalid variable access" />
+		<error name="INVALIDVARIABLETYPE" code="1027" description="invalid variable type" />	
+				
 	</errors>
 
 	
@@ -169,8 +173,38 @@ Custom implementation
 			<param name="Value" type="int64" pass="in" description="Value to set." />
 		</method>		
 
-		<method name="GetVariableBounds" description="Returns the min and max value an integer variable can hold.">
+		<method name="ReadFloatValue" description="Reads a value from an float Variable.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="double" pass="return" description="Result value." />
+		</method>		
+		
+		<method name="WriteFloatValue" description="Reads a value from an integer Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="double" pass="in" description="Value to set." />
+		</method>		
+
+		<method name="ReadBoolValue" description="Reads a value from an boolean Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="bool" pass="return" description="Result value." />
+		</method>		
+		
+		<method name="WriteBoolValue" description="Reads a value from an boolean Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="bool" pass="in" description="Value to set." />
+		</method>	
+		
+		<method name="ReadStringValue" description="Reads a value from an string Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="string" pass="return" description="Result value." />
+		</method>		
+		
+		<method name="WriteStringValue" description="Reads a value from an string Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="string" pass="in" description="Value to set." />
+		</method>			
+
+		<method name="GetVariableBounds" description="Returns the min and max value an integer variable can hold.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable. Fails if variable does not exist or is not an integer value." />
 			<param name="MinValue" type="int64" pass="out" description="Minimum value." />
 			<param name="MaxValue" type="int64" pass="out" description="Minimum value." />
 		</method>		
