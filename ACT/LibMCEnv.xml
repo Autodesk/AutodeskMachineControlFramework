@@ -31,7 +31,7 @@
 	</license>
 	
 	<bindings>
-		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="CppDynamic" indentation="tabs" documentation="true" />
 	</bindings>
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
