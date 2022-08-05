@@ -38,13 +38,13 @@ PLC Drivers
 
 Laser Scanner Drivers
 
-- :doc:`Driver API - ScanLab <source/Drivers/ScanLab/libmcdriver_scanlab_Driver_ScanLab>`
+- :doc:`Driver API - ScanLab <source/Drivers/ScanLab/libmcdriver_scanlab_Driver_ScanLab_RTC6>`
 
-- :doc:`Driver API - ScanLab Open Interface Extension <source/Drivers/ScanLabOIE/libmcdriver_scanlaboie_Driver_ScanLabOIE>`
+- :doc:`Driver API - ScanLab Open Interface Extension <source/Drivers/ScanLabOIE/libmcdriver_scanlaboie_Driver_ScanLab_OIE>`
 
-- :doc:`Driver API - RayLase <source/Drivers/Raylase/libmcdriver_raylase_Driver_Raylase>`
+- :doc:`Driver API - RayLase <source/Drivers/RayLase/libmcdriver_raylase_Driver_Raylase>`
 
-- :doc:`Driver API - HALaser systems (via LibOAPC) <source/Drivers/LibOAPC/libmcdriver_liboapc_Driver_LibOAPC>`
+- :doc:`Driver API - HALaser systems (via LibOAPC) <source/Drivers/LibOAPC/libmcdriver_liboapc_Driver_E1701>`
 
 Base functionality
 
