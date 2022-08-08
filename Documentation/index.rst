@@ -38,7 +38,7 @@ PLC Drivers
 
 Laser Scanner Drivers
 
-- :doc:`Driver API - ScanLab <source/Drivers/ScanLab/libmcdriver_scanlab_Driver_ScanLab_RTC6>`
+- :doc:`Driver API - ScanLab RTC6 <source/Drivers/ScanLab/libmcdriver_scanlab_Driver_ScanLab_RTC6>`
 
 - :doc:`Driver API - ScanLab Open Interface Extension <source/Drivers/ScanLabOIE/libmcdriver_scanlaboie_Driver_ScanLab_OIE>`
 
