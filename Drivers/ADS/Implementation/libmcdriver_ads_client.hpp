@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 
+#define ADS_MINSTRINGLENGTH 2
+#define ADS_MAXSTRINGLENGTH 65536
+
 namespace LibMCDriver_ADS {
 	namespace Impl {
 
@@ -67,7 +70,7 @@ namespace LibMCDriver_ADS {
 			uint32_t m_Handle;
 		protected:
 
-			void readBuffer(void * pData, uint32_t nLength);
+			void readBuffer(void* pData, uint32_t nLength);
 			void writeBuffer(void* pData, uint32_t nLength);
 
 		public:
@@ -78,12 +81,14 @@ namespace LibMCDriver_ADS {
 		};
 
 		class CADSClientStringVariable : public CADSClientVariable {
+		private:
+			size_t m_nStringSize;
 		public:
-			CADSClientStringVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle);
+			CADSClientStringVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle, size_t nStringSize);
 			virtual ~CADSClientStringVariable();
 
 			virtual std::string readValueFromPLC();
-			virtual void writeValueToPLC(const std::string & sValue);
+			virtual void writeValueToPLC(const std::string& sValue);
 
 		};
 
@@ -95,7 +100,7 @@ namespace LibMCDriver_ADS {
 			virtual int64_t readValueFromPLC() = 0;
 			virtual void writeValueToPLC(const int64_t nValue) = 0;
 
-			virtual void getBounds (int64_t & minValue, int64_t & maxValue) = 0;
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) = 0;
 		};
 
 
@@ -107,7 +112,7 @@ namespace LibMCDriver_ADS {
 			virtual int64_t readValueFromPLC() override;
 			virtual void writeValueToPLC(const int64_t nValue) override;
 
-			virtual void getBounds(int64_t& minValue, int64_t & maxValue) override;
+			virtual void getBounds(int64_t& minValue, int64_t& maxValue) override;
 		};
 
 		class CADSClientBoolVariable : public CADSClientIntegerVariable {
@@ -229,11 +234,11 @@ namespace LibMCDriver_ADS {
 
 			PADSClientConnection m_pCurrentConnection;
 
-			uint32_t getVariableHandle(const std::string & sName);
+			uint32_t getVariableHandle(const std::string& sName);
 			void registerVariable(PADSClientVariable pVariable);
 
 		public:
-			CADSClient (PADSSDK pSDK);
+			CADSClient(PADSSDK pSDK);
 			virtual ~CADSClient();
 
 			void connect(uint32_t nPortNumber);
@@ -242,7 +247,7 @@ namespace LibMCDriver_ADS {
 			std::string getVersionString();
 
 			PADSClientBoolVariable registerBoolVariable(const std::string& sName);
-			PADSClientInt8Variable registerInt8Variable(const std::string & sName);
+			PADSClientInt8Variable registerInt8Variable(const std::string& sName);
 			PADSClientUint8Variable registerUint8Variable(const std::string& sName);
 			PADSClientInt16Variable registerInt16Variable(const std::string& sName);
 			PADSClientUint16Variable registerUint16Variable(const std::string& sName);
@@ -252,7 +257,7 @@ namespace LibMCDriver_ADS {
 			PADSClientFloat32Variable registerFloat32Variable(const std::string& sName);
 			PADSClientFloat64Variable registerFloat64Variable(const std::string& sName);
 
-			PADSClientStringVariable registerStringVariable(const std::string& sName);
+			PADSClientStringVariable registerStringVariable(const std::string& sName, const size_t nStringBufferSize);
 
 			CADSClientVariable* findVariable(const std::string& sName, bool bFailIfNotExisting);
 			CADSClientIntegerVariable* findIntegerVariable(const std::string& sName, bool bFailIfNotExisting);
@@ -264,7 +269,7 @@ namespace LibMCDriver_ADS {
 
 		typedef std::shared_ptr<CADSClient> PADSClient;
 
-	} 
-} 
+	}
+}
 
 #endif // __LIBMCDRIVER_ADS_CLIENT

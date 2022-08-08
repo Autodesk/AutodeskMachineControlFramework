@@ -190,6 +190,19 @@ PDriver_ADSParameter readParameterFromXMLNode(pugi::xml_node& node)
     if (sNodeName == "lreal")
         return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_LREAL, eAccess);
 
+    if (sNodeName == "string") {
+
+        auto lengthAttrib = node.attribute("length");
+        if (lengthAttrib.empty ())
+            throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_STRINGLENGTHMISSING, "string length missing: " + sName);
+
+        uint32_t nLength = lengthAttrib.as_uint(0);
+        if ((nLength < ADS_MINSTRINGLENGTH) || (nLength > ADS_MAXSTRINGLENGTH))
+            throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGLENGTH, "invalid string length: " + sName + " / " + std::to_string (nLength));
+
+        return std::make_shared<CDriver_ADSParameter>(sName, sDescription, sADSName, eDriver_ADSParameterType::ADSParameter_STRING, eAccess, nLength);
+    }
+
     throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLETYPE, "invalid variable type: " + sNodeName);
 
 }
@@ -431,7 +444,7 @@ void CDriver_ADS::Connect(const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_
                     m_pADSClient->registerFloat64Variable(pParameter->getADSName());
                     break;
                 case eDriver_ADSParameterType::ADSParameter_STRING:
-                    m_pADSClient->registerStringVariable(pParameter->getADSName());
+                    m_pADSClient->registerStringVariable(pParameter->getADSName(), pParameter->getFieldSize ());
                     break;
                 default:
                     throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLETYPE, "invalid variable type: " + pParameter->getName());

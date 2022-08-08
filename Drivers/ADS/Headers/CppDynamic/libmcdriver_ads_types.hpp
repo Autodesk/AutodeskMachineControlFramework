@@ -133,6 +133,10 @@ typedef void * LibMCDriver_ADS_pvoid;
 #define LIBMCDRIVER_ADS_ERROR_VARIABLEACCESSMISSING 1025 /** variable access missing */
 #define LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLEACCESS 1026 /** invalid variable access */
 #define LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLETYPE 1027 /** invalid variable type */
+#define LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGBUFFERLENGTH 1028 /** invalid string buffer length */
+#define LIBMCDRIVER_ADS_ERROR_STRINGLENGTHEXCEEDSBUFFERSIZE 1029 /** string length exceeds buffer size */
+#define LIBMCDRIVER_ADS_ERROR_STRINGLENGTHMISSING 1030 /** string length missing */
+#define LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGLENGTH 1031 /** invalid string length */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ADS
@@ -178,6 +182,10 @@ inline const char * LIBMCDRIVER_ADS_GETERRORSTRING (LibMCDriver_ADSResult nError
     case LIBMCDRIVER_ADS_ERROR_VARIABLEACCESSMISSING: return "variable access missing";
     case LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLEACCESS: return "invalid variable access";
     case LIBMCDRIVER_ADS_ERROR_INVALIDVARIABLETYPE: return "invalid variable type";
+    case LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGBUFFERLENGTH: return "invalid string buffer length";
+    case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHEXCEEDSBUFFERSIZE: return "string length exceeds buffer size";
+    case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHMISSING: return "string length missing";
+    case LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGLENGTH: return "invalid string length";
     default: return "unknown error";
   }
 }

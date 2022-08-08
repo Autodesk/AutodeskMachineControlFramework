@@ -37,8 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace LibMCDriver_ADS::Impl;
 
+
 CADSClientConnection::CADSClientConnection(PADSSDK pSDK, AdsPort nPort, sAmsAddr localAddress)
-	: m_pSDK (pSDK), m_Port(nPort), m_LocalAddress (localAddress)
+	: m_pSDK(pSDK), m_Port(nPort), m_LocalAddress(localAddress)
 {
 	if (pSDK.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDPARAM);
@@ -73,16 +74,16 @@ void CADSClientConnection::disconnect()
 		auto nPort = m_Port;
 		m_Port = 0;
 
-		pSDK->checkError (pSDK->AdsPortCloseEx(nPort));
+		pSDK->checkError(pSDK->AdsPortCloseEx(nPort));
 	}
 
 	m_Port = 0;
-	memset((void*) &m_LocalAddress, sizeof(m_LocalAddress), 0);
+	memset((void*)&m_LocalAddress, sizeof(m_LocalAddress), 0);
 }
 
 
 CADSClientVariable::CADSClientVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
-	: m_pConnection(pConnection), m_sName (sName), m_Handle (Handle)
+	: m_pConnection(pConnection), m_sName(sName), m_Handle(Handle)
 {
 	if (pConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDPARAM);
@@ -111,7 +112,7 @@ void CADSClientVariable::readBuffer(void* pData, uint32_t nLength)
 	auto pSDK = m_pConnection->getSDK();
 
 	uint32_t bytesRead = 0;
-	pSDK->checkError (pSDK->AdsSyncReadReqEx2(m_pConnection->getPort(), m_pConnection->getAddressP(), ADSIGRP_SYM_VALBYHND, m_Handle, nLength, pData, &bytesRead));
+	pSDK->checkError(pSDK->AdsSyncReadReqEx2(m_pConnection->getPort(), m_pConnection->getAddressP(), ADSIGRP_SYM_VALBYHND, m_Handle, nLength, pData, &bytesRead));
 
 	if (bytesRead != nLength)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTREADDATA, "could not read data: " + m_sName);
@@ -130,10 +131,13 @@ void CADSClientVariable::writeBuffer(void* pData, uint32_t nLength)
 	pSDK->checkError(pSDK->AdsSyncWriteReqEx(m_pConnection->getPort(), m_pConnection->getAddressP(), ADSIGRP_SYM_VALBYHND, m_Handle, nLength, pData));
 }
 
-CADSClientStringVariable::CADSClientStringVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
-	: CADSClientVariable(pConnection, sName, Handle)
+CADSClientStringVariable::CADSClientStringVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle, size_t nStringSize)
+	: CADSClientVariable(pConnection, sName, Handle), m_nStringSize(nStringSize)
 {
-
+	if (nStringSize < ADS_MINSTRINGLENGTH)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGBUFFERLENGTH, "invalid string buffer length: " + std::to_string (nStringSize));
+	if (nStringSize > ADS_MAXSTRINGLENGTH)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGBUFFERLENGTH, "invalid string buffer length: " + std::to_string(nStringSize));
 }
 
 CADSClientStringVariable::~CADSClientStringVariable()
@@ -142,17 +146,33 @@ CADSClientStringVariable::~CADSClientStringVariable()
 
 std::string CADSClientStringVariable::readValueFromPLC()
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	std::vector<char> buffer;
+	buffer.resize(m_nStringSize + 1);
+	readBuffer(buffer.data(), (uint32_t) m_nStringSize);
+	buffer[m_nStringSize] = 0;
+	return buffer.data();
 }
 
 void CADSClientStringVariable::writeValueToPLC(const std::string& sValue)
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	size_t nLength = sValue.length();
+	if (nLength > m_nStringSize)
+		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_STRINGLENGTHEXCEEDSBUFFERSIZE, "string length of " + std::to_string(nLength) + " exceeds buffer size of " + std::to_string(m_nStringSize));
+
+	std::vector<char> buffer;
+	buffer.resize(m_nStringSize);
+
+	for (size_t nIndex = 0; nIndex < nLength; nIndex++)
+		buffer.at(nIndex) = sValue.at(nIndex);
+	for (size_t nIndex = nLength; nIndex < m_nStringSize; nIndex++)
+		buffer.at(nIndex) = 0;
+
+	writeBuffer(buffer.data(), (uint32_t) m_nStringSize);
 }
 
 
 CADSClientIntegerVariable::CADSClientIntegerVariable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
-	: CADSClientVariable (pConnection, sName, Handle)
+	: CADSClientVariable(pConnection, sName, Handle)
 {
 
 }
@@ -176,7 +196,7 @@ CADSClientFloatVariable::~CADSClientFloatVariable()
 
 
 CADSClientInt8Variable::CADSClientInt8Variable(PADSClientConnection pConnection, const std::string& sName, uint32_t Handle)
-	: CADSClientIntegerVariable (pConnection, sName, Handle)
+	: CADSClientIntegerVariable(pConnection, sName, Handle)
 {
 
 }
@@ -191,7 +211,7 @@ CADSClientBoolVariable::CADSClientBoolVariable(PADSClientConnection pConnection,
 {
 
 }
-	
+
 CADSClientBoolVariable::~CADSClientBoolVariable()
 {
 
@@ -485,7 +505,7 @@ void CADSClientFloat64Variable::writeValueToPLC(const double dValue)
 
 
 CADSClient::CADSClient(PADSSDK pSDK)
-	: m_pSDK(pSDK), m_Version({0, 0, 0})
+	: m_pSDK(pSDK), m_Version({ 0, 0, 0 })
 {
 	if (pSDK.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDPARAM);
@@ -513,11 +533,11 @@ void CADSClient::connect(uint32_t nPortNumber)
 	memset(&localAddress, sizeof(localAddress), 0);
 
 
-	m_pSDK->checkError (m_pSDK->AdsGetLocalAddressEx(nPortHandle, &localAddress));
-	 
-	localAddress.m_Port = nPortNumber; 
+	m_pSDK->checkError(m_pSDK->AdsGetLocalAddressEx(nPortHandle, &localAddress));
 
-	m_pCurrentConnection = std::make_shared<CADSClientConnection> (m_pSDK, nPortHandle, localAddress);
+	localAddress.m_Port = nPortNumber;
+
+	m_pCurrentConnection = std::make_shared<CADSClientConnection>(m_pSDK, nPortHandle, localAddress);
 }
 
 void CADSClient::disconnect()
@@ -547,7 +567,7 @@ uint32_t CADSClient::getVariableHandle(const std::string& sName)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NAMELENGTHEXCEEDSMAXIMUM);
 
 	auto pSDK = m_pCurrentConnection->getSDK();
-	pSDK->checkError (pSDK->AdsSyncReadWriteReqEx2(m_pCurrentConnection->getPort(), m_pCurrentConnection->getAddressP(), ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(HandleValue), &HandleValue, (uint32_t)sName.length(), (void*)sName.c_str(), &bytesRead));
+	pSDK->checkError(pSDK->AdsSyncReadWriteReqEx2(m_pCurrentConnection->getPort(), m_pCurrentConnection->getAddressP(), ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(HandleValue), &HandleValue, (uint32_t)sName.length(), (void*)sName.c_str(), &bytesRead));
 
 	if (bytesRead != sizeof(HandleValue))
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTREADHANDLEVALUE);
@@ -567,12 +587,12 @@ PADSClientBoolVariable CADSClient::registerBoolVariable(const std::string& sName
 }
 
 
-PADSClientStringVariable CADSClient::registerStringVariable(const std::string& sName)
+PADSClientStringVariable CADSClient::registerStringVariable(const std::string& sName, const size_t nStringBufferSize)
 {
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	auto pVariable = std::make_shared<CADSClientStringVariable>(m_pCurrentConnection, sName, getVariableHandle(sName));
+	auto pVariable = std::make_shared<CADSClientStringVariable>(m_pCurrentConnection, sName, getVariableHandle(sName), nStringBufferSize);
 	registerVariable(pVariable);
 	return pVariable;
 }
@@ -583,7 +603,7 @@ PADSClientInt8Variable CADSClient::registerInt8Variable(const std::string& sName
 	if (m_pCurrentConnection.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTCONNECTED);
 
-	auto pVariable = std::make_shared<CADSClientInt8Variable>(m_pCurrentConnection, sName, getVariableHandle (sName));
+	auto pVariable = std::make_shared<CADSClientInt8Variable>(m_pCurrentConnection, sName, getVariableHandle(sName));
 	registerVariable(pVariable);
 	return pVariable;
 }
@@ -663,11 +683,11 @@ PADSClientFloat64Variable CADSClient::registerFloat64Variable(const std::string&
 
 void CADSClient::registerVariable(PADSClientVariable pVariable)
 {
-	if (pVariable.get () == nullptr)
+	if (pVariable.get() == nullptr)
 		throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDPARAM);
 
 	m_Variables.push_back(pVariable);
-	m_VariableMap.insert(std::make_pair(pVariable->getName (), pVariable));
+	m_VariableMap.insert(std::make_pair(pVariable->getName(), pVariable));
 }
 
 CADSClientVariable* CADSClient::findVariable(const std::string& sName, bool bFailIfNotExisting)
