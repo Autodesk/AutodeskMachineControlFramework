@@ -467,6 +467,9 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_MISSINGTESTDESCRIPTION 440 /** Missing test description */
 #define LIBMC_ERROR_MISSINGTESTINSTANCENAME 441 /** Missing test instance name */
 #define LIBMC_ERROR_TESTDEFINITIONHASNOINSTANCES 442 /** Test definition has no instances */
+#define LIBMC_ERROR_INVALIDPACKAGEENTRYNAME 443 /** Invalid package entry name */
+#define LIBMC_ERROR_INVALIDPACKAGEENTRYEXTENSION 444 /** Invalid package entry name */
+#define LIBMC_ERROR_INVALIDPACKAGEENTRYFILENAME 445 /** Invalid package entry file name */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -846,6 +849,9 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_MISSINGTESTDESCRIPTION: return "Missing test description";
     case LIBMC_ERROR_MISSINGTESTINSTANCENAME: return "Missing test instance name";
     case LIBMC_ERROR_TESTDEFINITIONHASNOINSTANCES: return "Test definition has no instances";
+    case LIBMC_ERROR_INVALIDPACKAGEENTRYNAME: return "Invalid package entry name";
+    case LIBMC_ERROR_INVALIDPACKAGEENTRYEXTENSION: return "Invalid package entry name";
+    case LIBMC_ERROR_INVALIDPACKAGEENTRYFILENAME: return "Invalid package entry file name";
     default: return "unknown error";
   }
 }

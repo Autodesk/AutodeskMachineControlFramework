@@ -472,6 +472,9 @@
 		<error name="MISSINGTESTINSTANCENAME" code="441" description="Missing test instance name" />
 		<error name="TESTDEFINITIONHASNOINSTANCES" code="442" description="Test definition has no instances" />
 		
+		<error name="INVALIDPACKAGEENTRYNAME" code="443" description="Invalid package entry name" />
+		<error name="INVALIDPACKAGEENTRYEXTENSION" code="444" description="Invalid package entry name" />
+		<error name="INVALIDPACKAGEENTRYFILENAME" code="445" description="Invalid package entry file name" />
 		
 		
 		  

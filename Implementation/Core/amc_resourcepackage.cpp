@@ -32,13 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_resourcepackage.hpp"
 
 #include "common_utils.hpp"
-#include "libmc_exceptiontypes.hpp"
 #include "Libraries/libzip/zip.h"
-#include "pugixml.hpp"
-
+#include "Libraries/pugixml/pugixml.hpp"
+#include "libmc_exceptiontypes.hpp"
 #include <map>
-
-#define RESOURCEPACKAGE_XMLSCHEMA "http://schemas.autodesk.com/amc/resourcepackage/2020/07"
 
 #define ROOT_ZIP_READCHUNKSIZE 65536
 #define ROOT_PACKAGEFILENAME "package.xml"
@@ -253,9 +250,17 @@ namespace AMC {
 	
 
 
-	CResourcePackageEntry::CResourcePackageEntry(const std::string& sUUID,  const std::string& sName, const std::string& sFileName, const std::string& sContentType, uint32_t nSize)
-			: m_sName (sName), m_sFileName (sFileName), m_sContentType (sContentType), m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID))
+	CResourcePackageEntry::CResourcePackageEntry(const std::string& sUUID,  const std::string& sName, const std::string& sFileName, const std::string& sExtension, const std::string& sContentType, uint32_t nSize)
+			: m_sName (sName), m_sFileName (sFileName), m_sContentType (sContentType), m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sExtension (sExtension)
 	{
+
+		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(m_sName))
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPACKAGENAMEENTRY);
+
+		if (!m_sExtension.empty()) {
+			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(m_sExtension))
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPACKAGEEXTENSIONENTRY);
+		}
 	}
 
 	std::string CResourcePackageEntry::getName()
@@ -283,18 +288,23 @@ namespace AMC {
 		return m_nSize;
 	}
 
-
-
-    PResourcePackage CResourcePackage::makeFromStream(AMCCommon::PImportStream pStream, const std::string& sPackageDebugName)
+	std::string CResourcePackageEntry::getExtension()
 	{
-		return makeFromStream(pStream.get(), sPackageDebugName);
+		return m_sExtension;
 	}
 
-	PResourcePackage CResourcePackage::makeFromStream(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName)
+
+
+    PResourcePackage CResourcePackage::makeFromStream(AMCCommon::PImportStream pStream, const std::string& sPackageDebugName, const std::string& sSchemaNamespace)
+	{
+		return makeFromStream(pStream.get(), sPackageDebugName, sSchemaNamespace);
+	}
+
+	PResourcePackage CResourcePackage::makeFromStream(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName, const std::string& sSchemaNamespace)
 	{
 		LibMCAssertNotNull(pStream);
 
-		return std::make_shared<CResourcePackage>(pStream, sPackageDebugName);
+		return std::make_shared<CResourcePackage>(pStream, sPackageDebugName, sSchemaNamespace);
 	}
 
 	PResourcePackage CResourcePackage::makeEmpty(const std::string& sPackageDebugName)
@@ -309,7 +319,7 @@ namespace AMC {
 	}
 
 
-	CResourcePackage::CResourcePackage(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName)
+	CResourcePackage::CResourcePackage(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName, const std::string& sSchemaNamespace)
 		: m_sPackageDebugName (sPackageDebugName)
 	{
 		LibMCAssertNotNull(pStream);
@@ -344,7 +354,7 @@ namespace AMC {
 			throw ELibMCCustomException(LIBMC_ERROR_MISSINGXMLSCHEMA, m_sPackageDebugName);
 
 		std::string xmlns(xmlnsAttrib.as_string());
-		if (xmlns != RESOURCEPACKAGE_XMLSCHEMA)
+		if (xmlns != sSchemaNamespace)
 			throw ELibMCCustomException(LIBMC_ERROR_INVALIDXMLSCHEMA, m_sPackageDebugName);
 
 		auto entryNodes = rootNode.children("entry");
@@ -352,6 +362,8 @@ namespace AMC {
 			auto nameAttrib = entryNode.attribute("name");
 			if (nameAttrib.empty())
 				throw ELibMCCustomException(LIBMC_ERROR_MISSINGRESOURCENAME, m_sPackageDebugName);
+
+			auto extensionAttrib = entryNode.attribute("extension");
 
 			auto fileNameAttrib = entryNode.attribute("filename");
 			if (fileNameAttrib.empty())
@@ -369,6 +381,7 @@ namespace AMC {
 			std::string sFileName = fileNameAttrib.as_string();
 			std::string sContentType = contenttypeAttrib.as_string();
 			std::string sUUID = AMCCommon::CUtils::createUUID();
+			std::string sExtension = extensionAttrib.as_string();
 			uint32_t nSize = sizeAttrib.as_uint();
 
 			auto pEntry = std::make_shared <CResourcePackageEntry> (sUUID, sName, sFileName, sContentType, nSize);
