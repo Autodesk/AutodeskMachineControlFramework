@@ -135,7 +135,7 @@ namespace LibMCDriver_Raylase {
 			CRaylaseSDK(const std::string & sDLLNameUTF8);
 			~CRaylaseSDK();
 
-			void checkError(int32_t statusCode);
+			void checkError(int32_t statusCode, const std::string & sDebugMessage = "");
 
 		};
 

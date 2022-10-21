@@ -76,7 +76,7 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	PResourcePackage pResourcePackage;
 	if (!sResourcePath.empty()) {
 		auto pStream = std::make_shared <AMCCommon::CImportStream_Native> (sResourcePath);
-		pResourcePackage = CResourcePackage::makeFromStream(pStream, sResourcePath);
+		pResourcePackage = CResourcePackage::makeFromStream(pStream, sResourcePath, AMCPACKAGE_SCHEMANAMESPACE);
 	}
 	else {
 		pResourcePackage = CResourcePackage::makeEmpty(sResourcePath);

@@ -151,10 +151,14 @@ CRaylaseSDK::~CRaylaseSDK()
 }
 
 
-void CRaylaseSDK::checkError(int32_t statusCode)
+void CRaylaseSDK::checkError(int32_t statusCode, const std::string& sDebugMessage)
 {
-	if (statusCode != 0)
-		throw std::runtime_error("Raylase Error: " + std::to_string (statusCode));
+	if (statusCode != 0) {
+		std::string& sErrorMessage = "Raylase Error: " + std::to_string(statusCode);
+		if (!sDebugMessage.empty ())
+			sErrorMessage += " (" + sDebugMessage + ")";
+		throw std::runtime_error(sErrorMessage);
+	}
 }
 
 void CRaylaseSDK::resetFunctionPtrs()

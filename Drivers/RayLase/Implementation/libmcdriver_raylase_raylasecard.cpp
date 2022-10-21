@@ -173,7 +173,7 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
     double dUnits = pToolpathAccessor->GetUnits();
 
     rlListHandle listHandle = m_pSDK->rlListAllocate(m_Handle);
-    m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(listHandle));
+    m_pSDK->checkError(m_pSDK->rlListAppendLaserOn(listHandle), "rlListAppendLaserOn");
 
     uint32_t nSegmentCount = pLayer->GetSegmentCount();
     for (uint32_t nSegmentIndex = 0; nSegmentIndex < nSegmentCount; nSegmentIndex++) {
@@ -197,9 +197,9 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
             double dJumpSpeedInMeterPerSecond = dJumpSpeedInMMPerSecond * 0.001;
             double dMarkSpeedInMeterPerSecond = dMarkSpeedInMMPerSecond * 0.001;
 
-            m_pSDK->checkError(m_pSDK->rlListAppendJumpSpeed(listHandle, dJumpSpeedInMeterPerSecond));
-            m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(listHandle, dMarkSpeedInMeterPerSecond));
-            m_pSDK->checkError(m_pSDK->rlListAppendPower(listHandle, nPowerInUnits));
+            m_pSDK->checkError(m_pSDK->rlListAppendJumpSpeed(listHandle, dJumpSpeedInMeterPerSecond), "rlListAppendJumpSpeed");
+            m_pSDK->checkError(m_pSDK->rlListAppendMarkSpeed(listHandle, dMarkSpeedInMeterPerSecond), "rlListAppendMarkSpeed");
+            m_pSDK->checkError(m_pSDK->rlListAppendPower(listHandle, nPowerInUnits), "rlListAppendPower");
 
 
             std::vector<LibMCEnv::sPosition2D> Points;
@@ -221,10 +221,10 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
                     double dYinMicron = dYinMM * 1000.0;
 
                     if (nPointIndex == 0) {
-                        m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(listHandle, dXinMicron, dYinMicron));
+                        m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(listHandle, dXinMicron, dYinMicron), "rlListAppendJumpAbs2D");
                     }
                     else {
-                        m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, dXinMicron, dYinMicron));
+                        m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, dXinMicron, dYinMicron), "rlListAppendMarkAbs2D");
                     }
 
                 }
@@ -253,8 +253,8 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
                     double dX2inMicron = dX2inMM * 1000.0;
                     double dY2inMicron = dY2inMM * 1000.0;
 
-                    m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(listHandle, dX1inMicron, dY1inMicron));
-                    m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, dX2inMicron, dY2inMicron));
+                    m_pSDK->checkError(m_pSDK->rlListAppendJumpAbs2D(listHandle, dX1inMicron, dY1inMicron), "rlListAppendJumpAbs2D");
+                    m_pSDK->checkError(m_pSDK->rlListAppendMarkAbs2D(listHandle, dX2inMicron, dY2inMicron), "rlListAppendMarkAbs2D");
                 }
 
                 break;
@@ -266,16 +266,16 @@ void CRaylaseCardImpl::DrawLayer(const std::string& sStreamUUID, const LibMCDriv
 
     }
 
-    m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle));
+    m_pSDK->checkError(m_pSDK->rlListAppendLaserOff(listHandle), "rlListAppendLaserOff");
 
-    m_pSDK->checkError(m_pSDK->rlListSet(m_Handle, 0, listHandle, false, -1));
-    m_pSDK->checkError(m_pSDK->rlListExecute(m_Handle, 0));
+    m_pSDK->checkError(m_pSDK->rlListSet(m_Handle, 0, listHandle, false, -1), "rlListSet");
+    m_pSDK->checkError(m_pSDK->rlListExecute(m_Handle, 0), "rlListExecute");
     int timeoutMs = 30000;
     bool done = false;
     int32_t listID = 0;
-    m_pSDK->checkError(m_pSDK->rlListWaitForListDone(m_Handle, timeoutMs, done, listID));
-    m_pSDK->checkError(m_pSDK->rlListDelete(m_Handle, 0, true));
-    m_pSDK->checkError(m_pSDK->rlListReleaseHandle(listHandle));
+    m_pSDK->checkError(m_pSDK->rlListWaitForListDone(m_Handle, timeoutMs, done, listID), "rlListWaitForListDone");
+    m_pSDK->checkError(m_pSDK->rlListDelete(m_Handle, 0, true), "rlListDelete");
+    m_pSDK->checkError(m_pSDK->rlListReleaseHandle(listHandle), "rlListReleaseHandle");
 
 
     /*

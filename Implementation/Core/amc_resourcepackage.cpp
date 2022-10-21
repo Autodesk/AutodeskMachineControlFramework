@@ -254,12 +254,12 @@ namespace AMC {
 			: m_sName (sName), m_sFileName (sFileName), m_sContentType (sContentType), m_nSize (nSize), m_sUUID (AMCCommon::CUtils::normalizeUUIDString (sUUID)), m_sExtension (sExtension)
 	{
 
-		if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(m_sName))
-			throw ELibMCCustomException(LIBMC_ERROR_INVALIDPACKAGENAMEENTRY);
+		//if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(m_sName))
+			//throw ELibMCCustomException(LIBMC_ERROR_INVALIDPACKAGEENTRYNAME, m_sName);
 
 		if (!m_sExtension.empty()) {
 			if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(m_sExtension))
-				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPACKAGEEXTENSIONENTRY);
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPACKAGEENTRYEXTENSION, m_sExtension);
 		}
 	}
 
@@ -384,7 +384,7 @@ namespace AMC {
 			std::string sExtension = extensionAttrib.as_string();
 			uint32_t nSize = sizeAttrib.as_uint();
 
-			auto pEntry = std::make_shared <CResourcePackageEntry> (sUUID, sName, sFileName, sContentType, nSize);
+			auto pEntry = std::make_shared <CResourcePackageEntry> (sUUID, sName, sFileName, sExtension, sContentType, nSize);
 			m_Entries.push_back(pEntry);
 			m_NameMap.insert(std::make_pair(sName, pEntry));
 			m_UUIDMap.insert(std::make_pair (sUUID, pEntry));
