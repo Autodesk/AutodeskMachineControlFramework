@@ -77,9 +77,11 @@
 		<error name="INVALIDPIXELDATACOUNT" code="36" description="Invalid pixel data count." />
 		<error name="INVALIDIMAGEBUFFER" code="37" description="Invalid image buffer." />
 		<error name="INVALIDPIXELFORMAT" code="38" description="Invalid pixel format." />
-		<error name="INVALIDTESTOUTPUTNAME" code="39" description="Invalid test output name." />
-			
+		<error name="INVALIDTESTOUTPUTNAME" code="39" description="Invalid test output name." />		
+		<error name="TOOLPATHNOTLOADED" code="40" description="Toolpath has not been loaded." />
+		<error name="INVALIDLAYERINDEX" code="41" description="Invalid layer index." />
 		
+				
 					
 	</errors>
 
@@ -326,6 +328,10 @@
 		<method name="GetZValue" description="Retrieves the layers Z Value in units.">
 			<param name="ZValue" type="int32" pass="return" description="Z Value of the layer in units." />
 		</method>
+
+		<method name="GetZValueInMM" description="Retrieves the layers Z Value in mm.">
+			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
+		</method>
 		
 		<method name="GetUnits" description="Retrieves the toolpath units in mm.">
 			<param name="Units" type="double" pass="return" description="Toolpath units." />
@@ -408,6 +414,15 @@
 
 		<method name="GetLayerCount" description="Returns cached layer count of the toolpath.">
 			<param name="LayerCount" type="uint32" pass="return" description="Returns layer count." />
+		</method>
+
+		<method name="GetBuildHeightInMM" description="Retrieves the build height in mm.">
+			<param name="BuildHeight" type="double" pass="return" description="Build height in mm." />
+		</method>
+
+		<method name="GetZValueInMM" description="Retrieves the layers Z Value in mm.">
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index to return." />
+			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
 		</method>
 
 		<method name="LoadToolpath" description="loads the a toolpath into memory">

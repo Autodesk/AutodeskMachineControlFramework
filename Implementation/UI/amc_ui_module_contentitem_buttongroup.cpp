@@ -38,13 +38,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module.hpp"
 #include "amc_api_constants.hpp"
 #include "Common/common_utils.hpp"
+#include "amc_statemachinedata.hpp"
+#include "amc_ui_expression.hpp"
 
 using namespace AMC;
 
-CUIModule_ContentButton::CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sIconName, const std::string& sEventFormValueSetting)
-	: m_sUUID(AMCCommon::CUtils::createUUID()), m_sCaption(sCaption), m_sTargetPage(sTargetPage), m_sEvent(sEvent), m_sEventFormValueSetting(sEventFormValueSetting), m_sButtonName(sButtonName),
-	m_sIconName(sIconName)
+CUIModule_ContentButton::CUIModule_ContentButton (const std::string & sGroupPath, const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression& IconName, const CUIExpression& DisabledExpression, const std::string& sEventFormValueSetting, PStateMachineData pStateMachineData)
+	: m_sUUID(AMCCommon::CUtils::createUUID()), 
+	 m_CaptionExpression(Caption), 
+	m_TargetPageExpression(TargetPage), 
+	m_EventExpression (Event), 
+	m_IconExpression(IconName),
+	m_DisabledExpression (DisabledExpression),
+	m_sEventFormValueSetting(sEventFormValueSetting), 
+	m_sButtonName(sButtonName),
+	m_pStateMachineData (pStateMachineData)
+	
 {
+	LibMCAssertNotNull(pStateMachineData.get());
+
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericPathString (sGroupPath))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDFORMPATH, sGroupPath);
+	if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sButtonName))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDBUTTONNAME, sButtonName);
+
+	m_sElementPath = sGroupPath + "." + sButtonName;
+
 }
 
 CUIModule_ContentButton::~CUIModule_ContentButton()
@@ -57,19 +76,9 @@ std::string CUIModule_ContentButton::getUUID()
 	return m_sUUID;
 }
 
-std::string CUIModule_ContentButton::getCaption()
+std::string CUIModule_ContentButton::getElementPath()
 {
-	return m_sCaption;
-}
-
-std::string CUIModule_ContentButton::getTargetPage()
-{
-	return m_sTargetPage;
-}
-
-std::string CUIModule_ContentButton::getEvent()
-{
-	return m_sEvent;
+	return m_sElementPath;
 }
 
 std::string CUIModule_ContentButton::getEventFormValueSetting()
@@ -84,10 +93,6 @@ std::string CUIModule_ContentButton::getButtonName()
 }
 
 
-std::string CUIModule_ContentButton::getIconName()
-{
-	return m_sIconName;
-}
 
 void CUIModule_ContentButton::addFormFieldValue(PUIModule_ContentFormEntity pEntity)
 {
@@ -103,6 +108,58 @@ void CUIModule_ContentButton::writeFormValuesToJSON(CJSONWriterArray& pArray)
 	}
 }
 
+PParameterGroup CUIModule_ContentButton::registerClientVariableGroup(CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	auto pGroup = pClientVariableHandler->addGroup(m_sElementPath, "button");
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONCAPTION, "button caption", m_CaptionExpression.evaluateStringValue(m_pStateMachineData));
+	pGroup->addNewBoolParameter(AMC_API_KEY_UI_BUTTONDISABLED, "button is disabled", m_DisabledExpression.evaluateBoolValue(m_pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONTARGETPAGE, "button target page", m_TargetPageExpression.evaluateStringValue(m_pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONEVENT, "button event", m_EventExpression.evaluateStringValue(m_pStateMachineData));
+	pGroup->addNewStringParameter(AMC_API_KEY_UI_BUTTONICON, "button icon", m_IconExpression.evaluateStringValue(m_pStateMachineData));
+
+	return pGroup;
+}
+
+PParameterGroup CUIModule_ContentButton::getClientVariableGroup(CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	return pClientVariableHandler->findGroup(m_sElementPath, true);
+}
+
+
+
+void CUIModule_ContentButton::writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+{
+	auto pGroup = getClientVariableGroup(pClientVariableHandler);
+
+	object.addString(AMC_API_KEY_UI_BUTTONUUID, getUUID());
+	object.addString(AMC_API_KEY_UI_BUTTONCAPTION, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONCAPTION));
+	object.addBool(AMC_API_KEY_UI_BUTTONDISABLED, pGroup->getBoolParameterValueByName(AMC_API_KEY_UI_BUTTONDISABLED));
+	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONCAPTION));
+	object.addString(AMC_API_KEY_UI_BUTTONEVENT, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONEVENT));
+	object.addString(AMC_API_KEY_UI_BUTTONICON, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONICON));
+
+}
+
+
+void CUIModule_ContentButton::syncClientVariables(CParameterHandler* pClientVariableHandler)
+{
+	auto pGroup = getClientVariableGroup(pClientVariableHandler);
+	if (m_CaptionExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_BUTTONCAPTION, m_CaptionExpression.evaluateStringValue(m_pStateMachineData));
+	if (m_DisabledExpression.needsSync())
+		pGroup->setBoolParameterValueByName(AMC_API_KEY_UI_BUTTONDISABLED, m_DisabledExpression.evaluateBoolValue(m_pStateMachineData));
+	if (m_TargetPageExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_BUTTONTARGETPAGE, m_TargetPageExpression.evaluateStringValue(m_pStateMachineData));
+	if (m_EventExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_BUTTONEVENT, m_EventExpression.evaluateStringValue(m_pStateMachineData));
+	if (m_IconExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_BUTTONICON, m_IconExpression.evaluateStringValue(m_pStateMachineData));
+
+}
+
+
 PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 {
 	LibMCAssertNotNull(pUIModuleEnvironment);
@@ -113,7 +170,7 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 		buttonDistribution = stringToButtonDistribution(distributionAttrib.as_string ());
 	}	
 
-	auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->contentRegistry(), buttonDistribution, sItemName, sModulePath);
+	auto pButtonGroup = std::make_shared <CUIModule_ContentButtonGroup>(pUIModuleEnvironment->contentRegistry(), buttonDistribution, sItemName, sModulePath, pUIModuleEnvironment->stateMachineData());
 
 	uint32_t nButtonIndex = 0;
 	std::set<std::string> buttonNameMap;
@@ -121,12 +178,8 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 	auto buttonsNodes = xmlNode.children("button");
 	for (auto buttonNode : buttonsNodes) {
 
-		auto captionAttrib = buttonNode.attribute("caption");
-		auto targetpageAttrib = buttonNode.attribute("targetpage");
-		auto eventAttrib = buttonNode.attribute("event");
 		auto formvaluesAttrib = buttonNode.attribute("formvalues");
 		auto buttonNameAttrib = buttonNode.attribute("name");
-		auto buttonIconAttrib = buttonNode.attribute("icon");
 
 		std::string sButtonName = buttonNameAttrib.as_string ();
 		if (sButtonName.empty ())
@@ -147,17 +200,25 @@ PUIModule_ContentButtonGroup CUIModule_ContentButtonGroup::makeFromXML(const pug
 
 		buttonNameMap.insert(sButtonName);
 
-		auto pButton = pButtonGroup->addButton(captionAttrib.as_string(), targetpageAttrib.as_string(), eventAttrib.as_string(), sButtonName, buttonIconAttrib.as_string (), formvaluesAttrib.as_string());
+		CUIExpression captionExpression(buttonNode, "caption");
+		CUIExpression targetPageExpression(buttonNode, "targetpage");
+		CUIExpression eventExpression(buttonNode, "event");
+		CUIExpression iconExpression(buttonNode, "icon");
+		CUIExpression disabledExpression(buttonNode, "disabled");
+
+		auto pButton = pButtonGroup->addButton(captionExpression, targetPageExpression, eventExpression, sButtonName, iconExpression, disabledExpression, formvaluesAttrib.as_string());
+
 	}
 
 	return pButtonGroup;
 }
 
 
-CUIModule_ContentButtonGroup::CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const eUIModule_ContentButtonDistribution buttonDistribution, const std::string& sItemName, const std::string& sModulePath)
-	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_pFormOwner (pFormOwner), m_ButtonDistribution (buttonDistribution)
+CUIModule_ContentButtonGroup::CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const eUIModule_ContentButtonDistribution buttonDistribution, const std::string& sItemName, const std::string& sModulePath, PStateMachineData pStateMachineData)
+	: CUIModule_ContentItem(AMCCommon::CUtils::createUUID(), sItemName, sModulePath), m_pFormOwner (pFormOwner), m_ButtonDistribution (buttonDistribution), m_pStateMachineData (pStateMachineData)
 {
 	LibMCAssertNotNull(pFormOwner);
+	LibMCAssertNotNull(pStateMachineData);
 }
 
 CUIModule_ContentButtonGroup::~CUIModule_ContentButtonGroup()
@@ -176,11 +237,7 @@ void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSO
 
 	for (auto pButton : m_Buttons) {
 		CJSONWriterObject buttonobject(writer);
-		buttonobject.addString(AMC_API_KEY_UI_BUTTONUUID, pButton->getUUID ());
-		buttonobject.addString(AMC_API_KEY_UI_BUTTONCAPTION, pButton->getCaption ());
-		buttonobject.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pButton->getTargetPage ());
-		buttonobject.addString(AMC_API_KEY_UI_BUTTONEVENT, pButton->getEvent());
-		buttonobject.addString(AMC_API_KEY_UI_BUTTONICON, pButton->getIconName());
+		pButton->writeVariablesToJSON(writer, buttonobject, pClientVariableHandler);
 
 		CJSONWriterArray buttonEventFormValues (writer);
 		pButton->writeFormValuesToJSON(buttonEventFormValues);
@@ -194,11 +251,15 @@ void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSO
 
 }
 
-
-
-PUIModule_ContentButton CUIModule_ContentButtonGroup::addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sIconName, const std::string& sEventFormValues)
+void CUIModule_ContentButtonGroup::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
 {
-	auto pButton = std::make_shared<CUIModule_ContentButton>(sCaption, sTargetPage, sEvent, sButtonName, sIconName, sEventFormValues);
+
+}
+
+
+PUIModule_ContentButton CUIModule_ContentButtonGroup::addButton(const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression& IconName, const CUIExpression& DisabledExpression, const std::string& sEventFormValueSetting)
+{
+	auto pButton = std::make_shared<CUIModule_ContentButton>(m_sItemPath, Caption, TargetPage, Event, sButtonName, IconName, DisabledExpression, sEventFormValueSetting, m_pStateMachineData);
 	m_Buttons.push_back(pButton);
 	m_ButtonMap.insert(std::make_pair (pButton->getUUID (), pButton));
 
@@ -209,10 +270,10 @@ void CUIModule_ContentButtonGroup::configurePostLoading()
 {
 	for (auto pButton : m_Buttons) {
 
-		auto sEvent = pButton->getEvent();
+		/*auto sEvent = pButton->getEvent();
 		if (!sEvent.empty()) {
 			m_pFormOwner->ensureUIEventExists (sEvent);
-		}
+		} */
 
 		auto sFormValuesSetting = pButton->getEventFormValueSetting();
 		if (!sFormValuesSetting.empty()) {
@@ -338,3 +399,10 @@ std::string CUIModule_ContentButtonGroup::findElementPathByUUID(const std::strin
 }
 
 
+void CUIModule_ContentButtonGroup::populateClientVariables(CParameterHandler* pClientVariableHandler)
+{
+	LibMCAssertNotNull(pClientVariableHandler);
+	for (auto pButton : m_Buttons) {
+		pButton->registerClientVariableGroup(pClientVariableHandler);
+	}
+}

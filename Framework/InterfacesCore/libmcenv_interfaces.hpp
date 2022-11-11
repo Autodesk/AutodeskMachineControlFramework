@@ -547,6 +547,12 @@ public:
 	virtual LibMCEnv_int32 GetZValue() = 0;
 
 	/**
+	* IToolpathLayer::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @return Z Value of the layer in mm.
+	*/
+	virtual LibMCEnv_double GetZValueInMM() = 0;
+
+	/**
 	* IToolpathLayer::GetUnits - Retrieves the toolpath units in mm.
 	* @return Toolpath units.
 	*/
@@ -672,6 +678,19 @@ public:
 	* @return Returns layer count.
 	*/
 	virtual LibMCEnv_uint32 GetLayerCount() = 0;
+
+	/**
+	* IBuild::GetBuildHeightInMM - Retrieves the build height in mm.
+	* @return Build height in mm.
+	*/
+	virtual LibMCEnv_double GetBuildHeightInMM() = 0;
+
+	/**
+	* IBuild::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in mm.
+	*/
+	virtual LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) = 0;
 
 	/**
 	* IBuild::LoadToolpath - loads the a toolpath into memory

@@ -97,7 +97,7 @@ double CUIModule_GraphicSVGImageLinearMotion::getParameterValue(PStateMachineDat
 	LibMCAssertNotNull(pMachineData);
 
 	std::string sInstanceName, sGroupName, sParameterName;
-	pMachineData->extractParameterDetailsFromDotString(m_sParameter, sInstanceName, sGroupName, sParameterName);
+	pMachineData->extractParameterDetailsFromDotString(m_sParameter, sInstanceName, sGroupName, sParameterName, false, false);
 	auto pParameterHandler = pMachineData->getParameterHandler(sInstanceName);
 	auto pParameterGroup = pParameterHandler->findGroup(sGroupName, true);
 	return pParameterGroup->getDoubleParameterValueByName(sParameterName);

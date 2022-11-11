@@ -135,6 +135,8 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDIMAGEBUFFER 37 /** Invalid image buffer. */
 #define LIBMCENV_ERROR_INVALIDPIXELFORMAT 38 /** Invalid pixel format. */
 #define LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME 39 /** Invalid test output name. */
+#define LIBMCENV_ERROR_TOOLPATHNOTLOADED 40 /** Toolpath has not been loaded. */
+#define LIBMCENV_ERROR_INVALIDLAYERINDEX 41 /** Invalid layer index. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -182,6 +184,8 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDIMAGEBUFFER: return "Invalid image buffer.";
     case LIBMCENV_ERROR_INVALIDPIXELFORMAT: return "Invalid pixel format.";
     case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "Invalid test output name.";
+    case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "Toolpath has not been loaded.";
+    case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
     default: return "unknown error";
   }
 }

@@ -89,6 +89,8 @@ namespace AMC {
 		PToolpathPart getPart(uint32_t nIndex);
 		PToolpathPart findPartByUUID(const std::string & sUUID);
 
+		uint32_t getLayerZInUnits(uint32_t nLayerIndex);
+
 	};
 
 	

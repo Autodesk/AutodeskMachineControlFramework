@@ -1171,6 +1171,32 @@ LibMCEnvResult libmcenv_toolpathlayer_getzvalue(LibMCEnv_ToolpathLayer pToolpath
 	}
 }
 
+LibMCEnvResult libmcenv_toolpathlayer_getzvalueinmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pZValue)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pZValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pZValue = pIToolpathLayer->GetZValueInMM();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_toolpathlayer_getunits(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pUnits)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
@@ -1762,6 +1788,58 @@ LibMCEnvResult libmcenv_build_getlayercount(LibMCEnv_Build pBuild, LibMCEnv_uint
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		*pLayerCount = pIBuild->GetLayerCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_getbuildheightinmm(LibMCEnv_Build pBuild, LibMCEnv_double * pBuildHeight)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pBuildHeight == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pBuildHeight = pIBuild->GetBuildHeightInMM();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_build_getzvalueinmm(LibMCEnv_Build pBuild, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue)
+{
+	IBase* pIBaseClass = (IBase *)pBuild;
+
+	try {
+		if (pZValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBuild* pIBuild = dynamic_cast<IBuild*>(pIBaseClass);
+		if (!pIBuild)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pZValue = pIBuild->GetZValueInMM(nLayerIndex);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -6523,6 +6601,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpointdata;
 	if (sProcName == "libmcenv_toolpathlayer_getzvalue") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getzvalue;
+	if (sProcName == "libmcenv_toolpathlayer_getzvalueinmm") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getzvalueinmm;
 	if (sProcName == "libmcenv_toolpathlayer_getunits") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getunits;
 	if (sProcName == "libmcenv_toolpathaccessor_getstorageuuid") 
@@ -6555,6 +6635,10 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_build_getstoragesha256;
 	if (sProcName == "libmcenv_build_getlayercount") 
 		*ppProcAddress = (void*) &libmcenv_build_getlayercount;
+	if (sProcName == "libmcenv_build_getbuildheightinmm") 
+		*ppProcAddress = (void*) &libmcenv_build_getbuildheightinmm;
+	if (sProcName == "libmcenv_build_getzvalueinmm") 
+		*ppProcAddress = (void*) &libmcenv_build_getzvalueinmm;
 	if (sProcName == "libmcenv_build_loadtoolpath") 
 		*ppProcAddress = (void*) &libmcenv_build_loadtoolpath;
 	if (sProcName == "libmcenv_build_unloadtoolpath") 

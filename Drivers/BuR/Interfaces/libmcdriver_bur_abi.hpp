@@ -263,6 +263,14 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_connec
 LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_disconnect(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
 
 /**
+* Sends the machine initialization command.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_bur_reinitializemachine(LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
 * Create Command
 *
 * @param[in] pDriver_BuR - Driver_BuR instance.

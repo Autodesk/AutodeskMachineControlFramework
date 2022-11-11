@@ -476,6 +476,9 @@
 		<error name="INVALIDPACKAGEENTRYEXTENSION" code="444" description="Invalid package entry name" />
 		<error name="INVALIDPACKAGEENTRYFILENAME" code="445" description="Invalid package entry file name" />
 		
+		<error name="INVALIDEXPRESSIONVALUE" code="446" description="Invalid expression value" />
+		<error name="INVALIDBUTTONNAME" code="447" description="Invalid button name" />
+		
 		
 		  
 	</errors>
@@ -498,8 +501,6 @@
 		<option name="Testing" value="3"/>
 	</enum>	
 
-
-		
 		
 	<class name="Base">
 	</class>

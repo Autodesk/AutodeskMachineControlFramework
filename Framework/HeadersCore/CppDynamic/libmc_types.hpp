@@ -470,6 +470,8 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDPACKAGEENTRYNAME 443 /** Invalid package entry name */
 #define LIBMC_ERROR_INVALIDPACKAGEENTRYEXTENSION 444 /** Invalid package entry name */
 #define LIBMC_ERROR_INVALIDPACKAGEENTRYFILENAME 445 /** Invalid package entry file name */
+#define LIBMC_ERROR_INVALIDEXPRESSIONVALUE 446 /** Invalid expression value */
+#define LIBMC_ERROR_INVALIDBUTTONNAME 447 /** Invalid button name */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -852,6 +854,8 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDPACKAGEENTRYNAME: return "Invalid package entry name";
     case LIBMC_ERROR_INVALIDPACKAGEENTRYEXTENSION: return "Invalid package entry name";
     case LIBMC_ERROR_INVALIDPACKAGEENTRYFILENAME: return "Invalid package entry file name";
+    case LIBMC_ERROR_INVALIDEXPRESSIONVALUE: return "Invalid expression value";
+    case LIBMC_ERROR_INVALIDBUTTONNAME: return "Invalid button name";
     default: return "unknown error";
   }
 }

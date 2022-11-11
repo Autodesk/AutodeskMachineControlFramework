@@ -82,6 +82,8 @@ public:
 
 	LibMCEnv_int32 GetZValue() override;
 
+	LibMCEnv_double GetZValueInMM() override;
+
 	LibMCEnv_double GetUnits() override;
 
 };

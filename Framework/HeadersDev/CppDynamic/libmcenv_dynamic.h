@@ -432,6 +432,15 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataPtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetZValuePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_int32 * pZValue);
 
 /**
+* Retrieves the layers Z Value in mm.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pZValue - Z Value of the layer in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetZValueInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pZValue);
+
+/**
 * Retrieves the toolpath units in mm.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
@@ -605,6 +614,25 @@ typedef LibMCEnvResult (*PLibMCEnvBuild_GetStorageSHA256Ptr) (LibMCEnv_Build pBu
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvBuild_GetLayerCountPtr) (LibMCEnv_Build pBuild, LibMCEnv_uint32 * pLayerCount);
+
+/**
+* Retrieves the build height in mm.
+*
+* @param[in] pBuild - Build instance.
+* @param[out] pBuildHeight - Build height in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_GetBuildHeightInMMPtr) (LibMCEnv_Build pBuild, LibMCEnv_double * pBuildHeight);
+
+/**
+* Retrieves the layers Z Value in mm.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nLayerIndex - Layer Index to return.
+* @param[out] pZValue - Z Value of the layer in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvBuild_GetZValueInMMPtr) (LibMCEnv_Build pBuild, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue);
 
 /**
 * loads the a toolpath into memory
@@ -2209,6 +2237,7 @@ typedef struct {
 	PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr m_ToolpathLayer_GetSegmentPartUUID;
 	PLibMCEnvToolpathLayer_GetSegmentPointDataPtr m_ToolpathLayer_GetSegmentPointData;
 	PLibMCEnvToolpathLayer_GetZValuePtr m_ToolpathLayer_GetZValue;
+	PLibMCEnvToolpathLayer_GetZValueInMMPtr m_ToolpathLayer_GetZValueInMM;
 	PLibMCEnvToolpathLayer_GetUnitsPtr m_ToolpathLayer_GetUnits;
 	PLibMCEnvToolpathAccessor_GetStorageUUIDPtr m_ToolpathAccessor_GetStorageUUID;
 	PLibMCEnvToolpathAccessor_GetLayerCountPtr m_ToolpathAccessor_GetLayerCount;
@@ -2225,6 +2254,8 @@ typedef struct {
 	PLibMCEnvBuild_GetStorageUUIDPtr m_Build_GetStorageUUID;
 	PLibMCEnvBuild_GetStorageSHA256Ptr m_Build_GetStorageSHA256;
 	PLibMCEnvBuild_GetLayerCountPtr m_Build_GetLayerCount;
+	PLibMCEnvBuild_GetBuildHeightInMMPtr m_Build_GetBuildHeightInMM;
+	PLibMCEnvBuild_GetZValueInMMPtr m_Build_GetZValueInMM;
 	PLibMCEnvBuild_LoadToolpathPtr m_Build_LoadToolpath;
 	PLibMCEnvBuild_UnloadToolpathPtr m_Build_UnloadToolpath;
 	PLibMCEnvBuild_ToolpathIsLoadedPtr m_Build_ToolpathIsLoaded;

@@ -89,11 +89,24 @@ std::string CUIExpression::evaluateStringValue(CStateMachineData* pStateMachineD
 		LibMCAssertNotNull(pStateMachineData);
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
-		CStateMachineData::extractParameterDetailsFromDotString(m_sExpressionValue, sParameterInstanceName, sParameterGroupName, sParameterName);
+		CStateMachineData::extractParameterDetailsFromDotString(m_sExpressionValue, sParameterInstanceName, sParameterGroupName, sParameterName, true, true);
 
-		auto pParameterHandler = pStateMachineData->getParameterHandler(sParameterInstanceName);
-		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
-		return pParameterGroup->getParameterValueByName(sParameterName);
+		if (!sParameterName.empty()) {
+
+			auto pParameterHandler = pStateMachineData->getParameterHandler(sParameterInstanceName);
+
+			auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
+			return pParameterGroup->getParameterValueByName(sParameterName);
+		}
+		else {
+
+			if (sParameterGroupName == "$state") {
+				return pStateMachineData->getInstanceStateName(sParameterInstanceName);
+			}
+			else {
+				throw ELibMCCustomException(LIBMC_ERROR_INVALIDEXPRESSIONVALUE, m_sExpressionValue);
+			}
+		}
 	}
 	else {
 		return m_sFixedValue;
@@ -111,7 +124,7 @@ double CUIExpression::evaluateNumberValue(CStateMachineData* pStateMachineData)
 		LibMCAssertNotNull(pStateMachineData);
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
-		CStateMachineData::extractParameterDetailsFromDotString(m_sExpressionValue, sParameterInstanceName, sParameterGroupName, sParameterName);
+		CStateMachineData::extractParameterDetailsFromDotString(m_sExpressionValue, sParameterInstanceName, sParameterGroupName, sParameterName, false, false);
 
 		auto pParameterHandler = pStateMachineData->getParameterHandler(sParameterInstanceName);
 		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
@@ -146,7 +159,7 @@ int64_t CUIExpression::evaluateIntegerValue(CStateMachineData* pStateMachineData
 		LibMCAssertNotNull(pStateMachineData);
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
-		CStateMachineData::extractParameterDetailsFromDotString(m_sExpressionValue, sParameterInstanceName, sParameterGroupName, sParameterName);
+		CStateMachineData::extractParameterDetailsFromDotString(m_sExpressionValue, sParameterInstanceName, sParameterGroupName, sParameterName, false, false);
 
 		auto pParameterHandler = pStateMachineData->getParameterHandler(sParameterInstanceName);
 		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);
@@ -197,7 +210,7 @@ bool CUIExpression::evaluateBoolValue(CStateMachineData* pStateMachineData)
 		}
 
 		std::string sParameterInstanceName, sParameterGroupName, sParameterName;
-		CStateMachineData::extractParameterDetailsFromDotString(sExpression, sParameterInstanceName, sParameterGroupName, sParameterName);
+		CStateMachineData::extractParameterDetailsFromDotString(sExpression, sParameterInstanceName, sParameterGroupName, sParameterName, false, false);
 
 		auto pParameterHandler = pStateMachineData->getParameterHandler(sParameterInstanceName);
 		auto pParameterGroup = pParameterHandler->findGroup(sParameterGroupName, true);

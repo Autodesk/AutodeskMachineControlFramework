@@ -256,6 +256,7 @@ public:
 			case LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH: return "RECEIVEDINVALIDPACKETLENGTH";
 			case LIBMCDRIVER_BUR_ERROR_COULDNOTWRITETOPAYLOAD: return "COULDNOTWRITETOPAYLOAD";
 			case LIBMCDRIVER_BUR_ERROR_INVALIDPAYLOADADDRESS: return "INVALIDPAYLOADADDRESS";
+			case LIBMCDRIVER_BUR_ERROR_COULDNOTREINITIALIZEMACHINE: return "COULDNOTREINITIALIZEMACHINE";
 		}
 		return "UNKNOWN";
 	}
@@ -346,6 +347,7 @@ public:
 			case LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH: return "Received invalid packet length.";
 			case LIBMCDRIVER_BUR_ERROR_COULDNOTWRITETOPAYLOAD: return "Could not write to payload.";
 			case LIBMCDRIVER_BUR_ERROR_INVALIDPAYLOADADDRESS: return "Invalid payload address.";
+			case LIBMCDRIVER_BUR_ERROR_COULDNOTREINITIALIZEMACHINE: return "Could not reinitialize machine.";
 		}
 		return "unknown error";
 	}
@@ -613,6 +615,7 @@ public:
 	inline bool IsSimulationMode();
 	inline void Connect(const std::string & sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout);
 	inline void Disconnect();
+	inline void ReinitializeMachine();
 	inline PPLCCommandList CreateCommandList();
 	inline PPLCCommand CreateCommand(const std::string & sCommandName);
 	inline void StartJournaling();
@@ -760,6 +763,7 @@ public:
 		pWrapperTable->m_Driver_BuR_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_BuR_Connect = nullptr;
 		pWrapperTable->m_Driver_BuR_Disconnect = nullptr;
+		pWrapperTable->m_Driver_BuR_ReinitializeMachine = nullptr;
 		pWrapperTable->m_Driver_BuR_CreateCommandList = nullptr;
 		pWrapperTable->m_Driver_BuR_CreateCommand = nullptr;
 		pWrapperTable->m_Driver_BuR_StartJournaling = nullptr;
@@ -994,6 +998,15 @@ public:
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_BuR_ReinitializeMachine = (PLibMCDriver_BuRDriver_BuR_ReinitializeMachinePtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_reinitializemachine");
+		#else // _WIN32
+		pWrapperTable->m_Driver_BuR_ReinitializeMachine = (PLibMCDriver_BuRDriver_BuR_ReinitializeMachinePtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_reinitializemachine");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_BuR_ReinitializeMachine == nullptr)
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_BuR_CreateCommandList = (PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr) GetProcAddress(hLibrary, "libmcdriver_bur_driver_bur_createcommandlist");
 		#else // _WIN32
 		pWrapperTable->m_Driver_BuR_CreateCommandList = (PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr) dlsym(hLibrary, "libmcdriver_bur_driver_bur_createcommandlist");
@@ -1191,6 +1204,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_disconnect", (void**)&(pWrapperTable->m_Driver_BuR_Disconnect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_Disconnect == nullptr) )
+			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_reinitializemachine", (void**)&(pWrapperTable->m_Driver_BuR_ReinitializeMachine));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BuR_ReinitializeMachine == nullptr) )
 			return LIBMCDRIVER_BUR_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_bur_driver_bur_createcommandlist", (void**)&(pWrapperTable->m_Driver_BuR_CreateCommandList));
@@ -1472,6 +1489,14 @@ public:
 	void CDriver_BuR::Disconnect()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* CDriver_BuR::ReinitializeMachine - Sends the machine initialization command.
+	*/
+	void CDriver_BuR::ReinitializeMachine()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BuR_ReinitializeMachine(m_pHandle));
 	}
 	
 	/**

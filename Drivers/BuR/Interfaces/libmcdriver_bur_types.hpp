@@ -178,6 +178,7 @@ typedef void * LibMCDriver_BuR_pvoid;
 #define LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH 1079 /** Received invalid packet length. */
 #define LIBMCDRIVER_BUR_ERROR_COULDNOTWRITETOPAYLOAD 1080 /** Could not write to payload. */
 #define LIBMCDRIVER_BUR_ERROR_INVALIDPAYLOADADDRESS 1081 /** Invalid payload address. */
+#define LIBMCDRIVER_BUR_ERROR_COULDNOTREINITIALIZEMACHINE 1082 /** Could not reinitialize machine. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_BuR
@@ -268,6 +269,7 @@ inline const char * LIBMCDRIVER_BUR_GETERRORSTRING (LibMCDriver_BuRResult nError
     case LIBMCDRIVER_BUR_ERROR_RECEIVEDINVALIDPACKETLENGTH: return "Received invalid packet length.";
     case LIBMCDRIVER_BUR_ERROR_COULDNOTWRITETOPAYLOAD: return "Could not write to payload.";
     case LIBMCDRIVER_BUR_ERROR_INVALIDPAYLOADADDRESS: return "Invalid payload address.";
+    case LIBMCDRIVER_BUR_ERROR_COULDNOTREINITIALIZEMACHINE: return "Could not reinitialize machine.";
     default: return "unknown error";
   }
 }

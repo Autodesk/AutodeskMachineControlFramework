@@ -260,6 +260,8 @@ public:
 			case LIBMCENV_ERROR_INVALIDIMAGEBUFFER: return "INVALIDIMAGEBUFFER";
 			case LIBMCENV_ERROR_INVALIDPIXELFORMAT: return "INVALIDPIXELFORMAT";
 			case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "INVALIDTESTOUTPUTNAME";
+			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "TOOLPATHNOTLOADED";
+			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "INVALIDLAYERINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -307,6 +309,8 @@ public:
 			case LIBMCENV_ERROR_INVALIDIMAGEBUFFER: return "Invalid image buffer.";
 			case LIBMCENV_ERROR_INVALIDPIXELFORMAT: return "Invalid pixel format.";
 			case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "Invalid test output name.";
+			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "Toolpath has not been loaded.";
+			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
 		}
 		return "unknown error";
 	}
@@ -613,6 +617,7 @@ public:
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
 	inline LibMCEnv_int32 GetZValue();
+	inline LibMCEnv_double GetZValueInMM();
 	inline LibMCEnv_double GetUnits();
 };
 	
@@ -661,6 +666,8 @@ public:
 	inline std::string GetStorageUUID();
 	inline std::string GetStorageSHA256();
 	inline LibMCEnv_uint32 GetLayerCount();
+	inline LibMCEnv_double GetBuildHeightInMM();
+	inline LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex);
 	inline void LoadToolpath();
 	inline void UnloadToolpath();
 	inline bool ToolpathIsLoaded();
@@ -1064,6 +1071,7 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointData = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetZValueInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetStorageUUID = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetLayerCount = nullptr;
@@ -1080,6 +1088,8 @@ public:
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageSHA256 = nullptr;
 		pWrapperTable->m_Build_GetLayerCount = nullptr;
+		pWrapperTable->m_Build_GetBuildHeightInMM = nullptr;
+		pWrapperTable->m_Build_GetZValueInMM = nullptr;
 		pWrapperTable->m_Build_LoadToolpath = nullptr;
 		pWrapperTable->m_Build_UnloadToolpath = nullptr;
 		pWrapperTable->m_Build_ToolpathIsLoaded = nullptr;
@@ -1592,6 +1602,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetZValueInMM = (PLibMCEnvToolpathLayer_GetZValueInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getzvalueinmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetZValueInMM = (PLibMCEnvToolpathLayer_GetZValueInMMPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getzvalueinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetZValueInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetUnits = (PLibMCEnvToolpathLayer_GetUnitsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getunits");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetUnits = (PLibMCEnvToolpathLayer_GetUnitsPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getunits");
@@ -1733,6 +1752,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Build_GetLayerCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetBuildHeightInMM = (PLibMCEnvBuild_GetBuildHeightInMMPtr) GetProcAddress(hLibrary, "libmcenv_build_getbuildheightinmm");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetBuildHeightInMM = (PLibMCEnvBuild_GetBuildHeightInMMPtr) dlsym(hLibrary, "libmcenv_build_getbuildheightinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetBuildHeightInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Build_GetZValueInMM = (PLibMCEnvBuild_GetZValueInMMPtr) GetProcAddress(hLibrary, "libmcenv_build_getzvalueinmm");
+		#else // _WIN32
+		pWrapperTable->m_Build_GetZValueInMM = (PLibMCEnvBuild_GetZValueInMMPtr) dlsym(hLibrary, "libmcenv_build_getzvalueinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Build_GetZValueInMM == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3205,6 +3242,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetZValue == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getzvalueinmm", (void**)&(pWrapperTable->m_ToolpathLayer_GetZValueInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetZValueInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getunits", (void**)&(pWrapperTable->m_ToolpathLayer_GetUnits));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetUnits == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3267,6 +3308,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_build_getlayercount", (void**)&(pWrapperTable->m_Build_GetLayerCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetLayerCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getbuildheightinmm", (void**)&(pWrapperTable->m_Build_GetBuildHeightInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetBuildHeightInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_build_getzvalueinmm", (void**)&(pWrapperTable->m_Build_GetZValueInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetZValueInMM == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_loadtoolpath", (void**)&(pWrapperTable->m_Build_LoadToolpath));
@@ -4320,6 +4369,18 @@ public:
 	}
 	
 	/**
+	* CToolpathLayer::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @return Z Value of the layer in mm.
+	*/
+	LibMCEnv_double CToolpathLayer::GetZValueInMM()
+	{
+		LibMCEnv_double resultZValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetZValueInMM(m_pHandle, &resultZValue));
+		
+		return resultZValue;
+	}
+	
+	/**
 	* CToolpathLayer::GetUnits - Retrieves the toolpath units in mm.
 	* @return Toolpath units.
 	*/
@@ -4557,6 +4618,31 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetLayerCount(m_pHandle, &resultLayerCount));
 		
 		return resultLayerCount;
+	}
+	
+	/**
+	* CBuild::GetBuildHeightInMM - Retrieves the build height in mm.
+	* @return Build height in mm.
+	*/
+	LibMCEnv_double CBuild::GetBuildHeightInMM()
+	{
+		LibMCEnv_double resultBuildHeight = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetBuildHeightInMM(m_pHandle, &resultBuildHeight));
+		
+		return resultBuildHeight;
+	}
+	
+	/**
+	* CBuild::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in mm.
+	*/
+	LibMCEnv_double CBuild::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
+	{
+		LibMCEnv_double resultZValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Build_GetZValueInMM(m_pHandle, nLayerIndex, &resultZValue));
+		
+		return resultZValue;
 	}
 	
 	/**

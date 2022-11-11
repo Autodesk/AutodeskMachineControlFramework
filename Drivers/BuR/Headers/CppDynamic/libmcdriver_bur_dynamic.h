@@ -250,6 +250,14 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_ConnectPtr) (LibMCDri
 typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_DisconnectPtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
 
 /**
+* Sends the machine initialization command.
+*
+* @param[in] pDriver_BuR - Driver_BuR instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_BuR_ReinitializeMachinePtr) (LibMCDriver_BuR_Driver_BuR pDriver_BuR);
+
+/**
 * Create Command
 *
 * @param[in] pDriver_BuR - Driver_BuR instance.
@@ -387,6 +395,7 @@ typedef struct {
 	PLibMCDriver_BuRDriver_BuR_IsSimulationModePtr m_Driver_BuR_IsSimulationMode;
 	PLibMCDriver_BuRDriver_BuR_ConnectPtr m_Driver_BuR_Connect;
 	PLibMCDriver_BuRDriver_BuR_DisconnectPtr m_Driver_BuR_Disconnect;
+	PLibMCDriver_BuRDriver_BuR_ReinitializeMachinePtr m_Driver_BuR_ReinitializeMachine;
 	PLibMCDriver_BuRDriver_BuR_CreateCommandListPtr m_Driver_BuR_CreateCommandList;
 	PLibMCDriver_BuRDriver_BuR_CreateCommandPtr m_Driver_BuR_CreateCommand;
 	PLibMCDriver_BuRDriver_BuR_StartJournalingPtr m_Driver_BuR_StartJournaling;

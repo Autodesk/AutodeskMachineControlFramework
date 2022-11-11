@@ -419,6 +419,11 @@ public:
 	virtual void Disconnect() = 0;
 
 	/**
+	* IDriver_BuR::ReinitializeMachine - Sends the machine initialization command.
+	*/
+	virtual void ReinitializeMachine() = 0;
+
+	/**
 	* IDriver_BuR::CreateCommandList - Create Command
 	* @return Command list instance
 	*/

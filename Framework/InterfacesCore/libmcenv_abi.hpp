@@ -445,6 +445,15 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointdata(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getzvalue(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_int32 * pZValue);
 
 /**
+* Retrieves the layers Z Value in mm.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[out] pZValue - Z Value of the layer in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getzvalueinmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_double * pZValue);
+
+/**
 * Retrieves the toolpath units in mm.
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
@@ -618,6 +627,25 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getstoragesha256(LibMCEnv_Build 
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getlayercount(LibMCEnv_Build pBuild, LibMCEnv_uint32 * pLayerCount);
+
+/**
+* Retrieves the build height in mm.
+*
+* @param[in] pBuild - Build instance.
+* @param[out] pBuildHeight - Build height in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getbuildheightinmm(LibMCEnv_Build pBuild, LibMCEnv_double * pBuildHeight);
+
+/**
+* Retrieves the layers Z Value in mm.
+*
+* @param[in] pBuild - Build instance.
+* @param[in] nLayerIndex - Layer Index to return.
+* @param[out] pZValue - Z Value of the layer in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_build_getzvalueinmm(LibMCEnv_Build pBuild, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue);
 
 /**
 * loads the a toolpath into memory
