@@ -97,6 +97,14 @@ namespace AMC {
 		return m_pToolpath->GetLayerCount ();
 	}
 
+	uint32_t CToolpathEntity::getLayerZInUnits(uint32_t nLayerIndex)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+
+		return nZValue;
+	}
+
 	PToolpathLayerData CToolpathEntity::readLayer(uint32_t nLayerIndex)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);

@@ -60,47 +60,12 @@ Abstract: This is the class declaration of CDriver_BuR
 #define BUR_COMMAND_DIRECT_JOURNALSTART 109
 #define BUR_COMMAND_DIRECT_JOURNALSTOP 110
 #define BUR_COMMAND_DIRECT_JOURNALRETRIEVE 111
+#define BUR_COMMAND_DIRECT_DELETELIST 112
 
 
 namespace LibMCDriver_BuR {
 namespace Impl {
 
-
-    class CDriver_BuRSocketConnection;
-
-#pragma pack(push)
-#pragma pack(1)
-
-
-    struct sAMCFToPLCPacket {
-        uint32_t m_nSignature;
-        uint8_t m_nMajorVersion;
-        uint8_t m_nMinorVersion;
-        uint8_t m_nPatchVersion;
-        uint8_t m_nBuildVersion;
-        uint32_t m_nClientID;
-        uint32_t m_nSequenceID;
-        uint32_t m_nCommandID;
-        sAMCFToPLCPacketPayload m_Payload;
-        uint32_t m_nChecksum;
-    };
-
-
-    struct sPLCToAMCFPacket {
-        uint32_t m_nSignature;
-        uint8_t m_nMajorVersion;
-        uint8_t m_nMinorVersion;
-        uint8_t m_nPatchVersion;
-        uint8_t m_nBuildVersion;
-        uint32_t m_nClientID;
-        uint32_t m_nSequenceID;
-        uint32_t m_nErrorCode;
-        uint32_t m_nCommandID;
-        uint32_t m_nMessageLen;
-        uint32_t m_nHeaderChecksum;
-        uint32_t m_nDataChecksum;
-    };
-#pragma pack(pop)
 
 
 /*************************************************************************************************************************
@@ -132,34 +97,7 @@ public:
 
 typedef std::shared_ptr<CDriver_BuRPacket> PDriver_BuRPacket;
 
-class CDriver_BuRSendInfo;
-typedef std::function<void(CDriver_BuRSendInfo * pSendInfo, CDriver_BuRPacket * pPacket)> BurSendCallback;
-
-class CDriver_BuRSendInfo {
-private:
-    uint32_t m_nCommandID;
-    uint32_t m_nSequenceID;  
-    uint32_t m_nClientID;
-    uint64_t m_nTimeStamp;
-
-    BurSendCallback m_Callback;
-
-public:
-    CDriver_BuRSendInfo(uint32_t nCommandID, uint32_t nSequenceID, uint32_t nClientID, uint64_t nTimeStamp, BurSendCallback sendCallback);
-    ~CDriver_BuRSendInfo();
-
-    uint32_t getCommandID();
-    uint32_t getSequenceID();
-    uint32_t getClientID();
-    uint64_t getTimeStamp();
-
-    void resetCallback();
-    void triggerCallback(CDriver_BuRPacket* pPacket);
-};
-
-typedef std::shared_ptr<CDriver_BuRSendInfo> PDriver_BuRSendInfo;
-
-
+class CDriver_BuRSocketConnection;
 
 class CDriver_BuRConnector {
 private:
@@ -181,9 +119,6 @@ protected:
 
     std::shared_ptr<CDriver_BuRSocketConnection> m_pCurrentConnection;
 
-    std::map<uint32_t, PDriver_BuRSendInfo> m_SentPacketQueue;
-    std::queue<sAMCFToPLCPacket> m_PacketsToSend;
-
     std::mutex m_ConnectionMutex;
     std::mutex m_SequenceMapMutex;
 
@@ -193,15 +128,13 @@ protected:
     std::map<std::string, PDriver_BuRCommandDefinition> m_CommandDefinitions;
     std::map<std::string, PDriver_BuRValue> m_ControlParameterMap;
 
-    PDriver_BuRPacket receiveCommandFromPLCEx (CDriver_BuRSocketConnection* pConnection);
-
-    void handlePacket();
+    //PDriver_BuRPacket receiveCommandFromPLCEx (CDriver_BuRSocketConnection* pConnection);
 
 public:
 
 	CDriver_BuRConnector (uint32_t nWorkerThreadCount, uint32_t nMaxReceiveBufferSize, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion, uint32_t nBuildVersion, uint32_t nMaxPacketQueueSize);
 
-    void queryParameters(uint64_t nTimeStamp, BurSendCallback pCallback);
+    void queryParameters (BurPacketCallback callback);
 
     void refreshJournal();
 
@@ -209,10 +142,23 @@ public:
 
     void disconnect();
 
-    uint32_t sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, uint64_t nTimeStamp, BurSendCallback pCallback);
+    void sendCommandsToPLC(std::vector<sAMCFToPLCPacketToSend>& packetList);
 
-    uint32_t sendSimpleCommandToPLC(uint32_t nCommandID, uint64_t nTimeStamp, BurSendCallback pCallback, uint32_t nParameter0 = 0, uint32_t nParameter1 = 0, uint32_t nParameter2 = 0);
-    void unregisterSendCallback(uint32_t nSequenceID);
+    void sendCommandToPLC(uint32_t nCommandID, BurPacketCallback callback);
+    void sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, BurPacketCallback callback);
+    void sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, BurPacketCallback callback);
+    void sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, BurPacketCallback callback);
+    void sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, BurPacketCallback callback);
+    void sendCommandToPLC(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, uint32_t nParameter4, BurPacketCallback callback);
+    void sendCommandToPLC(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, BurPacketCallback callback);
+
+    sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, BurPacketCallback callback);
+    sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, BurPacketCallback callback);
+    sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, BurPacketCallback callback);
+    sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, BurPacketCallback callback);
+    sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, BurPacketCallback callback);
+    sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, uint32_t nParameter0, uint32_t nParameter1, uint32_t nParameter2, uint32_t nParameter3, uint32_t nParameter4, BurPacketCallback callback);
+    sAMCFToPLCPacketToSend makePacket(uint32_t nCommandID, sAMCFToPLCPacketPayload payLoad, BurPacketCallback callback);
 
 };
 

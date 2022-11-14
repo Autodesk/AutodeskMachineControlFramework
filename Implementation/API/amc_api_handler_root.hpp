@@ -47,7 +47,7 @@ namespace AMC {
 			
 	public:
 
-		CAPIHandler_Root();
+		CAPIHandler_Root(const std::string& sClientHash);
 
 		virtual ~CAPIHandler_Root();
 				

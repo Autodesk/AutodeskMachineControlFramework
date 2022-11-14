@@ -130,7 +130,8 @@ CDriver_BuR::CDriver_BuR(const std::string& sName, LibMCEnv::PDriverEnvironment 
        m_nBuildVersion (0), 
        m_bIsQueryingParameters (false),
        m_SimulationMode (false),
-       m_nMaxPacketQueueSize(1024) 
+       m_nMaxPacketQueueSize(1024),
+       m_InitMachineCommandID(DRIVER_BUR_DEFAULT_INITMACHINECOMMANDID)
 
 {  
     if (pDriverEnvironment.get() == nullptr)
@@ -209,10 +210,13 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
 
     }
 
-
     pugi::xml_node commandsNode = burprotocolNode.child("commands");
     if (commandsNode.empty())
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOCOMMANDSLIST);
+
+    auto initMachineAttrib = commandsNode.attribute("initmachine");
+    if (!initMachineAttrib.empty())
+        m_InitMachineCommandID = initMachineAttrib.as_uint();
 
     auto commandNodes = commandsNode.children("command");
     for (pugi::xml_node commandNode : commandNodes)
@@ -288,17 +292,15 @@ void CDriver_BuR::QueryParameters()
 {
 
     if (m_bIsQueryingParameters)
-        return;
-
-    uint64_t nTimeStamp = generateTimeStamp ();
+        return;   
 
     if (!m_SimulationMode) {
 
         if (m_pConnector.get() != nullptr) {
             m_bIsQueryingParameters = true;
 
-            m_pConnector->queryParameters(nTimeStamp,
-                [this](CDriver_BuRSendInfo* pSendInfo, CDriver_BuRPacket* pPacket) {
+            m_pConnector->queryParameters(
+                [this](CDriver_BuRPacket* pPacket) {
 
                 m_bIsQueryingParameters = false;
 
@@ -358,6 +360,24 @@ void CDriver_BuR::Disconnect()
     if (m_pConnector.get() != nullptr)
         m_pConnector->disconnect(); 
 }
+
+void CDriver_BuR::ReinitializeMachine()
+{
+    if (!m_SimulationMode) {
+        if (m_pConnector.get() == nullptr)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_NOTCONNECTED);
+
+        bool resetSuccessful = false;
+        
+        m_pConnector->sendCommandToPLC(m_InitMachineCommandID, [&resetSuccessful](CDriver_BuRPacket* pPacket) {
+            resetSuccessful = pPacket->readBool(0);
+        });
+
+        if (!resetSuccessful)
+            throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COULDNOTREINITIALIZEMACHINE);
+    }
+}
+
 
 
 IPLCCommandList* CDriver_BuR::CreateCommandList()

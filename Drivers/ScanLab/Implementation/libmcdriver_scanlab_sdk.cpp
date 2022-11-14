@@ -37,7 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <dlfcn.h>
 #endif // _WIN32
 
+
 #include <vector>
+#include <iostream>
 
 using namespace LibMCDriver_ScanLab::Impl;
 
@@ -54,7 +56,9 @@ void* _loadScanLabAddress (HMODULE hLibrary, const char * pSymbolName) {
 }
 #else
 void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName) {
-	void* pFuncPtr = (void*) dlsym(hLibrary, "libmcdriver_scanlab_driver_getname");
+	std::cout << "Loading symbol " << pSymbolName << std::endl;
+
+	void* pFuncPtr = (void*) dlsym(hLibrary, pSymbolName);
 	dlerror();
 	if (pFuncPtr == nullptr)
 		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT);
@@ -95,6 +99,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 #endif // _WIN32
 
 
+std::cout << "init_rtc6_dll" << std::endl;
 	this->init_rtc6_dll = (PScanLabPtr_init_rtc6_dll)_loadScanLabAddress(hLibrary, "init_rtc6_dll");
 	this->free_rtc6_dll = (PScanLabPtr_free_rtc6_dll)_loadScanLabAddress(hLibrary, "free_rtc6_dll");
 	this->eth_convert_string_to_ip = (PScanLabPtr_eth_convert_string_to_ip)_loadScanLabAddress(hLibrary, "eth_convert_string_to_ip");
@@ -104,6 +109,7 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->eth_count_cards = (PScanLabPtr_eth_count_cards)_loadScanLabAddress(hLibrary, "eth_count_cards");
 	this->eth_found_cards = (PScanLabPtr_eth_found_cards)_loadScanLabAddress(hLibrary, "eth_found_cards");
 	this->eth_assign_card = (PScanLabPtr_eth_assign_card)_loadScanLabAddress(hLibrary, "eth_assign_card");
+std::cout << "acquire_rtc" << std::endl;
 	this->acquire_rtc = (PScanLabPtr_acquire_rtc)_loadScanLabAddress(hLibrary, "acquire_rtc");
 	this->release_rtc = (PScanLabPtr_release_rtc)_loadScanLabAddress(hLibrary, "release_rtc");
 	this->n_get_serial_number = (PScanLabPtr_n_get_serial_number)_loadScanLabAddress(hLibrary, "n_get_serial_number");
@@ -111,8 +117,12 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->eth_search_cards = (PScanLabPtr_eth_search_cards)_loadScanLabAddress(hLibrary, "eth_search_cards");
 	this->n_load_correction_file = (PScanLabPtr_n_load_correction_file)_loadScanLabAddress(hLibrary, "n_load_correction_file");
 	this->n_select_cor_table = (PScanLabPtr_n_select_cor_table)_loadScanLabAddress(hLibrary, "n_select_cor_table");
+	this->n_eth_set_com_timeouts_auto = (PScanLabPtr_n_eth_set_com_timeouts_auto)_loadScanLabAddress(hLibrary, "n_eth_set_com_timeouts_auto");
+	this->n_eth_get_com_timeouts_auto = (PScanLabPtr_n_eth_get_com_timeouts_auto)_loadScanLabAddress(hLibrary, "n_eth_get_com_timeouts_auto");
+
 	this->n_config_list = (PScanLabPtr_n_config_list)_loadScanLabAddress(hLibrary, "n_config_list");
 	this->n_set_laser_mode = (PScanLabPtr_n_set_laser_mode)_loadScanLabAddress(hLibrary, "n_set_laser_mode");
+std::cout << "setlasercontrol" << std::endl;
 	this->n_set_laser_control = (PScanLabPtr_n_set_laser_control)_loadScanLabAddress(hLibrary, "n_set_laser_control");
 	this->n_set_auto_laser_control = (PScanLabPtr_n_set_auto_laser_control)_loadScanLabAddress(hLibrary, "n_set_auto_laser_control");
 	this->n_set_laser_pulses = (PScanLabPtr_n_set_laser_pulses)_loadScanLabAddress(hLibrary, "n_set_laser_pulses");
@@ -209,6 +219,9 @@ void CScanLabSDK::resetFunctionPtrs()
 	eth_search_cards = nullptr;
 	n_load_correction_file = nullptr;
 	n_select_cor_table = nullptr;
+	n_eth_set_com_timeouts_auto = nullptr;
+	n_eth_get_com_timeouts_auto = nullptr;
+
 	n_config_list = nullptr;
 	n_set_laser_mode = nullptr;
 	n_set_laser_control = nullptr;

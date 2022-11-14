@@ -42,7 +42,7 @@ namespace AMC {
 	class CServerIO {		
 		public:
 			virtual void logMessageString (const std::string & sMessage) = 0;
-			virtual std::string readConfigurationXMLString (const std::string & sFileName) = 0;
+			virtual std::string readConfigurationString (const std::string & sFileName) = 0;
 		
 	};
 
@@ -54,7 +54,7 @@ namespace AMC {
 		virtual ~CServerStdIO();
 
 		virtual void logMessageString(const std::string& sMessage) override;
-		virtual std::string readConfigurationXMLString (const std::string & sFileName) override;
+		virtual std::string readConfigurationString (const std::string & sFileName) override;
 
 	};
 	

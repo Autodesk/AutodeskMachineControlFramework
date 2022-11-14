@@ -4,9 +4,9 @@
 
 	<driver name="bur" library="driver_bur" type="bur-1.0" configurationresource="burprotocol"/>
 	<driver name="scanlab" library="driver_scanlab" type="scanlab-rtc6"/>
-	<driver name="opcua" library="driver_opcua" type="opcua" configurationresource="opcuaprotocol"/>
+  <driver name="raylase" library="driver_raylase" type="raylase"/>
 
-	<statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
+  <statemachine name="main" description="Main System" initstate="init" failedstate="fatalerror" library="plugin_main">
 
 		<parametergroup name="jobinfo" description="Job Information">
 			<parameter name="jobname" description="Job Name" default="Job Name" type="string"/>
@@ -118,12 +118,14 @@
 
 	<statemachine name="laser" description="Laser System" initstate="init" failedstate="fatalerror" library="plugin_laser">
 
-		<parametergroup name="cardconfig" description="Scanlab Card Config">
-			<parameter name="serial" description="Serial" default="1000" type="int"/>
-			<parameter name="ipaddress" description="Scanlab Ethernet Address" default="" type="string"/>
-			<parameter name="netmask" description="Scanlab Netmask" default="" type="string"/>
-			<parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
-			<parameter name="maxlaserpower" description="Max. laser power (W)" default="400" type="double"/>
+		<parametergroup name="cardconfig" description="Scanner Card Config">
+      <parameter name="cardtype" description="Scanner Card Type (scanlab or raylase)" default="raylase" type="string"/>
+      <parameter name="serial" description="Serial" default="1000" type="int"/>
+			<parameter name="ipaddress" description="Scanner Ethernet Address" default="169.254.70.75" type="string"/>
+			<parameter name="netmask" description="Scanner Netmask" default="" type="string"/>
+      <parameter name="port" description="Port" default="49374" type="int"/>
+      <parameter name="timeout" description="Connection timeout" default="1000" type="int"/>
+			<parameter name="maxlaserpower" description="Max. laser power (W)" default="1000" type="double"/>
 			<parameter name="laserondelay" description="Laser On Delay in microseconds" default="100" type="double"/>
 			<parameter name="laseroffdelay" description="Laser Off Delay in microseconds" default="100" type="double"/>
 			<parameter name="markdelay" description="Mark Delay in microseconds" default="570" type="double"/>
@@ -183,6 +185,10 @@
 
 		<driverparametergroup name="plcstate" description="BuR State" driver="bur"/>
 
+		<parametergroup name="axisvalues" description="Axis Values">
+			<parameter name="recoateraxis" description="Recoateraxis" default="0" type="double"/>
+		</parametergroup>
+		
 		<signaldefinition name="signal_recoatlayer">
 			<result name="success" type="bool"/>
 		</signaldefinition>
@@ -191,7 +197,7 @@
 			<outstate target="idle"/>
 		</state>
 
-		<state name="idle" repeatdelay="50">
+		<state name="idle" repeatdelay="10">
 			<outstate target="idle"/>
 			<outstate target="recoating"/>
 		</state>
@@ -208,13 +214,18 @@
 	</statemachine>
 
 
-	<userinterface appname="SLM Demo System" copyright="2021 Autodesk" mainpage="main" library="plugin_userinterface">
+	<userinterface appname="Autodesk Machine Control Framework" copyright="2022 Autodesk Inc." mainpage="main" library="plugin_userinterface">
 
-		<logo resource="ui_logo" aspectratio="2.5"/>
+		<logo resource="ui_logo" aspectratio="3.0"/>
+
+    <login 
+				backgroundresource="login_background" 
+        welcomemessage="Welcome to the Autodesk Machine Control Framework. This is SLM Test Machine 1. Please enter your account credential to log into the system."        
+		/>
 
 		<colors>
-			<color name="primary" red="0.024" green="0.588" blue="0.843"/>
-			<color name="secondary" red="0.529" green="0.737" blue="0.251"/>
+			<color name="primary" red="0.00" green="0.0" blue="0.0"/>
+			<color name="secondary" red="0.3" green="0.3" blue="0.3"/>
 			<color name="accent" red="0.400" green="0.400" blue="0.400"/>
 			<color name="error" red="0.867" green="0.133" blue="0.133"/>
 		</colors>
@@ -225,10 +236,17 @@
 					<edit name="o2_value" caption="Target Oxygen Value" suffix="ppm"/>
 					<edit name="recoaterspeed" caption="Recoater Speed" suffix="mm/s"/>
 					<edit name="gasflowspeed" caption="Gas flow speed" suffix="m/s"/>
-				</form>
+          <edit name="o2_value3" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value4" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value5" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value6" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value7" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value8" caption="Target Oxygen Value" suffix="ppm"/>
+          <edit name="o2_value9" caption="Target Oxygen Value" suffix="ppm"/>
+        </form>
 
 				<buttongroup distribution="equal">
-					<button caption="Save" event="onprocessparametersave" formvalues="processparameters"/>
+					<button caption="Save" event="onprocessparametersave" formvalues="processparameters" icon="mdi-refresh" />
 					<button caption="Cancel" event="onprocessparametercancel"/>
 				</buttongroup>
 
@@ -387,10 +405,19 @@
 				
 					<view minx="0" miny="0" maxx="160" maxy="110" showgrid="0" />
 										
-					<svgimage resource="machinesketch" x="0" y="0" z="45" scalex="1.0" scaley="1.0" angle="0.0" />
-					<svgimage name="platform" resource="platform" x="35" y="5" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
-					<svgimage name="powderreservoir" resource="platform" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
-					<svgimage name="recoater" resource="recoatersketch" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0" />
+					<svgimage resource="machinesketch" x="0" y="0" z="45" scalex="1.0" scaley="1.0" angle="0.0">
+          </svgimage>
+					
+					<svgimage name="platform" resource="platform" x="35" y="5" z="50" scalex="1.0" scaley="1.0" angle="0.0">
+            <linearmotion parameter="plc.axisvalues.recoateraxis" from="0.0" to="100.0" deltax="0" deltay="50" />
+          </svgimage>
+
+          <svgimage name="powderreservoir" resource="platform" x="0" y="50" z="50" scalex="1.0" scaley="1.0" angle="0.0">
+            <linearmotion parameter="plc.axisvalues.recoateraxis" from="0.0" to="100.0" deltax="0" deltay="-50" />
+          </svgimage>
+          <svgimage name="recoater" resource="recoatersketch" x="0" y="0" z="50" scalex="1.0" scaley="1.0" angle="0.0">
+            <linearmotion parameter="plc.axisvalues.recoateraxis" from="0.0" to="100.0" deltax="100" deltay="0" />
+          </svgimage>
 					
 				</graphic>
 
@@ -511,11 +538,10 @@
 
 					<content name="part list" caption="Part List">
 					
-					</content>	
+					</content>
 
-					<content name="systemstate" caption="Log Messages">
-					
-					</content>					
+          <logs name="systemlog" caption="Log Messages">
+          </logs>
 				
 				</tabs>
 				
@@ -523,6 +549,14 @@
 			</grid>
 		</page>
 
+
+    <page name="manualcontrol">
+
+      <content name="control" title="Manual control">
+      </content>
+
+    </page>
+    
 		<page name="buildreport">
 
 			<glscene name="manualcontrol3">
@@ -541,27 +575,45 @@
 					<entry statemachine="main" group="ui"/>
 					<entry statemachine="plc" group="plcconfig"/>
 					<entry statemachine="plc" group="plcstate"/>
+					<entry statemachine="plc" group="axisvalues"/>
 
 					<entry statemachine="laser" group="sdkstate"/>
 
 				</parameterlist>
-			</content>
+
+      </content>
 
 		</page>
 
-		<menu>
-			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-			<item id="buildlist" icon="mdi-apps" caption="Build Library" targetpage="buildlist"/>
-			<item id="preparebuild" icon="mdi-apps" caption="Prepare Build" targetpage="preparebuild"/>
-			<item id="buildstatus" icon="mdi-apps" caption="Build Status" targetpage="buildstatus"/>
-			<item id="buildreport" icon="mdi-apps" caption="Build Report" targetpage="buildreport"/>
-			<item id="systemstatus" icon="mdi-apps" caption="System Status" targetpage="systemstatus"/>
-		</menu>
+    <page name="systemlog">
+
+      <content name="logs" title="System Logs">
+      </content>
+
+    </page>
+
+    <page name="settings">
+
+      <content name="settings" title="System Settings">
+      </content>
+
+    </page>
+
+    <menu>
+			<item id="buildlist" icon="mdi-library" description= "Upload build files and start build jobs." caption="Build Library" targetpage="buildlist"/>
+			<item id="buildprocess" icon="mdi-printer-3d" caption="Build Process" description="Manage and monitor current build process"  targetpage="buildstatus"/>
+      <item id="buildreport" icon="mdi-printer" caption="Build Reports" description="Browse and investigate build job history." targetpage="buildreport"/>
+      <item id="manualcontrol" icon="mdi-gamepad-variant" caption="Manual control" description="Manually control machine behaviour." targetpage="manualcontrol"/>
+      <item id="systemstatus" icon="mdi-factory" caption="Current Status" description="Display current machine status." targetpage="systemstatus"/>
+      <item id="systemlog" icon="mdi-book-open-variant" caption="System Logs" description="Browse and display stored system log files." targetpage="systemlog"/>
+      <item id="system settings" icon="mdi-wrench" caption="Settings" description="Change machine configuration details." targetpage="settings"/>
+    </menu>
 
 
-		<toolbar>
+		<toolbar logoresource="ui_toolbarlogo">
 			<item id="home" icon="mdi-apps" caption="Home" targetpage="main"/>
-		</toolbar>
+      <item id="logout" icon="mdi-logout" caption="Log out" event="logout"/>
+    </toolbar>
 
 
 	</userinterface>

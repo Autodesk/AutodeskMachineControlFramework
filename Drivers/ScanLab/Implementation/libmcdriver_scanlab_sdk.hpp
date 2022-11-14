@@ -65,6 +65,10 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_get_serial_search) (uint32_t nSearchNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_search_cards) (uint32_t nIP, uint32_t n_NetMask);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_load_correction_file) (uint32_t nCardNo, const char * nFileName, uint32_t nNo, uint32_t n_Dimension);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_set_com_timeouts_auto) (uint32_t nCardNo, const double dInitialTimeout, const double dMaxTimeout, const double dMultiplier, const uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_get_com_timeouts_auto) (uint32_t nCardNo, double * pdInitialTimeout, double * pdMaxTimeout, double * pdMultiplier, uint32_t * pnMode);
+
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_select_cor_table) (uint32_t nCardNo, uint32_t nHeadA, uint32_t nHeadB);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_config_list) (uint32_t nCardNo, uint32_t nMem1, uint32_t nMem2);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_mode) (uint32_t nCardNo, uint32_t nMode);
@@ -74,7 +78,6 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_standby) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_last_error) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_get_last_error) ();
-
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_load_program_file) (uint32_t nCardNo, const char * pPath);
 		typedef double (SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_table_para) (uint32_t nCardNo, uint32_t nTableNo, uint32_t nParaNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_end_of_list) (uint32_t nCardNo);
@@ -133,6 +136,8 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_eth_search_cards eth_search_cards = nullptr;
 			PScanLabPtr_n_load_correction_file n_load_correction_file = nullptr;
 			PScanLabPtr_n_select_cor_table n_select_cor_table = nullptr;
+			PScanLabPtr_n_eth_set_com_timeouts_auto n_eth_set_com_timeouts_auto = nullptr;
+			PScanLabPtr_n_eth_get_com_timeouts_auto n_eth_get_com_timeouts_auto = nullptr;
 			PScanLabPtr_n_config_list n_config_list = nullptr;
 			PScanLabPtr_n_set_laser_mode n_set_laser_mode = nullptr;
 			PScanLabPtr_n_set_laser_control n_set_laser_control = nullptr;

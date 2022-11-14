@@ -138,3 +138,8 @@ LibMCEnv_int32 CToolpathLayer::GetZValue()
 {
 	return m_pToolpathLayerData->getZValue();
 }
+
+LibMCEnv_double CToolpathLayer::GetZValueInMM()
+{
+	return m_pToolpathLayerData->getUnits() * m_pToolpathLayerData->getZValue();
+}

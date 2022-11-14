@@ -83,6 +83,11 @@ namespace AMC {
 	void CStateMachineData::setInstanceStateName(const std::string& sInstanceName, const std::string& sInstanceState)
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto iIter = m_StateMachineStates.find(sInstanceName);
+		if (iIter != m_StateMachineStates.end())
+			m_StateMachineStates.erase(sInstanceName);
+		
+
 		m_StateMachineStates.insert(std::make_pair (sInstanceName, sInstanceState));
 
 	}
@@ -100,7 +105,7 @@ namespace AMC {
 
 
 
-	void CStateMachineData::extractParameterDetailsFromDotString(const std::string& sParameterPath, std::string& sParameterInstance, std::string& sParameterGroup, std::string& sParameterName)
+	void CStateMachineData::extractParameterDetailsFromDotString(const std::string& sParameterPath, std::string& sParameterInstance, std::string& sParameterGroup, std::string& sParameterName, bool allowEmptyParameterName, bool allowNonAlphaNumericNames)
 	{
 		std::string sTrimmedPath = AMCCommon::CUtils::trimString(sParameterPath);
 
@@ -116,16 +121,30 @@ namespace AMC {
 				sParameterGroup = sRestString.substr(0, nPointPosition2);
 				sParameterName = sRestString.substr(nPointPosition2 + 1);
 
-				if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterInstance))
-					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERINSTANCE, sParameterInstance);
-				if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterGroup))
-					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sParameterGroup);
-				if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))
-					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERNAME, sParameterName);
+				if (!allowNonAlphaNumericNames) {
+
+					if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterInstance))
+						throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERINSTANCE, sParameterInstance);
+					if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterGroup))
+						throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sParameterGroup);
+					if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName))
+						throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERNAME, sParameterName);
+				}
 
 			}
 			else {
-				throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERPATH, sParameterPath);
+				if (!allowEmptyParameterName)	
+					throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERPATH, sParameterPath);
+
+				sParameterGroup = sRestString;
+				sParameterName = "";
+
+				if (!allowNonAlphaNumericNames) {
+					if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterInstance))
+						throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERINSTANCE, sParameterInstance);
+					if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterGroup))
+						throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERGROUP, sParameterGroup);
+				}
 			}
 
 		}

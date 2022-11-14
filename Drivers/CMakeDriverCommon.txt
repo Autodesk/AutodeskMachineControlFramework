@@ -69,7 +69,7 @@ else()
 			set(BUILDRESOURCES_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.arm)
 						
 		else()
-			set(BUILDRESOURCES_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.linux)
+			set(BUILDRESOURCES_EXECUTABLE ${CMAKE_CURRENT_BINARY_DIR}/../../DevPackage/Framework/buildresources.linux64)
 						
 		endif()
 	endif()
@@ -77,7 +77,7 @@ else()
 endif()
 
 file(STRINGS ${PROJECT_BINARY_DIR}/../../githash.txt GLOBALGITHASH)
-message(STATUS "Global git hash: \"${GLOBALGITHASH}\"")
+message(STATUS "Driver \"${DRIVERPROJECT}\" git hash: \"${GLOBALGITHASH}\"")
 
 
 file(GLOB LIBMCDRIVER_SRC

@@ -28,6 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#ifdef _WIN32
+#define CPPHTTPLIB_OPENSSL_SUPPORT
+#endif
+
 #include "Libraries/cpp-httplib/httplib.h"
 
 #include "amc_server.hpp"
@@ -38,7 +42,123 @@ using namespace AMC;
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
+#define PEMMAXLENGTH (1024 * 1024)
 
+#ifdef _WIN32
+class CX509Certificate {
+private:
+	BIO * m_pIOObject;
+	X509* m_pX509Object;
+public:
+	CX509Certificate()
+		: m_pIOObject (nullptr), m_pX509Object (nullptr)
+	{
+
+	}
+
+	~CX509Certificate()
+	{
+		clear();
+	}
+
+	void clear()
+	{
+		if (m_pX509Object != nullptr) {
+			X509_free(m_pX509Object);
+			m_pX509Object = nullptr;
+		}
+
+		if (m_pIOObject != nullptr) {
+			BIO_free(m_pIOObject);
+			m_pIOObject = nullptr;
+		}
+
+	}
+
+	void setPEM(const std::string& sPEMString)
+	{
+		if (sPEMString.length() > PEMMAXLENGTH)
+			throw std::runtime_error("invalid PEM string");
+
+		clear();
+
+		m_pIOObject = BIO_new(BIO_s_mem());
+		BIO_write(m_pIOObject, sPEMString.c_str (), (int32_t) sPEMString.length ());
+		BIO_seek(m_pIOObject, 0);
+
+		m_pX509Object = PEM_read_bio_X509(m_pIOObject, nullptr, 0, 0);
+	}
+
+	X509* getCertificate()
+	{
+		if (m_pX509Object == nullptr)
+			throw std::runtime_error("invalid X509 Certificate");
+
+		return m_pX509Object;
+	}
+	
+
+};
+
+
+
+class CServerPrivateKey {
+private:
+	BIO* m_pIOObject;
+	EVP_PKEY* m_pPKeyObject;
+public:
+	CServerPrivateKey()
+		: m_pIOObject(nullptr), m_pPKeyObject(nullptr)
+	{
+
+	}
+
+	~CServerPrivateKey()
+	{
+		clear();
+	}
+
+	void clear()
+	{
+		if (m_pPKeyObject != nullptr) {
+			EVP_PKEY_free(m_pPKeyObject);
+			m_pPKeyObject = nullptr;
+		}
+
+		if (m_pIOObject != nullptr) {
+			BIO_free(m_pIOObject);
+			m_pIOObject = nullptr;
+		}
+
+	}
+
+	void setPEM(const std::string& sPEMString)
+	{
+		if (sPEMString.length() > PEMMAXLENGTH)
+			throw std::runtime_error("invalid PEM string");
+
+		clear();
+
+		m_pIOObject = BIO_new(BIO_s_mem());
+		BIO_write(m_pIOObject, sPEMString.c_str(), (int32_t)sPEMString.length());
+		BIO_seek(m_pIOObject, 0);
+
+		m_pPKeyObject = PEM_read_bio_PrivateKey(m_pIOObject, nullptr, 0, 0);
+
+	}
+
+	EVP_PKEY* getPrivateKey()
+	{
+		if (m_pPKeyObject == nullptr)
+			throw std::runtime_error("invalid Private Key");
+
+		return m_pPKeyObject;
+	}
+
+
+};
+
+#endif // _WIN32
 
 CServer::CServer(PServerIO pServerIO)
 	: m_pServerIO (pServerIO)
@@ -58,158 +178,209 @@ CServer::CServer(PServerIO pServerIO)
 
 CServer::~CServer()
 {
+	m_pContext = nullptr;
+	m_pWrapper = nullptr;
+	m_pDataModel = nullptr;
+	m_pDataWrapper = nullptr;
 
 }
 
 void CServer::executeBlocking(const std::string& sConfigurationFileName)
 {
-	uint32_t nMajorDataVersion = 0;
-	uint32_t nMinorDataVersion = 0;
-	uint32_t nMicroDataVersion = 0;
-
-	uint32_t nMajorFrameworkVersion = 0;
-	uint32_t nMinorFrameworkVersion = 0;
-	uint32_t nMicroFrameworkVersion = 0;
-
-	log("Loading server configuration...");
-
-	std::string sConfigurationXML = m_pServerIO->readConfigurationXMLString(sConfigurationFileName);
-	m_pServerConfiguration = std::make_shared<CServerConfiguration>(sConfigurationXML);
-
-	log("Loading data model...");
-
-	m_pDataWrapper = LibMCData::CWrapper::loadLibrary(m_pServerConfiguration->getLibraryPath ("datamodel"));
-	m_pDataWrapper->GetVersion(nMajorDataVersion, nMinorDataVersion, nMicroDataVersion);
-	log("Found data model interface " + std::to_string (nMajorDataVersion) + "." + std::to_string (nMinorDataVersion) + "." + std::to_string (nMicroDataVersion));
-
-	m_pDataModel = m_pDataWrapper->CreateDataModelInstance();
-
-	log("Initialising Database...");
-	m_pDataModel->InitialiseDatabase(m_pServerConfiguration->getDataDirectory(), m_pServerConfiguration->getDataBaseType(), m_pServerConfiguration->getConnectionString());
-
-	log("Loading framework...");
-	m_pWrapper = LibMC::CWrapper::loadLibrary(m_pServerConfiguration->getLibraryPath ("core"));
-	m_pWrapper->GetVersion(nMajorFrameworkVersion, nMinorFrameworkVersion, nMicroFrameworkVersion);
-	log("Found data model interface " + std::to_string(nMajorFrameworkVersion) + "." + std::to_string(nMinorFrameworkVersion) + "." + std::to_string(nMicroFrameworkVersion));
-
-	m_pWrapper->InjectComponent("LibMCData", m_pDataWrapper->GetSymbolLookupMethod());
-
-	log("Initializing framework...");
-	auto pContext = m_pWrapper->CreateMCContext(m_pDataModel);
-
-	//Register Library Path
-	auto libraryList = m_pServerConfiguration->getLibraryNames();
-	for (auto sLibraryName : libraryList) {
-		pContext->RegisterLibraryPath(sLibraryName, m_pServerConfiguration->getLibraryPath(sLibraryName), m_pServerConfiguration->getResourcePath(sLibraryName));
-	}
-
-	pContext->Log ("Loading " + m_pServerConfiguration->getPackageName () + " (" + m_pServerConfiguration->getPackageConfig () + ")", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
-	std::string sPackageConfigurationXML = m_pServerIO->readConfigurationXMLString(m_pServerConfiguration->getPackageConfig());
-
-	pContext->Log("Parsing package configuration", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
-	pContext->ParseConfiguration(sPackageConfigurationXML);
-
-	pContext->Log("Loading " + m_pServerConfiguration->getPackageCoreClient() + "...", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
-	pContext->LoadClientPackage(m_pServerConfiguration->getPackageCoreClient ());
-
-	pContext->StartAllThreads();
-
-
-	std::string sHostName = m_pServerConfiguration->getHostName();
-	uint32_t nPort = m_pServerConfiguration->getPort();
-
-
+	m_pContext = nullptr;
+	m_pWrapper = nullptr;
+	m_pDataModel = nullptr;
+	m_pDataWrapper = nullptr;
 
 	try {
+		uint32_t nMajorDataVersion = 0;
+		uint32_t nMinorDataVersion = 0;
+		uint32_t nMicroDataVersion = 0;
 
-		httplib::Server svr;
+		uint32_t nMajorFrameworkVersion = 0;
+		uint32_t nMinorFrameworkVersion = 0;
+		uint32_t nMicroFrameworkVersion = 0;
+
+		log("Loading server configuration...");
+
+		std::string sConfigurationXML = m_pServerIO->readConfigurationString(sConfigurationFileName);
+		m_pServerConfiguration = std::make_shared<CServerConfiguration>(sConfigurationXML, m_pServerIO);
+
+		log("Loading data model...");
+
+		m_pDataWrapper = LibMCData::CWrapper::loadLibrary(m_pServerConfiguration->getLibraryPath("datamodel"));
+		m_pDataWrapper->GetVersion(nMajorDataVersion, nMinorDataVersion, nMicroDataVersion);
+		log("Found data model interface " + std::to_string(nMajorDataVersion) + "." + std::to_string(nMinorDataVersion) + "." + std::to_string(nMicroDataVersion));
+
+		m_pDataModel = m_pDataWrapper->CreateDataModelInstance();
+
+		m_pDataModel->SetBaseTempDirectory(m_pServerConfiguration->getBaseTempDirectory ());
+
+		log("Initialising Database...");
+		m_pDataModel->InitialiseDatabase(m_pServerConfiguration->getDataDirectory(), m_pServerConfiguration->getDataBaseType(), m_pServerConfiguration->getConnectionString());
+
+		log("Loading framework...");
+		m_pWrapper = LibMC::CWrapper::loadLibrary(m_pServerConfiguration->getLibraryPath("core"));
+		m_pWrapper->GetVersion(nMajorFrameworkVersion, nMinorFrameworkVersion, nMicroFrameworkVersion);
+		log("Found framework interface " + std::to_string(nMajorFrameworkVersion) + "." + std::to_string(nMinorFrameworkVersion) + "." + std::to_string(nMicroFrameworkVersion));
+
+		m_pWrapper->InjectComponent("LibMCData", m_pDataWrapper->GetSymbolLookupMethod());
+
+		log("Initializing framework...");
+		m_pContext = m_pWrapper->CreateMCContext(m_pDataModel);
+
+		//Register Library Path
+		auto libraryList = m_pServerConfiguration->getLibraryNames();
+		for (auto sLibraryName : libraryList) {
+			m_pContext->RegisterLibraryPath(sLibraryName, m_pServerConfiguration->getLibraryPath(sLibraryName), m_pServerConfiguration->getResourcePath(sLibraryName));
+		}
+
+		m_pContext->Log("Loading " + m_pServerConfiguration->getPackageName() + " (" + m_pServerConfiguration->getPackageConfig() + ")", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
+		std::string sPackageConfigurationXML = m_pServerIO->readConfigurationString(m_pServerConfiguration->getPackageConfig());
+
+		m_pContext->Log("Parsing package configuration", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
+		m_pContext->ParseConfiguration(sPackageConfigurationXML);
+
+		m_pContext->Log("Loading " + m_pServerConfiguration->getPackageCoreClient() + "...", LibMC::eLogSubSystem::System, LibMC::eLogLevel::Message);
+		m_pContext->LoadClientPackage(m_pServerConfiguration->getPackageCoreClient());
 
 
-		auto requestHandler = [this, pContext](const httplib::Request& req, httplib::Response& res) {
-			try {
+		std::string sHostName = m_pServerConfiguration->getHostName();
+		uint32_t nPort = m_pServerConfiguration->getPort();
 
-				std::string sAuthorization = std::string(req.get_header_value("authorization"));
-				std::string sURL = std::string(req.path);
-				std::string sMethod = req.method;
+		m_pContext->StartAllThreads();
 
-				std::vector <uint8_t> Buffer;
-				std::vector <uint8_t> ResultBuffer;
-				std::string sContentType;
-				uint32_t nHttpCode;
+		try {
 
-				auto pHandler = pContext->CreateAPIRequestHandler(sURL, sMethod, sAuthorization);
+			auto requestHandler = [this](const httplib::Request& req, httplib::Response& res) {
+				try {
 
-				uint32_t nFieldCount = 0;
-				if (pHandler->ExpectsFormData(nFieldCount)) {
-					for (uint32_t nIndex = 0; nIndex < nFieldCount; nIndex++) {
-						std::string sName;
-						bool bIsFile = false;
-						bool bIsMandatory = false;
-						pHandler->GetFormDataDetails(nIndex, sName, bIsFile, bIsMandatory);
+					std::string sAuthorization = std::string(req.get_header_value("authorization"));
+					std::string sURL = std::string(req.path);
+					std::string sMethod = req.method;
 
-						if (bIsFile) {
-							auto pFormData = req.get_file_value(sName.c_str());
-							std::vector <uint8_t> FormData(pFormData.content.begin(), pFormData.content.end());
-							pHandler->SetFormDataField(sName, FormData);
-						}
-						else {
-							auto pFormData = req.get_file_value(sName.c_str());
-							pHandler->SetFormStringField(sName, pFormData.content);
+					std::vector <uint8_t> Buffer;
+					std::vector <uint8_t> ResultBuffer;
+					std::string sContentType;
+					uint32_t nHttpCode;
+
+					auto pHandler = m_pContext->CreateAPIRequestHandler(sURL, sMethod, sAuthorization);
+
+					uint32_t nFieldCount = 0;
+					if (pHandler->ExpectsFormData(nFieldCount)) {
+						for (uint32_t nIndex = 0; nIndex < nFieldCount; nIndex++) {
+							std::string sName;
+							bool bIsFile = false;
+							bool bIsMandatory = false;
+							pHandler->GetFormDataDetails(nIndex, sName, bIsFile, bIsMandatory);
+
+							if (bIsFile) {
+								auto pFormData = req.get_file_value(sName.c_str());
+								std::vector <uint8_t> FormData(pFormData.content.begin(), pFormData.content.end());
+								pHandler->SetFormDataField(sName, FormData);
+							}
+							else {
+								auto pFormData = req.get_file_value(sName.c_str());
+								pHandler->SetFormStringField(sName, pFormData.content);
+							}
 						}
 					}
+
+					if (pHandler->ExpectsRawBody()) {
+						auto body = req.body;
+						Buffer.reserve(body.length());
+						for (auto c : body)
+							Buffer.push_back((uint8_t)c);
+					}
+
+
+					pHandler->Handle(Buffer, sContentType, nHttpCode);
+
+					pHandler->GetResultData(ResultBuffer);
+
+					if (!ResultBuffer.empty()) {
+						std::string sResult(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());
+
+						res.set_content(sResult, sContentType.c_str());
+
+					}
+					else {
+						res.set_content("", sContentType.c_str());
+					}
+
+					res.status = nHttpCode;
+
 				}
-
-				if (pHandler->ExpectsRawBody()) {
-					auto body = req.body;
-					Buffer.reserve(body.length());
-					for (auto c : body)
-						Buffer.push_back((uint8_t)c);
+				catch (std::exception& E) {
+					this->log("Internal server error: " + std::string(E.what()));
+					res.status = 500;
+					res.set_content("Internal Server Error", "text/plain");
 				}
+				catch (...) {
+					this->log("Internal server error (Unknown)");
+
+					res.status = 500;
+					res.set_content("Internal Server Error", "text/plain");
+				}
+			};
 
 
-				pHandler->Handle(Buffer, sContentType, nHttpCode);
+			if (m_pServerConfiguration->useSSL()) {
 
-				pHandler->GetResultData(ResultBuffer);
+#ifdef _WIN32
 
-				if (!ResultBuffer.empty()) {
-					std::string sResult(reinterpret_cast<char*>(ResultBuffer.data()), ResultBuffer.size());
+				CX509Certificate serverCertificate;
+				CServerPrivateKey privateKey;
 
-					res.set_content(sResult, sContentType.c_str());
+				try {
+					serverCertificate.setPEM(m_pServerConfiguration->getServerCertificatePEM());
+					privateKey.setPEM(m_pServerConfiguration->getServerPrivateKeyPEM());
+
+					httplib::SSLServer sslsvr(serverCertificate.getCertificate(), privateKey.getPrivateKey());
+
+					sslsvr.Get("(.*?)", requestHandler);
+					sslsvr.Post("(.*?)", requestHandler);
+					sslsvr.Put("(.*?)", requestHandler);
+					sslsvr.listen(sHostName.c_str(), nPort);
+					m_pContext->TerminateAllThreads();
 
 				}
-				else {
-					res.set_content("", sContentType.c_str());
+				catch (std::exception & E) {
+					this->log("Fatal error: " + std::string(E.what()));
+
+					m_pContext->TerminateAllThreads();
+					throw;
 				}
+#else
+				throw std::runtime_error("SSL support is not implemented on this platform!");
 
-				res.status = nHttpCode;
-
+#endif // _WIN32
 			}
-			catch (std::exception & E) {
-				this->log("Internal server error: " + std::string (E.what()));
-				res.status = 500;
-				res.set_content("Internal Server Error", "text/plain");
+			else {
+
+				httplib::Server svr;
+				svr.Get("(.*?)", requestHandler);
+				svr.Post("(.*?)", requestHandler);
+				svr.Put("(.*?)", requestHandler);
+				svr.listen(sHostName.c_str(), nPort);
+
+				m_pContext->TerminateAllThreads();
 			}
-			catch (...) {
-				this->log("Internal server error (Unknown)");
 
-				res.status = 500;
-				res.set_content("Internal Server Error", "text/plain");
-			}
-		};
-		
-		
+			
 
-		svr.Get("(.*?)", requestHandler);
-		svr.Post("(.*?)", requestHandler);
-		svr.Put("(.*?)", requestHandler);
+			this->log("Failed to listen on " + sHostName + ":" + std::to_string(nPort));
 
-		svr.listen(sHostName.c_str(), nPort);
+		}
+		catch (std::exception& E) {
 
-		this->log("Failed to listen on " + sHostName + ":" + std::to_string(nPort));
+			this->log("Fatal error while listening on " + sHostName + ":" + std::to_string(nPort));
+			this->log(E.what());
+		}
+
 	}
 	catch (std::exception& E) {
-		this->log("Fatal error while listening on " + sHostName + ":" + std::to_string(nPort));
-		this->log(E.what());
+		this->log("Fatal initialization error: " + std::string (E.what ()));
 	}
 }
 

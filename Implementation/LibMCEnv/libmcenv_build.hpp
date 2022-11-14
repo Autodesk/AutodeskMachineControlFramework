@@ -77,6 +77,10 @@ public:
 
 	LibMCEnv_uint32 GetLayerCount() override;
 
+	LibMCEnv_double GetBuildHeightInMM() override;
+
+	LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) override;
+
 	void LoadToolpath() override;
 
 	void UnloadToolpath() override;

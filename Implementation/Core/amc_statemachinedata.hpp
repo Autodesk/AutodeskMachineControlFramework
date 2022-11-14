@@ -66,7 +66,7 @@ namespace AMC {
 		void setInstanceStateName(const std::string& sInstanceName, const std::string& sInstanceState);
 		std::string getInstanceStateName(const std::string& sInstanceName);
 
-		static void extractParameterDetailsFromDotString(const std::string& sParameterPath, std::string& sParameterInstance, std::string& sParameterGroup, std::string& sParameterName);
+		static void extractParameterDetailsFromDotString(const std::string& sParameterPath, std::string& sParameterInstance, std::string& sParameterGroup, std::string& sParameterName, bool allowEmptyParameterName, bool allowNonAlphaNumericNames);
 
 	};
 

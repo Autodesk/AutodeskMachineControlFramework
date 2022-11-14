@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_dynamic.hpp"
 
+#define AMCPACKAGE_SCHEMANAMESPACE "http://schemas.autodesk.com/amc/resourcepackage/2020/07"
+
 namespace AMC {
 
 	typedef void* HDriverHandle;

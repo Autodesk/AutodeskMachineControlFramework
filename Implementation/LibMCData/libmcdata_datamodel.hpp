@@ -65,6 +65,8 @@ protected:
 	std::string m_sInstallationUUID;
 	std::string m_sInstallationSecret;
 
+	std::string m_sTempBasePath;
+
 public:
 
 	CDataModel();
@@ -84,6 +86,10 @@ public:
 	ILoginHandler* CreateLoginHandler() override;
 
 	IPersistencyHandler* CreatePersistencyHandler() override;
+
+	void SetBaseTempDirectory(const std::string& sTempDirectory) override;
+
+	std::string GetBaseTempDirectory() override;
 
 };
 

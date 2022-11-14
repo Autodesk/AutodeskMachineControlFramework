@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include <pugixml.hpp>
+#include "amc_server_io.hpp"
 
 using namespace AMC;
 
@@ -62,9 +63,13 @@ std::string CServerLibrary::getResourcePath()
 	return m_sResourcePath;
 }
 
-CServerConfiguration::CServerConfiguration(const std::string& configurationXMLString)
-	: m_nPort(0), m_DataBaseType(LibMCData::eDataBaseType::Unknown)
+CServerConfiguration::CServerConfiguration(const std::string& configurationXMLString, PServerIO pServerIO)
+	: m_nPort(0), m_DataBaseType(LibMCData::eDataBaseType::Unknown), m_bUseSSL (false)
 {
+
+	if (pServerIO.get() == nullptr)
+		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "Invalid server IO");
+
 	pugi::xml_document xmlDoc;
 	pugi::xml_parse_result result = xmlDoc.load_string(configurationXMLString.c_str());
 	if (!result)
@@ -93,7 +98,6 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 	if (m_sHostName.empty())
 		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGHOSTNAME, "Missing host name");
 
-
 	auto portAttrib = serverNode.attribute("port");
 	if (portAttrib.empty())
 		throw LibMC::ELibMCException(LIBMC_ERROR_MISSINGPORT, "Missing port");
@@ -101,7 +105,37 @@ CServerConfiguration::CServerConfiguration(const std::string& configurationXMLSt
 	if ((m_nPort < 0x0400) || (m_nPort > 0xBFFF)) 
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPORT, "Invalid port: " + std::string (portAttrib.as_string ()));
 
+	auto tempFolderAttrib = serverNode.attribute("tempfolder");
+	m_sBaseTempDirectory = tempFolderAttrib.as_string();
 
+	auto sslAttrib = serverNode.attribute("ssl");
+	m_bUseSSL = sslAttrib.as_bool(false);
+
+	auto certificateNode = serverNode.child("certificate");
+	if (!certificateNode.empty()) {
+		m_sServerCertificatePEM = certificateNode.text().as_string();
+	}
+
+	auto certificateFileAttrib = serverNode.attribute("certificatefile");
+	if (!certificateFileAttrib.empty()) {
+		if (!m_sServerCertificatePEM.empty ())
+			throw LibMC::ELibMCException(LIBMC_ERROR_DUPLICATESERVERCERTIFICATE, "Duplicate server certificate");
+
+		m_sServerCertificatePEM = pServerIO->readConfigurationString(certificateFileAttrib.as_string ());
+	}
+
+	auto privateKeyNode = serverNode.child("privatekey");
+	if (!privateKeyNode.empty()) {
+		m_sServerPrivateKeyPEM = privateKeyNode.text().as_string();
+	}
+
+	auto privatekeyFileAttrib = serverNode.attribute("privatekeyfile");
+	if (!privatekeyFileAttrib.empty()) {
+		if (!m_sServerPrivateKeyPEM.empty())
+			throw LibMC::ELibMCException(LIBMC_ERROR_DUPLICATESERVERPRIVATEKEY, "Duplicate server private key");
+
+		m_sServerPrivateKeyPEM = pServerIO->readConfigurationString(privatekeyFileAttrib.as_string());
+	}
 
 	auto dataNode = amcNode.child("data");
 	if (dataNode.empty())
@@ -194,6 +228,11 @@ std::string CServerConfiguration::getPackageCoreClient()
 std::string CServerConfiguration::getPackageConfig()
 {
 	return m_sPackageConfig;
+}
+
+std::string CServerConfiguration::getBaseTempDirectory()
+{
+	return m_sBaseTempDirectory;
 }
 
 std::string CServerConfiguration::getLibraryPath(const std::string& sLibraryName)
@@ -292,3 +331,19 @@ void CServerConfiguration::loadPackageXML(const std::string sPackageFileName)
 	}
 
 }
+
+bool CServerConfiguration::useSSL()
+{
+	return m_bUseSSL;
+}
+
+std::string CServerConfiguration::getServerCertificatePEM()
+{
+	return m_sServerCertificatePEM;
+}
+
+std::string CServerConfiguration::getServerPrivateKeyPEM()
+{
+	return m_sServerPrivateKeyPEM;
+}
+

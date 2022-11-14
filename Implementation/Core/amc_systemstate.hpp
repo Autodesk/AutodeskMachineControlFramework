@@ -103,10 +103,11 @@ namespace AMC {
 
 		std::string m_sInstallationUUID;
 		std::string m_sInstallationSecret;		
+		std::string m_sTestEnvironmentPath;
 
 
 	public:
-		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper);
+		CSystemState(AMC::PLogger pLogger, LibMCData::PDataModel pDataModel, LibMCEnv::PWrapper pEnvWrapper, const std::string & sTestEnvironmentPath);
 
 		virtual ~CSystemState();
 
@@ -143,6 +144,9 @@ namespace AMC {
 		std::string getInstallationUUID(); // Returns a unique UUID of the installation
 		std::string getInstallationSecret(); // Returns a unique Secret SHA256 String of the installation. MUST NOT be shared externally.
 		std::string getGitHash();
+		std::string getClientHash();
+
+		std::string getTestEnvironmentPath();
 
 
 

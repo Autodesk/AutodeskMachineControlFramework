@@ -452,7 +452,34 @@
 		<error name="MISSINGLIBRARYNAME" code="425" description="Missing library name" />
 		<error name="MISSINGLIBRARYIMPORTNAME" code="426" description="Missing library import name" />
 		<error name="DUPLICATELIBRARYNAME" code="427" description="Duplicate library name" />
-
+		
+		<error name="INVALIDTRANSFORMINTERVAL" code="428" description="Invalid transform interval" />
+		<error name="INVALIDTRANSFORMCOORDINATE" code="429" description="Invalid transform coordinate" />		
+		<error name="SUCCESSSTATENOTFOUND" code="430" description="success state not found" />
+		
+		<error name="DUPLICATESERVERPRIVATEKEY" code="431" description="duplicate server private key" />
+		<error name="DUPLICATESERVERCERTIFICATE" code="432" description="duplicate server certificate" />
+		
+		<error name="INVALIDGITHASH" code="433" description="Invalid git hash" />
+		<error name="COULDNOTPARSETESTDEFINITION" code="434" description="Could not parse test definition." />
+		<error name="MISSINGTESTDEFINITIONNODE" code="435" description="Missing test definition node." />
+		
+		<error name="AMBIGIOUSMAINNODE" code="436" description="Ambigious main node" />
+		<error name="MISSINGMAINNODE" code="437" description="Missing main node" />
+		<error name="MISSINGLIBRARIESNODE" code="438" description="Missing libraries node" />
+		<error name="MISSINGLIBRARYDLLFILENAME" code="439" description="Missing library dll filename" />
+		<error name="MISSINGTESTDESCRIPTION" code="440" description="Missing test description" />
+		<error name="MISSINGTESTINSTANCENAME" code="441" description="Missing test instance name" />
+		<error name="TESTDEFINITIONHASNOINSTANCES" code="442" description="Test definition has no instances" />
+		
+		<error name="INVALIDPACKAGEENTRYNAME" code="443" description="Invalid package entry name" />
+		<error name="INVALIDPACKAGEENTRYEXTENSION" code="444" description="Invalid package entry name" />
+		<error name="INVALIDPACKAGEENTRYFILENAME" code="445" description="Invalid package entry file name" />
+		
+		<error name="INVALIDEXPRESSIONVALUE" code="446" description="Invalid expression value" />
+		<error name="INVALIDBUTTONNAME" code="447" description="Invalid button name" />
+		
+		
 		  
 	</errors>
 	
@@ -471,10 +498,9 @@
 	<enum name="LogSubSystem">
 		<option name="System" value="1"/>
 		<option name="Network" value="2"/>
+		<option name="Testing" value="3"/>
 	</enum>	
 
-
-		
 		
 	<class name="Base">
 	</class>
@@ -543,6 +569,29 @@
 		</method>
 
 		<method name="TerminateAllThreads" description="terminates the threads for all the state machines.">
+		</method>
+
+		<method name="StartInstanceThread" description="starts a single instance thread.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to start." />
+		</method>
+
+		<method name="TerminateInstanceThread" description="terminates a single instance thread.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine to terminate." />
+		</method>
+
+		<method name="GetInstanceThreadState" description="returns current state of a instance thread.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
+			<param name="StateName" type="string" pass="return" description="State of state machine." />
+		</method>
+
+		<method name="InstanceStateIsSuccessful" description="returns if an instance thread is in success state.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
+			<param name="IsSuccessful" type="bool" pass="return" description="State of state machine is in success state." />
+		</method>
+
+		<method name="InstanceStateHasFailed" description="returns if an instance thread is in failure state.">
+			<param name="InstanceName" type="string" pass="in" description="Instance name of state machine." />
+			<param name="IsSuccessful" type="bool" pass="return" description="State of state machine is in failure state." />
 		</method>
 		
 		<method name="LoadClientPackage" description="load a client package to serve the client website.">

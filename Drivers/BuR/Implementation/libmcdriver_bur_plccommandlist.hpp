@@ -75,9 +75,6 @@ private:
 
     uint32_t m_ListIdentifier;
 
-    std::list<std::promise<uint8_t>> m_receivedListStatus;
-    std::future<uint8_t> receiveListStatus();
-
     bool m_bIsSimulationMode;
 
 protected:
@@ -99,6 +96,8 @@ public:
 	void PauseList() override;
 
 	void ResumeList() override;
+
+    uint8_t receiveListStatus();
 
 };
 

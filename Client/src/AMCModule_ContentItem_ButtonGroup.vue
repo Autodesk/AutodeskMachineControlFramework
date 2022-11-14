@@ -5,8 +5,10 @@
 	
 		<span :key="button.name" v-on:click.stop="uiModuleButtonClick (button);">	
 			<v-btn color="primary" class="ml-1 mr-1" v-bind:style="moduleitem.buttoncssstyle" >
+				<v-icon v-if="button.icon">{{ button.icon }}</v-icon>
 				{{ button.caption }}
-			</v-btn>			
+			</v-btn>		
+				
 		</span>
 		
 		

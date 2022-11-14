@@ -39,7 +39,28 @@ using namespace LibMCUI::Impl;
 #pragma warning(disable : 4250)
 #endif
 
+/*************************************************************************************************************************
+ Class declaration of CEvent_Logout
+**************************************************************************************************************************/
 
+class CEvent_Logout : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "logout";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Logout");
+		pUIEnvironment->LogOut();
+
+	}
+
+};
 
 /*************************************************************************************************************************
  Class declaration of CEvent_StartBuildPreparation
@@ -441,6 +462,10 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;	
 	if (createEventInstanceByName<CEvent_NewLayerStarted>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_Logout>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	
 	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);

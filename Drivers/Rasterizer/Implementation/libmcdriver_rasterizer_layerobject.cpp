@@ -35,7 +35,7 @@ Abstract: This is a stub class definition of CLayerObject
 #include "libmcdriver_rasterizer_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#include <cmath>
 
 using namespace LibMCDriver_Rasterizer::Impl;
 
@@ -54,6 +54,65 @@ LibMCDriver_Rasterizer::eGeometryType CLayerDataEntity::getGeometryType()
 std::vector<LibMCDriver_Rasterizer::sPosition2D>& CLayerDataEntity::getPoints()
 {
 	return m_Points;
+}
+
+uint64_t CLayerDataEntity::calculateClosedPolygonLineCount()
+{
+
+	switch (m_GeometryType) {
+	case eGeometryType::SolidGeometry:
+		return m_Points.size();
+	default:
+		return 0;
+	}
+
+}
+
+void CLayerDataEntity::addClosedPolygonsToAlgorithm(CRasterizationAlgorithm* pAlgorithm, double dUnitsX, double dUnitsY)
+{
+	if (dUnitsX <= 0.0)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+	if (dUnitsY <= 0.0)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+	if (pAlgorithm == nullptr)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+
+	auto iIter = m_Points.begin();
+	if (iIter != m_Points.end()) {
+
+		int32_t nX1, nY1, nX2, nY2;
+		int32_t nFirstX, nFirstY;
+
+		switch (m_GeometryType) {
+		
+		case eGeometryType::SolidGeometry:
+			nFirstX = (int32_t) round(iIter->m_Coordinates[0] / dUnitsX);
+			nFirstY = (int32_t) round(iIter->m_Coordinates[1] / dUnitsY);
+
+			nX1 = nFirstX;
+			nY1 = nFirstY;
+			
+			iIter++;
+			while (iIter != m_Points.end()) {
+				nX2 = (int32_t) round(iIter->m_Coordinates[0] / dUnitsX);
+				nY2 = (int32_t) round(iIter->m_Coordinates[1] / dUnitsY);
+				iIter++;
+
+				pAlgorithm->addLine(nX1, nY1, nX2, nY2, 0);
+
+				nX1 = nX2;
+				nY1 = nY2;
+			}
+
+			if ((nX1 != nFirstX) || (nY1 != nFirstY))
+				pAlgorithm->addLine(nX1, nY1, nFirstX, nFirstY, 0);
+
+			break;
+
+		}
+	}
+
+
 }
 
 CLayerDataObject::CLayerDataObject()
@@ -144,6 +203,29 @@ void CLayerDataObject::mergeInto(CLayerDataObject* pOtherDataObject)
 
 
 	}
+}
+
+
+uint64_t CLayerDataObject::calculateClosedPolygonLineCount()
+{
+	uint64_t nLineCount = 0;
+	for (auto& entity : m_Entities)
+		nLineCount += entity.calculateClosedPolygonLineCount();
+
+	return nLineCount;
+}
+
+void CLayerDataObject::addClosedPolygonsToAlgorithm(CRasterizationAlgorithm* pAlgorithm, double dUnitsX, double dUnitsY)
+{
+	if (dUnitsX <= 0.0)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+	if (dUnitsY <= 0.0)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+	if (pAlgorithm == nullptr)
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
+
+	for (auto& entity : m_Entities)
+		entity.addClosedPolygonsToAlgorithm(pAlgorithm, dUnitsX, dUnitsY);
 }
 
 

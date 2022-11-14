@@ -58,7 +58,7 @@ set(CMAKE_CURRENT_PLUGIN_DIR ${CMAKE_FRAMEWORK_DIR}/PluginCpp)
 set(CMAKE_CURRENT_DRIVERHEADER_DIR ${CMAKE_FRAMEWORK_DIR}/HeadersDriver/CppDynamic)
 
 file(STRINGS ${PROJECT_BINARY_DIR}/../../githash.txt GLOBALGITHASH)
-message(STATUS "Global git hash: \"${GLOBALGITHASH}\"")
+message(STATUS "User interface git hash: \"${GLOBALGITHASH}\"")
 
 file(GLOB LIBMCPLUGIN_FRAMEWORK
 	${CMAKE_CURRENT_PLUGIN_DIR}/libmcui*.cpp

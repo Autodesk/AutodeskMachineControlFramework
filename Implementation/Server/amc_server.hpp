@@ -57,6 +57,7 @@ namespace AMC {
 			LibMCData::PDataModel m_pDataModel;
 
 			LibMC::PWrapper m_pWrapper;
+			LibMC::PMCContext m_pContext;
 
 			PServerConfiguration m_pServerConfiguration;
 

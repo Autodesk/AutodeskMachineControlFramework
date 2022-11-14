@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.5)
+
+set(CMAKE_CURRENT_BINDING_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.)
+project(LibMCDriver_ScanLabExample_CPPDynamic)
+set(CMAKE_CXX_STANDARD 11)
+add_executable(LibMCDriver_ScanLabExample_CPPDynamic "${CMAKE_CURRENT_SOURCE_DIR}/LibMCDriver_ScanLab_example.cpp")
+if (UNIX)
+	target_link_libraries(LibMCDriver_ScanLabExample_CPPDynamic ${CMAKE_DL_LIBS})
+endif (UNIX)
+target_include_directories(LibMCDriver_ScanLabExample_CPPDynamic PRIVATE "${CMAKE_CURRENT_BINDING_DIR}")
+target_include_directories(LibMCDriver_ScanLabExample_CPPDynamic PRIVATE "${CMAKE_CURRENT_BINDING_DIR}/../../../LibMCEnv_component/Bindings/CppDynamic")

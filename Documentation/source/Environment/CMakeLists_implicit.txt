@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.5)
+
+set(CMAKE_CURRENT_BINDING_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.)
+project(LibMCEnvExample_CPPImplicit)
+set(CMAKE_CXX_STANDARD 11)
+add_executable(LibMCEnvExample_CPPImplicit "${CMAKE_CURRENT_SOURCE_DIR}/LibMCEnv_example.cpp")
+find_library(LIBMCENVLOCATION libmcenv "${CMAKE_CURRENT_SOURCE_DIR}/../../Implementations/*/*/*")
+target_link_libraries(LibMCEnvExample_CPPImplicit ${LIBMCENVLOCATION})
+target_include_directories(LibMCEnvExample_CPPImplicit PRIVATE "${CMAKE_CURRENT_BINDING_DIR}")

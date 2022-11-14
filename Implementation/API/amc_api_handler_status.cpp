@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Status::CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances, PStateMachineData pStateMachineData)
-	: m_Instances(Instances), m_pStateMachineData (pStateMachineData)
+CAPIHandler_Status::CAPIHandler_Status(std::vector <AMC::PStateMachineInstance>& Instances, PStateMachineData pStateMachineData, const std::string& sClientHash)
+	: CAPIHandler(sClientHash), m_Instances(Instances), m_pStateMachineData (pStateMachineData)
 {
 	LibMCAssertNotNull(pStateMachineData.get());
 	

@@ -40,11 +40,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmc_exceptiontypes.hpp"
 #include "amc_ui_module.hpp"
 #include "amc_resourcepackage.hpp"
+#include "amc_statemachinedata.hpp"
 
 #include "libmcdata_dynamic.hpp"
+#include <cmath>
+
+#define SVGIMAGELINEARMOTION_MININTERVALRANGE 0.0001
+
+#define SVGIMAGELINEARMOTION_INVALIDINTERVAL -1E9
+#define SVGIMAGELINEARMOTION_MININTERVAL -1E8
+#define SVGIMAGELINEARMOTION_MAXINTERVAL +1E8
+
+#define SVGIMAGELINEARMOTION_INVALIDCOORDINATE -1E7
+#define SVGIMAGELINEARMOTION_MINCOORDINATE -1E6
+#define SVGIMAGELINEARMOTION_MAXCOORDINATE +1E6
 
 
 using namespace AMC;
+
+CUIModule_GraphicSVGImageLinearMotion::CUIModule_GraphicSVGImageLinearMotion(const pugi::xml_node& xmlNode, const std::string& sItemPath, PStateMachineData pMachineData)
+{
+	LibMCAssertNotNull(pMachineData);
+
+	m_sParameter = xmlNode.attribute("parameter").as_string();
+	if (m_sParameter.empty())
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAMETERPATH, sItemPath);
+
+	// Make sure parameter exists
+	getParameterValue(pMachineData);
+
+	m_dFrom = xmlNode.attribute("from").as_double(SVGIMAGELINEARMOTION_INVALIDINTERVAL);
+	if ((m_dFrom < SVGIMAGELINEARMOTION_MININTERVAL) || (m_dFrom > SVGIMAGELINEARMOTION_MAXINTERVAL))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDTRANSFORMINTERVAL, sItemPath);
+
+	m_dTo = xmlNode.attribute("to").as_double(SVGIMAGELINEARMOTION_INVALIDINTERVAL);
+	if ((m_dTo < SVGIMAGELINEARMOTION_MININTERVAL) || (m_dTo > SVGIMAGELINEARMOTION_MAXINTERVAL))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDTRANSFORMINTERVAL, sItemPath);
+
+	m_dDeltaX = xmlNode.attribute("deltax").as_double(SVGIMAGELINEARMOTION_INVALIDCOORDINATE);
+	if ((m_dDeltaX < SVGIMAGELINEARMOTION_MINCOORDINATE) || (m_dDeltaX > SVGIMAGELINEARMOTION_MAXCOORDINATE))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDTRANSFORMCOORDINATE, sItemPath);
+
+	m_dDeltaY = xmlNode.attribute("deltay").as_double(SVGIMAGELINEARMOTION_INVALIDCOORDINATE);
+	if ((m_dDeltaY < SVGIMAGELINEARMOTION_MINCOORDINATE) || (m_dDeltaY > SVGIMAGELINEARMOTION_MAXCOORDINATE))
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDTRANSFORMCOORDINATE, sItemPath);
+
+}
+
+CUIModule_GraphicSVGImageLinearMotion::~CUIModule_GraphicSVGImageLinearMotion()
+{
+
+}
+
+double CUIModule_GraphicSVGImageLinearMotion::getParameterValue(PStateMachineData pMachineData)
+{
+	LibMCAssertNotNull(pMachineData);
+
+	std::string sInstanceName, sGroupName, sParameterName;
+	pMachineData->extractParameterDetailsFromDotString(m_sParameter, sInstanceName, sGroupName, sParameterName, false, false);
+	auto pParameterHandler = pMachineData->getParameterHandler(sInstanceName);
+	auto pParameterGroup = pParameterHandler->findGroup(sGroupName, true);
+	return pParameterGroup->getDoubleParameterValueByName(sParameterName);
+}
+
+void CUIModule_GraphicSVGImageLinearMotion::transformPosition(double& dPositionX, double& dPositionY, PStateMachineData pMachineData)
+{
+	LibMCAssertNotNull(pMachineData);
+	double dInterval = (m_dTo - m_dFrom);
+	if (abs(dInterval) > SVGIMAGELINEARMOTION_MININTERVALRANGE) {
+
+		double dValue = getParameterValue(pMachineData);
+		double dLambda = (dValue - m_dFrom) / dInterval;
+		if (dLambda < 0.0)
+			dLambda = 0.0;
+		if (dLambda > 1.0)
+			dLambda = 1.0;
+
+		dPositionX += m_dDeltaX * dLambda;
+		dPositionY += m_dDeltaY * dLambda;
+
+	}
+}
+
 
 PUIModule_GraphicSVGImage CUIModule_GraphicSVGImage::makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment)
 {
@@ -59,6 +136,14 @@ PUIModule_GraphicSVGImage CUIModule_GraphicSVGImage::makeFromXML(const pugi::xml
 	CUIExpression angle(xmlNode, "angle", "0.0");
 
 	auto pItem = std::make_shared <CUIModule_GraphicSVGImage>(resourceName, x, y, z, scaleX, scaleY, angle, sItemName, sModulePath, pUIModuleEnvironment);
+
+	auto children = xmlNode.children();
+	for (auto xmlChild : children) {
+		std::string sChildName = xmlChild.name();
+		if (sChildName == "linearmotion")
+			pItem->addTransform(std::make_shared<CUIModule_GraphicSVGImageLinearMotion>(xmlChild, pItem->getItemPath(), pUIModuleEnvironment->stateMachineData ()));
+	}
+
 	return pItem;
 }
 
@@ -98,10 +183,22 @@ void CUIModule_GraphicSVGImage::addContentToJSON(CJSONWriter& writer, CJSONWrite
 		object.addString(AMC_API_KEY_UI_ITEMIMAGEUUID, pResourceEntry->getUUID());
 	}
 
-	object.addDouble(AMC_API_KEY_UI_ITEMX, m_X.evaluateNumberValue(pStateMachineData));
-	object.addDouble(AMC_API_KEY_UI_ITEMY, m_Y.evaluateNumberValue(pStateMachineData));
+	double dX = m_X.evaluateNumberValue(pStateMachineData);
+	double dY = m_Y.evaluateNumberValue(pStateMachineData);
+
+	for (auto pTransform : m_Transforms)
+		pTransform->transformPosition(dX, dY, pStateMachineData);
+
+	object.addDouble(AMC_API_KEY_UI_ITEMX, dX);
+	object.addDouble(AMC_API_KEY_UI_ITEMY, dY);
 	object.addDouble(AMC_API_KEY_UI_ITEMZ, m_Z.evaluateNumberValue(pStateMachineData));
 	object.addDouble(AMC_API_KEY_UI_ITEMSCALEX, m_ScaleX.evaluateNumberValue(pStateMachineData));
 	object.addDouble(AMC_API_KEY_UI_ITEMSCALEY, m_ScaleY.evaluateNumberValue(pStateMachineData));
 	object.addDouble(AMC_API_KEY_UI_ITEMANGLE, m_Angle.evaluateNumberValue(pStateMachineData));
+}
+
+void CUIModule_GraphicSVGImage::addTransform(PUIModule_GraphicSVGImageTransform pTransform)
+{
+	LibMCAssertNotNull(pTransform);
+	m_Transforms.push_back(pTransform);
 }

@@ -44,7 +44,7 @@ namespace AMC {
 			
 	public:
 
-		CAPIHandler_Logs(PLogger pLogger);
+		CAPIHandler_Logs(PLogger pLogger, const std::string & sClientHash);
 
 		virtual ~CAPIHandler_Logs();
 				

@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash)
-	: m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash)
+CAPIHandler_Auth::CAPIHandler_Auth(PAPISessionHandler pSessionHandler, LibMCData::PLoginHandler pLoginHandler, const std::string& sInstallationSecret, const std::string& sGitHash, const std::string& sClientHash)
+	: CAPIHandler (sClientHash), m_pSessionHandler(pSessionHandler), m_pLoginHandler (pLoginHandler), m_sInstallationSecret(sInstallationSecret), m_sGitHash (sGitHash)
 {
 
 	if (pSessionHandler.get() == nullptr)

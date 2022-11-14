@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_build.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_testenvironment.hpp"
 
 #include "amc_logger.hpp"
 #include "amc_driverhandler.hpp"
@@ -372,4 +373,14 @@ IImageData* CStateEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSize
 IImageData* CStateEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
 {
 	return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
+LibMCEnv_uint64 CStateEnvironment::GetGlobalTimerInMilliseconds()
+{
+	return m_pSystemState->getGlobalChronoInstance()->getExistenceTimeInMilliseconds();
+}
+
+ITestEnvironment* CStateEnvironment::GetTestEnvironment()
+{
+	return new CTestEnvironment(m_pSystemState->getTestEnvironmentPath ());
 }
