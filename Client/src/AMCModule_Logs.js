@@ -33,6 +33,29 @@ import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
 
 
+class AMCApplicationModule_LogItem extends Common.AMCApplicationItem {
+	
+	constructor (moduleInstance, itemUUID) 
+	{
+		super (moduleInstance, itemUUID, "logitem");		
+		this.registerClass ("amcItem_LogItem");
+		this.stateid = 1;
+		
+		this.updateFromJSON ({});
+		
+		this.setRefreshFlag ();
+		
+	}
+		
+	
+	updateFromJSON (updateJSON)
+	{
+		updateJSON;
+	}
+	
+}
+
+
 export default class AMCApplicationModule_Logs extends Common.AMCApplicationModule {
 	
 	constructor (page, moduleJSON) 
@@ -40,7 +63,33 @@ export default class AMCApplicationModule_Logs extends Common.AMCApplicationModu
 		Assert.ObjectValue (moduleJSON);				
 		super (page, moduleJSON.uuid, moduleJSON.type, moduleJSON.name, moduleJSON.caption);		
 		this.registerClass ("amcModule_Logs");
+		
+		this.currentReceiveIndex = 0;
+		
+		this.items = [];
+		
+		alert (moduleJSON.uuid);
+		
+		this.logItem = new AMCApplicationModule_LogItem (this, moduleJSON.uuid);
+		
+		this.items.push (this.logItem);
+		this.page.addItem (this.logItem);
+		
+		this.DisplayItems = [
+		{
+			logIndex: 1,
+			logTime: "13:48:23.231",
+			logText: "Text"
+		}];
+		
 						
 	}
 		
+		
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);
+		Assert.ArrayValue (updateJSON.entries);
+		
+	}
 }

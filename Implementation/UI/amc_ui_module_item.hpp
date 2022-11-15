@@ -60,7 +60,7 @@ namespace AMC {
 
 		virtual std::string findElementPathByUUID(const std::string & sUUID);
 
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler * pClientVariableHandler) = 0;
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler * pClientVariableHandler, uint32_t nStateID) = 0;
 
 		virtual void setEventPayloadValue (const std::string & sEventName, const std::string& sPayloadUUID, const std::string& sPayloadValue, CParameterHandler* pClientVariableHandler);
 

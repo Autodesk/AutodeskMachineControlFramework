@@ -375,7 +375,11 @@ export default class AMCApplication extends Common.AMCObject {
         if (authToken != Common.nullToken ())
             headers.Authorization = "Bearer " + authToken;
 
-        let url = this.API.baseURL + "/ui/contentitem/" + Assert.UUIDValue (item.uuid);
+		let stateidstring = "";
+		if (item.stateid > 0)
+			stateidstring = "?" + item.stateid;
+		
+        let url = this.API.baseURL + "/ui/contentitem/" + Assert.UUIDValue (item.uuid) + stateidstring;
         Axios({
             method: "GET",
             "headers": headers,

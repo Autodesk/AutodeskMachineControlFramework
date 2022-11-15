@@ -4,7 +4,7 @@
 
 		<v-data-table			
 			:headers="Headers"
-			:items="Items"
+			:items="module.DisplayItems"
 			:items-per-page="25"
 			class="elevation-1"
 			dense
@@ -29,123 +29,8 @@
 		
 		data: () => ({
 			Headers: [
-				{ text: 'Date', value: 'logTime', width: "100pt", fixed: true },
-				{ text: 'Time', value: 'logDate', width: "100pt", fixed: true },
+				{ text: 'Time', value: 'logTime', width: "50pt", fixed: true },
 				{ text: 'Text', value: 'logText' },
-			],
-			
-			Items: [ 
-				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},
-				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},
-				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},
-				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},
-				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},
-				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},
-				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				{
-					logTime: "1234",
-					logDate: "XXXX",
-					logText: "TEST"
-				},				
 			],
 			
 			logsAvailable: false,
