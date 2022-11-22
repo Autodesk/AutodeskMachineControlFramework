@@ -219,6 +219,212 @@ LibMCDataResult libmcdata_iterator_count(LibMCData_Iterator pIterator, LibMCData
 
 
 /*************************************************************************************************************************
+ Class implementation for LogEntryList
+**************************************************************************************************************************/
+LibMCDataResult libmcdata_logentrylist_count(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pLogEntryList;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ILogEntryList* pILogEntryList = dynamic_cast<ILogEntryList*>(pIBaseClass);
+		if (!pILogEntryList)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pCount = pILogEntryList->Count();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_logentrylist_getentrybyindex(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nIndex, LibMCData_uint32 * pID, const LibMCData_uint32 nMessageBufferSize, LibMCData_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCData_uint32 nSubSystemBufferSize, LibMCData_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, eLibMCDataLogLevel * pLogLevel, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pLogEntryList;
+
+	try {
+		if (!pID)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pMessageBuffer) && !(pMessageNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pSubSystemBuffer) && !(pSubSystemNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pLogLevel)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pTimestampBuffer) && !(pTimestampNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sMessage("");
+		std::string sSubSystem("");
+		std::string sTimestamp("");
+		ILogEntryList* pILogEntryList = dynamic_cast<ILogEntryList*>(pIBaseClass);
+		if (!pILogEntryList)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pMessageBuffer == nullptr) || (pSubSystemBuffer == nullptr) || (pTimestampBuffer == nullptr);
+		if (isCacheCall) {
+			pILogEntryList->GetEntryByIndex(nIndex, *pID, sMessage, sSubSystem, *pLogLevel, sTimestamp);
+
+			pILogEntryList->_setCache (new ParameterCache_5<LibMCData_uint32, std::string, std::string, LibMCData::eLogLevel, std::string> (*pID, sMessage, sSubSystem, *pLogLevel, sTimestamp));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_5<LibMCData_uint32, std::string, std::string, LibMCData::eLogLevel, std::string>*> (pILogEntryList->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (*pID, sMessage, sSubSystem, *pLogLevel, sTimestamp);
+			pILogEntryList->_setCache (nullptr);
+		}
+		
+		if (pMessageNeededChars)
+			*pMessageNeededChars = (LibMCData_uint32) (sMessage.size()+1);
+		if (pMessageBuffer) {
+			if (sMessage.size() >= nMessageBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iMessage = 0; iMessage < sMessage.size(); iMessage++)
+				pMessageBuffer[iMessage] = sMessage[iMessage];
+			pMessageBuffer[sMessage.size()] = 0;
+		}
+		if (pSubSystemNeededChars)
+			*pSubSystemNeededChars = (LibMCData_uint32) (sSubSystem.size()+1);
+		if (pSubSystemBuffer) {
+			if (sSubSystem.size() >= nSubSystemBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSubSystem = 0; iSubSystem < sSubSystem.size(); iSubSystem++)
+				pSubSystemBuffer[iSubSystem] = sSubSystem[iSubSystem];
+			pSubSystemBuffer[sSubSystem.size()] = 0;
+		}
+		if (pTimestampNeededChars)
+			*pTimestampNeededChars = (LibMCData_uint32) (sTimestamp.size()+1);
+		if (pTimestampBuffer) {
+			if (sTimestamp.size() >= nTimestampBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestamp = 0; iTimestamp < sTimestamp.size(); iTimestamp++)
+				pTimestampBuffer[iTimestamp] = sTimestamp[iTimestamp];
+			pTimestampBuffer[sTimestamp.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_logentrylist_getentrybyid(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nID, const LibMCData_uint32 nMessageBufferSize, LibMCData_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCData_uint32 nSubSystemBufferSize, LibMCData_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, eLibMCDataLogLevel * pLogLevel, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pLogEntryList;
+
+	try {
+		if ( (!pMessageBuffer) && !(pMessageNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pSubSystemBuffer) && !(pSubSystemNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (!pLogLevel)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if ( (!pTimestampBuffer) && !(pTimestampNeededChars) )
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sMessage("");
+		std::string sSubSystem("");
+		std::string sTimestamp("");
+		ILogEntryList* pILogEntryList = dynamic_cast<ILogEntryList*>(pIBaseClass);
+		if (!pILogEntryList)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pMessageBuffer == nullptr) || (pSubSystemBuffer == nullptr) || (pTimestampBuffer == nullptr);
+		if (isCacheCall) {
+			pILogEntryList->GetEntryByID(nID, sMessage, sSubSystem, *pLogLevel, sTimestamp);
+
+			pILogEntryList->_setCache (new ParameterCache_4<std::string, std::string, LibMCData::eLogLevel, std::string> (sMessage, sSubSystem, *pLogLevel, sTimestamp));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_4<std::string, std::string, LibMCData::eLogLevel, std::string>*> (pILogEntryList->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+			cache->retrieveData (sMessage, sSubSystem, *pLogLevel, sTimestamp);
+			pILogEntryList->_setCache (nullptr);
+		}
+		
+		if (pMessageNeededChars)
+			*pMessageNeededChars = (LibMCData_uint32) (sMessage.size()+1);
+		if (pMessageBuffer) {
+			if (sMessage.size() >= nMessageBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iMessage = 0; iMessage < sMessage.size(); iMessage++)
+				pMessageBuffer[iMessage] = sMessage[iMessage];
+			pMessageBuffer[sMessage.size()] = 0;
+		}
+		if (pSubSystemNeededChars)
+			*pSubSystemNeededChars = (LibMCData_uint32) (sSubSystem.size()+1);
+		if (pSubSystemBuffer) {
+			if (sSubSystem.size() >= nSubSystemBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iSubSystem = 0; iSubSystem < sSubSystem.size(); iSubSystem++)
+				pSubSystemBuffer[iSubSystem] = sSubSystem[iSubSystem];
+			pSubSystemBuffer[sSubSystem.size()] = 0;
+		}
+		if (pTimestampNeededChars)
+			*pTimestampNeededChars = (LibMCData_uint32) (sTimestamp.size()+1);
+		if (pTimestampBuffer) {
+			if (sTimestamp.size() >= nTimestampBufferSize)
+				throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_BUFFERTOOSMALL);
+			for (size_t iTimestamp = 0; iTimestamp < sTimestamp.size(); iTimestamp++)
+				pTimestampBuffer[iTimestamp] = sTimestamp[iTimestamp];
+			pTimestampBuffer[sTimestamp.size()] = 0;
+		}
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_logentrylist_hasentry(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nID, bool * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pLogEntryList;
+
+	try {
+		if (pValue == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ILogEntryList* pILogEntryList = dynamic_cast<ILogEntryList*>(pIBaseClass);
+		if (!pILogEntryList)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pValue = pILogEntryList->HasEntry(nID);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for LogSession
 **************************************************************************************************************************/
 LibMCDataResult libmcdata_logsession_addentry(LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, eLibMCDataLogLevel eLogLevel, const char * pTimestamp)
@@ -241,6 +447,60 @@ LibMCDataResult libmcdata_logsession_addentry(LibMCData_LogSession pLogSession, 
 		
 		pILogSession->AddEntry(sMessage, sSubSystem, eLogLevel, sTimestamp);
 
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_logsession_getmaxlogentryid(LibMCData_LogSession pLogSession, LibMCData_uint32 * pMaxLogID)
+{
+	IBase* pIBaseClass = (IBase *)pLogSession;
+
+	try {
+		if (pMaxLogID == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		ILogSession* pILogSession = dynamic_cast<ILogSession*>(pIBaseClass);
+		if (!pILogSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pMaxLogID = pILogSession->GetMaxLogEntryID();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, eLibMCDataLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList)
+{
+	IBase* pIBaseClass = (IBase *)pLogSession;
+
+	try {
+		if (pLogEntryList == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IBase* pBaseLogEntryList(nullptr);
+		ILogSession* pILogSession = dynamic_cast<ILogSession*>(pIBaseClass);
+		if (!pILogSession)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pBaseLogEntryList = pILogSession->RetrieveLogEntriesByID(nMinLogID, nMaxLogID, eMinLogLevel);
+
+		*pLogEntryList = (IBase*)(pBaseLogEntryList);
 		return LIBMCDATA_SUCCESS;
 	}
 	catch (ELibMCDataInterfaceException & Exception) {
@@ -3113,8 +3373,20 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_iterator_clone;
 	if (sProcName == "libmcdata_iterator_count") 
 		*ppProcAddress = (void*) &libmcdata_iterator_count;
+	if (sProcName == "libmcdata_logentrylist_count") 
+		*ppProcAddress = (void*) &libmcdata_logentrylist_count;
+	if (sProcName == "libmcdata_logentrylist_getentrybyindex") 
+		*ppProcAddress = (void*) &libmcdata_logentrylist_getentrybyindex;
+	if (sProcName == "libmcdata_logentrylist_getentrybyid") 
+		*ppProcAddress = (void*) &libmcdata_logentrylist_getentrybyid;
+	if (sProcName == "libmcdata_logentrylist_hasentry") 
+		*ppProcAddress = (void*) &libmcdata_logentrylist_hasentry;
 	if (sProcName == "libmcdata_logsession_addentry") 
 		*ppProcAddress = (void*) &libmcdata_logsession_addentry;
+	if (sProcName == "libmcdata_logsession_getmaxlogentryid") 
+		*ppProcAddress = (void*) &libmcdata_logsession_getmaxlogentryid;
+	if (sProcName == "libmcdata_logsession_retrievelogentriesbyid") 
+		*ppProcAddress = (void*) &libmcdata_logsession_retrievelogentriesbyid;
 	if (sProcName == "libmcdata_storagestream_getuuid") 
 		*ppProcAddress = (void*) &libmcdata_storagestream_getuuid;
 	if (sProcName == "libmcdata_storagestream_gettimestamp") 

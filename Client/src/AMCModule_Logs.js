@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
-
+import { DateTime } from "luxon";
 
 class AMCApplicationModule_LogItem extends Common.AMCApplicationItem {
 	
@@ -50,7 +50,26 @@ class AMCApplicationModule_LogItem extends Common.AMCApplicationItem {
 	
 	updateFromJSON (updateJSON)
 	{
-		updateJSON;
+		if (updateJSON.logentries) {
+			for (let logentry of updateJSON.logentries) {
+				
+				let timeStampInput = logentry.timestamp.replace ("Z UTC", "").trim();
+				let timeStampObject = DateTime.fromISO(timeStampInput, {zone: 'utc'});
+				let timeStampStr = timeStampObject.toFormat('HH:mm:ss.SSS');
+				
+				this.moduleInstance.DisplayItems.unshift ({
+					logIndex: logentry.id,
+					logSubsystem: logentry.subsystem,
+					logTime: timeStampStr,
+					logText: logentry.message
+				});
+				
+				if (logentry.id >= this.stateid) {
+					this.stateid = logentry.id + 1;
+				}
+				
+			}
+		}
 	}
 	
 }
@@ -67,20 +86,14 @@ export default class AMCApplicationModule_Logs extends Common.AMCApplicationModu
 		this.currentReceiveIndex = 0;
 		
 		this.items = [];
-		
-		alert (moduleJSON.uuid);
-		
+				
 		this.logItem = new AMCApplicationModule_LogItem (this, moduleJSON.uuid);
 		
 		this.items.push (this.logItem);
 		this.page.addItem (this.logItem);
 		
 		this.DisplayItems = [
-		{
-			logIndex: 1,
-			logTime: "13:48:23.231",
-			logText: "Text"
-		}];
+		];
 		
 						
 	}

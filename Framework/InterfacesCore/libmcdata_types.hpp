@@ -358,6 +358,7 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDNAMESTRING 331 /** Invalid name string */
 #define LIBMCDATA_ERROR_NAMESTRINGMISMATCH 332 /** Name string mismatch */
 #define LIBMCDATA_ERROR_DATATYPEMISMATCH 333 /** Datatype mismatch */
+#define LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY 334 /** Could not find log entry */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -628,6 +629,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDNAMESTRING: return "Invalid name string";
     case LIBMCDATA_ERROR_NAMESTRINGMISMATCH: return "Name string mismatch";
     case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
+    case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
     default: return "unknown error";
   }
 }
@@ -638,6 +640,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
 
 typedef LibMCDataHandle LibMCData_Base;
 typedef LibMCDataHandle LibMCData_Iterator;
+typedef LibMCDataHandle LibMCData_LogEntryList;
 typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;

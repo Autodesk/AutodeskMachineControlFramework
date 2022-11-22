@@ -88,13 +88,75 @@ typedef LibMCDataResult (*PLibMCDataIterator_GetCurrentPtr) (LibMCData_Iterator 
 typedef LibMCDataResult (*PLibMCDataIterator_ClonePtr) (LibMCData_Iterator pIterator, LibMCData_Iterator * pOutIterator);
 
 /**
-* Returns the number of resoucres the iterator captures.
+* Returns the number of resources the iterator captures.
 *
 * @param[in] pIterator - Iterator instance.
 * @param[out] pCount - returns the number of resources the iterator captures.
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataIterator_CountPtr) (LibMCData_Iterator pIterator, LibMCData_uint64 * pCount);
+
+/*************************************************************************************************************************
+ Class definition for LogEntryList
+**************************************************************************************************************************/
+
+/**
+* Returns the number of log entries in the list.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[out] pCount - returns the number of retrieved log entries.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLogEntryList_CountPtr) (LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 * pCount);
+
+/**
+* Returns a log entry in the list by its index.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nIndex - Index of log entry, 0-based.
+* @param[out] pID - ID of log entry.
+* @param[in] nMessageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMessageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMessageBuffer -  buffer of Log Message, may be NULL
+* @param[in] nSubSystemBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubSystemNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubSystemBuffer -  buffer of Sub System identifier, may be NULL
+* @param[out] pLogLevel - Log Level
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLogEntryList_GetEntryByIndexPtr) (LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nIndex, LibMCData_uint32 * pID, const LibMCData_uint32 nMessageBufferSize, LibMCData_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCData_uint32 nSubSystemBufferSize, LibMCData_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, LibMCData::eLogLevel * pLogLevel, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Returns a log entry in the list by its ID.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nID - ID of log entry.
+* @param[in] nMessageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMessageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMessageBuffer -  buffer of Log Message, may be NULL
+* @param[in] nSubSystemBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubSystemNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubSystemBuffer -  buffer of Sub System identifier, may be NULL
+* @param[out] pLogLevel - Log Level
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLogEntryList_GetEntryByIDPtr) (LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nID, const LibMCData_uint32 nMessageBufferSize, LibMCData_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCData_uint32 nSubSystemBufferSize, LibMCData_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, LibMCData::eLogLevel * pLogLevel, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Returns if a log entry in the list exists.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nID - ID of log entry.
+* @param[out] pValue - Returns if a list exists.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLogEntryList_HasEntryPtr) (LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nID, bool * pValue);
 
 /*************************************************************************************************************************
  Class definition for LogSession
@@ -111,6 +173,27 @@ typedef LibMCDataResult (*PLibMCDataIterator_CountPtr) (LibMCData_Iterator pIter
 * @return error code or 0 (success)
 */
 typedef LibMCDataResult (*PLibMCDataLogSession_AddEntryPtr) (LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestamp);
+
+/**
+* retrieves the maximum log entry ID in the log.
+*
+* @param[in] pLogSession - LogSession instance.
+* @param[out] pMaxLogID - Log entry ID
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLogSession_GetMaxLogEntryIDPtr) (LibMCData_LogSession pLogSession, LibMCData_uint32 * pMaxLogID);
+
+/**
+* retrieves an excerpt of the log.
+*
+* @param[in] pLogSession - LogSession instance.
+* @param[in] nMinLogID - Minimum log entry ID to receive.
+* @param[in] nMaxLogID - Maximum log entry ID to receive. MUST be between (MinLogID + 1) and (MinLogID + 65536).
+* @param[in] eMinLogLevel - Minimum Log Level to return.
+* @param[out] pLogEntryList - Log Entry List.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataLogSession_RetrieveLogEntriesByIDPtr) (LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
 
 /*************************************************************************************************************************
  Class definition for StorageStream
@@ -1053,7 +1136,13 @@ typedef struct {
 	PLibMCDataIterator_GetCurrentPtr m_Iterator_GetCurrent;
 	PLibMCDataIterator_ClonePtr m_Iterator_Clone;
 	PLibMCDataIterator_CountPtr m_Iterator_Count;
+	PLibMCDataLogEntryList_CountPtr m_LogEntryList_Count;
+	PLibMCDataLogEntryList_GetEntryByIndexPtr m_LogEntryList_GetEntryByIndex;
+	PLibMCDataLogEntryList_GetEntryByIDPtr m_LogEntryList_GetEntryByID;
+	PLibMCDataLogEntryList_HasEntryPtr m_LogEntryList_HasEntry;
 	PLibMCDataLogSession_AddEntryPtr m_LogSession_AddEntry;
+	PLibMCDataLogSession_GetMaxLogEntryIDPtr m_LogSession_GetMaxLogEntryID;
+	PLibMCDataLogSession_RetrieveLogEntriesByIDPtr m_LogSession_RetrieveLogEntriesByID;
 	PLibMCDataStorageStream_GetUUIDPtr m_StorageStream_GetUUID;
 	PLibMCDataStorageStream_GetTimeStampPtr m_StorageStream_GetTimeStamp;
 	PLibMCDataStorageStream_GetNamePtr m_StorageStream_GetName;

@@ -71,6 +71,11 @@ public:
 
 	void AddEntry(const std::string& sMessage, const std::string& sSubSystem, const LibMCData::eLogLevel logLevel, const std::string& sTimestamp) override;
 
+	LibMCData_uint32 GetMaxLogEntryID() override;
+
+	ILogEntryList* RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel) override;
+
+
 };
 
 } // namespace Impl

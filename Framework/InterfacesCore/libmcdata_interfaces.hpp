@@ -56,6 +56,7 @@ namespace Impl {
 */
 class IBase;
 class IIterator;
+class ILogEntryList;
 class ILogSession;
 class IStorageStream;
 class IStorage;
@@ -127,6 +128,50 @@ template <class T1, class T2, class T3> class ParameterCache_3 : public Paramete
 			param1 = m_param1;
 			param2 = m_param2;
 			param3 = m_param3;
+		}
+};
+
+template <class T1, class T2, class T3, class T4> class ParameterCache_4 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+	public:
+		ParameterCache_4 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
 		}
 };
 
@@ -278,7 +323,7 @@ public:
 	virtual IIterator * Clone() = 0;
 
 	/**
-	* IIterator::Count - Returns the number of resoucres the iterator captures.
+	* IIterator::Count - Returns the number of resources the iterator captures.
 	* @return returns the number of resources the iterator captures.
 	*/
 	virtual LibMCData_uint64 Count() = 0;
@@ -286,6 +331,51 @@ public:
 };
 
 typedef IBaseSharedPtr<IIterator> PIIterator;
+
+
+/*************************************************************************************************************************
+ Class interface for LogEntryList 
+**************************************************************************************************************************/
+
+class ILogEntryList : public virtual IBase {
+public:
+	/**
+	* ILogEntryList::Count - Returns the number of log entries in the list.
+	* @return returns the number of retrieved log entries.
+	*/
+	virtual LibMCData_uint32 Count() = 0;
+
+	/**
+	* ILogEntryList::GetEntryByIndex - Returns a log entry in the list by its index.
+	* @param[in] nIndex - Index of log entry, 0-based.
+	* @param[out] nID - ID of log entry.
+	* @param[out] sMessage - Log Message
+	* @param[out] sSubSystem - Sub System identifier
+	* @param[out] eLogLevel - Log Level
+	* @param[out] sTimestamp - Timestamp in ISO8601 UTC format
+	*/
+	virtual void GetEntryByIndex(const LibMCData_uint32 nIndex, LibMCData_uint32 & nID, std::string & sMessage, std::string & sSubSystem, LibMCData::eLogLevel & eLogLevel, std::string & sTimestamp) = 0;
+
+	/**
+	* ILogEntryList::GetEntryByID - Returns a log entry in the list by its ID.
+	* @param[in] nID - ID of log entry.
+	* @param[out] sMessage - Log Message
+	* @param[out] sSubSystem - Sub System identifier
+	* @param[out] eLogLevel - Log Level
+	* @param[out] sTimestamp - Timestamp in ISO8601 UTC format
+	*/
+	virtual void GetEntryByID(const LibMCData_uint32 nID, std::string & sMessage, std::string & sSubSystem, LibMCData::eLogLevel & eLogLevel, std::string & sTimestamp) = 0;
+
+	/**
+	* ILogEntryList::HasEntry - Returns if a log entry in the list exists.
+	* @param[in] nID - ID of log entry.
+	* @return Returns if a list exists.
+	*/
+	virtual bool HasEntry(const LibMCData_uint32 nID) = 0;
+
+};
+
+typedef IBaseSharedPtr<ILogEntryList> PILogEntryList;
 
 
 /*************************************************************************************************************************
@@ -302,6 +392,21 @@ public:
 	* @param[in] sTimestamp - Timestamp in ISO8601 UTC format
 	*/
 	virtual void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string & sTimestamp) = 0;
+
+	/**
+	* ILogSession::GetMaxLogEntryID - retrieves the maximum log entry ID in the log.
+	* @return Log entry ID
+	*/
+	virtual LibMCData_uint32 GetMaxLogEntryID() = 0;
+
+	/**
+	* ILogSession::RetrieveLogEntriesByID - retrieves an excerpt of the log.
+	* @param[in] nMinLogID - Minimum log entry ID to receive.
+	* @param[in] nMaxLogID - Maximum log entry ID to receive. MUST be between (MinLogID + 1) and (MinLogID + 65536).
+	* @param[in] eMinLogLevel - Minimum Log Level to return.
+	* @return Log Entry List.
+	*/
+	virtual ILogEntryList * RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel) = 0;
 
 };
 

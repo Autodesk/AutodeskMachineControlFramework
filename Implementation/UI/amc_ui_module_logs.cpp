@@ -69,11 +69,39 @@ std::string CUIModule_LogsItem::findElementPathByUUID(const std::string& sUUID)
 
 void CUIModule_LogsItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
-	auto pGroup = pClientVariableHandler->findGroup(getItemPath (), true);
+	//auto pGroup = pClientVariableHandler->findGroup(getItemPath (), true);
 
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData ();
+	uint32_t nMaxEntriesToRetrieve = 128;
+
+	CJSONWriterArray jsonLogEntryArray(writer);
 
 	auto pLogger = m_pUIModuleEnvironment->getLogger();
+	if (pLogger->supportsLogMessagesRetrieval()) {
+		std::vector<CLoggerEntry> loggerEntries;
+		uint32_t nEndID = pLogger->getLogMessageHeadID();
+		uint32_t nStartID = nStateID;
+		if ((nStartID + nMaxEntriesToRetrieve) < nEndID)
+			nStartID = nEndID - nMaxEntriesToRetrieve;
+
+		pLogger->retrieveLogMessages(loggerEntries, nStartID, nEndID, LibMCData::eLogLevel::Message);
+
+		for (auto loggerEntry : loggerEntries) {
+			CJSONWriterObject jsonEntryObject(writer);
+
+			jsonEntryObject.addInteger (AMC_API_KEY_UI_LOGENTRYID, loggerEntry.getID ());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGSUBSYSTEM, loggerEntry.getSubSystem());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGTIMESTAMP, loggerEntry.getTimeStamp());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGMESSAGE, loggerEntry.getMessage());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGLEVEL, loggerEntry.getlogLevelString());
+
+			jsonLogEntryArray.addObject(jsonEntryObject);
+		}
+
+	}
+
+
+	object.addArray(AMC_API_KEY_UI_LOGENTRIES, jsonLogEntryArray);
 
 }
 

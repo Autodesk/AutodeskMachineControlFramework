@@ -30,6 +30,7 @@
 		data: () => ({
 			Headers: [
 				{ text: 'Time', value: 'logTime', width: "50pt", fixed: true },
+				{ text: 'Subsystem', value: 'logSubsystem', width: "50pt", fixed: true },
 				{ text: 'Text', value: 'logText' },
 			],
 			

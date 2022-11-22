@@ -61,6 +61,7 @@ namespace LibMCData {
 class CWrapper;
 class CBase;
 class CIterator;
+class CLogEntryList;
 class CLogSession;
 class CStorageStream;
 class CStorage;
@@ -79,6 +80,7 @@ class CDataModel;
 typedef CWrapper CLibMCDataWrapper;
 typedef CBase CLibMCDataBase;
 typedef CIterator CLibMCDataIterator;
+typedef CLogEntryList CLibMCDataLogEntryList;
 typedef CLogSession CLibMCDataLogSession;
 typedef CStorageStream CLibMCDataStorageStream;
 typedef CStorage CLibMCDataStorage;
@@ -97,6 +99,7 @@ typedef CDataModel CLibMCDataDataModel;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CIterator> PIterator;
+typedef std::shared_ptr<CLogEntryList> PLogEntryList;
 typedef std::shared_ptr<CLogSession> PLogSession;
 typedef std::shared_ptr<CStorageStream> PStorageStream;
 typedef std::shared_ptr<CStorage> PStorage;
@@ -115,6 +118,7 @@ typedef std::shared_ptr<CDataModel> PDataModel;
 typedef PWrapper PLibMCDataWrapper;
 typedef PBase PLibMCDataBase;
 typedef PIterator PLibMCDataIterator;
+typedef PLogEntryList PLibMCDataLogEntryList;
 typedef PLogSession PLibMCDataLogSession;
 typedef PStorageStream PLibMCDataStorageStream;
 typedef PStorage PLibMCDataStorage;
@@ -467,6 +471,7 @@ public:
 			case LIBMCDATA_ERROR_INVALIDNAMESTRING: return "INVALIDNAMESTRING";
 			case LIBMCDATA_ERROR_NAMESTRINGMISMATCH: return "NAMESTRINGMISMATCH";
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "DATATYPEMISMATCH";
+			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "COULDNOTFINDLOGENTRY";
 		}
 		return "UNKNOWN";
 	}
@@ -737,6 +742,7 @@ public:
 			case LIBMCDATA_ERROR_INVALIDNAMESTRING: return "Invalid name string";
 			case LIBMCDATA_ERROR_NAMESTRINGMISMATCH: return "Name string mismatch";
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
+			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
 		}
 		return "unknown error";
 	}
@@ -856,6 +862,7 @@ private:
 
 	friend class CBase;
 	friend class CIterator;
+	friend class CLogEntryList;
 	friend class CLogSession;
 	friend class CStorageStream;
 	friend class CStorage;
@@ -949,6 +956,26 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CLogEntryList 
+**************************************************************************************************************************/
+class CLogEntryList : public CBase {
+public:
+	
+	/**
+	* CLogEntryList::CLogEntryList - Constructor for LogEntryList class.
+	*/
+	CLogEntryList(CWrapper* pWrapper, LibMCDataHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCData_uint32 Count();
+	inline void GetEntryByIndex(const LibMCData_uint32 nIndex, LibMCData_uint32 & nID, std::string & sMessage, std::string & sSubSystem, eLogLevel & eLogLevel, std::string & sTimestamp);
+	inline void GetEntryByID(const LibMCData_uint32 nID, std::string & sMessage, std::string & sSubSystem, eLogLevel & eLogLevel, std::string & sTimestamp);
+	inline bool HasEntry(const LibMCData_uint32 nID);
+};
+	
+/*************************************************************************************************************************
  Class CLogSession 
 **************************************************************************************************************************/
 class CLogSession : public CBase {
@@ -963,6 +990,8 @@ public:
 	}
 	
 	inline void AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp);
+	inline LibMCData_uint32 GetMaxLogEntryID();
+	inline PLogEntryList RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const eLogLevel eMinLogLevel);
 };
 	
 /*************************************************************************************************************************
@@ -1306,7 +1335,13 @@ public:
 		pWrapperTable->m_Iterator_GetCurrent = nullptr;
 		pWrapperTable->m_Iterator_Clone = nullptr;
 		pWrapperTable->m_Iterator_Count = nullptr;
+		pWrapperTable->m_LogEntryList_Count = nullptr;
+		pWrapperTable->m_LogEntryList_GetEntryByIndex = nullptr;
+		pWrapperTable->m_LogEntryList_GetEntryByID = nullptr;
+		pWrapperTable->m_LogEntryList_HasEntry = nullptr;
 		pWrapperTable->m_LogSession_AddEntry = nullptr;
+		pWrapperTable->m_LogSession_GetMaxLogEntryID = nullptr;
+		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = nullptr;
 		pWrapperTable->m_StorageStream_GetUUID = nullptr;
 		pWrapperTable->m_StorageStream_GetTimeStamp = nullptr;
 		pWrapperTable->m_StorageStream_GetName = nullptr;
@@ -1489,12 +1524,66 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_Count = (PLibMCDataLogEntryList_CountPtr) GetProcAddress(hLibrary, "libmcdata_logentrylist_count");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_Count = (PLibMCDataLogEntryList_CountPtr) dlsym(hLibrary, "libmcdata_logentrylist_count");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_Count == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryByIndex = (PLibMCDataLogEntryList_GetEntryByIndexPtr) GetProcAddress(hLibrary, "libmcdata_logentrylist_getentrybyindex");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryByIndex = (PLibMCDataLogEntryList_GetEntryByIndexPtr) dlsym(hLibrary, "libmcdata_logentrylist_getentrybyindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetEntryByIndex == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryByID = (PLibMCDataLogEntryList_GetEntryByIDPtr) GetProcAddress(hLibrary, "libmcdata_logentrylist_getentrybyid");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_GetEntryByID = (PLibMCDataLogEntryList_GetEntryByIDPtr) dlsym(hLibrary, "libmcdata_logentrylist_getentrybyid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_GetEntryByID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogEntryList_HasEntry = (PLibMCDataLogEntryList_HasEntryPtr) GetProcAddress(hLibrary, "libmcdata_logentrylist_hasentry");
+		#else // _WIN32
+		pWrapperTable->m_LogEntryList_HasEntry = (PLibMCDataLogEntryList_HasEntryPtr) dlsym(hLibrary, "libmcdata_logentrylist_hasentry");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogEntryList_HasEntry == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_LogSession_AddEntry = (PLibMCDataLogSession_AddEntryPtr) GetProcAddress(hLibrary, "libmcdata_logsession_addentry");
 		#else // _WIN32
 		pWrapperTable->m_LogSession_AddEntry = (PLibMCDataLogSession_AddEntryPtr) dlsym(hLibrary, "libmcdata_logsession_addentry");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_LogSession_AddEntry == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogSession_GetMaxLogEntryID = (PLibMCDataLogSession_GetMaxLogEntryIDPtr) GetProcAddress(hLibrary, "libmcdata_logsession_getmaxlogentryid");
+		#else // _WIN32
+		pWrapperTable->m_LogSession_GetMaxLogEntryID = (PLibMCDataLogSession_GetMaxLogEntryIDPtr) dlsym(hLibrary, "libmcdata_logsession_getmaxlogentryid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogSession_GetMaxLogEntryID == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = (PLibMCDataLogSession_RetrieveLogEntriesByIDPtr) GetProcAddress(hLibrary, "libmcdata_logsession_retrievelogentriesbyid");
+		#else // _WIN32
+		pWrapperTable->m_LogSession_RetrieveLogEntriesByID = (PLibMCDataLogSession_RetrieveLogEntriesByIDPtr) dlsym(hLibrary, "libmcdata_logsession_retrievelogentriesbyid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr)
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2307,8 +2396,32 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Iterator_Count == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdata_logentrylist_count", (void**)&(pWrapperTable->m_LogEntryList_Count));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_Count == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_logentrylist_getentrybyindex", (void**)&(pWrapperTable->m_LogEntryList_GetEntryByIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetEntryByIndex == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_logentrylist_getentrybyid", (void**)&(pWrapperTable->m_LogEntryList_GetEntryByID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_GetEntryByID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_logentrylist_hasentry", (void**)&(pWrapperTable->m_LogEntryList_HasEntry));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogEntryList_HasEntry == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdata_logsession_addentry", (void**)&(pWrapperTable->m_LogSession_AddEntry));
 		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_AddEntry == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_logsession_getmaxlogentryid", (void**)&(pWrapperTable->m_LogSession_GetMaxLogEntryID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_GetMaxLogEntryID == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_logsession_retrievelogentriesbyid", (void**)&(pWrapperTable->m_LogSession_RetrieveLogEntriesByID));
+		if ( (eLookupError != 0) || (pWrapperTable->m_LogSession_RetrieveLogEntriesByID == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_storagestream_getuuid", (void**)&(pWrapperTable->m_StorageStream_GetUUID));
@@ -2723,7 +2836,7 @@ public:
 	}
 	
 	/**
-	* CIterator::Count - Returns the number of resoucres the iterator captures.
+	* CIterator::Count - Returns the number of resources the iterator captures.
 	* @return returns the number of resources the iterator captures.
 	*/
 	LibMCData_uint64 CIterator::Count()
@@ -2732,6 +2845,88 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Iterator_Count(m_pHandle, &resultCount));
 		
 		return resultCount;
+	}
+	
+	/**
+	 * Method definitions for class CLogEntryList
+	 */
+	
+	/**
+	* CLogEntryList::Count - Returns the number of log entries in the list.
+	* @return returns the number of retrieved log entries.
+	*/
+	LibMCData_uint32 CLogEntryList::Count()
+	{
+		LibMCData_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_Count(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CLogEntryList::GetEntryByIndex - Returns a log entry in the list by its index.
+	* @param[in] nIndex - Index of log entry, 0-based.
+	* @param[out] nID - ID of log entry.
+	* @param[out] sMessage - Log Message
+	* @param[out] sSubSystem - Sub System identifier
+	* @param[out] eLogLevel - Log Level
+	* @param[out] sTimestamp - Timestamp in ISO8601 UTC format
+	*/
+	void CLogEntryList::GetEntryByIndex(const LibMCData_uint32 nIndex, LibMCData_uint32 & nID, std::string & sMessage, std::string & sSubSystem, eLogLevel & eLogLevel, std::string & sTimestamp)
+	{
+		LibMCData_uint32 bytesNeededMessage = 0;
+		LibMCData_uint32 bytesWrittenMessage = 0;
+		LibMCData_uint32 bytesNeededSubSystem = 0;
+		LibMCData_uint32 bytesWrittenSubSystem = 0;
+		LibMCData_uint32 bytesNeededTimestamp = 0;
+		LibMCData_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntryByIndex(m_pHandle, nIndex, &nID, 0, &bytesNeededMessage, nullptr, 0, &bytesNeededSubSystem, nullptr, &eLogLevel, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferMessage(bytesNeededMessage);
+		std::vector<char> bufferSubSystem(bytesNeededSubSystem);
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntryByIndex(m_pHandle, nIndex, &nID, bytesNeededMessage, &bytesWrittenMessage, &bufferMessage[0], bytesNeededSubSystem, &bytesWrittenSubSystem, &bufferSubSystem[0], &eLogLevel, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		sMessage = std::string(&bufferMessage[0]);
+		sSubSystem = std::string(&bufferSubSystem[0]);
+		sTimestamp = std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CLogEntryList::GetEntryByID - Returns a log entry in the list by its ID.
+	* @param[in] nID - ID of log entry.
+	* @param[out] sMessage - Log Message
+	* @param[out] sSubSystem - Sub System identifier
+	* @param[out] eLogLevel - Log Level
+	* @param[out] sTimestamp - Timestamp in ISO8601 UTC format
+	*/
+	void CLogEntryList::GetEntryByID(const LibMCData_uint32 nID, std::string & sMessage, std::string & sSubSystem, eLogLevel & eLogLevel, std::string & sTimestamp)
+	{
+		LibMCData_uint32 bytesNeededMessage = 0;
+		LibMCData_uint32 bytesWrittenMessage = 0;
+		LibMCData_uint32 bytesNeededSubSystem = 0;
+		LibMCData_uint32 bytesWrittenSubSystem = 0;
+		LibMCData_uint32 bytesNeededTimestamp = 0;
+		LibMCData_uint32 bytesWrittenTimestamp = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntryByID(m_pHandle, nID, 0, &bytesNeededMessage, nullptr, 0, &bytesNeededSubSystem, nullptr, &eLogLevel, 0, &bytesNeededTimestamp, nullptr));
+		std::vector<char> bufferMessage(bytesNeededMessage);
+		std::vector<char> bufferSubSystem(bytesNeededSubSystem);
+		std::vector<char> bufferTimestamp(bytesNeededTimestamp);
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_GetEntryByID(m_pHandle, nID, bytesNeededMessage, &bytesWrittenMessage, &bufferMessage[0], bytesNeededSubSystem, &bytesWrittenSubSystem, &bufferSubSystem[0], &eLogLevel, bytesNeededTimestamp, &bytesWrittenTimestamp, &bufferTimestamp[0]));
+		sMessage = std::string(&bufferMessage[0]);
+		sSubSystem = std::string(&bufferSubSystem[0]);
+		sTimestamp = std::string(&bufferTimestamp[0]);
+	}
+	
+	/**
+	* CLogEntryList::HasEntry - Returns if a log entry in the list exists.
+	* @param[in] nID - ID of log entry.
+	* @return Returns if a list exists.
+	*/
+	bool CLogEntryList::HasEntry(const LibMCData_uint32 nID)
+	{
+		bool resultValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogEntryList_HasEntry(m_pHandle, nID, &resultValue));
+		
+		return resultValue;
 	}
 	
 	/**
@@ -2748,6 +2943,36 @@ public:
 	void CLogSession::AddEntry(const std::string & sMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_AddEntry(m_pHandle, sMessage.c_str(), sSubSystem.c_str(), eLogLevel, sTimestamp.c_str()));
+	}
+	
+	/**
+	* CLogSession::GetMaxLogEntryID - retrieves the maximum log entry ID in the log.
+	* @return Log entry ID
+	*/
+	LibMCData_uint32 CLogSession::GetMaxLogEntryID()
+	{
+		LibMCData_uint32 resultMaxLogID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_GetMaxLogEntryID(m_pHandle, &resultMaxLogID));
+		
+		return resultMaxLogID;
+	}
+	
+	/**
+	* CLogSession::RetrieveLogEntriesByID - retrieves an excerpt of the log.
+	* @param[in] nMinLogID - Minimum log entry ID to receive.
+	* @param[in] nMaxLogID - Maximum log entry ID to receive. MUST be between (MinLogID + 1) and (MinLogID + 65536).
+	* @param[in] eMinLogLevel - Minimum Log Level to return.
+	* @return Log Entry List.
+	*/
+	PLogEntryList CLogSession::RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const eLogLevel eMinLogLevel)
+	{
+		LibMCDataHandle hLogEntryList = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_LogSession_RetrieveLogEntriesByID(m_pHandle, nMinLogID, nMaxLogID, eMinLogLevel, &hLogEntryList));
+		
+		if (!hLogEntryList) {
+			CheckError(LIBMCDATA_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CLogEntryList>(m_pWrapper, hLogEntryList);
 	}
 	
 	/**

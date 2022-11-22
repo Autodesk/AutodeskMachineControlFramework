@@ -377,7 +377,7 @@ export default class AMCApplication extends Common.AMCObject {
 
 		let stateidstring = "";
 		if (item.stateid > 0)
-			stateidstring = "?" + item.stateid;
+			stateidstring = "/" + item.stateid;
 		
         let url = this.API.baseURL + "/ui/contentitem/" + Assert.UUIDValue (item.uuid) + stateidstring;
         Axios({

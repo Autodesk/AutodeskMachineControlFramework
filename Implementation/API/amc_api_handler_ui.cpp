@@ -101,7 +101,7 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			if (sParameterString.substr(0, 13) == "/contentitem/") {
 				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(13, 36));
 				if (sParameterString.length() > 49) {
-					if (sParameterString.at(49) == '?') {
+					if (sParameterString.at(49) == '/') {
 						sParameterStateID = std::stoi(sParameterString.substr (50));
 					}
 				}
