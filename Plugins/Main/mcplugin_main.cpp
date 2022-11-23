@@ -29,6 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "libmcplugin_impl.hpp"
+#include <sstream>
+#include <iomanip>
 
 /*************************************************************************************************************************
   Driver import definition
@@ -47,7 +49,12 @@ __DECLARESTATE(init)
 
 	pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", 0);
 	pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
+	pStateEnvironment->SetDoubleParameter("jobinfo", "totalheight", 0.0);
+	pStateEnvironment->SetDoubleParameter("jobinfo", "currentheight", 0.0);
 	pStateEnvironment->SetBoolParameter("jobinfo", "printinprogress", false);
+
+	pStateEnvironment->SetStringParameter("ui", "currentlayerdisplay", "---");
+	pStateEnvironment->SetStringParameter("ui", "currentheightdisplay", "---");
 
 	pStateEnvironment->SetNextState("idle");
 }
@@ -56,21 +63,17 @@ __DECLARESTATE(init)
 __DECLARESTATE(idle) 
 {
 	PSignalHandler pSignalHandler;
+	pStateEnvironment->SetBoolParameter("ui", "build_canbestarted", true);
 
-	double targetO2 = pStateEnvironment->GetDoubleParameter("processsettings", "targeto2");
-	pStateEnvironment->SetDoubleParameter("processsettings", "targeto2", targetO2 + 1.0);
-
-	pStateEnvironment->SetBoolParameter("ui", "preparebuilddisabled", true);
-
-	pStateEnvironment->LogMessage ("Waiting for user input...");
-	if (pStateEnvironment->WaitForSignal("signal_preparebuildjob", 100, pSignalHandler)) {
+	//pStateEnvironment->LogMessage ("Waiting for user input...");
+	if (pStateEnvironment->WaitForSignal("signal_initjob", 100, pSignalHandler)) {
 		auto sJobUUID = pSignalHandler->GetUUID("jobuuid");
 		pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", sJobUUID);
 		pSignalHandler->SignalHandled();
 
 		pStateEnvironment->LogMessage("Preparing job " + sJobUUID);
 
-		pStateEnvironment->SetNextState("preparebuild");
+		pStateEnvironment->SetNextState("initbuild");
 
 	}
 	else if (pStateEnvironment->WaitForSignal("signal_changesimulationparameters", 100, pSignalHandler)) {
@@ -97,44 +100,6 @@ __DECLARESTATE(idle)
 
 
 
-__DECLARESTATE(preparebuild) 
-{
-	pStateEnvironment->LogMessage("Waiting for build preparation...");
-
-	pStateEnvironment->SetBoolParameter("ui", "preparebuilddisabled", false);
-
-	PSignalHandler pSignalHandler;
-	if (pStateEnvironment->WaitForSignal("signal_cancelbuildpreparation", 100, pSignalHandler)) {
-		pStateEnvironment->SetStringParameter("jobinfo", "jobuuid", "00000000-0000-0000-0000-000000000000");
-		pSignalHandler->SignalHandled();
-		pStateEnvironment->SetNextState("idle");
-
-	}
-	else if (pStateEnvironment->WaitForSignal("signal_changeprocesssettings", 100, pSignalHandler)) {
-		double dTargetO2 = pSignalHandler->GetDouble("targeto2");
-		double dRecoaterSpeed = pSignalHandler->GetDouble("recoaterspeed");
-		double dGasFlowSpeed = pSignalHandler->GetDouble("gasflowspeed");
-		pSignalHandler->SignalHandled();
-
-		pStateEnvironment->SetDoubleParameter("processsettings", "targeto2", dTargetO2);
-		pStateEnvironment->SetDoubleParameter("processsettings", "recoaterspeed", dRecoaterSpeed);
-		pStateEnvironment->SetDoubleParameter("processsettings", "gasflowspeed", dGasFlowSpeed);
-
-		pStateEnvironment->LogMessage("Updated process Parameters!");
-
-		pStateEnvironment->SetNextState("preparebuild");
-
-	}
-	else if (pStateEnvironment->WaitForSignal("signal_startbuild", 100, pSignalHandler)) {
-		pSignalHandler->SignalHandled();
-		pStateEnvironment->SetNextState("initbuild");
-
-	}
-	else {
-		pStateEnvironment->SetNextState("preparebuild");
-	}
-}
-
 
 
 __DECLARESTATE(initbuild) 
@@ -147,17 +112,31 @@ __DECLARESTATE(initbuild)
 	pBuildJob->LoadToolpath();
 
 	auto sJobName = pBuildJob->GetName();
+	double dTotalHeight = 0.0;
 	auto nLayerCount = pBuildJob->GetLayerCount();
+	{
+		dTotalHeight = pBuildJob->GetBuildHeightInMM();
+	}
 
 	pStateEnvironment->LogMessage("Job Name: " + sJobName);
 	pStateEnvironment->LogMessage("Layer Count: " + std::to_string (nLayerCount));
 
-	pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 0);
+	pStateEnvironment->SetStringParameter("jobinfo", "jobname", sJobName);
+	pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", 1);
 	pStateEnvironment->SetIntegerParameter("jobinfo", "layercount", nLayerCount);
+	pStateEnvironment->SetDoubleParameter("jobinfo", "currentheight", 0.0);
+	pStateEnvironment->SetDoubleParameter("jobinfo", "totalheight", dTotalHeight);
 
-	pStateEnvironment->Sleep(1000);
+	//pStateEnvironment->SetBoolParameter("ui", "build_canbepaused", true);
+	pStateEnvironment->SetBoolParameter("ui", "build_canbecanceled", true);
+	pStateEnvironment->SetBoolParameter("ui", "build_canbestarted", false);
+
+	pStateEnvironment->SetStringParameter("ui", "currentlayerdisplay", "initializing");
+	pStateEnvironment->SetStringParameter("ui", "currentheightdisplay", "initializing");
+
+	pStateEnvironment->Sleep(500);
 	pStateEnvironment->LogMessage("Waiting for atmosphere...");
-	pStateEnvironment->Sleep(3000);
+	pStateEnvironment->Sleep(1000);
 
 	pStateEnvironment->SetNextState("beginlayer");
 
@@ -169,6 +148,28 @@ __DECLARESTATE(beginlayer)
 	auto nLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
 	pStateEnvironment->LogMessage("Starting layer " + std::to_string (nLayer));
 
+	auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
+	auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
+	auto dTotalHeight = pStateEnvironment->GetDoubleParameter("jobinfo", "totalheight");
+
+	double dCurrentHeight = 0.0;
+
+	{
+		auto pBuildJob = pStateEnvironment->GetBuildJob(sJobUUID);
+		auto pAccessor = pBuildJob->CreateToolpathAccessor();
+		auto pLayer = pAccessor->LoadLayer((uint32_t) nLayer);
+		dCurrentHeight = pLayer->GetZValue() * pAccessor->GetUnits();
+	}
+
+	std::stringstream sLayerDisplay, sHeightDisplay;
+	sLayerDisplay << nLayer << " / " << nLayerCount;
+	sHeightDisplay << std::setprecision(4) << dCurrentHeight << " mm" << " / " << std::setprecision(4) << dTotalHeight << " mm";
+
+	pStateEnvironment->SetDoubleParameter("jobinfo", "currentheight", dCurrentHeight);
+	pStateEnvironment->SetStringParameter("ui", "currentlayerdisplay", sLayerDisplay.str ());
+	pStateEnvironment->SetStringParameter("ui", "currentheightdisplay", sHeightDisplay.str ());
+
+
 	pStateEnvironment->SetNextState("recoatlayer");
 }
 
@@ -179,7 +180,6 @@ __DECLARESTATE(recoatlayer)
 	pStateEnvironment->LogMessage("Recoating layer...");
 		
 	auto nRecoatingTimeOut = pStateEnvironment->GetIntegerParameter("jobinfo", "recoatingtimeout");
-
 	auto pSignal = pStateEnvironment->PrepareSignal("plc", "signal_recoatlayer");
 	pSignal->Trigger();
 
@@ -188,6 +188,7 @@ __DECLARESTATE(recoatlayer)
 		if (pSignal->GetBoolResult("success")) {
 
 			pStateEnvironment->LogMessage("Recoating successful...");
+
 			pStateEnvironment->SetNextState("exposelayer");
 		}
 		else {
@@ -215,23 +216,59 @@ __DECLARESTATE(exposelayer)
 
 	auto sJobUUID = pStateEnvironment->GetStringParameter("jobinfo", "jobuuid");
 	auto nCurrentLayer = pStateEnvironment->GetIntegerParameter("jobinfo", "currentlayer");
+	auto nLayerCount = pStateEnvironment->GetIntegerParameter("jobinfo", "layercount");
 	auto nExposureTimeOut = pStateEnvironment->GetIntegerParameter("jobinfo", "exposuretimeout");
 
-	auto pSignal = pStateEnvironment->PrepareSignal("laser", "signal_exposure");
-	pSignal->SetString("jobuuid", sJobUUID);
-	pSignal->SetInteger("layerindex", nCurrentLayer);
-	pSignal->SetInteger("timeout", nExposureTimeOut);
-	pSignal->Trigger();
+	if (nCurrentLayer < nLayerCount) {
 
-	if (pSignal->WaitForHandling((uint32_t)nExposureTimeOut)) {
-		pStateEnvironment->LogMessage("Layer successfully exposed...");
-		pStateEnvironment->SetNextState("finishlayer");
+		pStateEnvironment->LogMessage("Setting laser pointer on...");
+		auto pLaserOnSignal = pStateEnvironment->PrepareSignal("plc", "signal_laserpointer");
+		pLaserOnSignal->SetBool("laseron", true);
+		pLaserOnSignal->Trigger();
+
+		if (!pLaserOnSignal->WaitForHandling((uint32_t)nExposureTimeOut)) {
+			if (pLaserOnSignal->GetBoolResult("success") == false) {
+				pStateEnvironment->LogMessage("Could not set laser pointer on...");
+				pStateEnvironment->SetNextState("fatalerror");
+				return;
+			}
+		}
+
+		auto pExposureSignal = pStateEnvironment->PrepareSignal("laser", "signal_exposure");
+		pExposureSignal->SetString("jobuuid", sJobUUID);
+		pExposureSignal->SetInteger("layerindex", nCurrentLayer);
+		pExposureSignal->SetInteger("timeout", nExposureTimeOut);
+		pExposureSignal->Trigger();
+
+		if (pExposureSignal->WaitForHandling((uint32_t)nExposureTimeOut)) {
+			pStateEnvironment->LogMessage("Layer successfully exposed...");
+
+		}
+		else {
+			pStateEnvironment->LogMessage("Layer exposure failed...");
+			pStateEnvironment->SetNextState("fatalerror");
+			return;
+		}
+
+		pStateEnvironment->LogMessage("Setting laser pointer off...");
+		auto pLaserOffSignal = pStateEnvironment->PrepareSignal("plc", "signal_laserpointer");
+		pLaserOffSignal->SetBool("laseron", false);
+		pLaserOffSignal->Trigger();
+
+		if (!pLaserOffSignal->WaitForHandling((uint32_t)nExposureTimeOut)) {
+			if (pLaserOffSignal->GetBoolResult("success") == false) {
+				pStateEnvironment->LogMessage("Could not set laser pointer off...");
+				pStateEnvironment->SetNextState("fatalerror");
+				return;
+			}
+		}
 
 	}
 	else {
-		pStateEnvironment->LogMessage("Layer exposure failed...");
-		pStateEnvironment->SetNextState("fatalerror");
+		pStateEnvironment->LogMessage("Last layer is recoated only.");
 	}
+
+	pStateEnvironment->SetNextState("finishlayer");
 
 }
 
@@ -249,7 +286,23 @@ __DECLARESTATE(finishlayer)
 	pStateEnvironment->SetIntegerParameter("jobinfo", "currentlayer", nLayer);
 
 	if (nLayer < nLayerCount) {
-		pStateEnvironment->SetNextState("beginlayer");
+		PSignalHandler pSignalHandler;
+			pStateEnvironment->SetNextState("cancelbuild");
+		if (pStateEnvironment->WaitForSignal("signal_cancelbuild", 100, pSignalHandler)) {
+
+			pStateEnvironment->SetNextState("cancelbuild");
+
+		} else if (pStateEnvironment->WaitForSignal("signal_pausebuild", 100, pSignalHandler)) {
+
+			pStateEnvironment->SetNextState("buildpaused");
+
+		}
+		else {
+
+			pStateEnvironment->SetNextState("beginlayer");
+
+		}
+
 	}
 	else {
 		pStateEnvironment->SetNextState("finishbuild");
@@ -264,6 +317,12 @@ __DECLARESTATE(finishbuild)
 	pStateEnvironment->LogMessage("Finishing Build...");
 	pStateEnvironment->LogMessage("Turning laser off...");
 	pStateEnvironment->Sleep(1000);
+
+	pStateEnvironment->SetStringParameter("ui", "currentlayerdisplay", "finished");
+	pStateEnvironment->SetStringParameter("ui", "currentheightdisplay", "finished");
+	pStateEnvironment->SetBoolParameter("ui", "build_canbepaused", false);
+	pStateEnvironment->SetBoolParameter("ui", "build_canbecanceled", false);
+	pStateEnvironment->SetBoolParameter("ui", "build_canbestarted", true);
 
 	pStateEnvironment->SetNextState("idle");
 }
@@ -283,6 +342,9 @@ __DECLARESTATE(fatalerror)
 	// Unload all toolpathes that might be in memory
 	pStateEnvironment->UnloadAllToolpathes();
 
+	pStateEnvironment->SetBoolParameter("ui", "build_canbepaused", false);
+	pStateEnvironment->SetBoolParameter("ui", "build_canbecanceled", false);
+
 	pStateEnvironment->SetNextState("fatalerror");
 
 }
@@ -293,6 +355,11 @@ __DECLARESTATE(cancelbuild)
 	pStateEnvironment->LogMessage("Canceling Build...");
 	pStateEnvironment->LogMessage("Turning laser off...");
 	pStateEnvironment->Sleep(1000);
+
+	pStateEnvironment->SetStringParameter("ui", "currentlayerdisplay", "canceled");
+	pStateEnvironment->SetStringParameter("ui", "currentheightdisplay", "canceled");
+	pStateEnvironment->SetBoolParameter("ui", "build_canbepaused", false);
+	pStateEnvironment->SetBoolParameter("ui", "build_canbecanceled", false);
 
 	pStateEnvironment->SetNextState("idle");
 }

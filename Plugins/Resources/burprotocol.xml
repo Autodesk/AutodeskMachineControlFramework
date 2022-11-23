@@ -9,18 +9,7 @@
 	<machinestatus>
 
 		<dint name="journalindex" address="0" description="Journal Index" />
-		<real name="position_x" address="4" description="Position X" />
-		<real name="position_y" address="8" description="Position Y" />
-		<real name="position_z" address="12" description="Position Z" />
-		<real name="position_e" address="16" description="Position Extruder" />
-		<real name="actvelocity" address="20" description="Current velocity" />
-		<bool name="ready" address="24" description="Printer is ready" />
-		<bool name="turnedon" address="25" description="Printer is turned on" />
-		<bool name="referenced" address="26" description="Printer is referenced" />
-		<bool name="commandactive" address="27" description="Printer command is active" />
-		<bool name="inmotion" address="28" description="Printer is in motion" />
-		
-		
+		<dint name="cyclecounter" address="4" description="Cycle Counter" />		
 	</machinestatus>
 
 
@@ -29,40 +18,25 @@
 		<command name="home" id="1025">			
 		</command>	
 
-		<command name="move" id="1026">	
-			<dint name="targetx" description="Target X Position in microns" address="0" />		
-			<dint name="targety" description="Target Y Position in microns" address="4" />		
-			<dint name="targetz" description="Target Z Position in microns" address="8" />		
-			<dint name="targete" description="Target E Position in microns" address="12" />		
-			<dint name="velocity" description="Velocity in microns per second" address="16" />
-		</command>	
-		
-		<command name="jump" id="1027">			
-			<dint name="targetx" description="Target X Position in microns" address="0" />		
-			<dint name="targety" description="Target Y Position in microns" address="4" />		
-			<dint name="targetz" description="Target Z Position in microns" address="8" />		
-			<dint name="targete" description="Target E Position in microns" address="12" />		
-			<dint name="velocity" description="Velocity in microns per second" address="16" />
-		</command>	
-		
-		<command name="settemperature" id="1028">			
-		</command>	
-		
-		<command name="waitfortemperature" id="1029">			
-		</command>		
-
-		<command name="shutdown" id="1030">			
-		</command>		
-
-		<command name="setfanspeed" id="1031">			
-		</command>		
-
 		<command name="turnon" id="1032">			
-		</command>		
-
-		<command name="setledstate" id="1033">			
-		</command>		
+		</command>	
 		
+		<command name="moverecoater" id="2002">			
+			<dint name="targetposition" address="0" description="Recoater target position in micron" />
+			<dint name="targetspeed" address="4" description="Recoater target speed in micron per seconds" />
+			<dint name="acceleration" address="8" description="Recoater acceleration in micron per seconds squared" />
+		</command>	
+		
+		<command name="movepowder" id="2000">			
+			<dint name="targetposition" address="0" description="Powder feeder target position in micron" />
+			<dint name="targetspeed" address="4" description="Powder feeder target speed in micron per seconds" />
+			<dint name="acceleration" address="8" description="Powder feeder acceleration in micron per seconds squared" />
+		</command>			
+
+		<command name="setlaserpointer" id="2004">			
+			<dint name="laseron" address="0" description="Laser pointer On" />
+		</command>	
+	
 	</commands>
 
 
