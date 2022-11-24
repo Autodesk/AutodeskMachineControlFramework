@@ -90,6 +90,10 @@ void CDriver_Raylase::QueryParameters()
 {
 }
 
+void CDriver_Raylase::SetCustomSDKResource(const std::string& sResourceName)
+{
+    m_sSDKResourceNameOverride = sResourceName;
+}
 
 
 void CDriver_Raylase::LoadSDK()
@@ -98,24 +102,49 @@ void CDriver_Raylase::LoadSDK()
     m_pSDKClientLib = nullptr;
     m_pSDKWorkingDirectory = nullptr;
 
-    m_pSDKWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-    std::string sDLLFileName = "RAYLASE.SPICE3.Native.ClientLib.dll";
-
-    
 #ifdef _WIN32
-    std::string sResourceName = "raylase_clientlib_win";
+    std::string sDLLFileName = "RAYLASE.SPICE3.Native.ClientLib.dll";
 #else
-    std::string sResourceName = "raylase_clientlib_linux";
+    std::string sDLLFileName = "RAYLASE.SPICE3.Native.ClientLib.so";
 #endif
 
-    if (sizeof(size_t) == sizeof(uint64_t)) {
-        sResourceName += "64";
+    m_pSDKWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
+
+    std::string sResourceName;
+    if (m_sSDKResourceNameOverride.empty()) {
+
+#ifdef _WIN32
+        sResourceName = "raylase_clientlib_win";
+#else
+        sResourceName = "raylase_clientlib_linux";
+#endif
+
+        if (sizeof(size_t) == sizeof(uint64_t)) {
+            sResourceName += "64";
+        }
+        else {
+            sResourceName += "32";
+        }
     }
     else {
-        sResourceName += "32";
+        sResourceName = m_sSDKResourceNameOverride;
     }
 
-    m_pSDKClientLib = m_pSDKWorkingDirectory->StoreDriverData(sDLLFileName, sResourceName);
+    if (m_pDriverEnvironment->MachineHasResourceData(sResourceName)) {
+        std::vector<uint8_t> SDKData;
+
+        if (SDKData.empty())
+            throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK);
+        m_pDriverEnvironment->RetrieveMachineResourceData(sResourceName, SDKData);
+
+        m_pSDKClientLib = m_pSDKWorkingDirectory->StoreCustomData(sDLLFileName, SDKData);
+    }
+    else {
+        m_pSDKClientLib = m_pSDKWorkingDirectory->StoreDriverData(sDLLFileName, sResourceName);
+    }
+
+    if (m_pSDKClientLib->GetSize() == 0)
+        throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK);
 
     m_pRayLaseSDK = std::make_shared<CRaylaseSDK>(m_pSDKClientLib->GetAbsoluteFileName());
 

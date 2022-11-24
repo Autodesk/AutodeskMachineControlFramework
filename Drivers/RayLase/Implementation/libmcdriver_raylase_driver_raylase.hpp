@@ -66,6 +66,8 @@ protected:
 
     bool m_bSimulationMode;
 
+    std::string m_sSDKResourceNameOverride;
+
     LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
     LibMCEnv::PWorkingDirectory m_pSDKWorkingDirectory;
@@ -89,6 +91,8 @@ public:
     void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
 
     void QueryParameters() override;
+
+    void SetCustomSDKResource(const std::string& sResourceName) override;
 
 	void LoadSDK() override;
 

@@ -681,6 +681,33 @@ LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_issimulationmode(Li
 	}
 }
 
+LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_setcustomsdkresource(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pResourceName)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_Raylase;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCDriver_RaylaseInterfaceException (LIBMCDRIVER_RAYLASE_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		IDriver_Raylase* pIDriver_Raylase = dynamic_cast<IDriver_Raylase*>(pIBaseClass);
+		if (!pIDriver_Raylase)
+			throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDCAST);
+		
+		pIDriver_Raylase->SetCustomSDKResource(sResourceName);
+
+		return LIBMCDRIVER_RAYLASE_SUCCESS;
+	}
+	catch (ELibMCDriver_RaylaseInterfaceException & Exception) {
+		return handleLibMCDriver_RaylaseException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_loadsdk(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_Raylase;
@@ -823,6 +850,8 @@ LibMCDriver_RaylaseResult LibMCDriver_Raylase::Impl::LibMCDriver_Raylase_GetProc
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_raylase_settosimulationmode;
 	if (sProcName == "libmcdriver_raylase_driver_raylase_issimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_raylase_issimulationmode;
+	if (sProcName == "libmcdriver_raylase_driver_raylase_setcustomsdkresource") 
+		*ppProcAddress = (void*) &libmcdriver_raylase_driver_raylase_setcustomsdkresource;
 	if (sProcName == "libmcdriver_raylase_driver_raylase_loadsdk") 
 		*ppProcAddress = (void*) &libmcdriver_raylase_driver_raylase_loadsdk;
 	if (sProcName == "libmcdriver_raylase_driver_raylase_connectbyip") 

@@ -243,6 +243,15 @@ typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_SetToSimu
 typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, bool * pIsSimulationMode);
 
 /**
+* Sets the machine resource name of the SDK to load. MUST be called before LoadSDK or it has no effect.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pResourceName - Resource name of core machine package. Empty means standard naming applies.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_RaylaseResult (*PLibMCDriver_RaylaseDriver_Raylase_SetCustomSDKResourcePtr) (LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pResourceName);
+
+/**
 * Initializes the Raylase SDK.
 *
 * @param[in] pDriver_Raylase - Driver_Raylase instance.
@@ -368,6 +377,7 @@ typedef struct {
 	PLibMCDriver_RaylaseRaylaseCard_DrawLayerPtr m_RaylaseCard_DrawLayer;
 	PLibMCDriver_RaylaseDriver_Raylase_SetToSimulationModePtr m_Driver_Raylase_SetToSimulationMode;
 	PLibMCDriver_RaylaseDriver_Raylase_IsSimulationModePtr m_Driver_Raylase_IsSimulationMode;
+	PLibMCDriver_RaylaseDriver_Raylase_SetCustomSDKResourcePtr m_Driver_Raylase_SetCustomSDKResource;
 	PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPtr m_Driver_Raylase_LoadSDK;
 	PLibMCDriver_RaylaseDriver_Raylase_ConnectByIPPtr m_Driver_Raylase_ConnectByIP;
 	PLibMCDriver_RaylaseDriver_Raylase_GetConnectedCardPtr m_Driver_Raylase_GetConnectedCard;

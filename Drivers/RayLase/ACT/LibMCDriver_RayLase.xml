@@ -59,6 +59,7 @@
 		<error name="CARDNOTREGISTERED" code="1006" description="Card not registered" />	
 		<error name="INVALIDPOINTCOUNT" code="1007" description="Invalid point count" />
 		<error name="INVALIDLASERPOWER" code="1008" description="Invalid laser power" />
+		<error name="INVALIDRAYLASESDK" code="1009" description="Invalid Raylase SDK" />		
 				
 	</errors>
 
@@ -188,6 +189,10 @@ Custom implementation
 
 		<method name="IsSimulationMode" description="Returns if the driver is in Simulation mode.">
 			<param name="IsSimulationMode" type="bool" pass="return" description="Simulation mode is active." />
+		</method>
+
+		<method name="SetCustomSDKResource" description="Sets the machine resource name of the SDK to load. MUST be called before LoadSDK or it has no effect.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name of core machine package. Empty means standard naming applies." />
 		</method>
 
 		<method name="LoadSDK" description="Initializes the Raylase SDK.">
