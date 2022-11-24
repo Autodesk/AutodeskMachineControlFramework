@@ -261,33 +261,6 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 		
 		writer.addArray(AMC_API_KEY_UI_EVENTACTIONS, actionsArray);
 
-		/*if (pEventResult.closeModalDialog()) {
-			writer.addInteger(AMC_API_KEY_UI_EVENTCLOSEDIALOGS, 1);
-		}
-		else {
-			if (pEventResult.hasDialogToShow()) {
-				std::string sDialogName = pEventResult.getDialogToShow();
-				writer.addString(AMC_API_KEY_UI_EVENTDIALOGTOSHOW, sDialogName);
-
-				// Update state of dialog to open
-				auto pDialog = pUIHandler->findDialog(sDialogName);
-				if (pDialog) {
-					pDialog->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
-				}
-			}
-		}
-		if (pEventResult.hasPageToActivate()) {
-			std::string sPageName = pEventResult.getPageToActivate();
-			writer.addString(AMC_API_KEY_UI_EVENTPAGETOACTIVATE, sPageName);
-
-			// Update state of page to open
-			auto pPage = pUIHandler->findPage(sPageName);
-			if (pPage) {
-				pPage->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
-			}
-
-		} */
-
 		
 	}
 

@@ -638,6 +638,32 @@ public:
 	*/
 	virtual IToolpathPart * FindPartByUUID(const std::string & sPartUUID) = 0;
 
+	/**
+	* IToolpathAccessor::GetBuildHeightInUnits - Retrieves the build height in units.
+	* @return Build height in units.
+	*/
+	virtual LibMCEnv_int32 GetBuildHeightInUnits() = 0;
+
+	/**
+	* IToolpathAccessor::GetZValueInUnits - Retrieves the layers Z Value in units.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in units.
+	*/
+	virtual LibMCEnv_int32 GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex) = 0;
+
+	/**
+	* IToolpathAccessor::GetBuildHeightInMM - Retrieves the build height in mm.
+	* @return Build height in mm.
+	*/
+	virtual LibMCEnv_double GetBuildHeightInMM() = 0;
+
+	/**
+	* IToolpathAccessor::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in mm.
+	*/
+	virtual LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) = 0;
+
 };
 
 typedef IBaseSharedPtr<IToolpathAccessor> PIToolpathAccessor;
@@ -924,13 +950,45 @@ public:
 	virtual IWorkingDirectory * CreateWorkingDirectory() = 0;
 
 	/**
-	* IDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* IDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool DriverHasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool MachineHasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveDriverData - retrieves attached driver resource data into a memory buffer. (depreciated, equivalent to RetrieveDriverResourceData)
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @param[in] nDataBufferBufferSize - Number of elements in buffer
 	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
 	*/
 	virtual void RetrieveDriverData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveDriverResourceData - retrieves attached driver resource data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+	*/
+	virtual void RetrieveDriverResourceData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveMachineResourceData - retrieves a machine resource data (Plugins Directory) driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+	*/
+	virtual void RetrieveMachineResourceData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
 
 	/**
 	* IDriverEnvironment::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.

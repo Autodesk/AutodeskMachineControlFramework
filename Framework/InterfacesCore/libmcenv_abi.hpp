@@ -571,6 +571,44 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getpart(LibMCEnv_Tool
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_findpartbyuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPartUUID, LibMCEnv_ToolpathPart * pPart);
 
+/**
+* Retrieves the build height in units.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pBuildHeight - Build height in units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuildheightinunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_int32 * pBuildHeight);
+
+/**
+* Retrieves the layers Z Value in units.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nLayerIndex - Layer Index to return.
+* @param[out] pZValue - Z Value of the layer in units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_int32 * pZValue);
+
+/**
+* Retrieves the build height in mm.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pBuildHeight - Build height in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuildheightinmm(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pBuildHeight);
+
+/**
+* Retrieves the layers Z Value in mm.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nLayerIndex - Layer Index to return.
+* @param[out] pZValue - Z Value of the layer in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinmm(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue);
+
 /*************************************************************************************************************************
  Class definition for Build
 **************************************************************************************************************************/
@@ -938,7 +976,27 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_WorkingDirectory * pWorkingDirectory);
 
 /**
-* retrieves attached driver data into a memory buffer.
+* retrieves if attached driver has data with the given identifier.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_driverhasresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
+* retrieves if attached driver has data with the given identifier.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_machinehasresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
+* retrieves attached driver resource data into a memory buffer. (depreciated, equivalent to RetrieveDriverResourceData)
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pIdentifier - identifier of the binary data in the driver package.
@@ -948,6 +1006,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirecto
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* retrieves attached driver resource data into a memory buffer.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[out] pDataBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBufferBuffer - uint8  buffer of buffer data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievedriverresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* retrieves a machine resource data (Plugins Directory) driver data into a memory buffer.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[out] pDataBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBufferBuffer - uint8  buffer of buffer data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievemachineresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
 
 /**
 * Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.

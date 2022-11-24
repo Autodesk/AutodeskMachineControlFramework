@@ -149,13 +149,28 @@ void CDriver_ScanLab_RTC6::LoadFirmware(const std::string& sFirmwareResource, co
             throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
         std::vector<uint8_t> FirmwareData;
-        m_pDriverEnvironment->RetrieveDriverData(sFirmwareResource, FirmwareData);
+        if (m_pDriverEnvironment->MachineHasResourceData(sFirmwareResource)) {
+            m_pDriverEnvironment->RetrieveMachineResourceData(sFirmwareResource, FirmwareData);
+        }
+        else {
+            m_pDriverEnvironment->RetrieveDriverResourceData(sFirmwareResource, FirmwareData);
+        }
 
         std::vector<uint8_t> FPGAData;
-        m_pDriverEnvironment->RetrieveDriverData(sFPGAResource, FPGAData);
+        if (m_pDriverEnvironment->MachineHasResourceData(sFPGAResource)) {
+            m_pDriverEnvironment->RetrieveMachineResourceData(sFPGAResource, FPGAData);
+        }
+        else {
+            m_pDriverEnvironment->RetrieveDriverResourceData(sFPGAResource, FPGAData);
+        }
 
         std::vector<uint8_t> AuxiliaryData;
-        m_pDriverEnvironment->RetrieveDriverData(sAuxiliaryResource, AuxiliaryData);
+        if (m_pDriverEnvironment->MachineHasResourceData(sAuxiliaryResource)) {
+            m_pDriverEnvironment->RetrieveMachineResourceData(sAuxiliaryResource, AuxiliaryData);
+        }
+        else {
+            m_pDriverEnvironment->RetrieveDriverResourceData(sAuxiliaryResource, AuxiliaryData);
+        }
 
         m_pRTCContext->LoadFirmware (FirmwareData.size (), FirmwareData.data (), FPGAData.size (), FPGAData.data(), AuxiliaryData.size (), AuxiliaryData.data ());
 
@@ -164,7 +179,9 @@ void CDriver_ScanLab_RTC6::LoadFirmware(const std::string& sFirmwareResource, co
 
 void CDriver_ScanLab_RTC6::LoadCustomFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer)
 {
-
+    if (!m_SimulationMode) {
+        m_pRTCContext->LoadFirmware(nFirmwareDataBufferSize, pFirmwareDataBuffer, nFPGADataBufferSize, pFPGADataBuffer, nAuxiliaryDataBufferSize, pAuxiliaryDataBuffer);
+    }
 }
 
 

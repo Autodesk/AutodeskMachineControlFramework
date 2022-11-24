@@ -49,8 +49,9 @@ using namespace LibMCEnv::Impl;
  Class definition of CDriverEnvironment
 **************************************************************************************************************************/
 
-CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, const std::string & sDriverName)
-    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pResourcePackage (pResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName)
+
+CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string& sBaseTempPath, AMC::PLogger pLogger, const std::string& sDriverName)
+    : m_bIsInitializing(false), m_pParameterGroup(pParameterGroup), m_pDriverResourcePackage (pDriverResourcePackage), m_pMachineResourcePackage (pMachineResourcePackage), m_sBaseTempPath(sBaseTempPath), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger), m_sDriverName (sDriverName)
 {
     if (pParameterGroup.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -64,18 +65,31 @@ CDriverEnvironment::CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (sDriverName.empty())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pDriverResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pMachineResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+}
+
+CDriverEnvironment::~CDriverEnvironment()
+{
 
 }
 
 IWorkingDirectory* CDriverEnvironment::CreateWorkingDirectory()
 {
-    return new CWorkingDirectory(m_sBaseTempPath, m_pResourcePackage);
+    return new CWorkingDirectory(m_sBaseTempPath, m_pDriverResourcePackage);
 }
 
-void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer)
+
+void CDriverEnvironment::retrieveDriverDataFromPackage(AMC::PResourcePackage pResourcePackage, const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer)
 {
-    auto pEntry = m_pResourcePackage->findEntryByName(sIdentifier, false);
-    if (pEntry.get () == nullptr)
+    if (pResourcePackage.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+
+    auto pEntry = pResourcePackage->findEntryByName(sIdentifier, false);
+    if (pEntry.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND);
 
     size_t nSize = pEntry->getSize();
@@ -88,7 +102,7 @@ void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibM
 
         std::vector <uint8_t> Buffer;
 
-        m_pResourcePackage->readEntry(sIdentifier, Buffer);
+        pResourcePackage->readEntry(sIdentifier, Buffer);
 
         if (Buffer.size() != nSize)
             throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
@@ -106,6 +120,34 @@ void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibM
     }
 
 }
+
+bool CDriverEnvironment::DriverHasResourceData(const std::string& sIdentifier)
+{
+    auto pEntry = m_pDriverResourcePackage->findEntryByName(sIdentifier, false);
+    return (pEntry.get() != nullptr);
+}
+
+bool CDriverEnvironment::MachineHasResourceData(const std::string& sIdentifier)
+{
+    auto pEntry = m_pMachineResourcePackage->findEntryByName(sIdentifier, false);
+    return (pEntry.get() != nullptr);
+}
+
+void CDriverEnvironment::RetrieveDriverData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer)
+{
+    retrieveDriverDataFromPackage(m_pDriverResourcePackage, sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
+}
+
+void CDriverEnvironment::RetrieveDriverResourceData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer)
+{
+    retrieveDriverDataFromPackage(m_pDriverResourcePackage, sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
+}
+
+void CDriverEnvironment::RetrieveMachineResourceData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer)
+{
+    retrieveDriverDataFromPackage(m_pMachineResourcePackage, sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
+}
+
 
 IToolpathAccessor* CDriverEnvironment::CreateToolpathAccessor(const std::string& sStreamUUID)
 {

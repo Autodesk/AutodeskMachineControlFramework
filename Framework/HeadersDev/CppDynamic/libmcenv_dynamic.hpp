@@ -645,6 +645,10 @@ public:
 	inline LibMCEnv_uint32 GetPartCount();
 	inline PToolpathPart GetPart(const LibMCEnv_uint32 nPartIndex);
 	inline PToolpathPart FindPartByUUID(const std::string & sPartUUID);
+	inline LibMCEnv_int32 GetBuildHeightInUnits();
+	inline LibMCEnv_int32 GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex);
+	inline LibMCEnv_double GetBuildHeightInMM();
+	inline LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex);
 };
 	
 /*************************************************************************************************************************
@@ -776,7 +780,11 @@ public:
 	}
 	
 	inline PWorkingDirectory CreateWorkingDirectory();
+	inline bool DriverHasResourceData(const std::string & sIdentifier);
+	inline bool MachineHasResourceData(const std::string & sIdentifier);
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline void RetrieveDriverResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline void RetrieveMachineResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
 	inline PToolpathAccessor CreateToolpathAccessor(const std::string & sStreamUUID);
 	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
@@ -1083,6 +1091,10 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetPartCount = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetPart = nullptr;
 		pWrapperTable->m_ToolpathAccessor_FindPartByUUID = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetZValueInUnits = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetZValueInMM = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
@@ -1118,7 +1130,11 @@ public:
 		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
+		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = nullptr;
+		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData = nullptr;
+		pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
@@ -1710,6 +1726,42 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits = (PLibMCEnvToolpathAccessor_GetBuildHeightInUnitsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinunits");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits = (PLibMCEnvToolpathAccessor_GetBuildHeightInUnitsPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInUnits = (PLibMCEnvToolpathAccessor_GetZValueInUnitsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getzvalueinunits");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInUnits = (PLibMCEnvToolpathAccessor_GetZValueInUnitsPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getzvalueinunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetZValueInUnits == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM = (PLibMCEnvToolpathAccessor_GetBuildHeightInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM = (PLibMCEnvToolpathAccessor_GetBuildHeightInMMPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInMM = (PLibMCEnvToolpathAccessor_GetZValueInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getzvalueinmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInMM = (PLibMCEnvToolpathAccessor_GetZValueInMMPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getzvalueinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetZValueInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) GetProcAddress(hLibrary, "libmcenv_build_getname");
 		#else // _WIN32
 		pWrapperTable->m_Build_GetName = (PLibMCEnvBuild_GetNamePtr) dlsym(hLibrary, "libmcenv_build_getname");
@@ -2025,12 +2077,48 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_DriverHasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = (PLibMCEnvDriverEnvironment_MachineHasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_machinehasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = (PLibMCEnvDriverEnvironment_MachineHasResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_machinehasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_MachineHasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_retrievedriverdata");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_retrievedriverdata");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData = (PLibMCEnvDriverEnvironment_RetrieveDriverResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_retrievedriverresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData = (PLibMCEnvDriverEnvironment_RetrieveDriverResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_retrievedriverresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData = (PLibMCEnvDriverEnvironment_RetrieveMachineResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_retrievemachineresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData = (PLibMCEnvDriverEnvironment_RetrieveMachineResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_retrievemachineresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3290,6 +3378,22 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_FindPartByUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbuildheightinunits", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getzvalueinunits", (void**)&(pWrapperTable->m_ToolpathAccessor_GetZValueInUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetZValueInUnits == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbuildheightinmm", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getzvalueinmm", (void**)&(pWrapperTable->m_ToolpathAccessor_GetZValueInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetZValueInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Build_GetName == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3430,8 +3534,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_driverhasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_DriverHasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_DriverHasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_machinehasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_MachineHasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_MachineHasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievedriverdata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievedriverresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievemachineresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createtoolpathaccessor", (void**)&(pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor));
@@ -4545,6 +4665,56 @@ public:
 	}
 	
 	/**
+	* CToolpathAccessor::GetBuildHeightInUnits - Retrieves the build height in units.
+	* @return Build height in units.
+	*/
+	LibMCEnv_int32 CToolpathAccessor::GetBuildHeightInUnits()
+	{
+		LibMCEnv_int32 resultBuildHeight = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildHeightInUnits(m_pHandle, &resultBuildHeight));
+		
+		return resultBuildHeight;
+	}
+	
+	/**
+	* CToolpathAccessor::GetZValueInUnits - Retrieves the layers Z Value in units.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in units.
+	*/
+	LibMCEnv_int32 CToolpathAccessor::GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex)
+	{
+		LibMCEnv_int32 resultZValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetZValueInUnits(m_pHandle, nLayerIndex, &resultZValue));
+		
+		return resultZValue;
+	}
+	
+	/**
+	* CToolpathAccessor::GetBuildHeightInMM - Retrieves the build height in mm.
+	* @return Build height in mm.
+	*/
+	LibMCEnv_double CToolpathAccessor::GetBuildHeightInMM()
+	{
+		LibMCEnv_double resultBuildHeight = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildHeightInMM(m_pHandle, &resultBuildHeight));
+		
+		return resultBuildHeight;
+	}
+	
+	/**
+	* CToolpathAccessor::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in mm.
+	*/
+	LibMCEnv_double CToolpathAccessor::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
+	{
+		LibMCEnv_double resultZValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetZValueInMM(m_pHandle, nLayerIndex, &resultZValue));
+		
+		return resultZValue;
+	}
+	
+	/**
 	 * Method definitions for class CBuild
 	 */
 	
@@ -5044,7 +5214,33 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* CDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CDriverEnvironment::DriverHasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_DriverHasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
+	* CDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CDriverEnvironment::MachineHasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_MachineHasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveDriverData - retrieves attached driver resource data into a memory buffer. (depreciated, equivalent to RetrieveDriverResourceData)
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @param[out] DataBufferBuffer - buffer data.
 	*/
@@ -5055,6 +5251,34 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
 		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveDriverResourceData - retrieves attached driver resource data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[out] DataBufferBuffer - buffer data.
+	*/
+	void CDriverEnvironment::RetrieveDriverResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededDataBuffer = 0;
+		LibMCEnv_uint64 elementsWrittenDataBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverResourceData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
+		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverResourceData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveMachineResourceData - retrieves a machine resource data (Plugins Directory) driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @param[out] DataBufferBuffer - buffer data.
+	*/
+	void CDriverEnvironment::RetrieveMachineResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededDataBuffer = 0;
+		LibMCEnv_uint64 elementsWrittenDataBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveMachineResourceData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
+		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveMachineResourceData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
 	}
 	
 	/**

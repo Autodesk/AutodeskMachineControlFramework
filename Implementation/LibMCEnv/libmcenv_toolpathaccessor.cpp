@@ -122,3 +122,63 @@ IToolpathPart* CToolpathAccessor::FindPartByUUID(const std::string& sPartUUID)
 	return nullptr;
 
 }
+
+LibMCEnv_int32 CToolpathAccessor::GetBuildHeightInUnits()
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
+	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
+	if (nLayerCount == 0)
+		return 0.0;
+
+	return pToolpathEntity->getLayerZInUnits(nLayerCount - 1);
+
+}
+
+LibMCEnv_int32 CToolpathAccessor::GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
+	if (nLayerCount == 0)
+		return 0.0;
+
+	if (nLayerIndex >= nLayerCount)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDLAYERINDEX);
+
+	return pToolpathEntity->getLayerZInUnits(nLayerIndex);
+
+}
+
+LibMCEnv_double CToolpathAccessor::GetBuildHeightInMM()
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
+	if (nLayerCount == 0)
+		return 0.0;
+
+	return pToolpathEntity->getLayerZInUnits(nLayerCount - 1) * pToolpathEntity->getUnits();
+
+}
+
+LibMCEnv_double CToolpathAccessor::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
+{
+	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
+	if (nLayerCount == 0)
+		return 0.0;
+
+	if (nLayerIndex >= nLayerCount)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDLAYERINDEX);
+
+	return pToolpathEntity->getLayerZInUnits(nLayerIndex) * pToolpathEntity->getUnits();
+
+}
+
