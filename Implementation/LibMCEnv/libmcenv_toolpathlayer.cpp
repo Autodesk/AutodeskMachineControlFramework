@@ -64,6 +64,32 @@ void CToolpathLayer::GetSegmentInfo(const LibMCEnv_uint32 nIndex, LibMCEnv::eToo
 	nPointCount = m_pToolpathLayerData->getSegmentPointCount (nIndex);
 }
 
+LibMCEnv::eToolpathSegmentType CToolpathLayer::GetSegmentType(const LibMCEnv_uint32 nIndex)
+{
+	return m_pToolpathLayerData->getSegmentType(nIndex);
+}
+
+LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nIndex)
+{
+	return m_pToolpathLayerData->getSegmentPointCount(nIndex);
+}
+
+LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)
+{
+	auto segmentType = m_pToolpathLayerData->getSegmentType(nIndex);
+	if (segmentType == LibMCEnv::eToolpathSegmentType::Hatch) {
+		uint32_t nPointCount = m_pToolpathLayerData->getSegmentPointCount(nIndex);
+		if (nPointCount % 2 != 0)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDHATCHCOUNT);
+
+		return nPointCount / 2;
+	}
+	else {
+		return 0;
+	}
+}
+
+
 std::string CToolpathLayer::GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex)
 {
 	return m_pToolpathLayerData->getSegmentProfileUUID(nIndex);
@@ -125,9 +151,78 @@ void CToolpathLayer::GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_
 		if (nPointDataBufferSize < nNeededPointCount)
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
 
-		m_pToolpathLayerData->storePointsToBuffer (nIndex, pPointDataBuffer);
+		m_pToolpathLayerData->storePointsToBufferInUnits (nIndex, pPointDataBuffer);
 	}
 }
+
+void CToolpathLayer::GetSegmentHatchData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D* pHatchDataBuffer)
+{
+	auto segmentType = m_pToolpathLayerData->getSegmentType(nIndex);
+	if (segmentType == LibMCEnv::eToolpathSegmentType::Hatch) {
+		uint64_t nNeededPointCount = m_pToolpathLayerData->getSegmentPointCount(nIndex);
+		if (nNeededPointCount % 2 != 0)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDHATCHCOUNT);
+		uint64_t nNeededHatchCount = nNeededPointCount / 2;
+
+		if (pHatchDataNeededCount != nullptr)
+			*pHatchDataNeededCount = nNeededHatchCount;
+
+		if (pHatchDataBuffer != nullptr) {
+			if (nHatchDataBufferSize < nNeededHatchCount)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+			m_pToolpathLayerData->storeHatchesToBufferInUnits(nIndex, pHatchDataBuffer);
+		}
+
+	}
+	else {
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH);
+	}
+
+}
+
+void CToolpathLayer::GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D* pPointDataBuffer)
+{
+
+	uint64_t nNeededPointCount = m_pToolpathLayerData->getSegmentPointCount(nIndex);
+	if (pPointDataNeededCount != nullptr)
+		*pPointDataNeededCount = nNeededPointCount;
+
+	if (pPointDataBuffer != nullptr) {
+		if (nPointDataBufferSize < nNeededPointCount)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+		m_pToolpathLayerData->storePointsToBufferInMM(nIndex, pPointDataBuffer);
+	}
+
+}
+
+void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D* pHatchDataBuffer)
+{
+	auto segmentType = m_pToolpathLayerData->getSegmentType(nIndex);
+	if (segmentType == LibMCEnv::eToolpathSegmentType::Hatch) {
+		uint64_t nNeededPointCount = m_pToolpathLayerData->getSegmentPointCount(nIndex);
+		if (nNeededPointCount % 2 != 0)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDHATCHCOUNT);
+		uint64_t nNeededHatchCount = nNeededPointCount / 2;
+
+		if (pHatchDataNeededCount != nullptr)
+			*pHatchDataNeededCount = nNeededHatchCount;
+
+		if (pHatchDataBuffer != nullptr) {
+			if (nHatchDataBufferSize < nNeededHatchCount)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_BUFFERTOOSMALL);
+
+			m_pToolpathLayerData->storeHatchesToBufferInMM(nIndex, pHatchDataBuffer);
+		}
+
+	}
+	else {
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH);
+	}
+
+}
+
 
 LibMCEnv_double CToolpathLayer::GetUnits()
 {

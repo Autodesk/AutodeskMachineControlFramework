@@ -80,9 +80,9 @@
 		<error name="INVALIDTESTOUTPUTNAME" code="39" description="Invalid test output name." />		
 		<error name="TOOLPATHNOTLOADED" code="40" description="Toolpath has not been loaded." />
 		<error name="INVALIDLAYERINDEX" code="41" description="Invalid layer index." />
-		
-				
-					
+		<error name="INVALIDHATCHCOUNT" code="42" description="Invalid hatch count." />
+		<error name="SEGMENTISNOTOFTYPEHATCH" code="43" description="Segment is not of type hatch." />
+							
 	</errors>
 
 
@@ -129,6 +129,25 @@
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
+
+	<struct name="Hatch2D">
+		<member name="X1" type="int32" />
+		<member name="Y1" type="int32" />
+		<member name="X2" type="int32" />
+		<member name="Y2" type="int32" />
+	</struct>
+
+	<struct name="FloatPosition2D">
+		<member name="Coordinates" type="double" rows="2"/>
+	</struct>
+
+	<struct name="FloatHatch2D">
+		<member name="X1" type="double" />
+		<member name="Y1" type="double" />
+		<member name="X2" type="double" />
+		<member name="Y2" type="double" />
+	</struct>
+
 
 	<struct name="ToolpathPartTransform">
 		<member name="Matrix" type="double" rows="3" columns="3"/>
@@ -290,12 +309,27 @@
 			<param name="Count" type="uint32" pass="return" description="Count" />
 		</method>
 		
-		<method name="GetSegmentInfo" description="Retrieves the segment type information .">
+		<method name="GetSegmentInfo" description="Retrieves the segment type and point count information .">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Type" type="enum" class="ToolpathSegmentType" pass="out" description="Segment Type" />
 			<param name="PointCount" type="uint32" pass="out" description="Point count of segment." />
 		</method>
-				
+
+		<method name="GetSegmentType" description="Retrieves the segment type.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Type" type="enum" class="ToolpathSegmentType" pass="return" description="Segment Type" />
+		</method>
+
+		<method name="GetSegmentPointCount" description="Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchCount" type="uint32" pass="return" description="Hatch count of segment." />
+		</method>
+		
+		<method name="GetSegmentHatchCount" description="Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchCount" type="uint32" pass="return" description="Hatch count of segment." />
+		</method>
+		
 		<method name="GetSegmentProfileUUID" description="Retrieves the assigned segment profile uuid.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ProfileUUID" type="string" pass="return" description="Segment Profile UUID" />
@@ -313,16 +347,29 @@
 			<param name="Value" type="double" pass="return" description="Double Value" />
 		</method>
 
-		
 		<method name="GetSegmentPartUUID" description="Retrieves the assigned segment part uuid.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />
 		</method>
 	
-
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array. Positions are absolute in units." />
+		</method>
+		
+		<method name="GetSegmentHatchData" description="Retrieves the assigned segment hatch list. Fails if segment type is not hatch.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchData" type="structarray" class="Hatch2D" pass="out" description="The hatch data array. Positions are absolute in units." />
+		</method>
+
+		<method name="GetSegmentPointDataInMM" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="PointData" type="structarray" class="FloatPosition2D" pass="out" description="The point data array. Positions are absolute in mm." />
+		</method>
+		
+		<method name="GetSegmentHatchDataInMM" description="Retrieves the assigned segment hatch list. Fails if segment type is not hatch.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchData" type="structarray" class="FloatHatch2D" pass="out" description="The hatch data array. Positions are absolute in mm." />
 		</method>
 		
 		<method name="GetZValue" description="Retrieves the layers Z Value in units.">

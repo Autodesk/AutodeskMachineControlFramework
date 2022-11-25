@@ -494,12 +494,33 @@ public:
 	virtual LibMCEnv_uint32 GetSegmentCount() = 0;
 
 	/**
-	* IToolpathLayer::GetSegmentInfo - Retrieves the segment type information .
+	* IToolpathLayer::GetSegmentInfo - Retrieves the segment type and point count information .
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] eType - Segment Type
 	* @param[out] nPointCount - Point count of segment.
 	*/
 	virtual void GetSegmentInfo(const LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentType - Retrieves the segment type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Segment Type
+	*/
+	virtual LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	virtual LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentHatchCount - Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	virtual LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileUUID - Retrieves the assigned segment profile uuid.
@@ -539,6 +560,33 @@ public:
 	* @param[out] pPointDataBuffer - Position2D buffer of The point data array. Positions are absolute in units.
 	*/
 	virtual void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentHatchData - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nHatchDataBufferSize - Number of elements in buffer
+	* @param[out] pHatchDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pHatchDataBuffer - Hatch2D buffer of The hatch data array. Positions are absolute in units.
+	*/
+	virtual void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentPointDataInMM - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nPointDataBufferSize - Number of elements in buffer
+	* @param[out] pPointDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pPointDataBuffer - FloatPosition2D buffer of The point data array. Positions are absolute in mm.
+	*/
+	virtual void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentHatchDataInMM - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nHatchDataBufferSize - Number of elements in buffer
+	* @param[out] pHatchDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pHatchDataBuffer - FloatHatch2D buffer of The hatch data array. Positions are absolute in mm.
+	*/
+	virtual void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer) = 0;
 
 	/**
 	* IToolpathLayer::GetZValue - Retrieves the layers Z Value in units.

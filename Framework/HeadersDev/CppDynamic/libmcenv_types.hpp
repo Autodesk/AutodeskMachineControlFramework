@@ -137,6 +137,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME 39 /** Invalid test output name. */
 #define LIBMCENV_ERROR_TOOLPATHNOTLOADED 40 /** Toolpath has not been loaded. */
 #define LIBMCENV_ERROR_INVALIDLAYERINDEX 41 /** Invalid layer index. */
+#define LIBMCENV_ERROR_INVALIDHATCHCOUNT 42 /** Invalid hatch count. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -186,6 +187,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "Invalid test output name.";
     case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "Toolpath has not been loaded.";
     case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
+    case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "Invalid hatch count.";
     default: return "unknown error";
   }
 }
@@ -267,6 +269,24 @@ namespace LibMCEnv {
       LibMCEnv_int32 m_Coordinates[2];
   } sPosition2D;
   
+  typedef struct sHatch2D {
+      LibMCEnv_int32 m_X1;
+      LibMCEnv_int32 m_Y1;
+      LibMCEnv_int32 m_X2;
+      LibMCEnv_int32 m_Y2;
+  } sHatch2D;
+  
+  typedef struct sFloatPosition2D {
+      LibMCEnv_double m_Coordinates[2];
+  } sFloatPosition2D;
+  
+  typedef struct sFloatHatch2D {
+      LibMCEnv_double m_X1;
+      LibMCEnv_double m_Y1;
+      LibMCEnv_double m_X2;
+      LibMCEnv_double m_Y2;
+  } sFloatHatch2D;
+  
   typedef struct sToolpathPartTransform {
       LibMCEnv_double m_Matrix[3][3];
       LibMCEnv_double m_Translation[3];
@@ -288,6 +308,9 @@ typedef LibMCEnv::eToolpathSegmentType eLibMCEnvToolpathSegmentType;
 typedef LibMCEnv::eToolpathProfileValueType eLibMCEnvToolpathProfileValueType;
 typedef LibMCEnv::eMessageDialogType eLibMCEnvMessageDialogType;
 typedef LibMCEnv::sPosition2D sLibMCEnvPosition2D;
+typedef LibMCEnv::sHatch2D sLibMCEnvHatch2D;
+typedef LibMCEnv::sFloatPosition2D sLibMCEnvFloatPosition2D;
+typedef LibMCEnv::sFloatHatch2D sLibMCEnvFloatHatch2D;
 typedef LibMCEnv::sToolpathPartTransform sLibMCEnvToolpathPartTransform;
 typedef LibMCEnv::sColorRGB sLibMCEnvColorRGB;
 

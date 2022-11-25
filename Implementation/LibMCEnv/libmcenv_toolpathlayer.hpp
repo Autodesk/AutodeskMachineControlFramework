@@ -70,6 +70,12 @@ public:
 
 	void GetSegmentInfo(const LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount) override;
 
+	LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) override;
+
+	LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex) override;
+
+	LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex) override;
+
 	std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex) override;
 
 	std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex) override;
@@ -79,6 +85,12 @@ public:
 	LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const LibMCEnv::eToolpathProfileValueType eValueType) override;
 
 	void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) override;
+
+	void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D* pHatchDataBuffer) override;
+
+	void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D* pPointDataBuffer) override;
+
+	void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D* pHatchDataBuffer) override;
 
 	LibMCEnv_int32 GetZValue() override;
 

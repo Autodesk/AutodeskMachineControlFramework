@@ -99,7 +99,10 @@ namespace AMC {
 		uint32_t getSegmentPointCount (const uint32_t nSegmentIndex);
 		LibMCEnv::eToolpathSegmentType getSegmentType (const uint32_t nSegmentIndex);
 
-		void storePointsToBuffer (const uint32_t nSegmentIndex, LibMCEnv::sPosition2D * pPositionData);
+		void storePointsToBufferInUnits (const uint32_t nSegmentIndex, LibMCEnv::sPosition2D * pPositionData);
+		void storeHatchesToBufferInUnits (const uint32_t nSegmentIndex, LibMCEnv::sHatch2D* pHatchData);
+		void storePointsToBufferInMM(const uint32_t nSegmentIndex, LibMCEnv::sFloatPosition2D* pPositionData);
+		void storeHatchesToBufferInMM(const uint32_t nSegmentIndex, LibMCEnv::sFloatHatch2D* pHatchData);
 
 		std::string getSegmentProfileUUID(const uint32_t nSegmentIndex);
 		std::string getSegmentPartUUID(const uint32_t nSegmentIndex);

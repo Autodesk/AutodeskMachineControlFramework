@@ -352,7 +352,7 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr) (LibMCEnv_T
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 * pCount);
 
 /**
-* Retrieves the segment type information .
+* Retrieves the segment type and point count information .
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
 * @param[in] nIndex - Index. Must be between 0 and Count - 1.
@@ -361,6 +361,36 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentCountPtr) (LibMCEnv_To
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentInfoPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType, LibMCEnv_uint32 * pPointCount);
+
+/**
+* Retrieves the segment type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pType - Segment Type
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentTypePtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType);
+
+/**
+* Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pHatchCount - Hatch count of segment.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
+
+/**
+* Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pHatchCount - Hatch count of segment.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
 
 /**
 * Retrieves the assigned segment profile uuid.
@@ -421,6 +451,42 @@ typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr) (LibMCEnv
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer);
+
+/**
+* Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nHatchDataBufferSize - Number of elements in buffer
+* @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pHatchDataBuffer - Hatch2D  buffer of The hatch data array. Positions are absolute in units.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer);
+
+/**
+* Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nPointDataBufferSize - Number of elements in buffer
+* @param[out] pPointDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pPointDataBuffer - FloatPosition2D  buffer of The point data array. Positions are absolute in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer);
+
+/**
+* Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nHatchDataBufferSize - Number of elements in buffer
+* @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pHatchDataBuffer - FloatHatch2D  buffer of The hatch data array. Positions are absolute in mm.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) (LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer);
 
 /**
 * Retrieves the layers Z Value in units.
@@ -2313,11 +2379,17 @@ typedef struct {
 	PLibMCEnvToolpathLayer_GetLayerDataUUIDPtr m_ToolpathLayer_GetLayerDataUUID;
 	PLibMCEnvToolpathLayer_GetSegmentCountPtr m_ToolpathLayer_GetSegmentCount;
 	PLibMCEnvToolpathLayer_GetSegmentInfoPtr m_ToolpathLayer_GetSegmentInfo;
+	PLibMCEnvToolpathLayer_GetSegmentTypePtr m_ToolpathLayer_GetSegmentType;
+	PLibMCEnvToolpathLayer_GetSegmentPointCountPtr m_ToolpathLayer_GetSegmentPointCount;
+	PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr m_ToolpathLayer_GetSegmentHatchCount;
 	PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr m_ToolpathLayer_GetSegmentProfileUUID;
 	PLibMCEnvToolpathLayer_GetSegmentProfileValuePtr m_ToolpathLayer_GetSegmentProfileValue;
 	PLibMCEnvToolpathLayer_GetSegmentProfileTypedValuePtr m_ToolpathLayer_GetSegmentProfileTypedValue;
 	PLibMCEnvToolpathLayer_GetSegmentPartUUIDPtr m_ToolpathLayer_GetSegmentPartUUID;
 	PLibMCEnvToolpathLayer_GetSegmentPointDataPtr m_ToolpathLayer_GetSegmentPointData;
+	PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr m_ToolpathLayer_GetSegmentHatchData;
+	PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr m_ToolpathLayer_GetSegmentPointDataInMM;
+	PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr m_ToolpathLayer_GetSegmentHatchDataInMM;
 	PLibMCEnvToolpathLayer_GetZValuePtr m_ToolpathLayer_GetZValue;
 	PLibMCEnvToolpathLayer_GetZValueInMMPtr m_ToolpathLayer_GetZValueInMM;
 	PLibMCEnvToolpathLayer_GetUnitsPtr m_ToolpathLayer_GetUnits;

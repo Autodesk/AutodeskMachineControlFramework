@@ -262,6 +262,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "INVALIDTESTOUTPUTNAME";
 			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "TOOLPATHNOTLOADED";
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "INVALIDLAYERINDEX";
+			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "INVALIDHATCHCOUNT";
 		}
 		return "UNKNOWN";
 	}
@@ -311,6 +312,7 @@ public:
 			case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "Invalid test output name.";
 			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "Toolpath has not been loaded.";
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
+			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "Invalid hatch count.";
 		}
 		return "unknown error";
 	}
@@ -611,11 +613,17 @@ public:
 	inline std::string GetLayerDataUUID();
 	inline LibMCEnv_uint32 GetSegmentCount();
 	inline void GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount);
+	inline eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName);
 	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer);
+	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer);
 	inline LibMCEnv_int32 GetZValue();
 	inline LibMCEnv_double GetZValueInMM();
 	inline LibMCEnv_double GetUnits();
@@ -1073,11 +1081,17 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentType = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointData = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValueInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
@@ -1564,6 +1578,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentType = (PLibMCEnvToolpathLayer_GetSegmentTypePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenttype");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentType = (PLibMCEnvToolpathLayer_GetSegmentTypePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenttype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = (PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentpointcount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = (PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentpointcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = (PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchcount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = (PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = (PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileuuid");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = (PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileuuid");
@@ -1606,6 +1647,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = (PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = (PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = (PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentpointdatainmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = (PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentpointdatainmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = (PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdatainmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = (PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdatainmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3306,6 +3374,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentInfo == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenttype", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointcount", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchcount", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofileuuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3324,6 +3404,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointdata", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchdata", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointdatainmm", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchdatainmm", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getzvalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetZValue));
@@ -4389,7 +4481,7 @@ public:
 	}
 	
 	/**
-	* CToolpathLayer::GetSegmentInfo - Retrieves the segment type information .
+	* CToolpathLayer::GetSegmentInfo - Retrieves the segment type and point count information .
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] eType - Segment Type
 	* @param[out] nPointCount - Point count of segment.
@@ -4397,6 +4489,45 @@ public:
 	void CToolpathLayer::GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentInfo(m_pHandle, nIndex, &eType, &nPointCount));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentType - Retrieves the segment type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Segment Type
+	*/
+	eToolpathSegmentType CToolpathLayer::GetSegmentType(const LibMCEnv_uint32 nIndex)
+	{
+		eToolpathSegmentType resultType = (eToolpathSegmentType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentType(m_pHandle, nIndex, &resultType));
+		
+		return resultType;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 resultHatchCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointCount(m_pHandle, nIndex, &resultHatchCount));
+		
+		return resultHatchCount;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchCount - Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 resultHatchCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchCount(m_pHandle, nIndex, &resultHatchCount));
+		
+		return resultHatchCount;
 	}
 	
 	/**
@@ -4474,6 +4605,48 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
 		PointDataBuffer.resize((size_t) elementsNeededPointData);
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchData - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in units.
+	*/
+	void CToolpathLayer::GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededHatchData = 0;
+		LibMCEnv_uint64 elementsWrittenHatchData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentPointDataInMM - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[out] PointDataBuffer - The point data array. Positions are absolute in mm.
+	*/
+	void CToolpathLayer::GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPointData = 0;
+		LibMCEnv_uint64 elementsWrittenPointData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
+		PointDataBuffer.resize((size_t) elementsNeededPointData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchDataInMM - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in mm.
+	*/
+	void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededHatchData = 0;
+		LibMCEnv_uint64 elementsWrittenHatchData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
 	}
 	
 	/**
