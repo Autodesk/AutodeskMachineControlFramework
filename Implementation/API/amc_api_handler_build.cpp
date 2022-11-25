@@ -203,7 +203,7 @@ void CAPIHandler_Build::handleToolpathRequest(CJSONWriter& writer, const uint8_t
 
 					std::vector<LibMCEnv::sPosition2D> Points;
 					Points.resize(nPointCount);
-					pLayerData->storePointsToBuffer(nSegmentIndex, Points.data());
+					pLayerData->storePointsToBufferInUnits(nSegmentIndex, Points.data());
 
 					CJSONWriterArray pointArray(writer);
 

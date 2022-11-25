@@ -138,6 +138,7 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_TOOLPATHNOTLOADED 40 /** Toolpath has not been loaded. */
 #define LIBMCENV_ERROR_INVALIDLAYERINDEX 41 /** Invalid layer index. */
 #define LIBMCENV_ERROR_INVALIDHATCHCOUNT 42 /** Invalid hatch count. */
+#define LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH 43 /** Segment is not of type hatch. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -188,6 +189,7 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "Toolpath has not been loaded.";
     case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
     case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "Invalid hatch count.";
+    case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "Segment is not of type hatch.";
     default: return "unknown error";
   }
 }

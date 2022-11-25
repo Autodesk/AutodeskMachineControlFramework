@@ -263,6 +263,7 @@ public:
 			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "TOOLPATHNOTLOADED";
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "INVALIDLAYERINDEX";
 			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "INVALIDHATCHCOUNT";
+			case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "SEGMENTISNOTOFTYPEHATCH";
 		}
 		return "UNKNOWN";
 	}
@@ -313,6 +314,7 @@ public:
 			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "Toolpath has not been loaded.";
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
 			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "Invalid hatch count.";
+			case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "Segment is not of type hatch.";
 		}
 		return "unknown error";
 	}
