@@ -133,9 +133,10 @@ void CDriver_Raylase::LoadSDK()
     if (m_pDriverEnvironment->MachineHasResourceData(sResourceName)) {
         std::vector<uint8_t> SDKData;
 
+        m_pDriverEnvironment->RetrieveMachineResourceData(sResourceName, SDKData);
+
         if (SDKData.empty())
             throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK);
-        m_pDriverEnvironment->RetrieveMachineResourceData(sResourceName, SDKData);
 
         m_pSDKClientLib = m_pSDKWorkingDirectory->StoreCustomData(sDLLFileName, SDKData);
     }
