@@ -398,6 +398,33 @@ LibMCDriver_ADSResult libmcdriver_ads_driver_ads_issimulationmode(LibMCDriver_AD
 	}
 }
 
+LibMCDriver_ADSResult libmcdriver_ads_driver_ads_setcustomsdkresource(LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pResourceName)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_ADS;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCDriver_ADSInterfaceException (LIBMCDRIVER_ADS_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		IDriver_ADS* pIDriver_ADS = dynamic_cast<IDriver_ADS*>(pIBaseClass);
+		if (!pIDriver_ADS)
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDCAST);
+		
+		pIDriver_ADS->SetCustomSDKResource(sResourceName);
+
+		return LIBMCDRIVER_ADS_SUCCESS;
+	}
+	catch (ELibMCDriver_ADSInterfaceException & Exception) {
+		return handleLibMCDriver_ADSException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ADSResult libmcdriver_ads_driver_ads_connect(LibMCDriver_ADS_Driver_ADS pDriver_ADS, LibMCDriver_ADS_uint32 nPort, LibMCDriver_ADS_uint32 nTimeout)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_ADS;
@@ -786,6 +813,8 @@ LibMCDriver_ADSResult LibMCDriver_ADS::Impl::LibMCDriver_ADS_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_ads_driver_ads_settosimulationmode;
 	if (sProcName == "libmcdriver_ads_driver_ads_issimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_ads_driver_ads_issimulationmode;
+	if (sProcName == "libmcdriver_ads_driver_ads_setcustomsdkresource") 
+		*ppProcAddress = (void*) &libmcdriver_ads_driver_ads_setcustomsdkresource;
 	if (sProcName == "libmcdriver_ads_driver_ads_connect") 
 		*ppProcAddress = (void*) &libmcdriver_ads_driver_ads_connect;
 	if (sProcName == "libmcdriver_ads_driver_ads_disconnect") 
