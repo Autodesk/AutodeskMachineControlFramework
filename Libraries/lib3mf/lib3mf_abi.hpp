@@ -33,12 +33,23 @@ Interface version: 2.2.0
 
 */
 
-#ifndef __LIB3MF_DYNAMICHEADER_CPPTYPES
-#define __LIB3MF_DYNAMICHEADER_CPPTYPES
+#ifndef __LIB3MF_HEADER_CPP
+#define __LIB3MF_HEADER_CPP
+
+#ifdef __LIB3MF_EXPORTS
+#ifdef _WIN32
+#define LIB3MF_DECLSPEC __declspec (dllexport)
+#else // _WIN32
+#define LIB3MF_DECLSPEC __attribute__((visibility("default")))
+#endif // _WIN32
+#else // __LIB3MF_EXPORTS
+#define LIB3MF_DECLSPEC
+#endif // __LIB3MF_EXPORTS
 
 #include "lib3mf_types.hpp"
 
 
+extern "C" {
 
 /*************************************************************************************************************************
  Class definition for Base
@@ -55,7 +66,7 @@ Interface version: 2.2.0
 * @param[in] pFilename - Filename to write into
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_WriteToFilePtr) (Lib3MF_Writer pWriter, const char * pFilename);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_writetofile(Lib3MF_Writer pWriter, const char * pFilename);
 
 /**
 * Retrieves the size of the full 3MF file stream.
@@ -64,7 +75,7 @@ typedef Lib3MFResult (*PLib3MFWriter_WriteToFilePtr) (Lib3MF_Writer pWriter, con
 * @param[out] pStreamSize - the stream size
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_GetStreamSizePtr) (Lib3MF_Writer pWriter, Lib3MF_uint64 * pStreamSize);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_getstreamsize(Lib3MF_Writer pWriter, Lib3MF_uint64 * pStreamSize);
 
 /**
 * Writes out the 3MF file into a memory buffer
@@ -75,7 +86,7 @@ typedef Lib3MFResult (*PLib3MFWriter_GetStreamSizePtr) (Lib3MF_Writer pWriter, L
 * @param[out] pBufferBuffer - uint8  buffer of buffer to write into
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_WriteToBufferPtr) (Lib3MF_Writer pWriter, const Lib3MF_uint64 nBufferBufferSize, Lib3MF_uint64* pBufferNeededCount, Lib3MF_uint8 * pBufferBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_writetobuffer(Lib3MF_Writer pWriter, const Lib3MF_uint64 nBufferBufferSize, Lib3MF_uint64* pBufferNeededCount, Lib3MF_uint8 * pBufferBuffer);
 
 /**
 * Writes out the model and passes the data to a provided callback function. The file type is specified by the Model Writer class.
@@ -86,7 +97,7 @@ typedef Lib3MFResult (*PLib3MFWriter_WriteToBufferPtr) (Lib3MF_Writer pWriter, c
 * @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_WriteToCallbackPtr) (Lib3MF_Writer pWriter, Lib3MF::WriteCallback pTheWriteCallback, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_writetocallback(Lib3MF_Writer pWriter, Lib3MF::WriteCallback pTheWriteCallback, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Set the progress callback for calls to this writer
@@ -96,7 +107,7 @@ typedef Lib3MFResult (*PLib3MFWriter_WriteToCallbackPtr) (Lib3MF_Writer pWriter,
 * @param[in] pUserData - pointer to arbitrary user data that is passed without modification to the callback.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_SetProgressCallbackPtr) (Lib3MF_Writer pWriter, Lib3MF::ProgressCallback pProgressCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_setprogresscallback(Lib3MF_Writer pWriter, Lib3MF::ProgressCallback pProgressCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Returns the number of digits after the decimal point to be written in each vertex coordinate-value.
@@ -105,7 +116,7 @@ typedef Lib3MFResult (*PLib3MFWriter_SetProgressCallbackPtr) (Lib3MF_Writer pWri
 * @param[out] pDecimalPrecision - The number of digits to be written in each vertex coordinate-value after the decimal point.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_GetDecimalPrecisionPtr) (Lib3MF_Writer pWriter, Lib3MF_uint32 * pDecimalPrecision);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_getdecimalprecision(Lib3MF_Writer pWriter, Lib3MF_uint32 * pDecimalPrecision);
 
 /**
 * Sets the number of digits after the decimal point to be written in each vertex coordinate-value.
@@ -114,7 +125,7 @@ typedef Lib3MFResult (*PLib3MFWriter_GetDecimalPrecisionPtr) (Lib3MF_Writer pWri
 * @param[in] nDecimalPrecision - The number of digits to be written in each vertex coordinate-value after the decimal point.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_SetDecimalPrecisionPtr) (Lib3MF_Writer pWriter, Lib3MF_uint32 nDecimalPrecision);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_setdecimalprecision(Lib3MF_Writer pWriter, Lib3MF_uint32 nDecimalPrecision);
 
 /**
 * Activates (deactivates) the strict mode of the reader.
@@ -123,7 +134,7 @@ typedef Lib3MFResult (*PLib3MFWriter_SetDecimalPrecisionPtr) (Lib3MF_Writer pWri
 * @param[in] bStrictModeActive - flag whether strict mode is active or not.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_SetStrictModeActivePtr) (Lib3MF_Writer pWriter, bool bStrictModeActive);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_setstrictmodeactive(Lib3MF_Writer pWriter, bool bStrictModeActive);
 
 /**
 * Queries whether the strict mode of the reader is active or not
@@ -132,7 +143,7 @@ typedef Lib3MFResult (*PLib3MFWriter_SetStrictModeActivePtr) (Lib3MF_Writer pWri
 * @param[out] pStrictModeActive - returns flag whether strict mode is active or not.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_GetStrictModeActivePtr) (Lib3MF_Writer pWriter, bool * pStrictModeActive);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_getstrictmodeactive(Lib3MF_Writer pWriter, bool * pStrictModeActive);
 
 /**
 * Returns Warning and Error Information of the read process
@@ -145,7 +156,7 @@ typedef Lib3MFResult (*PLib3MFWriter_GetStrictModeActivePtr) (Lib3MF_Writer pWri
 * @param[out] pWarningBuffer -  buffer of the message of the warning, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_GetWarningPtr) (Lib3MF_Writer pWriter, Lib3MF_uint32 nIndex, Lib3MF_uint32 * pErrorCode, const Lib3MF_uint32 nWarningBufferSize, Lib3MF_uint32* pWarningNeededChars, char * pWarningBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_getwarning(Lib3MF_Writer pWriter, Lib3MF_uint32 nIndex, Lib3MF_uint32 * pErrorCode, const Lib3MF_uint32 nWarningBufferSize, Lib3MF_uint32* pWarningNeededChars, char * pWarningBuffer);
 
 /**
 * Returns Warning and Error Count of the read process
@@ -154,7 +165,7 @@ typedef Lib3MFResult (*PLib3MFWriter_GetWarningPtr) (Lib3MF_Writer pWriter, Lib3
 * @param[out] pCount - filled with the count of the occurred warnings.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_GetWarningCountPtr) (Lib3MF_Writer pWriter, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_getwarningcount(Lib3MF_Writer pWriter, Lib3MF_uint32 * pCount);
 
 /**
 * Registers a callback to deal with data key encryption/decryption from keystore
@@ -165,7 +176,7 @@ typedef Lib3MFResult (*PLib3MFWriter_GetWarningCountPtr) (Lib3MF_Writer pWriter,
 * @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_AddKeyWrappingCallbackPtr) (Lib3MF_Writer pWriter, const char * pConsumerID, Lib3MF::KeyWrappingCallback pTheCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_addkeywrappingcallback(Lib3MF_Writer pWriter, const char * pConsumerID, Lib3MF::KeyWrappingCallback pTheCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Registers a callback to deal with encryption of content
@@ -175,7 +186,7 @@ typedef Lib3MFResult (*PLib3MFWriter_AddKeyWrappingCallbackPtr) (Lib3MF_Writer p
 * @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFWriter_SetContentEncryptionCallbackPtr) (Lib3MF_Writer pWriter, Lib3MF::ContentEncryptionCallback pTheCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_writer_setcontentencryptioncallback(Lib3MF_Writer pWriter, Lib3MF::ContentEncryptionCallback pTheCallback, Lib3MF_pvoid pUserData);
 
 /*************************************************************************************************************************
  Class definition for PersistentReaderSource
@@ -188,7 +199,7 @@ typedef Lib3MFResult (*PLib3MFWriter_SetContentEncryptionCallbackPtr) (Lib3MF_Wr
 * @param[out] pSourceType - Reader Source Type
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFPersistentReaderSource_GetSourceTypePtr) (Lib3MF_PersistentReaderSource pPersistentReaderSource, Lib3MF::ePersistentReaderSourceType * pSourceType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_persistentreadersource_getsourcetype(Lib3MF_PersistentReaderSource pPersistentReaderSource, Lib3MF::ePersistentReaderSourceType * pSourceType);
 
 /**
 * Invalidates the reader source. Every subsequent read on this data will fail.
@@ -196,7 +207,7 @@ typedef Lib3MFResult (*PLib3MFPersistentReaderSource_GetSourceTypePtr) (Lib3MF_P
 * @param[in] pPersistentReaderSource - PersistentReaderSource instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFPersistentReaderSource_InvalidateSourceDataPtr) (Lib3MF_PersistentReaderSource pPersistentReaderSource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_persistentreadersource_invalidatesourcedata(Lib3MF_PersistentReaderSource pPersistentReaderSource);
 
 /**
 * Checks if the source data is valid. Any read on an invalid source object will fail.
@@ -205,7 +216,7 @@ typedef Lib3MFResult (*PLib3MFPersistentReaderSource_InvalidateSourceDataPtr) (L
 * @param[out] pDataIsValid - The source data is valid.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFPersistentReaderSource_SourceDataIsValidPtr) (Lib3MF_PersistentReaderSource pPersistentReaderSource, bool * pDataIsValid);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_persistentreadersource_sourcedataisvalid(Lib3MF_PersistentReaderSource pPersistentReaderSource, bool * pDataIsValid);
 
 /*************************************************************************************************************************
  Class definition for Reader
@@ -218,7 +229,7 @@ typedef Lib3MFResult (*PLib3MFPersistentReaderSource_SourceDataIsValidPtr) (Lib3
 * @param[in] pSource - Source object to read from
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_ReadFromPersistentSourcePtr) (Lib3MF_Reader pReader, Lib3MF_PersistentReaderSource pSource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_readfrompersistentsource(Lib3MF_Reader pReader, Lib3MF_PersistentReaderSource pSource);
 
 /**
 * Reads a model from a file. The file type is specified by the Model Reader class
@@ -227,7 +238,7 @@ typedef Lib3MFResult (*PLib3MFReader_ReadFromPersistentSourcePtr) (Lib3MF_Reader
 * @param[in] pFilename - Filename to read from
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_ReadFromFilePtr) (Lib3MF_Reader pReader, const char * pFilename);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_readfromfile(Lib3MF_Reader pReader, const char * pFilename);
 
 /**
 * Reads a model from a memory buffer.
@@ -237,7 +248,7 @@ typedef Lib3MFResult (*PLib3MFReader_ReadFromFilePtr) (Lib3MF_Reader pReader, co
 * @param[in] pBufferBuffer - uint8 buffer of Buffer to read from
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_ReadFromBufferPtr) (Lib3MF_Reader pReader, Lib3MF_uint64 nBufferBufferSize, const Lib3MF_uint8 * pBufferBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_readfrombuffer(Lib3MF_Reader pReader, Lib3MF_uint64 nBufferBufferSize, const Lib3MF_uint8 * pBufferBuffer);
 
 /**
 * Reads a model and from the data provided by a callback function
@@ -249,7 +260,7 @@ typedef Lib3MFResult (*PLib3MFReader_ReadFromBufferPtr) (Lib3MF_Reader pReader, 
 * @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_ReadFromCallbackPtr) (Lib3MF_Reader pReader, Lib3MF::ReadCallback pTheReadCallback, Lib3MF_uint64 nStreamSize, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_readfromcallback(Lib3MF_Reader pReader, Lib3MF::ReadCallback pTheReadCallback, Lib3MF_uint64 nStreamSize, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Set the progress callback for calls to this writer
@@ -259,7 +270,7 @@ typedef Lib3MFResult (*PLib3MFReader_ReadFromCallbackPtr) (Lib3MF_Reader pReader
 * @param[in] pUserData - pointer to arbitrary user data that is passed without modification to the callback.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_SetProgressCallbackPtr) (Lib3MF_Reader pReader, Lib3MF::ProgressCallback pProgressCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_setprogresscallback(Lib3MF_Reader pReader, Lib3MF::ProgressCallback pProgressCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Adds a relationship type which shall be read as attachment in memory while loading
@@ -268,7 +279,7 @@ typedef Lib3MFResult (*PLib3MFReader_SetProgressCallbackPtr) (Lib3MF_Reader pRea
 * @param[in] pRelationShipType - String of the relationship type
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_AddRelationToReadPtr) (Lib3MF_Reader pReader, const char * pRelationShipType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_addrelationtoread(Lib3MF_Reader pReader, const char * pRelationShipType);
 
 /**
 * Removes a relationship type which shall be read as attachment in memory while loading
@@ -277,7 +288,7 @@ typedef Lib3MFResult (*PLib3MFReader_AddRelationToReadPtr) (Lib3MF_Reader pReade
 * @param[in] pRelationShipType - String of the relationship type
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_RemoveRelationToReadPtr) (Lib3MF_Reader pReader, const char * pRelationShipType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_removerelationtoread(Lib3MF_Reader pReader, const char * pRelationShipType);
 
 /**
 * Activates (deactivates) the strict mode of the reader.
@@ -286,7 +297,7 @@ typedef Lib3MFResult (*PLib3MFReader_RemoveRelationToReadPtr) (Lib3MF_Reader pRe
 * @param[in] bStrictModeActive - flag whether strict mode is active or not.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_SetStrictModeActivePtr) (Lib3MF_Reader pReader, bool bStrictModeActive);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_setstrictmodeactive(Lib3MF_Reader pReader, bool bStrictModeActive);
 
 /**
 * Queries whether the strict mode of the reader is active or not
@@ -295,7 +306,7 @@ typedef Lib3MFResult (*PLib3MFReader_SetStrictModeActivePtr) (Lib3MF_Reader pRea
 * @param[out] pStrictModeActive - returns flag whether strict mode is active or not.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_GetStrictModeActivePtr) (Lib3MF_Reader pReader, bool * pStrictModeActive);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_getstrictmodeactive(Lib3MF_Reader pReader, bool * pStrictModeActive);
 
 /**
 * Returns Warning and Error Information of the read process
@@ -308,7 +319,7 @@ typedef Lib3MFResult (*PLib3MFReader_GetStrictModeActivePtr) (Lib3MF_Reader pRea
 * @param[out] pWarningBuffer -  buffer of the message of the warning, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_GetWarningPtr) (Lib3MF_Reader pReader, Lib3MF_uint32 nIndex, Lib3MF_uint32 * pErrorCode, const Lib3MF_uint32 nWarningBufferSize, Lib3MF_uint32* pWarningNeededChars, char * pWarningBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_getwarning(Lib3MF_Reader pReader, Lib3MF_uint32 nIndex, Lib3MF_uint32 * pErrorCode, const Lib3MF_uint32 nWarningBufferSize, Lib3MF_uint32* pWarningNeededChars, char * pWarningBuffer);
 
 /**
 * Returns Warning and Error Count of the read process
@@ -317,7 +328,7 @@ typedef Lib3MFResult (*PLib3MFReader_GetWarningPtr) (Lib3MF_Reader pReader, Lib3
 * @param[out] pCount - filled with the count of the occurred warnings.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_GetWarningCountPtr) (Lib3MF_Reader pReader, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_getwarningcount(Lib3MF_Reader pReader, Lib3MF_uint32 * pCount);
 
 /**
 * Registers a callback to deal with key wrapping mechanism from keystore
@@ -328,7 +339,7 @@ typedef Lib3MFResult (*PLib3MFReader_GetWarningCountPtr) (Lib3MF_Reader pReader,
 * @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_AddKeyWrappingCallbackPtr) (Lib3MF_Reader pReader, const char * pConsumerID, Lib3MF::KeyWrappingCallback pTheCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_addkeywrappingcallback(Lib3MF_Reader pReader, const char * pConsumerID, Lib3MF::KeyWrappingCallback pTheCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Registers a callback to deal with encryption of content
@@ -338,7 +349,7 @@ typedef Lib3MFResult (*PLib3MFReader_AddKeyWrappingCallbackPtr) (Lib3MF_Reader p
 * @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReader_SetContentEncryptionCallbackPtr) (Lib3MF_Reader pReader, Lib3MF::ContentEncryptionCallback pTheCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_reader_setcontentencryptioncallback(Lib3MF_Reader pReader, Lib3MF::ContentEncryptionCallback pTheCallback, Lib3MF_pvoid pUserData);
 
 /*************************************************************************************************************************
  Class definition for PackagePart
@@ -353,7 +364,7 @@ typedef Lib3MFResult (*PLib3MFReader_SetContentEncryptionCallbackPtr) (Lib3MF_Re
 * @param[out] pPathBuffer -  buffer of Returns the absolute path of this PackagePart, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFPackagePart_GetPathPtr) (Lib3MF_PackagePart pPackagePart, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_packagepart_getpath(Lib3MF_PackagePart pPackagePart, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
 
 /**
 * Sets the absolute path of this PackagePart.
@@ -362,7 +373,7 @@ typedef Lib3MFResult (*PLib3MFPackagePart_GetPathPtr) (Lib3MF_PackagePart pPacka
 * @param[in] pPath - Sets the absolute path of this PackagePart.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFPackagePart_SetPathPtr) (Lib3MF_PackagePart pPackagePart, const char * pPath);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_packagepart_setpath(Lib3MF_PackagePart pPackagePart, const char * pPath);
 
 /*************************************************************************************************************************
  Class definition for Resource
@@ -375,7 +386,7 @@ typedef Lib3MFResult (*PLib3MFPackagePart_SetPathPtr) (Lib3MF_PackagePart pPacka
 * @param[out] pUniqueResourceID - Retrieves the unique id of this resource within a package.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResource_GetResourceIDPtr) (Lib3MF_Resource pResource, Lib3MF_uint32 * pUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resource_getresourceid(Lib3MF_Resource pResource, Lib3MF_uint32 * pUniqueResourceID);
 
 /**
 * Retrieves the unique id of this resource within a package.
@@ -384,7 +395,7 @@ typedef Lib3MFResult (*PLib3MFResource_GetResourceIDPtr) (Lib3MF_Resource pResou
 * @param[out] pUniqueResourceID - Retrieves the unique id of this resource within a package.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResource_GetUniqueResourceIDPtr) (Lib3MF_Resource pResource, Lib3MF_uint32 * pUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resource_getuniqueresourceid(Lib3MF_Resource pResource, Lib3MF_uint32 * pUniqueResourceID);
 
 /**
 * Returns the PackagePart within which this resource resides
@@ -393,7 +404,7 @@ typedef Lib3MFResult (*PLib3MFResource_GetUniqueResourceIDPtr) (Lib3MF_Resource 
 * @param[out] pPackagePart - the PackagePart within which this resource resides.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResource_PackagePartPtr) (Lib3MF_Resource pResource, Lib3MF_PackagePart * pPackagePart);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resource_packagepart(Lib3MF_Resource pResource, Lib3MF_PackagePart * pPackagePart);
 
 /**
 * Sets the new PackagePart within which this resource resides
@@ -402,7 +413,7 @@ typedef Lib3MFResult (*PLib3MFResource_PackagePartPtr) (Lib3MF_Resource pResourc
 * @param[in] pPackagePart - the new PackagePart within which this resource resides.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResource_SetPackagePartPtr) (Lib3MF_Resource pResource, Lib3MF_PackagePart pPackagePart);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resource_setpackagepart(Lib3MF_Resource pResource, Lib3MF_PackagePart pPackagePart);
 
 /**
 * Retrieves the id of this resource within a model.
@@ -411,7 +422,7 @@ typedef Lib3MFResult (*PLib3MFResource_SetPackagePartPtr) (Lib3MF_Resource pReso
 * @param[out] pModelResourceId - Retrieves the id of this resource within a model.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResource_GetModelResourceIDPtr) (Lib3MF_Resource pResource, Lib3MF_uint32 * pModelResourceId);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resource_getmodelresourceid(Lib3MF_Resource pResource, Lib3MF_uint32 * pModelResourceId);
 
 /*************************************************************************************************************************
  Class definition for ResourceIterator
@@ -424,7 +435,7 @@ typedef Lib3MFResult (*PLib3MFResource_GetModelResourceIDPtr) (Lib3MF_Resource p
 * @param[out] pHasNext - Iterates to the next resource in the list.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceIterator_MoveNextPtr) (Lib3MF_ResourceIterator pResourceIterator, bool * pHasNext);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourceiterator_movenext(Lib3MF_ResourceIterator pResourceIterator, bool * pHasNext);
 
 /**
 * Iterates to the previous resource in the list.
@@ -433,7 +444,7 @@ typedef Lib3MFResult (*PLib3MFResourceIterator_MoveNextPtr) (Lib3MF_ResourceIter
 * @param[out] pHasPrevious - Iterates to the previous resource in the list.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceIterator_MovePreviousPtr) (Lib3MF_ResourceIterator pResourceIterator, bool * pHasPrevious);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourceiterator_moveprevious(Lib3MF_ResourceIterator pResourceIterator, bool * pHasPrevious);
 
 /**
 * Returns the resource the iterator points at.
@@ -442,7 +453,7 @@ typedef Lib3MFResult (*PLib3MFResourceIterator_MovePreviousPtr) (Lib3MF_Resource
 * @param[out] pResource - returns the resource instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceIterator_GetCurrentPtr) (Lib3MF_ResourceIterator pResourceIterator, Lib3MF_Resource * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourceiterator_getcurrent(Lib3MF_ResourceIterator pResourceIterator, Lib3MF_Resource * pResource);
 
 /**
 * Creates a new resource iterator with the same resource list.
@@ -451,7 +462,7 @@ typedef Lib3MFResult (*PLib3MFResourceIterator_GetCurrentPtr) (Lib3MF_ResourceIt
 * @param[out] pOutResourceIterator - returns the cloned Iterator instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceIterator_ClonePtr) (Lib3MF_ResourceIterator pResourceIterator, Lib3MF_ResourceIterator * pOutResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourceiterator_clone(Lib3MF_ResourceIterator pResourceIterator, Lib3MF_ResourceIterator * pOutResourceIterator);
 
 /**
 * Returns the number of resoucres the iterator captures.
@@ -460,7 +471,7 @@ typedef Lib3MFResult (*PLib3MFResourceIterator_ClonePtr) (Lib3MF_ResourceIterato
 * @param[out] pCount - returns the number of resoucres the iterator captures.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceIterator_CountPtr) (Lib3MF_ResourceIterator pResourceIterator, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourceiterator_count(Lib3MF_ResourceIterator pResourceIterator, Lib3MF_uint64 * pCount);
 
 /*************************************************************************************************************************
  Class definition for SliceStackIterator
@@ -473,7 +484,7 @@ typedef Lib3MFResult (*PLib3MFResourceIterator_CountPtr) (Lib3MF_ResourceIterato
 * @param[out] pResource - returns the SliceStack instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStackIterator_GetCurrentSliceStackPtr) (Lib3MF_SliceStackIterator pSliceStackIterator, Lib3MF_SliceStack * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestackiterator_getcurrentslicestack(Lib3MF_SliceStackIterator pSliceStackIterator, Lib3MF_SliceStack * pResource);
 
 /*************************************************************************************************************************
  Class definition for ObjectIterator
@@ -486,7 +497,7 @@ typedef Lib3MFResult (*PLib3MFSliceStackIterator_GetCurrentSliceStackPtr) (Lib3M
 * @param[out] pResource - returns the Object instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObjectIterator_GetCurrentObjectPtr) (Lib3MF_ObjectIterator pObjectIterator, Lib3MF_Object * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_objectiterator_getcurrentobject(Lib3MF_ObjectIterator pObjectIterator, Lib3MF_Object * pResource);
 
 /*************************************************************************************************************************
  Class definition for MeshObjectIterator
@@ -499,7 +510,7 @@ typedef Lib3MFResult (*PLib3MFObjectIterator_GetCurrentObjectPtr) (Lib3MF_Object
 * @param[out] pResource - returns the MeshObject instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObjectIterator_GetCurrentMeshObjectPtr) (Lib3MF_MeshObjectIterator pMeshObjectIterator, Lib3MF_MeshObject * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobjectiterator_getcurrentmeshobject(Lib3MF_MeshObjectIterator pMeshObjectIterator, Lib3MF_MeshObject * pResource);
 
 /*************************************************************************************************************************
  Class definition for ComponentsObjectIterator
@@ -512,7 +523,7 @@ typedef Lib3MFResult (*PLib3MFMeshObjectIterator_GetCurrentMeshObjectPtr) (Lib3M
 * @param[out] pResource - returns the ComponentsObject instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponentsObjectIterator_GetCurrentComponentsObjectPtr) (Lib3MF_ComponentsObjectIterator pComponentsObjectIterator, Lib3MF_ComponentsObject * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_componentsobjectiterator_getcurrentcomponentsobject(Lib3MF_ComponentsObjectIterator pComponentsObjectIterator, Lib3MF_ComponentsObject * pResource);
 
 /*************************************************************************************************************************
  Class definition for Texture2DIterator
@@ -525,7 +536,7 @@ typedef Lib3MFResult (*PLib3MFComponentsObjectIterator_GetCurrentComponentsObjec
 * @param[out] pResource - returns the Texture2D instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DIterator_GetCurrentTexture2DPtr) (Lib3MF_Texture2DIterator pTexture2DIterator, Lib3MF_Texture2D * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2diterator_getcurrenttexture2d(Lib3MF_Texture2DIterator pTexture2DIterator, Lib3MF_Texture2D * pResource);
 
 /*************************************************************************************************************************
  Class definition for BaseMaterialGroupIterator
@@ -538,7 +549,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DIterator_GetCurrentTexture2DPtr) (Lib3MF_
 * @param[out] pResource - returns the BaseMaterialGroup instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroupIterator_GetCurrentBaseMaterialGroupPtr) (Lib3MF_BaseMaterialGroupIterator pBaseMaterialGroupIterator, Lib3MF_BaseMaterialGroup * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroupiterator_getcurrentbasematerialgroup(Lib3MF_BaseMaterialGroupIterator pBaseMaterialGroupIterator, Lib3MF_BaseMaterialGroup * pResource);
 
 /*************************************************************************************************************************
  Class definition for ColorGroupIterator
@@ -551,7 +562,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroupIterator_GetCurrentBaseMaterialGr
 * @param[out] pResource - returns the ColorGroup instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorGroupIterator_GetCurrentColorGroupPtr) (Lib3MF_ColorGroupIterator pColorGroupIterator, Lib3MF_ColorGroup * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colorgroupiterator_getcurrentcolorgroup(Lib3MF_ColorGroupIterator pColorGroupIterator, Lib3MF_ColorGroup * pResource);
 
 /*************************************************************************************************************************
  Class definition for Texture2DGroupIterator
@@ -564,7 +575,7 @@ typedef Lib3MFResult (*PLib3MFColorGroupIterator_GetCurrentColorGroupPtr) (Lib3M
 * @param[out] pResource - returns the Texture2DGroup instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DGroupIterator_GetCurrentTexture2DGroupPtr) (Lib3MF_Texture2DGroupIterator pTexture2DGroupIterator, Lib3MF_Texture2DGroup * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2dgroupiterator_getcurrenttexture2dgroup(Lib3MF_Texture2DGroupIterator pTexture2DGroupIterator, Lib3MF_Texture2DGroup * pResource);
 
 /*************************************************************************************************************************
  Class definition for CompositeMaterialsIterator
@@ -577,7 +588,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DGroupIterator_GetCurrentTexture2DGroupPtr
 * @param[out] pResource - returns the CompositeMaterials instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCompositeMaterialsIterator_GetCurrentCompositeMaterialsPtr) (Lib3MF_CompositeMaterialsIterator pCompositeMaterialsIterator, Lib3MF_CompositeMaterials * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_compositematerialsiterator_getcurrentcompositematerials(Lib3MF_CompositeMaterialsIterator pCompositeMaterialsIterator, Lib3MF_CompositeMaterials * pResource);
 
 /*************************************************************************************************************************
  Class definition for MultiPropertyGroupIterator
@@ -590,7 +601,7 @@ typedef Lib3MFResult (*PLib3MFCompositeMaterialsIterator_GetCurrentCompositeMate
 * @param[out] pResource - returns the MultiPropertyGroup instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroupIterator_GetCurrentMultiPropertyGroupPtr) (Lib3MF_MultiPropertyGroupIterator pMultiPropertyGroupIterator, Lib3MF_MultiPropertyGroup * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroupiterator_getcurrentmultipropertygroup(Lib3MF_MultiPropertyGroupIterator pMultiPropertyGroupIterator, Lib3MF_MultiPropertyGroup * pResource);
 
 /*************************************************************************************************************************
  Class definition for MetaData
@@ -605,7 +616,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroupIterator_GetCurrentMultiProperty
 * @param[out] pNameSpaceBuffer -  buffer of the namespace URL of the metadata, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_GetNameSpacePtr) (Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nNameSpaceBufferSize, Lib3MF_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_getnamespace(Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nNameSpaceBufferSize, Lib3MF_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer);
 
 /**
 * sets a new namespace URL of the metadata
@@ -614,7 +625,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_GetNameSpacePtr) (Lib3MF_MetaData pMetaDa
 * @param[in] pNameSpace - the new namespace URL of the metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_SetNameSpacePtr) (Lib3MF_MetaData pMetaData, const char * pNameSpace);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_setnamespace(Lib3MF_MetaData pMetaData, const char * pNameSpace);
 
 /**
 * returns the name of a metadata
@@ -625,7 +636,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_SetNameSpacePtr) (Lib3MF_MetaData pMetaDa
 * @param[out] pNameBuffer -  buffer of the name of the metadata, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_GetNamePtr) (Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_getname(Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
 * sets a new name of a metadata
@@ -634,7 +645,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_GetNamePtr) (Lib3MF_MetaData pMetaData, c
 * @param[in] pName - the new name of the metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_SetNamePtr) (Lib3MF_MetaData pMetaData, const char * pName);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_setname(Lib3MF_MetaData pMetaData, const char * pName);
 
 /**
 * returns the (namespace+name) of a metadata
@@ -645,7 +656,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_SetNamePtr) (Lib3MF_MetaData pMetaData, c
 * @param[out] pKeyBuffer -  buffer of the key (namespace+name) of the metadata, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_GetKeyPtr) (Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nKeyBufferSize, Lib3MF_uint32* pKeyNeededChars, char * pKeyBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_getkey(Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nKeyBufferSize, Lib3MF_uint32* pKeyNeededChars, char * pKeyBuffer);
 
 /**
 * returns, whether a metadata must be preserved
@@ -654,7 +665,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_GetKeyPtr) (Lib3MF_MetaData pMetaData, co
 * @param[out] pMustPreserve - returns, whether a metadata must be preserved
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_GetMustPreservePtr) (Lib3MF_MetaData pMetaData, bool * pMustPreserve);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_getmustpreserve(Lib3MF_MetaData pMetaData, bool * pMustPreserve);
 
 /**
 * sets whether a metadata must be preserved
@@ -663,7 +674,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_GetMustPreservePtr) (Lib3MF_MetaData pMet
 * @param[in] bMustPreserve - a new value whether a metadata must be preserved
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_SetMustPreservePtr) (Lib3MF_MetaData pMetaData, bool bMustPreserve);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_setmustpreserve(Lib3MF_MetaData pMetaData, bool bMustPreserve);
 
 /**
 * returns the type of a metadata
@@ -674,7 +685,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_SetMustPreservePtr) (Lib3MF_MetaData pMet
 * @param[out] pTypeBuffer -  buffer of the type of the metadata, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_GetTypePtr) (Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nTypeBufferSize, Lib3MF_uint32* pTypeNeededChars, char * pTypeBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_gettype(Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nTypeBufferSize, Lib3MF_uint32* pTypeNeededChars, char * pTypeBuffer);
 
 /**
 * sets a new type of a metadata. This must be a simple XML type
@@ -683,7 +694,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_GetTypePtr) (Lib3MF_MetaData pMetaData, c
 * @param[in] pType - a new type of the metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_SetTypePtr) (Lib3MF_MetaData pMetaData, const char * pType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_settype(Lib3MF_MetaData pMetaData, const char * pType);
 
 /**
 * returns the value of the metadata
@@ -694,7 +705,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_SetTypePtr) (Lib3MF_MetaData pMetaData, c
 * @param[out] pValueBuffer -  buffer of the value of the metadata, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_GetValuePtr) (Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nValueBufferSize, Lib3MF_uint32* pValueNeededChars, char * pValueBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_getvalue(Lib3MF_MetaData pMetaData, const Lib3MF_uint32 nValueBufferSize, Lib3MF_uint32* pValueNeededChars, char * pValueBuffer);
 
 /**
 * sets a new value of the metadata
@@ -703,7 +714,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_GetValuePtr) (Lib3MF_MetaData pMetaData, 
 * @param[in] pValue - a new value of the metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaData_SetValuePtr) (Lib3MF_MetaData pMetaData, const char * pValue);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadata_setvalue(Lib3MF_MetaData pMetaData, const char * pValue);
 
 /*************************************************************************************************************************
  Class definition for MetaDataGroup
@@ -716,7 +727,7 @@ typedef Lib3MFResult (*PLib3MFMetaData_SetValuePtr) (Lib3MF_MetaData pMetaData, 
 * @param[out] pCount - returns the number metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataCountPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_getmetadatacount(Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 * pCount);
 
 /**
 * returns a metadata value within this metadatagroup
@@ -726,7 +737,7 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataCountPtr) (Lib3MF_MetaDat
 * @param[out] pMetaData - an instance of the metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 nIndex, Lib3MF_MetaData * pMetaData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_getmetadata(Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 nIndex, Lib3MF_MetaData * pMetaData);
 
 /**
 * returns a metadata value within this metadatagroup
@@ -737,7 +748,7 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataPtr) (Lib3MF_MetaDataGrou
 * @param[out] pMetaData - an instance of the metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataByKeyPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, const char * pNameSpace, const char * pName, Lib3MF_MetaData * pMetaData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_getmetadatabykey(Lib3MF_MetaDataGroup pMetaDataGroup, const char * pNameSpace, const char * pName, Lib3MF_MetaData * pMetaData);
 
 /**
 * removes metadata by index from the model.
@@ -746,7 +757,7 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_GetMetaDataByKeyPtr) (Lib3MF_MetaDat
 * @param[in] nIndex -  Index of the metadata to remove
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaDataGroup_RemoveMetaDataByIndexPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 nIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_removemetadatabyindex(Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_uint32 nIndex);
 
 /**
 * removes metadata from the model.
@@ -755,7 +766,7 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_RemoveMetaDataByIndexPtr) (Lib3MF_Me
 * @param[in] pTheMetaData - The metadata to remove
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaDataGroup_RemoveMetaDataPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_MetaData pTheMetaData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_removemetadata(Lib3MF_MetaDataGroup pMetaDataGroup, Lib3MF_MetaData pTheMetaData);
 
 /**
 * adds a new metadata to this metadatagroup
@@ -769,7 +780,7 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_RemoveMetaDataPtr) (Lib3MF_MetaDataG
 * @param[out] pMetaData - a new instance of the metadata
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMetaDataGroup_AddMetaDataPtr) (Lib3MF_MetaDataGroup pMetaDataGroup, const char * pNameSpace, const char * pName, const char * pValue, const char * pType, bool bMustPreserve, Lib3MF_MetaData * pMetaData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_metadatagroup_addmetadata(Lib3MF_MetaDataGroup pMetaDataGroup, const char * pNameSpace, const char * pName, const char * pValue, const char * pType, bool bMustPreserve, Lib3MF_MetaData * pMetaData);
 
 /*************************************************************************************************************************
  Class definition for Object
@@ -782,7 +793,7 @@ typedef Lib3MFResult (*PLib3MFMetaDataGroup_AddMetaDataPtr) (Lib3MF_MetaDataGrou
 * @param[out] pObjectType - returns object type enum.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetTypePtr) (Lib3MF_Object pObject, Lib3MF::eObjectType * pObjectType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_gettype(Lib3MF_Object pObject, Lib3MF::eObjectType * pObjectType);
 
 /**
 * Sets an object's type
@@ -791,7 +802,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetTypePtr) (Lib3MF_Object pObject, Lib3MF:
 * @param[in] eObjectType - object type enum.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_SetTypePtr) (Lib3MF_Object pObject, Lib3MF::eObjectType eObjectType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_settype(Lib3MF_Object pObject, Lib3MF::eObjectType eObjectType);
 
 /**
 * Retrieves an object's name
@@ -802,7 +813,7 @@ typedef Lib3MFResult (*PLib3MFObject_SetTypePtr) (Lib3MF_Object pObject, Lib3MF:
 * @param[out] pNameBuffer -  buffer of returns object name., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetNamePtr) (Lib3MF_Object pObject, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getname(Lib3MF_Object pObject, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
 * Sets an object's name string
@@ -811,7 +822,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetNamePtr) (Lib3MF_Object pObject, const L
 * @param[in] pName - new object name.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_SetNamePtr) (Lib3MF_Object pObject, const char * pName);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_setname(Lib3MF_Object pObject, const char * pName);
 
 /**
 * Retrieves an object's part number
@@ -822,7 +833,7 @@ typedef Lib3MFResult (*PLib3MFObject_SetNamePtr) (Lib3MF_Object pObject, const c
 * @param[out] pPartNumberBuffer -  buffer of returns object part number., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetPartNumberPtr) (Lib3MF_Object pObject, const Lib3MF_uint32 nPartNumberBufferSize, Lib3MF_uint32* pPartNumberNeededChars, char * pPartNumberBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getpartnumber(Lib3MF_Object pObject, const Lib3MF_uint32 nPartNumberBufferSize, Lib3MF_uint32* pPartNumberNeededChars, char * pPartNumberBuffer);
 
 /**
 * Sets an objects partnumber string
@@ -831,7 +842,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetPartNumberPtr) (Lib3MF_Object pObject, c
 * @param[in] pPartNumber - new object part number.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_SetPartNumberPtr) (Lib3MF_Object pObject, const char * pPartNumber);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_setpartnumber(Lib3MF_Object pObject, const char * pPartNumber);
 
 /**
 * Retrieves, if an object is a mesh object
@@ -840,7 +851,7 @@ typedef Lib3MFResult (*PLib3MFObject_SetPartNumberPtr) (Lib3MF_Object pObject, c
 * @param[out] pIsMeshObject - returns, whether the object is a mesh object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_IsMeshObjectPtr) (Lib3MF_Object pObject, bool * pIsMeshObject);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_ismeshobject(Lib3MF_Object pObject, bool * pIsMeshObject);
 
 /**
 * Retrieves, if an object is a components object
@@ -849,7 +860,7 @@ typedef Lib3MFResult (*PLib3MFObject_IsMeshObjectPtr) (Lib3MF_Object pObject, bo
 * @param[out] pIsComponentsObject - returns, whether the object is a components object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_IsComponentsObjectPtr) (Lib3MF_Object pObject, bool * pIsComponentsObject);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_iscomponentsobject(Lib3MF_Object pObject, bool * pIsComponentsObject);
 
 /**
 * Retrieves, if the object is valid according to the core spec. For mesh objects, we distinguish between the type attribute of the object:In case of object type other, this always means false.In case of object type model or solidsupport, this means, if the mesh suffices all requirements of the core spec chapter 4.1.In case of object type support or surface, this always means true.A component objects is valid if and only if it contains at least one component and all child components are valid objects.
@@ -858,7 +869,7 @@ typedef Lib3MFResult (*PLib3MFObject_IsComponentsObjectPtr) (Lib3MF_Object pObje
 * @param[out] pIsValid - returns whether the object is a valid object description
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_IsValidPtr) (Lib3MF_Object pObject, bool * pIsValid);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_isvalid(Lib3MF_Object pObject, bool * pIsValid);
 
 /**
 * Use an existing attachment as thumbnail for this object
@@ -867,7 +878,7 @@ typedef Lib3MFResult (*PLib3MFObject_IsValidPtr) (Lib3MF_Object pObject, bool * 
 * @param[in] pAttachment - Instance of a new or the existing thumbnailattachment object.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_SetAttachmentAsThumbnailPtr) (Lib3MF_Object pObject, Lib3MF_Attachment pAttachment);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_setattachmentasthumbnail(Lib3MF_Object pObject, Lib3MF_Attachment pAttachment);
 
 /**
 * Get the attachment containing the object thumbnail.
@@ -876,7 +887,7 @@ typedef Lib3MFResult (*PLib3MFObject_SetAttachmentAsThumbnailPtr) (Lib3MF_Object
 * @param[out] pAttachment - Instance of the thumbnailattachment object or NULL.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetThumbnailAttachmentPtr) (Lib3MF_Object pObject, Lib3MF_Attachment * pAttachment);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getthumbnailattachment(Lib3MF_Object pObject, Lib3MF_Attachment * pAttachment);
 
 /**
 * Clears the attachment. The attachment instance is not removed from the package.
@@ -884,7 +895,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetThumbnailAttachmentPtr) (Lib3MF_Object p
 * @param[in] pObject - Object instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_ClearThumbnailAttachmentPtr) (Lib3MF_Object pObject);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_clearthumbnailattachment(Lib3MF_Object pObject);
 
 /**
 * Returns the outbox of a build item
@@ -893,7 +904,7 @@ typedef Lib3MFResult (*PLib3MFObject_ClearThumbnailAttachmentPtr) (Lib3MF_Object
 * @param[out] pOutbox - Outbox of this build item
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetOutboxPtr) (Lib3MF_Object pObject, Lib3MF::sBox * pOutbox);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getoutbox(Lib3MF_Object pObject, Lib3MF::sBox * pOutbox);
 
 /**
 * Retrieves an object's uuid string (see production extension specification)
@@ -905,7 +916,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetOutboxPtr) (Lib3MF_Object pObject, Lib3M
 * @param[out] pUUIDBuffer -  buffer of returns object uuid., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetUUIDPtr) (Lib3MF_Object pObject, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getuuid(Lib3MF_Object pObject, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * Sets a build object's uuid string (see production extension specification)
@@ -914,7 +925,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetUUIDPtr) (Lib3MF_Object pObject, bool * 
 * @param[in] pUUID - new object uuid string.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_SetUUIDPtr) (Lib3MF_Object pObject, const char * pUUID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_setuuid(Lib3MF_Object pObject, const char * pUUID);
 
 /**
 * Returns the metadatagroup of this object
@@ -923,7 +934,7 @@ typedef Lib3MFResult (*PLib3MFObject_SetUUIDPtr) (Lib3MF_Object pObject, const c
 * @param[out] pMetaDataGroup - returns an Instance of the metadatagroup of this object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetMetaDataGroupPtr) (Lib3MF_Object pObject, Lib3MF_MetaDataGroup * pMetaDataGroup);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getmetadatagroup(Lib3MF_Object pObject, Lib3MF_MetaDataGroup * pMetaDataGroup);
 
 /**
 * set the meshresolution of the mesh object
@@ -932,7 +943,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetMetaDataGroupPtr) (Lib3MF_Object pObject
 * @param[in] eMeshResolution - meshresolution of this object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_SetSlicesMeshResolutionPtr) (Lib3MF_Object pObject, Lib3MF::eSlicesMeshResolution eMeshResolution);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_setslicesmeshresolution(Lib3MF_Object pObject, Lib3MF::eSlicesMeshResolution eMeshResolution);
 
 /**
 * get the meshresolution of the mesh object
@@ -941,7 +952,7 @@ typedef Lib3MFResult (*PLib3MFObject_SetSlicesMeshResolutionPtr) (Lib3MF_Object 
 * @param[out] pMeshResolution - meshresolution of this object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetSlicesMeshResolutionPtr) (Lib3MF_Object pObject, Lib3MF::eSlicesMeshResolution * pMeshResolution);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getslicesmeshresolution(Lib3MF_Object pObject, Lib3MF::eSlicesMeshResolution * pMeshResolution);
 
 /**
 * returns whether the Object has a slice stack. If Recursive is true, also checks whether any references object has a slice stack
@@ -951,7 +962,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetSlicesMeshResolutionPtr) (Lib3MF_Object 
 * @param[out] pHasSlices - does the object have a slice stack?
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_HasSlicesPtr) (Lib3MF_Object pObject, bool bRecursive, bool * pHasSlices);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_hasslices(Lib3MF_Object pObject, bool bRecursive, bool * pHasSlices);
 
 /**
 * unlinks the attached slicestack from this object. If no slice stack is attached, do noting.
@@ -959,7 +970,7 @@ typedef Lib3MFResult (*PLib3MFObject_HasSlicesPtr) (Lib3MF_Object pObject, bool 
 * @param[in] pObject - Object instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_ClearSliceStackPtr) (Lib3MF_Object pObject);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_clearslicestack(Lib3MF_Object pObject);
 
 /**
 * get the Slicestack attached to the object
@@ -968,7 +979,7 @@ typedef Lib3MFResult (*PLib3MFObject_ClearSliceStackPtr) (Lib3MF_Object pObject)
 * @param[out] pSliceStackInstance - returns the slicestack instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_GetSliceStackPtr) (Lib3MF_Object pObject, Lib3MF_SliceStack * pSliceStackInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_getslicestack(Lib3MF_Object pObject, Lib3MF_SliceStack * pSliceStackInstance);
 
 /**
 * assigns a slicestack to the object
@@ -977,7 +988,7 @@ typedef Lib3MFResult (*PLib3MFObject_GetSliceStackPtr) (Lib3MF_Object pObject, L
 * @param[in] pSliceStackInstance - the new slice stack of this Object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFObject_AssignSliceStackPtr) (Lib3MF_Object pObject, Lib3MF_SliceStack pSliceStackInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_object_assignslicestack(Lib3MF_Object pObject, Lib3MF_SliceStack pSliceStackInstance);
 
 /*************************************************************************************************************************
  Class definition for MeshObject
@@ -990,7 +1001,7 @@ typedef Lib3MFResult (*PLib3MFObject_AssignSliceStackPtr) (Lib3MF_Object pObject
 * @param[out] pVertexCount - filled with the vertex count.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetVertexCountPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 * pVertexCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_getvertexcount(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 * pVertexCount);
 
 /**
 * Returns the triangle count of a mesh object.
@@ -999,7 +1010,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetVertexCountPtr) (Lib3MF_MeshObject p
 * @param[out] pVertexCount - filled with the triangle count.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetTriangleCountPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 * pVertexCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_gettrianglecount(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 * pVertexCount);
 
 /**
 * Returns the vertex count of a mesh object.
@@ -1009,7 +1020,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetTriangleCountPtr) (Lib3MF_MeshObject
 * @param[out] pCoordinates - filled with the vertex coordinates.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetVertexPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, Lib3MF::sPosition * pCoordinates);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_getvertex(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, Lib3MF::sPosition * pCoordinates);
 
 /**
 * Sets the coordinates of a single vertex of a mesh object
@@ -1019,7 +1030,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetVertexPtr) (Lib3MF_MeshObject pMeshO
 * @param[in] pCoordinates - contains the vertex coordinates.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_SetVertexPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, const Lib3MF::sPosition * pCoordinates);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_setvertex(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, const Lib3MF::sPosition * pCoordinates);
 
 /**
 * Adds a single vertex to a mesh object
@@ -1029,7 +1040,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_SetVertexPtr) (Lib3MF_MeshObject pMeshO
 * @param[out] pNewIndex - Index of the new vertex
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_AddVertexPtr) (Lib3MF_MeshObject pMeshObject, const Lib3MF::sPosition * pCoordinates, Lib3MF_uint32 * pNewIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_addvertex(Lib3MF_MeshObject pMeshObject, const Lib3MF::sPosition * pCoordinates, Lib3MF_uint32 * pNewIndex);
 
 /**
 * Obtains all vertex positions of a mesh object
@@ -1040,7 +1051,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_AddVertexPtr) (Lib3MF_MeshObject pMeshO
 * @param[out] pVerticesBuffer - Position  buffer of contains the vertex coordinates.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetVerticesPtr) (Lib3MF_MeshObject pMeshObject, const Lib3MF_uint64 nVerticesBufferSize, Lib3MF_uint64* pVerticesNeededCount, Lib3MF::sPosition * pVerticesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_getvertices(Lib3MF_MeshObject pMeshObject, const Lib3MF_uint64 nVerticesBufferSize, Lib3MF_uint64* pVerticesNeededCount, Lib3MF::sPosition * pVerticesBuffer);
 
 /**
 * Returns indices of a single triangle of a mesh object.
@@ -1050,7 +1061,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetVerticesPtr) (Lib3MF_MeshObject pMes
 * @param[out] pIndices - filled with the triangle indices.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetTrianglePtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, Lib3MF::sTriangle * pIndices);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_gettriangle(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, Lib3MF::sTriangle * pIndices);
 
 /**
 * Sets the indices of a single triangle of a mesh object.
@@ -1060,7 +1071,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetTrianglePtr) (Lib3MF_MeshObject pMes
 * @param[in] pIndices - contains the triangle indices.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_SetTrianglePtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, const Lib3MF::sTriangle * pIndices);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_settriangle(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, const Lib3MF::sTriangle * pIndices);
 
 /**
 * Adds a single triangle to a mesh object
@@ -1070,7 +1081,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_SetTrianglePtr) (Lib3MF_MeshObject pMes
 * @param[out] pNewIndex - Index of the new triangle
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_AddTrianglePtr) (Lib3MF_MeshObject pMeshObject, const Lib3MF::sTriangle * pIndices, Lib3MF_uint32 * pNewIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_addtriangle(Lib3MF_MeshObject pMeshObject, const Lib3MF::sTriangle * pIndices, Lib3MF_uint32 * pNewIndex);
 
 /**
 * Get all triangles of a mesh object
@@ -1081,7 +1092,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_AddTrianglePtr) (Lib3MF_MeshObject pMes
 * @param[out] pIndicesBuffer - Triangle  buffer of contains the triangle indices.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetTriangleIndicesPtr) (Lib3MF_MeshObject pMeshObject, const Lib3MF_uint64 nIndicesBufferSize, Lib3MF_uint64* pIndicesNeededCount, Lib3MF::sTriangle * pIndicesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_gettriangleindices(Lib3MF_MeshObject pMeshObject, const Lib3MF_uint64 nIndicesBufferSize, Lib3MF_uint64* pIndicesNeededCount, Lib3MF::sTriangle * pIndicesBuffer);
 
 /**
 * Sets the property at the object-level of the mesh object.
@@ -1091,7 +1102,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetTriangleIndicesPtr) (Lib3MF_MeshObje
 * @param[in] nPropertyID - the object-level PropertyID.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_SetObjectLevelPropertyPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nUniqueResourceID, Lib3MF_uint32 nPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_setobjectlevelproperty(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nUniqueResourceID, Lib3MF_uint32 nPropertyID);
 
 /**
 * Gets the property at the object-level of the mesh object.
@@ -1102,7 +1113,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_SetObjectLevelPropertyPtr) (Lib3MF_Mesh
 * @param[out] pHasObjectLevelProperty - Has an object-level property been specified?
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetObjectLevelPropertyPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 * pUniqueResourceID, Lib3MF_uint32 * pPropertyID, bool * pHasObjectLevelProperty);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_getobjectlevelproperty(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 * pUniqueResourceID, Lib3MF_uint32 * pPropertyID, bool * pHasObjectLevelProperty);
 
 /**
 * Sets the properties of a single triangle of a mesh object.
@@ -1112,7 +1123,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetObjectLevelPropertyPtr) (Lib3MF_Mesh
 * @param[in] pProperties - contains the triangle properties.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_SetTrianglePropertiesPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, const Lib3MF::sTriangleProperties * pProperties);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_settriangleproperties(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, const Lib3MF::sTriangleProperties * pProperties);
 
 /**
 * Gets the properties of a single triangle of a mesh object.
@@ -1122,7 +1133,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_SetTrianglePropertiesPtr) (Lib3MF_MeshO
 * @param[out] pProperty - returns the triangle properties.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetTrianglePropertiesPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, Lib3MF::sTriangleProperties * pProperty);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_gettriangleproperties(Lib3MF_MeshObject pMeshObject, Lib3MF_uint32 nIndex, Lib3MF::sTriangleProperties * pProperty);
 
 /**
 * Sets the properties of all triangles of a mesh object. Sets the object level property to the first entry of the passed triangle properties, if not yet specified.
@@ -1132,7 +1143,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetTrianglePropertiesPtr) (Lib3MF_MeshO
 * @param[in] pPropertiesArrayBuffer - TriangleProperties buffer of contains the triangle properties array. Must have trianglecount elements.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_SetAllTrianglePropertiesPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint64 nPropertiesArrayBufferSize, const Lib3MF::sTriangleProperties * pPropertiesArrayBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_setalltriangleproperties(Lib3MF_MeshObject pMeshObject, Lib3MF_uint64 nPropertiesArrayBufferSize, const Lib3MF::sTriangleProperties * pPropertiesArrayBuffer);
 
 /**
 * Gets the properties of all triangles of a mesh object.
@@ -1143,7 +1154,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_SetAllTrianglePropertiesPtr) (Lib3MF_Me
 * @param[out] pPropertiesArrayBuffer - TriangleProperties  buffer of returns the triangle properties array. Must have trianglecount elements.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_GetAllTrianglePropertiesPtr) (Lib3MF_MeshObject pMeshObject, const Lib3MF_uint64 nPropertiesArrayBufferSize, Lib3MF_uint64* pPropertiesArrayNeededCount, Lib3MF::sTriangleProperties * pPropertiesArrayBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_getalltriangleproperties(Lib3MF_MeshObject pMeshObject, const Lib3MF_uint64 nPropertiesArrayBufferSize, Lib3MF_uint64* pPropertiesArrayNeededCount, Lib3MF::sTriangleProperties * pPropertiesArrayBuffer);
 
 /**
 * Clears all properties of this mesh object (triangle and object-level).
@@ -1151,7 +1162,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_GetAllTrianglePropertiesPtr) (Lib3MF_Me
 * @param[in] pMeshObject - MeshObject instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_ClearAllPropertiesPtr) (Lib3MF_MeshObject pMeshObject);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_clearallproperties(Lib3MF_MeshObject pMeshObject);
 
 /**
 * Set all triangles of a mesh object
@@ -1163,7 +1174,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_ClearAllPropertiesPtr) (Lib3MF_MeshObje
 * @param[in] pIndicesBuffer - Triangle buffer of contains the triangle indices.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_SetGeometryPtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_uint64 nVerticesBufferSize, const Lib3MF::sPosition * pVerticesBuffer, Lib3MF_uint64 nIndicesBufferSize, const Lib3MF::sTriangle * pIndicesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_setgeometry(Lib3MF_MeshObject pMeshObject, Lib3MF_uint64 nVerticesBufferSize, const Lib3MF::sPosition * pVerticesBuffer, Lib3MF_uint64 nIndicesBufferSize, const Lib3MF::sTriangle * pIndicesBuffer);
 
 /**
 * Retrieves, if an object describes a topologically oriented and manifold mesh, according to the core spec.
@@ -1172,7 +1183,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_SetGeometryPtr) (Lib3MF_MeshObject pMes
 * @param[out] pIsManifoldAndOriented - returns, if the object is oriented and manifold.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_IsManifoldAndOrientedPtr) (Lib3MF_MeshObject pMeshObject, bool * pIsManifoldAndOriented);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_ismanifoldandoriented(Lib3MF_MeshObject pMeshObject, bool * pIsManifoldAndOriented);
 
 /**
 * Retrieves the BeamLattice within this MeshObject.
@@ -1181,7 +1192,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_IsManifoldAndOrientedPtr) (Lib3MF_MeshO
 * @param[out] pTheBeamLattice - the BeamLattice within this MeshObject
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMeshObject_BeamLatticePtr) (Lib3MF_MeshObject pMeshObject, Lib3MF_BeamLattice * pTheBeamLattice);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_meshobject_beamlattice(Lib3MF_MeshObject pMeshObject, Lib3MF_BeamLattice * pTheBeamLattice);
 
 /*************************************************************************************************************************
  Class definition for BeamLattice
@@ -1194,7 +1205,7 @@ typedef Lib3MFResult (*PLib3MFMeshObject_BeamLatticePtr) (Lib3MF_MeshObject pMes
 * @param[out] pMinLength - minimal length of beams for the beamlattice
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetMinLengthPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_double * pMinLength);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getminlength(Lib3MF_BeamLattice pBeamLattice, Lib3MF_double * pMinLength);
 
 /**
 * Sets the minimal length of beams for the beamlattice.
@@ -1203,7 +1214,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetMinLengthPtr) (Lib3MF_BeamLattice p
 * @param[in] dMinLength - minimal length of beams for the beamlattice
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetMinLengthPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_double dMinLength);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setminlength(Lib3MF_BeamLattice pBeamLattice, Lib3MF_double dMinLength);
 
 /**
 * Returns the clipping mode and the clipping-mesh for the beamlattice of this mesh.
@@ -1213,7 +1224,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetMinLengthPtr) (Lib3MF_BeamLattice p
 * @param[out] pUniqueResourceID - filled with the UniqueResourceID of the clipping mesh-object or an undefined value if pClipMode is MODELBEAMLATTICECLIPMODE_NONE
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetClippingPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeClipMode * pClipMode, Lib3MF_uint32 * pUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getclipping(Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeClipMode * pClipMode, Lib3MF_uint32 * pUniqueResourceID);
 
 /**
 * Sets the clipping mode and the clipping-mesh for the beamlattice of this mesh.
@@ -1223,7 +1234,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetClippingPtr) (Lib3MF_BeamLattice pB
 * @param[in] nUniqueResourceID - the UniqueResourceID of the clipping mesh-object. This mesh-object has to be defined before setting the Clipping.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetClippingPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeClipMode eClipMode, Lib3MF_uint32 nUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setclipping(Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeClipMode eClipMode, Lib3MF_uint32 nUniqueResourceID);
 
 /**
 * Returns the representation-mesh for the beamlattice of this mesh.
@@ -1233,7 +1244,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetClippingPtr) (Lib3MF_BeamLattice pB
 * @param[out] pUniqueResourceID - filled with the UniqueResourceID of the clipping mesh-object.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetRepresentationPtr) (Lib3MF_BeamLattice pBeamLattice, bool * pHasRepresentation, Lib3MF_uint32 * pUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getrepresentation(Lib3MF_BeamLattice pBeamLattice, bool * pHasRepresentation, Lib3MF_uint32 * pUniqueResourceID);
 
 /**
 * Sets the representation-mesh for the beamlattice of this mesh.
@@ -1242,7 +1253,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetRepresentationPtr) (Lib3MF_BeamLatt
 * @param[in] nUniqueResourceID - the UniqueResourceID of the representation mesh-object. This mesh-object has to be defined before setting the representation.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetRepresentationPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setrepresentation(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nUniqueResourceID);
 
 /**
 * Returns the ball mode and the default ball radius for the beamlattice of this mesh.
@@ -1252,7 +1263,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetRepresentationPtr) (Lib3MF_BeamLatt
 * @param[out] pBallRadius - default ball radius of balls for the beamlattice
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallOptionsPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeBallMode * pBallMode, Lib3MF_double * pBallRadius);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getballoptions(Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeBallMode * pBallMode, Lib3MF_double * pBallRadius);
 
 /**
 * Sets the ball mode and thedefault ball radius for the beamlattice.
@@ -1262,7 +1273,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallOptionsPtr) (Lib3MF_BeamLattice
 * @param[in] dBallRadius - default ball radius of balls for the beamlattice
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetBallOptionsPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeBallMode eBallMode, Lib3MF_double dBallRadius);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setballoptions(Lib3MF_BeamLattice pBeamLattice, Lib3MF::eBeamLatticeBallMode eBallMode, Lib3MF_double dBallRadius);
 
 /**
 * Returns the beam count of a mesh object.
@@ -1271,7 +1282,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetBallOptionsPtr) (Lib3MF_BeamLattice
 * @param[out] pCount - filled with the beam count.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamCountPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getbeamcount(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 * pCount);
 
 /**
 * Returns indices, radii and capmodes of a single beam of a mesh object.
@@ -1281,7 +1292,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamCountPtr) (Lib3MF_BeamLattice p
 * @param[out] pBeamInfo - filled with the beam indices, radii and capmodes.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, Lib3MF::sBeam * pBeamInfo);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getbeam(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, Lib3MF::sBeam * pBeamInfo);
 
 /**
 * Adds a single beam to a mesh object.
@@ -1291,7 +1302,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamPtr) (Lib3MF_BeamLattice pBeamL
 * @param[out] pIndex - filled with the new Index of the beam.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_AddBeamPtr) (Lib3MF_BeamLattice pBeamLattice, const Lib3MF::sBeam * pBeamInfo, Lib3MF_uint32 * pIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_addbeam(Lib3MF_BeamLattice pBeamLattice, const Lib3MF::sBeam * pBeamInfo, Lib3MF_uint32 * pIndex);
 
 /**
 * Sets the indices, radii and capmodes of a single beam of a mesh object.
@@ -1301,7 +1312,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_AddBeamPtr) (Lib3MF_BeamLattice pBeamL
 * @param[in] pBeamInfo - filled with the beam indices, radii and capmodes.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetBeamPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, const Lib3MF::sBeam * pBeamInfo);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setbeam(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, const Lib3MF::sBeam * pBeamInfo);
 
 /**
 * Sets all beam indices, radii and capmodes of a mesh object.
@@ -1311,7 +1322,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetBeamPtr) (Lib3MF_BeamLattice pBeamL
 * @param[in] pBeamInfoBuffer - Beam buffer of contains information of a number of  beams
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetBeamsPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint64 nBeamInfoBufferSize, const Lib3MF::sBeam * pBeamInfoBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setbeams(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint64 nBeamInfoBufferSize, const Lib3MF::sBeam * pBeamInfoBuffer);
 
 /**
 * obtains all beam indices, radii and capmodes of a mesh object.
@@ -1322,7 +1333,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetBeamsPtr) (Lib3MF_BeamLattice pBeam
 * @param[out] pBeamInfoBuffer - Beam  buffer of contains information of all beams
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamsPtr) (Lib3MF_BeamLattice pBeamLattice, const Lib3MF_uint64 nBeamInfoBufferSize, Lib3MF_uint64* pBeamInfoNeededCount, Lib3MF::sBeam * pBeamInfoBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getbeams(Lib3MF_BeamLattice pBeamLattice, const Lib3MF_uint64 nBeamInfoBufferSize, Lib3MF_uint64* pBeamInfoNeededCount, Lib3MF::sBeam * pBeamInfoBuffer);
 
 /**
 * Returns the ball count of a mesh object.
@@ -1331,7 +1342,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamsPtr) (Lib3MF_BeamLattice pBeam
 * @param[out] pCount - filled with the ball count.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallCountPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getballcount(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 * pCount);
 
 /**
 * Returns index and radius of a single ball of a mesh object.
@@ -1341,7 +1352,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallCountPtr) (Lib3MF_BeamLattice p
 * @param[out] pBallInfo - filled with the ball node index and radius.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, Lib3MF::sBall * pBallInfo);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getball(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, Lib3MF::sBall * pBallInfo);
 
 /**
 * Adds a single ball to a mesh object.
@@ -1351,7 +1362,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallPtr) (Lib3MF_BeamLattice pBeamL
 * @param[out] pIndex - filled with the new Index of the ball.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_AddBallPtr) (Lib3MF_BeamLattice pBeamLattice, const Lib3MF::sBall * pBallInfo, Lib3MF_uint32 * pIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_addball(Lib3MF_BeamLattice pBeamLattice, const Lib3MF::sBall * pBallInfo, Lib3MF_uint32 * pIndex);
 
 /**
 * Sets the index and radius of a single ball of a mesh object.
@@ -1361,7 +1372,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_AddBallPtr) (Lib3MF_BeamLattice pBeamL
 * @param[in] pBallInfo - filled with the ball node index and radius.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetBallPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, const Lib3MF::sBall * pBallInfo);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setball(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, const Lib3MF::sBall * pBallInfo);
 
 /**
 * Sets all ball indices and radii of a mesh object.
@@ -1371,7 +1382,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetBallPtr) (Lib3MF_BeamLattice pBeamL
 * @param[in] pBallInfoBuffer - Ball buffer of contains information of a number of  balls
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_SetBallsPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint64 nBallInfoBufferSize, const Lib3MF::sBall * pBallInfoBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_setballs(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint64 nBallInfoBufferSize, const Lib3MF::sBall * pBallInfoBuffer);
 
 /**
 * obtains all ball indices and radii of a mesh object.
@@ -1382,7 +1393,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_SetBallsPtr) (Lib3MF_BeamLattice pBeam
 * @param[out] pBallInfoBuffer - Ball  buffer of contains information of all balls
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallsPtr) (Lib3MF_BeamLattice pBeamLattice, const Lib3MF_uint64 nBallInfoBufferSize, Lib3MF_uint64* pBallInfoNeededCount, Lib3MF::sBall * pBallInfoBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getballs(Lib3MF_BeamLattice pBeamLattice, const Lib3MF_uint64 nBallInfoBufferSize, Lib3MF_uint64* pBallInfoNeededCount, Lib3MF::sBall * pBallInfoBuffer);
 
 /**
 * Returns the number of beamsets of a mesh object.
@@ -1391,7 +1402,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBallsPtr) (Lib3MF_BeamLattice pBeam
 * @param[out] pCount - filled with the beamset count.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamSetCountPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getbeamsetcount(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 * pCount);
 
 /**
 * Adds an empty beamset to a mesh object
@@ -1400,7 +1411,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamSetCountPtr) (Lib3MF_BeamLattic
 * @param[out] pBeamSet - the new beamset
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_AddBeamSetPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_BeamSet * pBeamSet);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_addbeamset(Lib3MF_BeamLattice pBeamLattice, Lib3MF_BeamSet * pBeamSet);
 
 /**
 * Returns a beamset of a mesh object
@@ -1410,7 +1421,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_AddBeamSetPtr) (Lib3MF_BeamLattice pBe
 * @param[out] pBeamSet - the requested beamset
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamSetPtr) (Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, Lib3MF_BeamSet * pBeamSet);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamlattice_getbeamset(Lib3MF_BeamLattice pBeamLattice, Lib3MF_uint32 nIndex, Lib3MF_BeamSet * pBeamSet);
 
 /*************************************************************************************************************************
  Class definition for Component
@@ -1423,7 +1434,7 @@ typedef Lib3MFResult (*PLib3MFBeamLattice_GetBeamSetPtr) (Lib3MF_BeamLattice pBe
 * @param[out] pObjectResource - filled with the Resource Instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponent_GetObjectResourcePtr) (Lib3MF_Component pComponent, Lib3MF_Object * pObjectResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_component_getobjectresource(Lib3MF_Component pComponent, Lib3MF_Object * pObjectResource);
 
 /**
 * Returns the UniqueResourceID of the component.
@@ -1432,7 +1443,7 @@ typedef Lib3MFResult (*PLib3MFComponent_GetObjectResourcePtr) (Lib3MF_Component 
 * @param[out] pUniqueResourceID - returns the UniqueResourceID.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponent_GetObjectResourceIDPtr) (Lib3MF_Component pComponent, Lib3MF_uint32 * pUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_component_getobjectresourceid(Lib3MF_Component pComponent, Lib3MF_uint32 * pUniqueResourceID);
 
 /**
 * returns, whether a component has a UUID and, if true, the component's UUID
@@ -1444,7 +1455,7 @@ typedef Lib3MFResult (*PLib3MFComponent_GetObjectResourceIDPtr) (Lib3MF_Componen
 * @param[out] pUUIDBuffer -  buffer of the UUID as string of the form 'xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx', may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponent_GetUUIDPtr) (Lib3MF_Component pComponent, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_component_getuuid(Lib3MF_Component pComponent, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * sets the component's UUID
@@ -1453,7 +1464,7 @@ typedef Lib3MFResult (*PLib3MFComponent_GetUUIDPtr) (Lib3MF_Component pComponent
 * @param[in] pUUID - the UUID as string of the form 'xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx'
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponent_SetUUIDPtr) (Lib3MF_Component pComponent, const char * pUUID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_component_setuuid(Lib3MF_Component pComponent, const char * pUUID);
 
 /**
 * Returns, if the component has a different transformation than the identity matrix
@@ -1462,7 +1473,7 @@ typedef Lib3MFResult (*PLib3MFComponent_SetUUIDPtr) (Lib3MF_Component pComponent
 * @param[out] pHasTransform - if true is returned, the transformation is not equal than the identity
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponent_HasTransformPtr) (Lib3MF_Component pComponent, bool * pHasTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_component_hastransform(Lib3MF_Component pComponent, bool * pHasTransform);
 
 /**
 * Returns the transformation matrix of the component.
@@ -1471,7 +1482,7 @@ typedef Lib3MFResult (*PLib3MFComponent_HasTransformPtr) (Lib3MF_Component pComp
 * @param[out] pTransform - filled with the component transformation matrix
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponent_GetTransformPtr) (Lib3MF_Component pComponent, Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_component_gettransform(Lib3MF_Component pComponent, Lib3MF::sTransform * pTransform);
 
 /**
 * Sets the transformation matrix of the component.
@@ -1480,7 +1491,7 @@ typedef Lib3MFResult (*PLib3MFComponent_GetTransformPtr) (Lib3MF_Component pComp
 * @param[in] pTransform - new transformation matrix
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponent_SetTransformPtr) (Lib3MF_Component pComponent, const Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_component_settransform(Lib3MF_Component pComponent, const Lib3MF::sTransform * pTransform);
 
 /*************************************************************************************************************************
  Class definition for ComponentsObject
@@ -1495,7 +1506,7 @@ typedef Lib3MFResult (*PLib3MFComponent_SetTransformPtr) (Lib3MF_Component pComp
 * @param[out] pComponentInstance - new component instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponentsObject_AddComponentPtr) (Lib3MF_ComponentsObject pComponentsObject, Lib3MF_Object pObjectResource, const Lib3MF::sTransform * pTransform, Lib3MF_Component * pComponentInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_componentsobject_addcomponent(Lib3MF_ComponentsObject pComponentsObject, Lib3MF_Object pObjectResource, const Lib3MF::sTransform * pTransform, Lib3MF_Component * pComponentInstance);
 
 /**
 * Retrieves a component from a component object.
@@ -1505,7 +1516,7 @@ typedef Lib3MFResult (*PLib3MFComponentsObject_AddComponentPtr) (Lib3MF_Componen
 * @param[out] pComponentInstance - component instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponentsObject_GetComponentPtr) (Lib3MF_ComponentsObject pComponentsObject, Lib3MF_uint32 nIndex, Lib3MF_Component * pComponentInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_componentsobject_getcomponent(Lib3MF_ComponentsObject pComponentsObject, Lib3MF_uint32 nIndex, Lib3MF_Component * pComponentInstance);
 
 /**
 * Retrieves a component count of a component object.
@@ -1514,7 +1525,7 @@ typedef Lib3MFResult (*PLib3MFComponentsObject_GetComponentPtr) (Lib3MF_Componen
 * @param[out] pCount - returns the component count
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFComponentsObject_GetComponentCountPtr) (Lib3MF_ComponentsObject pComponentsObject, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_componentsobject_getcomponentcount(Lib3MF_ComponentsObject pComponentsObject, Lib3MF_uint32 * pCount);
 
 /*************************************************************************************************************************
  Class definition for BeamSet
@@ -1527,7 +1538,7 @@ typedef Lib3MFResult (*PLib3MFComponentsObject_GetComponentCountPtr) (Lib3MF_Com
 * @param[in] pName - new name of the beamset.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_SetNamePtr) (Lib3MF_BeamSet pBeamSet, const char * pName);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_setname(Lib3MF_BeamSet pBeamSet, const char * pName);
 
 /**
 * Retrieves a beamset's name string
@@ -1538,7 +1549,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_SetNamePtr) (Lib3MF_BeamSet pBeamSet, cons
 * @param[out] pNameBuffer -  buffer of returns the name of the beamset., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_GetNamePtr) (Lib3MF_BeamSet pBeamSet, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_getname(Lib3MF_BeamSet pBeamSet, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
 * Sets a beamset's identifier string
@@ -1547,7 +1558,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_GetNamePtr) (Lib3MF_BeamSet pBeamSet, cons
 * @param[in] pIdentifier - new name of the beamset.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_SetIdentifierPtr) (Lib3MF_BeamSet pBeamSet, const char * pIdentifier);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_setidentifier(Lib3MF_BeamSet pBeamSet, const char * pIdentifier);
 
 /**
 * Retrieves a beamset's identifier string
@@ -1558,7 +1569,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_SetIdentifierPtr) (Lib3MF_BeamSet pBeamSet
 * @param[out] pIdentifierBuffer -  buffer of returns the identifier of the beamset., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_GetIdentifierPtr) (Lib3MF_BeamSet pBeamSet, const Lib3MF_uint32 nIdentifierBufferSize, Lib3MF_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_getidentifier(Lib3MF_BeamSet pBeamSet, const Lib3MF_uint32 nIdentifierBufferSize, Lib3MF_uint32* pIdentifierNeededChars, char * pIdentifierBuffer);
 
 /**
 * Retrieves the reference count of a beamset
@@ -1567,7 +1578,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_GetIdentifierPtr) (Lib3MF_BeamSet pBeamSet
 * @param[out] pCount - returns the reference count
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_GetReferenceCountPtr) (Lib3MF_BeamSet pBeamSet, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_getreferencecount(Lib3MF_BeamSet pBeamSet, Lib3MF_uint32 * pCount);
 
 /**
 * Sets the references of a beamset
@@ -1577,7 +1588,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_GetReferenceCountPtr) (Lib3MF_BeamSet pBea
 * @param[in] pReferencesBuffer - uint32 buffer of the new indices of all beams in this beamset
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_SetReferencesPtr) (Lib3MF_BeamSet pBeamSet, Lib3MF_uint64 nReferencesBufferSize, const Lib3MF_uint32 * pReferencesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_setreferences(Lib3MF_BeamSet pBeamSet, Lib3MF_uint64 nReferencesBufferSize, const Lib3MF_uint32 * pReferencesBuffer);
 
 /**
 * Retrieves the references of a beamset
@@ -1588,7 +1599,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_SetReferencesPtr) (Lib3MF_BeamSet pBeamSet
 * @param[out] pReferencesBuffer - uint32  buffer of retrieves the indices of all beams in this beamset
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_GetReferencesPtr) (Lib3MF_BeamSet pBeamSet, const Lib3MF_uint64 nReferencesBufferSize, Lib3MF_uint64* pReferencesNeededCount, Lib3MF_uint32 * pReferencesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_getreferences(Lib3MF_BeamSet pBeamSet, const Lib3MF_uint64 nReferencesBufferSize, Lib3MF_uint64* pReferencesNeededCount, Lib3MF_uint32 * pReferencesBuffer);
 
 /**
 * Retrieves the ball reference count of a beamset
@@ -1597,7 +1608,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_GetReferencesPtr) (Lib3MF_BeamSet pBeamSet
 * @param[out] pCount - returns the ball reference count
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_GetBallReferenceCountPtr) (Lib3MF_BeamSet pBeamSet, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_getballreferencecount(Lib3MF_BeamSet pBeamSet, Lib3MF_uint32 * pCount);
 
 /**
 * Sets the ball references of a beamset
@@ -1607,7 +1618,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_GetBallReferenceCountPtr) (Lib3MF_BeamSet 
 * @param[in] pBallReferencesBuffer - uint32 buffer of the new indices of all balls in this beamset
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_SetBallReferencesPtr) (Lib3MF_BeamSet pBeamSet, Lib3MF_uint64 nBallReferencesBufferSize, const Lib3MF_uint32 * pBallReferencesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_setballreferences(Lib3MF_BeamSet pBeamSet, Lib3MF_uint64 nBallReferencesBufferSize, const Lib3MF_uint32 * pBallReferencesBuffer);
 
 /**
 * Retrieves the ball references of a beamset
@@ -1618,7 +1629,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_SetBallReferencesPtr) (Lib3MF_BeamSet pBea
 * @param[out] pBallReferencesBuffer - uint32  buffer of retrieves the indices of all balls in this beamset
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBeamSet_GetBallReferencesPtr) (Lib3MF_BeamSet pBeamSet, const Lib3MF_uint64 nBallReferencesBufferSize, Lib3MF_uint64* pBallReferencesNeededCount, Lib3MF_uint32 * pBallReferencesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_beamset_getballreferences(Lib3MF_BeamSet pBeamSet, const Lib3MF_uint64 nBallReferencesBufferSize, Lib3MF_uint64* pBallReferencesNeededCount, Lib3MF_uint32 * pBallReferencesBuffer);
 
 /*************************************************************************************************************************
  Class definition for BaseMaterialGroup
@@ -1631,7 +1642,7 @@ typedef Lib3MFResult (*PLib3MFBeamSet_GetBallReferencesPtr) (Lib3MF_BeamSet pBea
 * @param[out] pCount - returns the count of base materials.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetCountPtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_getcount(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 * pCount);
 
 /**
 * returns all the PropertyIDs of all materials in this group
@@ -1642,7 +1653,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetCountPtr) (Lib3MF_BaseMateria
 * @param[out] pPropertyIDsBuffer - uint32  buffer of PropertyID of the material in the material group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetAllPropertyIDsPtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_getallpropertyids(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
 
 /**
 * Adds a new material to the material group
@@ -1653,7 +1664,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetAllPropertyIDsPtr) (Lib3MF_Ba
 * @param[out] pPropertyID - returns new PropertyID of the new material in the material group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_AddMaterialPtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, const char * pName, const Lib3MF::sColor * pDisplayColor, Lib3MF_uint32 * pPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_addmaterial(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, const char * pName, const Lib3MF::sColor * pDisplayColor, Lib3MF_uint32 * pPropertyID);
 
 /**
 * Removes a material from the material group.
@@ -1662,7 +1673,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_AddMaterialPtr) (Lib3MF_BaseMate
 * @param[in] nPropertyID - PropertyID of the material in the material group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_RemoveMaterialPtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_removematerial(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID);
 
 /**
 * Returns the base material's name
@@ -1674,7 +1685,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_RemoveMaterialPtr) (Lib3MF_BaseM
 * @param[out] pNameBuffer -  buffer of returns the name of the base material., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetNamePtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_getname(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
 * Sets a base material's name
@@ -1684,7 +1695,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetNamePtr) (Lib3MF_BaseMaterial
 * @param[in] pName - new name of the base material.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_SetNamePtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, const char * pName);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_setname(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, const char * pName);
 
 /**
 * Sets a base material's display color.
@@ -1694,7 +1705,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_SetNamePtr) (Lib3MF_BaseMaterial
 * @param[in] pTheColor - The base material's display color
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_SetDisplayColorPtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, const Lib3MF::sColor * pTheColor);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_setdisplaycolor(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, const Lib3MF::sColor * pTheColor);
 
 /**
 * Returns a base material's display color.
@@ -1704,7 +1715,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_SetDisplayColorPtr) (Lib3MF_Base
 * @param[out] pTheColor - The base material's display color
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetDisplayColorPtr) (Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, Lib3MF::sColor * pTheColor);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_basematerialgroup_getdisplaycolor(Lib3MF_BaseMaterialGroup pBaseMaterialGroup, Lib3MF_uint32 nPropertyID, Lib3MF::sColor * pTheColor);
 
 /*************************************************************************************************************************
  Class definition for ColorGroup
@@ -1717,7 +1728,7 @@ typedef Lib3MFResult (*PLib3MFBaseMaterialGroup_GetDisplayColorPtr) (Lib3MF_Base
 * @param[out] pCount - returns the count of colors within this color group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorGroup_GetCountPtr) (Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colorgroup_getcount(Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 * pCount);
 
 /**
 * returns all the PropertyIDs of all colors within this group
@@ -1728,7 +1739,7 @@ typedef Lib3MFResult (*PLib3MFColorGroup_GetCountPtr) (Lib3MF_ColorGroup pColorG
 * @param[out] pPropertyIDsBuffer - uint32  buffer of PropertyID of the color in the color group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorGroup_GetAllPropertyIDsPtr) (Lib3MF_ColorGroup pColorGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colorgroup_getallpropertyids(Lib3MF_ColorGroup pColorGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
 
 /**
 * Adds a new value.
@@ -1738,7 +1749,7 @@ typedef Lib3MFResult (*PLib3MFColorGroup_GetAllPropertyIDsPtr) (Lib3MF_ColorGrou
 * @param[out] pPropertyID - PropertyID of the new color within this color group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorGroup_AddColorPtr) (Lib3MF_ColorGroup pColorGroup, const Lib3MF::sColor * pTheColor, Lib3MF_uint32 * pPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colorgroup_addcolor(Lib3MF_ColorGroup pColorGroup, const Lib3MF::sColor * pTheColor, Lib3MF_uint32 * pPropertyID);
 
 /**
 * Removes a color from the color group.
@@ -1747,7 +1758,7 @@ typedef Lib3MFResult (*PLib3MFColorGroup_AddColorPtr) (Lib3MF_ColorGroup pColorG
 * @param[in] nPropertyID - PropertyID of the color to be removed from the color group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorGroup_RemoveColorPtr) (Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 nPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colorgroup_removecolor(Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 nPropertyID);
 
 /**
 * Sets a color value.
@@ -1757,7 +1768,7 @@ typedef Lib3MFResult (*PLib3MFColorGroup_RemoveColorPtr) (Lib3MF_ColorGroup pCol
 * @param[in] pTheColor - The color
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorGroup_SetColorPtr) (Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 nPropertyID, const Lib3MF::sColor * pTheColor);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colorgroup_setcolor(Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 nPropertyID, const Lib3MF::sColor * pTheColor);
 
 /**
 * Sets a color value.
@@ -1767,7 +1778,7 @@ typedef Lib3MFResult (*PLib3MFColorGroup_SetColorPtr) (Lib3MF_ColorGroup pColorG
 * @param[out] pTheColor - The color
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorGroup_GetColorPtr) (Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 nPropertyID, Lib3MF::sColor * pTheColor);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colorgroup_getcolor(Lib3MF_ColorGroup pColorGroup, Lib3MF_uint32 nPropertyID, Lib3MF::sColor * pTheColor);
 
 /*************************************************************************************************************************
  Class definition for Texture2DGroup
@@ -1780,7 +1791,7 @@ typedef Lib3MFResult (*PLib3MFColorGroup_GetColorPtr) (Lib3MF_ColorGroup pColorG
 * @param[out] pCount - returns the count of tex2coords.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetCountPtr) (Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2dgroup_getcount(Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_uint32 * pCount);
 
 /**
 * returns all the PropertyIDs of all tex2coords in this Texture2DGroup
@@ -1791,7 +1802,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetCountPtr) (Lib3MF_Texture2DGroup
 * @param[out] pPropertyIDsBuffer - uint32  buffer of PropertyID of the tex2coords in the Texture2DGroup.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetAllPropertyIDsPtr) (Lib3MF_Texture2DGroup pTexture2DGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2dgroup_getallpropertyids(Lib3MF_Texture2DGroup pTexture2DGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
 
 /**
 * Adds a new tex2coord to the Texture2DGroup
@@ -1801,7 +1812,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetAllPropertyIDsPtr) (Lib3MF_Textu
 * @param[out] pPropertyID - returns new PropertyID of the new tex2coord in the Texture2DGroup.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DGroup_AddTex2CoordPtr) (Lib3MF_Texture2DGroup pTexture2DGroup, const Lib3MF::sTex2Coord * pUVCoordinate, Lib3MF_uint32 * pPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2dgroup_addtex2coord(Lib3MF_Texture2DGroup pTexture2DGroup, const Lib3MF::sTex2Coord * pUVCoordinate, Lib3MF_uint32 * pPropertyID);
 
 /**
 * Obtains a tex2coord to the Texture2DGroup
@@ -1811,7 +1822,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DGroup_AddTex2CoordPtr) (Lib3MF_Texture2DG
 * @param[out] pUVCoordinate - The u/v-coordinate within the texture, horizontally right/vertically up from the origin in the lower left of the texture.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetTex2CoordPtr) (Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_uint32 nPropertyID, Lib3MF::sTex2Coord * pUVCoordinate);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2dgroup_gettex2coord(Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_uint32 nPropertyID, Lib3MF::sTex2Coord * pUVCoordinate);
 
 /**
 * Removes a tex2coords from the Texture2DGroup.
@@ -1820,7 +1831,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetTex2CoordPtr) (Lib3MF_Texture2DG
 * @param[in] nPropertyID - PropertyID of the tex2coords in the Texture2DGroup.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DGroup_RemoveTex2CoordPtr) (Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_uint32 nPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2dgroup_removetex2coord(Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_uint32 nPropertyID);
 
 /**
 * Obtains the texture2D instance of this group.
@@ -1829,7 +1840,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DGroup_RemoveTex2CoordPtr) (Lib3MF_Texture
 * @param[out] pTexture2DInstance - the texture2D instance of this group.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetTexture2DPtr) (Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_Texture2D * pTexture2DInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2dgroup_gettexture2d(Lib3MF_Texture2DGroup pTexture2DGroup, Lib3MF_Texture2D * pTexture2DInstance);
 
 /*************************************************************************************************************************
  Class definition for CompositeMaterials
@@ -1842,7 +1853,7 @@ typedef Lib3MFResult (*PLib3MFTexture2DGroup_GetTexture2DPtr) (Lib3MF_Texture2DG
 * @param[out] pCount - returns the count of Composite-s
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetCountPtr) (Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_compositematerials_getcount(Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint32 * pCount);
 
 /**
 * returns all the PropertyIDs of all Composite-Mixing Values in this CompositeMaterials
@@ -1853,7 +1864,7 @@ typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetCountPtr) (Lib3MF_CompositeM
 * @param[out] pPropertyIDsBuffer - uint32  buffer of PropertyID of the Composite-Mixing Values in the CompositeMaterials.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetAllPropertyIDsPtr) (Lib3MF_CompositeMaterials pCompositeMaterials, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_compositematerials_getallpropertyids(Lib3MF_CompositeMaterials pCompositeMaterials, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
 
 /**
 * Obtains the BaseMaterialGroup instance of this CompositeMaterials.
@@ -1862,7 +1873,7 @@ typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetAllPropertyIDsPtr) (Lib3MF_C
 * @param[out] pBaseMaterialGroupInstance - returns the BaseMaterialGroup instance of this CompositeMaterials
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetBaseMaterialGroupPtr) (Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_BaseMaterialGroup * pBaseMaterialGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_compositematerials_getbasematerialgroup(Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_BaseMaterialGroup * pBaseMaterialGroupInstance);
 
 /**
 * Adds a new Composite-Mixing Values to the CompositeMaterials.
@@ -1873,7 +1884,7 @@ typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetBaseMaterialGroupPtr) (Lib3M
 * @param[out] pPropertyID - returns new PropertyID of the new Composite in the CompositeMaterials.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCompositeMaterials_AddCompositePtr) (Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint64 nCompositeBufferSize, const Lib3MF::sCompositeConstituent * pCompositeBuffer, Lib3MF_uint32 * pPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_compositematerials_addcomposite(Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint64 nCompositeBufferSize, const Lib3MF::sCompositeConstituent * pCompositeBuffer, Lib3MF_uint32 * pPropertyID);
 
 /**
 * Removes a Composite-Maxing Ratio from the CompositeMaterials.
@@ -1882,7 +1893,7 @@ typedef Lib3MFResult (*PLib3MFCompositeMaterials_AddCompositePtr) (Lib3MF_Compos
 * @param[in] nPropertyID - PropertyID of the  Composite-Mixing Values in the CompositeMaterials to be removed.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCompositeMaterials_RemoveCompositePtr) (Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint32 nPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_compositematerials_removecomposite(Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint32 nPropertyID);
 
 /**
 * Obtains a Composite-Maxing Ratio of this CompositeMaterials.
@@ -1894,7 +1905,7 @@ typedef Lib3MFResult (*PLib3MFCompositeMaterials_RemoveCompositePtr) (Lib3MF_Com
 * @param[out] pCompositeBuffer - CompositeConstituent  buffer of The Composite-Mixing Values with the given PropertyID
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetCompositePtr) (Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint32 nPropertyID, const Lib3MF_uint64 nCompositeBufferSize, Lib3MF_uint64* pCompositeNeededCount, Lib3MF::sCompositeConstituent * pCompositeBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_compositematerials_getcomposite(Lib3MF_CompositeMaterials pCompositeMaterials, Lib3MF_uint32 nPropertyID, const Lib3MF_uint64 nCompositeBufferSize, Lib3MF_uint64* pCompositeNeededCount, Lib3MF::sCompositeConstituent * pCompositeBuffer);
 
 /*************************************************************************************************************************
  Class definition for MultiPropertyGroup
@@ -1907,7 +1918,7 @@ typedef Lib3MFResult (*PLib3MFCompositeMaterials_GetCompositePtr) (Lib3MF_Compos
 * @param[out] pCount - returns the count of MultiProperty-s
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetCountPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_getcount(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 * pCount);
 
 /**
 * returns all the PropertyIDs of all MultiProperty-s in this MultiPropertyGroup
@@ -1918,7 +1929,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetCountPtr) (Lib3MF_MultiPrope
 * @param[out] pPropertyIDsBuffer - uint32  buffer of PropertyID of the MultiProperty-s in the MultiPropertyGroup.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetAllPropertyIDsPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_getallpropertyids(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
 
 /**
 * Adds a new MultiProperty to the MultiPropertyGroup.
@@ -1929,7 +1940,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetAllPropertyIDsPtr) (Lib3MF_M
 * @param[out] pPropertyID - returns the PropertyID of the new MultiProperty in the MultiPropertyGroup.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_AddMultiPropertyPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint64 nPropertyIDsBufferSize, const Lib3MF_uint32 * pPropertyIDsBuffer, Lib3MF_uint32 * pPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_addmultiproperty(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint64 nPropertyIDsBufferSize, const Lib3MF_uint32 * pPropertyIDsBuffer, Lib3MF_uint32 * pPropertyID);
 
 /**
 * Sets the PropertyIDs of a MultiProperty.
@@ -1940,7 +1951,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_AddMultiPropertyPtr) (Lib3MF_Mu
 * @param[in] pPropertyIDsBuffer - uint32 buffer of The new PropertyIDs of the MultiProperty
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_SetMultiPropertyPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nPropertyID, Lib3MF_uint64 nPropertyIDsBufferSize, const Lib3MF_uint32 * pPropertyIDsBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_setmultiproperty(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nPropertyID, Lib3MF_uint64 nPropertyIDsBufferSize, const Lib3MF_uint32 * pPropertyIDsBuffer);
 
 /**
 * Obtains the PropertyIDs of a MultiProperty.
@@ -1952,7 +1963,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_SetMultiPropertyPtr) (Lib3MF_Mu
 * @param[out] pPropertyIDsBuffer - uint32  buffer of The PropertyIDs of the MultiProperty
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetMultiPropertyPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nPropertyID, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_getmultiproperty(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nPropertyID, const Lib3MF_uint64 nPropertyIDsBufferSize, Lib3MF_uint64* pPropertyIDsNeededCount, Lib3MF_uint32 * pPropertyIDsBuffer);
 
 /**
 * Removes a MultiProperty from this MultiPropertyGroup.
@@ -1961,7 +1972,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetMultiPropertyPtr) (Lib3MF_Mu
 * @param[in] nPropertyID - the PropertyID of the MultiProperty to be removed.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_RemoveMultiPropertyPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nPropertyID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_removemultiproperty(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nPropertyID);
 
 /**
 * Retrieves the number of layers of this MultiPropertyGroup.
@@ -1970,7 +1981,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_RemoveMultiPropertyPtr) (Lib3MF
 * @param[out] pCount - returns the number of layers
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetLayerCountPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_getlayercount(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 * pCount);
 
 /**
 * Adds a MultiPropertyLayer to this MultiPropertyGroup.
@@ -1980,7 +1991,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetLayerCountPtr) (Lib3MF_Multi
 * @param[out] pLayerIndex - returns the index of this MultiPropertyLayer
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_AddLayerPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, const Lib3MF::sMultiPropertyLayer * pTheLayer, Lib3MF_uint32 * pLayerIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_addlayer(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, const Lib3MF::sMultiPropertyLayer * pTheLayer, Lib3MF_uint32 * pLayerIndex);
 
 /**
 * Obtains a MultiPropertyLayer of this MultiPropertyGroup.
@@ -1990,7 +2001,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_AddLayerPtr) (Lib3MF_MultiPrope
 * @param[out] pTheLayer - The MultiPropertyLayer with index LayerIndex within MultiPropertyGroup
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetLayerPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nLayerIndex, Lib3MF::sMultiPropertyLayer * pTheLayer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_getlayer(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nLayerIndex, Lib3MF::sMultiPropertyLayer * pTheLayer);
 
 /**
 * Removes a MultiPropertyLayer from this MultiPropertyGroup.
@@ -1999,7 +2010,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_GetLayerPtr) (Lib3MF_MultiPrope
 * @param[in] nLayerIndex - The Index of the MultiPropertyLayer to be removed
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_RemoveLayerPtr) (Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nLayerIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_multipropertygroup_removelayer(Lib3MF_MultiPropertyGroup pMultiPropertyGroup, Lib3MF_uint32 nLayerIndex);
 
 /*************************************************************************************************************************
  Class definition for Attachment
@@ -2014,7 +2025,7 @@ typedef Lib3MFResult (*PLib3MFMultiPropertyGroup_RemoveLayerPtr) (Lib3MF_MultiPr
 * @param[out] pPathBuffer -  buffer of returns the attachment's package path string, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_GetPathPtr) (Lib3MF_Attachment pAttachment, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_getpath(Lib3MF_Attachment pAttachment, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
 
 /**
 * Sets an attachment's package path. This function will be removed in a later release.
@@ -2023,7 +2034,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_GetPathPtr) (Lib3MF_Attachment pAttachm
 * @param[in] pPath - new path of the attachment.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_SetPathPtr) (Lib3MF_Attachment pAttachment, const char * pPath);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_setpath(Lib3MF_Attachment pAttachment, const char * pPath);
 
 /**
 * Returns the PackagePart that is this attachment.
@@ -2032,7 +2043,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_SetPathPtr) (Lib3MF_Attachment pAttachm
 * @param[out] pPackagePart - The PackagePart of this attachment.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_PackagePartPtr) (Lib3MF_Attachment pAttachment, Lib3MF_PackagePart * pPackagePart);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_packagepart(Lib3MF_Attachment pAttachment, Lib3MF_PackagePart * pPackagePart);
 
 /**
 * Retrieves an attachment's relationship type
@@ -2043,7 +2054,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_PackagePartPtr) (Lib3MF_Attachment pAtt
 * @param[out] pPathBuffer -  buffer of returns the attachment's package relationship type string, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_GetRelationShipTypePtr) (Lib3MF_Attachment pAttachment, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_getrelationshiptype(Lib3MF_Attachment pAttachment, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
 
 /**
 * Sets an attachment's relationship type.
@@ -2052,7 +2063,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_GetRelationShipTypePtr) (Lib3MF_Attachm
 * @param[in] pPath - new relationship type string.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_SetRelationShipTypePtr) (Lib3MF_Attachment pAttachment, const char * pPath);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_setrelationshiptype(Lib3MF_Attachment pAttachment, const char * pPath);
 
 /**
 * Writes out the attachment as file.
@@ -2061,7 +2072,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_SetRelationShipTypePtr) (Lib3MF_Attachm
 * @param[in] pFileName - file to write into.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_WriteToFilePtr) (Lib3MF_Attachment pAttachment, const char * pFileName);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_writetofile(Lib3MF_Attachment pAttachment, const char * pFileName);
 
 /**
 * Reads an attachment from a file. The path of this file is only read when this attachment is being written as part of the 3MF packege, or via the WriteToFile or WriteToBuffer-methods.
@@ -2070,7 +2081,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_WriteToFilePtr) (Lib3MF_Attachment pAtt
 * @param[in] pFileName - file to read from.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_ReadFromFilePtr) (Lib3MF_Attachment pAttachment, const char * pFileName);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_readfromfile(Lib3MF_Attachment pAttachment, const char * pFileName);
 
 /**
 * Reads a model and from the data provided by a callback function
@@ -2082,7 +2093,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_ReadFromFilePtr) (Lib3MF_Attachment pAt
 * @param[in] pUserData - Userdata that is passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_ReadFromCallbackPtr) (Lib3MF_Attachment pAttachment, Lib3MF::ReadCallback pTheReadCallback, Lib3MF_uint64 nStreamSize, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_readfromcallback(Lib3MF_Attachment pAttachment, Lib3MF::ReadCallback pTheReadCallback, Lib3MF_uint64 nStreamSize, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Retrieves the size of the attachment stream
@@ -2091,7 +2102,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_ReadFromCallbackPtr) (Lib3MF_Attachment
 * @param[out] pStreamSize - the stream size
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_GetStreamSizePtr) (Lib3MF_Attachment pAttachment, Lib3MF_uint64 * pStreamSize);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_getstreamsize(Lib3MF_Attachment pAttachment, Lib3MF_uint64 * pStreamSize);
 
 /**
 * Writes out the attachment into a buffer
@@ -2102,7 +2113,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_GetStreamSizePtr) (Lib3MF_Attachment pA
 * @param[out] pBufferBuffer - uint8  buffer of Buffer to write into
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_WriteToBufferPtr) (Lib3MF_Attachment pAttachment, const Lib3MF_uint64 nBufferBufferSize, Lib3MF_uint64* pBufferNeededCount, Lib3MF_uint8 * pBufferBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_writetobuffer(Lib3MF_Attachment pAttachment, const Lib3MF_uint64 nBufferBufferSize, Lib3MF_uint64* pBufferNeededCount, Lib3MF_uint8 * pBufferBuffer);
 
 /**
 * Reads an attachment from a memory buffer
@@ -2112,7 +2123,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_WriteToBufferPtr) (Lib3MF_Attachment pA
 * @param[in] pBufferBuffer - uint8 buffer of Buffer to read from
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAttachment_ReadFromBufferPtr) (Lib3MF_Attachment pAttachment, Lib3MF_uint64 nBufferBufferSize, const Lib3MF_uint8 * pBufferBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_attachment_readfrombuffer(Lib3MF_Attachment pAttachment, Lib3MF_uint64 nBufferBufferSize, const Lib3MF_uint8 * pBufferBuffer);
 
 /*************************************************************************************************************************
  Class definition for Texture2D
@@ -2125,7 +2136,7 @@ typedef Lib3MFResult (*PLib3MFAttachment_ReadFromBufferPtr) (Lib3MF_Attachment p
 * @param[out] pAttachment - attachment that holds the texture's image information.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_GetAttachmentPtr) (Lib3MF_Texture2D pTexture2D, Lib3MF_Attachment * pAttachment);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_getattachment(Lib3MF_Texture2D pTexture2D, Lib3MF_Attachment * pAttachment);
 
 /**
 * Sets the texture's package path to the path of the attachment.
@@ -2134,7 +2145,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_GetAttachmentPtr) (Lib3MF_Texture2D pTex
 * @param[in] pAttachment - attachment that holds the texture's image information.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_SetAttachmentPtr) (Lib3MF_Texture2D pTexture2D, Lib3MF_Attachment pAttachment);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_setattachment(Lib3MF_Texture2D pTexture2D, Lib3MF_Attachment pAttachment);
 
 /**
 * Retrieves a texture's content type.
@@ -2143,7 +2154,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_SetAttachmentPtr) (Lib3MF_Texture2D pTex
 * @param[out] pContentType - returns content type enum.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_GetContentTypePtr) (Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureType * pContentType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_getcontenttype(Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureType * pContentType);
 
 /**
 * Retrieves a texture's content type.
@@ -2152,7 +2163,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_GetContentTypePtr) (Lib3MF_Texture2D pTe
 * @param[in] eContentType - new Content Type
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_SetContentTypePtr) (Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureType eContentType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_setcontenttype(Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureType eContentType);
 
 /**
 * Retrieves a texture's tilestyle type.
@@ -2162,7 +2173,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_SetContentTypePtr) (Lib3MF_Texture2D pTe
 * @param[out] pTileStyleV - returns tilestyle type enum.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_GetTileStyleUVPtr) (Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureTileStyle * pTileStyleU, Lib3MF::eTextureTileStyle * pTileStyleV);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_gettilestyleuv(Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureTileStyle * pTileStyleU, Lib3MF::eTextureTileStyle * pTileStyleV);
 
 /**
 * Sets a texture's tilestyle type.
@@ -2172,7 +2183,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_GetTileStyleUVPtr) (Lib3MF_Texture2D pTe
 * @param[in] eTileStyleV - new tilestyle type enum.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_SetTileStyleUVPtr) (Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureTileStyle eTileStyleU, Lib3MF::eTextureTileStyle eTileStyleV);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_settilestyleuv(Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureTileStyle eTileStyleU, Lib3MF::eTextureTileStyle eTileStyleV);
 
 /**
 * Retrieves a texture's filter type.
@@ -2181,7 +2192,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_SetTileStyleUVPtr) (Lib3MF_Texture2D pTe
 * @param[out] pFilter - returns filter type enum.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_GetFilterPtr) (Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureFilter * pFilter);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_getfilter(Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureFilter * pFilter);
 
 /**
 * Sets a texture's filter type.
@@ -2190,7 +2201,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_GetFilterPtr) (Lib3MF_Texture2D pTexture
 * @param[in] eFilter - sets new filter type enum.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFTexture2D_SetFilterPtr) (Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureFilter eFilter);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_texture2d_setfilter(Lib3MF_Texture2D pTexture2D, Lib3MF::eTextureFilter eFilter);
 
 /*************************************************************************************************************************
  Class definition for BuildItem
@@ -2203,7 +2214,7 @@ typedef Lib3MFResult (*PLib3MFTexture2D_SetFilterPtr) (Lib3MF_Texture2D pTexture
 * @param[out] pObjectResource - returns the associated resource instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_GetObjectResourcePtr) (Lib3MF_BuildItem pBuildItem, Lib3MF_Object * pObjectResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_getobjectresource(Lib3MF_BuildItem pBuildItem, Lib3MF_Object * pObjectResource);
 
 /**
 * returns, whether a build item has a UUID and, if true, the build item's UUID
@@ -2215,7 +2226,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_GetObjectResourcePtr) (Lib3MF_BuildItem 
 * @param[out] pUUIDBuffer -  buffer of the UUID as string of the form 'xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx', may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_GetUUIDPtr) (Lib3MF_BuildItem pBuildItem, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_getuuid(Lib3MF_BuildItem pBuildItem, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * sets the build item's UUID
@@ -2224,7 +2235,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_GetUUIDPtr) (Lib3MF_BuildItem pBuildItem
 * @param[in] pUUID - the UUID as string of the form 'xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx'
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_SetUUIDPtr) (Lib3MF_BuildItem pBuildItem, const char * pUUID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_setuuid(Lib3MF_BuildItem pBuildItem, const char * pUUID);
 
 /**
 * Retrieves the object UniqueResourceID associated to a build item
@@ -2233,7 +2244,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_SetUUIDPtr) (Lib3MF_BuildItem pBuildItem
 * @param[out] pUniqueResourceID - returns the UniqueResourceID of the object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_GetObjectResourceIDPtr) (Lib3MF_BuildItem pBuildItem, Lib3MF_uint32 * pUniqueResourceID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_getobjectresourceid(Lib3MF_BuildItem pBuildItem, Lib3MF_uint32 * pUniqueResourceID);
 
 /**
 * Checks, if a build item has a non-identity transformation matrix
@@ -2242,7 +2253,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_GetObjectResourceIDPtr) (Lib3MF_BuildIte
 * @param[out] pHasTransform - returns true, if the transformation matrix is not the identity
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_HasObjectTransformPtr) (Lib3MF_BuildItem pBuildItem, bool * pHasTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_hasobjecttransform(Lib3MF_BuildItem pBuildItem, bool * pHasTransform);
 
 /**
 * Retrieves a build item's transformation matrix.
@@ -2251,7 +2262,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_HasObjectTransformPtr) (Lib3MF_BuildItem
 * @param[out] pTransform - returns the transformation matrix
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_GetObjectTransformPtr) (Lib3MF_BuildItem pBuildItem, Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_getobjecttransform(Lib3MF_BuildItem pBuildItem, Lib3MF::sTransform * pTransform);
 
 /**
 * Sets a build item's transformation matrix.
@@ -2260,7 +2271,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_GetObjectTransformPtr) (Lib3MF_BuildItem
 * @param[in] pTransform - new transformation matrix
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_SetObjectTransformPtr) (Lib3MF_BuildItem pBuildItem, const Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_setobjecttransform(Lib3MF_BuildItem pBuildItem, const Lib3MF::sTransform * pTransform);
 
 /**
 * Retrieves a build item's part number string
@@ -2271,7 +2282,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_SetObjectTransformPtr) (Lib3MF_BuildItem
 * @param[out] pPartNumberBuffer -  buffer of Returns a build item's part number string, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_GetPartNumberPtr) (Lib3MF_BuildItem pBuildItem, const Lib3MF_uint32 nPartNumberBufferSize, Lib3MF_uint32* pPartNumberNeededChars, char * pPartNumberBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_getpartnumber(Lib3MF_BuildItem pBuildItem, const Lib3MF_uint32 nPartNumberBufferSize, Lib3MF_uint32* pPartNumberNeededChars, char * pPartNumberBuffer);
 
 /**
 * Sets a build item's part number string
@@ -2280,7 +2291,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_GetPartNumberPtr) (Lib3MF_BuildItem pBui
 * @param[in] pSetPartnumber - new part number string for referencing parts from the outside world
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_SetPartNumberPtr) (Lib3MF_BuildItem pBuildItem, const char * pSetPartnumber);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_setpartnumber(Lib3MF_BuildItem pBuildItem, const char * pSetPartnumber);
 
 /**
 * Returns the metadatagroup of this build item
@@ -2289,7 +2300,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_SetPartNumberPtr) (Lib3MF_BuildItem pBui
 * @param[out] pMetaDataGroup - returns an Instance of the metadatagroup of this build item
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_GetMetaDataGroupPtr) (Lib3MF_BuildItem pBuildItem, Lib3MF_MetaDataGroup * pMetaDataGroup);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_getmetadatagroup(Lib3MF_BuildItem pBuildItem, Lib3MF_MetaDataGroup * pMetaDataGroup);
 
 /**
 * Returns the outbox of a build item
@@ -2298,7 +2309,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_GetMetaDataGroupPtr) (Lib3MF_BuildItem p
 * @param[out] pOutbox - Outbox of this build item
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItem_GetOutboxPtr) (Lib3MF_BuildItem pBuildItem, Lib3MF::sBox * pOutbox);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditem_getoutbox(Lib3MF_BuildItem pBuildItem, Lib3MF::sBox * pOutbox);
 
 /*************************************************************************************************************************
  Class definition for BuildItemIterator
@@ -2311,7 +2322,7 @@ typedef Lib3MFResult (*PLib3MFBuildItem_GetOutboxPtr) (Lib3MF_BuildItem pBuildIt
 * @param[out] pHasNext - Iterates to the next build item in the list.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItemIterator_MoveNextPtr) (Lib3MF_BuildItemIterator pBuildItemIterator, bool * pHasNext);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditemiterator_movenext(Lib3MF_BuildItemIterator pBuildItemIterator, bool * pHasNext);
 
 /**
 * Iterates to the previous build item in the list.
@@ -2320,7 +2331,7 @@ typedef Lib3MFResult (*PLib3MFBuildItemIterator_MoveNextPtr) (Lib3MF_BuildItemIt
 * @param[out] pHasPrevious - Iterates to the previous build item in the list.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItemIterator_MovePreviousPtr) (Lib3MF_BuildItemIterator pBuildItemIterator, bool * pHasPrevious);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditemiterator_moveprevious(Lib3MF_BuildItemIterator pBuildItemIterator, bool * pHasPrevious);
 
 /**
 * Returns the build item the iterator points at.
@@ -2329,7 +2340,7 @@ typedef Lib3MFResult (*PLib3MFBuildItemIterator_MovePreviousPtr) (Lib3MF_BuildIt
 * @param[out] pBuildItem - returns the build item instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItemIterator_GetCurrentPtr) (Lib3MF_BuildItemIterator pBuildItemIterator, Lib3MF_BuildItem * pBuildItem);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditemiterator_getcurrent(Lib3MF_BuildItemIterator pBuildItemIterator, Lib3MF_BuildItem * pBuildItem);
 
 /**
 * Creates a new build item iterator with the same build item list.
@@ -2338,7 +2349,7 @@ typedef Lib3MFResult (*PLib3MFBuildItemIterator_GetCurrentPtr) (Lib3MF_BuildItem
 * @param[out] pOutBuildItemIterator - returns the cloned Iterator instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItemIterator_ClonePtr) (Lib3MF_BuildItemIterator pBuildItemIterator, Lib3MF_BuildItemIterator * pOutBuildItemIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditemiterator_clone(Lib3MF_BuildItemIterator pBuildItemIterator, Lib3MF_BuildItemIterator * pOutBuildItemIterator);
 
 /**
 * Returns the number of build items the iterator captures.
@@ -2347,7 +2358,7 @@ typedef Lib3MFResult (*PLib3MFBuildItemIterator_ClonePtr) (Lib3MF_BuildItemItera
 * @param[out] pCount - returns the number of build items the iterator captures.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFBuildItemIterator_CountPtr) (Lib3MF_BuildItemIterator pBuildItemIterator, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_builditemiterator_count(Lib3MF_BuildItemIterator pBuildItemIterator, Lib3MF_uint64 * pCount);
 
 /*************************************************************************************************************************
  Class definition for Slice
@@ -2361,7 +2372,7 @@ typedef Lib3MFResult (*PLib3MFBuildItemIterator_CountPtr) (Lib3MF_BuildItemItera
 * @param[in] pVerticesBuffer - Position2D buffer of contains the positions.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_SetVerticesPtr) (Lib3MF_Slice pSlice, Lib3MF_uint64 nVerticesBufferSize, const Lib3MF::sPosition2D * pVerticesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_setvertices(Lib3MF_Slice pSlice, Lib3MF_uint64 nVerticesBufferSize, const Lib3MF::sPosition2D * pVerticesBuffer);
 
 /**
 * Get all vertices of a slice
@@ -2372,7 +2383,7 @@ typedef Lib3MFResult (*PLib3MFSlice_SetVerticesPtr) (Lib3MF_Slice pSlice, Lib3MF
 * @param[out] pVerticesBuffer - Position2D  buffer of contains the positions.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_GetVerticesPtr) (Lib3MF_Slice pSlice, const Lib3MF_uint64 nVerticesBufferSize, Lib3MF_uint64* pVerticesNeededCount, Lib3MF::sPosition2D * pVerticesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_getvertices(Lib3MF_Slice pSlice, const Lib3MF_uint64 nVerticesBufferSize, Lib3MF_uint64* pVerticesNeededCount, Lib3MF::sPosition2D * pVerticesBuffer);
 
 /**
 * Get the number of vertices in a slice
@@ -2381,7 +2392,7 @@ typedef Lib3MFResult (*PLib3MFSlice_GetVerticesPtr) (Lib3MF_Slice pSlice, const 
 * @param[out] pCount - the number of vertices in the slice
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_GetVertexCountPtr) (Lib3MF_Slice pSlice, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_getvertexcount(Lib3MF_Slice pSlice, Lib3MF_uint64 * pCount);
 
 /**
 * Add a new polygon to this slice
@@ -2392,7 +2403,7 @@ typedef Lib3MFResult (*PLib3MFSlice_GetVertexCountPtr) (Lib3MF_Slice pSlice, Lib
 * @param[out] pIndex - the index of the new polygon
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_AddPolygonPtr) (Lib3MF_Slice pSlice, Lib3MF_uint64 nIndicesBufferSize, const Lib3MF_uint32 * pIndicesBuffer, Lib3MF_uint64 * pIndex);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_addpolygon(Lib3MF_Slice pSlice, Lib3MF_uint64 nIndicesBufferSize, const Lib3MF_uint32 * pIndicesBuffer, Lib3MF_uint64 * pIndex);
 
 /**
 * Get the number of polygons in the slice
@@ -2401,7 +2412,7 @@ typedef Lib3MFResult (*PLib3MFSlice_AddPolygonPtr) (Lib3MF_Slice pSlice, Lib3MF_
 * @param[out] pCount - the number of polygons in the slice
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_GetPolygonCountPtr) (Lib3MF_Slice pSlice, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_getpolygoncount(Lib3MF_Slice pSlice, Lib3MF_uint64 * pCount);
 
 /**
 * Set all indices of a polygon
@@ -2412,7 +2423,7 @@ typedef Lib3MFResult (*PLib3MFSlice_GetPolygonCountPtr) (Lib3MF_Slice pSlice, Li
 * @param[in] pIndicesBuffer - uint32 buffer of the new indices of the index-th polygon
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_SetPolygonIndicesPtr) (Lib3MF_Slice pSlice, Lib3MF_uint64 nIndex, Lib3MF_uint64 nIndicesBufferSize, const Lib3MF_uint32 * pIndicesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_setpolygonindices(Lib3MF_Slice pSlice, Lib3MF_uint64 nIndex, Lib3MF_uint64 nIndicesBufferSize, const Lib3MF_uint32 * pIndicesBuffer);
 
 /**
 * Get all vertices of a slice
@@ -2424,7 +2435,7 @@ typedef Lib3MFResult (*PLib3MFSlice_SetPolygonIndicesPtr) (Lib3MF_Slice pSlice, 
 * @param[out] pIndicesBuffer - uint32  buffer of the indices of the index-th polygon 
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_GetPolygonIndicesPtr) (Lib3MF_Slice pSlice, Lib3MF_uint64 nIndex, const Lib3MF_uint64 nIndicesBufferSize, Lib3MF_uint64* pIndicesNeededCount, Lib3MF_uint32 * pIndicesBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_getpolygonindices(Lib3MF_Slice pSlice, Lib3MF_uint64 nIndex, const Lib3MF_uint64 nIndicesBufferSize, Lib3MF_uint64* pIndicesNeededCount, Lib3MF_uint32 * pIndicesBuffer);
 
 /**
 * Get the number of vertices in a slice
@@ -2434,7 +2445,7 @@ typedef Lib3MFResult (*PLib3MFSlice_GetPolygonIndicesPtr) (Lib3MF_Slice pSlice, 
 * @param[out] pCount - the number of indices of the index-th polygon
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_GetPolygonIndexCountPtr) (Lib3MF_Slice pSlice, Lib3MF_uint64 nIndex, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_getpolygonindexcount(Lib3MF_Slice pSlice, Lib3MF_uint64 nIndex, Lib3MF_uint64 * pCount);
 
 /**
 * Get the upper Z-Coordinate of this slice.
@@ -2443,7 +2454,7 @@ typedef Lib3MFResult (*PLib3MFSlice_GetPolygonIndexCountPtr) (Lib3MF_Slice pSlic
 * @param[out] pZTop - the upper Z-Coordinate of this slice
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSlice_GetZTopPtr) (Lib3MF_Slice pSlice, Lib3MF_double * pZTop);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slice_getztop(Lib3MF_Slice pSlice, Lib3MF_double * pZTop);
 
 /*************************************************************************************************************************
  Class definition for ToolpathProfile
@@ -2458,7 +2469,7 @@ typedef Lib3MFResult (*PLib3MFSlice_GetZTopPtr) (Lib3MF_Slice pSlice, Lib3MF_dou
 * @param[out] pUUIDBuffer -  buffer of Returns the uuid value., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetUUIDPtr) (Lib3MF_ToolpathProfile pToolpathProfile, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getuuid(Lib3MF_ToolpathProfile pToolpathProfile, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * Retrieves the profile's name
@@ -2469,7 +2480,7 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_GetUUIDPtr) (Lib3MF_ToolpathProfil
 * @param[out] pNameBuffer -  buffer of Returns the name., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetNamePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getname(Lib3MF_ToolpathProfile pToolpathProfile, const Lib3MF_uint32 nNameBufferSize, Lib3MF_uint32* pNameNeededChars, char * pNameBuffer);
 
 /**
 * Checks if a parameter value exists.
@@ -2480,7 +2491,7 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_GetNamePtr) (Lib3MF_ToolpathProfil
 * @param[out] pValueExists - Returns if a value exists.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_HasParameterValuePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, bool * pValueExists);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_hasparametervalue(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, bool * pValueExists);
 
 /**
 * Retrieves a profile's parameter value. Fails if value does not exist.
@@ -2491,7 +2502,7 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_HasParameterValuePtr) (Lib3MF_Tool
 * @param[out] pValue - Returns the value of the field.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetParameterDoubleValuePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double * pValue);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getparameterdoublevalue(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double * pValue);
 
 /**
 * Retrieves a profile's parameter value
@@ -2503,7 +2514,7 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_GetParameterDoubleValuePtr) (Lib3M
 * @param[out] pValue - Returns the value of the field.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_GetParameterDoubleValueDefPtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dDefaultValue, Lib3MF_double * pValue);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_getparameterdoublevaluedef(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dDefaultValue, Lib3MF_double * pValue);
 
 /**
 * Sets the profile's name
@@ -2512,7 +2523,7 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_GetParameterDoubleValueDefPtr) (Li
 * @param[in] pName - Returns the name.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_SetNamePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pName);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setname(Lib3MF_ToolpathProfile pToolpathProfile, const char * pName);
 
 /**
 * Sets a profile's parameter value.
@@ -2523,7 +2534,7 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_SetNamePtr) (Lib3MF_ToolpathProfil
 * @param[in] dValue - Double value of the parameter.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathProfile_SetParameterDoubleValuePtr) (Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dValue);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathprofile_setparameterdoublevalue(Lib3MF_ToolpathProfile pToolpathProfile, const char * pNameSpaceName, const char * pValueName, Lib3MF_double dValue);
 
 /*************************************************************************************************************************
  Class definition for ToolpathLayerReader
@@ -2538,7 +2549,7 @@ typedef Lib3MFResult (*PLib3MFToolpathProfile_SetParameterDoubleValuePtr) (Lib3M
 * @param[out] pUUIDBuffer -  buffer of Returns the uuid value., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetLayerDataUUIDPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getlayerdatauuid(Lib3MF_ToolpathLayerReader pToolpathLayerReader, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * Retrieves the count of segments.
@@ -2547,7 +2558,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetLayerDataUUIDPtr) (Lib3MF_T
 * @param[out] pCount - Count
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentCountPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentcount(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 * pCount);
 
 /**
 * Retrieves the segment type information .
@@ -2558,7 +2569,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentCountPtr) (Lib3MF_To
 * @param[out] pPointCount - Point count of segment.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentInfoPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF::eToolpathSegmentType * pType, Lib3MF_uint32 * pPointCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentinfo(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF::eToolpathSegmentType * pType, Lib3MF_uint32 * pPointCount);
 
 /**
 * Retrieves the assigned segment profile.
@@ -2568,7 +2579,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentInfoPtr) (Lib3MF_Too
 * @param[out] pProfile - Segment Profile
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentProfilePtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_ToolpathProfile * pProfile);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentprofile(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_ToolpathProfile * pProfile);
 
 /**
 * Retrieves the assigned segment profile uuid.
@@ -2580,7 +2591,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentProfilePtr) (Lib3MF_
 * @param[out] pProfileUUIDBuffer -  buffer of Segment Profile UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentProfileUUIDPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nProfileUUIDBufferSize, Lib3MF_uint32* pProfileUUIDNeededChars, char * pProfileUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentprofileuuid(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nProfileUUIDBufferSize, Lib3MF_uint32* pProfileUUIDNeededChars, char * pProfileUUIDBuffer);
 
 /**
 * Retrieves the assigned segment profile.
@@ -2590,7 +2601,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentProfileUUIDPtr) (Lib
 * @param[out] pBuildItem - Segment Build Item
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_BuildItem * pBuildItem);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentpart(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, Lib3MF_BuildItem * pBuildItem);
 
 /**
 * Retrieves the assigned segment part uuid.
@@ -2602,7 +2613,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartPtr) (Lib3MF_Too
 * @param[out] pPartUUIDBuffer -  buffer of Segment Part UUID, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartUUIDPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nPartUUIDBufferSize, Lib3MF_uint32* pPartUUIDNeededChars, char * pPartUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentpartuuid(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nPartUUIDBufferSize, Lib3MF_uint32* pPartUUIDNeededChars, char * pPartUUIDBuffer);
 
 /**
 * Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
@@ -2614,7 +2625,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPartUUIDPtr) (Lib3MF
 * @param[out] pPointDataBuffer - Position2D  buffer of The point data array
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPointDataPtr) (Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, const Lib3MF_uint64 nPointDataBufferSize, Lib3MF_uint64* pPointDataNeededCount, Lib3MF::sPosition2D * pPointDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerreader_getsegmentpointdata(Lib3MF_ToolpathLayerReader pToolpathLayerReader, Lib3MF_uint32 nIndex, const Lib3MF_uint64 nPointDataBufferSize, Lib3MF_uint64* pPointDataNeededCount, Lib3MF::sPosition2D * pPointDataBuffer);
 
 /*************************************************************************************************************************
  Class definition for ToolpathLayerData
@@ -2629,7 +2640,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerReader_GetSegmentPointDataPtr) (Lib3M
 * @param[out] pUUIDBuffer -  buffer of Returns the uuid value., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_GetLayerDataUUIDPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_getlayerdatauuid(Lib3MF_ToolpathLayerData pToolpathLayerData, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * Registers a toolpath profile
@@ -2639,7 +2650,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_GetLayerDataUUIDPtr) (Lib3MF_Too
 * @param[out] pProfileID - returns the local profile ID for the layer.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterProfilePtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_ToolpathProfile pProfile, Lib3MF_uint32 * pProfileID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_registerprofile(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_ToolpathProfile pProfile, Lib3MF_uint32 * pProfileID);
 
 /**
 * Registers a Model Build Item
@@ -2649,7 +2660,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterProfilePtr) (Lib3MF_Tool
 * @param[out] pPartID - returns the local part ID for the layer.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterBuildItemPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_BuildItem pBuildItem, Lib3MF_uint32 * pPartID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_registerbuilditem(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_BuildItem pBuildItem, Lib3MF_uint32 * pPartID);
 
 /**
 * writes hatch data to the layer.
@@ -2661,7 +2672,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_RegisterBuildItemPtr) (Lib3MF_To
 * @param[in] pPointDataBuffer - Position2D buffer of The point data
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_WriteHatchDataPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_writehatchdata(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer);
 
 /**
 * writes loop data to the layer.
@@ -2673,7 +2684,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_WriteHatchDataPtr) (Lib3MF_Toolp
 * @param[in] pPointDataBuffer - Position2D buffer of The point data
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_WriteLoopPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_writeloop(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer);
 
 /**
 * writes polyline data to the layer.
@@ -2685,7 +2696,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_WriteLoopPtr) (Lib3MF_ToolpathLa
 * @param[in] pPointDataBuffer - Position2D buffer of The point data
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_WritePolylinePtr) (Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_writepolyline(Lib3MF_ToolpathLayerData pToolpathLayerData, Lib3MF_uint32 nProfileID, Lib3MF_uint32 nPartID, Lib3MF_uint64 nPointDataBufferSize, const Lib3MF::sPosition2D * pPointDataBuffer);
 
 /**
 * finishes all writing of the layer and compresses toolpath data.
@@ -2693,7 +2704,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_WritePolylinePtr) (Lib3MF_Toolpa
 * @param[in] pToolpathLayerData - ToolpathLayerData instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathLayerData_FinishPtr) (Lib3MF_ToolpathLayerData pToolpathLayerData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathlayerdata_finish(Lib3MF_ToolpathLayerData pToolpathLayerData);
 
 /*************************************************************************************************************************
  Class definition for Toolpath
@@ -2706,7 +2717,7 @@ typedef Lib3MFResult (*PLib3MFToolpathLayerData_FinishPtr) (Lib3MF_ToolpathLayer
 * @param[out] pUnits - Returns the unit factor.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetUnitsPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_double * pUnits);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getunits(Lib3MF_Toolpath pToolpath, Lib3MF_double * pUnits);
 
 /**
 * Retrieves the count of layers
@@ -2715,7 +2726,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetUnitsPtr) (Lib3MF_Toolpath pToolpath, 
 * @param[out] pCount - Returns the layer count
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetLayerCountPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getlayercount(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 * pCount);
 
 /**
 * Retrieves the count of profiles
@@ -2724,7 +2735,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetLayerCountPtr) (Lib3MF_Toolpath pToolp
 * @param[out] pCount - Returns the profile count
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetProfileCountPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getprofilecount(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 * pCount);
 
 /**
 * Adds a new toolpath layer
@@ -2736,7 +2747,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetProfileCountPtr) (Lib3MF_Toolpath pToo
 * @param[out] pLayerData - Returns the layerdata object to write the layer content into.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_AddLayerPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nZMax, const char * pPath, Lib3MF_Writer pModelWriter, Lib3MF_ToolpathLayerData * pLayerData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_addlayer(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nZMax, const char * pPath, Lib3MF_Writer pModelWriter, Lib3MF_ToolpathLayerData * pLayerData);
 
 /**
 * Retrieves the Attachment of a layer
@@ -2746,7 +2757,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_AddLayerPtr) (Lib3MF_Toolpath pToolpath, 
 * @param[out] pAttachment - Attachment
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetLayerAttachmentPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, Lib3MF_Attachment * pAttachment);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getlayerattachment(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, Lib3MF_Attachment * pAttachment);
 
 /**
 * Reads the toolpath of a layer.
@@ -2756,7 +2767,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetLayerAttachmentPtr) (Lib3MF_Toolpath p
 * @param[out] pToolpathReader - Toolpath Reader Instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_ReadLayerDataPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, Lib3MF_ToolpathLayerReader * pToolpathReader);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_readlayerdata(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, Lib3MF_ToolpathLayerReader * pToolpathReader);
 
 /**
 * Retrieves the Path of a layer
@@ -2768,7 +2779,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_ReadLayerDataPtr) (Lib3MF_Toolpath pToolp
 * @param[out] pPathBuffer -  buffer of Package Path, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetLayerPathPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getlayerpath(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
 
 /**
 * Retrieves the ZMax of a layer
@@ -2778,7 +2789,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetLayerPathPtr) (Lib3MF_Toolpath pToolpa
 * @param[out] pZMax - ZMax value
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetLayerZMaxPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, Lib3MF_uint32 * pZMax);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getlayerzmax(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nIndex, Lib3MF_uint32 * pZMax);
 
 /**
 * Return the z value of a layer in units.
@@ -2788,7 +2799,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetLayerZMaxPtr) (Lib3MF_Toolpath pToolpa
 * @param[out] pZValue - Z Value in Units.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetLayerZPtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nLayerIndex, Lib3MF_uint32 * pZValue);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getlayerz(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nLayerIndex, Lib3MF_uint32 * pZValue);
 
 /**
 * Adds a new profile to the toolpath.
@@ -2798,7 +2809,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetLayerZPtr) (Lib3MF_Toolpath pToolpath,
 * @param[out] pProfile - Returns the profile.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_AddProfilePtr) (Lib3MF_Toolpath pToolpath, const char * pName, Lib3MF_ToolpathProfile * pProfile);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_addprofile(Lib3MF_Toolpath pToolpath, const char * pName, Lib3MF_ToolpathProfile * pProfile);
 
 /**
 * Returns a profile of the toolpath.
@@ -2808,7 +2819,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_AddProfilePtr) (Lib3MF_Toolpath pToolpath
 * @param[out] pProfile - Returns the profile.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetProfilePtr) (Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nProfileIndex, Lib3MF_ToolpathProfile * pProfile);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getprofile(Lib3MF_Toolpath pToolpath, Lib3MF_uint32 nProfileIndex, Lib3MF_ToolpathProfile * pProfile);
 
 /**
 * Returns a profile of the toolpath by UUID.
@@ -2818,7 +2829,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetProfilePtr) (Lib3MF_Toolpath pToolpath
 * @param[out] pProfile - Returns the profile.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpath_GetProfileUUIDPtr) (Lib3MF_Toolpath pToolpath, const char * pProfileUUID, Lib3MF_ToolpathProfile * pProfile);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpath_getprofileuuid(Lib3MF_Toolpath pToolpath, const char * pProfileUUID, Lib3MF_ToolpathProfile * pProfile);
 
 /*************************************************************************************************************************
  Class definition for ToolpathIterator
@@ -2831,7 +2842,7 @@ typedef Lib3MFResult (*PLib3MFToolpath_GetProfileUUIDPtr) (Lib3MF_Toolpath pTool
 * @param[out] pResource - returns the Toolpath instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFToolpathIterator_GetCurrentToolpathPtr) (Lib3MF_ToolpathIterator pToolpathIterator, Lib3MF_Toolpath * pResource);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_toolpathiterator_getcurrenttoolpath(Lib3MF_ToolpathIterator pToolpathIterator, Lib3MF_Toolpath * pResource);
 
 /*************************************************************************************************************************
  Class definition for SliceStack
@@ -2844,7 +2855,7 @@ typedef Lib3MFResult (*PLib3MFToolpathIterator_GetCurrentToolpathPtr) (Lib3MF_To
 * @param[out] pZBottom - the lower Z-Coordinate the slice stack
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_GetBottomZPtr) (Lib3MF_SliceStack pSliceStack, Lib3MF_double * pZBottom);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_getbottomz(Lib3MF_SliceStack pSliceStack, Lib3MF_double * pZBottom);
 
 /**
 * Returns the number of slices
@@ -2853,7 +2864,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_GetBottomZPtr) (Lib3MF_SliceStack pSlic
 * @param[out] pCount - the number of slices
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_GetSliceCountPtr) (Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_getslicecount(Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 * pCount);
 
 /**
 * Query a slice from the slice stack
@@ -2863,7 +2874,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_GetSliceCountPtr) (Lib3MF_SliceStack pS
 * @param[out] pTheSlice - the Slice instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_GetSlicePtr) (Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 nSliceIndex, Lib3MF_Slice * pTheSlice);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_getslice(Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 nSliceIndex, Lib3MF_Slice * pTheSlice);
 
 /**
 * Returns the number of slices
@@ -2873,7 +2884,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_GetSlicePtr) (Lib3MF_SliceStack pSliceS
 * @param[out] pTheSlice - a new Slice instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_AddSlicePtr) (Lib3MF_SliceStack pSliceStack, Lib3MF_double dZTop, Lib3MF_Slice * pTheSlice);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_addslice(Lib3MF_SliceStack pSliceStack, Lib3MF_double dZTop, Lib3MF_Slice * pTheSlice);
 
 /**
 * Returns the number of slice refs
@@ -2882,7 +2893,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_AddSlicePtr) (Lib3MF_SliceStack pSliceS
 * @param[out] pCount - the number of slicereferences
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_GetSliceRefCountPtr) (Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_getslicerefcount(Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 * pCount);
 
 /**
 * Adds another existing slicestack as sliceref in this slicestack
@@ -2891,7 +2902,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_GetSliceRefCountPtr) (Lib3MF_SliceStack
 * @param[in] pTheSliceStack - the slicestack to use as sliceref
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_AddSliceStackReferencePtr) (Lib3MF_SliceStack pSliceStack, Lib3MF_SliceStack pTheSliceStack);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_addslicestackreference(Lib3MF_SliceStack pSliceStack, Lib3MF_SliceStack pTheSliceStack);
 
 /**
 * Adds another existing slicestack as sliceref in this slicestack
@@ -2901,7 +2912,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_AddSliceStackReferencePtr) (Lib3MF_Slic
 * @param[out] pTheSliceStack - the slicestack that is used as sliceref
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_GetSliceStackReferencePtr) (Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 nSliceRefIndex, Lib3MF_SliceStack * pTheSliceStack);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_getslicestackreference(Lib3MF_SliceStack pSliceStack, Lib3MF_uint64 nSliceRefIndex, Lib3MF_SliceStack * pTheSliceStack);
 
 /**
 * Removes the indirection of slices via slice-refs, i.e. creates the slices of all slice refs of this SliceStack as actual slices of this SliceStack. All previously existing slices or slicerefs will be removed.
@@ -2909,7 +2920,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_GetSliceStackReferencePtr) (Lib3MF_Slic
 * @param[in] pSliceStack - SliceStack instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_CollapseSliceReferencesPtr) (Lib3MF_SliceStack pSliceStack);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_collapseslicereferences(Lib3MF_SliceStack pSliceStack);
 
 /**
 * Sets the package path where this Slice should be stored. Input an empty string to reset the path
@@ -2918,7 +2929,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_CollapseSliceReferencesPtr) (Lib3MF_Sli
 * @param[in] pPath - the package path where this Slice should be stored
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_SetOwnPathPtr) (Lib3MF_SliceStack pSliceStack, const char * pPath);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_setownpath(Lib3MF_SliceStack pSliceStack, const char * pPath);
 
 /**
 * Obtains the package path where this Slice should be stored. Returns an empty string if the slicestack is stored within the root model.
@@ -2929,7 +2940,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_SetOwnPathPtr) (Lib3MF_SliceStack pSlic
 * @param[out] pPathBuffer -  buffer of the package path where this Slice will be stored, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSliceStack_GetOwnPathPtr) (Lib3MF_SliceStack pSliceStack, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_slicestack_getownpath(Lib3MF_SliceStack pSliceStack, const Lib3MF_uint32 nPathBufferSize, Lib3MF_uint32* pPathNeededChars, char * pPathBuffer);
 
 /*************************************************************************************************************************
  Class definition for Consumer
@@ -2944,7 +2955,7 @@ typedef Lib3MFResult (*PLib3MFSliceStack_GetOwnPathPtr) (Lib3MF_SliceStack pSlic
 * @param[out] pConsumerIDBuffer -  buffer of A unique identifier for the consumers, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFConsumer_GetConsumerIDPtr) (Lib3MF_Consumer pConsumer, const Lib3MF_uint32 nConsumerIDBufferSize, Lib3MF_uint32* pConsumerIDNeededChars, char * pConsumerIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_consumer_getconsumerid(Lib3MF_Consumer pConsumer, const Lib3MF_uint32 nConsumerIDBufferSize, Lib3MF_uint32* pConsumerIDNeededChars, char * pConsumerIDBuffer);
 
 /**
 * Getts the keyid
@@ -2955,7 +2966,7 @@ typedef Lib3MFResult (*PLib3MFConsumer_GetConsumerIDPtr) (Lib3MF_Consumer pConsu
 * @param[out] pKeyIDBuffer -  buffer of The identifier for the key of this consumer, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFConsumer_GetKeyIDPtr) (Lib3MF_Consumer pConsumer, const Lib3MF_uint32 nKeyIDBufferSize, Lib3MF_uint32* pKeyIDNeededChars, char * pKeyIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_consumer_getkeyid(Lib3MF_Consumer pConsumer, const Lib3MF_uint32 nKeyIDBufferSize, Lib3MF_uint32* pKeyIDNeededChars, char * pKeyIDBuffer);
 
 /**
 * Gets the keyvalue associated with this consumer
@@ -2966,7 +2977,7 @@ typedef Lib3MFResult (*PLib3MFConsumer_GetKeyIDPtr) (Lib3MF_Consumer pConsumer, 
 * @param[out] pKeyValueBuffer -  buffer of The public key, when available, of this consumer, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFConsumer_GetKeyValuePtr) (Lib3MF_Consumer pConsumer, const Lib3MF_uint32 nKeyValueBufferSize, Lib3MF_uint32* pKeyValueNeededChars, char * pKeyValueBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_consumer_getkeyvalue(Lib3MF_Consumer pConsumer, const Lib3MF_uint32 nKeyValueBufferSize, Lib3MF_uint32* pKeyValueNeededChars, char * pKeyValueBuffer);
 
 /*************************************************************************************************************************
  Class definition for AccessRight
@@ -2979,7 +2990,7 @@ typedef Lib3MFResult (*PLib3MFConsumer_GetKeyValuePtr) (Lib3MF_Consumer pConsume
 * @param[out] pConsumer - The consumer instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAccessRight_GetConsumerPtr) (Lib3MF_AccessRight pAccessRight, Lib3MF_Consumer * pConsumer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_accessright_getconsumer(Lib3MF_AccessRight pAccessRight, Lib3MF_Consumer * pConsumer);
 
 /**
 * Gets the associated encryption algorithm
@@ -2988,7 +2999,7 @@ typedef Lib3MFResult (*PLib3MFAccessRight_GetConsumerPtr) (Lib3MF_AccessRight pA
 * @param[out] pAlgorithm - The algorithm used for the key in this accessright
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAccessRight_GetWrappingAlgorithmPtr) (Lib3MF_AccessRight pAccessRight, Lib3MF::eWrappingAlgorithm * pAlgorithm);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_accessright_getwrappingalgorithm(Lib3MF_AccessRight pAccessRight, Lib3MF::eWrappingAlgorithm * pAlgorithm);
 
 /**
 * Gets the associated mask generation function algorithm
@@ -2997,7 +3008,7 @@ typedef Lib3MFResult (*PLib3MFAccessRight_GetWrappingAlgorithmPtr) (Lib3MF_Acces
 * @param[out] pAlgorithm - The MFG1 algorithm
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAccessRight_GetMgfAlgorithmPtr) (Lib3MF_AccessRight pAccessRight, Lib3MF::eMgfAlgorithm * pAlgorithm);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_accessright_getmgfalgorithm(Lib3MF_AccessRight pAccessRight, Lib3MF::eMgfAlgorithm * pAlgorithm);
 
 /**
 * Gets the digest method assoicated
@@ -3006,7 +3017,7 @@ typedef Lib3MFResult (*PLib3MFAccessRight_GetMgfAlgorithmPtr) (Lib3MF_AccessRigh
 * @param[out] pAlgorithm - The digest method for this accessright
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAccessRight_GetDigestMethodPtr) (Lib3MF_AccessRight pAccessRight, Lib3MF::eDigestMethod * pAlgorithm);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_accessright_getdigestmethod(Lib3MF_AccessRight pAccessRight, Lib3MF::eDigestMethod * pAlgorithm);
 
 /*************************************************************************************************************************
  Class definition for ContentEncryptionParams
@@ -3019,7 +3030,7 @@ typedef Lib3MFResult (*PLib3MFAccessRight_GetDigestMethodPtr) (Lib3MF_AccessRigh
 * @param[out] pAlgorithm - 
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetEncryptionAlgorithmPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, Lib3MF::eEncryptionAlgorithm * pAlgorithm);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_getencryptionalgorithm(Lib3MF_ContentEncryptionParams pContentEncryptionParams, Lib3MF::eEncryptionAlgorithm * pAlgorithm);
 
 /**
 * Gets the key for the resource associated
@@ -3030,7 +3041,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetEncryptionAlgorithmPtr)
 * @param[out] pByteDataBuffer - uint8  buffer of Pointer to a buffer where to place the key.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetKeyPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_getkey(Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
 
 /**
 * Gets the IV data
@@ -3041,7 +3052,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetKeyPtr) (Lib3MF_Content
 * @param[out] pByteDataBuffer - uint8  buffer of Pointer to a buffer where to place the data.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetInitializationVectorPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_getinitializationvector(Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
 
 /**
 * A handler descriptor that uniquely identifies the context of the resource. Each resource will be assigned a different value
@@ -3052,7 +3063,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetInitializationVectorPtr
 * @param[out] pByteDataBuffer - uint8  buffer of Pointer to a buffer where to place the data.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetAuthenticationTagPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_getauthenticationtag(Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
 
 /**
 * Sets the authentication tag
@@ -3062,7 +3073,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetAuthenticationTagPtr) (
 * @param[in] pByteDataBuffer - uint8 buffer of The authentication tag size
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_SetAuthenticationTagPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, Lib3MF_uint64 nByteDataBufferSize, const Lib3MF_uint8 * pByteDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_setauthenticationtag(Lib3MF_ContentEncryptionParams pContentEncryptionParams, Lib3MF_uint64 nByteDataBufferSize, const Lib3MF_uint8 * pByteDataBuffer);
 
 /**
 * A handler descriptor that uniquely identifies the context of the resource. Each resource will be assigned a different value
@@ -3073,7 +3084,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_SetAuthenticationTagPtr) (
 * @param[out] pByteDataBuffer - uint8  buffer of Buffer where the data will be placed
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetAdditionalAuthenticationDataPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_getadditionalauthenticationdata(Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
 
 /**
 * A handler descriptor that uniquely identifies the context of the resource. Each resource will be assigned a different value
@@ -3082,7 +3093,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetAdditionalAuthenticatio
 * @param[out] pDescriptor - 
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetDescriptorPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, Lib3MF_uint64 * pDescriptor);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_getdescriptor(Lib3MF_ContentEncryptionParams pContentEncryptionParams, Lib3MF_uint64 * pDescriptor);
 
 /**
 * Gets the resourcedatagroup keyuuid
@@ -3093,7 +3104,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetDescriptorPtr) (Lib3MF_
 * @param[out] pUUIDBuffer -  buffer of The resourcedatagroup keyuuid that may be use to reference an external key, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetKeyUUIDPtr) (Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_contentencryptionparams_getkeyuuid(Lib3MF_ContentEncryptionParams pContentEncryptionParams, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /*************************************************************************************************************************
  Class definition for ResourceData
@@ -3106,7 +3117,7 @@ typedef Lib3MFResult (*PLib3MFContentEncryptionParams_GetKeyUUIDPtr) (Lib3MF_Con
 * @param[out] pPath - The part path
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceData_GetPathPtr) (Lib3MF_ResourceData pResourceData, Lib3MF_PackagePart * pPath);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedata_getpath(Lib3MF_ResourceData pResourceData, Lib3MF_PackagePart * pPath);
 
 /**
 * Gets the encryption algorithm used to encrypt this ResourceData
@@ -3115,7 +3126,7 @@ typedef Lib3MFResult (*PLib3MFResourceData_GetPathPtr) (Lib3MF_ResourceData pRes
 * @param[out] pEncryptionAlgorithm - The encryption algorithm
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceData_GetEncryptionAlgorithmPtr) (Lib3MF_ResourceData pResourceData, Lib3MF::eEncryptionAlgorithm * pEncryptionAlgorithm);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedata_getencryptionalgorithm(Lib3MF_ResourceData pResourceData, Lib3MF::eEncryptionAlgorithm * pEncryptionAlgorithm);
 
 /**
 * Tells whether this ResourceData is compressed or not
@@ -3124,7 +3135,7 @@ typedef Lib3MFResult (*PLib3MFResourceData_GetEncryptionAlgorithmPtr) (Lib3MF_Re
 * @param[out] pCompression - The compression method
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceData_GetCompressionPtr) (Lib3MF_ResourceData pResourceData, Lib3MF::eCompression * pCompression);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedata_getcompression(Lib3MF_ResourceData pResourceData, Lib3MF::eCompression * pCompression);
 
 /**
 * Tells whether this ResourceData is compressed or not
@@ -3135,7 +3146,7 @@ typedef Lib3MFResult (*PLib3MFResourceData_GetCompressionPtr) (Lib3MF_ResourceDa
 * @param[out] pByteDataBuffer - uint8  buffer of The compression method
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceData_GetAdditionalAuthenticationDataPtr) (Lib3MF_ResourceData pResourceData, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedata_getadditionalauthenticationdata(Lib3MF_ResourceData pResourceData, const Lib3MF_uint64 nByteDataBufferSize, Lib3MF_uint64* pByteDataNeededCount, Lib3MF_uint8 * pByteDataBuffer);
 
 /*************************************************************************************************************************
  Class definition for ResourceDataGroup
@@ -3150,7 +3161,7 @@ typedef Lib3MFResult (*PLib3MFResourceData_GetAdditionalAuthenticationDataPtr) (
 * @param[out] pUUIDBuffer -  buffer of The new resourcedatagroup keyuuid., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceDataGroup_GetKeyUUIDPtr) (Lib3MF_ResourceDataGroup pResourceDataGroup, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedatagroup_getkeyuuid(Lib3MF_ResourceDataGroup pResourceDataGroup, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * Add accessright to resourcedatagroup element
@@ -3163,7 +3174,7 @@ typedef Lib3MFResult (*PLib3MFResourceDataGroup_GetKeyUUIDPtr) (Lib3MF_ResourceD
 * @param[out] pTheAccessRight - The acess right instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceDataGroup_AddAccessRightPtr) (Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_Consumer pConsumer, Lib3MF::eWrappingAlgorithm eWrappingAlgorithm, Lib3MF::eMgfAlgorithm eMgfAlgorithm, Lib3MF::eDigestMethod eDigestMethod, Lib3MF_AccessRight * pTheAccessRight);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedatagroup_addaccessright(Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_Consumer pConsumer, Lib3MF::eWrappingAlgorithm eWrappingAlgorithm, Lib3MF::eMgfAlgorithm eMgfAlgorithm, Lib3MF::eDigestMethod eDigestMethod, Lib3MF_AccessRight * pTheAccessRight);
 
 /**
 * Finds the AccessRight associated with a Consumer
@@ -3173,7 +3184,7 @@ typedef Lib3MFResult (*PLib3MFResourceDataGroup_AddAccessRightPtr) (Lib3MF_Resou
 * @param[out] pTheAccessRight - The AcessRight instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceDataGroup_FindAccessRightByConsumerPtr) (Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_Consumer pConsumer, Lib3MF_AccessRight * pTheAccessRight);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedatagroup_findaccessrightbyconsumer(Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_Consumer pConsumer, Lib3MF_AccessRight * pTheAccessRight);
 
 /**
 * Removes access from a Consumer on this resource data group
@@ -3182,7 +3193,7 @@ typedef Lib3MFResult (*PLib3MFResourceDataGroup_FindAccessRightByConsumerPtr) (L
 * @param[in] pConsumer - The Consumer instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFResourceDataGroup_RemoveAccessRightPtr) (Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_Consumer pConsumer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_resourcedatagroup_removeaccessright(Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_Consumer pConsumer);
 
 /*************************************************************************************************************************
  Class definition for KeyStore
@@ -3198,7 +3209,7 @@ typedef Lib3MFResult (*PLib3MFResourceDataGroup_RemoveAccessRightPtr) (Lib3MF_Re
 * @param[out] pConsumer - The consumer instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_AddConsumerPtr) (Lib3MF_KeyStore pKeyStore, const char * pConsumerID, const char * pKeyID, const char * pKeyValue, Lib3MF_Consumer * pConsumer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_addconsumer(Lib3MF_KeyStore pKeyStore, const char * pConsumerID, const char * pKeyID, const char * pKeyValue, Lib3MF_Consumer * pConsumer);
 
 /**
 * Gets the number of consumers in the keystore
@@ -3207,7 +3218,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_AddConsumerPtr) (Lib3MF_KeyStore pKeyStor
 * @param[out] pCount - The consumer count
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_GetConsumerCountPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_getconsumercount(Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 * pCount);
 
 /**
 * Get a consumer from the keystore
@@ -3217,7 +3228,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_GetConsumerCountPtr) (Lib3MF_KeyStore pKe
 * @param[out] pConsumer - The consumer instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_GetConsumerPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 nConsumerIndex, Lib3MF_Consumer * pConsumer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_getconsumer(Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 nConsumerIndex, Lib3MF_Consumer * pConsumer);
 
 /**
 * Removes a consumer from the keystore
@@ -3226,7 +3237,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_GetConsumerPtr) (Lib3MF_KeyStore pKeyStor
 * @param[in] pConsumer - The consumer instance to remove
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_RemoveConsumerPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_Consumer pConsumer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_removeconsumer(Lib3MF_KeyStore pKeyStore, Lib3MF_Consumer pConsumer);
 
 /**
 * Finds a consumer by ID
@@ -3236,7 +3247,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_RemoveConsumerPtr) (Lib3MF_KeyStore pKeyS
 * @param[out] pConsumer - The consumer instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_FindConsumerPtr) (Lib3MF_KeyStore pKeyStore, const char * pConsumerID, Lib3MF_Consumer * pConsumer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_findconsumer(Lib3MF_KeyStore pKeyStore, const char * pConsumerID, Lib3MF_Consumer * pConsumer);
 
 /**
 * Gets the number of resource data group in the keysore
@@ -3245,7 +3256,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_FindConsumerPtr) (Lib3MF_KeyStore pKeySto
 * @param[out] pCount - The number of resource data available
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataGroupCountPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_getresourcedatagroupcount(Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 * pCount);
 
 /**
 * Adds a resource data group into the keystore.
@@ -3254,7 +3265,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataGroupCountPtr) (Lib3MF_Key
 * @param[out] pResourceDataGroup - The resource data group instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_AddResourceDataGroupPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceDataGroup * pResourceDataGroup);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_addresourcedatagroup(Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceDataGroup * pResourceDataGroup);
 
 /**
 * Gets a resource data group
@@ -3264,7 +3275,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_AddResourceDataGroupPtr) (Lib3MF_KeyStore
 * @param[out] pResourceDataGroup - The resource data group instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataGroupPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 nResourceDataIndex, Lib3MF_ResourceDataGroup * pResourceDataGroup);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_getresourcedatagroup(Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 nResourceDataIndex, Lib3MF_ResourceDataGroup * pResourceDataGroup);
 
 /**
 * Removes a resource data group
@@ -3273,7 +3284,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataGroupPtr) (Lib3MF_KeyStore
 * @param[in] pResourceDataGroup - The resource data group instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_RemoveResourceDataGroupPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceDataGroup pResourceDataGroup);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_removeresourcedatagroup(Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceDataGroup pResourceDataGroup);
 
 /**
 * Finds a resource data group that contains a particular resourcedata
@@ -3283,7 +3294,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_RemoveResourceDataGroupPtr) (Lib3MF_KeySt
 * @param[out] pResourceDataGroup - The data resource instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_FindResourceDataGroupPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_PackagePart pPartPath, Lib3MF_ResourceDataGroup * pResourceDataGroup);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_findresourcedatagroup(Lib3MF_KeyStore pKeyStore, Lib3MF_PackagePart pPartPath, Lib3MF_ResourceDataGroup * pResourceDataGroup);
 
 /**
 * Add resourcedata to resourcedatagroup element
@@ -3298,7 +3309,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_FindResourceDataGroupPtr) (Lib3MF_KeyStor
 * @param[out] pResourceData - The data resource instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_AddResourceDataPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_PackagePart pPartPath, Lib3MF::eEncryptionAlgorithm eAlgorithm, Lib3MF::eCompression eCompression, Lib3MF_uint64 nAdditionalAuthenticationDataBufferSize, const Lib3MF_uint8 * pAdditionalAuthenticationDataBuffer, Lib3MF_ResourceData * pResourceData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_addresourcedata(Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceDataGroup pResourceDataGroup, Lib3MF_PackagePart pPartPath, Lib3MF::eEncryptionAlgorithm eAlgorithm, Lib3MF::eCompression eCompression, Lib3MF_uint64 nAdditionalAuthenticationDataBufferSize, const Lib3MF_uint8 * pAdditionalAuthenticationDataBuffer, Lib3MF_ResourceData * pResourceData);
 
 /**
 * Removes a resource data
@@ -3307,7 +3318,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_AddResourceDataPtr) (Lib3MF_KeyStore pKey
 * @param[in] pResourceData - The resource data to be removed
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_RemoveResourceDataPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceData pResourceData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_removeresourcedata(Lib3MF_KeyStore pKeyStore, Lib3MF_ResourceData pResourceData);
 
 /**
 * Finds a resource data on this resource group
@@ -3317,7 +3328,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_RemoveResourceDataPtr) (Lib3MF_KeyStore p
 * @param[out] pResourceData - The resource data instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_FindResourceDataPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_PackagePart pResourcePath, Lib3MF_ResourceData * pResourceData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_findresourcedata(Lib3MF_KeyStore pKeyStore, Lib3MF_PackagePart pResourcePath, Lib3MF_ResourceData * pResourceData);
 
 /**
 * Gets the number of resource data in the keysore
@@ -3326,7 +3337,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_FindResourceDataPtr) (Lib3MF_KeyStore pKe
 * @param[out] pCount - The number of resource data available
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataCountPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 * pCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_getresourcedatacount(Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 * pCount);
 
 /**
 * Gets a resource data
@@ -3336,7 +3347,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataCountPtr) (Lib3MF_KeyStore
 * @param[out] pResourceData - The data resource instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataPtr) (Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 nResourceDataIndex, Lib3MF_ResourceData * pResourceData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_getresourcedata(Lib3MF_KeyStore pKeyStore, Lib3MF_uint64 nResourceDataIndex, Lib3MF_ResourceData * pResourceData);
 
 /**
 * Gets the keystore UUID
@@ -3348,7 +3359,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_GetResourceDataPtr) (Lib3MF_KeyStore pKey
 * @param[out] pUUIDBuffer -  buffer of returns the keystore uuid., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_GetUUIDPtr) (Lib3MF_KeyStore pKeyStore, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_getuuid(Lib3MF_KeyStore pKeyStore, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * Sets the keystore UUID
@@ -3357,7 +3368,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_GetUUIDPtr) (Lib3MF_KeyStore pKeyStore, b
 * @param[in] pUUID - The new keystore uuid.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFKeyStore_SetUUIDPtr) (Lib3MF_KeyStore pKeyStore, const char * pUUID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_keystore_setuuid(Lib3MF_KeyStore pKeyStore, const char * pUUID);
 
 /*************************************************************************************************************************
  Class definition for Model
@@ -3370,7 +3381,7 @@ typedef Lib3MFResult (*PLib3MFKeyStore_SetUUIDPtr) (Lib3MF_KeyStore pKeyStore, c
 * @param[out] pRootModelPart - the PackagePart within the OPC package that holds the model-file
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_RootModelPartPtr) (Lib3MF_Model pModel, Lib3MF_PackagePart * pRootModelPart);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_rootmodelpart(Lib3MF_Model pModel, Lib3MF_PackagePart * pRootModelPart);
 
 /**
 * Returns a new PackagePart for use within the OPC package.
@@ -3380,7 +3391,7 @@ typedef Lib3MFResult (*PLib3MFModel_RootModelPartPtr) (Lib3MF_Model pModel, Lib3
 * @param[out] pModelPart - the new PackagePart within the OPC package
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_FindOrCreatePackagePartPtr) (Lib3MF_Model pModel, const char * pAbsolutePath, Lib3MF_PackagePart * pModelPart);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_findorcreatepackagepart(Lib3MF_Model pModel, const char * pAbsolutePath, Lib3MF_PackagePart * pModelPart);
 
 /**
 * sets the units of a model.
@@ -3389,7 +3400,7 @@ typedef Lib3MFResult (*PLib3MFModel_FindOrCreatePackagePartPtr) (Lib3MF_Model pM
 * @param[in] eUnit - Unit enum value for the model unit
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_SetUnitPtr) (Lib3MF_Model pModel, Lib3MF::eModelUnit eUnit);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_setunit(Lib3MF_Model pModel, Lib3MF::eModelUnit eUnit);
 
 /**
 * returns the units of a model.
@@ -3398,7 +3409,7 @@ typedef Lib3MFResult (*PLib3MFModel_SetUnitPtr) (Lib3MF_Model pModel, Lib3MF::eM
 * @param[out] pUnit - Unit enum value for the model unit
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetUnitPtr) (Lib3MF_Model pModel, Lib3MF::eModelUnit * pUnit);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getunit(Lib3MF_Model pModel, Lib3MF::eModelUnit * pUnit);
 
 /**
 * retrieves the language of a model
@@ -3409,7 +3420,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetUnitPtr) (Lib3MF_Model pModel, Lib3MF::eM
 * @param[out] pLanguageBuffer -  buffer of language identifier, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetLanguagePtr) (Lib3MF_Model pModel, const Lib3MF_uint32 nLanguageBufferSize, Lib3MF_uint32* pLanguageNeededChars, char * pLanguageBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getlanguage(Lib3MF_Model pModel, const Lib3MF_uint32 nLanguageBufferSize, Lib3MF_uint32* pLanguageNeededChars, char * pLanguageBuffer);
 
 /**
 * sets the language of a model
@@ -3418,7 +3429,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetLanguagePtr) (Lib3MF_Model pModel, const 
 * @param[in] pLanguage - language identifier
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_SetLanguagePtr) (Lib3MF_Model pModel, const char * pLanguage);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_setlanguage(Lib3MF_Model pModel, const char * pLanguage);
 
 /**
 * creates a model writer instance for a specific file type
@@ -3428,7 +3439,7 @@ typedef Lib3MFResult (*PLib3MFModel_SetLanguagePtr) (Lib3MF_Model pModel, const 
 * @param[out] pWriterInstance -  string identifier for the file type
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_QueryWriterPtr) (Lib3MF_Model pModel, const char * pWriterClass, Lib3MF_Writer * pWriterInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_querywriter(Lib3MF_Model pModel, const char * pWriterClass, Lib3MF_Writer * pWriterInstance);
 
 /**
 * creates a model reader instance for a specific file type
@@ -3438,7 +3449,7 @@ typedef Lib3MFResult (*PLib3MFModel_QueryWriterPtr) (Lib3MF_Model pModel, const 
 * @param[out] pReaderInstance -  string identifier for the file type
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_QueryReaderPtr) (Lib3MF_Model pModel, const char * pReaderClass, Lib3MF_Reader * pReaderInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_queryreader(Lib3MF_Model pModel, const char * pReaderClass, Lib3MF_Reader * pReaderInstance);
 
 /**
 * finds a model texture by its UniqueResourceID
@@ -3448,7 +3459,7 @@ typedef Lib3MFResult (*PLib3MFModel_QueryReaderPtr) (Lib3MF_Model pModel, const 
 * @param[out] pTextureInstance - returns the texture2d instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetTexture2DByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_Texture2D * pTextureInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_gettexture2dbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_Texture2D * pTextureInstance);
 
 /**
 * returns a Property's type
@@ -3458,7 +3469,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetTexture2DByIDPtr) (Lib3MF_Model pModel, L
 * @param[out] pThePropertyType - returns a Property's type
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetPropertyTypeByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF::ePropertyType * pThePropertyType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getpropertytypebyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF::ePropertyType * pThePropertyType);
 
 /**
 * finds a model base material group by its UniqueResourceID
@@ -3468,7 +3479,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetPropertyTypeByIDPtr) (Lib3MF_Model pModel
 * @param[out] pBaseMaterialGroupInstance - returns the BaseMaterialGroup instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetBaseMaterialGroupByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_BaseMaterialGroup * pBaseMaterialGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getbasematerialgroupbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_BaseMaterialGroup * pBaseMaterialGroupInstance);
 
 /**
 * finds a model texture2d group by its UniqueResourceID
@@ -3478,7 +3489,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetBaseMaterialGroupByIDPtr) (Lib3MF_Model p
 * @param[out] pTexture2DGroupInstance - returns the Texture2DGroup instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetTexture2DGroupByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_Texture2DGroup * pTexture2DGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_gettexture2dgroupbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_Texture2DGroup * pTexture2DGroupInstance);
 
 /**
 * finds a model CompositeMaterials by its UniqueResourceID
@@ -3488,7 +3499,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetTexture2DGroupByIDPtr) (Lib3MF_Model pMod
 * @param[out] pCompositeMaterialsInstance - returns the CompositeMaterials instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetCompositeMaterialsByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_CompositeMaterials * pCompositeMaterialsInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getcompositematerialsbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_CompositeMaterials * pCompositeMaterialsInstance);
 
 /**
 * finds a model MultiPropertyGroup by its UniqueResourceID
@@ -3498,7 +3509,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetCompositeMaterialsByIDPtr) (Lib3MF_Model 
 * @param[out] pMultiPropertyGroupInstance - returns the MultiPropertyGroup instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetMultiPropertyGroupByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_MultiPropertyGroup * pMultiPropertyGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getmultipropertygroupbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_MultiPropertyGroup * pMultiPropertyGroupInstance);
 
 /**
 * finds a mesh object by its UniqueResourceID
@@ -3508,7 +3519,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetMultiPropertyGroupByIDPtr) (Lib3MF_Model 
 * @param[out] pMeshObjectInstance - returns the mesh object instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetMeshObjectByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_MeshObject * pMeshObjectInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getmeshobjectbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_MeshObject * pMeshObjectInstance);
 
 /**
 * finds a components object by its UniqueResourceID
@@ -3518,7 +3529,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetMeshObjectByIDPtr) (Lib3MF_Model pModel, 
 * @param[out] pComponentsObjectInstance - returns the components object instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetComponentsObjectByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_ComponentsObject * pComponentsObjectInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getcomponentsobjectbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_ComponentsObject * pComponentsObjectInstance);
 
 /**
 * finds a model color group by its UniqueResourceID
@@ -3528,7 +3539,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetComponentsObjectByIDPtr) (Lib3MF_Model pM
 * @param[out] pColorGroupInstance - returns the ColorGroup instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetColorGroupByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_ColorGroup * pColorGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getcolorgroupbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_ColorGroup * pColorGroupInstance);
 
 /**
 * finds a model slicestack by its UniqueResourceID
@@ -3538,7 +3549,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetColorGroupByIDPtr) (Lib3MF_Model pModel, 
 * @param[out] pSliceStacInstance - returns the slicestack instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetSliceStackByIDPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_SliceStack * pSliceStacInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getslicestackbyid(Lib3MF_Model pModel, Lib3MF_uint32 nUniqueResourceID, Lib3MF_SliceStack * pSliceStacInstance);
 
 /**
 * returns, whether a build has a UUID and, if true, the build's UUID
@@ -3550,7 +3561,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetSliceStackByIDPtr) (Lib3MF_Model pModel, 
 * @param[out] pUUIDBuffer -  buffer of the UUID as string of the form 'xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx', may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetBuildUUIDPtr) (Lib3MF_Model pModel, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getbuilduuid(Lib3MF_Model pModel, bool * pHasUUID, const Lib3MF_uint32 nUUIDBufferSize, Lib3MF_uint32* pUUIDNeededChars, char * pUUIDBuffer);
 
 /**
 * sets the build's UUID
@@ -3559,7 +3570,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetBuildUUIDPtr) (Lib3MF_Model pModel, bool 
 * @param[in] pUUID - the UUID as string of the form 'xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx'
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_SetBuildUUIDPtr) (Lib3MF_Model pModel, const char * pUUID);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_setbuilduuid(Lib3MF_Model pModel, const char * pUUID);
 
 /**
 * creates a build item iterator instance with all build items.
@@ -3568,7 +3579,7 @@ typedef Lib3MFResult (*PLib3MFModel_SetBuildUUIDPtr) (Lib3MF_Model pModel, const
 * @param[out] pBuildItemIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetBuildItemsPtr) (Lib3MF_Model pModel, Lib3MF_BuildItemIterator * pBuildItemIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getbuilditems(Lib3MF_Model pModel, Lib3MF_BuildItemIterator * pBuildItemIterator);
 
 /**
 * Returns the outbox of a Model
@@ -3577,7 +3588,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetBuildItemsPtr) (Lib3MF_Model pModel, Lib3
 * @param[out] pOutbox - Outbox of this Model
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetOutboxPtr) (Lib3MF_Model pModel, Lib3MF::sBox * pOutbox);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getoutbox(Lib3MF_Model pModel, Lib3MF::sBox * pOutbox);
 
 /**
 * creates a resource iterator instance with all resources.
@@ -3586,7 +3597,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetOutboxPtr) (Lib3MF_Model pModel, Lib3MF::
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetResourcesPtr) (Lib3MF_Model pModel, Lib3MF_ResourceIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getresources(Lib3MF_Model pModel, Lib3MF_ResourceIterator * pResourceIterator);
 
 /**
 * creates a resource iterator instance with all object resources.
@@ -3595,7 +3606,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetResourcesPtr) (Lib3MF_Model pModel, Lib3M
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetObjectsPtr) (Lib3MF_Model pModel, Lib3MF_ObjectIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getobjects(Lib3MF_Model pModel, Lib3MF_ObjectIterator * pResourceIterator);
 
 /**
 * creates a resource iterator instance with all mesh object resources.
@@ -3604,7 +3615,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetObjectsPtr) (Lib3MF_Model pModel, Lib3MF_
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetMeshObjectsPtr) (Lib3MF_Model pModel, Lib3MF_MeshObjectIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getmeshobjects(Lib3MF_Model pModel, Lib3MF_MeshObjectIterator * pResourceIterator);
 
 /**
 * creates a resource iterator instance with all components object resources.
@@ -3613,7 +3624,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetMeshObjectsPtr) (Lib3MF_Model pModel, Lib
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetComponentsObjectsPtr) (Lib3MF_Model pModel, Lib3MF_ComponentsObjectIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getcomponentsobjects(Lib3MF_Model pModel, Lib3MF_ComponentsObjectIterator * pResourceIterator);
 
 /**
 * creates a Texture2DIterator instance with all texture2d resources.
@@ -3622,7 +3633,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetComponentsObjectsPtr) (Lib3MF_Model pMode
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetTexture2DsPtr) (Lib3MF_Model pModel, Lib3MF_Texture2DIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_gettexture2ds(Lib3MF_Model pModel, Lib3MF_Texture2DIterator * pResourceIterator);
 
 /**
 * creates a BaseMaterialGroupIterator instance with all base material resources.
@@ -3631,7 +3642,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetTexture2DsPtr) (Lib3MF_Model pModel, Lib3
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetBaseMaterialGroupsPtr) (Lib3MF_Model pModel, Lib3MF_BaseMaterialGroupIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getbasematerialgroups(Lib3MF_Model pModel, Lib3MF_BaseMaterialGroupIterator * pResourceIterator);
 
 /**
 * creates a ColorGroupIterator instance with all ColorGroup resources.
@@ -3640,7 +3651,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetBaseMaterialGroupsPtr) (Lib3MF_Model pMod
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetColorGroupsPtr) (Lib3MF_Model pModel, Lib3MF_ColorGroupIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getcolorgroups(Lib3MF_Model pModel, Lib3MF_ColorGroupIterator * pResourceIterator);
 
 /**
 * creates a Texture2DGroupIterator instance with all base material resources.
@@ -3649,7 +3660,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetColorGroupsPtr) (Lib3MF_Model pModel, Lib
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetTexture2DGroupsPtr) (Lib3MF_Model pModel, Lib3MF_Texture2DGroupIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_gettexture2dgroups(Lib3MF_Model pModel, Lib3MF_Texture2DGroupIterator * pResourceIterator);
 
 /**
 * creates a CompositeMaterialsIterator instance with all CompositeMaterials resources.
@@ -3658,7 +3669,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetTexture2DGroupsPtr) (Lib3MF_Model pModel,
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetCompositeMaterialsPtr) (Lib3MF_Model pModel, Lib3MF_CompositeMaterialsIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getcompositematerials(Lib3MF_Model pModel, Lib3MF_CompositeMaterialsIterator * pResourceIterator);
 
 /**
 * creates a MultiPropertyGroupsIterator instance with all MultiPropertyGroup resources.
@@ -3667,7 +3678,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetCompositeMaterialsPtr) (Lib3MF_Model pMod
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetMultiPropertyGroupsPtr) (Lib3MF_Model pModel, Lib3MF_MultiPropertyGroupIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getmultipropertygroups(Lib3MF_Model pModel, Lib3MF_MultiPropertyGroupIterator * pResourceIterator);
 
 /**
 * creates a Toolpath instance with all toolpath resources.
@@ -3676,7 +3687,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetMultiPropertyGroupsPtr) (Lib3MF_Model pMo
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetToolpathsPtr) (Lib3MF_Model pModel, Lib3MF_ToolpathIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_gettoolpaths(Lib3MF_Model pModel, Lib3MF_ToolpathIterator * pResourceIterator);
 
 /**
 * creates a resource iterator instance with all slice stack resources.
@@ -3685,7 +3696,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetToolpathsPtr) (Lib3MF_Model pModel, Lib3M
 * @param[out] pResourceIterator - returns the iterator instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetSliceStacksPtr) (Lib3MF_Model pModel, Lib3MF_SliceStackIterator * pResourceIterator);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getslicestacks(Lib3MF_Model pModel, Lib3MF_SliceStackIterator * pResourceIterator);
 
 /**
 * Merges all components and objects which are referenced by a build item into a mesh. The memory is duplicated and a new model is created.
@@ -3694,7 +3705,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetSliceStacksPtr) (Lib3MF_Model pModel, Lib
 * @param[out] pMergedModelInstance - returns the merged model instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_MergeToModelPtr) (Lib3MF_Model pModel, Lib3MF_Model * pMergedModelInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_mergetomodel(Lib3MF_Model pModel, Lib3MF_Model * pMergedModelInstance);
 
 /**
 * adds an empty mesh object to the model.
@@ -3703,7 +3714,7 @@ typedef Lib3MFResult (*PLib3MFModel_MergeToModelPtr) (Lib3MF_Model pModel, Lib3M
 * @param[out] pMeshObjectInstance -  returns the mesh object instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddMeshObjectPtr) (Lib3MF_Model pModel, Lib3MF_MeshObject * pMeshObjectInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addmeshobject(Lib3MF_Model pModel, Lib3MF_MeshObject * pMeshObjectInstance);
 
 /**
 * adds an empty component object to the model.
@@ -3712,7 +3723,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddMeshObjectPtr) (Lib3MF_Model pModel, Lib3
 * @param[out] pComponentsObjectInstance -  returns the components object instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddComponentsObjectPtr) (Lib3MF_Model pModel, Lib3MF_ComponentsObject * pComponentsObjectInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addcomponentsobject(Lib3MF_Model pModel, Lib3MF_ComponentsObject * pComponentsObjectInstance);
 
 /**
 * creates a new model slicestack by its id
@@ -3722,7 +3733,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddComponentsObjectPtr) (Lib3MF_Model pModel
 * @param[out] pSliceStackInstance - returns the new slicestack instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddSliceStackPtr) (Lib3MF_Model pModel, Lib3MF_double dZBottom, Lib3MF_SliceStack * pSliceStackInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addslicestack(Lib3MF_Model pModel, Lib3MF_double dZBottom, Lib3MF_SliceStack * pSliceStackInstance);
 
 /**
 * adds a texture2d resource to the model. Its path is given by that of an existing attachment.
@@ -3732,7 +3743,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddSliceStackPtr) (Lib3MF_Model pModel, Lib3
 * @param[out] pTexture2DInstance - returns the new texture instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddTexture2DFromAttachmentPtr) (Lib3MF_Model pModel, Lib3MF_Attachment pTextureAttachment, Lib3MF_Texture2D * pTexture2DInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addtexture2dfromattachment(Lib3MF_Model pModel, Lib3MF_Attachment pTextureAttachment, Lib3MF_Texture2D * pTexture2DInstance);
 
 /**
 * adds an empty BaseMaterialGroup resource to the model.
@@ -3741,7 +3752,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddTexture2DFromAttachmentPtr) (Lib3MF_Model
 * @param[out] pBaseMaterialGroupInstance - returns the new base material instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddBaseMaterialGroupPtr) (Lib3MF_Model pModel, Lib3MF_BaseMaterialGroup * pBaseMaterialGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addbasematerialgroup(Lib3MF_Model pModel, Lib3MF_BaseMaterialGroup * pBaseMaterialGroupInstance);
 
 /**
 * adds an empty ColorGroup resource to the model.
@@ -3750,7 +3761,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddBaseMaterialGroupPtr) (Lib3MF_Model pMode
 * @param[out] pColorGroupInstance - returns the new ColorGroup instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddColorGroupPtr) (Lib3MF_Model pModel, Lib3MF_ColorGroup * pColorGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addcolorgroup(Lib3MF_Model pModel, Lib3MF_ColorGroup * pColorGroupInstance);
 
 /**
 * adds an empty Texture2DGroup resource to the model.
@@ -3760,7 +3771,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddColorGroupPtr) (Lib3MF_Model pModel, Lib3
 * @param[out] pTexture2DGroupInstance - returns the new Texture2DGroup instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddTexture2DGroupPtr) (Lib3MF_Model pModel, Lib3MF_Texture2D pTexture2DInstance, Lib3MF_Texture2DGroup * pTexture2DGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addtexture2dgroup(Lib3MF_Model pModel, Lib3MF_Texture2D pTexture2DInstance, Lib3MF_Texture2DGroup * pTexture2DGroupInstance);
 
 /**
 * adds an empty CompositeMaterials resource to the model.
@@ -3770,7 +3781,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddTexture2DGroupPtr) (Lib3MF_Model pModel, 
 * @param[out] pCompositeMaterialsInstance - returns the new CompositeMaterials instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddCompositeMaterialsPtr) (Lib3MF_Model pModel, Lib3MF_BaseMaterialGroup pBaseMaterialGroupInstance, Lib3MF_CompositeMaterials * pCompositeMaterialsInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addcompositematerials(Lib3MF_Model pModel, Lib3MF_BaseMaterialGroup pBaseMaterialGroupInstance, Lib3MF_CompositeMaterials * pCompositeMaterialsInstance);
 
 /**
 * adds an empty MultiPropertyGroup resource to the model.
@@ -3779,7 +3790,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddCompositeMaterialsPtr) (Lib3MF_Model pMod
 * @param[out] pMultiPropertyGroupInstance - returns the new MultiPropertyGroup instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddMultiPropertyGroupPtr) (Lib3MF_Model pModel, Lib3MF_MultiPropertyGroup * pMultiPropertyGroupInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addmultipropertygroup(Lib3MF_Model pModel, Lib3MF_MultiPropertyGroup * pMultiPropertyGroupInstance);
 
 /**
 * adds a build item to the model.
@@ -3790,7 +3801,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddMultiPropertyGroupPtr) (Lib3MF_Model pMod
 * @param[out] pBuildItemInstance - returns the build item instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddBuildItemPtr) (Lib3MF_Model pModel, Lib3MF_Object pObject, const Lib3MF::sTransform * pTransform, Lib3MF_BuildItem * pBuildItemInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addbuilditem(Lib3MF_Model pModel, Lib3MF_Object pObject, const Lib3MF::sTransform * pTransform, Lib3MF_BuildItem * pBuildItemInstance);
 
 /**
 * removes a build item from the model
@@ -3799,7 +3810,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddBuildItemPtr) (Lib3MF_Model pModel, Lib3M
 * @param[in] pBuildItemInstance - Build item to remove.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_RemoveBuildItemPtr) (Lib3MF_Model pModel, Lib3MF_BuildItem pBuildItemInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_removebuilditem(Lib3MF_Model pModel, Lib3MF_BuildItem pBuildItemInstance);
 
 /**
 * adds an empty Toolpath resource to the model.
@@ -3809,7 +3820,7 @@ typedef Lib3MFResult (*PLib3MFModel_RemoveBuildItemPtr) (Lib3MF_Model pModel, Li
 * @param[out] pToolpathInstance - The toolpath instance of the created Toolpath.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddToolpathPtr) (Lib3MF_Model pModel, Lib3MF_double dUnitFactor, Lib3MF_Toolpath * pToolpathInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addtoolpath(Lib3MF_Model pModel, Lib3MF_double dUnitFactor, Lib3MF_Toolpath * pToolpathInstance);
 
 /**
 * Returns the metadata of the model as MetaDataGroup
@@ -3818,7 +3829,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddToolpathPtr) (Lib3MF_Model pModel, Lib3MF
 * @param[out] pTheMetaDataGroup - returns an Instance of the metadatagroup of the model
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetMetaDataGroupPtr) (Lib3MF_Model pModel, Lib3MF_MetaDataGroup * pTheMetaDataGroup);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getmetadatagroup(Lib3MF_Model pModel, Lib3MF_MetaDataGroup * pTheMetaDataGroup);
 
 /**
 * adds an attachment stream to the model. The OPC part will be related to the model stream with a certain relationship type.
@@ -3829,7 +3840,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetMetaDataGroupPtr) (Lib3MF_Model pModel, L
 * @param[out] pAttachmentInstance - Instance of the attachment object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddAttachmentPtr) (Lib3MF_Model pModel, const char * pURI, const char * pRelationShipType, Lib3MF_Attachment * pAttachmentInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addattachment(Lib3MF_Model pModel, const char * pURI, const char * pRelationShipType, Lib3MF_Attachment * pAttachmentInstance);
 
 /**
 * Removes attachment from the model.
@@ -3838,7 +3849,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddAttachmentPtr) (Lib3MF_Model pModel, cons
 * @param[in] pAttachmentInstance - Attachment instance to remove
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_RemoveAttachmentPtr) (Lib3MF_Model pModel, Lib3MF_Attachment pAttachmentInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_removeattachment(Lib3MF_Model pModel, Lib3MF_Attachment pAttachmentInstance);
 
 /**
 * retrieves an attachment stream object from the model..
@@ -3848,7 +3859,7 @@ typedef Lib3MFResult (*PLib3MFModel_RemoveAttachmentPtr) (Lib3MF_Model pModel, L
 * @param[out] pAttachmentInstance - Instance of the attachment object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetAttachmentPtr) (Lib3MF_Model pModel, Lib3MF_uint32 nIndex, Lib3MF_Attachment * pAttachmentInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getattachment(Lib3MF_Model pModel, Lib3MF_uint32 nIndex, Lib3MF_Attachment * pAttachmentInstance);
 
 /**
 * retrieves an attachment stream object from the model.
@@ -3858,7 +3869,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetAttachmentPtr) (Lib3MF_Model pModel, Lib3
 * @param[out] pAttachmentInstance - Instance of the attachment object
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_FindAttachmentPtr) (Lib3MF_Model pModel, const char * pURI, Lib3MF_Attachment * pAttachmentInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_findattachment(Lib3MF_Model pModel, const char * pURI, Lib3MF_Attachment * pAttachmentInstance);
 
 /**
 * retrieves the number of attachments of the model.
@@ -3867,7 +3878,7 @@ typedef Lib3MFResult (*PLib3MFModel_FindAttachmentPtr) (Lib3MF_Model pModel, con
 * @param[out] pAttachmentCount - Returns the number of attachments.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetAttachmentCountPtr) (Lib3MF_Model pModel, Lib3MF_uint32 * pAttachmentCount);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getattachmentcount(Lib3MF_Model pModel, Lib3MF_uint32 * pAttachmentCount);
 
 /**
 * Retrieve whether the OPC package contains a package thumbnail.
@@ -3876,7 +3887,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetAttachmentCountPtr) (Lib3MF_Model pModel,
 * @param[out] pHasThumbnail - returns whether the OPC package contains a package thumbnail
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_HasPackageThumbnailAttachmentPtr) (Lib3MF_Model pModel, bool * pHasThumbnail);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_haspackagethumbnailattachment(Lib3MF_Model pModel, bool * pHasThumbnail);
 
 /**
 * Create a new or the existing package thumbnail for the OPC package.
@@ -3885,7 +3896,7 @@ typedef Lib3MFResult (*PLib3MFModel_HasPackageThumbnailAttachmentPtr) (Lib3MF_Mo
 * @param[out] pAttachment - Instance of a new or the existing thumbnailattachment object.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_CreatePackageThumbnailAttachmentPtr) (Lib3MF_Model pModel, Lib3MF_Attachment * pAttachment);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_createpackagethumbnailattachment(Lib3MF_Model pModel, Lib3MF_Attachment * pAttachment);
 
 /**
 * Get the attachment to the OPC package containing the package thumbnail.
@@ -3894,7 +3905,7 @@ typedef Lib3MFResult (*PLib3MFModel_CreatePackageThumbnailAttachmentPtr) (Lib3MF
 * @param[out] pAttachment - Instance of the thumbnailattachment object or NULL.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetPackageThumbnailAttachmentPtr) (Lib3MF_Model pModel, Lib3MF_Attachment * pAttachment);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getpackagethumbnailattachment(Lib3MF_Model pModel, Lib3MF_Attachment * pAttachment);
 
 /**
 * Remove the attachment to the OPC package containing the package thumbnail.
@@ -3902,7 +3913,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetPackageThumbnailAttachmentPtr) (Lib3MF_Mo
 * @param[in] pModel - Model instance.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_RemovePackageThumbnailAttachmentPtr) (Lib3MF_Model pModel);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_removepackagethumbnailattachment(Lib3MF_Model pModel);
 
 /**
 * Adds a new Content Type to the model.
@@ -3912,7 +3923,7 @@ typedef Lib3MFResult (*PLib3MFModel_RemovePackageThumbnailAttachmentPtr) (Lib3MF
 * @param[in] pContentType - Content Type Identifier
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_AddCustomContentTypePtr) (Lib3MF_Model pModel, const char * pExtension, const char * pContentType);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_addcustomcontenttype(Lib3MF_Model pModel, const char * pExtension, const char * pContentType);
 
 /**
 * Removes a custom Content Type from the model (UTF8 version).
@@ -3921,7 +3932,7 @@ typedef Lib3MFResult (*PLib3MFModel_AddCustomContentTypePtr) (Lib3MF_Model pMode
 * @param[in] pExtension - File Extension
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_RemoveCustomContentTypePtr) (Lib3MF_Model pModel, const char * pExtension);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_removecustomcontenttype(Lib3MF_Model pModel, const char * pExtension);
 
 /**
 * Sets the random number generator callback for use in the library
@@ -3931,7 +3942,7 @@ typedef Lib3MFResult (*PLib3MFModel_RemoveCustomContentTypePtr) (Lib3MF_Model pM
 * @param[in] pUserData - Userdata to be passed to the callback function
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_SetRandomNumberCallbackPtr) (Lib3MF_Model pModel, Lib3MF::RandomNumberCallback pTheCallback, Lib3MF_pvoid pUserData);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_setrandomnumbercallback(Lib3MF_Model pModel, Lib3MF::RandomNumberCallback pTheCallback, Lib3MF_pvoid pUserData);
 
 /**
 * Gets the keystore associated with this model
@@ -3940,7 +3951,7 @@ typedef Lib3MFResult (*PLib3MFModel_SetRandomNumberCallbackPtr) (Lib3MF_Model pM
 * @param[out] pKeyStore - The package keystore
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_GetKeyStorePtr) (Lib3MF_Model pModel, Lib3MF_KeyStore * pKeyStore);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_getkeystore(Lib3MF_Model pModel, Lib3MF_KeyStore * pKeyStore);
 
 /**
 * Creates an OPC Reader Source from a file.
@@ -3950,7 +3961,7 @@ typedef Lib3MFResult (*PLib3MFModel_GetKeyStorePtr) (Lib3MF_Model pModel, Lib3MF
 * @param[out] pInstance - The instance of the created reader source
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_CreatePersistentSourceFromFilePtr) (Lib3MF_Model pModel, const char * pFilename, Lib3MF_PersistentReaderSource * pInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_createpersistentsourcefromfile(Lib3MF_Model pModel, const char * pFilename, Lib3MF_PersistentReaderSource * pInstance);
 
 /**
 * Creates an OPC Reader Source from a memory buffer. The memory buffer MUST exist as long as the Source object exists.
@@ -3961,7 +3972,7 @@ typedef Lib3MFResult (*PLib3MFModel_CreatePersistentSourceFromFilePtr) (Lib3MF_M
 * @param[out] pInstance - The instance of the created reader source
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_CreatePersistentSourceFromBufferPtr) (Lib3MF_Model pModel, Lib3MF_uint64 nBufferBufferSize, const Lib3MF_uint8 * pBufferBuffer, Lib3MF_PersistentReaderSource * pInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_createpersistentsourcefrombuffer(Lib3MF_Model pModel, Lib3MF_uint64 nBufferBufferSize, const Lib3MF_uint8 * pBufferBuffer, Lib3MF_PersistentReaderSource * pInstance);
 
 /**
 * Creates an OPC Reader Source from a data provided by a callback function. The callbacks MUST exist as long as the source object exists.
@@ -3974,7 +3985,7 @@ typedef Lib3MFResult (*PLib3MFModel_CreatePersistentSourceFromBufferPtr) (Lib3MF
 * @param[out] pInstance - The instance of the created reader source
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFModel_CreatePersistentSourceFromCallbackPtr) (Lib3MF_Model pModel, Lib3MF::ReadCallback pTheReadCallback, Lib3MF_uint64 nStreamSize, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData, Lib3MF_PersistentReaderSource * pInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_model_createpersistentsourcefromcallback(Lib3MF_Model pModel, Lib3MF::ReadCallback pTheReadCallback, Lib3MF_uint64 nStreamSize, Lib3MF::SeekCallback pTheSeekCallback, Lib3MF_pvoid pUserData, Lib3MF_PersistentReaderSource * pInstance);
 
 /*************************************************************************************************************************
  Global functions
@@ -3988,7 +3999,7 @@ typedef Lib3MFResult (*PLib3MFModel_CreatePersistentSourceFromCallbackPtr) (Lib3
 * @param[out] pMicro - returns the micro version of this library
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetLibraryVersionPtr) (Lib3MF_uint32 * pMajor, Lib3MF_uint32 * pMinor, Lib3MF_uint32 * pMicro);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getlibraryversion(Lib3MF_uint32 * pMajor, Lib3MF_uint32 * pMinor, Lib3MF_uint32 * pMicro);
 
 /**
 * retrieves prerelease information of this library.
@@ -3999,7 +4010,7 @@ typedef Lib3MFResult (*PLib3MFGetLibraryVersionPtr) (Lib3MF_uint32 * pMajor, Lib
 * @param[out] pPrereleaseInfoBuffer -  buffer of retrieves prerelease information of this library., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetPrereleaseInformationPtr) (bool * pHasPrereleaseInfo, const Lib3MF_uint32 nPrereleaseInfoBufferSize, Lib3MF_uint32* pPrereleaseInfoNeededChars, char * pPrereleaseInfoBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getprereleaseinformation(bool * pHasPrereleaseInfo, const Lib3MF_uint32 nPrereleaseInfoBufferSize, Lib3MF_uint32* pPrereleaseInfoNeededChars, char * pPrereleaseInfoBuffer);
 
 /**
 * retrieves build information of this library.
@@ -4010,7 +4021,7 @@ typedef Lib3MFResult (*PLib3MFGetPrereleaseInformationPtr) (bool * pHasPrereleas
 * @param[out] pBuildInformationBuffer -  buffer of retrieves build information of this library., may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetBuildInformationPtr) (bool * pHasBuildInfo, const Lib3MF_uint32 nBuildInformationBufferSize, Lib3MF_uint32* pBuildInformationNeededChars, char * pBuildInformationBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getbuildinformation(bool * pHasBuildInfo, const Lib3MF_uint32 nBuildInformationBufferSize, Lib3MF_uint32* pBuildInformationNeededChars, char * pBuildInformationBuffer);
 
 /**
 * retrieves whether a specification is supported, and if so, which version.
@@ -4022,7 +4033,7 @@ typedef Lib3MFResult (*PLib3MFGetBuildInformationPtr) (bool * pHasBuildInfo, con
 * @param[out] pMicro - returns the micro version of the extension (if IsSupported)
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetSpecificationVersionPtr) (const char * pSpecificationURL, bool * pIsSupported, Lib3MF_uint32 * pMajor, Lib3MF_uint32 * pMinor, Lib3MF_uint32 * pMicro);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getspecificationversion(const char * pSpecificationURL, bool * pIsSupported, Lib3MF_uint32 * pMajor, Lib3MF_uint32 * pMinor, Lib3MF_uint32 * pMicro);
 
 /**
 * creates an empty model instance.
@@ -4030,7 +4041,7 @@ typedef Lib3MFResult (*PLib3MFGetSpecificationVersionPtr) (const char * pSpecifi
 * @param[out] pModel - returns an empty model instance
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFCreateModelPtr) (Lib3MF_Model * pModel);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_createmodel(Lib3MF_Model * pModel);
 
 /**
 * releases shared ownership of an object instance
@@ -4038,7 +4049,7 @@ typedef Lib3MFResult (*PLib3MFCreateModelPtr) (Lib3MF_Model * pModel);
 * @param[in] pInstance - the object instance to release
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFReleasePtr) (Lib3MF_Base pInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_release(Lib3MF_Base pInstance);
 
 /**
 * acquires shared ownership of an object instance
@@ -4046,7 +4057,7 @@ typedef Lib3MFResult (*PLib3MFReleasePtr) (Lib3MF_Base pInstance);
 * @param[in] pInstance - the object instance to acquire
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFAcquirePtr) (Lib3MF_Base pInstance);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_acquire(Lib3MF_Base pInstance);
 
 /**
 * Sets the journal file path
@@ -4054,7 +4065,7 @@ typedef Lib3MFResult (*PLib3MFAcquirePtr) (Lib3MF_Base pInstance);
 * @param[in] pJournalPath - File name of the journal file
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFSetJournalPtr) (const char * pJournalPath);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_setjournal(const char * pJournalPath);
 
 /**
 * Retrieves the last error string of an instance
@@ -4066,7 +4077,7 @@ typedef Lib3MFResult (*PLib3MFSetJournalPtr) (const char * pJournalPath);
 * @param[out] pHasLastError - Returns if the instance has a last error.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetLastErrorPtr) (Lib3MF_Base pInstance, const Lib3MF_uint32 nLastErrorStringBufferSize, Lib3MF_uint32* pLastErrorStringNeededChars, char * pLastErrorStringBuffer, bool * pHasLastError);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getlasterror(Lib3MF_Base pInstance, const Lib3MF_uint32 nLastErrorStringBufferSize, Lib3MF_uint32* pLastErrorStringNeededChars, char * pLastErrorStringBuffer, bool * pHasLastError);
 
 /**
 * Returns the address of the SymbolLookupMethod
@@ -4074,7 +4085,7 @@ typedef Lib3MFResult (*PLib3MFGetLastErrorPtr) (Lib3MF_Base pInstance, const Lib
 * @param[out] pSymbolLookupMethod - Address of the SymbolAddressMethod
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetSymbolLookupMethodPtr) (Lib3MF_pvoid * pSymbolLookupMethod);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getsymbollookupmethod(Lib3MF_pvoid * pSymbolLookupMethod);
 
 /**
 * Return an English text for a progress identifier.|Note: this is the only function you can call from your callback function.
@@ -4085,7 +4096,7 @@ typedef Lib3MFResult (*PLib3MFGetSymbolLookupMethodPtr) (Lib3MF_pvoid * pSymbolL
 * @param[out] pProgressMessageBuffer -  buffer of English text for the progress identifier, may be NULL
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFRetrieveProgressMessagePtr) (Lib3MF::eProgressIdentifier eTheProgressIdentifier, const Lib3MF_uint32 nProgressMessageBufferSize, Lib3MF_uint32* pProgressMessageNeededChars, char * pProgressMessageBuffer);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_retrieveprogressmessage(Lib3MF::eProgressIdentifier eTheProgressIdentifier, const Lib3MF_uint32 nProgressMessageBufferSize, Lib3MF_uint32* pProgressMessageNeededChars, char * pProgressMessageBuffer);
 
 /**
 * Creates a Color from uint8 RGBA values
@@ -4097,7 +4108,7 @@ typedef Lib3MFResult (*PLib3MFRetrieveProgressMessagePtr) (Lib3MF::eProgressIden
 * @param[out] pTheColor - Assembled color
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFRGBAToColorPtr) (Lib3MF_uint8 nRed, Lib3MF_uint8 nGreen, Lib3MF_uint8 nBlue, Lib3MF_uint8 nAlpha, Lib3MF::sColor * pTheColor);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_rgbatocolor(Lib3MF_uint8 nRed, Lib3MF_uint8 nGreen, Lib3MF_uint8 nBlue, Lib3MF_uint8 nAlpha, Lib3MF::sColor * pTheColor);
 
 /**
 * Creates a Color from uint8 RGBA values
@@ -4109,7 +4120,7 @@ typedef Lib3MFResult (*PLib3MFRGBAToColorPtr) (Lib3MF_uint8 nRed, Lib3MF_uint8 n
 * @param[out] pTheColor - Assembled color
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFFloatRGBAToColorPtr) (Lib3MF_single fRed, Lib3MF_single fGreen, Lib3MF_single fBlue, Lib3MF_single fAlpha, Lib3MF::sColor * pTheColor);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_floatrgbatocolor(Lib3MF_single fRed, Lib3MF_single fGreen, Lib3MF_single fBlue, Lib3MF_single fAlpha, Lib3MF::sColor * pTheColor);
 
 /**
 * Calculates uint8-RGBA-values from a Color
@@ -4121,7 +4132,7 @@ typedef Lib3MFResult (*PLib3MFFloatRGBAToColorPtr) (Lib3MF_single fRed, Lib3MF_s
 * @param[out] pAlpha - Alpha value of color (0-255)
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorToRGBAPtr) (const Lib3MF::sColor * pTheColor, Lib3MF_uint8 * pRed, Lib3MF_uint8 * pGreen, Lib3MF_uint8 * pBlue, Lib3MF_uint8 * pAlpha);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colortorgba(const Lib3MF::sColor * pTheColor, Lib3MF_uint8 * pRed, Lib3MF_uint8 * pGreen, Lib3MF_uint8 * pBlue, Lib3MF_uint8 * pAlpha);
 
 /**
 * Calculates float-RGBA-values from a Color
@@ -4133,7 +4144,7 @@ typedef Lib3MFResult (*PLib3MFColorToRGBAPtr) (const Lib3MF::sColor * pTheColor,
 * @param[out] pAlpha - Alpha value of color (0-1)
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFColorToFloatRGBAPtr) (const Lib3MF::sColor * pTheColor, Lib3MF_single * pRed, Lib3MF_single * pGreen, Lib3MF_single * pBlue, Lib3MF_single * pAlpha);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_colortofloatrgba(const Lib3MF::sColor * pTheColor, Lib3MF_single * pRed, Lib3MF_single * pGreen, Lib3MF_single * pBlue, Lib3MF_single * pAlpha);
 
 /**
 * Creates an identity transform
@@ -4141,7 +4152,7 @@ typedef Lib3MFResult (*PLib3MFColorToFloatRGBAPtr) (const Lib3MF::sColor * pTheC
 * @param[out] pTransform - Transformation matrix.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetIdentityTransformPtr) (Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getidentitytransform(Lib3MF::sTransform * pTransform);
 
 /**
 * Creates a uniform scale transform
@@ -4150,7 +4161,7 @@ typedef Lib3MFResult (*PLib3MFGetIdentityTransformPtr) (Lib3MF::sTransform * pTr
 * @param[out] pTransform - Transformation matrix.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetUniformScaleTransformPtr) (Lib3MF_single fFactor, Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getuniformscaletransform(Lib3MF_single fFactor, Lib3MF::sTransform * pTransform);
 
 /**
 * Creates a scale transform
@@ -4161,7 +4172,7 @@ typedef Lib3MFResult (*PLib3MFGetUniformScaleTransformPtr) (Lib3MF_single fFacto
 * @param[out] pTransform - Transformation matrix.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetScaleTransformPtr) (Lib3MF_single fFactorX, Lib3MF_single fFactorY, Lib3MF_single fFactorZ, Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_getscaletransform(Lib3MF_single fFactorX, Lib3MF_single fFactorY, Lib3MF_single fFactorZ, Lib3MF::sTransform * pTransform);
 
 /**
 * Creates an translation transform
@@ -4172,416 +4183,9 @@ typedef Lib3MFResult (*PLib3MFGetScaleTransformPtr) (Lib3MF_single fFactorX, Lib
 * @param[out] pTransform - Transformation matrix.
 * @return error code or 0 (success)
 */
-typedef Lib3MFResult (*PLib3MFGetTranslationTransformPtr) (Lib3MF_single fVectorX, Lib3MF_single fVectorY, Lib3MF_single fVectorZ, Lib3MF::sTransform * pTransform);
+LIB3MF_DECLSPEC Lib3MFResult lib3mf_gettranslationtransform(Lib3MF_single fVectorX, Lib3MF_single fVectorY, Lib3MF_single fVectorZ, Lib3MF::sTransform * pTransform);
 
-/*************************************************************************************************************************
- Function Table Structure
-**************************************************************************************************************************/
+}
 
-typedef struct {
-	void * m_LibraryHandle;
-	PLib3MFWriter_WriteToFilePtr m_Writer_WriteToFile;
-	PLib3MFWriter_GetStreamSizePtr m_Writer_GetStreamSize;
-	PLib3MFWriter_WriteToBufferPtr m_Writer_WriteToBuffer;
-	PLib3MFWriter_WriteToCallbackPtr m_Writer_WriteToCallback;
-	PLib3MFWriter_SetProgressCallbackPtr m_Writer_SetProgressCallback;
-	PLib3MFWriter_GetDecimalPrecisionPtr m_Writer_GetDecimalPrecision;
-	PLib3MFWriter_SetDecimalPrecisionPtr m_Writer_SetDecimalPrecision;
-	PLib3MFWriter_SetStrictModeActivePtr m_Writer_SetStrictModeActive;
-	PLib3MFWriter_GetStrictModeActivePtr m_Writer_GetStrictModeActive;
-	PLib3MFWriter_GetWarningPtr m_Writer_GetWarning;
-	PLib3MFWriter_GetWarningCountPtr m_Writer_GetWarningCount;
-	PLib3MFWriter_AddKeyWrappingCallbackPtr m_Writer_AddKeyWrappingCallback;
-	PLib3MFWriter_SetContentEncryptionCallbackPtr m_Writer_SetContentEncryptionCallback;
-	PLib3MFPersistentReaderSource_GetSourceTypePtr m_PersistentReaderSource_GetSourceType;
-	PLib3MFPersistentReaderSource_InvalidateSourceDataPtr m_PersistentReaderSource_InvalidateSourceData;
-	PLib3MFPersistentReaderSource_SourceDataIsValidPtr m_PersistentReaderSource_SourceDataIsValid;
-	PLib3MFReader_ReadFromPersistentSourcePtr m_Reader_ReadFromPersistentSource;
-	PLib3MFReader_ReadFromFilePtr m_Reader_ReadFromFile;
-	PLib3MFReader_ReadFromBufferPtr m_Reader_ReadFromBuffer;
-	PLib3MFReader_ReadFromCallbackPtr m_Reader_ReadFromCallback;
-	PLib3MFReader_SetProgressCallbackPtr m_Reader_SetProgressCallback;
-	PLib3MFReader_AddRelationToReadPtr m_Reader_AddRelationToRead;
-	PLib3MFReader_RemoveRelationToReadPtr m_Reader_RemoveRelationToRead;
-	PLib3MFReader_SetStrictModeActivePtr m_Reader_SetStrictModeActive;
-	PLib3MFReader_GetStrictModeActivePtr m_Reader_GetStrictModeActive;
-	PLib3MFReader_GetWarningPtr m_Reader_GetWarning;
-	PLib3MFReader_GetWarningCountPtr m_Reader_GetWarningCount;
-	PLib3MFReader_AddKeyWrappingCallbackPtr m_Reader_AddKeyWrappingCallback;
-	PLib3MFReader_SetContentEncryptionCallbackPtr m_Reader_SetContentEncryptionCallback;
-	PLib3MFPackagePart_GetPathPtr m_PackagePart_GetPath;
-	PLib3MFPackagePart_SetPathPtr m_PackagePart_SetPath;
-	PLib3MFResource_GetResourceIDPtr m_Resource_GetResourceID;
-	PLib3MFResource_GetUniqueResourceIDPtr m_Resource_GetUniqueResourceID;
-	PLib3MFResource_PackagePartPtr m_Resource_PackagePart;
-	PLib3MFResource_SetPackagePartPtr m_Resource_SetPackagePart;
-	PLib3MFResource_GetModelResourceIDPtr m_Resource_GetModelResourceID;
-	PLib3MFResourceIterator_MoveNextPtr m_ResourceIterator_MoveNext;
-	PLib3MFResourceIterator_MovePreviousPtr m_ResourceIterator_MovePrevious;
-	PLib3MFResourceIterator_GetCurrentPtr m_ResourceIterator_GetCurrent;
-	PLib3MFResourceIterator_ClonePtr m_ResourceIterator_Clone;
-	PLib3MFResourceIterator_CountPtr m_ResourceIterator_Count;
-	PLib3MFSliceStackIterator_GetCurrentSliceStackPtr m_SliceStackIterator_GetCurrentSliceStack;
-	PLib3MFObjectIterator_GetCurrentObjectPtr m_ObjectIterator_GetCurrentObject;
-	PLib3MFMeshObjectIterator_GetCurrentMeshObjectPtr m_MeshObjectIterator_GetCurrentMeshObject;
-	PLib3MFComponentsObjectIterator_GetCurrentComponentsObjectPtr m_ComponentsObjectIterator_GetCurrentComponentsObject;
-	PLib3MFTexture2DIterator_GetCurrentTexture2DPtr m_Texture2DIterator_GetCurrentTexture2D;
-	PLib3MFBaseMaterialGroupIterator_GetCurrentBaseMaterialGroupPtr m_BaseMaterialGroupIterator_GetCurrentBaseMaterialGroup;
-	PLib3MFColorGroupIterator_GetCurrentColorGroupPtr m_ColorGroupIterator_GetCurrentColorGroup;
-	PLib3MFTexture2DGroupIterator_GetCurrentTexture2DGroupPtr m_Texture2DGroupIterator_GetCurrentTexture2DGroup;
-	PLib3MFCompositeMaterialsIterator_GetCurrentCompositeMaterialsPtr m_CompositeMaterialsIterator_GetCurrentCompositeMaterials;
-	PLib3MFMultiPropertyGroupIterator_GetCurrentMultiPropertyGroupPtr m_MultiPropertyGroupIterator_GetCurrentMultiPropertyGroup;
-	PLib3MFMetaData_GetNameSpacePtr m_MetaData_GetNameSpace;
-	PLib3MFMetaData_SetNameSpacePtr m_MetaData_SetNameSpace;
-	PLib3MFMetaData_GetNamePtr m_MetaData_GetName;
-	PLib3MFMetaData_SetNamePtr m_MetaData_SetName;
-	PLib3MFMetaData_GetKeyPtr m_MetaData_GetKey;
-	PLib3MFMetaData_GetMustPreservePtr m_MetaData_GetMustPreserve;
-	PLib3MFMetaData_SetMustPreservePtr m_MetaData_SetMustPreserve;
-	PLib3MFMetaData_GetTypePtr m_MetaData_GetType;
-	PLib3MFMetaData_SetTypePtr m_MetaData_SetType;
-	PLib3MFMetaData_GetValuePtr m_MetaData_GetValue;
-	PLib3MFMetaData_SetValuePtr m_MetaData_SetValue;
-	PLib3MFMetaDataGroup_GetMetaDataCountPtr m_MetaDataGroup_GetMetaDataCount;
-	PLib3MFMetaDataGroup_GetMetaDataPtr m_MetaDataGroup_GetMetaData;
-	PLib3MFMetaDataGroup_GetMetaDataByKeyPtr m_MetaDataGroup_GetMetaDataByKey;
-	PLib3MFMetaDataGroup_RemoveMetaDataByIndexPtr m_MetaDataGroup_RemoveMetaDataByIndex;
-	PLib3MFMetaDataGroup_RemoveMetaDataPtr m_MetaDataGroup_RemoveMetaData;
-	PLib3MFMetaDataGroup_AddMetaDataPtr m_MetaDataGroup_AddMetaData;
-	PLib3MFObject_GetTypePtr m_Object_GetType;
-	PLib3MFObject_SetTypePtr m_Object_SetType;
-	PLib3MFObject_GetNamePtr m_Object_GetName;
-	PLib3MFObject_SetNamePtr m_Object_SetName;
-	PLib3MFObject_GetPartNumberPtr m_Object_GetPartNumber;
-	PLib3MFObject_SetPartNumberPtr m_Object_SetPartNumber;
-	PLib3MFObject_IsMeshObjectPtr m_Object_IsMeshObject;
-	PLib3MFObject_IsComponentsObjectPtr m_Object_IsComponentsObject;
-	PLib3MFObject_IsValidPtr m_Object_IsValid;
-	PLib3MFObject_SetAttachmentAsThumbnailPtr m_Object_SetAttachmentAsThumbnail;
-	PLib3MFObject_GetThumbnailAttachmentPtr m_Object_GetThumbnailAttachment;
-	PLib3MFObject_ClearThumbnailAttachmentPtr m_Object_ClearThumbnailAttachment;
-	PLib3MFObject_GetOutboxPtr m_Object_GetOutbox;
-	PLib3MFObject_GetUUIDPtr m_Object_GetUUID;
-	PLib3MFObject_SetUUIDPtr m_Object_SetUUID;
-	PLib3MFObject_GetMetaDataGroupPtr m_Object_GetMetaDataGroup;
-	PLib3MFObject_SetSlicesMeshResolutionPtr m_Object_SetSlicesMeshResolution;
-	PLib3MFObject_GetSlicesMeshResolutionPtr m_Object_GetSlicesMeshResolution;
-	PLib3MFObject_HasSlicesPtr m_Object_HasSlices;
-	PLib3MFObject_ClearSliceStackPtr m_Object_ClearSliceStack;
-	PLib3MFObject_GetSliceStackPtr m_Object_GetSliceStack;
-	PLib3MFObject_AssignSliceStackPtr m_Object_AssignSliceStack;
-	PLib3MFMeshObject_GetVertexCountPtr m_MeshObject_GetVertexCount;
-	PLib3MFMeshObject_GetTriangleCountPtr m_MeshObject_GetTriangleCount;
-	PLib3MFMeshObject_GetVertexPtr m_MeshObject_GetVertex;
-	PLib3MFMeshObject_SetVertexPtr m_MeshObject_SetVertex;
-	PLib3MFMeshObject_AddVertexPtr m_MeshObject_AddVertex;
-	PLib3MFMeshObject_GetVerticesPtr m_MeshObject_GetVertices;
-	PLib3MFMeshObject_GetTrianglePtr m_MeshObject_GetTriangle;
-	PLib3MFMeshObject_SetTrianglePtr m_MeshObject_SetTriangle;
-	PLib3MFMeshObject_AddTrianglePtr m_MeshObject_AddTriangle;
-	PLib3MFMeshObject_GetTriangleIndicesPtr m_MeshObject_GetTriangleIndices;
-	PLib3MFMeshObject_SetObjectLevelPropertyPtr m_MeshObject_SetObjectLevelProperty;
-	PLib3MFMeshObject_GetObjectLevelPropertyPtr m_MeshObject_GetObjectLevelProperty;
-	PLib3MFMeshObject_SetTrianglePropertiesPtr m_MeshObject_SetTriangleProperties;
-	PLib3MFMeshObject_GetTrianglePropertiesPtr m_MeshObject_GetTriangleProperties;
-	PLib3MFMeshObject_SetAllTrianglePropertiesPtr m_MeshObject_SetAllTriangleProperties;
-	PLib3MFMeshObject_GetAllTrianglePropertiesPtr m_MeshObject_GetAllTriangleProperties;
-	PLib3MFMeshObject_ClearAllPropertiesPtr m_MeshObject_ClearAllProperties;
-	PLib3MFMeshObject_SetGeometryPtr m_MeshObject_SetGeometry;
-	PLib3MFMeshObject_IsManifoldAndOrientedPtr m_MeshObject_IsManifoldAndOriented;
-	PLib3MFMeshObject_BeamLatticePtr m_MeshObject_BeamLattice;
-	PLib3MFBeamLattice_GetMinLengthPtr m_BeamLattice_GetMinLength;
-	PLib3MFBeamLattice_SetMinLengthPtr m_BeamLattice_SetMinLength;
-	PLib3MFBeamLattice_GetClippingPtr m_BeamLattice_GetClipping;
-	PLib3MFBeamLattice_SetClippingPtr m_BeamLattice_SetClipping;
-	PLib3MFBeamLattice_GetRepresentationPtr m_BeamLattice_GetRepresentation;
-	PLib3MFBeamLattice_SetRepresentationPtr m_BeamLattice_SetRepresentation;
-	PLib3MFBeamLattice_GetBallOptionsPtr m_BeamLattice_GetBallOptions;
-	PLib3MFBeamLattice_SetBallOptionsPtr m_BeamLattice_SetBallOptions;
-	PLib3MFBeamLattice_GetBeamCountPtr m_BeamLattice_GetBeamCount;
-	PLib3MFBeamLattice_GetBeamPtr m_BeamLattice_GetBeam;
-	PLib3MFBeamLattice_AddBeamPtr m_BeamLattice_AddBeam;
-	PLib3MFBeamLattice_SetBeamPtr m_BeamLattice_SetBeam;
-	PLib3MFBeamLattice_SetBeamsPtr m_BeamLattice_SetBeams;
-	PLib3MFBeamLattice_GetBeamsPtr m_BeamLattice_GetBeams;
-	PLib3MFBeamLattice_GetBallCountPtr m_BeamLattice_GetBallCount;
-	PLib3MFBeamLattice_GetBallPtr m_BeamLattice_GetBall;
-	PLib3MFBeamLattice_AddBallPtr m_BeamLattice_AddBall;
-	PLib3MFBeamLattice_SetBallPtr m_BeamLattice_SetBall;
-	PLib3MFBeamLattice_SetBallsPtr m_BeamLattice_SetBalls;
-	PLib3MFBeamLattice_GetBallsPtr m_BeamLattice_GetBalls;
-	PLib3MFBeamLattice_GetBeamSetCountPtr m_BeamLattice_GetBeamSetCount;
-	PLib3MFBeamLattice_AddBeamSetPtr m_BeamLattice_AddBeamSet;
-	PLib3MFBeamLattice_GetBeamSetPtr m_BeamLattice_GetBeamSet;
-	PLib3MFComponent_GetObjectResourcePtr m_Component_GetObjectResource;
-	PLib3MFComponent_GetObjectResourceIDPtr m_Component_GetObjectResourceID;
-	PLib3MFComponent_GetUUIDPtr m_Component_GetUUID;
-	PLib3MFComponent_SetUUIDPtr m_Component_SetUUID;
-	PLib3MFComponent_HasTransformPtr m_Component_HasTransform;
-	PLib3MFComponent_GetTransformPtr m_Component_GetTransform;
-	PLib3MFComponent_SetTransformPtr m_Component_SetTransform;
-	PLib3MFComponentsObject_AddComponentPtr m_ComponentsObject_AddComponent;
-	PLib3MFComponentsObject_GetComponentPtr m_ComponentsObject_GetComponent;
-	PLib3MFComponentsObject_GetComponentCountPtr m_ComponentsObject_GetComponentCount;
-	PLib3MFBeamSet_SetNamePtr m_BeamSet_SetName;
-	PLib3MFBeamSet_GetNamePtr m_BeamSet_GetName;
-	PLib3MFBeamSet_SetIdentifierPtr m_BeamSet_SetIdentifier;
-	PLib3MFBeamSet_GetIdentifierPtr m_BeamSet_GetIdentifier;
-	PLib3MFBeamSet_GetReferenceCountPtr m_BeamSet_GetReferenceCount;
-	PLib3MFBeamSet_SetReferencesPtr m_BeamSet_SetReferences;
-	PLib3MFBeamSet_GetReferencesPtr m_BeamSet_GetReferences;
-	PLib3MFBeamSet_GetBallReferenceCountPtr m_BeamSet_GetBallReferenceCount;
-	PLib3MFBeamSet_SetBallReferencesPtr m_BeamSet_SetBallReferences;
-	PLib3MFBeamSet_GetBallReferencesPtr m_BeamSet_GetBallReferences;
-	PLib3MFBaseMaterialGroup_GetCountPtr m_BaseMaterialGroup_GetCount;
-	PLib3MFBaseMaterialGroup_GetAllPropertyIDsPtr m_BaseMaterialGroup_GetAllPropertyIDs;
-	PLib3MFBaseMaterialGroup_AddMaterialPtr m_BaseMaterialGroup_AddMaterial;
-	PLib3MFBaseMaterialGroup_RemoveMaterialPtr m_BaseMaterialGroup_RemoveMaterial;
-	PLib3MFBaseMaterialGroup_GetNamePtr m_BaseMaterialGroup_GetName;
-	PLib3MFBaseMaterialGroup_SetNamePtr m_BaseMaterialGroup_SetName;
-	PLib3MFBaseMaterialGroup_SetDisplayColorPtr m_BaseMaterialGroup_SetDisplayColor;
-	PLib3MFBaseMaterialGroup_GetDisplayColorPtr m_BaseMaterialGroup_GetDisplayColor;
-	PLib3MFColorGroup_GetCountPtr m_ColorGroup_GetCount;
-	PLib3MFColorGroup_GetAllPropertyIDsPtr m_ColorGroup_GetAllPropertyIDs;
-	PLib3MFColorGroup_AddColorPtr m_ColorGroup_AddColor;
-	PLib3MFColorGroup_RemoveColorPtr m_ColorGroup_RemoveColor;
-	PLib3MFColorGroup_SetColorPtr m_ColorGroup_SetColor;
-	PLib3MFColorGroup_GetColorPtr m_ColorGroup_GetColor;
-	PLib3MFTexture2DGroup_GetCountPtr m_Texture2DGroup_GetCount;
-	PLib3MFTexture2DGroup_GetAllPropertyIDsPtr m_Texture2DGroup_GetAllPropertyIDs;
-	PLib3MFTexture2DGroup_AddTex2CoordPtr m_Texture2DGroup_AddTex2Coord;
-	PLib3MFTexture2DGroup_GetTex2CoordPtr m_Texture2DGroup_GetTex2Coord;
-	PLib3MFTexture2DGroup_RemoveTex2CoordPtr m_Texture2DGroup_RemoveTex2Coord;
-	PLib3MFTexture2DGroup_GetTexture2DPtr m_Texture2DGroup_GetTexture2D;
-	PLib3MFCompositeMaterials_GetCountPtr m_CompositeMaterials_GetCount;
-	PLib3MFCompositeMaterials_GetAllPropertyIDsPtr m_CompositeMaterials_GetAllPropertyIDs;
-	PLib3MFCompositeMaterials_GetBaseMaterialGroupPtr m_CompositeMaterials_GetBaseMaterialGroup;
-	PLib3MFCompositeMaterials_AddCompositePtr m_CompositeMaterials_AddComposite;
-	PLib3MFCompositeMaterials_RemoveCompositePtr m_CompositeMaterials_RemoveComposite;
-	PLib3MFCompositeMaterials_GetCompositePtr m_CompositeMaterials_GetComposite;
-	PLib3MFMultiPropertyGroup_GetCountPtr m_MultiPropertyGroup_GetCount;
-	PLib3MFMultiPropertyGroup_GetAllPropertyIDsPtr m_MultiPropertyGroup_GetAllPropertyIDs;
-	PLib3MFMultiPropertyGroup_AddMultiPropertyPtr m_MultiPropertyGroup_AddMultiProperty;
-	PLib3MFMultiPropertyGroup_SetMultiPropertyPtr m_MultiPropertyGroup_SetMultiProperty;
-	PLib3MFMultiPropertyGroup_GetMultiPropertyPtr m_MultiPropertyGroup_GetMultiProperty;
-	PLib3MFMultiPropertyGroup_RemoveMultiPropertyPtr m_MultiPropertyGroup_RemoveMultiProperty;
-	PLib3MFMultiPropertyGroup_GetLayerCountPtr m_MultiPropertyGroup_GetLayerCount;
-	PLib3MFMultiPropertyGroup_AddLayerPtr m_MultiPropertyGroup_AddLayer;
-	PLib3MFMultiPropertyGroup_GetLayerPtr m_MultiPropertyGroup_GetLayer;
-	PLib3MFMultiPropertyGroup_RemoveLayerPtr m_MultiPropertyGroup_RemoveLayer;
-	PLib3MFAttachment_GetPathPtr m_Attachment_GetPath;
-	PLib3MFAttachment_SetPathPtr m_Attachment_SetPath;
-	PLib3MFAttachment_PackagePartPtr m_Attachment_PackagePart;
-	PLib3MFAttachment_GetRelationShipTypePtr m_Attachment_GetRelationShipType;
-	PLib3MFAttachment_SetRelationShipTypePtr m_Attachment_SetRelationShipType;
-	PLib3MFAttachment_WriteToFilePtr m_Attachment_WriteToFile;
-	PLib3MFAttachment_ReadFromFilePtr m_Attachment_ReadFromFile;
-	PLib3MFAttachment_ReadFromCallbackPtr m_Attachment_ReadFromCallback;
-	PLib3MFAttachment_GetStreamSizePtr m_Attachment_GetStreamSize;
-	PLib3MFAttachment_WriteToBufferPtr m_Attachment_WriteToBuffer;
-	PLib3MFAttachment_ReadFromBufferPtr m_Attachment_ReadFromBuffer;
-	PLib3MFTexture2D_GetAttachmentPtr m_Texture2D_GetAttachment;
-	PLib3MFTexture2D_SetAttachmentPtr m_Texture2D_SetAttachment;
-	PLib3MFTexture2D_GetContentTypePtr m_Texture2D_GetContentType;
-	PLib3MFTexture2D_SetContentTypePtr m_Texture2D_SetContentType;
-	PLib3MFTexture2D_GetTileStyleUVPtr m_Texture2D_GetTileStyleUV;
-	PLib3MFTexture2D_SetTileStyleUVPtr m_Texture2D_SetTileStyleUV;
-	PLib3MFTexture2D_GetFilterPtr m_Texture2D_GetFilter;
-	PLib3MFTexture2D_SetFilterPtr m_Texture2D_SetFilter;
-	PLib3MFBuildItem_GetObjectResourcePtr m_BuildItem_GetObjectResource;
-	PLib3MFBuildItem_GetUUIDPtr m_BuildItem_GetUUID;
-	PLib3MFBuildItem_SetUUIDPtr m_BuildItem_SetUUID;
-	PLib3MFBuildItem_GetObjectResourceIDPtr m_BuildItem_GetObjectResourceID;
-	PLib3MFBuildItem_HasObjectTransformPtr m_BuildItem_HasObjectTransform;
-	PLib3MFBuildItem_GetObjectTransformPtr m_BuildItem_GetObjectTransform;
-	PLib3MFBuildItem_SetObjectTransformPtr m_BuildItem_SetObjectTransform;
-	PLib3MFBuildItem_GetPartNumberPtr m_BuildItem_GetPartNumber;
-	PLib3MFBuildItem_SetPartNumberPtr m_BuildItem_SetPartNumber;
-	PLib3MFBuildItem_GetMetaDataGroupPtr m_BuildItem_GetMetaDataGroup;
-	PLib3MFBuildItem_GetOutboxPtr m_BuildItem_GetOutbox;
-	PLib3MFBuildItemIterator_MoveNextPtr m_BuildItemIterator_MoveNext;
-	PLib3MFBuildItemIterator_MovePreviousPtr m_BuildItemIterator_MovePrevious;
-	PLib3MFBuildItemIterator_GetCurrentPtr m_BuildItemIterator_GetCurrent;
-	PLib3MFBuildItemIterator_ClonePtr m_BuildItemIterator_Clone;
-	PLib3MFBuildItemIterator_CountPtr m_BuildItemIterator_Count;
-	PLib3MFSlice_SetVerticesPtr m_Slice_SetVertices;
-	PLib3MFSlice_GetVerticesPtr m_Slice_GetVertices;
-	PLib3MFSlice_GetVertexCountPtr m_Slice_GetVertexCount;
-	PLib3MFSlice_AddPolygonPtr m_Slice_AddPolygon;
-	PLib3MFSlice_GetPolygonCountPtr m_Slice_GetPolygonCount;
-	PLib3MFSlice_SetPolygonIndicesPtr m_Slice_SetPolygonIndices;
-	PLib3MFSlice_GetPolygonIndicesPtr m_Slice_GetPolygonIndices;
-	PLib3MFSlice_GetPolygonIndexCountPtr m_Slice_GetPolygonIndexCount;
-	PLib3MFSlice_GetZTopPtr m_Slice_GetZTop;
-	PLib3MFToolpathProfile_GetUUIDPtr m_ToolpathProfile_GetUUID;
-	PLib3MFToolpathProfile_GetNamePtr m_ToolpathProfile_GetName;
-	PLib3MFToolpathProfile_HasParameterValuePtr m_ToolpathProfile_HasParameterValue;
-	PLib3MFToolpathProfile_GetParameterDoubleValuePtr m_ToolpathProfile_GetParameterDoubleValue;
-	PLib3MFToolpathProfile_GetParameterDoubleValueDefPtr m_ToolpathProfile_GetParameterDoubleValueDef;
-	PLib3MFToolpathProfile_SetNamePtr m_ToolpathProfile_SetName;
-	PLib3MFToolpathProfile_SetParameterDoubleValuePtr m_ToolpathProfile_SetParameterDoubleValue;
-	PLib3MFToolpathLayerReader_GetLayerDataUUIDPtr m_ToolpathLayerReader_GetLayerDataUUID;
-	PLib3MFToolpathLayerReader_GetSegmentCountPtr m_ToolpathLayerReader_GetSegmentCount;
-	PLib3MFToolpathLayerReader_GetSegmentInfoPtr m_ToolpathLayerReader_GetSegmentInfo;
-	PLib3MFToolpathLayerReader_GetSegmentProfilePtr m_ToolpathLayerReader_GetSegmentProfile;
-	PLib3MFToolpathLayerReader_GetSegmentProfileUUIDPtr m_ToolpathLayerReader_GetSegmentProfileUUID;
-	PLib3MFToolpathLayerReader_GetSegmentPartPtr m_ToolpathLayerReader_GetSegmentPart;
-	PLib3MFToolpathLayerReader_GetSegmentPartUUIDPtr m_ToolpathLayerReader_GetSegmentPartUUID;
-	PLib3MFToolpathLayerReader_GetSegmentPointDataPtr m_ToolpathLayerReader_GetSegmentPointData;
-	PLib3MFToolpathLayerData_GetLayerDataUUIDPtr m_ToolpathLayerData_GetLayerDataUUID;
-	PLib3MFToolpathLayerData_RegisterProfilePtr m_ToolpathLayerData_RegisterProfile;
-	PLib3MFToolpathLayerData_RegisterBuildItemPtr m_ToolpathLayerData_RegisterBuildItem;
-	PLib3MFToolpathLayerData_WriteHatchDataPtr m_ToolpathLayerData_WriteHatchData;
-	PLib3MFToolpathLayerData_WriteLoopPtr m_ToolpathLayerData_WriteLoop;
-	PLib3MFToolpathLayerData_WritePolylinePtr m_ToolpathLayerData_WritePolyline;
-	PLib3MFToolpathLayerData_FinishPtr m_ToolpathLayerData_Finish;
-	PLib3MFToolpath_GetUnitsPtr m_Toolpath_GetUnits;
-	PLib3MFToolpath_GetLayerCountPtr m_Toolpath_GetLayerCount;
-	PLib3MFToolpath_GetProfileCountPtr m_Toolpath_GetProfileCount;
-	PLib3MFToolpath_AddLayerPtr m_Toolpath_AddLayer;
-	PLib3MFToolpath_GetLayerAttachmentPtr m_Toolpath_GetLayerAttachment;
-	PLib3MFToolpath_ReadLayerDataPtr m_Toolpath_ReadLayerData;
-	PLib3MFToolpath_GetLayerPathPtr m_Toolpath_GetLayerPath;
-	PLib3MFToolpath_GetLayerZMaxPtr m_Toolpath_GetLayerZMax;
-	PLib3MFToolpath_GetLayerZPtr m_Toolpath_GetLayerZ;
-	PLib3MFToolpath_AddProfilePtr m_Toolpath_AddProfile;
-	PLib3MFToolpath_GetProfilePtr m_Toolpath_GetProfile;
-	PLib3MFToolpath_GetProfileUUIDPtr m_Toolpath_GetProfileUUID;
-	PLib3MFToolpathIterator_GetCurrentToolpathPtr m_ToolpathIterator_GetCurrentToolpath;
-	PLib3MFSliceStack_GetBottomZPtr m_SliceStack_GetBottomZ;
-	PLib3MFSliceStack_GetSliceCountPtr m_SliceStack_GetSliceCount;
-	PLib3MFSliceStack_GetSlicePtr m_SliceStack_GetSlice;
-	PLib3MFSliceStack_AddSlicePtr m_SliceStack_AddSlice;
-	PLib3MFSliceStack_GetSliceRefCountPtr m_SliceStack_GetSliceRefCount;
-	PLib3MFSliceStack_AddSliceStackReferencePtr m_SliceStack_AddSliceStackReference;
-	PLib3MFSliceStack_GetSliceStackReferencePtr m_SliceStack_GetSliceStackReference;
-	PLib3MFSliceStack_CollapseSliceReferencesPtr m_SliceStack_CollapseSliceReferences;
-	PLib3MFSliceStack_SetOwnPathPtr m_SliceStack_SetOwnPath;
-	PLib3MFSliceStack_GetOwnPathPtr m_SliceStack_GetOwnPath;
-	PLib3MFConsumer_GetConsumerIDPtr m_Consumer_GetConsumerID;
-	PLib3MFConsumer_GetKeyIDPtr m_Consumer_GetKeyID;
-	PLib3MFConsumer_GetKeyValuePtr m_Consumer_GetKeyValue;
-	PLib3MFAccessRight_GetConsumerPtr m_AccessRight_GetConsumer;
-	PLib3MFAccessRight_GetWrappingAlgorithmPtr m_AccessRight_GetWrappingAlgorithm;
-	PLib3MFAccessRight_GetMgfAlgorithmPtr m_AccessRight_GetMgfAlgorithm;
-	PLib3MFAccessRight_GetDigestMethodPtr m_AccessRight_GetDigestMethod;
-	PLib3MFContentEncryptionParams_GetEncryptionAlgorithmPtr m_ContentEncryptionParams_GetEncryptionAlgorithm;
-	PLib3MFContentEncryptionParams_GetKeyPtr m_ContentEncryptionParams_GetKey;
-	PLib3MFContentEncryptionParams_GetInitializationVectorPtr m_ContentEncryptionParams_GetInitializationVector;
-	PLib3MFContentEncryptionParams_GetAuthenticationTagPtr m_ContentEncryptionParams_GetAuthenticationTag;
-	PLib3MFContentEncryptionParams_SetAuthenticationTagPtr m_ContentEncryptionParams_SetAuthenticationTag;
-	PLib3MFContentEncryptionParams_GetAdditionalAuthenticationDataPtr m_ContentEncryptionParams_GetAdditionalAuthenticationData;
-	PLib3MFContentEncryptionParams_GetDescriptorPtr m_ContentEncryptionParams_GetDescriptor;
-	PLib3MFContentEncryptionParams_GetKeyUUIDPtr m_ContentEncryptionParams_GetKeyUUID;
-	PLib3MFResourceData_GetPathPtr m_ResourceData_GetPath;
-	PLib3MFResourceData_GetEncryptionAlgorithmPtr m_ResourceData_GetEncryptionAlgorithm;
-	PLib3MFResourceData_GetCompressionPtr m_ResourceData_GetCompression;
-	PLib3MFResourceData_GetAdditionalAuthenticationDataPtr m_ResourceData_GetAdditionalAuthenticationData;
-	PLib3MFResourceDataGroup_GetKeyUUIDPtr m_ResourceDataGroup_GetKeyUUID;
-	PLib3MFResourceDataGroup_AddAccessRightPtr m_ResourceDataGroup_AddAccessRight;
-	PLib3MFResourceDataGroup_FindAccessRightByConsumerPtr m_ResourceDataGroup_FindAccessRightByConsumer;
-	PLib3MFResourceDataGroup_RemoveAccessRightPtr m_ResourceDataGroup_RemoveAccessRight;
-	PLib3MFKeyStore_AddConsumerPtr m_KeyStore_AddConsumer;
-	PLib3MFKeyStore_GetConsumerCountPtr m_KeyStore_GetConsumerCount;
-	PLib3MFKeyStore_GetConsumerPtr m_KeyStore_GetConsumer;
-	PLib3MFKeyStore_RemoveConsumerPtr m_KeyStore_RemoveConsumer;
-	PLib3MFKeyStore_FindConsumerPtr m_KeyStore_FindConsumer;
-	PLib3MFKeyStore_GetResourceDataGroupCountPtr m_KeyStore_GetResourceDataGroupCount;
-	PLib3MFKeyStore_AddResourceDataGroupPtr m_KeyStore_AddResourceDataGroup;
-	PLib3MFKeyStore_GetResourceDataGroupPtr m_KeyStore_GetResourceDataGroup;
-	PLib3MFKeyStore_RemoveResourceDataGroupPtr m_KeyStore_RemoveResourceDataGroup;
-	PLib3MFKeyStore_FindResourceDataGroupPtr m_KeyStore_FindResourceDataGroup;
-	PLib3MFKeyStore_AddResourceDataPtr m_KeyStore_AddResourceData;
-	PLib3MFKeyStore_RemoveResourceDataPtr m_KeyStore_RemoveResourceData;
-	PLib3MFKeyStore_FindResourceDataPtr m_KeyStore_FindResourceData;
-	PLib3MFKeyStore_GetResourceDataCountPtr m_KeyStore_GetResourceDataCount;
-	PLib3MFKeyStore_GetResourceDataPtr m_KeyStore_GetResourceData;
-	PLib3MFKeyStore_GetUUIDPtr m_KeyStore_GetUUID;
-	PLib3MFKeyStore_SetUUIDPtr m_KeyStore_SetUUID;
-	PLib3MFModel_RootModelPartPtr m_Model_RootModelPart;
-	PLib3MFModel_FindOrCreatePackagePartPtr m_Model_FindOrCreatePackagePart;
-	PLib3MFModel_SetUnitPtr m_Model_SetUnit;
-	PLib3MFModel_GetUnitPtr m_Model_GetUnit;
-	PLib3MFModel_GetLanguagePtr m_Model_GetLanguage;
-	PLib3MFModel_SetLanguagePtr m_Model_SetLanguage;
-	PLib3MFModel_QueryWriterPtr m_Model_QueryWriter;
-	PLib3MFModel_QueryReaderPtr m_Model_QueryReader;
-	PLib3MFModel_GetTexture2DByIDPtr m_Model_GetTexture2DByID;
-	PLib3MFModel_GetPropertyTypeByIDPtr m_Model_GetPropertyTypeByID;
-	PLib3MFModel_GetBaseMaterialGroupByIDPtr m_Model_GetBaseMaterialGroupByID;
-	PLib3MFModel_GetTexture2DGroupByIDPtr m_Model_GetTexture2DGroupByID;
-	PLib3MFModel_GetCompositeMaterialsByIDPtr m_Model_GetCompositeMaterialsByID;
-	PLib3MFModel_GetMultiPropertyGroupByIDPtr m_Model_GetMultiPropertyGroupByID;
-	PLib3MFModel_GetMeshObjectByIDPtr m_Model_GetMeshObjectByID;
-	PLib3MFModel_GetComponentsObjectByIDPtr m_Model_GetComponentsObjectByID;
-	PLib3MFModel_GetColorGroupByIDPtr m_Model_GetColorGroupByID;
-	PLib3MFModel_GetSliceStackByIDPtr m_Model_GetSliceStackByID;
-	PLib3MFModel_GetBuildUUIDPtr m_Model_GetBuildUUID;
-	PLib3MFModel_SetBuildUUIDPtr m_Model_SetBuildUUID;
-	PLib3MFModel_GetBuildItemsPtr m_Model_GetBuildItems;
-	PLib3MFModel_GetOutboxPtr m_Model_GetOutbox;
-	PLib3MFModel_GetResourcesPtr m_Model_GetResources;
-	PLib3MFModel_GetObjectsPtr m_Model_GetObjects;
-	PLib3MFModel_GetMeshObjectsPtr m_Model_GetMeshObjects;
-	PLib3MFModel_GetComponentsObjectsPtr m_Model_GetComponentsObjects;
-	PLib3MFModel_GetTexture2DsPtr m_Model_GetTexture2Ds;
-	PLib3MFModel_GetBaseMaterialGroupsPtr m_Model_GetBaseMaterialGroups;
-	PLib3MFModel_GetColorGroupsPtr m_Model_GetColorGroups;
-	PLib3MFModel_GetTexture2DGroupsPtr m_Model_GetTexture2DGroups;
-	PLib3MFModel_GetCompositeMaterialsPtr m_Model_GetCompositeMaterials;
-	PLib3MFModel_GetMultiPropertyGroupsPtr m_Model_GetMultiPropertyGroups;
-	PLib3MFModel_GetToolpathsPtr m_Model_GetToolpaths;
-	PLib3MFModel_GetSliceStacksPtr m_Model_GetSliceStacks;
-	PLib3MFModel_MergeToModelPtr m_Model_MergeToModel;
-	PLib3MFModel_AddMeshObjectPtr m_Model_AddMeshObject;
-	PLib3MFModel_AddComponentsObjectPtr m_Model_AddComponentsObject;
-	PLib3MFModel_AddSliceStackPtr m_Model_AddSliceStack;
-	PLib3MFModel_AddTexture2DFromAttachmentPtr m_Model_AddTexture2DFromAttachment;
-	PLib3MFModel_AddBaseMaterialGroupPtr m_Model_AddBaseMaterialGroup;
-	PLib3MFModel_AddColorGroupPtr m_Model_AddColorGroup;
-	PLib3MFModel_AddTexture2DGroupPtr m_Model_AddTexture2DGroup;
-	PLib3MFModel_AddCompositeMaterialsPtr m_Model_AddCompositeMaterials;
-	PLib3MFModel_AddMultiPropertyGroupPtr m_Model_AddMultiPropertyGroup;
-	PLib3MFModel_AddBuildItemPtr m_Model_AddBuildItem;
-	PLib3MFModel_RemoveBuildItemPtr m_Model_RemoveBuildItem;
-	PLib3MFModel_AddToolpathPtr m_Model_AddToolpath;
-	PLib3MFModel_GetMetaDataGroupPtr m_Model_GetMetaDataGroup;
-	PLib3MFModel_AddAttachmentPtr m_Model_AddAttachment;
-	PLib3MFModel_RemoveAttachmentPtr m_Model_RemoveAttachment;
-	PLib3MFModel_GetAttachmentPtr m_Model_GetAttachment;
-	PLib3MFModel_FindAttachmentPtr m_Model_FindAttachment;
-	PLib3MFModel_GetAttachmentCountPtr m_Model_GetAttachmentCount;
-	PLib3MFModel_HasPackageThumbnailAttachmentPtr m_Model_HasPackageThumbnailAttachment;
-	PLib3MFModel_CreatePackageThumbnailAttachmentPtr m_Model_CreatePackageThumbnailAttachment;
-	PLib3MFModel_GetPackageThumbnailAttachmentPtr m_Model_GetPackageThumbnailAttachment;
-	PLib3MFModel_RemovePackageThumbnailAttachmentPtr m_Model_RemovePackageThumbnailAttachment;
-	PLib3MFModel_AddCustomContentTypePtr m_Model_AddCustomContentType;
-	PLib3MFModel_RemoveCustomContentTypePtr m_Model_RemoveCustomContentType;
-	PLib3MFModel_SetRandomNumberCallbackPtr m_Model_SetRandomNumberCallback;
-	PLib3MFModel_GetKeyStorePtr m_Model_GetKeyStore;
-	PLib3MFModel_CreatePersistentSourceFromFilePtr m_Model_CreatePersistentSourceFromFile;
-	PLib3MFModel_CreatePersistentSourceFromBufferPtr m_Model_CreatePersistentSourceFromBuffer;
-	PLib3MFModel_CreatePersistentSourceFromCallbackPtr m_Model_CreatePersistentSourceFromCallback;
-	PLib3MFGetLibraryVersionPtr m_GetLibraryVersion;
-	PLib3MFGetPrereleaseInformationPtr m_GetPrereleaseInformation;
-	PLib3MFGetBuildInformationPtr m_GetBuildInformation;
-	PLib3MFGetSpecificationVersionPtr m_GetSpecificationVersion;
-	PLib3MFCreateModelPtr m_CreateModel;
-	PLib3MFReleasePtr m_Release;
-	PLib3MFAcquirePtr m_Acquire;
-	PLib3MFSetJournalPtr m_SetJournal;
-	PLib3MFGetLastErrorPtr m_GetLastError;
-	PLib3MFGetSymbolLookupMethodPtr m_GetSymbolLookupMethod;
-	PLib3MFRetrieveProgressMessagePtr m_RetrieveProgressMessage;
-	PLib3MFRGBAToColorPtr m_RGBAToColor;
-	PLib3MFFloatRGBAToColorPtr m_FloatRGBAToColor;
-	PLib3MFColorToRGBAPtr m_ColorToRGBA;
-	PLib3MFColorToFloatRGBAPtr m_ColorToFloatRGBA;
-	PLib3MFGetIdentityTransformPtr m_GetIdentityTransform;
-	PLib3MFGetUniformScaleTransformPtr m_GetUniformScaleTransform;
-	PLib3MFGetScaleTransformPtr m_GetScaleTransform;
-	PLib3MFGetTranslationTransformPtr m_GetTranslationTransform;
-} sLib3MFDynamicWrapperTable;
-
-#endif // __LIB3MF_DYNAMICHEADER_CPPTYPES
+#endif // __LIB3MF_HEADER_CPP
 
