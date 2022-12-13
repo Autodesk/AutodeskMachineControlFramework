@@ -18,6 +18,7 @@ cmake_minimum_required(VERSION 3.5)
 project("AMCDrivers")
 
 add_subdirectory(ScanLab)
+add_subdirectory(ScanLabOIE)
 add_subdirectory(Marlin)
 add_subdirectory(S7Net)
 add_subdirectory(Duet)

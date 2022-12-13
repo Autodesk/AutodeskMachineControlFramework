@@ -43,18 +43,5 @@ include (../CMakeDriverCommon.txt)
 ### Add custom code below
 ##########################################################################################
 
-file(GLOB LIBOIE_SRC
-	${CMAKE_CURRENT_SOURCE_DIR}/LibOIE/*.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Interfaces/liboie*.cpp
-)
 
-add_library(liboie SHARED ${LIBOIE_SRC})
-# Do not prefix the binary's name with "lib" on Unix systems:
-set_target_properties(liboie PROPERTIES PREFIX "" IMPORT_PREFIX "" )
-# The following two properties are crucial to reduce the number of undesirably exported symbols
-set_target_properties(liboie PROPERTIES CXX_VISIBILITY_PRESET hidden)
-set_target_properties(liboie PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
-# This makes sure symbols are exported
-target_compile_options(liboie PRIVATE "-D__LIBOIE_EXPORTS")
-target_include_directories(liboie PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/LibOIE)
-target_include_directories(liboie PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Interfaces)
+

@@ -57,6 +57,7 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
+class IOIEDevice;
 class IDriver_ScanLab_OIE;
 
 
@@ -310,11 +311,224 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for OIEDevice 
+**************************************************************************************************************************/
+
+class IOIEDevice : public virtual IBase {
+public:
+	/**
+	* IOIEDevice::SetHostName - Sets the host name of the device. Fails if device is already connected.
+	* @param[in] sHostName - New Host name of device.
+	*/
+	virtual void SetHostName(const std::string & sHostName) = 0;
+
+	/**
+	* IOIEDevice::GetHostName - Returns the host name of the device.
+	* @return Host name of device.
+	*/
+	virtual std::string GetHostName() = 0;
+
+	/**
+	* IOIEDevice::SetPort - Sets the port of the device. Fails if device is already connected.
+	* @param[in] nPort - New port of device.
+	*/
+	virtual void SetPort(const LibMCDriver_ScanLabOIE_uint32 nPort) = 0;
+
+	/**
+	* IOIEDevice::GetPort - Returns the port of the device. Fails if device is already connected.
+	* @return Port of device.
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetPort() = 0;
+
+	/**
+	* IOIEDevice::IsConnected - Returns if the device is connected and logged in.
+	* @return Flag if the device is connected.
+	*/
+	virtual bool IsConnected() = 0;
+
+	/**
+	* IOIEDevice::GetDeviceID - Returns the ID of the device.
+	* @return ID of the device.
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetDeviceID() = 0;
+
+	/**
+	* IOIEDevice::Connect - Connects to the device and attempts to log in with user name and password.
+	* @param[in] sUserName - UserName to use.
+	* @param[in] sPassword - Password to use.
+	*/
+	virtual void Connect(const std::string & sUserName, const std::string & sPassword) = 0;
+
+	/**
+	* IOIEDevice::Disconnect - Disconnects from the device. Has no effect if device is not connected.
+	*/
+	virtual void Disconnect() = 0;
+
+	/**
+	* IOIEDevice::GetAppCount - Returns how many apps are installed on the device. Fails if device is not connected.
+	* @return Number of apps installed on the device.
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetAppCount() = 0;
+
+	/**
+	* IOIEDevice::GetAppName - Returns the name of an app from the app list.
+	* @param[in] nIndex - Index of App, 0-based
+	* @return Name of app.
+	*/
+	virtual std::string GetAppName(const LibMCDriver_ScanLabOIE_uint32 nIndex) = 0;
+
+	/**
+	* IOIEDevice::GetAppVersion - Returns the version of an app from the app list.
+	* @param[in] nIndex - Index of App, 0-based
+	* @param[out] nMajor - Major version of the app.
+	* @param[out] nMinor - Minor version of the app.
+	* @param[out] nPatch - Patch version of the app.
+	*/
+	virtual void GetAppVersion(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch) = 0;
+
+	/**
+	* IOIEDevice::GetAppInfo - Returns the name and version of an app from the app list.
+	* @param[in] nIndex - Index of App, 0-based
+	* @param[out] sName - Name of app.
+	* @param[out] nMajor - Major version of the app.
+	* @param[out] nMinor - Minor version of the app.
+	* @param[out] nPatch - Patch version of the app.
+	*/
+	virtual void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch) = 0;
+
+	/**
+	* IOIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running.
+	* @param[in] sName - Name of app to be started.
+	* @param[in] sDeviceConfig - Device config string.
+	*/
+	virtual void StartAppByName(const std::string & sName, const std::string & sDeviceConfig) = 0;
+
+	/**
+	* IOIEDevice::StartAppByIndex - Starts an app by its index. Fails if an app is already running.
+	* @param[in] nIndex - Index of App, 0-based
+	* @param[in] sDeviceConfig - Device config string.
+	*/
+	virtual void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig) = 0;
+
+	/**
+	* IOIEDevice::StartAppByMajorVersion - Starts an app by its major version. Fails if an app is already running.
+	* @param[in] sName - Name of app to be started.
+	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
+	* @param[in] sDeviceConfig - Device config string.
+	*/
+	virtual void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig) = 0;
+
+	/**
+	* IOIEDevice::StartAppByMinorVersion - Starts an app by its major version. Fails if an app is already running.
+	* @param[in] sName - Name of app to be started.
+	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
+	* @param[in] nMinorVersion - Minor version of app to be started. Fails if app does not exist or only with wrong minor number.
+	* @param[in] sDeviceConfig - Device config string.
+	*/
+	virtual void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string & sDeviceConfig) = 0;
+
+	/**
+	* IOIEDevice::StopApp - Stops the currently running app. Does nothing if no app is running.
+	*/
+	virtual void StopApp() = 0;
+
+	/**
+	* IOIEDevice::AppIsRunning - Returns if the device is running an app.
+	* @return Flag if the device is running an app.
+	*/
+	virtual bool AppIsRunning() = 0;
+
+	/**
+	* IOIEDevice::GetRunningApp - Returns if the app that is currently running on the device. Fails if no app is running on the device.
+	* @param[out] sName - Name of app.
+	* @param[out] nMajor - Major version of the app.
+	* @param[out] nMinor - Minor version of the app.
+	* @param[out] nPatch - Patch version of the app.
+	*/
+	virtual void GetRunningApp(std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch) = 0;
+
+	/**
+	* IOIEDevice::InstallApp - Installs an app package on the device. Fails if any app is running on the device. You have to be logged in with an administrator account.
+	* @param[in] nAppPackageBufferSize - Number of elements in buffer
+	* @param[in] pAppPackageBuffer - Binary data of the app to be installed.
+	*/
+	virtual void InstallApp(const LibMCDriver_ScanLabOIE_uint64 nAppPackageBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pAppPackageBuffer) = 0;
+
+	/**
+	* IOIEDevice::UninstallAppByName - Uninstall all the versions of an app by its name. Fails if any app is running on the device.
+	* @param[in] sName - Name of app to be uninstalled.
+	*/
+	virtual void UninstallAppByName(const std::string & sName) = 0;
+
+	/**
+	* IOIEDevice::UninstallAppByIndex - Uninstall an app by its index. Fails if any app is running on the device.
+	* @param[in] nIndex - Index of App, 0-based
+	*/
+	virtual void UninstallAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex) = 0;
+
+	/**
+	* IOIEDevice::UninstallAppByMajorVersion - Uninstall all major versions of an app. Fails if any app is running on the device.
+	* @param[in] sName - Name of app to be uninstalled.
+	* @param[in] nMajorVersion - Major version of app to be uninstalled. Fails if app does not exist or only with wrong major number.
+	*/
+	virtual void UninstallAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion) = 0;
+
+	/**
+	* IOIEDevice::UninstallAppByMinorVersion - Uninstall all minor versions of an app. Fails if any app is running on the device.
+	* @param[in] sName - Name of app to be uninstalled.
+	* @param[in] nMajorVersion - Major version of app to be uninstalled.
+	* @param[in] nMinorVersion - Minor version of app to be uninstalled.
+	*/
+	virtual void UninstallAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion) = 0;
+
+};
+
+typedef IBaseSharedPtr<IOIEDevice> PIOIEDevice;
+
+
+/*************************************************************************************************************************
  Class interface for Driver_ScanLab_OIE 
 **************************************************************************************************************************/
 
 class IDriver_ScanLab_OIE : public virtual IDriver {
 public:
+	/**
+	* IDriver_ScanLab_OIE::SetDependencyResourceNames - Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.
+	* @param[in] sLibSSLResourceName - Resource name of LibSSL DLL. Default is libssl_win64 or libssl_linux64, depending on platform.
+	* @param[in] sLibCryptoResourceName - Resource name of LibCrypto DLL. Default is libcrypto_win64 or libcrypto_linux64, depending on platform.
+	* @param[in] sQT5CoreResourceName - Resource name of Qt5Core DLL. Default is qt5core_win64 or qt5core_linux64, depending on platform.
+	* @param[in] sQT5NetworkResourceName - Resource name of Qt5Network DLL. Default is qt5network_win64 or qt5network_linux64, depending on platform.
+	*/
+	virtual void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::InitializeSDK - Initializes the ScanLab OIE SDK.
+	* @param[in] sOIEResourceName - Resource name of Scanlab OIE DLL. Searches in Machine Resources first, then in Driver Resources.
+	*/
+	virtual void InitializeSDK(const std::string & sOIEResourceName) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::InitializeCustomSDK - Initializes the ScanLab OIE SDK from a custom array.
+	* @param[in] nOIEDLLBufferSize - Number of elements in buffer
+	* @param[in] pOIEDLLBuffer - Byte array of Scanlab OIE DLL
+	*/
+	virtual void InitializeCustomSDK(const LibMCDriver_ScanLabOIE_uint64 nOIEDLLBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pOIEDLLBuffer) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::AddDevice - Adds a new device to the OIE.
+	* @param[in] sHostName - Host name of device.
+	* @param[in] nPort - Port of device.
+	* @param[in] nResponseTimeOut - Response timeout of device in ms.
+	* @return OIE Device Instance
+	*/
+	virtual IOIEDevice * AddDevice(const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::RemoveDevice - Removes a device from the OIE.
+	* @param[in] pDeviceInstance - OIE Device Instance
+	*/
+	virtual void RemoveDevice(IOIEDevice* pDeviceInstance) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDriver_ScanLab_OIE> PIDriver_ScanLab_OIE;

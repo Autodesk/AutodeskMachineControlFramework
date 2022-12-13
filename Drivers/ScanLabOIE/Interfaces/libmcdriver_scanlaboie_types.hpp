@@ -130,6 +130,7 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
 
 typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_Base;
 typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_Driver;
+typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_OIEDevice;
 typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE;
 
 namespace LibMCDriver_ScanLabOIE {
