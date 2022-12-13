@@ -14,7 +14,7 @@ cmake ..\submodules\lib3mf
 cmake --build . --config Release
 copy Release\lib3mf.dll ..\Artifacts\lib3mf\lib3mf_win64.dll /Y
 
-git rev-parse --verify HEAD >"..\Artifacts\lib3mf\_githash_win64_lib3mf.txt"
+git rev-parse --verify HEAD >"..\Artifacts\lib3mf\_githash_lib3mf.txt"
 
 cd ..
 
