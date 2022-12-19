@@ -927,7 +927,7 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_IsActivePtr) (LibMCEnv_Workin
 typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const LibMCEnv_uint32 nFilePathBufferSize, LibMCEnv_uint32* pFilePathNeededChars, char * pFilePathBuffer);
 
 /**
-* Stores a data buffer in a temporary file.
+* Stores a data buffer in a temporary file with a given name.
 *
 * @param[in] pWorkingDirectory - WorkingDirectory instance.
 * @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
@@ -939,7 +939,7 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_GetAbsoluteFilePathPtr) (LibM
 typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomDataPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
 
 /**
-* Stores a string in a temporary file.
+* Stores a string in a temporary file with a given name.
 *
 * @param[in] pWorkingDirectory - WorkingDirectory instance.
 * @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
@@ -959,6 +959,40 @@ typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomStringPtr) (LibMCE
 * @return error code or 0 (success)
 */
 typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreDriverDataPtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores a data buffer in a temporary file with a generated name.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[in] pDataBufferBuffer - uint8 buffer of file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomDataInTempFilePtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores a string in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+* @param[in] pDataString - file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreCustomStringInTempFilePtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores attached driver data in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvWorkingDirectory_StoreDriverDataInTempFilePtr) (LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile);
 
 /**
 * Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
@@ -2435,6 +2469,9 @@ typedef struct {
 	PLibMCEnvWorkingDirectory_StoreCustomDataPtr m_WorkingDirectory_StoreCustomData;
 	PLibMCEnvWorkingDirectory_StoreCustomStringPtr m_WorkingDirectory_StoreCustomString;
 	PLibMCEnvWorkingDirectory_StoreDriverDataPtr m_WorkingDirectory_StoreDriverData;
+	PLibMCEnvWorkingDirectory_StoreCustomDataInTempFilePtr m_WorkingDirectory_StoreCustomDataInTempFile;
+	PLibMCEnvWorkingDirectory_StoreCustomStringInTempFilePtr m_WorkingDirectory_StoreCustomStringInTempFile;
+	PLibMCEnvWorkingDirectory_StoreDriverDataInTempFilePtr m_WorkingDirectory_StoreDriverDataInTempFile;
 	PLibMCEnvWorkingDirectory_CleanUpPtr m_WorkingDirectory_CleanUp;
 	PLibMCEnvWorkingDirectory_AddManagedFilePtr m_WorkingDirectory_AddManagedFile;
 	PLibMCEnvWorkingDirectory_HasUnmanagedFilesPtr m_WorkingDirectory_HasUnmanagedFiles;

@@ -264,6 +264,9 @@ public:
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "INVALIDLAYERINDEX";
 			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "INVALIDHATCHCOUNT";
 			case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "SEGMENTISNOTOFTYPEHATCH";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "TEMPFILEEXTENSIONEXCEEDS64CHARACTERS";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS";
+			case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "COULDNOTGENERATETEMPFILENAME";
 		}
 		return "UNKNOWN";
 	}
@@ -315,6 +318,9 @@ public:
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
 			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "Invalid hatch count.";
 			case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "Segment is not of type hatch.";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "Temp file extension exceeds 64 characters.";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "Temp file extension contains invalid characters.";
+			case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "Could not generate temp file name.";
 		}
 		return "unknown error";
 	}
@@ -767,6 +773,9 @@ public:
 	inline PWorkingFile StoreCustomData(const std::string & sFileName, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
 	inline PWorkingFile StoreCustomString(const std::string & sFileName, const std::string & sDataString);
 	inline PWorkingFile StoreDriverData(const std::string & sFileName, const std::string & sIdentifier);
+	inline PWorkingFile StoreCustomDataInTempFile(const std::string & sExtension, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PWorkingFile StoreCustomStringInTempFile(const std::string & sExtension, const std::string & sDataString);
+	inline PWorkingFile StoreDriverDataInTempFile(const std::string & sExtension, const std::string & sIdentifier);
 	inline bool CleanUp();
 	inline PWorkingFile AddManagedFile(const std::string & sFileName);
 	inline bool HasUnmanagedFiles();
@@ -1139,6 +1148,9 @@ public:
 		pWrapperTable->m_WorkingDirectory_StoreCustomData = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreCustomString = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile = nullptr;
 		pWrapperTable->m_WorkingDirectory_CleanUp = nullptr;
 		pWrapperTable->m_WorkingDirectory_AddManagedFile = nullptr;
 		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = nullptr;
@@ -2081,6 +2093,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomDataInTempFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storecustomdataintempfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomDataInTempFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_storecustomdataintempfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomStringInTempFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storecustomstringintempfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomStringInTempFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_storecustomstringintempfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile = (PLibMCEnvWorkingDirectory_StoreDriverDataInTempFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storedriverdataintempfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile = (PLibMCEnvWorkingDirectory_StoreDriverDataInTempFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_storedriverdataintempfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3598,6 +3637,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_workingdirectory_storedriverdata", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storecustomdataintempfile", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storecustomstringintempfile", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storedriverdataintempfile", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_workingdirectory_cleanup", (void**)&(pWrapperTable->m_WorkingDirectory_CleanUp));
@@ -5234,7 +5285,7 @@ public:
 	}
 	
 	/**
-	* CWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* CWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] DataBufferBuffer - file data to store to.
 	* @return working file instance.
@@ -5251,7 +5302,7 @@ public:
 	}
 	
 	/**
-	* CWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* CWorkingDirectory::StoreCustomString - Stores a string in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] sDataString - file data to store to.
 	* @return working file instance.
@@ -5277,6 +5328,57 @@ public:
 	{
 		LibMCEnvHandle hWorkingFile = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreDriverData(m_pHandle, sFileName.c_str(), sIdentifier.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreCustomDataInTempFile - Stores a data buffer in a temporary file with a generated name.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] DataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomDataInTempFile(const std::string & sExtension, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomDataInTempFile(m_pHandle, sExtension.c_str(), (LibMCEnv_uint64)DataBufferBuffer.size(), DataBufferBuffer.data(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreCustomStringInTempFile - Stores a string in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomStringInTempFile(const std::string & sExtension, const std::string & sDataString)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomStringInTempFile(m_pHandle, sExtension.c_str(), sDataString.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreDriverDataInTempFile - Stores attached driver data in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreDriverDataInTempFile(const std::string & sExtension, const std::string & sIdentifier)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreDriverDataInTempFile(m_pHandle, sExtension.c_str(), sIdentifier.c_str(), &hWorkingFile));
 		
 		if (!hWorkingFile) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);

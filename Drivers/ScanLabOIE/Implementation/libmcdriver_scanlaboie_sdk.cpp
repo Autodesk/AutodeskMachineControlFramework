@@ -154,7 +154,7 @@ void CScanLabOIESDK::initDLL()
 	if (!m_bIsInitialized) {
 
 		if (oie_get_version == nullptr)
-			throw std::runtime_error("RTC DLL not loaded");
+			throw std::runtime_error("OIE DLL not loaded");
 
 		m_bIsInitialized = true;
 	}

@@ -81,7 +81,11 @@
 		<error name="TOOLPATHNOTLOADED" code="40" description="Toolpath has not been loaded." />
 		<error name="INVALIDLAYERINDEX" code="41" description="Invalid layer index." />
 		<error name="INVALIDHATCHCOUNT" code="42" description="Invalid hatch count." />
-		<error name="SEGMENTISNOTOFTYPEHATCH" code="43" description="Segment is not of type hatch." />
+		<error name="SEGMENTISNOTOFTYPEHATCH" code="43" description="Segment is not of type hatch." />		
+		<error name="TEMPFILEEXTENSIONEXCEEDS64CHARACTERS" code="44" description="Temp file extension exceeds 64 characters." />
+		<error name="TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS" code="45" description="Temp file extension contains invalid characters." />
+		<error name="COULDNOTGENERATETEMPFILENAME" code="46" description="Could not generate temp file name." />
+		
 							
 	</errors>
 
@@ -580,13 +584,13 @@
 			<param name="FilePath" type="string" pass="return" description="global path of the directory, including path delimiter." />
 		</method>
 
-		<method name="StoreCustomData" description = "Stores a data buffer in a temporary file.">
+		<method name="StoreCustomData" description = "Stores a data buffer in a temporary file with a given name.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
 			<param name="DataBuffer" type="basicarray" class="uint8" pass="in" description="file data to store to." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
 		</method>
 
-		<method name="StoreCustomString" description = "Stores a string in a temporary file.">
+		<method name="StoreCustomString" description = "Stores a string in a temporary file with a given name.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
 			<param name="DataString" type="string" pass="in" description="file data to store to." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
@@ -594,6 +598,24 @@
 
 		<method name="StoreDriverData" description = "Stores attached driver data in a temporary file.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreCustomDataInTempFile" description = "Stores a data buffer in a temporary file with a generated name.">
+			<param name="Extension" type="string" pass="in" description="extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreCustomStringInTempFile" description = "Stores a string in a temporary file.">
+			<param name="Extension" type="string" pass="in" description="extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters." />
+			<param name="DataString" type="string" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreDriverDataInTempFile" description = "Stores attached driver data in a temporary file.">
+			<param name="Extension" type="string" pass="in" description="extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters." />
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
 		</method>

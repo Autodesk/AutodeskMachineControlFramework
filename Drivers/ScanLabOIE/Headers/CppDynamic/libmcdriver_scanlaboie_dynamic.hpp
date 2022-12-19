@@ -178,6 +178,27 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY: return "COULDNOTLOADLIBRARY";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT: return "COULDNOTFINDLIBRARYEXPORT";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INCOMPATIBLEBINARYVERSION: return "INCOMPATIBLEBINARYVERSION";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERTYPE: return "INVALIDDRIVERTYPE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERNAME: return "INVALIDDRIVERNAME";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERENVIRONMENT: return "INVALIDDRIVERENVIRONMENT";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_SDKALREADYINITIALIZED: return "SDKALREADYINITIALIZED";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSCANLABOIESDK: return "INVALIDSCANLABOIESDK";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTAVAILABLEANYMORE: return "DEVICENOTAVAILABLEANYMORE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTADDDEVICE: return "COULDNOTADDDEVICE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYCONNECTED: return "DEVICEALREADYCONNECTED";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYREMOVED: return "DEVICEALREADYREMOVED";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTCONNECTED: return "DEVICENOTCONNECTED";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPCOUNTONDEVICE: return "INVALIDAPPCOUNTONDEVICE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPINDEX: return "INVALIDAPPINDEX";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPNAME: return "INVALIDAPPNAME";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPVERSION: return "INVALIDAPPVERSION";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESPONSETIMEOUT: return "INVALIDRESPONSETIMEOUT";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPPACKAGEBUFFER: return "INVALIDAPPPACKAGEBUFFER";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESOURCENAME: return "INVALIDRESOURCENAME";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBRESSLRESOURCE: return "COULDNOTSTORELIBRESSLRESOURCE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE: return "COULDNOTSTORELIBCRYPTORESOURCE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE: return "COULDNOTSTOREQT5CORERESOURCE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE: return "COULDNOTSTOREQT5NETWORKRESOURCE";
 		}
 		return "UNKNOWN";
 	}
@@ -194,6 +215,27 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERTYPE: return "Invalid OIE Driver type";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERNAME: return "Invalid OIE Driver name";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERENVIRONMENT: return "Invalid OIE Driver environment";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_SDKALREADYINITIALIZED: return "SDK already initialized.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSCANLABOIESDK: return "Invalid Scanlab OIE SDK.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTAVAILABLEANYMORE: return "Device not available anymore.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTADDDEVICE: return "Could not add device.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYCONNECTED: return "Device already connected.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYREMOVED: return "Device already removed.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTCONNECTED: return "Device not connected.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPCOUNTONDEVICE: return "Invalid app count on device.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPINDEX: return "Invalid app index.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPNAME: return "Invalid app name.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPVERSION: return "Invalid app version.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESPONSETIMEOUT: return "Invalid response timeout.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPPACKAGEBUFFER: return "Invalid app package buffer.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESOURCENAME: return "Invalid resource name.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBRESSLRESOURCE: return "Could not store LibreSSL resource.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE: return "Could not store LibCrypto resource.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE: return "Could not store QT5Core resource.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE: return "Could not store QT5Network resource.";
 		}
 		return "unknown error";
 	}
@@ -423,6 +465,7 @@ public:
 	inline LibMCDriver_ScanLabOIE_uint32 GetDeviceID();
 	inline void Connect(const std::string & sUserName, const std::string & sPassword);
 	inline void Disconnect();
+	inline void RefreshAppList();
 	inline LibMCDriver_ScanLabOIE_uint32 GetAppCount();
 	inline std::string GetAppName(const LibMCDriver_ScanLabOIE_uint32 nIndex);
 	inline void GetAppVersion(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
@@ -597,6 +640,7 @@ public:
 		pWrapperTable->m_OIEDevice_GetDeviceID = nullptr;
 		pWrapperTable->m_OIEDevice_Connect = nullptr;
 		pWrapperTable->m_OIEDevice_Disconnect = nullptr;
+		pWrapperTable->m_OIEDevice_RefreshAppList = nullptr;
 		pWrapperTable->m_OIEDevice_GetAppCount = nullptr;
 		pWrapperTable->m_OIEDevice_GetAppName = nullptr;
 		pWrapperTable->m_OIEDevice_GetAppVersion = nullptr;
@@ -799,6 +843,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_OIEDevice_Disconnect == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_RefreshAppList = (PLibMCDriver_ScanLabOIEOIEDevice_RefreshAppListPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_refreshapplist");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_RefreshAppList = (PLibMCDriver_ScanLabOIEOIEDevice_RefreshAppListPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_refreshapplist");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_RefreshAppList == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1125,6 +1178,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_Disconnect == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_refreshapplist", (void**)&(pWrapperTable->m_OIEDevice_RefreshAppList));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_RefreshAppList == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_getappcount", (void**)&(pWrapperTable->m_OIEDevice_GetAppCount));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetAppCount == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1422,6 +1479,14 @@ public:
 	void COIEDevice::Disconnect()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* COIEDevice::RefreshAppList - Refreshes the list of installed apps on the system.
+	*/
+	void COIEDevice::RefreshAppList()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_RefreshAppList(m_pHandle));
 	}
 	
 	/**

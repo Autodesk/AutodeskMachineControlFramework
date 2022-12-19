@@ -211,6 +211,14 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_disconnect(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice);
 
 /**
+* Refreshes the list of installed apps on the system.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_refreshapplist(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice);
+
+/**
 * Returns how many apps are installed on the device. Fails if device is not connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.

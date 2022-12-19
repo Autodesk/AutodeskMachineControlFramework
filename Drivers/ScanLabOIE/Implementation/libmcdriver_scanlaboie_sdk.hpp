@@ -70,14 +70,14 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef void(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_reply_timeout) (oie_device pDevice, int32_t nTimeOutInMs);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_connect) (oie_device pDevice, const char * pHostName, uint16_t nPort);
 		typedef int(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_is_connected) (oie_device pDevice);
-		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_disconnect) (oie_device pDevice, const char* pHostName, uint16_t nPort);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_disconnect) (oie_device pDevice);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_login) (oie_device pDevice, const char * pUserName, const char * pPassword);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_list_apps) (oie_device pDevice, oie_appinfo * pAppBuffer, int32_t nLen, int32_t * pCount);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_start_app) (oie_device pDevice, const char* pAppName, const char* pDeviceConfigFileName);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_start_app_ver) (oie_device pDevice, const char* pAppName, int32_t nMajorVersion, int32_t nMinorVersion, const char* pDeviceConfigFileName);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_stop_app) (oie_device pDevice);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_is_app_running) (oie_device pDevice, uint32_t* pState);
-		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_get_appinfo) (oie_device pDevice, uint32_t* pState);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_get_appinfo) (oie_device pDevice, oie_appinfo* pInfo);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_install_app) (oie_device pDevice, const char * pEfwFileName);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_uninstall_app) (oie_device pDevice, const char* pAppName);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_uninstall_app_ver) (oie_device pDevice, const char* pAppName, int32_t nMajorVersion, int32_t nMinorVersion);

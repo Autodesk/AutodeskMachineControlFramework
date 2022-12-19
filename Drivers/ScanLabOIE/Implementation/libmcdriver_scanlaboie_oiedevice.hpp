@@ -45,7 +45,7 @@ Abstract: This is the class declaration of COIEDevice
 #endif
 
 // Include custom headers here.
-
+#include "libmcdriver_scanlaboie_sdk.hpp"
 
 namespace LibMCDriver_ScanLabOIE {
 namespace Impl {
@@ -54,30 +54,124 @@ namespace Impl {
 /*************************************************************************************************************************
  Class declaration of COIEDevice 
 **************************************************************************************************************************/
-
-class COIEDevice : public virtual IOIEDevice, public virtual CBase {
-private:
-
-	/**
-	* Put private members here.
-	*/
-
+class COIEDeviceApp {
 protected:
+	std::string m_sName;
+	uint32_t m_nMajorVersion;
+	uint32_t m_nMinorVersion;
+	uint32_t m_nPatchVersion;
 
-	/**
-	* Put protected members here.
-	*/
+public:
+	COIEDeviceApp(const std::string & sName, uint32_t nMajorVersion, uint32_t nMinorVersion, uint32_t nPatchVersion);
+	virtual ~COIEDeviceApp();
+
+	std::string getName();
+	uint32_t getMajorVersion();
+	uint32_t getMinorVersion();
+	uint32_t getPatchVersion();
+
+};
+
+
+typedef std::shared_ptr<COIEDeviceApp> POIEDeviceApp;
+
+class COIEDeviceInstance {
+protected:
+	PScanLabOIESDK m_pOIESDK;
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+
+	oie_instance m_pInstance;
+	oie_device m_pDevice;
+
+	std::string m_sHostName;
+	uint32_t m_nPort;
+
+	uint32_t m_nDeviceID;
+
+	bool m_bIsConnected;
+
+	std::vector<POIEDeviceApp> m_AppList;
+
+	void ensureConnectivity();
+	void removeDevice(bool bCheckForError);
+
+	static std::string getNameFromAppInfo(const oie_appinfo& appInfo);
+
+	void startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig);
+	void uninstallAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion);
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory);
+
+	virtual ~COIEDeviceInstance();
+
+	void SetHostName(const std::string& sHostName);
+
+	std::string GetHostName();
+
+	void SetPort(const LibMCDriver_ScanLabOIE_uint32 nPort);
+
+	LibMCDriver_ScanLabOIE_uint32 GetPort();
+
+	bool IsConnected();
+
+	LibMCDriver_ScanLabOIE_uint32 GetDeviceID();
+
+	void Connect(const std::string& sUserName, const std::string& sPassword);
+
+	void Disconnect();
+
+	void RefreshAppList();
+
+	LibMCDriver_ScanLabOIE_uint32 GetAppCount();
+
+	std::string GetAppName(const LibMCDriver_ScanLabOIE_uint32 nIndex);
+
+	void GetAppVersion(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nPatch);
+
+	void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string& sName, LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nPatch);
+
+	void StartAppByName(const std::string& sName, const std::string& sDeviceConfig);
+
+	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string& sDeviceConfig);
+
+	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string& sDeviceConfig);
+
+	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string& sDeviceConfig);
+
+	void StopApp();
+
+	bool AppIsRunning();
+
+	void GetRunningApp(std::string& sName, LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nPatch);
+
+	void InstallApp(const LibMCDriver_ScanLabOIE_uint64 nAppPackageBufferSize, const LibMCDriver_ScanLabOIE_uint8* pAppPackageBuffer);
+
+	void UninstallAppByName(const std::string& sName);
+
+	void UninstallAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex);
+
+	void UninstallAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion);
+
+	void UninstallAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
+
+};
+
+typedef std::shared_ptr<COIEDeviceInstance> POIEDeviceInstance;
 
 
-	/**
-	* Public member functions to implement.
-	*/
+class COIEDevice : public virtual IOIEDevice, public virtual CBase {
+protected:
+
+	std::weak_ptr<COIEDeviceInstance> m_pDeviceInstancePtr;
+	POIEDeviceInstance lockInstance();
+
+public:
+
+	COIEDevice(POIEDeviceInstance pDeviceInstance);
+
+	virtual ~COIEDevice();
 
 	void SetHostName(const std::string & sHostName) override;
 

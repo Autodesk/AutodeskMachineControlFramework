@@ -139,6 +139,9 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_INVALIDLAYERINDEX 41 /** Invalid layer index. */
 #define LIBMCENV_ERROR_INVALIDHATCHCOUNT 42 /** Invalid hatch count. */
 #define LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH 43 /** Segment is not of type hatch. */
+#define LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS 44 /** Temp file extension exceeds 64 characters. */
+#define LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS 45 /** Temp file extension contains invalid characters. */
+#define LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME 46 /** Could not generate temp file name. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -190,6 +193,9 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
     case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "Invalid hatch count.";
     case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "Segment is not of type hatch.";
+    case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "Temp file extension exceeds 64 characters.";
+    case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "Temp file extension contains invalid characters.";
+    case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "Could not generate temp file name.";
     default: return "unknown error";
   }
 }

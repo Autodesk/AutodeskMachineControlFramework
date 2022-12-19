@@ -48,6 +48,31 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		
+		<error name="INVALIDDRIVERTYPE" code="1000" description="Invalid OIE Driver type" />
+		<error name="INVALIDDRIVERNAME" code="1001" description="Invalid OIE Driver name" />
+		<error name="INVALIDDRIVERENVIRONMENT" code="1002" description="Invalid OIE Driver environment" />		
+		<error name="SDKALREADYINITIALIZED" code="1003" description="SDK already initialized." />
+		<error name="INVALIDSCANLABOIESDK" code="1004" description="Invalid Scanlab OIE SDK." />
+		
+		<error name="DEVICENOTAVAILABLEANYMORE" code="1005" description="Device not available anymore." />
+		<error name="COULDNOTADDDEVICE" code="1006" description="Could not add device." />
+		<error name="DEVICEALREADYCONNECTED" code="1007" description="Device already connected." />
+		<error name="DEVICEALREADYREMOVED" code="1008" description="Device already removed." />
+		<error name="DEVICENOTCONNECTED" code="1009" description="Device not connected." />
+		<error name="INVALIDAPPCOUNTONDEVICE" code="1010" description="Invalid app count on device." />
+		<error name="INVALIDAPPINDEX" code="1011" description="Invalid app index." />		
+		<error name="INVALIDAPPNAME" code="1012" description="Invalid app name." />		
+		<error name="INVALIDAPPVERSION" code="1013" description="Invalid app version." />		
+		
+		<error name="INVALIDRESPONSETIMEOUT" code="1014" description="Invalid response timeout." />	
+		<error name="INVALIDAPPPACKAGEBUFFER" code="1015" description="Invalid app package buffer." />	
+		<error name="INVALIDRESOURCENAME" code="1016" description="Invalid resource name." />	
+		
+		<error name="COULDNOTSTORELIBRESSLRESOURCE" code="1017" description="Could not store LibreSSL resource." />	
+		<error name="COULDNOTSTORELIBCRYPTORESOURCE" code="1018" description="Could not store LibCrypto resource." />	
+		<error name="COULDNOTSTOREQT5CORERESOURCE" code="1019" description="Could not store QT5Core resource." />	
+		<error name="COULDNOTSTOREQT5NETWORKRESOURCE" code="1020" description="Could not store QT5Network resource." />					
 			
 	</errors>
 	
@@ -138,6 +163,9 @@ Custom implementation
 		</method>		
 
 		<method name="Disconnect" description="Disconnects from the device. Has no effect if device is not connected.">
+		</method>
+
+		<method name="RefreshAppList" description="Refreshes the list of installed apps on the system.">
 		</method>
 
 		<method name="GetAppCount" description="Returns how many apps are installed on the device. Fails if device is not connected.">

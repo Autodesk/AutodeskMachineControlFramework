@@ -128,7 +128,7 @@ LibMCEnv_int32 CToolpathAccessor::GetBuildHeightInUnits()
 	auto pToolpathEntity = m_pToolpathHandler->findToolpathEntity(m_sStorageUUID, true);
 	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
 	if (nLayerCount == 0)
-		return 0.0;
+		return 0;
 
 	return pToolpathEntity->getLayerZInUnits(nLayerCount - 1);
 
@@ -142,7 +142,7 @@ LibMCEnv_int32 CToolpathAccessor::GetZValueInUnits(const LibMCEnv_uint32 nLayerI
 
 	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
 	if (nLayerCount == 0)
-		return 0.0;
+		return 0;
 
 	if (nLayerIndex >= nLayerCount)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDLAYERINDEX);

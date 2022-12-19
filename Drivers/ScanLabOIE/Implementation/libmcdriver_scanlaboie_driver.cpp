@@ -43,33 +43,3 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
  Class definition of CDriver 
 **************************************************************************************************************************/
 
-void CDriver::Configure(const std::string & sConfigurationString)
-{
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
-}
-
-std::string CDriver::GetName()
-{
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
-}
-
-std::string CDriver::GetType()
-{
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::GetVersion(LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nMicro, std::string & sBuild)
-{
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName)
-{
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::QueryParameters()
-{
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
-}
-

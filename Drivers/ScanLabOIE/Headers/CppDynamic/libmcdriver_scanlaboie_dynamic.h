@@ -198,6 +198,14 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_ConnectP
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_DisconnectPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice);
 
 /**
+* Refreshes the list of installed apps on the system.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_RefreshAppListPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice);
+
+/**
 * Returns how many apps are installed on the device. Fails if device is not connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
@@ -514,6 +522,7 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_GetDeviceIDPtr m_OIEDevice_GetDeviceID;
 	PLibMCDriver_ScanLabOIEOIEDevice_ConnectPtr m_OIEDevice_Connect;
 	PLibMCDriver_ScanLabOIEOIEDevice_DisconnectPtr m_OIEDevice_Disconnect;
+	PLibMCDriver_ScanLabOIEOIEDevice_RefreshAppListPtr m_OIEDevice_RefreshAppList;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetAppCountPtr m_OIEDevice_GetAppCount;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetAppNamePtr m_OIEDevice_GetAppName;
 	PLibMCDriver_ScanLabOIEOIEDevice_GetAppVersionPtr m_OIEDevice_GetAppVersion;

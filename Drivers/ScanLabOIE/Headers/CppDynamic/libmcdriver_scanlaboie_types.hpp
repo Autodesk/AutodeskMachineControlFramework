@@ -104,6 +104,27 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY 6 /** the library could not be loaded */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT 7 /** a required exported symbol could not be found in the library */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERTYPE 1000 /** Invalid OIE Driver type */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERNAME 1001 /** Invalid OIE Driver name */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERENVIRONMENT 1002 /** Invalid OIE Driver environment */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_SDKALREADYINITIALIZED 1003 /** SDK already initialized. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSCANLABOIESDK 1004 /** Invalid Scanlab OIE SDK. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTAVAILABLEANYMORE 1005 /** Device not available anymore. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTADDDEVICE 1006 /** Could not add device. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYCONNECTED 1007 /** Device already connected. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYREMOVED 1008 /** Device already removed. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTCONNECTED 1009 /** Device not connected. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPCOUNTONDEVICE 1010 /** Invalid app count on device. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPINDEX 1011 /** Invalid app index. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPNAME 1012 /** Invalid app name. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPVERSION 1013 /** Invalid app version. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESPONSETIMEOUT 1014 /** Invalid response timeout. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPPACKAGEBUFFER 1015 /** Invalid app package buffer. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESOURCENAME 1016 /** Invalid resource name. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBRESSLRESOURCE 1017 /** Could not store LibreSSL resource. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE 1018 /** Could not store LibCrypto resource. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE 1019 /** Could not store QT5Core resource. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE 1020 /** Could not store QT5Network resource. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -120,6 +141,27 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERTYPE: return "Invalid OIE Driver type";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERNAME: return "Invalid OIE Driver name";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERENVIRONMENT: return "Invalid OIE Driver environment";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_SDKALREADYINITIALIZED: return "SDK already initialized.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSCANLABOIESDK: return "Invalid Scanlab OIE SDK.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTAVAILABLEANYMORE: return "Device not available anymore.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTADDDEVICE: return "Could not add device.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYCONNECTED: return "Device already connected.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYREMOVED: return "Device already removed.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTCONNECTED: return "Device not connected.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPCOUNTONDEVICE: return "Invalid app count on device.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPINDEX: return "Invalid app index.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPNAME: return "Invalid app name.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPVERSION: return "Invalid app version.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESPONSETIMEOUT: return "Invalid response timeout.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPPACKAGEBUFFER: return "Invalid app package buffer.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESOURCENAME: return "Invalid resource name.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBRESSLRESOURCE: return "Could not store LibreSSL resource.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE: return "Could not store LibCrypto resource.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE: return "Could not store QT5Core resource.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE: return "Could not store QT5Network resource.";
     default: return "unknown error";
   }
 }

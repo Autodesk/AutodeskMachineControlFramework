@@ -919,7 +919,7 @@ public:
 	virtual std::string GetAbsoluteFilePath() = 0;
 
 	/**
-	* IWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* IWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] nDataBufferBufferSize - Number of elements in buffer
 	* @param[in] pDataBufferBuffer - file data to store to.
@@ -928,7 +928,7 @@ public:
 	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
 
 	/**
-	* IWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* IWorkingDirectory::StoreCustomString - Stores a string in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] sDataString - file data to store to.
 	* @return working file instance.
@@ -942,6 +942,31 @@ public:
 	* @return working file instance.
 	*/
 	virtual IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomDataInTempFile - Stores a data buffer in a temporary file with a generated name.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[in] pDataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomDataInTempFile(const std::string & sExtension, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomStringInTempFile - Stores a string in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomStringInTempFile(const std::string & sExtension, const std::string & sDataString) = 0;
+
+	/**
+	* IWorkingDirectory::StoreDriverDataInTempFile - Stores attached driver data in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreDriverDataInTempFile(const std::string & sExtension, const std::string & sIdentifier) = 0;
 
 	/**
 	* IWorkingDirectory::CleanUp - Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.

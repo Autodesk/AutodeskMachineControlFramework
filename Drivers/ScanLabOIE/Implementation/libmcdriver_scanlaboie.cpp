@@ -39,6 +39,7 @@ Interface version: 1.0.0
 #include "libmcdriver_scanlaboie_abi.hpp"
 #include "libmcdriver_scanlaboie_interfaces.hpp"
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
+#include "libmcdriver_scanlaboie_driver_scanlab_oie.hpp"
 
 using namespace LibMCDriver_ScanLabOIE;
 using namespace LibMCDriver_ScanLabOIE::Impl;
@@ -74,7 +75,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	if (sType == CDriver_ScanLab_OIE::getTypeString())
+		return new CDriver_ScanLab_OIE(sName, pDriverEnvironment);
+
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERTYPE);
 }
 
 

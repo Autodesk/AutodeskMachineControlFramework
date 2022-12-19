@@ -579,6 +579,30 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_disconnect(LibMCDr
 	}
 }
 
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_refreshapplist(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice)
+{
+	IBase* pIBaseClass = (IBase *)pOIEDevice;
+
+	try {
+		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
+		if (!pIOIEDevice)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIOIEDevice->RefreshAppList();
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getappcount(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 * pCount)
 {
 	IBase* pIBaseClass = (IBase *)pOIEDevice;
@@ -1285,6 +1309,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_connect;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_disconnect") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_disconnect;
+	if (sProcName == "libmcdriver_scanlaboie_oiedevice_refreshapplist") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_refreshapplist;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_getappcount") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_getappcount;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_getappname") 

@@ -45,7 +45,7 @@ Abstract: This is the class declaration of CDriver_ScanLab_OIE
 #endif
 
 // Include custom headers here.
-
+#include "libmcdriver_scanlaboie_sdk.hpp"
 
 namespace LibMCDriver_ScanLabOIE {
 namespace Impl {
@@ -56,28 +56,51 @@ namespace Impl {
 **************************************************************************************************************************/
 
 class CDriver_ScanLab_OIE : public virtual IDriver_ScanLab_OIE, public virtual CDriver {
-private:
-
-	/**
-	* Put private members here.
-	*/
-
 protected:
 
-	/**
-	* Put protected members here.
-	*/
+	PScanLabOIESDK m_pOIESDK;
+
+	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
+	LibMCEnv::PWorkingDirectory m_pWorkingDirectory;
+	LibMCEnv::PWorkingFile m_pSDKLibraryFile;
+
+	std::string m_sDriverName;
+		
+	std::string m_sLibSSLResourceName;
+	std::string m_sLibCryptoResourceName;
+	std::string m_sQT5CoreResourceName;
+	std::string m_sQT5NetworkResourceName;
+
+	LibMCEnv::PWorkingFile m_pLibSSLResourceFile;
+	LibMCEnv::PWorkingFile m_pLibCryptoResourceFile;
+	LibMCEnv::PWorkingFile m_pQT5CoreResourceFile;
+	LibMCEnv::PWorkingFile m_pQT5NetworkResourceFile;
+
+	bool bSimulationMode;
+
+	oie_instance m_pInstance;
+
+	void initializeSDKEx (const std::vector<uint8_t> & SDKDLLBuffer);
+
+	void releaseInstance();
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CDriver_ScanLab_OIE (const std::string & sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
+	virtual ~CDriver_ScanLab_OIE ();
 
-	/**
-	* Public member functions to implement.
-	*/
+	void Configure(const std::string& sConfigurationString) override;
+
+	std::string GetName() override;
+
+	std::string GetType() override;
+
+	void GetVersion(LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nMicro, std::string& sBuild) override;
+
+	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
+
+	void QueryParameters() override;
 
 	void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName) override;
 
@@ -88,6 +111,9 @@ public:
 	IOIEDevice * AddDevice(const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) override;
 
 	void RemoveDevice(IOIEDevice* pDeviceInstance) override;
+
+	static std::string getTypeString();
+
 
 };
 

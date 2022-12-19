@@ -365,6 +365,11 @@ public:
 	virtual void Disconnect() = 0;
 
 	/**
+	* IOIEDevice::RefreshAppList - Refreshes the list of installed apps on the system.
+	*/
+	virtual void RefreshAppList() = 0;
+
+	/**
 	* IOIEDevice::GetAppCount - Returns how many apps are installed on the device. Fails if device is not connected.
 	* @return Number of apps installed on the device.
 	*/
