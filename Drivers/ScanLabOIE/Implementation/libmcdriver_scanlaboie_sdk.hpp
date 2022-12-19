@@ -49,16 +49,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace LibMCDriver_ScanLabOIE {
 	namespace Impl {
 
-		typedef void * oie_instance;
+		typedef void* oie_instance;
 		typedef void* oie_device;
 		typedef uint32_t oie_error;
 
+
+#pragma pack(push, 1)
 		typedef struct _oie_appinfo {
 			char m_Name[128]; 
 			uint32_t m_nMajorVersion;
 			uint32_t m_nMinorVersion;
 			uint32_t m_nPatchVersion;
 		} oie_appinfo;
+
+		typedef struct _oie_pkt {
+			uint32_t pktNr; 
+			uint32_t id; 
+			uint8_t flags; 
+			const void* data;
+		} oie_pkt;
+#pragma pack(pop)
+
+		typedef void (*oie_pkt_listener)(oie_device device, const oie_pkt* pkt, void* userData);
+		typedef void (*oie_err_listener)(oie_device device, oie_error error, int32_t value, void* userData);
 
 		typedef void(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_version) (uint32_t* majorVersion, uint32_t* minorVersion, uint32_t* patchVersion);
 		typedef oie_instance(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_create) ();
@@ -88,17 +101,8 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_type) (const char * pDeviceConfigFileName, int32_t * pRTCType);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_signals) (const char* pDeviceConfigFileName, uint32_t* pSignals, uint32_t * pNumberOfSignals);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_sensor_signals) (const char* pDeviceConfigFileName, uint32_t* pSignals, uint32_t* pNumberOfSignals);
-
-
-
-/*
-		LIBOIE_EXPORT void oie_set_packet_listener(oie_device device,
-			oie_pkt_listener listener,
-			void* user_data);
-		LIBOIE_EXPORT void oie_set_runtime_error_listener(oie_device device,
-			oie_err_listener listener,
-			void* user_data);
-*/
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_packet_listener) (oie_device pDevice, oie_pkt_listener pListener, void * pUserData);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_runtime_error_listener) (oie_device pDevice, oie_err_listener pListener, void* pUserData);
 
 
 		class CScanLabOIESDK {
@@ -137,6 +141,8 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_get_rtc_type oie_get_rtc_type = nullptr;
 			PScanLabOIEPtr_oie_get_rtc_signals oie_get_rtc_signals = nullptr;
 			PScanLabOIEPtr_oie_get_sensor_signals oie_get_sensor_signals = nullptr;
+			PScanLabOIEPtr_oie_set_packet_listener oie_set_packet_listener = nullptr;
+			PScanLabOIEPtr_oie_set_runtime_error_listener oie_set_runtime_error_listener = nullptr;
 
 			CScanLabOIESDK(const std::string & sDLLNameUTF8);
 			~CScanLabOIESDK();

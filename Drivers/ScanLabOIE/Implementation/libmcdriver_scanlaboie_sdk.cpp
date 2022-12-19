@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <dlfcn.h>
 #endif // _WIN32
 
+#define OIE_ERRORMESSAGE_BUFFERSIZE 1024
 
 #include <vector>
 #include <iostream>
@@ -127,7 +128,8 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8)
 	this->oie_get_rtc_type = (PScanLabOIEPtr_oie_get_rtc_type)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_type");
 	this->oie_get_rtc_signals = (PScanLabOIEPtr_oie_get_rtc_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_rtc_signals");
 	this->oie_get_sensor_signals = (PScanLabOIEPtr_oie_get_sensor_signals)_loadScanLabOIEAddress(hLibrary, "oie_get_sensor_signals");
-
+	this->oie_set_packet_listener = (PScanLabOIEPtr_oie_set_packet_listener)_loadScanLabOIEAddress(hLibrary, "oie_set_packet_listener");
+	this->oie_set_runtime_error_listener = (PScanLabOIEPtr_oie_set_runtime_error_listener)_loadScanLabOIEAddress(hLibrary, "oie_set_runtime_error_listener");
 
 	m_LibraryHandle = (void*) hLibrary;
 }
@@ -162,8 +164,25 @@ void CScanLabOIESDK::initDLL()
 
 void CScanLabOIESDK::checkError(uint32_t nSDKError)
 {
-	if (nSDKError != 0)
-		throw std::runtime_error("Scanlab OIE Error: " + std::to_string (nSDKError));
+	if (nSDKError != 0) {
+
+		if (oie_get_error != nullptr) {
+			std::vector<char> buffer;
+			buffer.resize (OIE_ERRORMESSAGE_BUFFERSIZE + 1);
+			oie_get_error(nSDKError, buffer.data(), (int32_t)buffer.size());
+			buffer.at(OIE_ERRORMESSAGE_BUFFERSIZE) = 0;
+
+			std::string sErrorMessage(buffer.data());
+
+			throw std::runtime_error("Scanlab OIE Error: " + sErrorMessage + " (#" + std::to_string(nSDKError) + ")");
+
+		}
+		else {
+			throw std::runtime_error("Scanlab OIE Error - error no #" + std::to_string(nSDKError));
+		}
+
+
+	}
 }
 
 void CScanLabOIESDK::resetFunctionPtrs()
@@ -197,5 +216,8 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	oie_get_rtc_type = nullptr;
 	oie_get_rtc_signals = nullptr;
 	oie_get_sensor_signals = nullptr;
+	oie_set_packet_listener = nullptr;
+	oie_set_runtime_error_listener = nullptr;
+
 }
 

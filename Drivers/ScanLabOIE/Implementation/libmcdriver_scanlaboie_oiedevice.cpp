@@ -78,6 +78,22 @@ uint32_t COIEDeviceApp::getPatchVersion()
 	return m_nPatchVersion;
 }
 
+void oieDevicePacketListener(oie_device device, const oie_pkt* pkt, void* userData)
+{
+	if (userData != nullptr) {
+		COIEDeviceInstance* pDeviceInstance = static_cast<COIEDeviceInstance*> (userData);
+		pDeviceInstance->onPacketEvent (device, pkt);
+	}
+}
+
+void oieErrorListener(oie_device device, oie_error error, int32_t value, void* userData)
+{
+	if (userData != nullptr) {
+		COIEDeviceInstance* pDeviceInstance = static_cast<COIEDeviceInstance*> (userData);
+		pDeviceInstance->onErrorEvent(device, error, value);
+	}
+}
+
 COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory)
 	: m_pOIESDK (pOIESDK), 
 	  m_pInstance (pInstance), 
@@ -100,6 +116,9 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	m_nDeviceID = m_pOIESDK->oie_get_device_id (m_pDevice);
 
 	m_pOIESDK->oie_set_reply_timeout(m_pDevice, nResponseTimeOut);
+
+	m_pOIESDK->oie_set_packet_listener(m_pDevice, oieDevicePacketListener, this);
+	m_pOIESDK->oie_set_runtime_error_listener(m_pDevice, oieErrorListener, this);
 
 }
 
@@ -465,6 +484,35 @@ void COIEDeviceInstance::UninstallAppByMinorVersion(const std::string& sName, co
 
 	uninstallAppEx(sName, (int32_t)nMajorVersion, (int32_t)nMinorVersion);
 }
+
+
+void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
+{
+	try {
+		if ((device == m_pDevice) && (pkt != nullptr)) {
+			std::lock_guard<std::mutex> lockGuard(m_PacketMutex);
+		}
+
+	}
+	catch (...)
+	{
+
+	}
+}
+
+void COIEDeviceInstance::onErrorEvent(oie_device device, oie_error error, int32_t value)
+{
+	try {
+		if (device == m_pDevice) {
+
+		}
+	}
+	catch (...)
+	{
+
+	}
+}
+
 
 
 COIEDevice::COIEDevice(POIEDeviceInstance pDeviceInstance)

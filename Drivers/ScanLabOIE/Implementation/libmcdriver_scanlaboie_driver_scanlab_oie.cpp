@@ -157,41 +157,51 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		if (m_pSDKLibraryFile->GetSize() == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSCANLABOIESDK);
 
+		std::vector<uint8_t> LibSSLBuffer;
 		if (m_pDriverEnvironment->MachineHasResourceData(m_sLibSSLResourceName)) {
-			std::vector<uint8_t> DLLBuffer;
-			m_pDriverEnvironment->RetrieveMachineResourceData(m_sLibSSLResourceName, DLLBuffer);
-			m_pLibSSLResourceFile = m_pWorkingDirectory->StoreCustomData("libssl-1_1.dll", DLLBuffer);
+			m_pDriverEnvironment->RetrieveMachineResourceData(m_sLibSSLResourceName, LibSSLBuffer);
 		}
 		else {
+			m_pDriverEnvironment->RetrieveDriverResourceData(m_sLibSSLResourceName, LibSSLBuffer);
+		}
+		if (LibSSLBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBRESSLRESOURCE);
-		}
+		m_pLibSSLResourceFile = m_pWorkingDirectory->StoreCustomData("libssl-1_1.dll", LibSSLBuffer);
 
+		std::vector<uint8_t> LibCryptoBuffer;
 		if (m_pDriverEnvironment->MachineHasResourceData(m_sLibCryptoResourceName)) {
-			std::vector<uint8_t> DLLBuffer;
-			m_pDriverEnvironment->RetrieveMachineResourceData(m_sLibCryptoResourceName, DLLBuffer);
-			m_pLibSSLResourceFile = m_pWorkingDirectory->StoreCustomData("libcrypto-1_1.dll", DLLBuffer);
+			m_pDriverEnvironment->RetrieveMachineResourceData(m_sLibCryptoResourceName, LibCryptoBuffer);
 		}
 		else {
+			m_pDriverEnvironment->RetrieveDriverResourceData(m_sLibCryptoResourceName, LibCryptoBuffer);
+		}
+		if (LibCryptoBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE);
-		}
-		
+		m_pLibCryptoResourceFile = m_pWorkingDirectory->StoreCustomData("libcrypto-1_1.dll", LibCryptoBuffer);
+
+		std::vector<uint8_t> Qt5CoreBuffer;
 		if (m_pDriverEnvironment->MachineHasResourceData(m_sQT5CoreResourceName)) {
-			std::vector<uint8_t> DLLBuffer;
-			m_pDriverEnvironment->RetrieveMachineResourceData(m_sQT5CoreResourceName, DLLBuffer);
-			m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData("Qt5Core.dll", DLLBuffer);
+			m_pDriverEnvironment->RetrieveMachineResourceData(m_sQT5CoreResourceName, Qt5CoreBuffer);
 		}
 		else {
+			m_pDriverEnvironment->RetrieveDriverResourceData(m_sQT5CoreResourceName, Qt5CoreBuffer);
+		}
+		if (Qt5CoreBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE);
+		m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData("Qt5Core.dll", Qt5CoreBuffer);
+
+		std::vector<uint8_t> Qt5NetworkBuffer;
+		if (m_pDriverEnvironment->MachineHasResourceData(m_sQT5NetworkResourceName)) {
+			m_pDriverEnvironment->RetrieveMachineResourceData(m_sQT5NetworkResourceName, Qt5NetworkBuffer);
+		}
+		else {
+			m_pDriverEnvironment->RetrieveDriverResourceData(m_sQT5NetworkResourceName, Qt5NetworkBuffer);
 		}
 
-		if (m_pDriverEnvironment->MachineHasResourceData(m_sQT5NetworkResourceName)) {
-			std::vector<uint8_t> DLLBuffer;
-			m_pDriverEnvironment->RetrieveMachineResourceData(m_sQT5NetworkResourceName, DLLBuffer);
-			m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData("Qt5Network.dll", DLLBuffer);
-		}
-		else {
+		if (Qt5NetworkBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE);
-		}
+		m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData("Qt5Network.dll", Qt5NetworkBuffer);
+
 		m_pOIESDK = std::make_shared<CScanLabOIESDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
 
 		m_pOIESDK->initDLL();

@@ -46,6 +46,7 @@ Abstract: This is the class declaration of COIEDevice
 
 // Include custom headers here.
 #include "libmcdriver_scanlaboie_sdk.hpp"
+#include <mutex>
 
 namespace LibMCDriver_ScanLabOIE {
 namespace Impl {
@@ -91,6 +92,8 @@ protected:
 	bool m_bIsConnected;
 
 	std::vector<POIEDeviceApp> m_AppList;
+
+	std::mutex m_PacketMutex;
 
 	void ensureConnectivity();
 	void removeDevice(bool bCheckForError);
@@ -155,6 +158,10 @@ public:
 	void UninstallAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion);
 
 	void UninstallAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
+
+	void onPacketEvent (oie_device device, const oie_pkt* pkt);
+
+	void onErrorEvent (oie_device device, oie_error error, int32_t value);
 
 };
 
