@@ -144,7 +144,7 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_set_packet_listener oie_set_packet_listener = nullptr;
 			PScanLabOIEPtr_oie_set_runtime_error_listener oie_set_runtime_error_listener = nullptr;
 
-			CScanLabOIESDK(const std::string & sDLLNameUTF8);
+			CScanLabOIESDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);
 			~CScanLabOIESDK();
 
 			void initDLL();

@@ -317,6 +317,12 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 class IOIEDevice : public virtual IBase {
 public:
 	/**
+	* IOIEDevice::GetDeviceName - Returns the unique name of the device.
+	* @return Name of device.
+	*/
+	virtual std::string GetDeviceName() = 0;
+
+	/**
 	* IOIEDevice::SetHostName - Sets the host name of the device. Fails if device is already connected.
 	* @param[in] sHostName - New Host name of device.
 	*/
@@ -521,18 +527,39 @@ public:
 
 	/**
 	* IDriver_ScanLab_OIE::AddDevice - Adds a new device to the OIE.
+	* @param[in] sName - Name of the device. MUST be a unique string and not exist yet.
 	* @param[in] sHostName - Host name of device.
 	* @param[in] nPort - Port of device.
 	* @param[in] nResponseTimeOut - Response timeout of device in ms.
 	* @return OIE Device Instance
 	*/
-	virtual IOIEDevice * AddDevice(const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) = 0;
+	virtual IOIEDevice * AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::HasDevice - Checks a device with the given name has been previously added.
+	* @param[in] sName - Name of the device.
+	* @return Flag if device exists.
+	*/
+	virtual bool HasDevice(const std::string & sName) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::FindDevice - Finds a previously added device by name. Device MUST exist or function throws an error.
+	* @param[in] sName - Name of the device.
+	* @return OIE Device Instance
+	*/
+	virtual IOIEDevice * FindDevice(const std::string & sName) = 0;
 
 	/**
 	* IDriver_ScanLab_OIE::RemoveDevice - Removes a device from the OIE.
 	* @param[in] pDeviceInstance - OIE Device Instance
 	*/
 	virtual void RemoveDevice(IOIEDevice* pDeviceInstance) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::RemoveDeviceByName - Removes a device from the OIE by name. Does nothing if the device does not exist.
+	* @param[in] sName - Name of the device.
+	*/
+	virtual void RemoveDeviceByName(const std::string & sName) = 0;
 
 };
 

@@ -90,7 +90,7 @@ void CDriverEnvironment::retrieveDriverDataFromPackage(AMC::PResourcePackage pRe
 
     auto pEntry = pResourcePackage->findEntryByName(sIdentifier, false);
     if (pEntry.get() == nullptr)
-        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND);
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_RESOURCEENTRYNOTFOUND, "resource entry not found: " + sIdentifier);
 
     size_t nSize = pEntry->getSize();
     if (pDataBufferNeededCount != nullptr)

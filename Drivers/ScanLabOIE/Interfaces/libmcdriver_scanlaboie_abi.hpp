@@ -137,6 +137,17 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 **************************************************************************************************************************/
 
 /**
+* Returns the unique name of the device.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[in] nDeviceNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDeviceNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDeviceNameBuffer -  buffer of Name of device., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getdevicename(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const LibMCDriver_ScanLabOIE_uint32 nDeviceNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pDeviceNameNeededChars, char * pDeviceNameBuffer);
+
+/**
 * Sets the host name of the device. Fails if device is already connected.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
@@ -428,13 +439,34 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * Adds a new device to the OIE.
 *
 * @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pName - Name of the device. MUST be a unique string and not exist yet.
 * @param[in] pHostName - Host name of device.
 * @param[in] nPort - Port of device.
 * @param[in] nResponseTimeOut - Response timeout of device in ms.
 * @param[out] pDeviceInstance - OIE Device Instance
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_adddevice(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pHostName, LibMCDriver_ScanLabOIE_uint32 nPort, LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut, LibMCDriver_ScanLabOIE_OIEDevice * pDeviceInstance);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_adddevice(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName, const char * pHostName, LibMCDriver_ScanLabOIE_uint32 nPort, LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut, LibMCDriver_ScanLabOIE_OIEDevice * pDeviceInstance);
+
+/**
+* Checks a device with the given name has been previously added.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pName - Name of the device.
+* @param[out] pHasDevice - Flag if device exists.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_hasdevice(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName, bool * pHasDevice);
+
+/**
+* Finds a previously added device by name. Device MUST exist or function throws an error.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pName - Name of the device.
+* @param[out] pDeviceInstance - OIE Device Instance
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_finddevice(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName, LibMCDriver_ScanLabOIE_OIEDevice * pDeviceInstance);
 
 /**
 * Removes a device from the OIE.
@@ -444,6 +476,15 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_removedevice(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, LibMCDriver_ScanLabOIE_OIEDevice pDeviceInstance);
+
+/**
+* Removes a device from the OIE by name. Does nothing if the device does not exist.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pName - Name of the device.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_removedevicebyname(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName);
 
 /*************************************************************************************************************************
  Global functions

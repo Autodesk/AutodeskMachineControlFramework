@@ -84,6 +84,7 @@ protected:
 	oie_instance m_pInstance;
 	oie_device m_pDevice;
 
+	std::string m_sDeviceName;
 	std::string m_sHostName;
 	uint32_t m_nPort;
 
@@ -105,9 +106,11 @@ protected:
 
 public:
 
-	COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory);
+	COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string & sDeviceName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory);
 
 	virtual ~COIEDeviceInstance();
+
+	std::string GetDeviceName();
 
 	void SetHostName(const std::string& sHostName);
 
@@ -180,6 +183,8 @@ public:
 
 	virtual ~COIEDevice();
 
+	std::string GetDeviceName() override;
+
 	void SetHostName(const std::string & sHostName) override;
 
 	std::string GetHostName() override;
@@ -227,6 +232,8 @@ public:
 	void UninstallAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion) override;
 
 	void UninstallAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion) override;
+
+	void RefreshAppList() override;
 
 };
 

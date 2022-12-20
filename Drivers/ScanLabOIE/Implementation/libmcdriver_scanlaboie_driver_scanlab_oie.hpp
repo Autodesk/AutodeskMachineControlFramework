@@ -46,6 +46,8 @@ Abstract: This is the class declaration of CDriver_ScanLab_OIE
 
 // Include custom headers here.
 #include "libmcdriver_scanlaboie_sdk.hpp"
+#include "libmcdriver_scanlaboie_oiedevice.hpp"
+#include <map>
 
 namespace LibMCDriver_ScanLabOIE {
 namespace Impl {
@@ -80,6 +82,8 @@ protected:
 
 	oie_instance m_pInstance;
 
+	std::map<std::string, POIEDeviceInstance> m_Devices;
+
 	void initializeSDKEx (const std::vector<uint8_t> & SDKDLLBuffer);
 
 	void releaseInstance();
@@ -108,9 +112,15 @@ public:
 
 	void InitializeCustomSDK(const LibMCDriver_ScanLabOIE_uint64 nOIEDLLBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pOIEDLLBuffer) override;
 
-	IOIEDevice * AddDevice(const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) override;
+	IOIEDevice* AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut) override;
+
+	bool HasDevice(const std::string& sName) override;
+
+	virtual IOIEDevice* FindDevice(const std::string& sName) override;
 
 	void RemoveDevice(IOIEDevice* pDeviceInstance) override;
+
+	void RemoveDeviceByName(const std::string& sName) override;
 
 	static std::string getTypeString();
 

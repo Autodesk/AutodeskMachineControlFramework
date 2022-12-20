@@ -125,6 +125,11 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE 1018 /** Could not store LibCrypto resource. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE 1019 /** Could not store QT5Core resource. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE 1020 /** Could not store QT5Network resource. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED 1021 /** Scanlab OIE SDK not loaded. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICENAME 1022 /** Invalid device name. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND 1023 /** Device has not been found. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING 1024 /** Device is already existing. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME 1025 /** Empty device name. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -162,6 +167,11 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE: return "Could not store LibCrypto resource.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE: return "Could not store QT5Core resource.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE: return "Could not store QT5Network resource.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED: return "Scanlab OIE SDK not loaded.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICENAME: return "Invalid device name.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND: return "Device has not been found.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING: return "Device is already existing.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME: return "Empty device name.";
     default: return "unknown error";
   }
 }

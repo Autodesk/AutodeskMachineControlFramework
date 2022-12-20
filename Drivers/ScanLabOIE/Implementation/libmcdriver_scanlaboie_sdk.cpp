@@ -68,7 +68,7 @@ void* _loadScanLabOIEAddress(void* hLibrary, const char* pSymbolName) {
 
 
 
-CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8)
+CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirectoryUTF8)
 	: m_LibraryHandle (nullptr), m_bIsInitialized (false)
 {
 
@@ -76,16 +76,35 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8)
 
 #ifdef _WIN32
 
+	if (sDLLNameUTF8.empty ())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 	if (sDLLNameUTF8.length() > SCANLABOIE_MAXDLLNAMELENGTH)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 
+	if (sDLLDirectoryUTF8.empty())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	if (sDLLDirectoryUTF8.length() > SCANLABOIE_MAXDLLNAMELENGTH)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	
 	// Convert filename to UTF16-string
-	int nLength = (int)sDLLNameUTF8.length ();
-	int nBufferSize = nLength * 2 + 2;
-	std::vector<wchar_t> wsLibraryFileName(nBufferSize);
-	int nResult = MultiByteToWideChar(CP_UTF8, 0, sDLLNameUTF8.c_str(), nLength, &wsLibraryFileName[0], nBufferSize);
-	if (nResult == 0)
-		throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
+	
+	int nDLLLength = (int)sDLLNameUTF8.length();
+	int nDLLBufferSize = nDLLLength * 2 + 2;
+	std::vector<wchar_t> wsLibraryFileName(nDLLBufferSize);
+	int nDLLResult = MultiByteToWideChar(CP_UTF8, 0, sDLLNameUTF8.c_str(), nDLLLength, &wsLibraryFileName[0], nDLLBufferSize);
+	if (nDLLResult == 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
+	
+
+	
+	int nPathLength = (int)sDLLDirectoryUTF8.length();
+	int nPathBufferSize = nPathLength * 2 + 2;
+	std::vector<wchar_t> wsDLLPath(nPathBufferSize);
+	int nPathResult = MultiByteToWideChar(CP_UTF8, 0, sDLLDirectoryUTF8.c_str(), nPathLength, &wsDLLPath[0], nPathBufferSize);
+	if (nPathResult == 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
+
+	SetDllDirectoryW(wsDLLPath.data());
 
 	HMODULE hLibrary = LoadLibraryW(wsLibraryFileName.data());
 	if (hLibrary == 0)

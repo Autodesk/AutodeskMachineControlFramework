@@ -35,6 +35,7 @@ Abstract: This is a stub class definition of COIEDevice
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
 
 #include <array>
+#include <iostream>
 
 // Include custom headers here.
 using namespace LibMCDriver_ScanLabOIE::Impl;
@@ -94,11 +95,12 @@ void oieErrorListener(oie_device device, oie_error error, int32_t value, void* u
 	}
 }
 
-COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory)
+COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string& sDeviceName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory)
 	: m_pOIESDK (pOIESDK), 
 	  m_pInstance (pInstance), 
 	  m_pDevice (nullptr), 
 	  m_sHostName (sHostName),
+	  m_sDeviceName (sDeviceName),
 	  m_nPort (nPort),
 	  m_bIsConnected (false),
 	  m_pWorkingDirectory (pWorkingDirectory),
@@ -106,6 +108,10 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 {
 	if ((pOIESDK.get() == nullptr) || (pInstance == nullptr) || (pWorkingDirectory.get () == nullptr))
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	if (sDeviceName.empty())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICENAME);
+
 	if (nResponseTimeOut < OIE_MINRESPONSETIMEOUT)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRESPONSETIMEOUT);
 
@@ -128,6 +134,11 @@ COIEDeviceInstance::~COIEDeviceInstance()
 
 	m_pInstance = nullptr;
 	m_pOIESDK = nullptr;
+}
+
+std::string COIEDeviceInstance::GetDeviceName()
+{
+	return m_sDeviceName;
 }
 
 void COIEDeviceInstance::removeDevice(bool bCheckForError)
@@ -491,6 +502,7 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 	try {
 		if ((device == m_pDevice) && (pkt != nullptr)) {
 			std::lock_guard<std::mutex> lockGuard(m_PacketMutex);
+			std::cout << "Packet event: " << pkt->pktNr << " id: " << pkt->id << std::endl;
 		}
 
 	}
@@ -504,7 +516,7 @@ void COIEDeviceInstance::onErrorEvent(oie_device device, oie_error error, int32_
 {
 	try {
 		if (device == m_pDevice) {
-
+			std::cout << "Error event: " << error << " value: " << value << std::endl;
 		}
 	}
 	catch (...)
@@ -533,7 +545,14 @@ POIEDeviceInstance COIEDevice::lockInstance()
 	if (m_pDeviceInstancePtr.expired ())
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_DEVICENOTAVAILABLEANYMORE);
 
-	POIEDeviceInstance pLockedInstace = m_pDeviceInstancePtr.lock();
+	POIEDeviceInstance pLockedInstance = m_pDeviceInstancePtr.lock();
+
+	return pLockedInstance;
+}
+
+std::string COIEDevice::GetDeviceName()
+{
+	return lockInstance()->GetDeviceName();
 }
 
 void COIEDevice::SetHostName(const std::string & sHostName)
@@ -656,3 +675,8 @@ void COIEDevice::UninstallAppByMinorVersion(const std::string & sName, const Lib
 	lockInstance()->UninstallAppByMinorVersion(sName, nMajorVersion, nMinorVersion);
 }
 
+
+void COIEDevice::RefreshAppList()
+{
+	lockInstance()->RefreshAppList();
+}

@@ -199,6 +199,11 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE: return "COULDNOTSTORELIBCRYPTORESOURCE";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE: return "COULDNOTSTOREQT5CORERESOURCE";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE: return "COULDNOTSTOREQT5NETWORKRESOURCE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED: return "SCANLABOIESDKNOTLOADED";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICENAME: return "INVALIDDEVICENAME";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND: return "DEVICEHASNOTBEENFOUND";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING: return "DEVICEISALREADYEXISTING";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME: return "EMPTYDEVICENAME";
 		}
 		return "UNKNOWN";
 	}
@@ -236,6 +241,11 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE: return "Could not store LibCrypto resource.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE: return "Could not store QT5Core resource.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE: return "Could not store QT5Network resource.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED: return "Scanlab OIE SDK not loaded.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDEVICENAME: return "Invalid device name.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND: return "Device has not been found.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING: return "Device is already existing.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME: return "Empty device name.";
 		}
 		return "unknown error";
 	}
@@ -457,6 +467,7 @@ public:
 	{
 	}
 	
+	inline std::string GetDeviceName();
 	inline void SetHostName(const std::string & sHostName);
 	inline std::string GetHostName();
 	inline void SetPort(const LibMCDriver_ScanLabOIE_uint32 nPort);
@@ -501,8 +512,11 @@ public:
 	inline void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName);
 	inline void InitializeSDK(const std::string & sOIEResourceName);
 	inline void InitializeCustomSDK(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & OIEDLLBuffer);
-	inline POIEDevice AddDevice(const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut);
+	inline POIEDevice AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut);
+	inline bool HasDevice(const std::string & sName);
+	inline POIEDevice FindDevice(const std::string & sName);
 	inline void RemoveDevice(classParam<COIEDevice> pDeviceInstance);
+	inline void RemoveDeviceByName(const std::string & sName);
 };
 	
 	/**
@@ -632,6 +646,7 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_OIEDevice_GetDeviceName = nullptr;
 		pWrapperTable->m_OIEDevice_SetHostName = nullptr;
 		pWrapperTable->m_OIEDevice_GetHostName = nullptr;
 		pWrapperTable->m_OIEDevice_SetPort = nullptr;
@@ -661,7 +676,10 @@ public:
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeCustomSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_AddDevice = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_HasDevice = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_FindDevice = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDevice = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -771,6 +789,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_GetDeviceName = (PLibMCDriver_ScanLabOIEOIEDevice_GetDeviceNamePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_getdevicename");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_GetDeviceName = (PLibMCDriver_ScanLabOIEOIEDevice_GetDeviceNamePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_getdevicename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_GetDeviceName == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1035,12 +1062,39 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_HasDevice = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_HasDevicePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_hasdevice");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_HasDevice = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_HasDevicePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_hasdevice");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_HasDevice == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_FindDevice = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_FindDevicePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_finddevice");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_FindDevice = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_FindDevicePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_finddevice");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_FindDevice == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDevice = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_RemoveDevicePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_removedevice");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDevice = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_RemoveDevicePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_removedevice");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_OIE_RemoveDevice == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_RemoveDeviceByNamePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_removedevicebyname");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_RemoveDeviceByNamePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_removedevicebyname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1144,6 +1198,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_queryparameters", (void**)&(pWrapperTable->m_Driver_QueryParameters));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_getdevicename", (void**)&(pWrapperTable->m_OIEDevice_GetDeviceName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetDeviceName == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_sethostname", (void**)&(pWrapperTable->m_OIEDevice_SetHostName));
@@ -1262,8 +1320,20 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_AddDevice == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_hasdevice", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_HasDevice));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_HasDevice == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_finddevice", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_FindDevice));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_FindDevice == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_removedevice", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_RemoveDevice));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_RemoveDevice == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_removedevicebyname", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1393,6 +1463,21 @@ public:
 	/**
 	 * Method definitions for class COIEDevice
 	 */
+	
+	/**
+	* COIEDevice::GetDeviceName - Returns the unique name of the device.
+	* @return Name of device.
+	*/
+	std::string COIEDevice::GetDeviceName()
+	{
+		LibMCDriver_ScanLabOIE_uint32 bytesNeededDeviceName = 0;
+		LibMCDriver_ScanLabOIE_uint32 bytesWrittenDeviceName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_GetDeviceName(m_pHandle, 0, &bytesNeededDeviceName, nullptr));
+		std::vector<char> bufferDeviceName(bytesNeededDeviceName);
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_GetDeviceName(m_pHandle, bytesNeededDeviceName, &bytesWrittenDeviceName, &bufferDeviceName[0]));
+		
+		return std::string(&bufferDeviceName[0]);
+	}
 	
 	/**
 	* COIEDevice::SetHostName - Sets the host name of the device. Fails if device is already connected.
@@ -1711,15 +1796,45 @@ public:
 	
 	/**
 	* CDriver_ScanLab_OIE::AddDevice - Adds a new device to the OIE.
+	* @param[in] sName - Name of the device. MUST be a unique string and not exist yet.
 	* @param[in] sHostName - Host name of device.
 	* @param[in] nPort - Port of device.
 	* @param[in] nResponseTimeOut - Response timeout of device in ms.
 	* @return OIE Device Instance
 	*/
-	POIEDevice CDriver_ScanLab_OIE::AddDevice(const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
+	POIEDevice CDriver_ScanLab_OIE::AddDevice(const std::string & sName, const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
 	{
 		LibMCDriver_ScanLabOIEHandle hDeviceInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_AddDevice(m_pHandle, sHostName.c_str(), nPort, nResponseTimeOut, &hDeviceInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_AddDevice(m_pHandle, sName.c_str(), sHostName.c_str(), nPort, nResponseTimeOut, &hDeviceInstance));
+		
+		if (!hDeviceInstance) {
+			CheckError(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<COIEDevice>(m_pWrapper, hDeviceInstance);
+	}
+	
+	/**
+	* CDriver_ScanLab_OIE::HasDevice - Checks a device with the given name has been previously added.
+	* @param[in] sName - Name of the device.
+	* @return Flag if device exists.
+	*/
+	bool CDriver_ScanLab_OIE::HasDevice(const std::string & sName)
+	{
+		bool resultHasDevice = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_HasDevice(m_pHandle, sName.c_str(), &resultHasDevice));
+		
+		return resultHasDevice;
+	}
+	
+	/**
+	* CDriver_ScanLab_OIE::FindDevice - Finds a previously added device by name. Device MUST exist or function throws an error.
+	* @param[in] sName - Name of the device.
+	* @return OIE Device Instance
+	*/
+	POIEDevice CDriver_ScanLab_OIE::FindDevice(const std::string & sName)
+	{
+		LibMCDriver_ScanLabOIEHandle hDeviceInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_FindDevice(m_pHandle, sName.c_str(), &hDeviceInstance));
 		
 		if (!hDeviceInstance) {
 			CheckError(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
@@ -1735,6 +1850,15 @@ public:
 	{
 		LibMCDriver_ScanLabOIEHandle hDeviceInstance = pDeviceInstance.GetHandle();
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_RemoveDevice(m_pHandle, hDeviceInstance));
+	}
+	
+	/**
+	* CDriver_ScanLab_OIE::RemoveDeviceByName - Removes a device from the OIE by name. Does nothing if the device does not exist.
+	* @param[in] sName - Name of the device.
+	*/
+	void CDriver_ScanLab_OIE::RemoveDeviceByName(const std::string & sName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_RemoveDeviceByName(m_pHandle, sName.c_str()));
 	}
 
 } // namespace LibMCDriver_ScanLabOIE

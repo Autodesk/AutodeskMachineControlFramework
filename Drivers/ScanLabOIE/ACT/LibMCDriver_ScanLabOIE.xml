@@ -73,6 +73,15 @@
 		<error name="COULDNOTSTORELIBCRYPTORESOURCE" code="1018" description="Could not store LibCrypto resource." />	
 		<error name="COULDNOTSTOREQT5CORERESOURCE" code="1019" description="Could not store QT5Core resource." />	
 		<error name="COULDNOTSTOREQT5NETWORKRESOURCE" code="1020" description="Could not store QT5Network resource." />					
+		
+		<error name="SCANLABOIESDKNOTLOADED" code="1021" description="Scanlab OIE SDK not loaded." />	
+		<error name="INVALIDDEVICENAME" code="1022" description="Invalid device name." />	
+		<error name="DEVICEHASNOTBEENFOUND" code="1023" description="Device has not been found." />	
+		<error name="DEVICEISALREADYEXISTING" code="1024" description="Device is already existing." />	
+		<error name="EMPTYDEVICENAME" code="1025" description="Empty device name." />	
+		
+		
+		
 			
 	</errors>
 	
@@ -131,6 +140,10 @@ Custom implementation
 -->
 
 	<class name="OIEDevice" parent="Base" description="An attached device of the Open Interface Extension.">
+
+		<method name="GetDeviceName" description="Returns the unique name of the device.">
+			<param name="DeviceName" type="string" pass="return" description="Name of device." />
+		</method>
 	
 		<method name="SetHostName" description="Sets the host name of the device. Fails if device is already connected.">
 			<param name="HostName" type="string" pass="in" description="New Host name of device." />
@@ -274,9 +287,20 @@ Custom implementation
 		</method>
 		
 		<method name="AddDevice" description="Adds a new device to the OIE.">
+			<param name="Name" type="string" pass="in" description="Name of the device. MUST be a unique string and not exist yet." />
 			<param name="HostName" type="string" pass="in" description="Host name of device." />
 			<param name="Port" type="uint32" pass="in" description="Port of device." />
 			<param name="ResponseTimeOut" type="uint32" pass="in" description="Response timeout of device in ms." />
+			<param name="DeviceInstance" type="class" class="OIEDevice" pass="return" description="OIE Device Instance" />
+		</method>
+
+		<method name="HasDevice" description="Checks a device with the given name has been previously added.">
+			<param name="Name" type="string" pass="in" description="Name of the device." />
+			<param name="HasDevice" type="bool" pass="return" description="Flag if device exists." />
+		</method>
+
+		<method name="FindDevice" description="Finds a previously added device by name. Device MUST exist or function throws an error.">
+			<param name="Name" type="string" pass="in" description="Name of the device." />
 			<param name="DeviceInstance" type="class" class="OIEDevice" pass="return" description="OIE Device Instance" />
 		</method>
 		
@@ -284,6 +308,10 @@ Custom implementation
 			<param name="DeviceInstance" type="class" class="OIEDevice" pass="in" description="OIE Device Instance" />
 		</method>
 	
+		<method name="RemoveDeviceByName" description="Removes a device from the OIE by name. Does nothing if the device does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of the device." />
+		</method>
+		
 	</class>
 
 

@@ -33,6 +33,7 @@ Abstract: This is a stub class definition of CDriver_ScanLab_OIE
 
 #include "libmcdriver_scanlaboie_driver_scanlab_oie.hpp"
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
+#include "libmcdriver_scanlaboie_oiedevice.hpp"
 
 // Include custom headers here.
 #define __STRINGIZE(x) #x
@@ -55,8 +56,8 @@ CDriver_ScanLab_OIE::CDriver_ScanLab_OIE(const std::string& sName, LibMCEnv::PDr
 	if (pDriverEnvironment.get() == nullptr)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERENVIRONMENT);
 
-	m_sLibSSLResourceName = "libssl-1_1";
-	m_sLibCryptoResourceName = "libcrypto-1_1";
+	m_sLibSSLResourceName = "libssl-1_1-x64";
+	m_sLibCryptoResourceName = "libcrypto-1_1-x64";
 	m_sQT5CoreResourceName = "qt5core";
 	m_sQT5NetworkResourceName = "qt5network";
 }
@@ -82,7 +83,7 @@ std::string CDriver_ScanLab_OIE::GetName()
 
 std::string CDriver_ScanLab_OIE::getTypeString()
 {
-	return "oie-1.0";
+	return "scanlab-oie2";
 }
 
 std::string CDriver_ScanLab_OIE::GetType()
@@ -144,10 +145,31 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSCANLABOIESDK);
 
 		std::string sFileName;
+		std::string sLibSSLFileNameOnDisk;
+		std::string sLibCryptoFileNameOnDisk;
+		std::string sLibQT5CoreFileNameOnDisk;
+		std::string sLibQT5NetworkFileNameOnDisk;
 #ifdef _WIN32
-		sFileName = "liboie.dll";
+		sFileName = "liboie.dll";		
+		sLibQT5CoreFileNameOnDisk = "Qt5Core.dll";
+		sLibQT5NetworkFileNameOnDisk = "Qt5Network.dll";
+
+		if (sizeof(intptr_t) == sizeof(uint32_t)) {
+			// 32 bit system
+			sLibSSLFileNameOnDisk = "libssl-1_1.dll";
+			sLibCryptoFileNameOnDisk = "libcrypto-1_1.dll";
+		}
+		else {
+			sLibSSLFileNameOnDisk = "libssl-1_1-x64.dll";
+			sLibCryptoFileNameOnDisk = "libcrypto-1_1-x64.dll";
+		}
+
 #else
 		sFileName = "liboie.so";
+		sLibSSLFileNameOnDisk = "libssl-1_1-x64.so";
+		sLibCryptoFileNameOnDisk = "libcrypto-1_1-x64.so";
+		sLibQT5CoreFileNameOnDisk = "Qt5Core.so";
+		sLibQT5NetworkFileNameOnDisk = "Qt5Network.so";
 #endif
 
 		m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
@@ -166,7 +188,7 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		}
 		if (LibSSLBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBRESSLRESOURCE);
-		m_pLibSSLResourceFile = m_pWorkingDirectory->StoreCustomData("libssl-1_1.dll", LibSSLBuffer);
+		m_pLibSSLResourceFile = m_pWorkingDirectory->StoreCustomData(sLibSSLFileNameOnDisk, LibSSLBuffer);
 
 		std::vector<uint8_t> LibCryptoBuffer;
 		if (m_pDriverEnvironment->MachineHasResourceData(m_sLibCryptoResourceName)) {
@@ -177,7 +199,7 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		}
 		if (LibCryptoBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTORELIBCRYPTORESOURCE);
-		m_pLibCryptoResourceFile = m_pWorkingDirectory->StoreCustomData("libcrypto-1_1.dll", LibCryptoBuffer);
+		m_pLibCryptoResourceFile = m_pWorkingDirectory->StoreCustomData(sLibCryptoFileNameOnDisk, LibCryptoBuffer);
 
 		std::vector<uint8_t> Qt5CoreBuffer;
 		if (m_pDriverEnvironment->MachineHasResourceData(m_sQT5CoreResourceName)) {
@@ -188,7 +210,7 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 		}
 		if (Qt5CoreBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5CORERESOURCE);
-		m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData("Qt5Core.dll", Qt5CoreBuffer);
+		m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData(sLibQT5CoreFileNameOnDisk, Qt5CoreBuffer);
 
 		std::vector<uint8_t> Qt5NetworkBuffer;
 		if (m_pDriverEnvironment->MachineHasResourceData(m_sQT5NetworkResourceName)) {
@@ -200,9 +222,9 @@ void CDriver_ScanLab_OIE::initializeSDKEx(const std::vector<uint8_t>& SDKDLLBuff
 
 		if (Qt5NetworkBuffer.size () == 0)
 			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOREQT5NETWORKRESOURCE);
-		m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData("Qt5Network.dll", Qt5NetworkBuffer);
+		m_pQT5CoreResourceFile = m_pWorkingDirectory->StoreCustomData(sLibQT5NetworkFileNameOnDisk, Qt5NetworkBuffer);
 
-		m_pOIESDK = std::make_shared<CScanLabOIESDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
+		m_pOIESDK = std::make_shared<CScanLabOIESDK>(m_pSDKLibraryFile->GetAbsoluteFileName(), m_pWorkingDirectory->GetAbsoluteFilePath ());
 
 		m_pOIESDK->initDLL();
 
@@ -258,21 +280,63 @@ void CDriver_ScanLab_OIE::InitializeCustomSDK(const LibMCDriver_ScanLabOIE_uint6
 
 }
 
-IOIEDevice * CDriver_ScanLab_OIE::AddDevice(const std::string & sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
+IOIEDevice* CDriver_ScanLab_OIE::AddDevice(const std::string& sName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, const LibMCDriver_ScanLabOIE_uint32 nResponseTimeOut)
 {
-	return nullptr;
+	if ((m_pInstance == nullptr) || (m_pOIESDK.get() == nullptr))
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED);
+
+	if (sName.empty ())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME);
+
+	auto iIter = m_Devices.find(sName);
+	if (iIter != m_Devices.end ())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING, "device is already existing: " + sName);
+
+	auto pDeviceInstance = std::make_shared<COIEDeviceInstance>(m_pOIESDK, m_pInstance, sName, sHostName, nPort, nResponseTimeOut, m_pWorkingDirectory);
+	m_Devices.insert(std::make_pair(sName, pDeviceInstance));
+
+	return new COIEDevice(pDeviceInstance);
+}
+
+bool CDriver_ScanLab_OIE::HasDevice(const std::string& sName)
+{
+	auto iIter = m_Devices.find(sName);
+	return (iIter != m_Devices.end());
+}
+
+IOIEDevice* CDriver_ScanLab_OIE::FindDevice(const std::string& sName)
+{
+	auto iIter = m_Devices.find(sName);
+	if (iIter == m_Devices.end())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND, "device has not been found: " + sName);
+
+	return new COIEDevice(iIter->second);
 }
 
 void CDriver_ScanLab_OIE::RemoveDevice(IOIEDevice* pDeviceInstance)
 {
-	
+	if (pDeviceInstance == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	RemoveDeviceByName(pDeviceInstance->GetDeviceName ());
 }
+
+void CDriver_ScanLab_OIE::RemoveDeviceByName(const std::string& sName)
+{
+	auto iIter = m_Devices.find(sName);
+	if (iIter != m_Devices.end()) {
+		m_Devices.erase(iIter);
+	}
+}
+
+
+
 
 void CDriver_ScanLab_OIE::releaseInstance()
 {
 	if ((m_pInstance != nullptr) && (m_pOIESDK.get() != nullptr)) {
+		m_Devices.clear();
 		m_pOIESDK->oie_destroy(m_pInstance);
-
 	}
 
 	m_pInstance = nullptr;
