@@ -101,7 +101,8 @@ public:
 		auto pOIEDriver = m_pPluginData->acquireOIE(pStateEnvironment);
 
 		pStateEnvironment->LogMessage("Loading SDK...");
-		pOIEDriver->InitializeSDK("liboie");
+		pOIEDriver->SetDependencyResourceNames("libssl-1_1-x64", "libcrypto-1_1-x64", "qt5core-x64", "qt5network-x64");
+		pOIEDriver->InitializeSDK("liboie-x64");
 
 		pStateEnvironment->LogMessage("Adding Device...");
 		auto pDevice = pOIEDriver->AddDevice("oie1", "192.168.5.8", 21072, 2000);
