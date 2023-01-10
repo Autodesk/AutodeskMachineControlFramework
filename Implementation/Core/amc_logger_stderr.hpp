@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2022 Autodesk Inc.
+Copyright (C) 2020 Autodesk Inc.
 
 All rights reserved.
 
@@ -28,59 +28,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMCSERVER_SERVER
-#define __AMCSERVER_SERVER
 
+#ifndef __AMC_LOGGER_STDERR
+#define __AMC_LOGGER_STDERR
 
-#include <string>
 #include <memory>
-#include <map>
+#include <string>
+#include <vector>
 
-#include "amc_server_io.hpp"
-#include "amc_server_configuration.hpp"
-
-#include "libmcdata_dynamic.hpp"
-#include "libmc_dynamic.hpp"
-
+#include "amc_logger.hpp"
 
 namespace AMC {
 
+	class CLogger_StdErr;
+	typedef std::shared_ptr<CLogger_StdErr> PLogger_StdErr;
+
+	class CLogger_StdErr : public CLogger {
+	private:
 		
-	class CServer {
+	public:
+
+		CLogger_StdErr();
+		virtual ~CLogger_StdErr();
+
+		void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) override;
 		
-		private:
-			PServerIO m_pServerIO;
-			std::string m_sGitHash;
-			std::string m_sVersionString;
+		void retrieveLogMessages(std::vector<CLoggerEntry>& entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel) override;
 
-			LibMCData::PWrapper m_pDataWrapper;
-			LibMCData::PDataModel m_pDataModel;
-
-			LibMC::PWrapper m_pWrapper;
-			LibMC::PMCContext m_pContext;
-
-			PServerConfiguration m_pServerConfiguration;
-
-			void* m_pListeningServerInstance;
-		
-		public:
-		
-			CServer(PServerIO pServerIO);
-
-			virtual ~CServer();
-						
-			void executeBlocking (const std::string& sConfigurationFileName);
-			
-			void log (const std::string & sMessage);
-
-			PServerIO getServerIO ();
-
-			void stopListening();
-			
 	};
-	
-	
+
 	
 }
 
-#endif //__AMCSERVER_SERVER
+
+#endif //__AMC_LOGGER_STDERR
+

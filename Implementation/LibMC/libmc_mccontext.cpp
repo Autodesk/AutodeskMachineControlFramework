@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_logger_multi.hpp"
-#include "amc_logger_stdout.hpp"
+#include "amc_logger_callback.hpp"
 #include "amc_logger_database.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
@@ -76,8 +76,9 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 
     // Create Log Multiplexer to StdOut and Database
     auto pMultiLogger = std::make_shared<AMC::CLogger_Multi>();
-    pMultiLogger->addLogger(std::make_shared<AMC::CLogger_StdOut>());
     pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel->CreateNewLogSession ()));
+    if (pDataModel->HasLogCallback())
+        pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel));
 
     // Create system state
     m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, "./testoutput");

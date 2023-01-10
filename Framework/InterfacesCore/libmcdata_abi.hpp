@@ -1080,6 +1080,45 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_setbasetempdirectory(LibM
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getbasetempdirectory(LibMCData_DataModel pDataModel, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer);
 
+/**
+* Sets a log callback to be used for the execution.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pLogCallback - LogCallback.
+* @param[in] pUserData - Userdata that is passed to the callback function
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_setlogcallback(LibMCData_DataModel pDataModel, LibMCData::LogCallback pLogCallback, LibMCData_pvoid pUserData);
+
+/**
+* Resets the log callback to be used for the execution.
+*
+* @param[in] pDataModel - DataModel instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_clearlogcallback(LibMCData_DataModel pDataModel);
+
+/**
+* Returns if a log callback has been set.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pHasCallback - Flag if log callback has been set.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_haslogcallback(LibMCData_DataModel pDataModel, bool * pHasCallback);
+
+/**
+* Triggers the log callback. Fails if no log callback has been set.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pLogMessage - Log message to be logged.
+* @param[in] pSubSystem - SubSystem of Log Message.
+* @param[in] eLogLevel - Log Level to be used.
+* @param[in] pTimestamp - Timestamp of the log message.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_triggerlogcallback(LibMCData_DataModel pDataModel, const char * pLogMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestamp);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/

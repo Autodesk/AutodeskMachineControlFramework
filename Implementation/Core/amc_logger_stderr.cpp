@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2022 Autodesk Inc.
+Copyright (C) 2020 Autodesk Inc.
 
 All rights reserved.
 
@@ -28,59 +28,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMCSERVER_SERVER
-#define __AMCSERVER_SERVER
 
+#include "amc_logger_stderr.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include <string>
-#include <memory>
-#include <map>
+#include <sstream>
+#include <iomanip>
+#include <iostream>
 
-#include "amc_server_io.hpp"
-#include "amc_server_configuration.hpp"
-
-#include "libmcdata_dynamic.hpp"
-#include "libmc_dynamic.hpp"
-
+#include <ctime>
+#include <time.h>
 
 namespace AMC {
-
 		
-	class CServer {
-		
-		private:
-			PServerIO m_pServerIO;
-			std::string m_sGitHash;
-			std::string m_sVersionString;
-
-			LibMCData::PWrapper m_pDataWrapper;
-			LibMCData::PDataModel m_pDataModel;
-
-			LibMC::PWrapper m_pWrapper;
-			LibMC::PMCContext m_pContext;
-
-			PServerConfiguration m_pServerConfiguration;
-
-			void* m_pListeningServerInstance;
-		
-		public:
-		
-			CServer(PServerIO pServerIO);
-
-			virtual ~CServer();
-						
-			void executeBlocking (const std::string& sConfigurationFileName);
-			
-			void log (const std::string & sMessage);
-
-			PServerIO getServerIO ();
-
-			void stopListening();
-			
-	};
+	CLogger_StdErr::CLogger_StdErr()
+	{
+	}
 	
-	
-	
+	CLogger_StdErr::~CLogger_StdErr()
+	{
+	}
+
+	void CLogger_StdErr::logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp)
+	{	
+		std::cerr << sTimeStamp << " | " <<  std::setw (8) << sSubSystem.substr(0, 8) << " | " << std::setw(8) << logLevelToString (logLevel) <<  " | " << sMessage << std::endl;
+	}
+
+	void CLogger_StdErr::retrieveLogMessages(std::vector<CLoggerEntry>& entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel)
+	{
+		throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	}
+
 }
 
-#endif //__AMCSERVER_SERVER
+

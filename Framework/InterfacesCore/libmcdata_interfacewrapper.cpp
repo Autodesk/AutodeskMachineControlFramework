@@ -3348,6 +3348,113 @@ LibMCDataResult libmcdata_datamodel_getbasetempdirectory(LibMCData_DataModel pDa
 	}
 }
 
+LibMCDataResult libmcdata_datamodel_setlogcallback(LibMCData_DataModel pDataModel, LibMCDataLogCallback pLogCallback, LibMCData_pvoid pUserData)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIDataModel->SetLogCallback(pLogCallback, pUserData);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_clearlogcallback(LibMCData_DataModel pDataModel)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIDataModel->ClearLogCallback();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_haslogcallback(LibMCData_DataModel pDataModel, bool * pHasCallback)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pHasCallback == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		*pHasCallback = pIDataModel->HasLogCallback();
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDataResult libmcdata_datamodel_triggerlogcallback(LibMCData_DataModel pDataModel, const char * pLogMessage, const char * pSubSystem, eLibMCDataLogLevel eLogLevel, const char * pTimestamp)
+{
+	IBase* pIBaseClass = (IBase *)pDataModel;
+
+	try {
+		if (pLogMessage == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pSubSystem == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		if (pTimestamp == nullptr)
+			throw ELibMCDataInterfaceException (LIBMCDATA_ERROR_INVALIDPARAM);
+		std::string sLogMessage(pLogMessage);
+		std::string sSubSystem(pSubSystem);
+		std::string sTimestamp(pTimestamp);
+		IDataModel* pIDataModel = dynamic_cast<IDataModel*>(pIBaseClass);
+		if (!pIDataModel)
+			throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_INVALIDCAST);
+		
+		pIDataModel->TriggerLogCallback(sLogMessage, sSubSystem, eLogLevel, sTimestamp);
+
+		return LIBMCDATA_SUCCESS;
+	}
+	catch (ELibMCDataInterfaceException & Exception) {
+		return handleLibMCDataException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 
 /*************************************************************************************************************************
@@ -3547,6 +3654,14 @@ LibMCDataResult LibMCData::Impl::LibMCData_GetProcAddress (const char * pProcNam
 		*ppProcAddress = (void*) &libmcdata_datamodel_setbasetempdirectory;
 	if (sProcName == "libmcdata_datamodel_getbasetempdirectory") 
 		*ppProcAddress = (void*) &libmcdata_datamodel_getbasetempdirectory;
+	if (sProcName == "libmcdata_datamodel_setlogcallback") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_setlogcallback;
+	if (sProcName == "libmcdata_datamodel_clearlogcallback") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_clearlogcallback;
+	if (sProcName == "libmcdata_datamodel_haslogcallback") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_haslogcallback;
+	if (sProcName == "libmcdata_datamodel_triggerlogcallback") 
+		*ppProcAddress = (void*) &libmcdata_datamodel_triggerlogcallback;
 	if (sProcName == "libmcdata_getversion") 
 		*ppProcAddress = (void*) &libmcdata_getversion;
 	if (sProcName == "libmcdata_getlasterror") 

@@ -472,6 +472,7 @@ public:
 			case LIBMCDATA_ERROR_NAMESTRINGMISMATCH: return "NAMESTRINGMISMATCH";
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "DATATYPEMISMATCH";
 			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "COULDNOTFINDLOGENTRY";
+			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "NOLOGCALLBACK";
 		}
 		return "UNKNOWN";
 	}
@@ -743,6 +744,7 @@ public:
 			case LIBMCDATA_ERROR_NAMESTRINGMISMATCH: return "Name string mismatch";
 			case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
 			case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
+			case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
 		}
 		return "unknown error";
 	}
@@ -1232,6 +1234,10 @@ public:
 	inline PPersistencyHandler CreatePersistencyHandler();
 	inline void SetBaseTempDirectory(const std::string & sTempDirectory);
 	inline std::string GetBaseTempDirectory();
+	inline void SetLogCallback(const LogCallback pLogCallback, const LibMCData_pvoid pUserData);
+	inline void ClearLogCallback();
+	inline bool HasLogCallback();
+	inline void TriggerLogCallback(const std::string & sLogMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp);
 };
 	
 	/**
@@ -1422,6 +1428,10 @@ public:
 		pWrapperTable->m_DataModel_CreatePersistencyHandler = nullptr;
 		pWrapperTable->m_DataModel_SetBaseTempDirectory = nullptr;
 		pWrapperTable->m_DataModel_GetBaseTempDirectory = nullptr;
+		pWrapperTable->m_DataModel_SetLogCallback = nullptr;
+		pWrapperTable->m_DataModel_ClearLogCallback = nullptr;
+		pWrapperTable->m_DataModel_HasLogCallback = nullptr;
+		pWrapperTable->m_DataModel_TriggerLogCallback = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -2307,6 +2317,42 @@ public:
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DataModel_SetLogCallback = (PLibMCDataDataModel_SetLogCallbackPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_setlogcallback");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_SetLogCallback = (PLibMCDataDataModel_SetLogCallbackPtr) dlsym(hLibrary, "libmcdata_datamodel_setlogcallback");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_SetLogCallback == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_ClearLogCallback = (PLibMCDataDataModel_ClearLogCallbackPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_clearlogcallback");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_ClearLogCallback = (PLibMCDataDataModel_ClearLogCallbackPtr) dlsym(hLibrary, "libmcdata_datamodel_clearlogcallback");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_ClearLogCallback == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_HasLogCallback = (PLibMCDataDataModel_HasLogCallbackPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_haslogcallback");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_HasLogCallback = (PLibMCDataDataModel_HasLogCallbackPtr) dlsym(hLibrary, "libmcdata_datamodel_haslogcallback");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_HasLogCallback == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataModel_TriggerLogCallback = (PLibMCDataDataModel_TriggerLogCallbackPtr) GetProcAddress(hLibrary, "libmcdata_datamodel_triggerlogcallback");
+		#else // _WIN32
+		pWrapperTable->m_DataModel_TriggerLogCallback = (PLibMCDataDataModel_TriggerLogCallbackPtr) dlsym(hLibrary, "libmcdata_datamodel_triggerlogcallback");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataModel_TriggerLogCallback == nullptr)
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDataGetVersionPtr) GetProcAddress(hLibrary, "libmcdata_getversion");
 		#else // _WIN32
 		pWrapperTable->m_GetVersion = (PLibMCDataGetVersionPtr) dlsym(hLibrary, "libmcdata_getversion");
@@ -2742,6 +2788,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdata_datamodel_getbasetempdirectory", (void**)&(pWrapperTable->m_DataModel_GetBaseTempDirectory));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_GetBaseTempDirectory == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_setlogcallback", (void**)&(pWrapperTable->m_DataModel_SetLogCallback));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_SetLogCallback == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_clearlogcallback", (void**)&(pWrapperTable->m_DataModel_ClearLogCallback));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_ClearLogCallback == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_haslogcallback", (void**)&(pWrapperTable->m_DataModel_HasLogCallback));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_HasLogCallback == nullptr) )
+			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdata_datamodel_triggerlogcallback", (void**)&(pWrapperTable->m_DataModel_TriggerLogCallback));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataModel_TriggerLogCallback == nullptr) )
 			return LIBMCDATA_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdata_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -4101,6 +4163,48 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_GetBaseTempDirectory(m_pHandle, bytesNeededTempDirectory, &bytesWrittenTempDirectory, &bufferTempDirectory[0]));
 		
 		return std::string(&bufferTempDirectory[0]);
+	}
+	
+	/**
+	* CDataModel::SetLogCallback - Sets a log callback to be used for the execution.
+	* @param[in] pLogCallback - LogCallback.
+	* @param[in] pUserData - Userdata that is passed to the callback function
+	*/
+	void CDataModel::SetLogCallback(const LogCallback pLogCallback, const LibMCData_pvoid pUserData)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_SetLogCallback(m_pHandle, pLogCallback, pUserData));
+	}
+	
+	/**
+	* CDataModel::ClearLogCallback - Resets the log callback to be used for the execution.
+	*/
+	void CDataModel::ClearLogCallback()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_ClearLogCallback(m_pHandle));
+	}
+	
+	/**
+	* CDataModel::HasLogCallback - Returns if a log callback has been set.
+	* @return Flag if log callback has been set.
+	*/
+	bool CDataModel::HasLogCallback()
+	{
+		bool resultHasCallback = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_HasLogCallback(m_pHandle, &resultHasCallback));
+		
+		return resultHasCallback;
+	}
+	
+	/**
+	* CDataModel::TriggerLogCallback - Triggers the log callback. Fails if no log callback has been set.
+	* @param[in] sLogMessage - Log message to be logged.
+	* @param[in] sSubSystem - SubSystem of Log Message.
+	* @param[in] eLogLevel - Log Level to be used.
+	* @param[in] sTimestamp - Timestamp of the log message.
+	*/
+	void CDataModel::TriggerLogCallback(const std::string & sLogMessage, const std::string & sSubSystem, const eLogLevel eLogLevel, const std::string & sTimestamp)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataModel_TriggerLogCallback(m_pHandle, sLogMessage.c_str(), sSubSystem.c_str(), eLogLevel, sTimestamp.c_str()));
 	}
 
 } // namespace LibMCData

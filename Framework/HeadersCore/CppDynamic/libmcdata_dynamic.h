@@ -1067,6 +1067,45 @@ typedef LibMCDataResult (*PLibMCDataDataModel_SetBaseTempDirectoryPtr) (LibMCDat
 */
 typedef LibMCDataResult (*PLibMCDataDataModel_GetBaseTempDirectoryPtr) (LibMCData_DataModel pDataModel, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer);
 
+/**
+* Sets a log callback to be used for the execution.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pLogCallback - LogCallback.
+* @param[in] pUserData - Userdata that is passed to the callback function
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_SetLogCallbackPtr) (LibMCData_DataModel pDataModel, LibMCData::LogCallback pLogCallback, LibMCData_pvoid pUserData);
+
+/**
+* Resets the log callback to be used for the execution.
+*
+* @param[in] pDataModel - DataModel instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_ClearLogCallbackPtr) (LibMCData_DataModel pDataModel);
+
+/**
+* Returns if a log callback has been set.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pHasCallback - Flag if log callback has been set.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_HasLogCallbackPtr) (LibMCData_DataModel pDataModel, bool * pHasCallback);
+
+/**
+* Triggers the log callback. Fails if no log callback has been set.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pLogMessage - Log message to be logged.
+* @param[in] pSubSystem - SubSystem of Log Message.
+* @param[in] eLogLevel - Log Level to be used.
+* @param[in] pTimestamp - Timestamp of the log message.
+* @return error code or 0 (success)
+*/
+typedef LibMCDataResult (*PLibMCDataDataModel_TriggerLogCallbackPtr) (LibMCData_DataModel pDataModel, const char * pLogMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestamp);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -1223,6 +1262,10 @@ typedef struct {
 	PLibMCDataDataModel_CreatePersistencyHandlerPtr m_DataModel_CreatePersistencyHandler;
 	PLibMCDataDataModel_SetBaseTempDirectoryPtr m_DataModel_SetBaseTempDirectory;
 	PLibMCDataDataModel_GetBaseTempDirectoryPtr m_DataModel_GetBaseTempDirectory;
+	PLibMCDataDataModel_SetLogCallbackPtr m_DataModel_SetLogCallback;
+	PLibMCDataDataModel_ClearLogCallbackPtr m_DataModel_ClearLogCallback;
+	PLibMCDataDataModel_HasLogCallbackPtr m_DataModel_HasLogCallback;
+	PLibMCDataDataModel_TriggerLogCallbackPtr m_DataModel_TriggerLogCallback;
 	PLibMCDataGetVersionPtr m_GetVersion;
 	PLibMCDataGetLastErrorPtr m_GetLastError;
 	PLibMCDataReleaseInstancePtr m_ReleaseInstance;

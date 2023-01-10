@@ -1060,6 +1060,33 @@ public:
 	*/
 	virtual std::string GetBaseTempDirectory() = 0;
 
+	/**
+	* IDataModel::SetLogCallback - Sets a log callback to be used for the execution.
+	* @param[in] pLogCallback - callback function
+	* @param[in] nUserData - Userdata that is passed to the callback function
+	*/
+	virtual void SetLogCallback(const LibMCData::LogCallback pLogCallback, const LibMCData_pvoid pUserData) = 0;
+
+	/**
+	* IDataModel::ClearLogCallback - Resets the log callback to be used for the execution.
+	*/
+	virtual void ClearLogCallback() = 0;
+
+	/**
+	* IDataModel::HasLogCallback - Returns if a log callback has been set.
+	* @return Flag if log callback has been set.
+	*/
+	virtual bool HasLogCallback() = 0;
+
+	/**
+	* IDataModel::TriggerLogCallback - Triggers the log callback. Fails if no log callback has been set.
+	* @param[in] sLogMessage - Log message to be logged.
+	* @param[in] sSubSystem - SubSystem of Log Message.
+	* @param[in] eLogLevel - Log Level to be used.
+	* @param[in] sTimestamp - Timestamp of the log message.
+	*/
+	virtual void TriggerLogCallback(const std::string & sLogMessage, const std::string & sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string & sTimestamp) = 0;
+
 };
 
 typedef IBaseSharedPtr<IDataModel> PIDataModel;

@@ -1,6 +1,6 @@
 /*++
 
-Copyright (C) 2022 Autodesk Inc.
+Copyright (C) 2020 Autodesk Inc.
 
 All rights reserved.
 
@@ -28,59 +28,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef __AMCSERVER_SERVER
-#define __AMCSERVER_SERVER
 
+#include "amc_logger_callback.hpp"
+#include "libmc_exceptiontypes.hpp"
 
 #include <string>
-#include <memory>
-#include <map>
+#include <sstream>
+#include <iomanip>
+#include <iostream>
 
-#include "amc_server_io.hpp"
-#include "amc_server_configuration.hpp"
-
-#include "libmcdata_dynamic.hpp"
-#include "libmc_dynamic.hpp"
-
+#include <ctime>
+#include <time.h>
 
 namespace AMC {
-
 		
-	class CServer {
-		
-		private:
-			PServerIO m_pServerIO;
-			std::string m_sGitHash;
-			std::string m_sVersionString;
+	CLogger_Callback::CLogger_Callback(LibMCData::PDataModel pDataModel)
+		: m_pDataModel (pDataModel)
+	{
+		if (pDataModel.get() == nullptr)
+			throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
 
-			LibMCData::PWrapper m_pDataWrapper;
-			LibMCData::PDataModel m_pDataModel;
-
-			LibMC::PWrapper m_pWrapper;
-			LibMC::PMCContext m_pContext;
-
-			PServerConfiguration m_pServerConfiguration;
-
-			void* m_pListeningServerInstance;
-		
-		public:
-		
-			CServer(PServerIO pServerIO);
-
-			virtual ~CServer();
-						
-			void executeBlocking (const std::string& sConfigurationFileName);
-			
-			void log (const std::string & sMessage);
-
-			PServerIO getServerIO ();
-
-			void stopListening();
-			
-	};
+	}
 	
-	
-	
+	CLogger_Callback::~CLogger_Callback()
+	{
+	}
+
+	void CLogger_Callback::logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp)
+	{	
+		m_pDataModel->TriggerLogCallback(sMessage, sSubSystem, logLevel, sTimeStamp);
+	}
+
+	void CLogger_Callback::retrieveLogMessages(std::vector<CLoggerEntry>& entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel)
+	{
+		throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	}
+
 }
 
-#endif //__AMCSERVER_SERVER
+

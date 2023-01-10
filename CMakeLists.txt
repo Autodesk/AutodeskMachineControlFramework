@@ -554,6 +554,69 @@ set_target_properties(amc_server
 )
 
 
+#[[++
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++ AMC Win32 Target
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+]]
+
+if(WIN32)
+
+file(GLOB SERVER_WIN32_SRC
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_win32.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_io.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_configuration.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML/pugixml.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib/*.c
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_importstream_native.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_exportstream_native.cpp 
+)
+
+
+add_executable(amc_win32 WIN32 ${SERVER_WIN32_SRC})
+
+target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_HEADERS_CORE_DIR})
+target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML)
+target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/)
+target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib)
+target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl)
+target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common)
+target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_compile_options(amc_win32 PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
+target_compile_options(amc_win32 PRIVATE "-DLIBUS_NO_SSL")
+
+	target_link_libraries(amc_win32 shlwapi.lib)
+	target_link_libraries(amc_win32 ws2_32.lib)
+	target_link_libraries(amc_win32 userenv.lib)
+	target_link_libraries(amc_win32 psapi.lib)
+	target_link_libraries(amc_win32 bcrypt.lib)	
+	target_link_libraries(amc_win32 iphlpapi.lib)
+
+if(MSVC)
+	target_link_libraries(amc_win32 ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl/win64/tls-24.lib)
+	target_link_libraries(amc_win32 ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl/win64/crypto-49.lib)
+	target_link_libraries(amc_win32 ${CMAKE_CURRENT_SOURCE_DIR}/Libraries/libressl/win64/ssl-52.lib)
+endif()
+
+set_target_properties(amc_win32
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Output"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${PROJECT_BINARY_DIR}/Output"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${PROJECT_BINARY_DIR}/Output"
+	LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Output"
+	
+	OUTPUT_NAME "amc_win32"	
+
+	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	
+    
+)
+
+
+endif(WIN32)
 
 
 #[[++
