@@ -569,6 +569,7 @@ file(GLOB SERVER_WIN32_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_win32.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_io.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server_configuration.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_win32.rc
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/PugiXML/pugixml.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Libraries/zlib/*.c
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Common/common_utils.cpp 
@@ -588,6 +589,8 @@ target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Impleme
 target_include_directories(amc_win32 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
 target_compile_options(amc_win32 PRIVATE "-D__GITHASH=${GLOBALGITHASH}")
 target_compile_options(amc_win32 PRIVATE "-DLIBUS_NO_SSL")
+target_compile_options(amc_win32 PRIVATE "-DUNICODE")
+target_compile_options(amc_win32 PRIVATE "-D_UNICODE")
 
 	target_link_libraries(amc_win32 shlwapi.lib)
 	target_link_libraries(amc_win32 ws2_32.lib)

@@ -191,13 +191,31 @@ void* CServer_Win32::getAccelTable()
 }
 
 
-// Forward declarations of functions included in this code module:
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+// Message handler for about box.
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    static HWND hwndEdit;
-    static HFONT fontHandle;
+{   
+    HFONT fontHandle;
+    HINSTANCE hInst = (HINSTANCE)GetWindowLongPtrW(hWnd, GWLP_HINSTANCE);
 
    
     switch (message)
@@ -220,7 +238,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             L"Courier New");
 
 
-        hwndEdit = CreateWindowExW(
+        HWND hwndListBox = CreateWindowExW(
             0, L"LISTBOX",   // predefined class 
             NULL,         // no window title 
             WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_DISABLENOSCROLL,
@@ -231,7 +249,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             NULL);        // pointer not needed 
 
         // Add text to the window. 
-        SendMessage(hwndEdit, WM_SETFONT, (WPARAM)fontHandle, 0);
+        SendMessage(hwndListBox, WM_SETFONT, (WPARAM)fontHandle, 0);
 
         return 0;
 
@@ -250,7 +268,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wmId)
         {
         case IDM_ABOUT:
-            //DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            DialogBoxW(hInst, MAKEINTRESOURCEW(IDD_ABOUTBOX), hWnd, About);
             break;
         case IDM_EXIT:
             DestroyWindow(hWnd);
@@ -264,8 +282,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
     {
         // Make the edit control the size of the window's client area. 
-
-        MoveWindow(hwndEdit,
+        HWND hwndListBox = GetDlgItem(hWnd, ID_EDITCHILD);
+        MoveWindow(hwndListBox,
             0, 0,                  // starting x- and y-coordinates 
             LOWORD(lParam),        // width of client area 
             HIWORD(lParam),        // height of client area 
@@ -327,35 +345,3 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
 
-
-
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE: Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
-}
