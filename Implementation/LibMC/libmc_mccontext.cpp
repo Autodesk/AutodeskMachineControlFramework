@@ -222,6 +222,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
                 throw ELibMCNoContextException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
 
             m_pSystemState->logger()->logMessage("Using default testing UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+            m_pSystemState->uiHandler()->setCoreResourcePackage(m_pCoreResourcePackage);
         }
         else {
 
@@ -233,7 +234,8 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string());
 
             m_pSystemState->logger()->logMessage("Loading UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-            m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
+            m_pSystemState->uiHandler()->setCoreResourcePackage(m_pCoreResourcePackage);
+            m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
         }
 
     }

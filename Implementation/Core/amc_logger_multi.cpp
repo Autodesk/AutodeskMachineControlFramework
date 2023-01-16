@@ -88,7 +88,7 @@ namespace AMC {
 			return m_RetrievalLogger->getLogMessageHeadID();
 		}
 
-
+		return 0;
 	}
 
 
