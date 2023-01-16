@@ -1902,6 +1902,18 @@ typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_GetBoolParameterPtr) (LibMCEn
 typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadResourceDataPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
 
 /**
+* loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - size of the buffer (including trailing 0)
+* @param[out] pResourceDataNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pResourceDataBuffer -  buffer of Resource Data String., may be NULL
+* @return error code or 0 (success)
+*/
+typedef LibMCEnvResult (*PLibMCEnvStateEnvironment_LoadResourceStringPtr) (LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer);
+
+/**
 * creates an empty image object.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.
@@ -2558,6 +2570,7 @@ typedef struct {
 	PLibMCEnvStateEnvironment_GetIntegerParameterPtr m_StateEnvironment_GetIntegerParameter;
 	PLibMCEnvStateEnvironment_GetBoolParameterPtr m_StateEnvironment_GetBoolParameter;
 	PLibMCEnvStateEnvironment_LoadResourceDataPtr m_StateEnvironment_LoadResourceData;
+	PLibMCEnvStateEnvironment_LoadResourceStringPtr m_StateEnvironment_LoadResourceString;
 	PLibMCEnvStateEnvironment_CreateEmptyImagePtr m_StateEnvironment_CreateEmptyImage;
 	PLibMCEnvStateEnvironment_LoadPNGImagePtr m_StateEnvironment_LoadPNGImage;
 	PLibMCEnvStateEnvironment_GetGlobalTimerInMillisecondsPtr m_StateEnvironment_GetGlobalTimerInMilliseconds;

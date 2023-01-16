@@ -48,20 +48,24 @@ using namespace LibMCDriver_ScanLab::Impl;
 #define SCANLAB_MAXDLLNAMELENGTH 1024 * 1024
 
 #ifdef _WIN32
-void* _loadScanLabAddress (HMODULE hLibrary, const char * pSymbolName) {
+void* _loadScanLabAddress (HMODULE hLibrary, const char * pSymbolName, bool bMandatory = true) {
 	void * pFuncPtr = (void*) GetProcAddress(hLibrary, pSymbolName);
-	if (pFuncPtr == nullptr)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string (pSymbolName));
+	if (bMandatory) {
+		if (pFuncPtr == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string(pSymbolName));
+	}
 
 	return pFuncPtr;
 }
 #else
-void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName) {
+void* _loadScanLabAddress(void * hLibrary, const char* pSymbolName, bool bMandatory = true) {
 
 	void* pFuncPtr = (void*) dlsym(hLibrary, pSymbolName);
 	dlerror();
-	if (pFuncPtr == nullptr)
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string (pSymbolName));
+	if (bMandatory) {
+		if (pFuncPtr == nullptr)
+			throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT, "could not find library export: " + std::string(pSymbolName));
+	}
 
 	return pFuncPtr;
 }
@@ -160,6 +164,49 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_get_rtc_version = (PScanLabPtr_n_get_rtc_version)_loadScanLabAddress(hLibrary, "n_get_rtc_version");
 	this->n_get_card_type = (PScanLabPtr_n_get_card_type)_loadScanLabAddress(hLibrary, "n_get_card_type");
 
+	this->n_set_mcbsp_freq = (PScanLabPtr_n_set_mcbsp_freq)_loadScanLabAddress(hLibrary, "n_set_mcbsp_freq");
+	this->n_mcbsp_init = (PScanLabPtr_n_mcbsp_init)_loadScanLabAddress(hLibrary, "n_mcbsp_init");
+	this->n_mcbsp_init_spi = (PScanLabPtr_n_mcbsp_init_spi)_loadScanLabAddress(hLibrary, "n_mcbsp_init_spi");
+	this->n_set_mcbsp_out_ptr = (PScanLabPtr_n_set_mcbsp_out_ptr)_loadScanLabAddress(hLibrary, "n_set_mcbsp_out_ptr");
+	this->n_set_multi_mcbsp_in = (PScanLabPtr_n_set_multi_mcbsp_in)_loadScanLabAddress(hLibrary, "n_set_multi_mcbsp_in");
+	this->n_list_nop = (PScanLabPtr_n_list_nop)_loadScanLabAddress(hLibrary, "n_list_nop");
+	this->n_set_free_variable_list = (PScanLabPtr_n_set_free_variable_list)_loadScanLabAddress(hLibrary, "n_set_free_variable_list");
+	this->n_set_free_variable = (PScanLabPtr_n_set_free_variable)_loadScanLabAddress(hLibrary, "n_set_free_variable");
+	this->n_get_free_variable = (PScanLabPtr_n_get_free_variable)_loadScanLabAddress(hLibrary, "n_get_free_variable");
+	this->n_set_trigger = (PScanLabPtr_n_set_trigger)_loadScanLabAddress(hLibrary, "n_set_trigger");
+	this->n_set_trigger4 = (PScanLabPtr_n_set_trigger4)_loadScanLabAddress(hLibrary, "n_set_trigger4");
+	this->n_set_control_mode = (PScanLabPtr_n_set_control_mode)_loadScanLabAddress(hLibrary, "n_set_control_mode");
+	this->n_set_laser_pulses_ctrl = (PScanLabPtr_n_set_laser_pulses_ctrl)_loadScanLabAddress(hLibrary, "n_set_laser_pulses_ctrl");
+	this->n_set_mark_speed_ctrl = (PScanLabPtr_n_set_mark_speed_ctrl)_loadScanLabAddress(hLibrary, "n_set_mark_speed_ctrl");
+	this->n_set_jump_speed_ctrl = (PScanLabPtr_n_set_jump_speed_ctrl)_loadScanLabAddress(hLibrary, "n_set_jump_speed_ctrl");
+	this->n_set_firstpulse_killer = (PScanLabPtr_n_set_firstpulse_killer)_loadScanLabAddress(hLibrary, "n_set_firstpulse_killer");
+	this->n_set_firstpulse_killer_list = (PScanLabPtr_n_set_firstpulse_killer_list)_loadScanLabAddress(hLibrary, "n_set_firstpulse_killer_list");
+	this->n_set_qswitch_delay = (PScanLabPtr_n_set_qswitch_delay)_loadScanLabAddress(hLibrary, "n_set_qswitch_delay");
+	this->n_set_qswitch_delay_list = (PScanLabPtr_n_set_qswitch_delay_list)_loadScanLabAddress(hLibrary, "n_set_qswitch_delay_list");
+	this->n_write_da_x = (PScanLabPtr_n_write_da_x)_loadScanLabAddress(hLibrary, "n_write_da_x");
+	this->n_set_laser_pin_out = (PScanLabPtr_n_set_laser_pin_out)_loadScanLabAddress(hLibrary, "n_set_laser_pin_out");
+	this->n_get_laser_pin_in = (PScanLabPtr_n_get_laser_pin_in)_loadScanLabAddress(hLibrary, "n_get_laser_pin_in");
+	this->n_set_sky_writing_para = (PScanLabPtr_n_set_sky_writing_para)_loadScanLabAddress(hLibrary, "n_set_sky_writing_para");
+	this->n_set_sky_writing_limit = (PScanLabPtr_n_set_sky_writing_limit)_loadScanLabAddress(hLibrary, "n_set_sky_writing_limit");
+	this->n_set_sky_writing_mode = (PScanLabPtr_n_set_sky_writing_mode)_loadScanLabAddress(hLibrary, "n_set_sky_writing_mode");
+	this->n_set_sky_writing = (PScanLabPtr_n_set_sky_writing)_loadScanLabAddress(hLibrary, "n_set_sky_writing");
+	this->n_set_sky_writing_para_list = (PScanLabPtr_n_set_sky_writing_para_list)_loadScanLabAddress(hLibrary, "n_set_sky_writing_para_list");
+	this->n_set_sky_writing_list = (PScanLabPtr_n_set_sky_writing_list)_loadScanLabAddress(hLibrary, "n_set_sky_writing_list");
+	this->n_set_sky_writing_limit_list = (PScanLabPtr_n_set_sky_writing_limit_list)_loadScanLabAddress(hLibrary, "n_set_sky_writing_limit_list");
+	this->n_set_sky_writing_mode_list = (PScanLabPtr_n_set_sky_writing_mode_list)_loadScanLabAddress(hLibrary, "n_set_sky_writing_mode_list");
+	this->n_control_command = (PScanLabPtr_n_control_command)_loadScanLabAddress(hLibrary, "n_control_command");
+	this->n_get_scanahead_params = (PScanLabPtr_n_get_scanahead_params)_loadScanLabAddress(hLibrary, "n_get_scanahead_params", false);
+	this->n_activate_scanahead_autodelays = (PScanLabPtr_n_activate_scanahead_autodelays)_loadScanLabAddress(hLibrary, "n_activate_scanahead_autodelays", false);
+	this->n_set_scanahead_laser_shifts = (PScanLabPtr_n_set_scanahead_laser_shifts)_loadScanLabAddress(hLibrary, "n_set_scanahead_laser_shifts", false);
+	this->n_set_scanahead_line_params = (PScanLabPtr_n_set_scanahead_line_params)_loadScanLabAddress(hLibrary, "n_set_scanahead_line_params", false);
+	this->n_set_scanahead_line_params_ex = (PScanLabPtr_n_set_scanahead_line_params_ex)_loadScanLabAddress(hLibrary, "n_set_scanahead_line_params_ex", false);
+	this->n_set_scanahead_params = (PScanLabPtr_n_set_scanahead_params)_loadScanLabAddress(hLibrary, "n_set_scanahead_params", false);
+	this->n_set_scanahead_speed_control = (PScanLabPtr_n_set_scanahead_speed_control)_loadScanLabAddress(hLibrary, "n_set_scanahead_speed_control", false);
+	this->n_micro_vector_abs_3d = (PScanLabPtr_n_micro_vector_abs_3d)_loadScanLabAddress(hLibrary, "n_micro_vector_abs_3d", false);
+	this->n_micro_vector_rel_3d = (PScanLabPtr_n_micro_vector_rel_3d)_loadScanLabAddress(hLibrary, "n_micro_vector_rel_3d", false);
+	this->n_micro_vector_abs = (PScanLabPtr_n_micro_vector_abs)_loadScanLabAddress(hLibrary, "n_micro_vector_abs", false);
+	this->n_micro_vector_rel = (PScanLabPtr_n_micro_vector_rel)_loadScanLabAddress(hLibrary, "n_micro_vector_rel", false);
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -253,5 +300,56 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_set_laser_delays = nullptr;
 	n_set_start_list_pos = nullptr;
 	n_set_defocus_list = nullptr;
+
+	n_get_head_status = nullptr;
+	n_get_value = nullptr;
+	get_dll_version = nullptr;
+	n_get_hex_version = nullptr;
+	n_get_bios_version = nullptr;
+	n_get_rtc_version = nullptr;
+	n_get_card_type = nullptr;
+
+	n_set_mcbsp_freq = nullptr;
+	n_mcbsp_init = nullptr;
+	n_mcbsp_init_spi = nullptr;
+	n_set_mcbsp_out_ptr = nullptr;
+	n_set_multi_mcbsp_in = nullptr;
+	n_list_nop = nullptr;
+	n_set_free_variable_list = nullptr;
+	n_set_free_variable = nullptr;
+	n_get_free_variable = nullptr;
+	n_set_trigger = nullptr;
+	n_set_trigger4 = nullptr;
+	n_set_control_mode = nullptr;
+	n_set_laser_pulses_ctrl = nullptr;
+	n_set_mark_speed_ctrl = nullptr;
+	n_set_jump_speed_ctrl = nullptr;
+	n_set_firstpulse_killer = nullptr;
+	n_set_firstpulse_killer_list = nullptr;
+	n_set_qswitch_delay = nullptr;
+	n_set_qswitch_delay_list = nullptr;
+	n_write_da_x = nullptr;
+	n_set_laser_pin_out = nullptr;
+	n_get_laser_pin_in = nullptr;
+	n_set_sky_writing_para = nullptr;
+	n_set_sky_writing_limit = nullptr;
+	n_set_sky_writing_mode = nullptr;
+	n_set_sky_writing = nullptr;
+	n_set_sky_writing_para_list = nullptr;
+	n_set_sky_writing_list = nullptr;
+	n_set_sky_writing_limit_list = nullptr;
+	n_set_sky_writing_mode_list = nullptr;
+	n_control_command = nullptr;
+	n_get_scanahead_params = nullptr;
+	n_activate_scanahead_autodelays = nullptr;
+	n_set_scanahead_laser_shifts = nullptr;
+	n_set_scanahead_line_params = nullptr;
+	n_set_scanahead_line_params_ex = nullptr;
+	n_set_scanahead_params = nullptr;
+	n_set_scanahead_speed_control = nullptr;
+	n_micro_vector_abs_3d = nullptr;
+	n_micro_vector_rel_3d = nullptr;
+	n_micro_vector_abs = nullptr;
+	n_micro_vector_rel = nullptr;
 }
 

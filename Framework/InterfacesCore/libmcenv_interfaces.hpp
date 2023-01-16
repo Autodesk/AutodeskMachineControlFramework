@@ -1620,6 +1620,13 @@ public:
 	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
 
 	/**
+	* IStateEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	virtual std::string LoadResourceString(const std::string & sResourceName) = 0;
+
+	/**
 	* IStateEnvironment::CreateEmptyImage - creates an empty image object.
 	* @param[in] nPixelSizeX - Pixel size in X. MUST be positive.
 	* @param[in] nPixelSizeY - Pixel size in Y. MUST be positive.

@@ -1075,6 +1075,11 @@
 			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
 		</method>
 
+		<method name="LoadResourceString" description="loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="string" pass="return" description="Resource Data String." />
+		</method>
+
 		<method name="CreateEmptyImage" description="creates an empty image object.">
 			<param name="PixelSizeX" type="uint32" pass="in" description="Pixel size in X. MUST be positive." />
 			<param name="PixelSizeY" type="uint32" pass="in" description="Pixel size in Y. MUST be positive." />

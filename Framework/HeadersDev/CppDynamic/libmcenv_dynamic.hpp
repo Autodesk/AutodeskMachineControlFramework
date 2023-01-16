@@ -926,6 +926,7 @@ public:
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
+	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
@@ -1237,6 +1238,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
@@ -2897,6 +2899,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceString = (PLibMCEnvStateEnvironment_LoadResourceStringPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcestring");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceString = (PLibMCEnvStateEnvironment_LoadResourceStringPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadResourceString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createemptyimage");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_createemptyimage");
@@ -3993,6 +4004,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcestring", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createemptyimage", (void**)&(pWrapperTable->m_StateEnvironment_CreateEmptyImage));
@@ -6476,6 +6491,22 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
 		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
+	}
+	
+	/**
+	* CStateEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	std::string CStateEnvironment::LoadResourceString(const std::string & sResourceName)
+	{
+		LibMCEnv_uint32 bytesNeededResourceData = 0;
+		LibMCEnv_uint32 bytesWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), 0, &bytesNeededResourceData, nullptr));
+		std::vector<char> bufferResourceData(bytesNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), bytesNeededResourceData, &bytesWrittenResourceData, &bufferResourceData[0]));
+		
+		return std::string(&bufferResourceData[0]);
 	}
 	
 	/**

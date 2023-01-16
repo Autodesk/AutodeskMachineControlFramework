@@ -1915,6 +1915,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
 
 /**
+* loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - size of the buffer (including trailing 0)
+* @param[out] pResourceDataNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pResourceDataBuffer -  buffer of Resource Data String., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer);
+
+/**
 * creates an empty image object.
 *
 * @param[in] pStateEnvironment - StateEnvironment instance.

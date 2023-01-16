@@ -472,6 +472,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_INVALIDPACKAGEENTRYFILENAME 445 /** Invalid package entry file name */
 #define LIBMC_ERROR_INVALIDEXPRESSIONVALUE 446 /** Invalid expression value */
 #define LIBMC_ERROR_INVALIDBUTTONNAME 447 /** Invalid button name */
+#define LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING 448 /** Resource entry is no UTF8 string */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -856,6 +857,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_INVALIDPACKAGEENTRYFILENAME: return "Invalid package entry file name";
     case LIBMC_ERROR_INVALIDEXPRESSIONVALUE: return "Invalid expression value";
     case LIBMC_ERROR_INVALIDBUTTONNAME: return "Invalid button name";
+    case LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING: return "Resource entry is no UTF8 string";
     default: return "unknown error";
   }
 }

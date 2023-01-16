@@ -5681,6 +5681,57 @@ LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironm
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_loadresourcestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pResourceDataBuffer) && !(pResourceDataNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		std::string sResourceData("");
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pResourceDataBuffer == nullptr);
+		if (isCacheCall) {
+			sResourceData = pIStateEnvironment->LoadResourceString(sResourceName);
+
+			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sResourceData));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sResourceData);
+			pIStateEnvironment->_setCache (nullptr);
+		}
+		
+		if (pResourceDataNeededChars)
+			*pResourceDataNeededChars = (LibMCEnv_uint32) (sResourceData.size()+1);
+		if (pResourceDataBuffer) {
+			if (sResourceData.size() >= nResourceDataBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iResourceData = 0; iResourceData < sResourceData.size(); iResourceData++)
+				pResourceDataBuffer[iResourceData] = sResourceData[iResourceData];
+			pResourceDataBuffer[sResourceData.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_createemptyimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -7356,6 +7407,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getboolparameter;
 	if (sProcName == "libmcenv_stateenvironment_loadresourcedata") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcedata;
+	if (sProcName == "libmcenv_stateenvironment_loadresourcestring") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcestring;
 	if (sProcName == "libmcenv_stateenvironment_createemptyimage") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createemptyimage;
 	if (sProcName == "libmcenv_stateenvironment_loadpngimage") 
