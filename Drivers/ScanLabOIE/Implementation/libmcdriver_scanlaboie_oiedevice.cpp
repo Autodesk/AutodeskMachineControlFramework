@@ -202,11 +202,17 @@ void COIEDeviceInstance::Connect(const std::string& sUserName, const std::string
 
 	Disconnect();
 
-	m_pOIESDK->checkError (m_pOIESDK->oie_connect(m_pDevice, m_sHostName.c_str(), m_nPort));
+	auto pDLLCache = m_pOIESDK->cacheDllDirectory();
 
+	m_pOIESDK->checkError (m_pOIESDK->oie_connect(m_pDevice, m_sHostName.c_str(), m_nPort));
+	
 	m_pOIESDK->checkError (m_pOIESDK->oie_device_login(m_pDevice, sUserName.c_str (), sPassword.c_str ()));
 
+	m_bIsConnected = true;
+
 	RefreshAppList();
+
+	pDLLCache = nullptr;
 
 }
 
@@ -215,8 +221,10 @@ void COIEDeviceInstance::Disconnect()
 	if (m_pDevice == nullptr)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEALREADYREMOVED);
 
-	m_bIsConnected = false;
-	m_pOIESDK->oie_disconnect(m_pDevice);
+	if (m_bIsConnected) {
+		m_bIsConnected = false;
+		m_pOIESDK->oie_disconnect(m_pDevice);
+	}
 
 }
 

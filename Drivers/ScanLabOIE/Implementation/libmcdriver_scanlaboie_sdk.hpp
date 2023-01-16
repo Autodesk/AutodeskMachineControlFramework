@@ -104,9 +104,23 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_packet_listener) (oie_device pDevice, oie_pkt_listener pListener, void * pUserData);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_runtime_error_listener) (oie_device pDevice, oie_err_listener pListener, void* pUserData);
 
+		class CScanLabOIESDK_DLLDirectoryCache {
+		private:
+			std::wstring m_sCachedDLLDirectoryW;
+
+		public:
+			CScanLabOIESDK_DLLDirectoryCache();
+			virtual ~CScanLabOIESDK_DLLDirectoryCache();
+
+		};
+
+		typedef std::shared_ptr<CScanLabOIESDK_DLLDirectoryCache> PScanLabOIESDK_DLLDirectoryCache;
+
 
 		class CScanLabOIESDK {
 		private:
+			std::wstring m_sDLLDirectoryW;
+
 			bool m_bIsInitialized;
 
 			void* m_LibraryHandle;
@@ -149,6 +163,8 @@ namespace LibMCDriver_ScanLabOIE {
 
 			void initDLL();
 			void checkError(uint32_t nSDKError);
+
+			PScanLabOIESDK_DLLDirectoryCache cacheDllDirectory ();
 
 		};
 

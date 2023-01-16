@@ -66,6 +66,23 @@ void* _loadScanLabOIEAddress(void* hLibrary, const char* pSymbolName) {
 }
 #endif
 
+CScanLabOIESDK_DLLDirectoryCache::CScanLabOIESDK_DLLDirectoryCache()	
+{
+	std::vector<wchar_t> buffer;
+	buffer.resize(MAX_PATH + 1);
+	GetDllDirectoryW(MAX_PATH, buffer.data());
+
+	buffer.at(MAX_PATH) = 0;
+	m_sCachedDLLDirectoryW = std::wstring(buffer.data());
+
+}
+
+CScanLabOIESDK_DLLDirectoryCache::~CScanLabOIESDK_DLLDirectoryCache()
+{
+	if (!m_sCachedDLLDirectoryW.empty()) {
+		SetDllDirectoryW(m_sCachedDLLDirectoryW.c_str ());
+	}
+}
 
 
 CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::string& sDLLDirectoryUTF8)
@@ -104,7 +121,9 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 	if (nPathResult == 0)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
 
-	SetDllDirectoryW(wsDLLPath.data());
+	m_sDLLDirectoryW = std::wstring (wsDLLPath.data());
+
+	auto pDirectoryCache = cacheDllDirectory();
 
 	HMODULE hLibrary = LoadLibraryW(wsLibraryFileName.data());
 	if (hLibrary == 0)
@@ -237,6 +256,17 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	oie_get_sensor_signals = nullptr;
 	oie_set_packet_listener = nullptr;
 	oie_set_runtime_error_listener = nullptr;
+
+}
+
+PScanLabOIESDK_DLLDirectoryCache CScanLabOIESDK::cacheDllDirectory()
+{
+	auto pCache = std::make_shared<CScanLabOIESDK_DLLDirectoryCache>();
+
+	SetDllDirectoryW (m_sDLLDirectoryW.c_str ());
+	SetCurrentDirectoryW (m_sDLLDirectoryW.c_str());
+
+	return pCache;
 
 }
 

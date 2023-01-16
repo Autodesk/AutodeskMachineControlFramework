@@ -96,6 +96,15 @@ public:
 
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+		
+		
+		pStateEnvironment->LogMessage("Loading OIE Device Config...");
+		std::vector<uint8_t> buffer;
+		pStateEnvironment->LoadResourceData("oie_test1", buffer);
+		buffer.push_back(0);
+		std::string sDeviceConfig((char*)buffer.data());
+
+		std::cout << "device config: " << sDeviceConfig << std::endl;
 
 		pStateEnvironment->LogMessage("acquiring Driver...");
 		auto pOIEDriver = m_pPluginData->acquireOIE(pStateEnvironment);
@@ -105,10 +114,41 @@ public:
 		pOIEDriver->InitializeSDK("liboie-x64");
 
 		pStateEnvironment->LogMessage("Adding Device...");
-		auto pDevice = pOIEDriver->AddDevice("oie1", "192.168.5.8", 21072, 2000);
+		auto pDevice = pOIEDriver->AddDevice("oie1", "192.168.5.8", 21072, 200000);
+
+		pStateEnvironment->LogMessage("  Device Name: " + pDevice->GetDeviceName ());
+		pStateEnvironment->LogMessage("  Device ID: " + std::to_string(pDevice->GetDeviceID()));
 
 		pStateEnvironment->LogMessage("Connecting..");
 		pDevice->Connect("sluser", "sluser");
+
+		uint32_t appCount = pDevice->GetAppCount();
+		pStateEnvironment->LogMessage("Found " + std::to_string (appCount) + " apps...");
+
+		for (uint32_t appIndex = 0; appIndex < appCount; appIndex++) {
+			std::string sName;
+			uint32_t nMajor = 0;
+			uint32_t nMinor = 0;
+			uint32_t nPatch = 0;
+			pDevice->GetAppInfo(appIndex, sName, nMajor, nMinor, nPatch);
+			pStateEnvironment->LogMessage("  - " + sName + " (" + std::to_string(nMajor) + "." + std::to_string(nMinor) + "." + std::to_string(nPatch) + ")");
+		}
+
+
+
+		pStateEnvironment->LogMessage("Starting App AIB...");
+		pDevice->StartAppByName("AIB", sDeviceConfig);
+
+		pStateEnvironment->LogMessage("Waiting..");
+		pStateEnvironment->Sleep(3000);
+
+		pStateEnvironment->LogMessage("App is running:  " + std::to_string ((uint32_t)pDevice->AppIsRunning()));
+		std::string sName;
+		uint32_t nMajor = 0;
+		uint32_t nMinor = 0;
+		uint32_t nPatch = 0;
+		pDevice->GetRunningApp(sName, nMajor, nMinor, nPatch);
+		pStateEnvironment->LogMessage("  Running app: " + sName + " (" + std::to_string(nMajor) + "." + std::to_string(nMinor) + "." + std::to_string(nPatch) + ")");
 
 		pStateEnvironment->LogMessage("Waiting..");
 		pStateEnvironment->Sleep(3000);
