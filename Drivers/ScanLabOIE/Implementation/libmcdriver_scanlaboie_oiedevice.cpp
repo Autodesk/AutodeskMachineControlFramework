@@ -36,6 +36,7 @@ Abstract: This is a stub class definition of COIEDevice
 
 #include <array>
 #include <iostream>
+#include <cstring>
 
 // Include custom headers here.
 using namespace LibMCDriver_ScanLabOIE::Impl;
