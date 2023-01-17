@@ -155,7 +155,13 @@ void CDriver_BuR::Configure(const std::string& sConfigurationString)
     if (!result)
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_COULDNOTPARSEDRIVERPROTOCOL);
 
-    pugi::xml_node burprotocolNode = doc.child("burprotocol");
+    
+    pugi::xml_node burprotocolNode = doc.child("driverconfiguration");
+    // Depreciated fallback: root Node was called "burprotocol" in earlier versions.
+    // Going forward, the driver configurations should all be "driverconfiguration"
+    if (burprotocolNode.empty())
+        burprotocolNode = doc.child("burprotocol");
+
     if (burprotocolNode.empty())
         throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDDRIVERPROTOCOL);
 

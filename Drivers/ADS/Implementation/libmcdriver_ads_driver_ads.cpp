@@ -221,7 +221,12 @@ void CDriver_ADS::Configure(const std::string& sConfigurationString)
     if (!result)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTPARSEDRIVERPROTOCOL);
 
-    pugi::xml_node adsprotocolNode = doc.child("adsprotocol");
+    pugi::xml_node adsprotocolNode = doc.child("driverconfiguration");
+    // Depreciated fallback: root Node was called "adsprotocol" in earlier versions.
+    // Going forward, the driver configurations should all be "driverconfiguration"
+    if (adsprotocolNode.empty())
+        adsprotocolNode = doc.child("adsprotocol");
+
     if (adsprotocolNode.empty())
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDDRIVERPROTOCOL);
 
@@ -549,7 +554,7 @@ void CDriver_ADS::WriteIntegerValue(const std::string& sVariableName, const LibM
 LibMCDriver_ADS_double CDriver_ADS::ReadFloatValue(const std::string& sVariableName)
 {
     if (m_bSimulationMode)
-        return 0;
+        return 0.0;
 
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
@@ -577,7 +582,7 @@ void CDriver_ADS::WriteFloatValue(const std::string& sVariableName, const LibMCD
 bool CDriver_ADS::ReadBoolValue(const std::string& sVariableName)
 {
     if (m_bSimulationMode)
-        return 0;
+        return false;
 
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
@@ -603,7 +608,7 @@ void CDriver_ADS::WriteBoolValue(const std::string& sVariableName, const bool bV
 std::string CDriver_ADS::ReadStringValue(const std::string& sVariableName)
 {
     if (m_bSimulationMode)
-        return 0;
+        return "";
 
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);

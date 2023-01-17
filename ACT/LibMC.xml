@@ -474,12 +474,13 @@
 		
 		<error name="INVALIDPACKAGEENTRYNAME" code="443" description="Invalid package entry name" />
 		<error name="INVALIDPACKAGEENTRYEXTENSION" code="444" description="Invalid package entry name" />
-		<error name="INVALIDPACKAGEENTRYFILENAME" code="445" description="Invalid package entry file name" />
-		
+		<error name="INVALIDPACKAGEENTRYFILENAME" code="445" description="Invalid package entry file name" />		
 		<error name="INVALIDEXPRESSIONVALUE" code="446" description="Invalid expression value" />
-		<error name="INVALIDBUTTONNAME" code="447" description="Invalid button name" />
+		<error name="INVALIDBUTTONNAME" code="447" description="Invalid button name" />		
 		
 		<error name="RESOURCEENTRYISNOUTF8STRING" code="448" description="Resource entry is no UTF8 string" />
+		<error name="AMBIGUOUSDRIVERCONFIGURATION" code="449" description="Ambiguous driver configuration" />		
+		
 		
 		
 		

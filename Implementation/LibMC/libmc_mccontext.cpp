@@ -271,6 +271,15 @@ void CMCContext::LoadClientPackage(const std::string& sResourcePath)
     m_pClientDistHandler->LoadClientPackage (pPackage);
 }
 
+struct xml_sstream_writer : pugi::xml_writer
+{
+    std::stringstream resultStream;
+
+    virtual void write(const void* data, size_t size)
+    {
+        resultStream << std::string (static_cast<const char*>(data), size);
+    }
+};
 
 void CMCContext::addDriver(const pugi::xml_node& xmlNode)
 {
@@ -293,11 +302,33 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
     m_pSystemState->logger()->logMessage("Initializing " + sName + " (" + sType + "@" + sLibraryName + ")", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
     std::string sConfigurationData = "";
-    auto configAttrib = xmlNode.attribute("configurationresource");
-    if (!configAttrib.empty()) {
-        std::vector<uint8_t> Buffer;
-        m_pCoreResourcePackage->readEntry(configAttrib.as_string(), Buffer);
-        sConfigurationData.assign(Buffer.begin (), Buffer.end ());
+
+    std::string sConfigSchema = xmlNode.attribute("configurationschema").as_string ();
+    std::string sConfigResource = xmlNode.attribute("configurationresource").as_string ();
+    if ((!sConfigResource.empty()) && (!sConfigSchema.empty()))
+        throw ELibMCCustomException(LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION, sName);
+
+    // If configuration schema is given, then the driver configuration is inlined in the config XML.
+    if (!sConfigSchema.empty()) {
+        pugi::xml_document config_document;
+        xml_sstream_writer config_writer;
+
+        // Copy driver node content into driver configuration XML.
+        auto driverNode = config_document.append_child("driverconfiguration");
+        driverNode.append_attribute("xmlns").set_value(sConfigSchema.c_str());
+        for (auto subNode : xmlNode.children()) {
+            driverNode.prepend_copy(subNode);
+        }
+       
+        config_document.save(config_writer);
+
+        sConfigurationData = config_writer.resultStream.str();
+
+        std::cout << sConfigurationData << std::endl;
+    }
+
+    if (!sConfigResource.empty()) {
+        sConfigurationData = m_pCoreResourcePackage->readEntryUTF8String(sConfigResource);
     }
 
     try {
