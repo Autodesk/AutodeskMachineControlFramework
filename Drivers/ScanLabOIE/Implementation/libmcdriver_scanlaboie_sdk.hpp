@@ -106,7 +106,9 @@ namespace LibMCDriver_ScanLabOIE {
 
 		class CScanLabOIESDK_DLLDirectoryCache {
 		private:
+#ifdef _WIN32
 			std::wstring m_sCachedDLLDirectoryW;
+#endif // _WIN32
 
 		public:
 			CScanLabOIESDK_DLLDirectoryCache();

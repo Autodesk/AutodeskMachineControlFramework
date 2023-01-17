@@ -68,20 +68,23 @@ void* _loadScanLabOIEAddress(void* hLibrary, const char* pSymbolName) {
 
 CScanLabOIESDK_DLLDirectoryCache::CScanLabOIESDK_DLLDirectoryCache()	
 {
+#ifdef _WIN32
 	std::vector<wchar_t> buffer;
 	buffer.resize(MAX_PATH + 1);
 	GetDllDirectoryW(MAX_PATH, buffer.data());
 
 	buffer.at(MAX_PATH) = 0;
 	m_sCachedDLLDirectoryW = std::wstring(buffer.data());
-
+#endif // _WIN32
 }
 
 CScanLabOIESDK_DLLDirectoryCache::~CScanLabOIESDK_DLLDirectoryCache()
 {
+#ifdef _WIN32
 	if (!m_sCachedDLLDirectoryW.empty()) {
 		SetDllDirectoryW(m_sCachedDLLDirectoryW.c_str ());
 	}
+#endif // _WIN32
 }
 
 
