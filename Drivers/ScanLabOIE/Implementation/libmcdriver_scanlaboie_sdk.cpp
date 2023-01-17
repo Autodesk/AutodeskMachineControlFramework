@@ -135,7 +135,7 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 	void* hLibrary = dlopen(sDLLNameUTF8.c_str(), RTLD_LAZY);
 	if (hLibrary == 0) {
 		dlerror();
-		throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTLOADLIBRARY);
 	}
 #endif // _WIN32
 
@@ -266,8 +266,10 @@ PScanLabOIESDK_DLLDirectoryCache CScanLabOIESDK::cacheDllDirectory()
 {
 	auto pCache = std::make_shared<CScanLabOIESDK_DLLDirectoryCache>();
 
+#ifdef _WIN32
 	SetDllDirectoryW (m_sDLLDirectoryW.c_str ());
 	SetCurrentDirectoryW (m_sDLLDirectoryW.c_str());
+#endif // _WIN32
 
 	return pCache;
 
