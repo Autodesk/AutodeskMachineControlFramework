@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_utils.hpp"
 #include "Libraries/libzip/zip.h"
-#include "Libraries/pugixml/pugixml.hpp"
+#include "Libraries/PugiXML/pugixml.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include <map>
 
