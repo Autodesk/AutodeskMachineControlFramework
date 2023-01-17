@@ -73,22 +73,24 @@ namespace AMC {
 		if (startID > (endID + m_MaxLogMessageRequestCount))
 			throw ELibMCInterfaceException(LIBMC_ERROR_TOOMANYREQUESTEDLOGS);
 
-/*		std::string sQuery = "SELECT logindex, loglevel, timestamp, subsystem, message FROM logs WHERE logindex >= ? AND logindex <= ? AND loglevel <= ?";
-		auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
-		pStatement->setInt(1, startID);
-		pStatement->setInt(2, endID);
-		pStatement->setInt(3, (int) eMinLogLevel);
-		while (pStatement->nextRow()) {
-			int nLogID = pStatement->getColumnInt(0);
-			int nLogLevel = pStatement->getColumnInt(1);
-			std::string sTimeStamp = pStatement->getColumnString(2);
-			std::string sSubSystem = pStatement->getColumnString(3);
-			std::string sMessage = pStatement->getColumnString(4);
+		auto pLogEntries = m_pLogSession->RetrieveLogEntriesByID (startID, endID, eMinLogLevel);
 
-			entryBuffer.push_back(CLoggerEntry (nLogID, sMessage, sSubSystem, (AMC::eLogLevel) nLogLevel, sTimeStamp));
-		} 
-		pStatement = nullptr; */
+		uint32_t nLogCount = pLogEntries->Count();
+		for (uint32_t nIndex = 0; nIndex < nLogCount; nIndex++) {
+			uint32_t nID = 0;
+			std::string sMessage, sSubSystem, sTimeStamp;
+			eLogLevel logLevel = eLogLevel::Unknown;			
+			pLogEntries->GetEntryByIndex(nIndex, nID, sMessage, sSubSystem, logLevel, sTimeStamp);			
+			entryBuffer.push_back(CLoggerEntry (nID, sMessage, sSubSystem, logLevel, sTimeStamp));
+		}
 
+
+	}
+
+	uint32_t CLogger_Database::getLogMessageHeadID()
+	{
+		std::lock_guard<std::mutex> lockGuard(m_DBMutex);
+		return m_pLogSession->GetMaxLogEntryID();
 	}
 
 	bool CLogger_Database::supportsLogMessagesRetrieval()

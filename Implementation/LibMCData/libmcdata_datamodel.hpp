@@ -65,9 +65,16 @@ protected:
 	std::string m_sInstallationUUID;
 	std::string m_sInstallationSecret;
 
+	std::string m_sTempBasePath;
+
+	LibMCData::LogCallback m_pLogCallback;
+	LibMCData_pvoid m_pLogUserData;
+
 public:
 
 	CDataModel();
+
+	virtual ~CDataModel();
 
 	void InitialiseDatabase(const std::string & sDataDirectory, const LibMCData::eDataBaseType dataBaseType, const std::string & sConnectionString) override;
 
@@ -84,6 +91,19 @@ public:
 	ILoginHandler* CreateLoginHandler() override;
 
 	IPersistencyHandler* CreatePersistencyHandler() override;
+
+	void SetBaseTempDirectory(const std::string& sTempDirectory) override;
+
+	std::string GetBaseTempDirectory() override;
+
+	void SetLogCallback(const LibMCData::LogCallback pLogCallback, const LibMCData_pvoid pUserData) override;
+
+	void ClearLogCallback() override;
+
+	bool HasLogCallback() override;
+	
+	void TriggerLogCallback(const std::string& sLogMessage, const std::string& sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string& sTimestamp) override;
+
 
 };
 

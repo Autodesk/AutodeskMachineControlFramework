@@ -87,6 +87,14 @@ public:
 
 	IToolpathPart* FindPartByUUID(const std::string& sPartUUID) override;
 
+	LibMCEnv_int32 GetBuildHeightInUnits() override;
+
+	LibMCEnv_int32 GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex) override;
+
+	LibMCEnv_double GetBuildHeightInMM() override;
+
+	LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) override;
+
 };
 
 } // namespace Impl

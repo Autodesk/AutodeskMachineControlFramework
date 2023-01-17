@@ -56,7 +56,12 @@ using namespace LibMCData::Impl;
 **************************************************************************************************************************/
 
 CDataModel::CDataModel()
-    : m_eDataBaseType(eDataBaseType::Unknown)
+    : m_eDataBaseType(eDataBaseType::Unknown), m_pLogCallback (nullptr), m_pLogUserData (nullptr)
+{
+
+}
+
+CDataModel::~CDataModel()
 {
 
 }
@@ -136,3 +141,46 @@ IPersistencyHandler* CDataModel::CreatePersistencyHandler()
     return new CPersistencyHandler(m_pSQLHandler);
 }
 
+void CDataModel::SetBaseTempDirectory(const std::string& sTempDirectory)
+{
+    if (!sTempDirectory.empty()) {
+        if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sTempDirectory))
+            AMCCommon::CUtils::createDirectoryOnDisk(sTempDirectory);
+
+        m_sTempBasePath = AMCCommon::CUtils::getFullPathName (sTempDirectory, true);
+    }
+    else {
+        m_sTempBasePath = "";
+    }
+}
+
+std::string CDataModel::GetBaseTempDirectory()
+{
+    return m_sTempBasePath;
+}
+
+
+void CDataModel::SetLogCallback(const LibMCData::LogCallback pLogCallback, const LibMCData_pvoid pUserData)
+{
+    m_pLogCallback = pLogCallback;
+    m_pLogUserData = pUserData;
+}
+
+void CDataModel::ClearLogCallback()
+{
+    m_pLogCallback = nullptr;
+    m_pLogUserData = nullptr;
+}
+
+bool CDataModel::HasLogCallback()
+{
+    return (m_pLogCallback != nullptr);
+}
+
+void CDataModel::TriggerLogCallback(const std::string& sLogMessage, const std::string& sSubSystem, const LibMCData::eLogLevel eLogLevel, const std::string& sTimestamp)
+{
+    if (m_pLogCallback == nullptr)
+        throw ELibMCDataInterfaceException(LIBMCDATA_ERROR_NOLOGCALLBACK);
+
+    m_pLogCallback(sLogMessage.c_str(), sSubSystem.c_str(), eLogLevel, sTimestamp.c_str (), m_pLogUserData);
+}

@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CAPIHandler_Logs::CAPIHandler_Logs(PLogger pLogger)
-	: m_pLogger (pLogger)
+CAPIHandler_Logs::CAPIHandler_Logs(PLogger pLogger, const std::string& sClientHash)
+	: CAPIHandler (sClientHash), m_pLogger (pLogger)
 {
 	if (pLogger.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);

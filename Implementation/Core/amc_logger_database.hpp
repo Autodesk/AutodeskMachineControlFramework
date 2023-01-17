@@ -63,7 +63,10 @@ namespace AMC {
 		void logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp) override;
 
 		bool supportsLogMessagesRetrieval() override;
+
 		void retrieveLogMessages (std::vector<CLoggerEntry> & entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel) override;
+
+		uint32_t getLogMessageHeadID() override;
 	};
 
 	

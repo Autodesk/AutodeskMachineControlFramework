@@ -30,7 +30,7 @@
 	</license>
 	
 	<bindings>
-		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
 	</bindings>
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
@@ -136,10 +136,7 @@
 
 		<error name="COULDNOTWRITETOPAYLOAD" code="1080" description="Could not write to payload." />
 		<error name="INVALIDPAYLOADADDRESS" code="1081" description="Invalid payload address." />
-		
-		
-		
-		
+		<error name="COULDNOTREINITIALIZEMACHINE" code="1082" description="Could not reinitialize machine." />						
 		
 		
 	</errors>
@@ -262,6 +259,9 @@ Custom implementation
 
 
 		<method name="Disconnect" description= "Disconnects from the BuR PLC Controller.">
+		</method>
+
+		<method name="ReinitializeMachine" description="Sends the machine initialization command.">
 		</method>
 
 		<method name="CreateCommandList" description="Create Command">

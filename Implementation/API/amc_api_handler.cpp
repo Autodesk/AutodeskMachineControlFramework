@@ -100,8 +100,8 @@ namespace AMC {
 		return std::stoull(sString);
 	}
 
-
-	CAPIHandler::CAPIHandler()
+	CAPIHandler::CAPIHandler(const std::string& sClientHash)
+		: m_sClientHash (sClientHash)
 	{
 		
 	}

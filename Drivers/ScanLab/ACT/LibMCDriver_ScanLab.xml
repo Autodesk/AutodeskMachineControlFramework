@@ -30,7 +30,7 @@
 	</license>
 	
 	<bindings>
-		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
 	</bindings>
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
@@ -84,7 +84,7 @@
 		<error name="INVALIDMAXLASERPOWER" code="1031" description="Invalid max laser power." />
 		<error name="INVALIDLASERDELAY" code="1032" description="Invalid laser delay." />
 		<error name="INVALIDSCANNERDELAY" code="1033" description="Invalid scanner delay." />
-		
+		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />
 		
 		
 		
@@ -179,9 +179,9 @@ Custom implementation
 	<class name="RTCContext" parent="Base" description="Selector of the RTC Controller Card">
 
 		<method name="LoadFirmware" description="Loads card firmware from resource files.">
-			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
-			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
-			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
 		</method>
 
 		<method name="LoadCorrectionFile" description="Loads card calibration file from given resource file.">
@@ -316,14 +316,14 @@ Custom implementation
 
 		<method name="GetStateValues" description="Returns status values of scan head">
 			<param name="LaserIsOn" type="bool" pass="out" description="Laser is on" />
-			<param name="PositionX" type="uint32" pass="out" description="Current Position X in Units" />
-			<param name="PositionY" type="uint32" pass="out" description="Current Position Y in Units" />
-			<param name="PositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
-			<param name="CorrectedPositionX" type="uint32" pass="out" description="Current Position X in Units" />
-			<param name="CorrectedPositionY" type="uint32" pass="out" description="Current Position Y in Units" />
-			<param name="CorrectedPositionZ" type="uint32" pass="out" description="Current Position Z in Units" />
-			<param name="FocusShift" type="uint32" pass="out" description="Current Focus Shift in Units" />
-			<param name="MarkSpeed" type="uint32" pass="out" description="Current Mark Speed in Units" />
+			<param name="PositionX" type="int32" pass="out" description="Current Position X in Units" />
+			<param name="PositionY" type="int32" pass="out" description="Current Position Y in Units" />
+			<param name="PositionZ" type="int32" pass="out" description="Current Position Z in Units" />
+			<param name="CorrectedPositionX" type="int32" pass="out" description="Current Position X in Units" />
+			<param name="CorrectedPositionY" type="int32" pass="out" description="Current Position Y in Units" />
+			<param name="CorrectedPositionZ" type="int32" pass="out" description="Current Position Z in Units" />
+			<param name="FocusShift" type="int32" pass="out" description="Current Focus Shift in Units" />
+			<param name="MarkSpeed" type="int32" pass="out" description="Current Mark Speed in Units" />
 		</method>
 
 		<method name="GetInputPointer" description="returns current input list position">
@@ -337,7 +337,19 @@ Custom implementation
 			<param name="HEXVersion" type="uint32" pass="out" description="RTC HEX Version" />
 			<param name="BIOSVersion" type="uint32" pass="out" description="RTC BIOS Version" />
 		</method>
+		
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
 						
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+		
 	</class>
 
 	
@@ -396,6 +408,10 @@ Custom implementation
 			<param name="ResourceName" type="string" pass="in" description="Resource name of Scanlab DLL" />
 		</method>
 
+		<method name="LoadCustomSDK" description="Initializes the ScanLab SDK from an external source.">
+			<param name="ScanlabDLL" type="basicarray" class="uint8" pass="in" description="Byte array of Scanlab DLL" />
+		</method>
+		
 		<method name="CreateRTCSelector" description="Creates and initializes a new RTC selector singleton. Should only be called once per Process.">
 			<param name="Instance" type="class" class="RTCSelector" pass="return" description="New Selector instance" />
 		</method>
@@ -424,6 +440,12 @@ Custom implementation
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
 			<param name="FPGAResource" type="string" pass="in" description="resource name of the firmware FPGA file." />
 			<param name="AuxiliaryResource" type="string" pass="in" description="resource name of the binary auxiliary file." />
+		</method>		
+
+		<method name="LoadCustomFirmware" description="Loads the firmware from custom resources.">
+			<param name="FirmwareData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware program file." />
+			<param name="FPGAData" type="basicarray" class="uint8" pass="in" description="byte array of the firmware FPGA file." />
+			<param name="AuxiliaryData" type="basicarray" class="uint8" pass="in" description="byte array of the binary auxiliary file." />
 		</method>		
 		
 		<method name="SetCorrectionFile" description="Sets the correction file stream.">
@@ -458,6 +480,18 @@ Custom implementation
 		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
 			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
 			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+
+		<method name="SetCommunicationTimeouts" description="Set RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="in" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="in" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="in" description="Multiplier" />
+		</method>		
+						
+		<method name="GetCommunicationTimeouts" description="Get RTC Ethernet communication timeouts">
+			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
+			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
+			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 		
 	</class>

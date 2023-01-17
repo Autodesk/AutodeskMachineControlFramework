@@ -71,6 +71,18 @@ protected:
 
 	std::vector <uint8_t> m_PixelData;
 
+	// Data for rasterization algorithm
+	std::vector<PRasterizationAlgorithm> m_Algorithms;
+	uint32_t m_nBlockCountX;
+	uint32_t m_nBlockCountY;
+	uint32_t m_nUnitsPerSubPixel;
+	uint32_t m_nSubSamplingX;
+	uint32_t m_nSubSamplingY;
+	uint32_t m_nPixelsPerBlock;
+	double m_dUnitsX;
+	double m_dUnitsY;
+
+
 public:
 
 	CImageObject(const uint32_t nPixelCountX, const uint32_t nPixelCountY, const double dDPIValueX, const double dDPIValueY);
@@ -90,6 +102,12 @@ public:
 	void setPixel(const LibMCDriver_Rasterizer_uint32 nX, const LibMCDriver_Rasterizer_uint32 nY, const LibMCDriver_Rasterizer_uint8 nValue);
 
 	std::vector<uint8_t> & getBuffer();
+
+	void initRasterizationAlgorithms(uint32_t nUnitsPerSubPixel, uint32_t nPixelsPerBlock, uint32_t nSubSamplingX, uint32_t nSubSamplingY);
+
+	void addRasterizationLayer(CLayerDataObject * pLayer);
+
+	void calculateRasterizationImage(bool bAntiAliased);
 
 };
 

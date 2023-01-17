@@ -78,6 +78,37 @@ std::string CBuild::GetStorageSHA256()
 
 }
 
+
+LibMCEnv_double CBuild::GetBuildHeightInMM()
+{
+	auto pToolpathEntity = m_pSystemState->toolpathHandler()->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
+	if (nLayerCount == 0)
+		return 0.0;
+
+	return pToolpathEntity->getLayerZInUnits(nLayerCount - 1) * pToolpathEntity->getUnits();
+}
+
+LibMCEnv_double CBuild::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
+{
+	auto pToolpathEntity = m_pSystemState->toolpathHandler()->findToolpathEntity(m_pBuildJob->GetStorageStreamUUID(), false);
+	if (pToolpathEntity == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TOOLPATHNOTLOADED);
+
+	uint32_t nLayerCount = pToolpathEntity->getLayerCount();
+	if (nLayerCount == 0)
+		return 0.0;
+
+	if (nLayerIndex >= nLayerCount)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDLAYERINDEX);
+
+	return pToolpathEntity->getLayerZInUnits(nLayerIndex) * pToolpathEntity->getUnits();
+}
+
+
 LibMCEnv_uint32 CBuild::GetLayerCount()
 {
 	return m_pBuildJob->GetLayerCount();

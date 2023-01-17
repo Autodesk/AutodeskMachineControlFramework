@@ -67,7 +67,7 @@ namespace AMC {
 
 		virtual void addDefinitionToJSON (CJSONWriter & writer, CJSONWriterObject & object, CParameterHandler* pClientVariableHandler);
 
-		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		virtual void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
 
 		// Returns all UUIDs that could be contained in this Item
 		virtual std::list <std::string> getReferenceUUIDs();

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_page.hpp"
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module.hpp"
+#include "amc_ui_clientaction.hpp"
 
 #include "libmc_interfaceexception.hpp"
 #include "libmcdata_dynamic.hpp"
@@ -55,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 CAPIHandler_UI::CAPIHandler_UI(PSystemState pSystemState)
-	: m_pSystemState(pSystemState)
+	: CAPIHandler(pSystemState->getClientHash()), m_pSystemState(pSystemState)
 {
 	if (pSystemState.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -72,11 +73,12 @@ std::string CAPIHandler_UI::getBaseURI ()
 	return "api/ui";
 }
 
-APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& sParameterUUID)
+APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string& sParameterUUID, uint32_t & sParameterStateID)
 {
 	// Leave away base URI
 	auto sParameterString = AMCCommon::CUtils::toLowerString (sURI.substr(getBaseURI ().length ()));
 	sParameterUUID = "";
+	sParameterStateID = 0;
 
 	if (requestType == eAPIRequestType::rtGet) {
 
@@ -95,9 +97,15 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 			}
 		}
 
-		if (sParameterString.length() == 49) {
+		if (sParameterString.length() >= 49) {
 			if (sParameterString.substr(0, 13) == "/contentitem/") {
 				sParameterUUID = AMCCommon::CUtils::normalizeUUIDString(sParameterString.substr(13, 36));
+				if (sParameterString.length() > 49) {
+					if (sParameterString.at(49) == '/') {
+						sParameterStateID = std::stoi(sParameterString.substr (50));
+					}
+				}
+
 				return APIHandler_UIType::utContentItem;
 			}
 		}
@@ -121,7 +129,8 @@ APIHandler_UIType CAPIHandler_UI::parseRequest(const std::string& sURI, const eA
 void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIRequestType requestType, bool& bNeedsToBeAuthorized, bool& bCreateNewSession) 
 {
 	std::string sParameterUUID;
-	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
+	uint32_t nParameterStateID = 0;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
 
 	if ((uiType == APIHandler_UIType::utConfiguration) || (uiType == APIHandler_UIType::utImage)) {
 
@@ -139,7 +148,8 @@ void CAPIHandler_UI::checkAuthorizationMode(const std::string& sURI, const eAPIR
 bool CAPIHandler_UI::expectsRawBody(const std::string& sURI, const eAPIRequestType requestType)
 {
 	std::string sParameterUUID;
-	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
+	uint32_t nParameterStateID = 0;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
 
 	return (uiType == APIHandler_UIType::utEvent);
 
@@ -197,7 +207,7 @@ PAPIResponse CAPIHandler_UI::handleImageRequest(const std::string& sParameterUUI
 }
 
 
-void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth)
+void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth, uint32_t nStateID)
 {
 	if (pAuth.get() == nullptr)
 		throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
@@ -207,7 +217,7 @@ void CAPIHandler_UI::handleContentItemRequest(CJSONWriter& writer, const std::st
 		throw ELibMCInterfaceException(LIBMC_ERROR_MODULEITEMNOTFOUND);
 
 	CJSONWriterObject object(writer);
-	pModuleItem->addContentToJSON(writer, object, pAuth->getClientVariableHandler ().get());
+	pModuleItem->addContentToJSON(writer, object, pAuth->getClientVariableHandler ().get(), nStateID);
 	writer.addString(AMC_API_KEY_UI_ITEMUUID, sParameterUUID);
 	writer.addObject(AMC_API_KEY_UI_CONTENT, object);
 }
@@ -241,32 +251,15 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 		writer.addString(AMC_API_KEY_UI_EVENTERRORMESSAGE, pEventResult.getErrorMessage());
 	} 
 	else {
-		if (pEventResult.closeModalDialog()) {
-			writer.addInteger(AMC_API_KEY_UI_EVENTCLOSEDIALOGS, 1);
-		}
-		else {
-			if (pEventResult.hasDialogToShow()) {
-				std::string sDialogName = pEventResult.getDialogToShow();
-				writer.addString(AMC_API_KEY_UI_EVENTDIALOGTOSHOW, sDialogName);
 
-				// Update state of dialog to open
-				auto pDialog = pUIHandler->findDialog(sDialogName);
-				if (pDialog) {
-					pDialog->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
-				}
-			}
+		AMC::CJSONWriterArray actionsArray(writer);
+		for (auto pAction : pEventResult.getClientActions()) {
+			AMC::CJSONWriterObject actionObject(writer);
+			pAction->writeToJSON(writer, actionObject);
+			actionsArray.addObject(actionObject);
 		}
-		if (pEventResult.hasPageToActivate()) {
-			std::string sPageName = pEventResult.getPageToActivate();
-			writer.addString(AMC_API_KEY_UI_EVENTPAGETOACTIVATE, sPageName);
-
-			// Update state of page to open
-			auto pPage = pUIHandler->findPage(sPageName);
-			if (pPage) {
-				pPage->writeModuleItemUpdatesToJSON(writer, contentUpdateNode, pAuth->getClientVariableHandler().get());
-			}
-
-		}
+		
+		writer.addArray(AMC_API_KEY_UI_EVENTACTIONS, actionsArray);
 
 		
 	}
@@ -282,7 +275,8 @@ void CAPIHandler_UI::handleEventRequest(CJSONWriter& writer, const uint8_t* pBod
 PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRequestType requestType, CAPIFormFields & pFormFields, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth)
 {
 	std::string sParameterUUID;
-	auto uiType = parseRequest(sURI, requestType, sParameterUUID);
+	uint32_t nParameterStateID = 0;
+	auto uiType = parseRequest(sURI, requestType, sParameterUUID, nParameterStateID);
 
 	CJSONWriter writer;
 	writeJSONHeader(writer, AMC_API_PROTOCOL_UI);
@@ -297,7 +291,7 @@ PAPIResponse CAPIHandler_UI::handleRequest(const std::string& sURI, const eAPIRe
 		break;
 
 	case APIHandler_UIType::utContentItem:
-		handleContentItemRequest(writer, sParameterUUID, pAuth);
+		handleContentItemRequest(writer, sParameterUUID, pAuth, nParameterStateID);
 		break;
 
 	case APIHandler_UIType::utImage:

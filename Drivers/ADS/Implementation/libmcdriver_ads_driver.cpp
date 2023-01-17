@@ -42,34 +42,3 @@ using namespace LibMCDriver_ADS::Impl;
 /*************************************************************************************************************************
  Class definition of CDriver 
 **************************************************************************************************************************/
-
-void CDriver::Configure(const std::string & sConfigurationString)
-{
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
-}
-
-std::string CDriver::GetName()
-{
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
-}
-
-std::string CDriver::GetType()
-{
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::GetVersion(LibMCDriver_ADS_uint32 & nMajor, LibMCDriver_ADS_uint32 & nMinor, LibMCDriver_ADS_uint32 & nMicro, std::string & sBuild)
-{
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName)
-{
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
-}
-
-void CDriver::QueryParameters()
-{
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
-}
-

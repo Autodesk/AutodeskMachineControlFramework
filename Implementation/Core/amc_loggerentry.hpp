@@ -72,6 +72,20 @@ namespace AMC {
 		{
 			return m_sMessage;
 		}
+
+		std::string getlogLevelString() const
+		{
+			switch (m_logLevel) {
+			case eLogLevel::FatalError: return "FatalError";
+			case eLogLevel::CriticalError: return "CriticalError";
+			case eLogLevel::Warning: return "Warning";
+			case eLogLevel::Message: return "Message";
+			case eLogLevel::Info: return "Info";
+			case eLogLevel::Debug: return "Debug";
+			default:
+				return "Unknown";
+			}
+		}
 		
 		std::string getSubSystem () const
 		{

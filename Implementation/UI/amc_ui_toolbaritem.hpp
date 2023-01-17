@@ -45,21 +45,25 @@ namespace AMC {
 	class CUIToolbarItem {
 	protected:
 		std::string m_sID;
+		std::string m_sUUID;
 		std::string m_sIcon;
 		std::string m_sCaption;
-		PUIPage m_pPage;
-		
+		std::string m_sEventName;
+		std::string m_sPageName;
+
 	public:
 
-		CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, PUIPage pPage);
+		CUIToolbarItem(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sPageName, const std::string& sEventName);
 		
 		virtual ~CUIToolbarItem();
 						
 		std::string getID ();
+		std::string getUUID();
 		std::string getIcon ();
 		std::string getCaption ();
+		std::string getEventName();
+		std::string getPageName();
 
-		PUIPage getPage();
 				
 	};
 	

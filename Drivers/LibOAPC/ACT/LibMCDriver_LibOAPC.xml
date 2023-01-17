@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="MC Driver LibOAPC" namespace="LibMCDriver_LibOAPC" copyright="Autodesk Inc." year="2020" basename="libmcdriver_liboapc"
+	version="1.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
+		
+		<error name="E1701_ERROR_GENERIC" code="100" description="generic E1701 error" />
+		<error name="E1701_ERROR_INVALID_CARD" code="101" description="wrong or illegal card number specified" />
+		<error name="E1701_ERROR_NO_CONNECTION" code="102" description="could not connect to card" />
+		<error name="E1701_ERROR_NO_MEMORY" code="103" description="wrong or illegal card number specified" />
+		<error name="E1701_ERROR_UNKNOWN_FW" code="104" description="unknown or incompatible firmware version" />
+		<error name="E1701_ERROR_UNKNOWN" code="105" description="unknown or unspecified error" />
+		<error name="E1701_ERROR_TRANSMISSION" code="106" description="wrong or illegal card number specified" />
+		<error name="E1701_ERROR_FILEOPEN" code="107" description="opening a file failed" />
+		<error name="E1701_ERROR_FILEWRITE" code="108" description="writing data to a file failed" />
+		<error name="E1701_ERROR_BORD_NA" code="109" description="a base- or extension board that would be required for a function is not available" />
+		<error name="E1701_ERROR_INVALID_DATA" code="110" description="a function was called with invalid data or by using an operation mode where this function is not used or allowed" />
+		<error name="E1701_ERROR_UNKNOWN_BOARD" code="111" description="trying to access a board that is not a scanner controller" />
+		<error name="E1701_ERROR_FILENAME" code="112" description="there is an error with the given filename" />
+		<error name="E1701_ERROR_NOT_SUPPORTED" code="113" description="the requested feature is not supported by the current firmware version" />
+		<error name="E1701_ERROR_NO_DATA_AVAILABLE" code="114" description="tried to receive some data but there are none avilable yet" />
+
+		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+		<error name="NOTCONNECTED" code="1001" description="scanner is not connected" />
+		<error name="INVALIDPOINTCOUNT" code="1002" description="invalid point count" />
+		<error name="INVALIDFIELDSIZE" code="1003" description="invalid field size" />
+		
+	</errors>
+
+	
+<!--
+
+This base Driver interface MUST be in Sync with LibMCDriver.xml
+
+-->
+	
+	<class name="Base">
+	</class>
+	
+	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+	
+		<method name="GetName" description = "returns the name identifier of the driver">
+			<param name="Name" type="string" pass="return" description="Name of the driver." />
+		</method>
+
+		<method name="GetType" description = "returns the type identifier of the driver">
+			<param name="Type" type="string" pass="return" description="Type of the driver." />
+		</method>
+
+		<method name="GetVersion" description = "returns the version identifiers of the driver">
+			<param name="Major" type="uint32" pass="out" description="Major version." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version." />
+			<param name="Micro" type="uint32" pass="out" description="Micro version." />
+			<param name="Build" type="string" pass="out" description="Build identifier." />
+		</method>
+
+		<method name="GetHeaderInformation" description = "returns the header information">
+			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
+			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
+		</method>
+		
+		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
+		</method>
+	
+	</class>
+
+<!--
+
+End Interface
+
+-->
+
+
+<!--
+
+Custom implementation
+
+-->
+
+
+
+	<class name="Driver_E1701" parent="Driver" description="A Driver for a E1701 Scanner Driver.">
+
+		<method name="SetCorrectionFile" description="Sets the correction file stream.">
+			<param name="CorrectionFile" type="basicarray" class="uint8" pass="in" description="binary data of the correction file." />
+		</method>
+
+		<method name="SetOpticalField" description="Sets the field size in mm of the optical system.">
+			<param name="MinX" type="double" pass="in" description="Minimum X Coordinate in mm" />
+			<param name="MinY" type="double" pass="in" description="Minimum Y Coordinate in mm" />
+			<param name="MaxX" type="double" pass="in" description="Maximum X Coordinate in mm" />
+			<param name="MaxY" type="double" pass="in" description="Maximum Y Coordinate in mm" />
+		</method>
+
+		<method name="SetLogicalField" description="Sets the field size in mm of the internal unit system.">
+			<param name="MinX" type="int32" pass="in" description="Minimum X Coordinate in logical units" />
+			<param name="MinY" type="int32" pass="in" description="Minimum Y Coordinate in logical units" />
+			<param name="MaxX" type="int32" pass="in" description="Maximum X Coordinate in logical units" />
+			<param name="MaxY" type="int32" pass="in" description="Maximum Y Coordinate in logical units" />
+		</method>
+
+		<method name="Connect" description="Creates and initializes the OAPC Scanner Driver.">
+			<param name="ConnectionString" type="string" pass="in" description="Connection string of the device." />
+			<param name="Password" type="string" pass="in" description="Password of the device. Pass empty string if not used." />
+		</method>
+
+		<method name="Disconnect" description="Disconnects from the Laser Scanner Emulator.">
+		</method>
+
+		<method name="DrawLayer" description="Draws a layer of a build stream. Blocks until the layer is drawn.">
+			<param name="StreamUUID" type="string" pass="in" description="UUID of the build stream. Must have been loaded in memory by the system." />
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer index of the build file." />
+		</method>
+
+	</class>
+
+
+
+
+<!--
+
+End of Custom implementation
+
+-->
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
+			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
+			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="Instance" type="class" class="Driver" pass="return" description="New Driver instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_module_glscene.hpp"
 #include "amc_ui_module_graphic.hpp"
 #include "amc_ui_module_layerview.hpp"
+#include "amc_ui_module_logs.hpp"
 
 using namespace AMC;
 
@@ -55,6 +56,9 @@ PUIModule CUIModuleFactory::createModule(pugi::xml_node& xmlNode, const std::str
 
 	if (sType == CUIModule_Tabs::getStaticType())
 		return std::make_shared<CUIModule_Tabs>(xmlNode, sPath, pUIModuleEnvironment);
+
+	if (sType == CUIModule_Logs::getStaticType())
+		return std::make_shared<CUIModule_Logs>(xmlNode, sPath, pUIModuleEnvironment);
 
 	if (sType == CUIModule_Grid::getStaticType())
 		return std::make_shared<CUIModule_Grid>(xmlNode, sPath, pUIModuleEnvironment);

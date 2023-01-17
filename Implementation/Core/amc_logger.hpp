@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_loggerentry.hpp"
 
 #define LOG_SUBSYSTEM_SYSTEM "system"
+#define LOG_SUBSYSTEM_TESTING "testing"
 #define LOG_SUBSYSTEM_WORKINGDIRECTORIES "workdir"
 #define LOG_SUBSYSTEM_NETWORK "network"
 #define LOG_SUBSYSTEM_UNKNOWN "unknown"
@@ -72,6 +73,11 @@ namespace AMC {
 		}
 
 		virtual void retrieveLogMessages(std::vector<CLoggerEntry>& entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel) = 0;
+
+		virtual uint32_t getLogMessageHeadID()
+		{
+			return 0;
+		}
 		
 		void logMessage(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel)
 		{

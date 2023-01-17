@@ -86,10 +86,12 @@ namespace AMC {
 	private:
 
 	protected:
+
+		std::string m_sClientHash;
 			
 	public:
 
-		CAPIHandler();
+		CAPIHandler(const std::string & sClientHash);
 
 		virtual ~CAPIHandler();
 
@@ -106,6 +108,9 @@ namespace AMC {
 		virtual CAPIFieldDetails getFormDataFieldDetails(const std::string& sURI, const eAPIRequestType requestType, const uint32_t nFieldIndex);
 
 		virtual void writeJSONHeader(CJSONWriter& writer, const std::string& sProtocol);
+
+		std::string getClientHash ();
+
 
 	};
 

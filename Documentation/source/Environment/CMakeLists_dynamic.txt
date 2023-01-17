@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.5)
+
+set(CMAKE_CURRENT_BINDING_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.)
+project(LibMCEnvExample_CPPDynamic)
+set(CMAKE_CXX_STANDARD 11)
+add_executable(LibMCEnvExample_CPPDynamic "${CMAKE_CURRENT_SOURCE_DIR}/LibMCEnv_example.cpp")
+if (UNIX)
+	target_link_libraries(LibMCEnvExample_CPPDynamic ${CMAKE_DL_LIBS})
+endif (UNIX)
+target_include_directories(LibMCEnvExample_CPPDynamic PRIVATE "${CMAKE_CURRENT_BINDING_DIR}")

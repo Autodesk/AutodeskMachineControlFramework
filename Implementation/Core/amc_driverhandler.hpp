@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcenv_dynamic.hpp"
 
+#define AMCPACKAGE_SCHEMANAMESPACE "http://schemas.autodesk.com/amc/resourcepackage/2020/07"
+
 namespace AMC {
 
 	typedef void* HDriverHandle;
@@ -47,6 +49,9 @@ namespace AMC {
 
 	class CDriver;
 	typedef std::shared_ptr<CDriver> PDriver;
+
+	class CResourcePackage;
+	typedef std::shared_ptr<CResourcePackage> PResourcePackage;
 
 	class CLogger;
 	typedef std::shared_ptr<CLogger> PLogger;
@@ -77,7 +82,7 @@ namespace AMC {
 
 		virtual ~CDriverHandler();
 
-		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath, const std::string & sDriverConfigurationData);
+		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath, const std::string & sDriverConfigurationData, AMC::PResourcePackage pMachineResourcePackage);
 
 		void GetDriverInformation (const std::string& sName, std::string& sType, HSymbolLookupHandle & pSymbolLookup);
 

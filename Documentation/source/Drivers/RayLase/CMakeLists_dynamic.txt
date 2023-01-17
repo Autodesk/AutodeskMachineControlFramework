@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.5)
+
+set(CMAKE_CURRENT_BINDING_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.)
+project(LibMCDriver_RaylaseExample_CPPDynamic)
+set(CMAKE_CXX_STANDARD 11)
+add_executable(LibMCDriver_RaylaseExample_CPPDynamic "${CMAKE_CURRENT_SOURCE_DIR}/LibMCDriver_Raylase_example.cpp")
+if (UNIX)
+	target_link_libraries(LibMCDriver_RaylaseExample_CPPDynamic ${CMAKE_DL_LIBS})
+endif (UNIX)
+target_include_directories(LibMCDriver_RaylaseExample_CPPDynamic PRIVATE "${CMAKE_CURRENT_BINDING_DIR}")
+target_include_directories(LibMCDriver_RaylaseExample_CPPDynamic PRIVATE "${CMAKE_CURRENT_BINDING_DIR}/../../../LibMCEnv_component/Bindings/CppDynamic")

@@ -30,7 +30,7 @@
 	</license>
 	
 	<bindings>
-		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
 	</bindings>
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
@@ -48,6 +48,40 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+		
+		<error name="INVALIDDRIVERTYPE" code="1000" description="Invalid OIE Driver type" />
+		<error name="INVALIDDRIVERNAME" code="1001" description="Invalid OIE Driver name" />
+		<error name="INVALIDDRIVERENVIRONMENT" code="1002" description="Invalid OIE Driver environment" />		
+		<error name="SDKALREADYINITIALIZED" code="1003" description="SDK already initialized." />
+		<error name="INVALIDSCANLABOIESDK" code="1004" description="Invalid Scanlab OIE SDK." />
+		
+		<error name="DEVICENOTAVAILABLEANYMORE" code="1005" description="Device not available anymore." />
+		<error name="COULDNOTADDDEVICE" code="1006" description="Could not add device." />
+		<error name="DEVICEALREADYCONNECTED" code="1007" description="Device already connected." />
+		<error name="DEVICEALREADYREMOVED" code="1008" description="Device already removed." />
+		<error name="DEVICENOTCONNECTED" code="1009" description="Device not connected." />
+		<error name="INVALIDAPPCOUNTONDEVICE" code="1010" description="Invalid app count on device." />
+		<error name="INVALIDAPPINDEX" code="1011" description="Invalid app index." />		
+		<error name="INVALIDAPPNAME" code="1012" description="Invalid app name." />		
+		<error name="INVALIDAPPVERSION" code="1013" description="Invalid app version." />		
+		
+		<error name="INVALIDRESPONSETIMEOUT" code="1014" description="Invalid response timeout." />	
+		<error name="INVALIDAPPPACKAGEBUFFER" code="1015" description="Invalid app package buffer." />	
+		<error name="INVALIDRESOURCENAME" code="1016" description="Invalid resource name." />	
+		
+		<error name="COULDNOTSTORELIBRESSLRESOURCE" code="1017" description="Could not store LibreSSL resource." />	
+		<error name="COULDNOTSTORELIBCRYPTORESOURCE" code="1018" description="Could not store LibCrypto resource." />	
+		<error name="COULDNOTSTOREQT5CORERESOURCE" code="1019" description="Could not store QT5Core resource." />	
+		<error name="COULDNOTSTOREQT5NETWORKRESOURCE" code="1020" description="Could not store QT5Network resource." />					
+		
+		<error name="SCANLABOIESDKNOTLOADED" code="1021" description="Scanlab OIE SDK not loaded." />	
+		<error name="INVALIDDEVICENAME" code="1022" description="Invalid device name." />	
+		<error name="DEVICEHASNOTBEENFOUND" code="1023" description="Device has not been found." />	
+		<error name="DEVICEISALREADYEXISTING" code="1024" description="Device is already existing." />	
+		<error name="EMPTYDEVICENAME" code="1025" description="Empty device name." />	
+		
+		
+		
 			
 	</errors>
 	
@@ -105,11 +139,179 @@ Custom implementation
 
 -->
 
+	<class name="OIEDevice" parent="Base" description="An attached device of the Open Interface Extension.">
+
+		<method name="GetDeviceName" description="Returns the unique name of the device.">
+			<param name="DeviceName" type="string" pass="return" description="Name of device." />
+		</method>
+	
+		<method name="SetHostName" description="Sets the host name of the device. Fails if device is already connected.">
+			<param name="HostName" type="string" pass="in" description="New Host name of device." />
+		</method>
+	
+		<method name="GetHostName" description="Returns the host name of the device.">
+			<param name="HostName" type="string" pass="return" description="Host name of device." />
+		</method>
+	
+		<method name="SetPort" description="Sets the port of the device. Fails if device is already connected.">
+			<param name="Port" type="uint32" pass="in" description="New port of device." />
+		</method>
+		
+		<method name="GetPort" description="Returns the port of the device. Fails if device is already connected.">
+			<param name="Port" type="uint32" pass="return" description="Port of device." />
+		</method>
+
+		<method name="IsConnected" description="Returns if the device is connected and logged in.">
+			<param name="Value" type="bool" pass="return" description="Flag if the device is connected." />
+		</method>
+		
+		<method name="GetDeviceID" description="Returns the ID of the device.">
+			<param name="DeviceID" type="uint32" pass="return" description="ID of the device." />
+		</method>
+		
+		
+		<method name="Connect" description="Connects to the device and attempts to log in with user name and password.">
+			<param name="UserName" type="string" pass="in" description="UserName to use." />
+			<param name="Password" type="string" pass="in" description="Password to use." />
+		</method>		
+
+		<method name="Disconnect" description="Disconnects from the device. Has no effect if device is not connected.">
+		</method>
+
+		<method name="RefreshAppList" description="Refreshes the list of installed apps on the system.">
+		</method>
+
+		<method name="GetAppCount" description="Returns how many apps are installed on the device. Fails if device is not connected.">
+			<param name="Count" type="uint32" pass="return" description="Number of apps installed on the device." />
+		</method>
+	
+		<method name="GetAppName" description="Returns the name of an app from the app list.">
+			<param name="Index" type="uint32" pass="in" description="Index of App, 0-based" />
+			<param name="Name" type="string" pass="return" description="Name of app." />
+		</method>
+		
+		<method name="GetAppVersion" description="Returns the version of an app from the app list.">
+			<param name="Index" type="uint32" pass="in" description="Index of App, 0-based" />
+			<param name="Major" type="uint32" pass="out" description="Major version of the app." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version of the app." />
+			<param name="Patch" type="uint32" pass="out" description="Patch version of the app." />
+		</method>
+
+		<method name="GetAppInfo" description="Returns the name and version of an app from the app list.">
+			<param name="Index" type="uint32" pass="in" description="Index of App, 0-based" />
+			<param name="Name" type="string" pass="out" description="Name of app." />
+			<param name="Major" type="uint32" pass="out" description="Major version of the app." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version of the app." />
+			<param name="Patch" type="uint32" pass="out" description="Patch version of the app." />
+		</method>
+		
+		<method name="StartAppByName" description="Starts an app by its name. Fails if an app is already running.">
+			<param name="Name" type="string" pass="in" description="Name of app to be started." />
+			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+		</method>
+		
+		<method name="StartAppByIndex" description="Starts an app by its index. Fails if an app is already running.">
+			<param name="Index" type="uint32" pass="in" description="Index of App, 0-based" />
+			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+		</method>
+
+		<method name="StartAppByMajorVersion" description="Starts an app by its major version. Fails if an app is already running.">
+			<param name="Name" type="string" pass="in" description="Name of app to be started." />
+			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be started. Fails if app does not exist or only with wrong major number." />
+			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+		</method>
+
+		<method name="StartAppByMinorVersion" description="Starts an app by its major version. Fails if an app is already running.">
+			<param name="Name" type="string" pass="in" description="Name of app to be started." />
+			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be started. Fails if app does not exist or only with wrong major number." />
+			<param name="MinorVersion" type="uint32" pass="in" description="Minor version of app to be started. Fails if app does not exist or only with wrong minor number." />
+			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+		</method>
+
+		<method name="StopApp" description="Stops the currently running app. Does nothing if no app is running.">
+		</method>
+		
+		<method name="AppIsRunning" description="Returns if the device is running an app.">
+			<param name="Value" type="bool" pass="return" description="Flag if the device is running an app." />
+		</method>		
+		
+		<method name="GetRunningApp" description="Returns if the app that is currently running on the device. Fails if no app is running on the device.">
+			<param name="Name" type="string" pass="out" description="Name of app." />
+			<param name="Major" type="uint32" pass="out" description="Major version of the app." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version of the app." />
+			<param name="Patch" type="uint32" pass="out" description="Patch version of the app." />
+		</method>		
+
+		<method name="InstallApp" description="Installs an app package on the device. Fails if any app is running on the device. You have to be logged in with an administrator account.">
+			<param name="AppPackage" type="basicarray" class="uint8" pass="in" description="Binary data of the app to be installed." />
+		</method>
+
+		<method name="UninstallAppByName" description="Uninstall all the versions of an app by its name. Fails if any app is running on the device.">
+			<param name="Name" type="string" pass="in" description="Name of app to be uninstalled." />
+		</method>
+		
+		<method name="UninstallAppByIndex" description="Uninstall an app by its index. Fails if any app is running on the device.">
+			<param name="Index" type="uint32" pass="in" description="Index of App, 0-based" />
+		</method>
+
+		<method name="UninstallAppByMajorVersion" description="Uninstall all major versions of an app. Fails if any app is running on the device.">
+			<param name="Name" type="string" pass="in" description="Name of app to be uninstalled." />
+			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be uninstalled. Fails if app does not exist or only with wrong major number." />
+		</method>
+
+		<method name="UninstallAppByMinorVersion" description="Uninstall all minor versions of an app. Fails if any app is running on the device.">
+			<param name="Name" type="string" pass="in" description="Name of app to be uninstalled." />
+			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be uninstalled." />
+			<param name="MinorVersion" type="uint32" pass="in" description="Minor version of app to be uninstalled." />
+		</method>
+		
+	</class>
+
 
 
 	<class name="Driver_ScanLab_OIE" parent="Driver" description="A Driver for the ScanLab OIE Extension.">
 
+		<method name="SetDependencyResourceNames" description="Sets the resource names of the OIE SDK Dependencies. Searches in Machine Resources first, then in Driver Resources.">
+			<param name="LibSSLResourceName" type="string" pass="in" description="Resource name of LibSSL DLL. Default is libssl_win64 or libssl_linux64, depending on platform." />
+			<param name="LibCryptoResourceName" type="string" pass="in" description="Resource name of LibCrypto DLL. Default is libcrypto_win64 or libcrypto_linux64, depending on platform." />
+			<param name="QT5CoreResourceName" type="string" pass="in" description="Resource name of Qt5Core DLL. Default is qt5core_win64 or qt5core_linux64, depending on platform." />
+			<param name="QT5NetworkResourceName" type="string" pass="in" description="Resource name of Qt5Network DLL. Default is qt5network_win64 or qt5network_linux64, depending on platform." />
+		</method>
+
+		<method name="InitializeSDK" description="Initializes the ScanLab OIE SDK.">
+			<param name="OIEResourceName" type="string" pass="in" description="Resource name of Scanlab OIE DLL. Searches in Machine Resources first, then in Driver Resources." />
+		</method>
 	
+		<method name="InitializeCustomSDK" description="Initializes the ScanLab OIE SDK from a custom array.">
+			<param name="OIEDLL" type="basicarray" class="uint8" pass="in" description="Byte array of Scanlab OIE DLL" />
+		</method>
+		
+		<method name="AddDevice" description="Adds a new device to the OIE.">
+			<param name="Name" type="string" pass="in" description="Name of the device. MUST be a unique string and not exist yet." />
+			<param name="HostName" type="string" pass="in" description="Host name of device." />
+			<param name="Port" type="uint32" pass="in" description="Port of device." />
+			<param name="ResponseTimeOut" type="uint32" pass="in" description="Response timeout of device in ms." />
+			<param name="DeviceInstance" type="class" class="OIEDevice" pass="return" description="OIE Device Instance" />
+		</method>
+
+		<method name="HasDevice" description="Checks a device with the given name has been previously added.">
+			<param name="Name" type="string" pass="in" description="Name of the device." />
+			<param name="HasDevice" type="bool" pass="return" description="Flag if device exists." />
+		</method>
+
+		<method name="FindDevice" description="Finds a previously added device by name. Device MUST exist or function throws an error.">
+			<param name="Name" type="string" pass="in" description="Name of the device." />
+			<param name="DeviceInstance" type="class" class="OIEDevice" pass="return" description="OIE Device Instance" />
+		</method>
+		
+		<method name="RemoveDevice" description="Removes a device from the OIE.">
+			<param name="DeviceInstance" type="class" class="OIEDevice" pass="in" description="OIE Device Instance" />
+		</method>
+	
+		<method name="RemoveDeviceByName" description="Removes a device from the OIE by name. Does nothing if the device does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of the device." />
+		</method>
+		
 	</class>
 
 

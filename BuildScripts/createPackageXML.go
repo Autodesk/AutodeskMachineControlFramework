@@ -51,7 +51,9 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_laser\" import=\"%s_plugin_laser.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_mechanics\" import=\"%s_plugin_mechanics.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_plc\" import=\"%s_plugin_plc.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_buildprocess\" import=\"%s_plugin_buildprocess.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_pidcontrol\" import=\"%s_plugin_pidcontrol.%s\" />\n", gitHash, dllExtension);
+	fmt.Fprintf(pkgfile, "    <library name=\"plugin_controller\" import=\"%s_plugin_controller.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_printerconnection\" import=\"%s_plugin_printerconnection.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"plugin_userinterface\" import=\"%s_plugin_userinterface.%s\" />\n", gitHash, dllExtension);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_marlin\" import=\"%s_driver_marlin.%s\" resources=\"%s_driver_marlin.data\"  />\n", gitHash, dllExtension, gitHash);
@@ -60,8 +62,12 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_scanlaboie\" import=\"%s_driver_scanlaboie.%s\" resources=\"%s_driver_scanlaboie.data\" />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_s7net\" import=\"%s_driver_s7net.%s\" resources=\"%s_driver_s7net.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_mqtt\" import=\"%s_driver_mqtt.%s\" resources=\"%s_driver_mqtt.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_raylase\" import=\"%s_driver_raylase.%s\" resources=\"%s_driver_raylase.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_ximc\" import=\"%s_driver_ximc.%s\" resources=\"%s_driver_ximc.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_bur\" import=\"%s_driver_bur.%s\" resources=\"%s_driver_bur.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_ads\" import=\"%s_driver_ads.%s\" resources=\"%s_driver_ads.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_cifx\" import=\"%s_driver_cifx.%s\" resources=\"%s_driver_cifx.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_modbustcp\" import=\"%s_driver_modbustcp.%s\" resources=\"%s_driver_modbustcp.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_opcua\" import=\"%s_driver_opcua.%s\" resources=\"%s_driver_opcua.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_tcpip\" import=\"%s_driver_tcpip.%s\" resources=\"%s_driver_tcpip.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_uart\" import=\"%s_driver_uart.%s\" resources=\"%s_driver_uart.data\"  />\n", gitHash, dllExtension, gitHash);

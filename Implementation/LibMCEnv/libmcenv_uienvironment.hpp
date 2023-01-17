@@ -39,6 +39,9 @@ Abstract: This is the class declaration of CUIEnvironment
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_statesignalhandler.hpp"
+#include "amc_ui_clientaction.hpp"
+
+#include <vector>
 
 // Parent classes
 #include "libmcenv_base.hpp"
@@ -50,6 +53,10 @@ Abstract: This is the class declaration of CUIEnvironment
 // Include custom headers here.
 
 
+namespace AMC {
+	class CUIHandler;
+}
+
 namespace LibMCEnv {
 namespace Impl {
 
@@ -60,23 +67,28 @@ namespace Impl {
 
 class CUIEnvironment : public virtual IUIEnvironment, public virtual CBase {
 private:
+
 	AMC::PLogger m_pLogger;
 	AMC::PStateMachineData m_pStateMachineData;
 	AMC::PParameterHandler m_pClientVariableHandler;
 	AMC::PStateSignalHandler m_pSignalHandler;
+	AMC::CUIHandler * m_pUIHandler;
 	std::string m_sLogSubSystem;
 	std::string m_sSenderUUID;
 	std::string m_sSenderName;
+	std::string m_sTestEnvironmentPath;
 
-	std::string m_sModalDialogToShow;
-	bool m_bCloseModalDialog;
-	std::string m_sPageToActivate;
+	AMCCommon::CChrono m_Chrono;
+
+	std::vector<AMC::PUIClientAction> m_ClientActions;
 
 protected:
 
 public:
 
-	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler);
+	CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler * pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string & sTestEnvironmentPath);
+
+	virtual ~CUIEnvironment();
 
 	void ActivateModalDialog(const std::string& sDialogName) override;
 
@@ -85,6 +97,8 @@ public:
 	void ActivatePage(const std::string& sPageName) override;
 
 	std::string RetrieveEventSender() override;
+
+	std::string RetrieveEventSenderUUID() override;
 
 	ISignalTrigger * PrepareSignal(const std::string & sMachineInstance, const std::string & sSignalName) override;
 
@@ -131,11 +145,22 @@ public:
 
 	IImageData* LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat) override;
 
-	std::string getModalDialogToShow();
+	LibMCEnv_uint64 GetGlobalTimerInMilliseconds() override;
 
-	bool getCloseModalDialog();
+	void LogOut() override;
 
-	std::string getPageToActivate();
+	void ShowHint(const std::string& sHint, const LibMCEnv_uint32 nTimeoutInMS) override;
+
+	void ShowHintColored(const std::string& sHint, const LibMCEnv_uint32 nTimeoutInMS, const LibMCEnv::sColorRGB Color, const LibMCEnv::sColorRGB FontColor) override;
+
+	void HideHint() override;
+
+	std::string ShowMessageDlg(const std::string& sCaption, const std::string& sTitle, const LibMCEnv::eMessageDialogType eDialogType, const std::string& sYesEvent, const std::string& sNoEvent, const std::string& sCancelEvent) override;
+
+	std::vector<AMC::PUIClientAction>& getClientActions();
+
+	ITestEnvironment* GetTestEnvironment() override;
+
 
 };
 

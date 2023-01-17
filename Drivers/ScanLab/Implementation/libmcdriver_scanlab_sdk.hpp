@@ -65,6 +65,10 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_get_serial_search) (uint32_t nSearchNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_eth_search_cards) (uint32_t nIP, uint32_t n_NetMask);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_load_correction_file) (uint32_t nCardNo, const char * nFileName, uint32_t nNo, uint32_t n_Dimension);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_set_com_timeouts_auto) (uint32_t nCardNo, const double dInitialTimeout, const double dMaxTimeout, const double dMultiplier, const uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_eth_get_com_timeouts_auto) (uint32_t nCardNo, double * pdInitialTimeout, double * pdMaxTimeout, double * pdMultiplier, uint32_t * pnMode);
+
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_select_cor_table) (uint32_t nCardNo, uint32_t nHeadA, uint32_t nHeadB);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_config_list) (uint32_t nCardNo, uint32_t nMem1, uint32_t nMem2);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_mode) (uint32_t nCardNo, uint32_t nMode);
@@ -74,7 +78,6 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_standby) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_last_error) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_get_last_error) ();
-
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_load_program_file) (uint32_t nCardNo, const char * pPath);
 		typedef double (SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_table_para) (uint32_t nCardNo, uint32_t nTableNo, uint32_t nParaNo);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_end_of_list) (uint32_t nCardNo);
@@ -109,6 +112,57 @@ namespace LibMCDriver_ScanLab {
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_rtc_version) (uint32_t nCardNo);
 		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_card_type) (uint32_t nCardNo);
 
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mcbsp_freq) (uint32_t nCardNo, uint32_t nFrequency);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_mcbsp_init) (uint32_t nCardNo, uint32_t nXDelay, uint32_t nYDelay);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_mcbsp_init_spi) (uint32_t nCardNo, uint32_t nClockLevel, uint32_t nClockDelay);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mcbsp_out_ptr) (uint32_t nCardNo, uint32_t nNumber, void* pSignalPtr);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_multi_mcbsp_in) (uint32_t nCardNo, uint32_t nCtrl, uint32_t nP, uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_list_nop) (uint32_t nCardNo);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_free_variable_list) (uint32_t nCardNo, uint32_t nVarNo, uint32_t nValue);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_free_variable) (uint32_t nCardNo, uint32_t nVarNo, uint32_t nValue);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_free_variable) (uint32_t nCardNo, uint32_t nVarNo);
+		
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_trigger4) (uint32_t nCardNo, uint32_t nPeriod, uint32_t nSignal1, uint32_t nSignal2, uint32_t nSignal3, uint32_t nSignal4);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_control_mode) (uint32_t nCardNo, uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pulses_ctrl) (uint32_t nCardNo, uint32_t nHalfPeriod, uint32_t nPulseLength);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_mark_speed_ctrl) (uint32_t nCardNo, double dSpeed);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_jump_speed_ctrl) (uint32_t nCardNo, double dSpeed);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_firstpulse_killer) (uint32_t nCardNo, uint32_t nLength);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_firstpulse_killer_list) (uint32_t nCardNo, uint32_t nLength);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_qswitch_delay) (uint32_t nCardNo, uint32_t nDelay);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_qswitch_delay_list) (uint32_t nCardNo, uint32_t nDelay);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_write_da_x) (uint32_t nCardNo, uint32_t nX, uint32_t nValue);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_laser_pin_out) (uint32_t nCardNo, uint32_t nPins);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_laser_pin_in) (uint32_t nCardNo);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_para) (uint32_t nCardNo, double dTimelag, int32_t nLaserOnShift, uint32_t nNprev, uint32_t nNPost);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_limit) (uint32_t nCardNo, double dCosAngle);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_mode) (uint32_t nCardNo, uint32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing) (uint32_t nCardNo, double dTimelag, int32_t nLaserOnShift);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_para_list) (uint32_t nCardNo, double dTimelag, int32_t nLaserOnShift, uint32_t nNprev, uint32_t nNPost);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_list) (uint32_t nCardNo, double dTimelag, int32_t nLaserOnShift);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_limit_list) (uint32_t nCardNo, double dCosAngle);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_sky_writing_mode_list) (uint32_t nCardNo, uint32_t nMode);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_control_command) (uint32_t nCardNo, uint32_t nHead, uint32_t nAxis, uint32_t nData);
+
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_scanahead_params) (uint32_t nCardNo, uint32_t nHead, uint32_t * pPreViewTime, uint32_t * Vmax, double* Amax);
+		typedef int32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_activate_scanahead_autodelays) (uint32_t nCardNo, int32_t nMode);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_laser_shifts) (uint32_t nCardNo, int32_t nDLasOn, int32_t nDLasOff);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_line_params) (uint32_t nCardNo, uint32_t nCornerScale, uint32_t nEndScale, uint32_t nAccScale);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_line_params_ex) (uint32_t nCardNo, uint32_t nCornerScale, uint32_t nEndScale, uint32_t nAccScale, uint32_t nJumpScale);
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_params) (uint32_t nCardNo, uint32_t nMode, uint32_t nTableNo, uint32_t nPreviewTime, uint32_t nVMax, double dAmax);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_set_scanahead_speed_control) (uint32_t nCardNo, uint32_t nMode);
+
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_micro_vector_abs_3d) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nZ, int32_t nLasOn, int32_t nLasOff);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_micro_vector_rel_3d) (uint32_t nCardNo, int32_t ndX, int32_t ndY, int32_t ndZ, int32_t nLasOn, int32_t nLasOff);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_micro_vector_abs) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nLasOn, int32_t nLasOff);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_micro_vector_rel) (uint32_t nCardNo, int32_t ndX, int32_t ndY, int32_t nLasOn, int32_t nLasOff);
+
 		class CScanLabSDK {
 		private:
 			bool m_bIsInitialized;
@@ -133,6 +187,8 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_eth_search_cards eth_search_cards = nullptr;
 			PScanLabPtr_n_load_correction_file n_load_correction_file = nullptr;
 			PScanLabPtr_n_select_cor_table n_select_cor_table = nullptr;
+			PScanLabPtr_n_eth_set_com_timeouts_auto n_eth_set_com_timeouts_auto = nullptr;
+			PScanLabPtr_n_eth_get_com_timeouts_auto n_eth_get_com_timeouts_auto = nullptr;
 			PScanLabPtr_n_config_list n_config_list = nullptr;
 			PScanLabPtr_n_set_laser_mode n_set_laser_mode = nullptr;
 			PScanLabPtr_n_set_laser_control n_set_laser_control = nullptr;
@@ -174,6 +230,50 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_get_bios_version n_get_bios_version = nullptr;
 			PScanLabPtr_n_get_rtc_version n_get_rtc_version = nullptr;
 			PScanLabPtr_n_get_card_type n_get_card_type = nullptr;
+
+			PScanLabPtr_n_set_mcbsp_freq n_set_mcbsp_freq = nullptr;
+			PScanLabPtr_n_mcbsp_init n_mcbsp_init = nullptr;
+			PScanLabPtr_n_mcbsp_init_spi n_mcbsp_init_spi = nullptr;
+			PScanLabPtr_n_set_mcbsp_out_ptr n_set_mcbsp_out_ptr = nullptr;
+			PScanLabPtr_n_set_multi_mcbsp_in n_set_multi_mcbsp_in = nullptr;
+			PScanLabPtr_n_list_nop n_list_nop = nullptr;
+			PScanLabPtr_n_set_free_variable_list n_set_free_variable_list  = nullptr;
+			PScanLabPtr_n_set_free_variable n_set_free_variable = nullptr;
+			PScanLabPtr_n_get_free_variable n_get_free_variable = nullptr;
+			PScanLabPtr_n_set_trigger n_set_trigger = nullptr;
+			PScanLabPtr_n_set_trigger4 n_set_trigger4 = nullptr;
+			PScanLabPtr_n_set_control_mode n_set_control_mode = nullptr;
+			PScanLabPtr_n_set_laser_pulses_ctrl n_set_laser_pulses_ctrl = nullptr;
+			PScanLabPtr_n_set_mark_speed_ctrl n_set_mark_speed_ctrl = nullptr;
+			PScanLabPtr_n_set_jump_speed_ctrl n_set_jump_speed_ctrl = nullptr;
+			PScanLabPtr_n_set_firstpulse_killer n_set_firstpulse_killer = nullptr;
+			PScanLabPtr_n_set_firstpulse_killer_list n_set_firstpulse_killer_list = nullptr;
+			PScanLabPtr_n_set_qswitch_delay n_set_qswitch_delay = nullptr;
+			PScanLabPtr_n_set_qswitch_delay_list n_set_qswitch_delay_list = nullptr;
+			PScanLabPtr_n_write_da_x n_write_da_x = nullptr;
+			PScanLabPtr_n_set_laser_pin_out n_set_laser_pin_out = nullptr;
+			PScanLabPtr_n_get_laser_pin_in n_get_laser_pin_in = nullptr;
+			PScanLabPtr_n_set_sky_writing_para n_set_sky_writing_para = nullptr;
+			PScanLabPtr_n_set_sky_writing_limit n_set_sky_writing_limit = nullptr;
+			PScanLabPtr_n_set_sky_writing_mode n_set_sky_writing_mode = nullptr;
+			PScanLabPtr_n_set_sky_writing n_set_sky_writing = nullptr;
+			PScanLabPtr_n_set_sky_writing_para_list n_set_sky_writing_para_list = nullptr;
+			PScanLabPtr_n_set_sky_writing_list n_set_sky_writing_list = nullptr;
+			PScanLabPtr_n_set_sky_writing_limit_list n_set_sky_writing_limit_list = nullptr;
+			PScanLabPtr_n_set_sky_writing_mode_list n_set_sky_writing_mode_list = nullptr;
+			PScanLabPtr_n_control_command n_control_command = nullptr;
+			PScanLabPtr_n_get_scanahead_params n_get_scanahead_params = nullptr;
+			PScanLabPtr_n_activate_scanahead_autodelays n_activate_scanahead_autodelays = nullptr;
+			PScanLabPtr_n_set_scanahead_laser_shifts n_set_scanahead_laser_shifts = nullptr;
+			PScanLabPtr_n_set_scanahead_line_params n_set_scanahead_line_params = nullptr;
+			PScanLabPtr_n_set_scanahead_line_params_ex n_set_scanahead_line_params_ex = nullptr;
+			PScanLabPtr_n_set_scanahead_params n_set_scanahead_params = nullptr;
+			PScanLabPtr_n_set_scanahead_speed_control n_set_scanahead_speed_control = nullptr;
+			PScanLabPtr_n_micro_vector_abs_3d n_micro_vector_abs_3d = nullptr;
+			PScanLabPtr_n_micro_vector_rel_3d n_micro_vector_rel_3d = nullptr;
+			PScanLabPtr_n_micro_vector_abs n_micro_vector_abs = nullptr;
+			PScanLabPtr_n_micro_vector_rel n_micro_vector_rel = nullptr;
+
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();

@@ -28,306 +28,209 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#include "libmcplugin_statefactory.hpp"
-#include "libmcplugin_interfaceexception.hpp"
-#include "libmcplugin_state.hpp"
 
+#include "libmcplugin_impl.hpp"
 #include "libmcdriver_bur_dynamic.hpp"
-#include "libmcenv_drivercast.hpp"
 
-using namespace LibMCPlugin::Impl;
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4250)
-#endif
-
+#include <cmath>
 
 /*************************************************************************************************************************
  Import functionality for Driver into current plugin
 **************************************************************************************************************************/
 LIBMC_IMPORTDRIVERCLASSES(BuR, BuR)
 
+__BEGINDRIVERIMPORT
+__IMPORTDRIVER(BuR, "bur");
+__ENDDRIVERIMPORT
 
 /*************************************************************************************************************************
- Class definition of CPLCData
+  State definitions
 **************************************************************************************************************************/
-class CPLCData : public virtual CPluginData {
-protected:
-	// We need to globally store driver wrappers in the plugin
-	PDriverCast_BuR m_DriverCast_BuR;
 
-public:
+__BEGINSTATEDEFINITIONS
 
-	PDriver_BuR acquireBuRDriver(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		return m_DriverCast_BuR.acquireDriver(pStateEnvironment, "bur");
+__DECLARESTATE(init) 
+{
+
+	std::string sIPAddress = pStateEnvironment->GetStringParameter("plcconfig", "ipaddress");
+	auto nPort = pStateEnvironment->GetIntegerParameter("plcconfig", "port");
+	auto nTimeout = pStateEnvironment->GetIntegerParameter("plcconfig", "timeout");
+
+	auto pDriver = __acquireDriver(BuR);
+
+	if (pStateEnvironment->GetBoolParameter("plcconfig", "simulateplc")) {
+		pStateEnvironment->LogMessage("PLC Simulation enabled!...");
+		pDriver->SetToSimulationMode();
 	}
 
-};
-
-/*************************************************************************************************************************
- Class definition of CPLCData
-**************************************************************************************************************************/
-typedef CState<CPLCData> CPLCState;
-
-
-/*************************************************************************************************************************
- Class definition of CPLCState_Init
-**************************************************************************************************************************/
-class CPLCState_Init : public virtual CPLCState {
-public:
-
-	CPLCState_Init(const std::string& sStateName, PPluginData pPluginData)
-		: CPLCState(getStateName(), sStateName, pPluginData)
-	{
-	}
-
-	static const std::string getStateName()
-	{
-		return "init";
-	}
+	pStateEnvironment->LogMessage("Connecting to PLC...");
+	pDriver->Connect(sIPAddress, (uint32_t) nPort, (uint32_t) nTimeout);
+	pStateEnvironment->LogMessage("successful...");
+	pStateEnvironment->LogMessage("Initializing machine..");
+	pDriver->ReinitializeMachine();
+	pStateEnvironment->LogMessage("Successfully Initialized machine..");
 
 
-	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
+	auto pPLCCommandList = pDriver->CreateCommandList();
 
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
+	auto pPLCCommand_TurnOn = pDriver->CreateCommand("turnon");
+	pPLCCommandList->AddCommand(pPLCCommand_TurnOn);
 
-		std::string sIPAddress = pStateEnvironment->GetStringParameter("plcconfig", "ipaddress");
-		auto nPort = pStateEnvironment->GetIntegerParameter("plcconfig", "port");
-		auto nTimeout = pStateEnvironment->GetIntegerParameter("plcconfig", "timeout");
-
-		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment); 
-		if (pStateEnvironment->GetBoolParameter("plcconfig", "simulateplc")) {
-			pStateEnvironment->LogMessage("PLC Simulation enabled!...");
-			pDriver->SetToSimulationMode();
-		}
-
-		pStateEnvironment->LogMessage("Connecting to PLC...");
-		pDriver->Connect(sIPAddress, (uint32_t) nPort, (uint32_t) nTimeout);
-		pStateEnvironment->LogMessage("successful...");
-
-		auto pPLCCommandList = pDriver->CreateCommandList();
-
-		pStateEnvironment->LogMessage("Turning on printer..");
-
-		auto pPLCCommand_TurnOn = pDriver->CreateCommand("turnon");
-		pPLCCommandList->AddCommand(pPLCCommand_TurnOn);
-
-		auto pPLCCommand_Home = pDriver->CreateCommand("home");
-		pPLCCommandList->AddCommand(pPLCCommand_Home);
+	auto pPLCCommand_Home = pDriver->CreateCommand("home");
+	pPLCCommandList->AddCommand(pPLCCommand_Home);  
 
 
-		pPLCCommandList->FinishList();
-		pPLCCommandList->ExecuteList();
+	pPLCCommandList->FinishList();
+	pPLCCommandList->ExecuteList();
 
-		bool bReady = false;
-		for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
-			pDriver->QueryParameters();
-
-			if (pPLCCommandList->WaitForList(300, 100)) {
-				bReady = true;
-				break;
-			}
-		}
-
-		if (bReady) {
-			pStateEnvironment->LogMessage("Printer turned on");
-		}
-		else {
-			pStateEnvironment->LogMessage("Timeout while turning on printer!");
-		} 
-
-		pStateEnvironment->SetNextState("idle");
-	}
-
-};
-
-
-/*************************************************************************************************************************
- Class definition of CPLCState_Idle
-**************************************************************************************************************************/
-class CPLCState_Idle : public virtual CPLCState {
-public:
-
-	CPLCState_Idle(const std::string& sStateName, PPluginData pPluginData)
-		: CPLCState(getStateName(), sStateName, pPluginData)
-	{
-	}
-
-	static const std::string getStateName()
-	{
-		return "idle";
-	}
-
-
-	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
-		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
+	bool bReady = false;
+	for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
 		pDriver->QueryParameters();
 
+		if (pPLCCommandList->WaitForList(300, 100)) {
+			bReady = true;
+			break;
+		}
+	}
 
-		LibMCEnv::PSignalHandler pHandlerInstance;
-		if (pStateEnvironment->WaitForSignal("signal_recoatlayer", 0, pHandlerInstance)) {			
+	if (bReady) {
+		pStateEnvironment->LogMessage("Printer turned on");
+	}
+	else {
+		pStateEnvironment->LogMessage("Timeout while turning on printer!");
+	}
 
-			pStateEnvironment->StoreSignal ("recoatsignal", pHandlerInstance);
+	pStateEnvironment->SetNextState("idle");
+}
 
-			pStateEnvironment->SetNextState("recoating");
 
+
+__DECLARESTATE(idle)
+{
+
+	auto pDriver = __acquireDriver(BuR);
+	pDriver->QueryParameters();
+
+
+
+	LibMCEnv::PSignalHandler pHandlerInstance;
+	if (pStateEnvironment->WaitForSignal("signal_recoatlayer", 0, pHandlerInstance)) {			
+
+		pStateEnvironment->StoreSignal ("recoatsignal", pHandlerInstance);
+
+		pStateEnvironment->SetNextState("recoating");
+
+	} else if (pStateEnvironment->WaitForSignal("signal_laserpointer", 0, pHandlerInstance)) {
+
+		bool bLaserOn = pHandlerInstance->GetBool("laseron");
+
+		if (bLaserOn) {
+			pStateEnvironment->LogMessage("Turning laser pointer on");
 		}
 		else {
-			pStateEnvironment->SetNextState("idle");
+			pStateEnvironment->LogMessage("Turning laser pointer off");
 		}
 
-	}
-
-};
-
-/*************************************************************************************************************************
- Class definition of CPLCState_Recoating
-**************************************************************************************************************************/
-class CPLCState_Recoating : public virtual CPLCState {
-public:
-
-	CPLCState_Recoating(const std::string& sStateName, PPluginData pPluginData)
-		: CPLCState(getStateName(), sStateName, pPluginData)
-	{
-	}
-
-	static const std::string getStateName()
-	{
-		return "recoating";
-	}
-
-
-	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-
-		pStateEnvironment->LogMessage("Recoating...");
-		
-		auto pDriver = m_pPluginData->acquireBuRDriver(pStateEnvironment);
-		
 		auto pPLCCommandList = pDriver->CreateCommandList();
 
-
-		for (uint32_t nIndex = 0; nIndex < 1; nIndex++) {
-			auto pPLCCommand1 = pDriver->CreateCommand("move");
-			pPLCCommand1->SetIntegerParameter("targetx", 100000);
-			pPLCCommand1->SetIntegerParameter("targety", 100000);
-			pPLCCommand1->SetIntegerParameter("targetz", 0);
-			pPLCCommand1->SetIntegerParameter("velocity", 10000);
-			pPLCCommandList->AddCommand(pPLCCommand1);
-
-			auto pPLCCommand2 = pDriver->CreateCommand("move");
-			pPLCCommand2->SetIntegerParameter("targetx", 200000);
-			pPLCCommand2->SetIntegerParameter("targety", 100000);
-			pPLCCommand2->SetIntegerParameter("targetz", 0);
-			pPLCCommand2->SetIntegerParameter("velocity", 10000);
-			pPLCCommandList->AddCommand(pPLCCommand2);
-
-			auto pPLCCommand3 = pDriver->CreateCommand("move");
-			pPLCCommand3->SetIntegerParameter("targetx", 200000);
-			pPLCCommand3->SetIntegerParameter("targety", 200000);
-			pPLCCommand3->SetIntegerParameter("targetz", 0);
-			pPLCCommand3->SetIntegerParameter("velocity", 10000);
-			pPLCCommandList->AddCommand(pPLCCommand3);
-
-			auto pPLCCommand4 = pDriver->CreateCommand("move");
-			pPLCCommand4->SetIntegerParameter("targetx", 100000);
-			pPLCCommand4->SetIntegerParameter("targety", 200000);
-			pPLCCommand4->SetIntegerParameter("targetz", 0);
-			pPLCCommand4->SetIntegerParameter("velocity", 10000);
-			pPLCCommandList->AddCommand(pPLCCommand4);
-
-		}
-
-
+		auto pPLCCommand_LaserPointerOn = pDriver->CreateCommand("setlaserpointer");
+		pPLCCommand_LaserPointerOn->SetIntegerParameter("laseron", (int)bLaserOn);
+		pPLCCommandList->AddCommand(pPLCCommand_LaserPointerOn);
 		pPLCCommandList->FinishList();
 		pPLCCommandList->ExecuteList();
 
+		if (pPLCCommandList->WaitForList(300, 10000)) {
+			pStateEnvironment->LogMessage("Laser pointer state changed");
+			pHandlerInstance->SetBoolResult("success", true);
+			pStateEnvironment->SetNextState("idle");
 
-		if (pPLCCommandList->WaitForList(300, 100000)) {
-			pStateEnvironment->LogMessage("Printer turned on");
 		}
 		else {
-			pStateEnvironment->LogMessage("Timeout while turning on printer!");
-		}
-		auto pSignalHandler = pStateEnvironment->RetrieveSignal("recoatsignal");
-		pSignalHandler->SetBoolResult("success", true);
-		pSignalHandler->SignalHandled(); 
+			pStateEnvironment->LogMessage("Timeout while laser pointer state change!");
+			pHandlerInstance->SetBoolResult("success", false);
+			pStateEnvironment->SetNextState("fatalerror");
 
+		}
+
+		pHandlerInstance->SignalHandled();
+
+	}
+	else {
 		pStateEnvironment->SetNextState("idle");
 	}
 
-};
-
-
-/*************************************************************************************************************************
- Class definition of CMainState_FatalError
-**************************************************************************************************************************/
-class CPLCState_FatalError : public virtual CPLCState {
-public:
-
-	CPLCState_FatalError(const std::string& sStateName, PPluginData pPluginData)
-		: CPLCState(getStateName(), sStateName, pPluginData)
-	{
-	}
-
-	static const std::string getStateName()
-	{
-		return "fatalerror";
-	}
-
-
-	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
-	{
-		if (pStateEnvironment.get() == nullptr)
-			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
-
-		pStateEnvironment->SetNextState("fatalerror");
-	}
-
-};
-
-
-
-/*************************************************************************************************************************
- Class definition of CStateFactory
-**************************************************************************************************************************/
-
-CStateFactory::CStateFactory(const std::string& sInstanceName)
-{
-	m_pPluginData = std::make_shared<CPLCData>();
 }
 
-IState* CStateFactory::CreateState(const std::string& sStateName)
+__DECLARESTATE(recoating)
 {
 
-	IState* pStateInstance = nullptr;
+	pStateEnvironment->LogMessage("Recoating...");
+		
+	auto pDriver = __acquireDriver(BuR);
 
-	if (createStateInstanceByName<CPLCState_Init>(sStateName, pStateInstance, m_pPluginData))
-		return pStateInstance;
+	if (pDriver->IsSimulationMode()) {
+		pStateEnvironment->LogMessage ("Simulation mode delay of 0.4 seconds..");
+		pStateEnvironment->Sleep (400);
+	}
 
-	if (createStateInstanceByName<CPLCState_Idle>(sStateName, pStateInstance, m_pPluginData))
-		return pStateInstance;
 
-	if (createStateInstanceByName<CPLCState_Recoating>(sStateName, pStateInstance, m_pPluginData))
-		return pStateInstance;
+	auto pPLCCommandList = pDriver->CreateCommandList();
 
-	if (createStateInstanceByName<CPLCState_FatalError>(sStateName, pStateInstance, m_pPluginData))
-		return pStateInstance;
+	auto pPLCCommand_MoveRecoater = pDriver->CreateCommand("moverecoater");
+	pPLCCommand_MoveRecoater->SetIntegerParameter("targetposition", 50000);
+	pPLCCommand_MoveRecoater->SetIntegerParameter("targetspeed", 10000);
+	pPLCCommand_MoveRecoater->SetIntegerParameter("acceleration", 60000);
+	pPLCCommandList->AddCommand(pPLCCommand_MoveRecoater);
 
-	throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDSTATENAME);
+	auto pPLCCommand_MoveRecoater2 = pDriver->CreateCommand("moverecoater");
+	pPLCCommand_MoveRecoater2->SetIntegerParameter("targetposition", 00000);
+	pPLCCommand_MoveRecoater2->SetIntegerParameter("targetspeed", 10000);
+	pPLCCommand_MoveRecoater2->SetIntegerParameter("acceleration", 60000);
+	pPLCCommandList->AddCommand(pPLCCommand_MoveRecoater2);
 
+	pPLCCommandList->FinishList();
+	pPLCCommandList->ExecuteList(); 
+
+	bool bReady = false;
+	for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
+		pDriver->QueryParameters();
+
+		if (pPLCCommandList->WaitForList(300, 100)) {
+			bReady = true;
+			break;
+		}
+	}
+
+
+
+	if (bReady) {
+		pStateEnvironment->LogMessage("Recoating finished");
+
+		auto pSignalHandler = pStateEnvironment->RetrieveSignal("recoatsignal");
+		pSignalHandler->SetBoolResult("success", true);
+		pSignalHandler->SignalHandled();
+	}
+	else {
+		pStateEnvironment->LogMessage("Timeout while recoating!");
+
+		auto pSignalHandler = pStateEnvironment->RetrieveSignal("recoatsignal");
+		pSignalHandler->SetBoolResult("success", false);
+		pSignalHandler->SignalHandled();
+
+	} 
+
+
+	pStateEnvironment->SetNextState("idle");
 }
 
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+
+__DECLARESTATE(fatalerror)
+{
+	
+	pStateEnvironment->SetNextState("fatalerror");
+	
+
+};
+
+__ENDSTATEDEFINITIONS

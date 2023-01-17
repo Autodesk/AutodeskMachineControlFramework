@@ -48,9 +48,14 @@ namespace AMC {
 		uint64_t nStreamSize = m_pStorageStream->GetSize();
 
 		m_p3MFModel = p3MFWrapper->CreateModel();
+		m_pPersistentSource = m_p3MFModel->CreatePersistentSourceFromCallback((Lib3MF::ReadCallback)pReadCallback, nStreamSize, (Lib3MF::SeekCallback)pSeekCallback, pUserData);
+
 		m_p3MFReader = m_p3MFModel->QueryReader("3mf");
-		m_p3MFReader->AddRelationToRead("http://schemas.microsoft.com/3dmanufacturing/2019/05/toolpath");
-		m_p3MFReader->ReadFromCallback((Lib3MF::ReadCallback) pReadCallback, nStreamSize, (Lib3MF::SeekCallback) pSeekCallback, pUserData);
+		m_p3MFReader->ReadFromPersistentSource(m_pPersistentSource.get ());
+
+		// Depreciated read from memory 
+		   //m_p3MFReader->AddRelationToRead("http://schemas.microsoft.com/3dmanufacturing/2019/05/toolpath");
+		   //m_p3MFReader->ReadFromCallback((Lib3MF::ReadCallback) pReadCallback, nStreamSize, (Lib3MF::SeekCallback) pSeekCallback, pUserData);
 
 		auto pToolpathIterator = m_p3MFModel->GetToolpaths();
 		if (!pToolpathIterator->MoveNext())
@@ -70,7 +75,10 @@ namespace AMC {
 
 	CToolpathEntity::~CToolpathEntity()
 	{
-
+		m_pToolpath = nullptr;
+		m_p3MFReader = nullptr;
+		m_pPersistentSource = nullptr;
+		m_p3MFModel = nullptr;
 	}
 
 	void CToolpathEntity::IncRef()
@@ -95,6 +103,14 @@ namespace AMC {
 	{
 		std::lock_guard<std::mutex> lockGuard(m_Mutex);		
 		return m_pToolpath->GetLayerCount ();
+	}
+
+	uint32_t CToolpathEntity::getLayerZInUnits(uint32_t nLayerIndex)
+	{
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+		auto nZValue = m_pToolpath->GetLayerZ(nLayerIndex);
+
+		return nZValue;
 	}
 
 	PToolpathLayerData CToolpathEntity::readLayer(uint32_t nLayerIndex)

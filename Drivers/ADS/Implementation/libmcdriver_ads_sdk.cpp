@@ -107,10 +107,10 @@ CADSSDK::CADSSDK(const std::string& sDLLNameUTF8)
 	this->AdsGetDllVersion = (PAdsGetDllVersion)_loadADSAddress(hLibrary, "AdsGetDllVersion", 0);
 	this->AdsPortOpenEx = (PAdsPortOpenEx)_loadADSAddress(hLibrary, "AdsPortOpenEx", 0);
 	this->AdsPortCloseEx = (PAdsPortCloseEx)_loadADSAddress(hLibrary, "AdsPortCloseEx", 0);
-	this->AdsGetLocalAddressEx = (PAdsGetLocalAddressEx)_loadADSAddress(hLibrary, "AdsGetLocalAddress", 8);
-	this->AdsSyncWriteReqEx = (PAdsSyncWriteReqEx)_loadADSAddress(hLibrary, "AdsSyncWriteReq", 24);
-	this->AdsSyncReadReqEx2 = (PAdsSyncReadReqEx2)_loadADSAddress(hLibrary, "AdsSyncReadReqEx", 28);
-	this->AdsSyncReadWriteReqEx2 = (PAdsSyncReadWriteReqEx2)_loadADSAddress(hLibrary, "AdsSyncReadWriteReq", 36);
+	this->AdsGetLocalAddressEx = (PAdsGetLocalAddressEx)_loadADSAddress(hLibrary, "AdsGetLocalAddressEx", 8);
+	this->AdsSyncWriteReqEx = (PAdsSyncWriteReqEx)_loadADSAddress(hLibrary, "AdsSyncWriteReqEx", 24);
+	this->AdsSyncReadReqEx2 = (PAdsSyncReadReqEx2)_loadADSAddress(hLibrary, "AdsSyncReadReqEx2", 28);
+	this->AdsSyncReadWriteReqEx2 = (PAdsSyncReadWriteReqEx2)_loadADSAddress(hLibrary, "AdsSyncReadWriteReqEx2", 36);
 
 	m_LibraryHandle = (void*) hLibrary;
 }

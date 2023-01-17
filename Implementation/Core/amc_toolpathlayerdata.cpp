@@ -131,7 +131,7 @@ namespace AMC {
 		return m_Segments[nSegmentIndex].m_Type;
 	}
 
-	void CToolpathLayerData::storePointsToBuffer(const uint32_t nSegmentIndex, LibMCEnv::sPosition2D* pPositionData)
+	void CToolpathLayerData::storePointsToBufferInUnits(const uint32_t nSegmentIndex, LibMCEnv::sPosition2D* pPositionData)
 	{
 		LibMCAssertNotNull(pPositionData);
 		if (nSegmentIndex >= m_Segments.size())
@@ -149,6 +149,76 @@ namespace AMC {
 		}
 
 	}
+
+	void CToolpathLayerData::storeHatchesToBufferInUnits(const uint32_t nSegmentIndex, LibMCEnv::sHatch2D* pHatchData)
+	{
+		LibMCAssertNotNull(pHatchData);
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+
+		auto pSegment = &m_Segments[nSegmentIndex];
+		if (pSegment->m_PointCount > 0) {
+			uint32_t nHatchCount = pSegment->m_PointCount / 2;
+
+			auto pSrcPoint = &m_Points[pSegment->m_PointStartIndex];
+			auto pDstHatch = pHatchData;
+			for (uint32_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+				pDstHatch->m_X1 = pSrcPoint->m_Coordinates[0];
+				pDstHatch->m_Y1 = pSrcPoint->m_Coordinates[1];
+				pSrcPoint++;
+				pDstHatch->m_X2 = pSrcPoint->m_Coordinates[0];
+				pDstHatch->m_Y2 = pSrcPoint->m_Coordinates[1];
+				pSrcPoint++;
+				pDstHatch++;
+
+			}
+		}
+	}
+
+	void CToolpathLayerData::storePointsToBufferInMM(const uint32_t nSegmentIndex, LibMCEnv::sFloatPosition2D* pPositionData)
+	{
+		LibMCAssertNotNull(pPositionData);
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+
+		auto pSegment = &m_Segments[nSegmentIndex];
+		if (pSegment->m_PointCount > 0) {
+			auto pSrcPoint = &m_Points[pSegment->m_PointStartIndex];
+			auto pDstPoint = pPositionData;
+			for (uint32_t nPointIndex = 0; nPointIndex < pSegment->m_PointCount; nPointIndex++) {
+				pDstPoint->m_Coordinates[0] = pSrcPoint->m_Coordinates[0] * m_dUnits;
+				pDstPoint->m_Coordinates[1] = pSrcPoint->m_Coordinates[1] * m_dUnits;
+				pDstPoint++;
+				pSrcPoint++;
+			}
+		}
+	}
+
+	void CToolpathLayerData::storeHatchesToBufferInMM(const uint32_t nSegmentIndex, LibMCEnv::sFloatHatch2D* pHatchData)
+	{
+		LibMCAssertNotNull(pHatchData);
+		if (nSegmentIndex >= m_Segments.size())
+			throw ELibMCCustomException(LIBMC_ERROR_INVALIDINDEX, m_sDebugName);
+
+		auto pSegment = &m_Segments[nSegmentIndex];
+		if (pSegment->m_PointCount > 0) {
+			uint32_t nHatchCount = pSegment->m_PointCount / 2;
+
+			auto pSrcPoint = &m_Points[pSegment->m_PointStartIndex];
+			auto pDstHatch = pHatchData;
+			for (uint32_t nHatchIndex = 0; nHatchIndex < nHatchCount; nHatchIndex++) {
+				pDstHatch->m_X1 = pSrcPoint->m_Coordinates[0] * m_dUnits;
+				pDstHatch->m_Y1 = pSrcPoint->m_Coordinates[1] * m_dUnits;
+				pSrcPoint++;
+				pDstHatch->m_X2 = pSrcPoint->m_Coordinates[0] * m_dUnits;
+				pDstHatch->m_Y2 = pSrcPoint->m_Coordinates[1] * m_dUnits;
+				pSrcPoint++;
+				pDstHatch++;
+
+			}
+		}
+	}
+
 
 	uint32_t CToolpathLayerData::registerUUID(const std::string& sUUID)
 	{

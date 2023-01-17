@@ -30,7 +30,7 @@
 	</license>
 	
 	<bindings>
-		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
 	</bindings>
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
@@ -62,11 +62,34 @@
 		<error name="COULDNOTREADHANDLEVALUE" code="1008" description="Could not read handle value" />
 		<error name="NAMELENGTHEXCEEDSMAXIMUM" code="1009" description="Name length exceeds maximum" />
 		
+		<error name="NOVERSIONDEFINITION" code="1010" description="No version definition" />
+		<error name="NOMAJORVERSION" code="1011" description="No major version" />
+		<error name="NOMINORVERSION" code="1012" description="No minor version" />
+		<error name="NOPATCHVERSION" code="1013" description="No patch version" />
+		<error name="NOVARIABLEDEFINITION" code="1014" description="No variable definition" />
+		<error name="DRIVERNOTCONFIGURED" code="1015" description="Driver not configured" />
+		<error name="VARIABLEISNOTINTEGER" code="1016" description="Variable is not integer" />
+		<error name="VARIABLEISNOTBOOLEAN" code="1017" description="Variable is not a boolean" />
+		<error name="VARIABLENOTFOUND" code="1018" description="Variable not found" />
+		<error name="VARIABLEISNOTFLOAT" code="1019" description="Variable is not a float" />
+		<error name="VARIABLEISNOTSTRING" code="1020" description="Variable is not a string" />
+		<error name="VARIABLEISNOTSTRUCT" code="1021" description="Variable is not a struct" />
+		
+		<error name="VARIABLENAMEMISSING" code="1022" description="Variable name missing" />
+		<error name="VARIABLEDESCRIPTIONMISSING" code="1023" description="Variable description missing" />
+		<error name="VARIABLEADSNAMEMISSING" code="1024" description="variable ads name missing" />
+		<error name="VARIABLEACCESSMISSING" code="1025" description="variable access missing" />
+		<error name="INVALIDVARIABLEACCESS" code="1026" description="invalid variable access" />
+		<error name="INVALIDVARIABLETYPE" code="1027" description="invalid variable type" />	
+		<error name="INVALIDSTRINGBUFFERLENGTH" code="1028" description="invalid string buffer length" />	
+		<error name="STRINGLENGTHEXCEEDSBUFFERSIZE" code="1029" description="string length exceeds buffer size" />	
+		<error name="STRINGLENGTHMISSING" code="1030" description="string length missing" />	
+		<error name="INVALIDSTRINGLENGTH" code="1031" description="invalid string length" />	
+		
+		<error name="INVALIDADSSDKRESOURCE" code="1032" description="invalid ads sdk resource" />	
 		
 		
-		
-		
-		
+						
 	</errors>
 
 	
@@ -124,51 +147,6 @@ Custom implementation
 
 -->
 
-	<class name="PLCCommand" parent="Base">
-	
-		<method name="SetIntegerParameter" description="Sets an integer parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="int64" pass="in" description="Parameter Value" />
-		</method>		
-	
-		<method name="SetBoolParameter" description="Sets a bool parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="bool" pass="in" description="Parameter Value" />
-		</method>
-
-		<method name="SetDoubleParameter" description="Sets a double parameter of the command">
-			<param name="ParameterName" type="string" pass="in" description="Parameter Value" />
-			<param name="Value" type="double" pass="in" description="Parameter Value" />
-		</method>		
-
-	</class>
-
-	<class name="PLCCommandList" parent="Base">
-	
-		<method name="AddCommand" description="Adds a command to the list. List must not be executed before.">
-			<param name="CommandInstance" type="class" class="PLCCommand" pass="in" description="Add a command instance." />
-		</method>		
-				
-		<method name="FinishList" description="Finish command list.">
-		</method>		
-
-		<method name="ExecuteList" description="Execute command list.">
-		</method>		
-
-		<method name="WaitForList" description="Wait for command list to finish executing">
-			<param name="ReactionTimeInMS" type="uint32" pass="in" description="How much time the PLC may need to react to the command in Milliseconds. Will fail if no reaction in that time." />
-			<param name="WaitForTimeInMS" type="uint32" pass="in" description="How long to wait for the command to be finished in Milliseconds. Will return false if command has not finished." />
-			<param name="CommandSuccess" type="bool" pass="return" description="Returns true if the command was finished successfully." />
-		</method>
-
-		<method name="PauseList" description="Pause command list. Must be executed or resumed before.">
-		</method>		
-		
-		<method name="ResumeList" description="Resume command list. Must be paused before.">
-		</method>		
-
-	</class>
-
 
 	<class name="Driver_ADS" parent="Driver" description="A Driver for a BR Automation PLC.">
 
@@ -178,9 +156,12 @@ Custom implementation
 		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
 			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
 		</method>	
+		
+		<method name="SetCustomSDKResource" description="Sets the machine resource name of the ADS SDK to load. MUST be called before Connect or it has no effect.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name of core machine package. Empty means standard naming applies." />
+		</method>		
 
 		<method name="Connect" description= "Connects to a ADS PLC Controller.">
-			<param name="IPAddress" type="string" pass="in" description="IP Address of PLC Service." />
 			<param name="Port" type="uint32" pass="in" description="Port of PLC Service." />				
 			<param name="Timeout" type="uint32" pass="in" description="Timeout in milliseconds." />				
 		</method>
@@ -189,24 +170,57 @@ Custom implementation
 		<method name="Disconnect" description= "Disconnects from the ADS PLC Controller.">
 		</method>
 
-		<method name="CreateCommandList" description="Create Command">
-			<param name="ListInstance" type="class" class="PLCCommandList" pass="return" description="Command list instance" />
+		<method name="VariableExists" description="Returns if a variable exists.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="VariableExists" type="bool" pass="return" description="Flag if value exists." />
 		</method>		
 		
-		<method name="CreateCommand" description="Creates a command instance.">
-			<param name="CommandName" type="string" pass="in" description="Command Name." />
-			<param name="CommandInstance" type="class" class="PLCCommand" pass="return" description="Returns a command instance." />
+		<method name="ReadIntegerValue" description="Reads a value from an integer Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="int64" pass="return" description="Result value." />
 		</method>		
 		
-		<method name="StartJournaling" description="Start Journaling.">
-		</method>		
-		
-		<method name="StopJournaling" description="Stop Journaling.">
+		<method name="WriteIntegerValue" description="Reads a value from an integer Variable. Fails if value is not within the bounds of the variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="int64" pass="in" description="Value to set." />
 		</method>		
 
-		<method name="RefreshJournal" description="Refresh Journal.">
+		<method name="ReadFloatValue" description="Reads a value from an float Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="double" pass="return" description="Result value." />
+		</method>		
+		
+		<method name="WriteFloatValue" description="Reads a value from an integer Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="double" pass="in" description="Value to set." />
 		</method>		
 
+		<method name="ReadBoolValue" description="Reads a value from an boolean Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="bool" pass="return" description="Result value." />
+		</method>		
+		
+		<method name="WriteBoolValue" description="Reads a value from an boolean Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="bool" pass="in" description="Value to set." />
+		</method>	
+		
+		<method name="ReadStringValue" description="Reads a value from an string Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="string" pass="return" description="Result value." />
+		</method>		
+		
+		<method name="WriteStringValue" description="Reads a value from an string Variable.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable." />
+			<param name="Value" type="string" pass="in" description="Value to set." />
+		</method>			
+
+		<method name="GetVariableBounds" description="Returns the min and max value an integer variable can hold.">
+			<param name="VariableName" type="string" pass="in" description="Name of variable. Fails if variable does not exist or is not an integer value." />
+			<param name="MinValue" type="int64" pass="out" description="Minimum value." />
+			<param name="MaxValue" type="int64" pass="out" description="Minimum value." />
+		</method>		
+		
 	</class>
 
 

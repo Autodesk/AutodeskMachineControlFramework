@@ -66,9 +66,14 @@ protected:
 
     PWorkingFileMonitor m_pWorkingFileMonitor;
 
+    std::string m_sTempFileNamePrefix;
+
+    std::string generateFileNameForExtension(const std::string & sExtension);
+
 public:
 
     CWorkingDirectory(const std::string & sBasePath, AMC::PResourcePackage pResourcePackage);
+
     ~CWorkingDirectory();
 
     bool IsActive() override;
@@ -80,6 +85,13 @@ public:
 	IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) override;
 
     IWorkingFile* StoreCustomString(const std::string& sFileName, const std::string& sDataString) override;
+
+	IWorkingFile* StoreCustomDataInTempFile(const std::string& sExtension, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8* pDataBufferBuffer) override;
+
+	IWorkingFile* StoreCustomStringInTempFile(const std::string& sExtension, const std::string& sDataString) override;
+
+	IWorkingFile* StoreDriverDataInTempFile(const std::string& sExtension, const std::string& sIdentifier) override;
+
 
 	bool CleanUp() override;
 

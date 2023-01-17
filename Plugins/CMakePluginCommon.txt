@@ -50,7 +50,7 @@ set(CMAKE_CURRENT_DRIVERHEADER_DEV ${CMAKE_FRAMEWORK_DIR}/HeadersDriver/CppDynam
 set(CMAKE_CURRENT_DRIVERHEADER_CORE ${PROJECT_BINARY_DIR}/../../DevPackage/Framework/HeadersDriver/CppDynamic)
 
 file(STRINGS ${PROJECT_BINARY_DIR}/../../githash.txt GLOBALGITHASH)
-message(STATUS "Global git hash: \"${GLOBALGITHASH}\"")
+message(STATUS "Plugin \"${PLUGINPROJECT}\" git hash: \"${GLOBALGITHASH}\"")
 
 file(GLOB LIBMCPLUGIN_FRAMEWORK
 	${CMAKE_CURRENT_PLUGIN_DIR}/libmcplugin*.cpp

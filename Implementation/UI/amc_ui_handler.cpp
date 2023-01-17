@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_ui_dialog.hpp"
 #include "amc_ui_module_contentitem_form.hpp"
 #include "amc_parameterhandler.hpp"
+#include "amc_ui_expression.hpp"
 
 #include "amc_ui_module.hpp"
 #include "amc_ui_modulefactory.hpp"
@@ -66,8 +67,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
-CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::string& sPageToActivate, bool bCloseModalDialog, const std::string& sDialogToShow)
-    : m_nErrorCode (nErrorCode), m_sErrorMessage (sErrorMessage), m_sPageToActivate (sPageToActivate), m_sDialogToShow (sDialogToShow), m_bCloseModalDialog (bCloseModalDialog)
+CUIHandleEventResponse::CUIHandleEventResponse(uint32_t nErrorCode, const std::string& sErrorMessage, const std::vector<PUIClientAction>& clientActions)
+    : m_nErrorCode(nErrorCode), m_clientActions (clientActions), m_sErrorMessage (sErrorMessage)
 {
 
 }
@@ -82,37 +83,19 @@ std::string CUIHandleEventResponse::getErrorMessage()
     return m_sErrorMessage;
 }
 
-std::string CUIHandleEventResponse::getPageToActivate()
+std::vector<PUIClientAction>& CUIHandleEventResponse::getClientActions()
 {
-    return m_sPageToActivate;
-}
-
-std::string CUIHandleEventResponse::getDialogToShow()
-{
-    return m_sDialogToShow;
-}
-
-bool CUIHandleEventResponse::hasPageToActivate()
-{
-    return !m_sPageToActivate.empty();
-}
-
-bool CUIHandleEventResponse::hasDialogToShow()
-{
-    return !m_sDialogToShow.empty();
-}
-
-bool CUIHandleEventResponse::closeModalDialog()
-{
-    return m_bCloseModalDialog;
+    return m_clientActions;
 }
 
 
-CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger)
+
+CUIHandler::CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, const std::string& sTestOutputPath)
     : m_dLogoAspectRatio (1.0), 
     m_pStateMachineData(pStateMachineData),
     m_pEnvironmentWrapper (pEnvironmentWrapper),
     m_pSignalHandler (pSignalHandler),
+    m_sTestOutputPath (sTestOutputPath),
     m_pLogger(pLogger)
 {
     if (pStateMachineData.get() == nullptr)
@@ -145,20 +128,32 @@ std::string CUIHandler::getCopyrightString()
     return m_sCopyrightString;
 }
 
-void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
+void CUIHandler::addMenuItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sDescription, const std::string& sTargetPage, const std::string& sEventName)
 {
     std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
-    auto pPage = findPage (sTargetPage);    
-    m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption, pPage));
+    PUIPage pPage;
+    if (!sTargetPage.empty ())
+        pPage = findPage(sTargetPage);
+    if (!sEventName.empty())
+        ensureUIEventExists(sEventName);
+
+    m_MenuItems.push_back(std::make_shared<CUIMenuItem> (sID, sIcon, sCaption, sDescription, sTargetPage, sEventName));
 }
 
-void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage)
+void CUIHandler::addToolbarItem_Unsafe(const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName)
 {
     std::lock_guard<std::mutex> lockGuard(m_Mutex);
     
-    auto pPage = findPage(sTargetPage);
-    m_ToolbarItems.push_back(std::make_shared<CUIToolbarItem> (sID, sIcon, sCaption, pPage));
+    PUIPage pPage;
+    if (!sTargetPage.empty())
+        pPage = findPage(sTargetPage);
+    if (!sEventName.empty())
+        ensureUIEventExists(sEventName);
+
+    auto pToolbarItem = std::make_shared<CUIToolbarItem>(sID, sIcon, sCaption, sTargetPage, sEventName);
+    m_ToolbarItems.push_back(pToolbarItem);
+    m_ToolbarItemUUIDMap.insert(std::make_pair (pToolbarItem->getUUID(), pToolbarItem));
 }
 
 PUIPage CUIHandler::findPage(const std::string& sName)
@@ -176,9 +171,21 @@ void CUIHandler::writeConfigurationToJSON(CJSONWriter& writer, CParameterHandler
 {
     writer.addString(AMC_API_KEY_UI_APPNAME, m_sAppName);
     writer.addString(AMC_API_KEY_UI_COPYRIGHT, m_sCopyrightString);
-    writer.addString(AMC_API_KEY_UI_MAINPAGE, m_pMainPage->getName());
+    writer.addString(AMC_API_KEY_UI_MAINPAGE, m_sMainPageName);
+
     writer.addString(AMC_API_KEY_UI_LOGOUUID, m_sLogoUUID);
     writer.addDouble(AMC_API_KEY_UI_LOGOASPECTRATIO, m_dLogoAspectRatio);
+
+    if (!m_ToolbarLogoResourceName.empty()) {
+        auto pToolbarLogoResource = m_pCoreResourcePackage->findEntryByName(m_ToolbarLogoResourceName, true);
+        writer.addString(AMC_API_KEY_UI_TOOLBARLOGOUUID, pToolbarLogoResource->getUUID());
+    }
+
+    if (!m_LoginBackgroundUUID.isEmpty(m_pStateMachineData)) {
+        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(m_LoginBackgroundUUID.evaluateStringValue (m_pStateMachineData), true);
+        writer.addString(AMC_API_KEY_UI_LOGINBACKGROUNDUUID, pResourceEntry->getUUID ());
+    }
+    writer.addString(AMC_API_KEY_UI_LOGINWELCOMEMESSAGE, m_LoginWelcomeMessage.evaluateStringValue(m_pStateMachineData));
 
     CJSONWriterObject colorsObject(writer);
     for (auto color : m_Colors) {
@@ -204,10 +211,13 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClien
 	for (auto iter : m_MenuItems) {
 		CJSONWriterObject menuItem(writer);
 		menuItem.addString(AMC_API_KEY_UI_ID, iter->getID ());
-		menuItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon ());
+        menuItem.addString(AMC_API_KEY_UI_UUID, iter->getUUID());
+        menuItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon ());
 		menuItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption ());
-		menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPage()->getName ());
-		menuItems.addObject(menuItem);
+        menuItem.addString(AMC_API_KEY_UI_DESCRIPTION, iter->getDescription());
+        menuItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
+        menuItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
+        menuItems.addObject(menuItem);
 	}
 
 	writer.addArray(AMC_API_KEY_UI_MENUITEMS, menuItems);
@@ -217,12 +227,15 @@ void CUIHandler::writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClien
 	for (auto iter : m_ToolbarItems) {
 		CJSONWriterObject toolbarItem(writer);
 		toolbarItem.addString(AMC_API_KEY_UI_ID, iter->getID());
-		toolbarItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon());
+        toolbarItem.addString(AMC_API_KEY_UI_UUID, iter->getUUID());
+        toolbarItem.addString(AMC_API_KEY_UI_ICON, iter->getIcon());
 		toolbarItem.addString(AMC_API_KEY_UI_CAPTION, iter->getCaption());
-        toolbarItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPage()->getName());
+        toolbarItem.addString(AMC_API_KEY_UI_TARGETPAGE, iter->getPageName());
+        toolbarItem.addString(AMC_API_KEY_UI_EVENTNAME, iter->getEventName());
         toolbarItems.addObject(toolbarItem);
 	}
 	writer.addArray(AMC_API_KEY_UI_TOOLBARITEMS, toolbarItems);
+
 
     CJSONWriterArray pages(writer);
     for (auto iter : m_Pages) {
@@ -299,16 +312,20 @@ PUIDialog CUIHandler::findDialog(const std::string& sName)
 
 }
 
-
-
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
+void CUIHandler::setCoreResourcePackage(PResourcePackage pCoreResourcePackage)
 {
-    if (pResourcePackage.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    m_pCoreResourcePackage = pCoreResourcePackage;
+
+}
+
+
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
+{
+    if (m_pCoreResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
 
     m_sAppName = "";
     m_sCopyrightString = "";
-    m_pCoreResourcePackage = pResourcePackage;
 
     try {
         auto pUIPluginWrapper = LibMCUI::CWrapper::loadLibrary(sUILibraryPath);
@@ -389,6 +406,12 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
 
     }
 
+    auto loginNode = xmlNode.child("login");
+    if (!loginNode.empty()) {
+        m_LoginBackgroundUUID = CUIExpression(loginNode, "backgroundresource", "");
+        m_LoginWelcomeMessage = CUIExpression(loginNode, "welcomemessage", "");
+    }
+
 
     auto logoNode = xmlNode.child("logo");
     if (!logoNode.empty()) {
@@ -397,7 +420,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         if (resourceAttrib.empty ())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGLOGORESOURCE);
 
-        auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
         m_sLogoUUID = pResourceEntry->getUUID ();
 
         auto aspectratioAttrib = logoNode.attribute("aspectratio");
@@ -425,7 +448,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger);
             auto pModule = CUIModuleFactory::createModule(pageChild, sPageName, pModuleEnvironment);
             pPage->addModule(pModule);
 
@@ -450,7 +473,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         auto dialogChildren = dialogNode.children();
         for (pugi::xml_node dialogChild : dialogChildren) {
 
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get());
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get(), m_pLogger);
             auto pModule = CUIModuleFactory::createModule(dialogChild, sDialogName, pModuleEnvironment);
             pDialog->addModule(pModule);
 
@@ -477,16 +500,20 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         if (captionAttrib.empty())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGMENUITEMCAPTION);
 
-        auto targetPageAttrib = menuItem.attribute("targetpage");
-        if (targetPageAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
+        auto descriptionAttrib = menuItem.attribute("description");
 
-        addMenuItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
+        auto targetPageAttrib = menuItem.attribute("targetpage");
+        auto eventNameAttrib = menuItem.attribute("event");
+
+        addMenuItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), descriptionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string ());
     }
 
     auto toolbarNode = xmlNode.child("toolbar");
     if (toolbarNode.empty())
         throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARNODE);
+
+    auto toolbarLogoResourceAttrib = toolbarNode.attribute("logoresource");
+    m_ToolbarLogoResourceName = toolbarLogoResourceAttrib.as_string();
 
     auto toolbarItems = toolbarNode.children("item");
     for (pugi::xml_node toolbarItem : toolbarItems) {
@@ -503,13 +530,13 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTOOLBARITEMCAPTION);
 
         auto targetPageAttrib = toolbarItem.attribute("targetpage");
-        if (targetPageAttrib.empty())
-            throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGTARGETPAGE);
+        auto eventNameAttrib = toolbarItem.attribute("event");
 
-        addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string());
+        addToolbarItem_Unsafe(idAttrib.as_string(), iconAttrib.as_string(), captionAttrib.as_string(), targetPageAttrib.as_string(), eventNameAttrib.as_string());
     }
 
-    m_pMainPage = findPage (sMainPage);
+    auto pMainPage = findPage (sMainPage);
+    m_sMainPageName = pMainPage->getName();
 
     // Update all cross-references!
     for (auto pPage : m_Pages)
@@ -580,7 +607,7 @@ void CUIHandler::ensureUIEventExists(const std::string& sEventName)
 
     auto pDummyClientVariableHandler = std::make_shared<CParameterHandler>("");
 
-    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, "", pDummyClientVariableHandler);
+    LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, "", pDummyClientVariableHandler, m_sTestOutputPath);
     auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
     // Create event to see if it exists.
@@ -614,10 +641,9 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 {
 
     uint32_t nErrorCode = 0;
-    bool bCloseModalDialog = false;
     std::string sErrorMessage;
-    std::string sPageToActivate;
-    std::string sModalDialogToShow;
+
+    std::vector<PUIClientAction> clientActions;
 
     try {
 
@@ -625,19 +651,27 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
         AMC::PUIPage pPage;
         if (!sSenderUUID.empty()) {
 
-            pPage = findPageOfModuleItem(sSenderUUID);
-            if (pPage.get() == nullptr)
-                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
+            auto iToolbarIter = m_ToolbarItemUUIDMap.find(sSenderUUID);
+            if (iToolbarIter != m_ToolbarItemUUIDMap.end()) {
+                sSenderPath = "toolbar." + iToolbarIter->second->getID();
+            }
+            else {
 
-            auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
-            if (pModuleItem.get() == nullptr)
-                throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+                pPage = findPageOfModuleItem(sSenderUUID);
+                if (pPage.get() == nullptr)
+                    throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDERPAGE, sEventName + "/" + sSenderUUID);
 
-            sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+                auto pModuleItem = pPage->findModuleItemByUUID(sSenderUUID);
+                if (pModuleItem.get() == nullptr)
+                    throw ELibMCCustomException(LIBMC_ERROR_COULDNOTFINDEVENTSENDER, sEventName + "/" + sSenderUUID);
+
+                sSenderPath = pModuleItem->findElementPathByUUID(sSenderUUID);
+
+            }
 
         }
 
-        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, sSenderUUID, sSenderPath, pClientVariableHandler);
+        LibMCEnv::Impl::PUIEnvironment pInternalUIEnvironment = std::make_shared<LibMCEnv::Impl::CUIEnvironment>(m_pLogger, m_pStateMachineData, m_pSignalHandler, this, sSenderUUID, sSenderPath, pClientVariableHandler, m_sTestOutputPath);
         auto pExternalEnvironment = mapInternalUIEnvInstance<LibMCEnv::CUIEnvironment>(pInternalUIEnvironment, m_pEnvironmentWrapper);
 
         auto pEvent = m_pUIEventHandler->CreateEvent(sEventName, pExternalEnvironment);
@@ -688,9 +722,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
         pEvent->Handle(pExternalEnvironment);
 
-        sPageToActivate = pInternalUIEnvironment->getPageToActivate();
-        bCloseModalDialog = pInternalUIEnvironment->getCloseModalDialog();
-        sModalDialogToShow = pInternalUIEnvironment->getModalDialogToShow();
+        clientActions = pInternalUIEnvironment->getClientActions();
 
     } 
     catch (LibMCUI::ELibMCUIException & UIException) {
@@ -712,7 +744,7 @@ CUIHandleEventResponse CUIHandler::handleEvent(const std::string& sEventName, co
 
     }
 
-    return CUIHandleEventResponse (nErrorCode, sErrorMessage, sPageToActivate, bCloseModalDialog, sModalDialogToShow);
+    return CUIHandleEventResponse (nErrorCode, sErrorMessage, clientActions);
        
 
 }

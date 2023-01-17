@@ -48,6 +48,30 @@ namespace AMC {
 	amcDeclareDependingClass(CUIModule_GraphicSVGImage, PUIModule_GraphicSVGImage);
 	amcDeclareDependingClass(CUIModuleEnvironment, PUIModuleEnvironment);
 
+	class CUIModule_GraphicSVGImageTransform {
+	private:
+	public:
+		virtual void transformPosition(double& dPositionX, double& dPositionY, PStateMachineData pMachineData) = 0;
+	};
+
+
+	class CUIModule_GraphicSVGImageLinearMotion : public CUIModule_GraphicSVGImageTransform {
+	private:
+		std::string m_sParameter;
+		double m_dFrom;
+		double m_dTo;
+		double m_dDeltaX;
+		double m_dDeltaY;
+
+		double getParameterValue(PStateMachineData pMachineData);
+	public:
+		CUIModule_GraphicSVGImageLinearMotion(const pugi::xml_node& xmlNode, const std::string & sItemPath, PStateMachineData pMachineData);
+		virtual ~CUIModule_GraphicSVGImageLinearMotion();
+		virtual void transformPosition(double& dPositionX, double& dPositionY, PStateMachineData pMachineData) override;
+	};
+
+	typedef std::shared_ptr<CUIModule_GraphicSVGImageTransform> PUIModule_GraphicSVGImageTransform;
+
 	class CUIModule_GraphicSVGImage : public CUIModuleGraphicItem {
 	protected:		
 		CUIExpression m_ResourceName;
@@ -60,6 +84,8 @@ namespace AMC {
 
 		PUIModuleEnvironment m_pUIModuleEnvironment;
 
+		std::vector <PUIModule_GraphicSVGImageTransform> m_Transforms;
+
 	public:
 
 		static PUIModule_GraphicSVGImage makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
@@ -68,7 +94,9 @@ namespace AMC {
 		
 		virtual ~CUIModule_GraphicSVGImage();
 
-		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
+
+		void addTransform(PUIModule_GraphicSVGImageTransform pTransform);
 
 
 	};

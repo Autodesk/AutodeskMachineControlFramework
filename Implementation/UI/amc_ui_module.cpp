@@ -38,12 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using namespace AMC;
 
 
-CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry)
-	: m_pStateMachineData(pStateMachineData), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pContentRegistry(pContentRegistry)
+CUIModuleEnvironment::CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry, PLogger pLogger)
+	: m_pStateMachineData(pStateMachineData), m_pResourcePackage (pResourcePackage), m_pBuildJobHandler (pBuildJobHandler), m_pContentRegistry(pContentRegistry), m_pLogger (pLogger)
 {
 	LibMCAssertNotNull(pStateMachineData.get());
 	LibMCAssertNotNull(pResourcePackage.get());
 	LibMCAssertNotNull(pBuildJobHandler.get());
+	LibMCAssertNotNull(pLogger.get());
 	LibMCAssertNotNull(pContentRegistry);
 }
 
@@ -66,6 +67,12 @@ CUIModule_ContentRegistry* CUIModuleEnvironment::contentRegistry()
 {
 	return m_pContentRegistry;
 }
+
+CLogger* CUIModuleEnvironment::getLogger()
+{
+	return m_pLogger.get();
+}
+
 
 
 CUIModule::CUIModule(const std::string& sName)

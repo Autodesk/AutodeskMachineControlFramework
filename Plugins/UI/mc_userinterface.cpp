@@ -39,32 +39,24 @@ using namespace LibMCUI::Impl;
 #pragma warning(disable : 4250)
 #endif
 
-
-
 /*************************************************************************************************************************
- Class declaration of CEvent_StartBuildPreparation
+ Class declaration of CEvent_Logout
 **************************************************************************************************************************/
 
-class CEvent_StartBuildPreparation : public virtual CEvent {
+class CEvent_Logout : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "startbuildpreparation";
+		return "logout";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
-		pUIEnvironment->LogMessage("Clicked on StartBuildPreparation Button");
-		std::string sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID("previewbuild.preview", "builduuid");
-		pUIEnvironment->LogMessage("Preparing build " + sBuildUUID);
-
-		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_preparebuildjob");
-		pSignal->SetString("jobuuid", sBuildUUID);
-		pSignal->SetString("jobname", "Job");
-		pSignal->Trigger(); 
+		pUIEnvironment->LogMessage("Clicked on Logout");
+		pUIEnvironment->LogOut();
 
 	}
 
@@ -73,25 +65,26 @@ public:
 
 
 /*************************************************************************************************************************
- Class declaration of CEvent_CancelBuildPreparation
+ Class declaration of CEvent_CancelPreview
 **************************************************************************************************************************/
 
-class CEvent_CancelBuildPreparation : public virtual CEvent {
+class CEvent_CancelPreview : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "cancelbuildpreparation";
+		return "cancelpreview";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
-		pUIEnvironment->LogMessage("Clicked on CancelBuildPreparation Button");
+		pUIEnvironment->LogMessage("Clicked on CancelPreview Button");
+		pUIEnvironment->SetUIProperty("importbuildjob.preview", "builduuid", "");
+		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 3);
 
-		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_cancelbuildpreparation");
-		pSignal->Trigger();
+		pUIEnvironment->ActivatePage("main");
 		
 
 	}
@@ -118,14 +111,23 @@ public:
 
 		pUIEnvironment->LogMessage("Clicked on StartBuild Button");
 
-		auto sBuildUUID = pUIEnvironment->GetMachineParameterAsUUID("main", "jobinfo", "jobuuid");
-		pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);
+		if (pUIEnvironment->GetMachineParameterAsBool("main", "ui", "build_canbestarted")) {
 
-		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_startbuild");
-		pSignal->Trigger();
+			auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID("importbuildjob.preview", "builduuid");
 
-		pUIEnvironment->ActivatePage("buildstatus");
+			pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
+			pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);
+
+			auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_initjob");
+			pSignal->SetString("jobuuid", sBuildUUID);
+			pSignal->Trigger();
+
+			pUIEnvironment->ActivatePage("buildstatus");
+		}
+		else {
+
+			pUIEnvironment->LogMessage("Build cannot be started!");
+		}
 
 	}
 
@@ -184,50 +186,6 @@ public:
 };
 
 
-class CEvent_OnProcessParameterSave : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "onprocessparametersave";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-
-		auto dO2Value = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.o2_value", "value");
-		auto dGasFlowSpeed = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.gasflowspeed", "value");
-		auto dRecoaterSpeed = pUIEnvironment->GetUIPropertyAsDouble("testdialog.infobox.processparameters.recoaterspeed", "value");
-
-		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_changeprocesssettings");
-		pSignal->SetDouble("targeto2", dO2Value);
-		pSignal->SetDouble("gasflowspeed", dGasFlowSpeed);
-		pSignal->SetDouble("recoaterspeed", dRecoaterSpeed);
-		pSignal->Trigger();
-
-
-		pUIEnvironment->CloseModalDialog();
-	}
-
-};
-
-class CEvent_OnProcessParameterCancel : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "onprocessparametercancel";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-
-		pUIEnvironment->CloseModalDialog();
-	}
-
-};
 
 class CEvent_OnUploadFinished : public virtual CEvent {
 
@@ -246,33 +204,15 @@ public:
 		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "uploaduuid");
 		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
 
-		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 2);
 
-		pUIEnvironment->ActivatePage("previewbuild");
+		pUIEnvironment->SetUIProperty("importbuildjob.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 3);
+
+		pUIEnvironment->ActivatePage("importbuildjob");
 	}
 
 };
 
-
-class CEvent_OnUnloadBuildPreview : public virtual CEvent {
-
-public:
-
-	static std::string getEventName()
-	{
-		return "unloadbuildpreview";
-	}
-
-	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
-	{
-		pUIEnvironment->LogMessage("Unloading build preview...");
-
-		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", "");
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 1);
-	}
-
-};
 
 
 
@@ -293,10 +233,18 @@ public:
 		auto sBuildUUID = pUIEnvironment->GetUIPropertyAsUUID(sSender, "selecteduuid");
 		pUIEnvironment->LogMessage("Build job ID " + sBuildUUID);
 
-		pUIEnvironment->SetUIPropertyAsUUID("previewbuild.preview", "builduuid", sBuildUUID);
-		pUIEnvironment->SetUIPropertyAsInteger("previewbuild.preview", "currentlayer", 2);
+/*		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_initjob");
+		pSignal->SetString("jobuuid", sBuildUUID);
+		pSignal->Trigger();
 
-		pUIEnvironment->ActivatePage("previewbuild");
+		pUIEnvironment->SetUIPropertyAsUUID("buildstatus.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("buildstatus.preview", "currentlayer", 2);*/
+
+		pUIEnvironment->SetUIProperty("importbuildjob.preview", "builduuid", sBuildUUID);
+		pUIEnvironment->SetUIPropertyAsInteger("importbuildjob.preview", "currentlayer", 3);
+
+		pUIEnvironment->ActivatePage("importbuildjob");
+
 	}
 
 };
@@ -320,31 +268,55 @@ public:
 		pUIEnvironment->LogMessage("Change " + sSender + " to " + std::to_string (bValue));
 
 		auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_changesimulationparameters");
-		pSignal->SetBool("simulatelaser", pUIEnvironment->GetUIPropertyAsBool("main.infobox.simulationparameters.simulatelaser", "value"));
-		pSignal->SetBool("simulateplc", pUIEnvironment->GetUIPropertyAsBool("main.infobox.simulationparameters.simulateplc", "value"));
+		pSignal->SetBool("simulatelaser", pUIEnvironment->GetUIPropertyAsBool("main.settings.simulationparameters.simulatelaser", "value"));
+		pSignal->SetBool("simulateplc", pUIEnvironment->GetUIPropertyAsBool("main.settings.simulationparameters.simulateplc", "value"));
 		pSignal->Trigger();
 	}
 
 };
 
 
-class CEvent_TestMovement : public virtual CEvent {
+class CEvent_OnBuildCancelDialogOK : public virtual CEvent {
 
 public:
 
 	static std::string getEventName()
 	{
-		return "testmovement";
+		return "onbuildcanceldialogok";
 	}
 
 	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
 	{
 
-		pUIEnvironment->LogMessage("Clicked on TestMovement Button");
+		pUIEnvironment->LogMessage("Clicked on OK: " + pUIEnvironment->RetrieveEventSender());
+		if (pUIEnvironment->GetMachineParameterAsBool("main", "ui", "build_canbecanceled")) {
+			auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_cancelbuild");
+			pSignal->Trigger();
+		}
 
-		auto pSignal = pUIEnvironment->PrepareSignal("plc", "signal_recoatlayer");
-		pSignal->Trigger();
+		pUIEnvironment->CloseModalDialog();
 
+	}
+
+};
+
+
+
+class CEvent_OnBuildCancelDialogCancel : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "onbuildcanceldialogcancel";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{		
+
+		pUIEnvironment->LogMessage("Clicked on cancel: " + pUIEnvironment->RetrieveEventSender());
+
+		pUIEnvironment->CloseModalDialog();
 
 	}
 
@@ -364,6 +336,9 @@ public:
 	{
 
 		pUIEnvironment->LogMessage("Clicked on Pause Build");
+		if (pUIEnvironment->GetMachineParameterAsBool("main", "ui", "build_canbepaused")) {
+			pUIEnvironment->ActivateModalDialog("pausedialog");
+		}
 
 	}
 
@@ -383,6 +358,39 @@ public:
 	{
 
 		pUIEnvironment->LogMessage("Clicked on Cancel Build");
+		if (pUIEnvironment->GetMachineParameterAsBool("main", "ui", "build_canbecanceled")) {
+			pUIEnvironment->SetUIProperty("generaldialog.infobox.buttongroup.button1", "caption", "Yes");
+			pUIEnvironment->SetUIProperty("generaldialog.infobox.buttongroup.button2", "caption", "No");
+			pUIEnvironment->SetUIProperty("generaldialog.infobox.buttongroup.button1", "event", "onbuildcanceldialogok");
+			pUIEnvironment->SetUIProperty("generaldialog.infobox.buttongroup.button2", "event", "onbuildcanceldialogcancel");
+			pUIEnvironment->ActivateModalDialog("generaldialog");
+		}
+
+	}
+
+};
+
+class CEvent_CancelBuildFromPause : public virtual CEvent {
+
+public:
+
+	static std::string getEventName()
+	{
+		return "cancelbuildfrompause";
+	}
+
+	void Handle(LibMCEnv::PUIEnvironment pUIEnvironment) override
+	{
+
+		pUIEnvironment->LogMessage("Clicked on Cancel Build");
+
+		if (pUIEnvironment->GetMachineParameterAsBool("main", "ui", "build_canbecanceled")) {
+			auto pSignal = pUIEnvironment->PrepareSignal("main", "signal_canceljob");
+			pSignal->Trigger();
+		}
+
+		pUIEnvironment->CloseModalDialog ();
+
 
 	}
 
@@ -411,29 +419,25 @@ public:
 IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIEnvironment pUIEnvironment)
 {
 	IEvent* pEventInstance = nullptr;
-	if (createEventInstanceByName<CEvent_StartBuildPreparation>(sEventName, pEventInstance))
-		return pEventInstance;
-	if (createEventInstanceByName<CEvent_CancelBuildPreparation>(sEventName, pEventInstance))
+	if (createEventInstanceByName<CEvent_CancelPreview>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_StartBuild>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_ChangeManualValues>(sEventName, pEventInstance))
 		return pEventInstance;
-	if (createEventInstanceByName<CEvent_OnProcessParameterSave>(sEventName, pEventInstance))
-		return pEventInstance;
-	if (createEventInstanceByName<CEvent_OnProcessParameterCancel>(sEventName, pEventInstance))
-		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnUploadFinished>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnSelectBuild>(sEventName, pEventInstance))
 		return pEventInstance;
-	if (createEventInstanceByName<CEvent_OnUnloadBuildPreview>(sEventName, pEventInstance))
+	if (createEventInstanceByName<CEvent_OnBuildCancelDialogOK>(sEventName, pEventInstance))
 		return pEventInstance;	
+	if (createEventInstanceByName<CEvent_OnBuildCancelDialogCancel>(sEventName, pEventInstance))
+		return pEventInstance;
 	if (createEventInstanceByName<CEvent_OnChangeSimulationParameterEvent>(sEventName, pEventInstance))
 		return pEventInstance;
-	if (createEventInstanceByName<CEvent_TestMovement>(sEventName, pEventInstance))
-		return pEventInstance;
 	if (createEventInstanceByName<CEvent_CancelBuild>(sEventName, pEventInstance))
+		return pEventInstance;
+	if (createEventInstanceByName<CEvent_CancelBuildFromPause>(sEventName, pEventInstance))
 		return pEventInstance;
 	if (createEventInstanceByName<CEvent_PauseBuild>(sEventName, pEventInstance))
 		return pEventInstance;
@@ -441,6 +445,10 @@ IEvent* CEventHandler::CreateEvent(const std::string& sEventName, LibMCEnv::PUIE
 		return pEventInstance;	
 	if (createEventInstanceByName<CEvent_NewLayerStarted>(sEventName, pEventInstance))
 		return pEventInstance;
+	if (createEventInstanceByName<CEvent_Logout>(sEventName, pEventInstance))
+		return pEventInstance;
+
+	
 	
 
 	throw ELibMCUIInterfaceException(LIBMCUI_ERROR_INVALIDEVENTNAME, "invalid event name: " + sEventName);

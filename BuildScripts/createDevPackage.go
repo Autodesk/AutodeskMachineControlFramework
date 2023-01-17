@@ -130,7 +130,7 @@ func main() {
 		
 	} else if (systemprefix == "linux64") {
 
-		err = addFile (zipWriter, DevPackageDir + "buildresources.linux", "buildresources.linux");
+		err = addFile (zipWriter, DevPackageDir + "buildresources.linux64", "buildresources.linux64");
 		if err != nil {
 			log.Fatal(err)
 		}

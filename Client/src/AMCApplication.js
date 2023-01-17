@@ -33,26 +33,29 @@ import * as asmCrypto from "asmcrypto-lite";
 
 import * as Assert from "./AMCAsserts.js";
 import * as Common from "./AMCCommon.js"
+import * as GitHash from "./AMCGitHash.js"
 
 import AMCApplicationModule_Content from "./AMCModule_Content.js"
 import AMCApplicationModule_GLScene from "./AMCModule_GLScene.js"
 import AMCApplicationModule_Graphic from "./AMCModule_Graphic.js"
 import AMCApplicationModule_Grid from "./AMCModule_Grid.js"
 import AMCApplicationModule_Tabs from "./AMCModule_Tabs.js"
+import AMCApplicationModule_Logs from "./AMCModule_Logs.js"
 import AMCApplicationModule_LayerView from "./AMCModule_LayerView.js"
 
 import AMCApplicationPage from "./AMCPage.js"
 import AMCApplicationDialog from "./AMCDialog.js"
 import AMCUpload from "./AMCImplementation_Upload.js"
 
-
 export default class AMCApplication extends Common.AMCObject {
 
-    constructor(apiBaseURL) {
+    constructor(apiBaseURL, uiResizeEvent) {
 		
 		super ();
 		this.registerClass ("amcApplication");
 		
+		console.log ("AMC Client git hash: " + GitHash.getClientGitHash ());
+				
         this.API = {
             baseURL: apiBaseURL,
             authToken: Common.nullToken (),
@@ -63,15 +66,19 @@ export default class AMCApplication extends Common.AMCObject {
             currentStatus: "initial", // one of "initial" / "login" / "ready" / "error",
             currentError: "",
             activePage: "",
+			appResizeEvent: uiResizeEvent,
             WebGLInstances: new Map()
         }
 
         this.AppDefinition = {
             TextApplicationName: "",
+			ToolbarLogoUUID: "",
             TextCopyRight: "",
             MainPage: "",
             LogoUUID: "",
             LogoAspectRatio: 1.0,
+			LoginBackgroundImageUUID: "",
+			LoginWelcomeMessage: "",
             Colors: {}
         }
 
@@ -86,12 +93,22 @@ export default class AMCApplication extends Common.AMCObject {
 			ItemMap: new Map(),			
             FormEntityMap: new Map()
         }
+		
+		this.SnackBar = {
+			Visible: false,
+			Timeout: -1,
+			Text: "",
+			Color: "secondary",
+			FontColor: "white"			
+		}
 
     }
 
     setStatus(newStatus) {
         this.AppState.currentStatus = newStatus;
         this.AppState.currentError = "";
+		if (this.AppState.appResizeEvent)
+			this.AppState.appResizeEvent ();
     }
 
     setStatusToError(message) {
@@ -153,6 +170,10 @@ export default class AMCApplication extends Common.AMCObject {
             this.AppDefinition.TextCopyRight = resultJSON.data.copyright;
             this.AppDefinition.MainPage = resultJSON.data.mainpage;
             this.AppDefinition.LogoUUID = resultJSON.data.logouuid;
+            this.AppDefinition.LoginBackgroundImageUUID = resultJSON.data.loginbackgrounduuid;
+			this.AppDefinition.ToolbarLogoUUID = resultJSON.data.toolbarlogouuid;
+			this.AppDefinition.LoginWelcomeMessage = resultJSON.data.loginwelcomemessage;
+
             this.AppDefinition.LogoAspectRatio = resultJSON.data.logoaspectratio;
             if (resultJSON.data.colors) {
                 this.AppDefinition.Colors = resultJSON.data.colors;
@@ -254,6 +275,9 @@ export default class AMCApplication extends Common.AMCObject {
 		if (moduleDefinitionJSON.type === "tabs") 
 			return new AMCApplicationModule_Tabs (page, moduleDefinitionJSON);
 
+		if (moduleDefinitionJSON.type === "logs") 
+			return new AMCApplicationModule_Logs (page, moduleDefinitionJSON);
+
 		if (moduleDefinitionJSON.type === "layerview") 
 			return new AMCApplicationModule_LayerView (page, moduleDefinitionJSON);
 		
@@ -351,7 +375,11 @@ export default class AMCApplication extends Common.AMCObject {
         if (authToken != Common.nullToken ())
             headers.Authorization = "Bearer " + authToken;
 
-        let url = this.API.baseURL + "/ui/contentitem/" + Assert.UUIDValue (item.uuid);
+		let stateidstring = "";
+		if (item.stateid > 0)
+			stateidstring = "/" + item.stateid;
+		
+        let url = this.API.baseURL + "/ui/contentitem/" + Assert.UUIDValue (item.uuid) + stateidstring;
         Axios({
             method: "GET",
             "headers": headers,
@@ -524,6 +552,9 @@ export default class AMCApplication extends Common.AMCObject {
 
         let pageString = String(page);
         this.AppState.activePage = pageString;
+		
+		if (this.AppState.appResizeEvent)
+			this.AppState.appResizeEvent ();
 
     }
 
@@ -545,6 +576,10 @@ export default class AMCApplication extends Common.AMCObject {
                 dialogObject.dialogIsActive = true;
             }
         }
+		
+		if (this.AppState.appResizeEvent)
+			this.AppState.appResizeEvent ();
+		
 
     }
 
@@ -560,25 +595,26 @@ export default class AMCApplication extends Common.AMCObject {
             "formvalues": eventValues
         })
         .then(resultHandleEvent => {
-            if (resultHandleEvent.data.pagetoactivate) {
-                this.changePage(resultHandleEvent.data.pagetoactivate);
-            }
-            if (resultHandleEvent.data.dialogtoshow) {
-                this.showDialog(resultHandleEvent.data.dialogtoshow);
-            }
-            if (resultHandleEvent.data.closedialogs) {
-                this.closeAllDialogs();
-            }
-            if (resultHandleEvent.data.contentupdate) {
-                for (let item of resultHandleEvent.data.contentupdate) {
-                    if (item.uuid) {
-                        if (item.entries) {
-                            this.updateContentItemResult(item.uuid, item);
-                        }
-                    }
-                }
-            }
-
+			
+			if (resultHandleEvent.data.actions) {
+				if (Array.isArray(resultHandleEvent.data.actions)) {
+					let action;
+					for (action of resultHandleEvent.data.actions) {
+						if (action.action === "activatemodaldialog") {
+							this.showDialog(action.dialogname);
+						}
+						if (action.action === "activatepage") {
+							this.changePage(action.pagename);
+						}
+						if (action.action === "closemodaldialog") {
+							this.closeAllDialogs();
+						}
+						
+						//this.updateContentItemResult(item.uuid, item);
+					}
+				}
+			}
+			
         })
         .catch(err => {
             console.log(err);

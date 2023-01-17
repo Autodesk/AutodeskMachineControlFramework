@@ -57,9 +57,11 @@ namespace AMC {
 			LibMCData::PDataModel m_pDataModel;
 
 			LibMC::PWrapper m_pWrapper;
+			LibMC::PMCContext m_pContext;
 
 			PServerConfiguration m_pServerConfiguration;
 
+			void* m_pListeningServerInstance;
 		
 		public:
 		
@@ -70,6 +72,10 @@ namespace AMC {
 			void executeBlocking (const std::string& sConfigurationFileName);
 			
 			void log (const std::string & sMessage);
+
+			PServerIO getServerIO ();
+
+			void stopListening();
 			
 	};
 	

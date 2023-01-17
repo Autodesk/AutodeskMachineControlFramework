@@ -30,7 +30,7 @@
 	</license>
 	
 	<bindings>
-		<binding language="CppDynamic" indentation="tabs" />
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
 	</bindings>
 	<implementations>
 		<implementation language="Cpp" indentation="tabs"/>
@@ -67,7 +67,17 @@
 		<error name="IDENTIFIERNOTREGISTERED" code="24" description="identifier not registered" />
 		<error name="IDENTIFIERALREADYREGISTERED" code="25" description="identifier already registered" />		
 		<error name="PIXELFORMATSHOULDBEGREYSCALE" code="26" description="pixel format should be greyscale" />
-		<error name="PIXELSIZEMISMATCH" code="27" description="pixel size mismatch" />		
+		<error name="PIXELSIZEMISMATCH" code="27" description="pixel size mismatch" />				
+		<error name="INVALIDUNITSPERSUBPIXEL" code="28" description="Invalid units per subpixel" />
+		<error name="INVALIDSUBPIXELSPERPIXELS" code="29" description="Invalid subpixels per pixel" />
+		<error name="INVALIDPIXELSPERBLOCK" code="30" description="invalid pixels per block" />
+		<error name="INVALIDBLOCKCOUNT" code="31" description="invalid block count" />
+		<error name="LINECOORDINATEOVERFLOW" code="32" description="line coordinate overflow" />
+		<error name="TOOMANYLINESINLAYER" code="33" description="too many lines in layer" />
+		<error name="INVALIDHATCHCOUNT" code="34" description="invalid hatch count" />
+		<error name="RASTERIZATIONNOTINITIALIZED" code="35" description="rasterization not initialized" />
+		
+		
 		
 	</errors>
 
@@ -233,6 +243,16 @@ Custom implementation
 		<method name="GetSubsampling" description="Returns subsampling values in X and Y.">
 			<param name="SubsamplingX" type="uint32" pass="out" description="Subsampling in X" />
 			<param name="SubsamplingY" type="uint32" pass="out" description="Subsampling in Y" />
+		</method>
+
+		<method name="SetSamplingParameters" description="Set sampling parameters of algorithm.">
+			<param name="UnitsPerSubpixel" type="uint32" pass="in" description="Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even." />
+			<param name="PixelsPerBlock" type="uint32" pass="in" description="Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024." />
+		</method>
+
+		<method name="GetSamplingParameters" description="Returns sampling parameters of algorithm.">
+			<param name="UnitsPerSubpixel" type="uint32" pass="out" description="Units per subpixel. Line coordinates will be discretized with this value. Minimum 4, Maximum 1048576. Must be even." />
+			<param name="PixelsPerBlock" type="uint32" pass="out" description="Pixels per lookup block. Improves calculation speed. Minimum 4, Maximum 1024." />
 		</method>
 
 		<method name="AddLayer" description="Adds a layer object to subsample.">

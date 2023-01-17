@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "amc_ui_module_contentitem.hpp"
 #include "amc_ui_interfaces.hpp"
+#include "amc_ui_expression.hpp"
+#include "amc_parameterhandler.hpp"
 
 #include "pugixml.hpp"
 
@@ -63,27 +65,31 @@ namespace AMC {
 	protected:
 
 		std::string m_sUUID;
-		std::string m_sCaption;
-		std::string m_sTargetPage;
-		std::string m_sEvent;
+		std::string m_sElementPath;
 		std::string m_sButtonName;
+
+		CUIExpression m_CaptionExpression;
+		CUIExpression m_DisabledExpression;
+		CUIExpression m_TargetPageExpression;
+		CUIExpression m_EventExpression;
+		CUIExpression m_IconExpression;
+
+		PStateMachineData m_pStateMachineData;
 
 		std::string m_sEventFormValueSetting;
 		std::list<PUIModule_ContentFormEntity> m_pFormValues;
 
+		PParameterGroup getClientVariableGroup(CParameterHandler* pClientVariableHandler);
+
 	public:
 
-		CUIModule_ContentButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sEventFormValueSetting);
+		CUIModule_ContentButton (const std::string & sGroupPath, const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression & IconName, const CUIExpression& Disabled, const std::string& sEventFormValueSetting, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentButton();
 
+		std::string getElementPath();
+
 		std::string getUUID();
-
-		std::string getCaption();
-
-		std::string getTargetPage();
-
-		std::string getEvent();
 
 		std::string getEventFormValueSetting();
 
@@ -93,6 +99,12 @@ namespace AMC {
 
 		void writeFormValuesToJSON (CJSONWriterArray & pArray);
 
+		void writeVariablesToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler);
+
+		PParameterGroup registerClientVariableGroup(CParameterHandler* pClientVariableHandler);
+
+		void syncClientVariables(CParameterHandler* pClientVariableHandler);
+
 	};
 
 	class CUIModule_ContentButtonGroup : public CUIModule_ContentItem {
@@ -100,6 +112,7 @@ namespace AMC {
 		std::list<PUIModule_ContentButton> m_Buttons;
 		std::map<std::string, PUIModule_ContentButton> m_ButtonMap;
 		CUIModule_ContentRegistry* m_pFormOwner;
+		PStateMachineData m_pStateMachineData;
 
 		eUIModule_ContentButtonDistribution m_ButtonDistribution;
 
@@ -107,13 +120,15 @@ namespace AMC {
 
 		static PUIModule_ContentButtonGroup makeFromXML(const pugi::xml_node& xmlNode, const std::string& sItemName, const std::string& sModulePath, PUIModuleEnvironment pUIModuleEnvironment);
 
-		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const eUIModule_ContentButtonDistribution buttonDistribution, const std::string& sItemName, const std::string & sModulePath);
+		CUIModule_ContentButtonGroup(CUIModule_ContentRegistry* pFormOwner, const eUIModule_ContentButtonDistribution buttonDistribution, const std::string& sItemName, const std::string & sModulePath, PStateMachineData pStateMachineData);
 
 		virtual ~CUIModule_ContentButtonGroup();
 
 		void addDefinitionToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler) override;
 
-		PUIModule_ContentButton addButton(const std::string& sCaption, const std::string& sTargetPage, const std::string& sEvent, const std::string& sButtonName, const std::string& sEventFormValues);
+		void addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID) override;
+
+		PUIModule_ContentButton addButton(const CUIExpression& Caption, const CUIExpression& TargetPage, const CUIExpression& Event, const std::string& sButtonName, const CUIExpression& IconName, const CUIExpression& DisabledExpression, const std::string& sEventFormValueSetting);
 
 		virtual void configurePostLoading() override;
 
@@ -128,6 +143,7 @@ namespace AMC {
 
 		virtual std::string findElementPathByUUID(const std::string& sUUID) override;
 
+		virtual void populateClientVariables(CParameterHandler* pClientVariableHandler) override;
 
 
 	};

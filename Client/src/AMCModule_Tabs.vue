@@ -14,7 +14,7 @@
 			
 		</v-tabs>
 		
-		<v-tabs-items v-model="tab"  style="overflow:auto; width:100%; height:100%">
+		<v-tabs-items v-model="tab"  style="overflow:auto; width:100%; height:95%;">
 		
 			<template v-for="moduleTab in module.tabs" fill-height>
 						
@@ -23,6 +23,7 @@
 						<Module_GLScene :key="moduleTab.name" v-if="(moduleTab.type == 'glscene')" :module="moduleTab" :Application="Application" />							
 						<Module_Graphic :key="moduleTab.name" v-if="(moduleTab.type == 'graphic')" :module="moduleTab" :Application="Application" />							
 						<Module_LayerView :key="moduleTab.name" v-if="(moduleTab.type == 'layerview')" :module="moduleTab" :Application="Application" />							
+						<Module_Logs :key="moduleTab.name" v-if="(moduleTab.type == 'logs')" :module="moduleTab" :Application="Application" />							
 				</v-tab-item>
 							
 			</template>	
@@ -38,6 +39,7 @@
 	import Module_GLScene from "./AMCModule_GLScene.vue";
 	import Module_Graphic from "./AMCModule_Graphic.vue";
 	import Module_LayerView from "./AMCModule_LayerView.vue";
+	import Module_Logs from "./AMCModule_Logs.vue";
 
 	export default {
 		props: ["Application", "module"],
@@ -47,6 +49,7 @@
 			Module_GLScene,
 			Module_Graphic,
 			Module_LayerView,
+			Module_Logs,
 		},
 		
 		data: () => ({

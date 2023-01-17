@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "header_pugixml.hpp"
 #include "amc_resourcepackage.hpp"
 #include "amc_ui_interfaces.hpp"
+#include "amc_ui_expression.hpp"
 
 #include <memory>
 #include <vector>
@@ -74,27 +75,24 @@ namespace AMC {
 	amcDeclareDependingClass(CAPIJSONRequest, PAPIJSONRequest);
 	amcDeclareDependingClass(CStateMachineData, PStateMachineData);
 	amcDeclareDependingClass(CParameterHandler, PParameterHandler);
+	amcDeclareDependingClass(CUIClientAction, PUIClientAction);
 
 
 	class CUIHandleEventResponse {
 	private:
 		uint32_t m_nErrorCode;
 		std::string m_sErrorMessage;
-		std::string m_sPageToActivate;
-		std::string m_sDialogToShow;
-		bool m_bCloseModalDialog;
+
+		std::vector<PUIClientAction> m_clientActions;
+		
 	public:
-		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::string& sPageToActivate, bool bCloseModalDialog, const std::string& sDialogToShow);
+		CUIHandleEventResponse(uint32_t nErrorCode,  const std::string& sErrorMessage, const std::vector<PUIClientAction> & clientActions);
 
 		uint32_t getErrorCode();
-		std::string getErrorMessage ();
-		std::string getPageToActivate();
-		std::string getDialogToShow();
 
-		bool hasPageToActivate();
-		bool hasDialogToShow();
-		bool closeModalDialog();
+		std::string getErrorMessage();
 
+		std::vector<PUIClientAction> & getClientActions ();
 	};
 
 	class CUIHandler : public CUIModule_UIEventHandler {
@@ -108,24 +106,32 @@ namespace AMC {
 		std::string m_sLogoUUID;
 		double m_dLogoAspectRatio;
 
+		CUIExpression m_LoginBackgroundUUID;
+		CUIExpression m_LoginWelcomeMessage;
+
+		std::string m_sMainPageName;
+		std::string m_sTestOutputPath;
+
 		PStateMachineData m_pStateMachineData;
 		PStateSignalHandler m_pSignalHandler;
-		PResourcePackage m_pCoreResourcePackage;
 		PLogger m_pLogger;
 
 		std::vector <PUIMenuItem> m_MenuItems;
 		std::vector <PUIToolbarItem> m_ToolbarItems;
+		std::map<std::string, PUIToolbarItem> m_ToolbarItemUUIDMap;
+		std::string m_ToolbarLogoResourceName;
 
 		std::map <std::string, PUIPage> m_Pages;
 		std::map <std::string, PUIDialog> m_Dialogs;
-		PUIPage m_pMainPage;
+		
+		PResourcePackage m_pCoreResourcePackage; // Might be null!
 
 		LibMCUI::PWrapper m_pUIPluginWrapper;
 		LibMCUI::PEventHandler m_pUIEventHandler;
 		LibMCEnv::PWrapper m_pEnvironmentWrapper;
 
-		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
-		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage);
+		void addMenuItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string & sDescription, const std::string& sTargetPage, const std::string & sEventName);
+		void addToolbarItem_Unsafe (const std::string& sID, const std::string& sIcon, const std::string& sCaption, const std::string& sTargetPage, const std::string& sEventName);
 
 		PUIPage addPage_Unsafe (const std::string& sName);
 
@@ -133,7 +139,7 @@ namespace AMC {
 
 	public:
 
-		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger);
+		CUIHandler(PStateMachineData pStateMachineData, PStateSignalHandler pSignalHandler, LibMCEnv::PWrapper pEnvironmentWrapper, PLogger pLogger, const std::string & sTestOutputPath);
 		
 		virtual ~CUIHandler();
 		
@@ -143,7 +149,9 @@ namespace AMC {
 		void writeConfigurationToJSON (CJSONWriter & writer, CParameterHandler* pClientVariableHandler);
 		void writeStateToJSON(CJSONWriter& writer, CParameterHandler* pClientVariableHandler);
 
-		void loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pCoreResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
+		void loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler);
+
+		void setCoreResourcePackage(PResourcePackage pCoreResourcePackage);
 
 		PResourcePackage getCoreResourcePackage ();
 

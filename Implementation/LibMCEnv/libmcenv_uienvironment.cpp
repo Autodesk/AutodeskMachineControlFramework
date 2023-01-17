@@ -36,11 +36,15 @@ Abstract: This is a stub class definition of CUIEnvironment
 #include "amc_systemstate.hpp"
 #include "libmcenv_signaltrigger.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_testenvironment.hpp"
 #include "amc_logger.hpp"
 #include "amc_statemachinedata.hpp"
+#include "amc_ui_handler.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
+
+#include <cmath>
 
 using namespace LibMCEnv::Impl;
 
@@ -48,15 +52,39 @@ using namespace LibMCEnv::Impl;
  Class definition of CUIEnvironment 
 **************************************************************************************************************************/
 
-CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler)
+uint32_t colorRGBtoInteger(const LibMCEnv::sColorRGB Color)
+{
+    int32_t nColorRed = (int32_t)round(Color.m_Red * 255.0);
+    if (nColorRed < 0)
+        nColorRed = 0;
+    if (nColorRed > 255)
+        nColorRed = 255;
+
+    int32_t nColorGreen = (int32_t)round(Color.m_Green * 255.0);
+    if (nColorGreen < 0)
+        nColorGreen = 0;
+    if (nColorGreen > 255)
+        nColorGreen = 255;
+
+    int32_t nColorBlue = (int32_t)round(Color.m_Blue * 255.0);
+    if (nColorBlue < 0)
+        nColorBlue = 0;
+    if (nColorBlue > 255)
+        nColorBlue = 255;
+
+    return (uint32_t)nColorRed + (uint32_t)nColorGreen * 256 + (uint32_t)nColorBlue * 65536;
+}
+
+
+CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pStateMachineData, AMC::PStateSignalHandler pSignalHandler, AMC::CUIHandler* pUIHandler, const std::string& sSenderUUID, const std::string& sSenderName, AMC::PParameterHandler pClientVariableHandler, const std::string& sTestEnvironmentPath)
     : 
       m_pLogger(pLogger),
       m_pStateMachineData(pStateMachineData),
       m_pSignalHandler (pSignalHandler),
+      m_pUIHandler (pUIHandler),
       m_sLogSubSystem ("ui"),
       m_sSenderName (sSenderName),
-      m_pClientVariableHandler (pClientVariableHandler),
-      m_bCloseModalDialog (false)
+      m_pClientVariableHandler (pClientVariableHandler)
 {
 
     if (pLogger.get() == nullptr)
@@ -64,6 +92,8 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
     if (pStateMachineData.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pSignalHandler.get() == nullptr)
+        throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
+    if (pUIHandler == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (pClientVariableHandler.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
@@ -77,26 +107,34 @@ CUIEnvironment::CUIEnvironment(AMC::PLogger pLogger, AMC::PStateMachineData pSta
 
 }
 
+CUIEnvironment::~CUIEnvironment()
+{
+
+}
+
 void CUIEnvironment::ActivateModalDialog(const std::string& sDialogName)
 {
-    m_sModalDialogToShow = sDialogName;
-    m_bCloseModalDialog = false;
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ActivateModalDialog> (sDialogName));
 }
 
 void CUIEnvironment::CloseModalDialog()
 {
-    m_sModalDialogToShow = "";
-    m_bCloseModalDialog = true;
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_CloseModalDialog>());
 }
 
 void CUIEnvironment::ActivatePage(const std::string& sPageName)
 {
-    m_sPageToActivate = sPageName;
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ActivatePage>(sPageName));
 }
 
 std::string CUIEnvironment::RetrieveEventSender()
 {
     return m_sSenderName;
+}
+
+std::string CUIEnvironment::RetrieveEventSenderUUID()
+{
+    return m_sSenderUUID;
 }
 
 
@@ -264,23 +302,6 @@ void CUIEnvironment::SetUIPropertyAsBool(const std::string& sElementPath, const 
 
 
 
-std::string CUIEnvironment::getModalDialogToShow()
-{
-    return m_sModalDialogToShow;
-}
-
-bool CUIEnvironment::getCloseModalDialog()
-{
-    return m_bCloseModalDialog;
-}
-
-std::string CUIEnvironment::getPageToActivate()
-{
-    return m_sPageToActivate;
-}
-
-
-
 IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
 {
     return CImageData::createEmpty(nPixelSizeX, nPixelSizeY, dDPIValueX, dDPIValueY, ePixelFormat);
@@ -289,4 +310,74 @@ IImageData* CUIEnvironment::CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, 
 IImageData* CUIEnvironment::LoadPNGImage(const LibMCEnv_uint64 nPNGDataBufferSize, const LibMCEnv_uint8* pPNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const LibMCEnv::eImagePixelFormat ePixelFormat)
 {
     return CImageData::createFromPNG(pPNGDataBuffer, nPNGDataBufferSize, dDPIValueX, dDPIValueY, ePixelFormat);
+}
+
+LibMCEnv_uint64 CUIEnvironment::GetGlobalTimerInMilliseconds()
+{
+    return m_Chrono.getExistenceTimeInMilliseconds();
+}
+
+void CUIEnvironment::LogOut()
+{
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_Logout>());
+}
+
+void CUIEnvironment::ShowHint(const std::string& sHint, const LibMCEnv_uint32 nTimeoutInMS)
+{
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ShowHint>(sHint, nTimeoutInMS, -1, -1));
+}
+
+
+void CUIEnvironment::ShowHintColored(const std::string& sHint, const LibMCEnv_uint32 nTimeoutInMS, const LibMCEnv::sColorRGB Color, const LibMCEnv::sColorRGB FontColor)
+{
+
+    int32_t nColorValue = (int32_t)colorRGBtoInteger (Color);
+    int32_t nFontColorValue = (int32_t)colorRGBtoInteger(FontColor);
+
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ShowHint>(sHint, nTimeoutInMS, nColorValue, nFontColorValue));
+}
+
+void CUIEnvironment::HideHint()
+{
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_HideHint>());
+}
+
+std::string CUIEnvironment::ShowMessageDlg(const std::string& sCaption, const std::string& sTitle, const LibMCEnv::eMessageDialogType eDialogType, const std::string& sYesEvent, const std::string& sNoEvent, const std::string& sCancelEvent)
+{
+    std::string sDialogType;
+    std::string sDialogUUID = AMCCommon::CUtils::createUUID();
+
+    switch (eDialogType) {
+    case LibMCEnv::eMessageDialogType::DialogOK:
+        sDialogType = "ok"; break;
+    case LibMCEnv::eMessageDialogType::DialogOKCancel:
+        sDialogType = "okcancel"; break;
+    case LibMCEnv::eMessageDialogType::DialogYesNo:
+        sDialogType = "yesno"; break;
+    case LibMCEnv::eMessageDialogType::DialogYesNoCancel:
+        sDialogType = "yesnocancel"; break;        
+    }
+
+    if (!sYesEvent.empty())
+        m_pUIHandler->ensureUIEventExists(sYesEvent);
+    if (!sNoEvent.empty())
+        m_pUIHandler->ensureUIEventExists(sNoEvent);
+    if (!sCancelEvent.empty())
+        m_pUIHandler->ensureUIEventExists(sCancelEvent);
+
+    m_ClientActions.push_back(std::make_shared<AMC::CUIClientAction_ShowMessageDlg> (sDialogUUID, sDialogType, sCaption, sTitle, sYesEvent, sNoEvent, sCancelEvent));
+
+    return sDialogUUID;
+}
+
+
+std::vector<AMC::PUIClientAction>& CUIEnvironment::getClientActions()
+{
+    return m_ClientActions;
+}
+
+
+ITestEnvironment* CUIEnvironment::GetTestEnvironment()
+{
+    return new CTestEnvironment(m_sTestEnvironmentPath);
 }

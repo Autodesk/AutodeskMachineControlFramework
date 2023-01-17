@@ -74,6 +74,8 @@ namespace Impl {
 class CMCContext : public virtual IMCContext, public virtual CBase {
 private:
 
+	bool m_bIsTestingEnvironment;
+
 	std::map <std::string, AMC::PStateMachineInstance> m_Instances;
 	std::vector <AMC::PStateMachineInstance> m_InstanceList;
 
@@ -106,6 +108,8 @@ public:
 
 	CMCContext(LibMCData::PDataModel pDataModel);
 
+	virtual ~CMCContext();
+
 	void ParseConfiguration(const std::string & sXMLString) override;
 
 	void RegisterLibraryPath(const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sLibraryResource) override;
@@ -121,6 +125,16 @@ public:
 	void LoadClientPackage(const std::string& sResourcePath) override;
 
 	IAPIRequestHandler* CreateAPIRequestHandler(const std::string& sURI, const std::string& sRequestMethod, const std::string& sAuthorization) override;
+
+	void StartInstanceThread(const std::string& sInstanceName) override;
+
+	void TerminateInstanceThread(const std::string& sInstanceName) override;
+
+	std::string GetInstanceThreadState(const std::string& sInstanceName) override;
+
+	bool InstanceStateIsSuccessful(const std::string& sInstanceName) override;
+
+	bool InstanceStateHasFailed(const std::string& sInstanceName) override;
 
 	AMC::PStateMachineInstance addMachineInstance (const pugi::xml_node & xmlNode);
 	AMC::PStateMachineInstance findMachineInstance (std::string sName, bool bFailIfNotExisting);	

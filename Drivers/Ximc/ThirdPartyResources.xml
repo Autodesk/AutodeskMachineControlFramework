@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources xmlns="http://schemas.autodesk.com/amc/thirdpartyresources/2022/04">
+
+  <source 
+		name="libximc_2_13_3"
+		url="https://files.xisupport.com/libximc/libximc-2.13.3-all.tar.gz"
+		sha256="014d12bc7ebd6aaeea4b90662708cfd2f2952f9a5d53d84db44c19c0a7d58f48"
+		type="tgz">
+		
+		<content filename="ximc-2.13.3/ximc/win64/bindy.dll" resourcename="bindy_win64.dll" />
+		<content filename="ximc-2.13.3/ximc/win64/libximc.dll" resourcename="libximc_win64.dll" />
+		<content filename="ximc-2.13.3/ximc/win64/xiwrapper.dll" resourcename="xiwrapper_win64.dll" />
+		<content filename="ximc-2.13.3/ximc/win32/bindy.dll" resourcename="bindy_win32.dll" />
+		<content filename="ximc-2.13.3/ximc/win32/libximc.dll" resourcename="libximc_win32.dll" />
+		<content filename="ximc-2.13.3/ximc/win32/xiwrapper.dll" resourcename="xiwrapper_win32.dll" />
+		<content filename="ximc-2.13.3/ximc/debian-amd64/libbindy.so" resourcename="libbindy_linux64.so" />
+		<content filename="ximc-2.13.3/ximc/debian-amd64/libximc.so" resourcename="libximc_linux64.so" />
+		<content filename="ximc-2.13.3/ximc/debian-amd64/libxiwrapper.so" resourcename="libxiwrapper_linux64.so" />
+		<content filename="ximc-2.13.3/ximc/debian-i386/libbindy.so" resourcename="libbindy_linux32.so" />
+		<content filename="ximc-2.13.3/ximc/debian-i386/libximc.so" resourcename="libximc_linux32.so" />
+		<content filename="ximc-2.13.3/ximc/debian-i386/libxiwrapper.so" resourcename="libxiwrapper_linux32.so" />
+		<content filename="ximc-2.13.3/ximc/debian-armhf/libbindy.so" resourcename="libbindy_arm32.so" />
+		<content filename="ximc-2.13.3/ximc/debian-armhf/libximc.so" resourcename="libximc_arm32.so" />
+		<content filename="ximc-2.13.3/ximc/debian-armhf/libxiwrapper.so" resourcename="libxiwrapper_arm32.so" />
+		
+		<license>
+			Copyright (c) 2019, XIMC
+
+			Redistribution and use in source and binary forms, with or without
+			modification, are permitted provided that the following conditions are met:
+
+			1. Redistributions of source code must retain the above copyright notice, this
+			   list of conditions and the following disclaimer.
+			2. Redistributions in binary form must reproduce the above copyright notice,
+			   this list of conditions and the following disclaimer in the documentation
+			   and/or other materials provided with the distribution.
+
+			THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+			ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+			WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+			DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+			ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+			(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+			LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+			ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+			(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+			SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+		
+		</license>
+		
+  </source>
+
+
+</resources>
+

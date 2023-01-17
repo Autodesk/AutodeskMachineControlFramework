@@ -54,14 +54,16 @@ namespace AMC {
 	private:
 		std::string m_sName;
 		std::string m_sFileName;
+		std::string m_sExtension;
 		std::string m_sContentType;
 		std::string m_sUUID;
 		uint32_t m_nSize;
 	public:
-		CResourcePackageEntry(const std::string& sUUID, const std::string& sName, const std::string& sFileName, const std::string& sContentType, uint32_t nSize);
+		CResourcePackageEntry(const std::string& sUUID, const std::string& sName, const std::string& sFileName, const std::string& sExtension, const std::string& sContentType, uint32_t nSize);
 
 		std::string getName();
 		std::string getFileName();
+		std::string getExtension();
 		std::string getContentType();
 		std::string getUUID();
 		uint32_t getSize();
@@ -83,11 +85,11 @@ namespace AMC {
 
 	public:
 
-		static PResourcePackage makeFromStream (AMCCommon::CImportStream * pStream, const std::string & sPackageDebugName);
-		static PResourcePackage makeFromStream (AMCCommon::PImportStream pStream, const std::string& sPackageDebugName);
+		static PResourcePackage makeFromStream (AMCCommon::CImportStream * pStream, const std::string & sPackageDebugName, const std::string & sSchemaNamespace);
+		static PResourcePackage makeFromStream (AMCCommon::PImportStream pStream, const std::string& sPackageDebugName, const std::string& sSchemaNamespace);
 		static PResourcePackage makeEmpty (const std::string& sPackageDebugName);
 
-		CResourcePackage(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName);
+		CResourcePackage(AMCCommon::CImportStream* pStream, const std::string& sPackageDebugName, const std::string & sSchemaNamespace);
 		CResourcePackage(const std::string& sPackageDebugName);
 		virtual ~CResourcePackage();
 
@@ -99,6 +101,7 @@ namespace AMC {
 
 		// Resizes Buffer array to right size
 		void readEntry(const std::string& sName, std::vector<uint8_t>& Buffer);
+		std::string readEntryUTF8String (const std::string& sName);
 
 		// Needs allocated memory passed
 		void readEntryEx(const std::string& sName, uint8_t * pBuffer, const uint64_t nBufferSize);

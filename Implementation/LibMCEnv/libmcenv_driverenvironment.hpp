@@ -73,7 +73,8 @@ protected:
 	std::string m_sDriverName;
 
 	AMC::PParameterGroup m_pParameterGroup;
-	AMC::PResourcePackage m_pResourcePackage;
+	AMC::PResourcePackage m_pDriverResourcePackage;
+	AMC::PResourcePackage m_pMachineResourcePackage;
 	AMC::PToolpathHandler m_pToolpathHandler;
 	AMC::PLogger m_pLogger;
 
@@ -81,11 +82,23 @@ protected:
 
 public:
 
-	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string & sBaseTempPath, AMC::PLogger pLogger, const std::string& sDriverName);
+	CDriverEnvironment(AMC::PParameterGroup pParameterGroup, AMC::PResourcePackage pDriverResourcePackage, AMC::PResourcePackage pMachineResourcePackage, AMC::PToolpathHandler pToolpathHandler, const std::string & sBaseTempPath, AMC::PLogger pLogger, const std::string& sDriverName);
+
+	virtual ~CDriverEnvironment();
 
 	IWorkingDirectory* CreateWorkingDirectory() override;
 
+	void retrieveDriverDataFromPackage(AMC::PResourcePackage pResourcePackage, const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer);
+
+	bool DriverHasResourceData(const std::string& sIdentifier) override;
+
+	bool MachineHasResourceData(const std::string& sIdentifier) override;
+
 	void RetrieveDriverData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer) override;
+
+	void RetrieveDriverResourceData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer) override;
+
+	void RetrieveMachineResourceData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer) override;
 
 	IToolpathAccessor* CreateToolpathAccessor(const std::string& sBuildUUID);
 

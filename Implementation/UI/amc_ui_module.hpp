@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Libraries/PugiXML/pugixml.hpp"
 #include "Core/amc_jsonwriter.hpp"
 #include "amc_ui_interfaces.hpp"
+#include "amc_logger.hpp"
 
 namespace LibMCData {
 	amcDeclareDependingClass(CBuildJobHandler, PBuildJobHandler);
@@ -63,14 +64,16 @@ namespace AMC {
 		PResourcePackage m_pResourcePackage;
 		LibMCData::PBuildJobHandler m_pBuildJobHandler;
 		CUIModule_ContentRegistry* m_pContentRegistry;
+		PLogger m_pLogger;
 
 	public:
-		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry);
+		CUIModuleEnvironment(PStateMachineData pStateMachineData, PResourcePackage pResourcePackage, LibMCData::PBuildJobHandler pBuildJobHandler, CUIModule_ContentRegistry* pContentRegistry, PLogger pLogger);
 
 		PStateMachineData stateMachineData();
 		PResourcePackage resourcePackage();
 		LibMCData::PBuildJobHandler buildJobHandler ();
 		CUIModule_ContentRegistry* contentRegistry ();
+		CLogger* getLogger();
 
 	};
 

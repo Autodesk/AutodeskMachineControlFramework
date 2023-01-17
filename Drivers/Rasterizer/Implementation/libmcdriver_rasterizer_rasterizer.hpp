@@ -50,8 +50,6 @@ Abstract: This is the class declaration of CRasterizer
 namespace LibMCDriver_Rasterizer {
 namespace Impl {
 
-#define RASTERER_MINSUBSAMPLING 1
-#define RASTERER_MAXSUBSAMPLING 32
 
 /*************************************************************************************************************************
 Class declaration of CRasterizerInstance
@@ -67,6 +65,9 @@ private:
 	double m_dPositionY;
 	uint32_t m_nSubSamplingX;
 	uint32_t m_nSubSamplingY;
+
+	uint32_t m_nUnitsPerSubPixel;
+	uint32_t m_nPixelsPerBlock;
 
 	std::vector<PLayerDataObject> m_Layers;
 
@@ -93,7 +94,8 @@ public:
 
 	void AddLayer(ILayerObject* pLayerObject);
 
-	void CalculateImage(LibMCEnv::CImageData * pImageData, const bool bAntialiased);
+	void CalculateImage(LibMCEnv::CImageData * pImageData, const bool bAntialiased, uint32_t nUnitsPerSubPixel, uint32_t nPixelsPerBlock);
+
 
 };
 
@@ -108,6 +110,9 @@ private:
 
 protected:
 	PRasterizerInstance m_pRasterizerInstance;
+
+	uint32_t m_nUnitsPerSubPixel;
+	uint32_t m_nPixelsPerBlock;
 
 public:
 
@@ -132,6 +137,10 @@ public:
 	void AddLayer(ILayerObject* pLayerObject) override;
 
 	void CalculateImage(LibMCEnv::PImageData pImageObject, const bool bAntialiased);
+
+	void SetSamplingParameters(const LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, const LibMCDriver_Rasterizer_uint32 nPixelsPerBlock) override;
+
+	void GetSamplingParameters(LibMCDriver_Rasterizer_uint32& nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32& nPixelsPerBlock) override;
 
 };
 

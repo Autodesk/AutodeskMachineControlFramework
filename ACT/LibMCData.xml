@@ -327,13 +327,13 @@
 		<error name="BUILDJOBDATANOTFOUND" code="330" description="Build job data not found" />
 		<error name="INVALIDNAMESTRING" code="331" description="Invalid name string" />
 		<error name="NAMESTRINGMISMATCH" code="332" description="Name string mismatch" />
-		<error name="DATATYPEMISMATCH" code="333" description="Datatype mismatch" />		
-		
-		
+		<error name="DATATYPEMISMATCH" code="333" description="Datatype mismatch" />				
+		<error name="COULDNOTFINDLOGENTRY" code="334" description="Could not find log entry" />			
+
+		<error name="NOLOGCALLBACK" code="335" description="No log callback" />			
 								
 	</errors>
 	
-
 		
 	<enum name="LogLevel">
 		<option name="FatalError" value="1"/>
@@ -349,6 +349,15 @@
 		<option name="Unknown" value="0"/>
 		<option name="SqLite" value="1"/>
 	</enum>	
+	
+	<functiontype name="LogCallback" description="A callback function for external logging systems">
+		<param name="LogMessage" type="string" pass="in" description="Log message to be logged."/>
+		<param name="SubSystem" type="string" pass="in" description="SubSystem of Log Message."/>
+		<param name="LogLevel" type="enum" class="LogLevel" pass="in" description="Log Level to be used."/>
+		<param name="Timestamp" type="string" pass="in" description="Timestamp of the log message."/>
+		<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+	</functiontype>
+	
 
 	<enum name="ParameterDataType">
 		<option name="Unknown" value="0"/>
@@ -409,10 +418,41 @@
 		<method name="Clone" description="Creates a new resource iterator with the same resource list.">
 			<param name="OutIterator" type="handle" class="Iterator" pass="return" description="returns the cloned Iterator instance"/>
 		</method>
-		<method name="Count" description="Returns the number of resoucres the iterator captures.">
+		<method name="Count" description="Returns the number of resources the iterator captures.">
 			<param name="Count" type="uint64" pass="return" description="returns the number of resources the iterator captures."/>
 		</method>
 	</class>
+
+	<class name="LogEntryList" parent="Base" description="List of retrieved log entries">
+	
+		<method name="Count" description="Returns the number of log entries in the list.">
+			<param name="Count" type="uint32" pass="return" description="returns the number of retrieved log entries."/>
+		</method>
+
+		<method name="GetEntryByIndex" description="Returns a log entry in the list by its index.">
+			<param name="Index" type="uint32" pass="in" description="Index of log entry, 0-based."/>
+			<param name="ID" type="uint32" pass="out" description="ID of log entry."/>
+			<param name="Message" type="string" pass="out" description="Log Message" />	
+			<param name="SubSystem" type="string" pass="out" description="Sub System identifier" />	
+			<param name="LogLevel" type="enum" class="LogLevel" pass="out" description="Log Level" />	
+			<param name="Timestamp" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+		</method>
+		
+		<method name="GetEntryByID" description="Returns a log entry in the list by its ID.">
+			<param name="ID" type="uint32" pass="in" description="ID of log entry."/>
+			<param name="Message" type="string" pass="out" description="Log Message" />	
+			<param name="SubSystem" type="string" pass="out" description="Sub System identifier" />	
+			<param name="LogLevel" type="enum" class="LogLevel" pass="out" description="Log Level" />	
+			<param name="Timestamp" type="string" pass="out" description="Timestamp in ISO8601 UTC format" />	
+		</method>
+
+		<method name="HasEntry" description="Returns if a log entry in the list exists.">
+			<param name="ID" type="uint32" pass="in" description="ID of log entry."/>
+			<param name="Value" type="bool" pass="return" description="Returns if a list exists."/>
+		</method>
+
+	</class>
+
 
 	<class name="LogSession" parent="Base" description="Logging Instance">
 	
@@ -421,6 +461,17 @@
 			<param name="SubSystem" type="string" pass="in" description="Sub System identifier" />	
 			<param name="LogLevel" type="enum" class="LogLevel" pass="in" description="Log Level" />	
 			<param name="Timestamp" type="string" pass="in" description="Timestamp in ISO8601 UTC format" />	
+		</method>	
+
+		<method name="GetMaxLogEntryID" description="retrieves the maximum log entry ID in the log.">
+			<param name="MaxLogID" type="uint32" pass="return" description="Log entry ID" />	
+		</method>	
+
+		<method name="RetrieveLogEntriesByID" description="retrieves an excerpt of the log.">
+			<param name="MinLogID" type="uint32" pass="in" description="Minimum log entry ID to receive." />
+			<param name="MaxLogID" type="uint32" pass="in" description="Maximum log entry ID to receive. MUST be between (MinLogID + 1) and (MinLogID + 65536)." />
+			<param name="MinLogLevel" type="enum" class="LogLevel" pass="in" description="Minimum Log Level to return." />	
+			<param name="LogEntryList" type="class" class="LogEntryList" pass="return" description="Log Entry List." />
 		</method>	
 				
 	</class>
@@ -841,7 +892,33 @@
 			<param name="PersistencyHandler" type="class" class="PersistencyHandler" pass="return" description="PersistencyHandler instance." />	
 		</method>
 		
-				
+		<method name="SetBaseTempDirectory" description="Sets a custom base temp directory. An empty string defaults to the system temp directory.">
+			<param name="TempDirectory" type="string" pass="in" description="Temp directory path to use. SHOULD be an absolute path, if not empty. Directory MUST exist, if not empty." />	
+		</method>
+
+		<method name="GetBaseTempDirectory" description="Returns a custom base temp directory. An empty string defaults to the system temp directory.">
+			<param name="TempDirectory" type="string" pass="return" description="Temp directory path." />	
+		</method>
+
+		<method name="SetLogCallback" description="Sets a log callback to be used for the execution.">
+			<param name="LogCallback" type="functiontype" class="LogCallback" pass="in" description="LogCallback." />	
+			<param name="UserData" type="pointer" pass="in" description="Userdata that is passed to the callback function"/>
+		</method>
+
+		<method name="ClearLogCallback" description="Resets the log callback to be used for the execution.">
+		</method>
+		
+		<method name="HasLogCallback" description="Returns if a log callback has been set.">
+			<param name="HasCallback" type="bool" pass="return" description="Flag if log callback has been set." />	
+		</method>
+		
+		<method name="TriggerLogCallback" description="Triggers the log callback. Fails if no log callback has been set.">
+			<param name="LogMessage" type="string" pass="in" description="Log message to be logged."/>
+			<param name="SubSystem" type="string" pass="in" description="SubSystem of Log Message."/>
+			<param name="LogLevel" type="enum" class="LogLevel" pass="in" description="Log Level to be used."/>
+			<param name="Timestamp" type="string" pass="in" description="Timestamp of the log message."/>
+		</method>
+		
 	</class>
 
 		

@@ -39,6 +39,7 @@ Interface version: 1.0.0
 #include "libmcdriver_ads_abi.hpp"
 #include "libmcdriver_ads_interfaces.hpp"
 #include "libmcdriver_ads_interfaceexception.hpp"
+#include "libmcdriver_ads_driver_ads.hpp"
 
 using namespace LibMCDriver_ADS;
 using namespace LibMCDriver_ADS::Impl;
@@ -74,7 +75,10 @@ void CWrapper::AcquireInstance(IBase* pInstance)
 
 IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & sType, LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_NOTIMPLEMENTED);
+	if (sType == "ads-1.0")
+		return new CDriver_ADS(sName, pDriverEnvironment);
+
+	throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERERROR, "driver type not found: " + sType);
 }
 
 

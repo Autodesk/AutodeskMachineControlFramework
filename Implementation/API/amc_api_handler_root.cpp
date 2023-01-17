@@ -46,7 +46,8 @@ using namespace AMC;
 
 
 
-CAPIHandler_Root::CAPIHandler_Root()
+CAPIHandler_Root::CAPIHandler_Root(const std::string& sClientHash)
+	: CAPIHandler (sClientHash)
 {
 	
 }

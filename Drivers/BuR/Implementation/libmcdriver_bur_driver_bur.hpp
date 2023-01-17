@@ -57,6 +57,8 @@ namespace LibMCDriver_BuR {
 namespace Impl {
 
 
+#define DRIVER_BUR_DEFAULT_INITMACHINECOMMANDID 100
+
 
 class CDriver_BuR : public virtual IDriver_BuR, public virtual CDriver, public virtual ITimeStampGenerator {
 private:
@@ -77,6 +79,7 @@ protected:
     uint32_t m_nBuildVersion;
 
     uint32_t m_nMaxPacketQueueSize;
+    uint32_t m_InitMachineCommandID;
 
     bool m_bIsQueryingParameters;
 
@@ -111,6 +114,8 @@ public:
     void Connect(const std::string& sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout) override;
 
     void Disconnect() override;
+
+    void ReinitializeMachine() override;
 
     IPLCCommandList* CreateCommandList() override;
 

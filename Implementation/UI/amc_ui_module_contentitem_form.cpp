@@ -198,6 +198,8 @@ void CUIModule_ContentFormEdit::populateClientVariables(CParameterHandler* pClie
 void CUIModule_ContentFormEdit::syncClientVariables(CParameterHandler* pClientVariableHandler)
 {
 	auto pGroup = getClientVariableGroup(pClientVariableHandler);
+	if (m_CaptionExpression.needsSync())
+		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMCAPTION, m_CaptionExpression.evaluateStringValue(m_pStateMachineData));
 	if (m_ValueExpression.needsSync())
 		pGroup->setParameterValueByName(AMC_API_KEY_UI_FORMDEFAULTVALUE, m_ValueExpression.evaluateStringValue(m_pStateMachineData));
 	if (m_PrefixExpression.needsSync())
@@ -439,7 +441,7 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 }
 
 
-void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 	CJSONWriterArray entityArray(writer);
 	for (auto pEntity : m_Entities) {

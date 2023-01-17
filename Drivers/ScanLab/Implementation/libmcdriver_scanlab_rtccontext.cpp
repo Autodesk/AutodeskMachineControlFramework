@@ -69,7 +69,7 @@ CRTCContext::~CRTCContext()
 
 
 
-void CRTCContext::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
+void CRTCContext::LoadFirmware(const LibMCDriver_ScanLab_uint64 nFirmwareDataBufferSize, const LibMCDriver_ScanLab_uint8* pFirmwareDataBuffer, const LibMCDriver_ScanLab_uint64 nFPGADataBufferSize, const LibMCDriver_ScanLab_uint8* pFPGADataBuffer, const LibMCDriver_ScanLab_uint64 nAuxiliaryDataBufferSize, const LibMCDriver_ScanLab_uint8* pAuxiliaryDataBuffer)
 {
 
 	auto pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
@@ -82,9 +82,9 @@ void CRTCContext::LoadFirmware(const std::string& sFirmwareResource, const std::
 		sFirmwareName = "RTC6OUT.out";
 	}
 
-	auto pFirmwareFile = pWorkingDirectory->StoreDriverData (sFirmwareName, sFirmwareResource);
-	auto pFPGAFile = pWorkingDirectory->StoreDriverData ("RTC6RBF.rbf", sFPGAResource);
-	auto pAuxiliaryFile = pWorkingDirectory->StoreDriverData("RTC6DAT.dat", sAuxiliaryResource);
+	auto pFirmwareFile = pWorkingDirectory->StoreCustomData (sFirmwareName, LibMCEnv::CInputVector<uint8_t> (pFirmwareDataBuffer, nFirmwareDataBufferSize));
+	auto pFPGAFile = pWorkingDirectory->StoreCustomData("RTC6RBF.rbf", LibMCEnv::CInputVector<uint8_t>(pFPGADataBuffer, nFPGADataBufferSize));
+	auto pAuxiliaryFile = pWorkingDirectory->StoreCustomData("RTC6DAT.dat", LibMCEnv::CInputVector<uint8_t>(pAuxiliaryDataBuffer, nAuxiliaryDataBufferSize));
 
 	// TODO: Convert to ANSI
 	uint32_t nErrorCode = m_pScanLabSDK->n_load_program_file (m_CardNo, pWorkingDirectory->GetAbsoluteFilePath().c_str ());
@@ -478,7 +478,7 @@ void CRTCContext::GetRTCVersion(LibMCDriver_ScanLab_uint32& nRTCVersion, LibMCDr
 	nHEXVersion = m_pScanLabSDK->n_get_hex_version(m_CardNo);
 }
 
-void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_uint32& nPositionX, LibMCDriver_ScanLab_uint32& nPositionY, LibMCDriver_ScanLab_uint32& nPositionZ, LibMCDriver_ScanLab_uint32& nCorrectedPositionX, LibMCDriver_ScanLab_uint32& nCorrectedPositionY, LibMCDriver_ScanLab_uint32& nCorrectedPositionZ, LibMCDriver_ScanLab_uint32& nFocusShift, LibMCDriver_ScanLab_uint32& nMarkSpeed)
+void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_int32& nPositionX, LibMCDriver_ScanLab_int32& nPositionY, LibMCDriver_ScanLab_int32& nPositionZ, LibMCDriver_ScanLab_int32& nCorrectedPositionX, LibMCDriver_ScanLab_int32& nCorrectedPositionY, LibMCDriver_ScanLab_int32& nCorrectedPositionZ, LibMCDriver_ScanLab_int32& nFocusShift, LibMCDriver_ScanLab_int32& nMarkSpeed)
 {
 	bLaserIsOn = m_pScanLabSDK->n_get_value(m_CardNo, 0); // LASERON
 	nPositionX = m_pScanLabSDK->n_get_value(m_CardNo, 7); // SampleX
@@ -490,3 +490,27 @@ void CRTCContext::GetStateValues(bool& bLaserIsOn, LibMCDriver_ScanLab_uint32& n
 	nFocusShift = m_pScanLabSDK->n_get_value(m_CardNo, 32); // Focus shift
 	nMarkSpeed = m_pScanLabSDK->n_get_value(m_CardNo, 45); // Mark Speed
 }
+
+void CRTCContext::SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier)
+{
+	double dOldInitialTimeout = 0.0;
+	double dOldMaxTimeout = 0.0;
+	double dOldMultiplier = 0.0;
+	uint32_t nOldMode = 0;
+	m_pScanLabSDK->n_eth_get_com_timeouts_auto(m_CardNo, &dOldInitialTimeout, &dOldMaxTimeout, &dOldMultiplier, &nOldMode);
+	m_pScanLabSDK->n_eth_set_com_timeouts_auto(m_CardNo, dInitialTimeout, dMaxTimeout, dMultiplier, nOldMode);
+}
+
+void CRTCContext::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier)
+{
+	double dRetrievedInitialTimeout = 0.0;
+	double dRetrievedMaxTimeout = 0.0;
+	double dRetrievedMultiplier = 0.0;
+	uint32_t nRetrievedMode = 0;
+	m_pScanLabSDK->n_eth_get_com_timeouts_auto(m_CardNo, &dRetrievedInitialTimeout, &dRetrievedMaxTimeout, &dRetrievedMultiplier, &nRetrievedMode);
+
+	dInitialTimeout = dRetrievedInitialTimeout;
+	dMaxTimeout = dRetrievedMaxTimeout;
+	dMultiplier = dRetrievedMultiplier;
+}
+

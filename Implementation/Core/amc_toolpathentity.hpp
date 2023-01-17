@@ -59,6 +59,7 @@ namespace AMC {
 		Lib3MF::PModel m_p3MFModel;
 		Lib3MF::PReader m_p3MFReader;
 		Lib3MF::PToolpath m_pToolpath;
+		Lib3MF::PPersistentReaderSource m_pPersistentSource;
 
 		std::map<std::string, PToolpathPart> m_PartMap;
 		std::vector<PToolpathPart> m_PartList;
@@ -88,6 +89,8 @@ namespace AMC {
 		uint32_t getPartCount();
 		PToolpathPart getPart(uint32_t nIndex);
 		PToolpathPart findPartByUUID(const std::string & sUUID);
+
+		uint32_t getLayerZInUnits(uint32_t nLayerIndex);
 
 	};
 

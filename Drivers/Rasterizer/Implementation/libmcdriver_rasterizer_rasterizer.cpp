@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CRasterizer
 #include "libmcdriver_rasterizer_rasterizer.hpp"
 #include "libmcdriver_rasterizer_interfaceexception.hpp"
 #include "libmcdriver_rasterizer_imageobject.hpp"
+#include "libmcdriver_rasterizer_algorithm.hpp"
 
 // Include custom headers here.
 
@@ -45,7 +46,12 @@ using namespace LibMCDriver_Rasterizer::Impl;
 **************************************************************************************************************************/
 CRasterizerInstance::CRasterizerInstance(const uint32_t nPixelCountX, const uint32_t nPixelCountY, double dDPIX, double dDPIY)
 	: m_nPixelCountX(nPixelCountX), m_nPixelCountY(nPixelCountY), m_dDPIX(dDPIX), m_dDPIY(dDPIY),
-	m_dPositionX(0.0), m_dPositionY(0.0), m_nSubSamplingX(1), m_nSubSamplingY(1)
+	m_dPositionX(0.0), 
+	m_dPositionY(0.0), 
+	m_nSubSamplingX(1), 
+	m_nSubSamplingY(1),
+	m_nPixelsPerBlock (RASTERALGORITHM_DEFAULTPIXELSPERBLOCK),
+	m_nUnitsPerSubPixel (RASTERALGORITHM_DEFAULTUNITSPERSUBPIXEL)
 {
 	if (nPixelCountX <= 0)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPIXELCOUNT);
@@ -128,13 +134,18 @@ void CRasterizerInstance::AddLayer(ILayerObject* pLayerObject)
 	m_Layers.push_back(pLayerObjectInstance->getDataObject());
 }
 
-void CRasterizerInstance::CalculateImage(LibMCEnv::CImageData* pImageData, const bool bAntialiased)
+void CRasterizerInstance::CalculateImage(LibMCEnv::CImageData* pImageData, const bool bAntialiased, uint32_t nUnitsPerSubPixel, uint32_t nPixelsPerBlock)
 {
 	if (pImageData == nullptr)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
 
 	if (pImageData->GetPixelFormat () != LibMCEnv::eImagePixelFormat::GreyScale8bit)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_PIXELFORMATSHOULDBEGREYSCALE);
+
+	if ((nUnitsPerSubPixel < RASTERALGORITHM_MINUNITSPERSUBPIXEL) || (nUnitsPerSubPixel > RASTERALGORITHM_MAXUNITSPERSUBPIXEL) || ((nUnitsPerSubPixel % 2) != 0))
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDUNITSPERSUBPIXEL);
+	if ((nPixelsPerBlock < RASTERALGORITHM_MINPIXELSPERBLOCK) || (nPixelsPerBlock > RASTERALGORITHM_MAXPIXELSPERBLOCK))
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPIXELSPERBLOCK);
 
 	uint32_t nPixelSizeX = 0;
 	uint32_t nPixelSizeY = 0;
@@ -149,8 +160,15 @@ void CRasterizerInstance::CalculateImage(LibMCEnv::CImageData* pImageData, const
 
 	auto pImage = std::make_unique<CImageObject>(m_nPixelCountX, m_nPixelCountY, m_dDPIX, m_dDPIY);
 
-	for (auto pLayer : m_Layers)
-		pImage->drawLayerObject(pLayer.get(), 255);
+	if (!m_Layers.empty()) {
+
+		pImage->initRasterizationAlgorithms(nUnitsPerSubPixel, nPixelsPerBlock, m_nSubSamplingX, m_nSubSamplingY);
+		for (auto pLayer : m_Layers)
+			pImage->addRasterizationLayer (pLayer.get());
+		pImage->calculateRasterizationImage (bAntialiased);
+
+	}
+
 
 	pImageData->SetPixelRange(0, 0, m_nPixelCountX, m_nPixelCountY, pImage->getBuffer ());
 }
@@ -162,7 +180,9 @@ void CRasterizerInstance::CalculateImage(LibMCEnv::CImageData* pImageData, const
 **************************************************************************************************************************/
 
 CRasterizer::CRasterizer(PRasterizerInstance pRasterizerInstance)
-	: m_pRasterizerInstance (pRasterizerInstance)
+	: m_pRasterizerInstance (pRasterizerInstance),
+	m_nUnitsPerSubPixel (RASTERALGORITHM_DEFAULTUNITSPERSUBPIXEL),
+	m_nPixelsPerBlock (RASTERALGORITHM_DEFAULTPIXELSPERBLOCK)
 {
 	if (pRasterizerInstance.get() == nullptr)
 		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPARAM);
@@ -216,6 +236,24 @@ void CRasterizer::AddLayer(ILayerObject* pLayerObject)
 
 void CRasterizer::CalculateImage(LibMCEnv::PImageData pImageObject, const bool bAntialiased)
 {
-	m_pRasterizerInstance->CalculateImage(pImageObject.get(), bAntialiased);
+	m_pRasterizerInstance->CalculateImage(pImageObject.get(), bAntialiased, m_nUnitsPerSubPixel, m_nPixelsPerBlock);
+}
+
+void CRasterizer::SetSamplingParameters(const LibMCDriver_Rasterizer_uint32 nUnitsPerSubpixel, const LibMCDriver_Rasterizer_uint32 nPixelsPerBlock)
+{
+	if ((nUnitsPerSubpixel < RASTERALGORITHM_MINUNITSPERSUBPIXEL) || (nUnitsPerSubpixel > RASTERALGORITHM_MAXUNITSPERSUBPIXEL) || ((nUnitsPerSubpixel % 2) != 0))
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDUNITSPERSUBPIXEL);
+
+	if ((nPixelsPerBlock < RASTERALGORITHM_MINPIXELSPERBLOCK) || (nPixelsPerBlock > RASTERALGORITHM_MAXPIXELSPERBLOCK))
+		throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_INVALIDPIXELSPERBLOCK);
+
+	m_nUnitsPerSubPixel = nUnitsPerSubpixel;
+	m_nPixelsPerBlock = nPixelsPerBlock;
+}
+
+void CRasterizer::GetSamplingParameters(LibMCDriver_Rasterizer_uint32& nUnitsPerSubpixel, LibMCDriver_Rasterizer_uint32& nPixelsPerBlock)
+{
+	nUnitsPerSubpixel = m_nUnitsPerSubPixel;
+	nPixelsPerBlock = m_nPixelsPerBlock;
 }
 

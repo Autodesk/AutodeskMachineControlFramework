@@ -44,17 +44,26 @@ class AMCApplicationItem_Graphic_SVGImage extends Common.AMCApplicationItem {
 		
 		this.name = Assert.IdentifierString (itemJSON.name);		
 		this.imageuuid = Assert.OptionalUUIDValue (itemJSON.imageuuid);
-		this.x = Assert.NumberValue (itemJSON.x);
-		this.y = Assert.NumberValue (itemJSON.y);
-		this.z = Assert.NumberValue (itemJSON.z);
-		this.scalex = Assert.NumberValue (itemJSON.scalex);
-		this.scaley = Assert.NumberValue (itemJSON.scaley);
-		this.angle = Assert.NumberValue (itemJSON.angle);
-		
+
+		this.updateFromJSON (itemJSON);
+				
 		this.setRefreshFlag ();
 		
 	}
 		
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);		
+		
+		this.x = Assert.NumberValue (updateJSON.x);
+		this.y = Assert.NumberValue (updateJSON.y);
+		this.z = Assert.NumberValue (updateJSON.z);
+		this.scalex = Assert.NumberValue (updateJSON.scalex);
+		this.scaley = Assert.NumberValue (updateJSON.scaley);
+		this.angle = Assert.NumberValue (updateJSON.angle);
+		
+		this.moduleInstance.callDataHasChanged ();
+	}		
 }
 
 
