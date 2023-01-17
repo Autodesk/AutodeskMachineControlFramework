@@ -67,13 +67,41 @@ std::string CUIModule_LogsItem::findElementPathByUUID(const std::string& sUUID)
 	return "";
 }
 
-void CUIModule_LogsItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_LogsItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
-	auto pGroup = pClientVariableHandler->findGroup(getItemPath (), true);
+	//auto pGroup = pClientVariableHandler->findGroup(getItemPath (), true);
 
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData ();
+	uint32_t nMaxEntriesToRetrieve = 128;
 
-	
+	CJSONWriterArray jsonLogEntryArray(writer);
+
+	auto pLogger = m_pUIModuleEnvironment->getLogger();
+	if (pLogger->supportsLogMessagesRetrieval()) {
+		std::vector<CLoggerEntry> loggerEntries;
+		uint32_t nEndID = pLogger->getLogMessageHeadID();
+		uint32_t nStartID = nStateID;
+		if ((nStartID + nMaxEntriesToRetrieve) < nEndID)
+			nStartID = nEndID - nMaxEntriesToRetrieve;
+
+		pLogger->retrieveLogMessages(loggerEntries, nStartID, nEndID, LibMCData::eLogLevel::Message);
+
+		for (auto loggerEntry : loggerEntries) {
+			CJSONWriterObject jsonEntryObject(writer);
+
+			jsonEntryObject.addInteger (AMC_API_KEY_UI_LOGENTRYID, loggerEntry.getID ());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGSUBSYSTEM, loggerEntry.getSubSystem());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGTIMESTAMP, loggerEntry.getTimeStamp());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGMESSAGE, loggerEntry.getMessage());
+			jsonEntryObject.addString(AMC_API_KEY_UI_LOGLEVEL, loggerEntry.getlogLevelString());
+
+			jsonLogEntryArray.addObject(jsonEntryObject);
+		}
+
+	}
+
+
+	object.addArray(AMC_API_KEY_UI_LOGENTRIES, jsonLogEntryArray);
 
 }
 
@@ -148,19 +176,14 @@ void CUIModule_Logs::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterObjec
 	moduleObject.addString(AMC_API_KEY_UI_MODULETYPE, getType());
 	moduleObject.addString(AMC_API_KEY_UI_CAPTION, m_sCaption);
 
-/*	CJSONWriterArray itemsNode(writer);
-	CJSONWriterObject itemObject(writer);
-	itemObject.addString(AMC_API_KEY_UI_ITEMTYPE, "platform");
-	itemObject.addString(AMC_API_KEY_UI_ITEMUUID, m_PlatformItem->getUUID ());
-	m_PlatformItem->addContentToJSON(writer, itemObject, pClientVariableHandler);
-	itemsNode.addObject(itemObject);
-
-	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode); */
 
 }
 
 PUIModuleItem CUIModule_Logs::findItem(const std::string& sUUID)
 {
+	if (sUUID == m_sUUID)
+		return m_LogsItem;
+
 	if (m_LogsItem->getUUID() == sUUID)
 		return m_LogsItem;
 
@@ -169,7 +192,8 @@ PUIModuleItem CUIModule_Logs::findItem(const std::string& sUUID)
 
 void CUIModule_Logs::populateItemMap(std::map<std::string, PUIModuleItem>& itemMap)
 {
-	itemMap.insert (std::make_pair (m_LogsItem->getUUID (), m_LogsItem));
+	itemMap.insert (std::make_pair (m_sUUID, m_LogsItem));
+	itemMap.insert(std::make_pair(m_LogsItem->getUUID(), m_LogsItem));
 }
 
 void CUIModule_Logs::configurePostLoading()

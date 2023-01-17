@@ -140,6 +140,18 @@ CTest::~CTest()
 
 }
 
+void onLogMessage(const char* pLogMessage, const char* pSubSystem, LibMCData::eLogLevel eLogLevel, const char* pTimeStamp, LibMCData_pvoid pUserData)
+{
+	if ((pLogMessage != nullptr) && (pSubSystem != nullptr) && (pTimeStamp != nullptr) && (pUserData != nullptr)) {
+		std::string sLogMessage(pLogMessage);
+		std::string sSubSystem(pSubSystem);
+		std::string sTimeStamp(pTimeStamp);
+		CTest* pTest = (CTest*)pUserData;
+
+		pTest->log(sTimeStamp + " | " + sLogMessage);
+	}
+}
+
 void CTest::executeBlocking()
 {
 	m_pContext = nullptr;
@@ -172,6 +184,8 @@ void CTest::executeBlocking()
 
 		log("Initialising Database...");
 		m_pDataModel->InitialiseDatabase(sTestOutputDirectory, LibMCData::eDataBaseType::SqLite, sTestOutputDirectory + "output.db");
+
+		m_pDataModel->SetLogCallback(onLogMessage, this);
 
 		log("Loading framework...");
 		m_pWrapper = LibMC::CWrapper::loadLibrary(sCoreLibraryPath);

@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_parameterhandler.hpp"
 #include "amc_statemachinedata.hpp"
 #include "amc_logger_multi.hpp"
-#include "amc_logger_stdout.hpp"
+#include "amc_logger_callback.hpp"
 #include "amc_logger_database.hpp"
 #include "amc_servicehandler.hpp"
 #include "amc_ui_handler.hpp"
@@ -76,8 +76,9 @@ CMCContext::CMCContext(LibMCData::PDataModel pDataModel)
 
     // Create Log Multiplexer to StdOut and Database
     auto pMultiLogger = std::make_shared<AMC::CLogger_Multi>();
-    pMultiLogger->addLogger(std::make_shared<AMC::CLogger_StdOut>());
     pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Database> (pDataModel->CreateNewLogSession ()));
+    if (pDataModel->HasLogCallback())
+        pMultiLogger->addLogger(std::make_shared<AMC::CLogger_Callback>(pDataModel));
 
     // Create system state
     m_pSystemState = std::make_shared <CSystemState> (pMultiLogger, pDataModel, m_pEnvironmentWrapper, "./testoutput");
@@ -221,6 +222,7 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
                 throw ELibMCNoContextException(LIBMC_ERROR_NOUSERINTERFACEDEFINITION);
 
             m_pSystemState->logger()->logMessage("Using default testing UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
+            m_pSystemState->uiHandler()->setCoreResourcePackage(m_pCoreResourcePackage);
         }
         else {
 
@@ -232,7 +234,8 @@ void CMCContext::ParseConfiguration(const std::string & sXMLString)
             auto sUILibraryPath = m_pSystemState->getLibraryPath(uiLibraryAttrib.as_string());
 
             m_pSystemState->logger()->logMessage("Loading UI Handler...", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
-            m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, m_pCoreResourcePackage, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
+            m_pSystemState->uiHandler()->setCoreResourcePackage(m_pCoreResourcePackage);
+            m_pSystemState->uiHandler()->loadFromXML(userInterfaceNode, sUILibraryPath, m_pSystemState->getBuildJobHandlerInstance());
         }
 
     }
@@ -268,6 +271,15 @@ void CMCContext::LoadClientPackage(const std::string& sResourcePath)
     m_pClientDistHandler->LoadClientPackage (pPackage);
 }
 
+struct xml_sstream_writer : pugi::xml_writer
+{
+    std::stringstream resultStream;
+
+    virtual void write(const void* data, size_t size)
+    {
+        resultStream << std::string (static_cast<const char*>(data), size);
+    }
+};
 
 void CMCContext::addDriver(const pugi::xml_node& xmlNode)
 {
@@ -290,15 +302,37 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
     m_pSystemState->logger()->logMessage("Initializing " + sName + " (" + sType + "@" + sLibraryName + ")", LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::Message);
 
     std::string sConfigurationData = "";
-    auto configAttrib = xmlNode.attribute("configurationresource");
-    if (!configAttrib.empty()) {
-        std::vector<uint8_t> Buffer;
-        m_pCoreResourcePackage->readEntry(configAttrib.as_string(), Buffer);
-        sConfigurationData.assign(Buffer.begin (), Buffer.end ());
+
+    std::string sConfigSchema = xmlNode.attribute("configurationschema").as_string ();
+    std::string sConfigResource = xmlNode.attribute("configurationresource").as_string ();
+    if ((!sConfigResource.empty()) && (!sConfigSchema.empty()))
+        throw ELibMCCustomException(LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION, sName);
+
+    // If configuration schema is given, then the driver configuration is inlined in the config XML.
+    if (!sConfigSchema.empty()) {
+        pugi::xml_document config_document;
+        xml_sstream_writer config_writer;
+
+        // Copy driver node content into driver configuration XML.
+        auto driverNode = config_document.append_child("driverconfiguration");
+        driverNode.append_attribute("xmlns").set_value(sConfigSchema.c_str());
+        for (auto subNode : xmlNode.children()) {
+            driverNode.prepend_copy(subNode);
+        }
+       
+        config_document.save(config_writer);
+
+        sConfigurationData = config_writer.resultStream.str();
+
+        std::cout << sConfigurationData << std::endl;
+    }
+
+    if (!sConfigResource.empty()) {
+        sConfigurationData = m_pCoreResourcePackage->readEntryUTF8String(sConfigResource);
     }
 
     try {
-        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName), sConfigurationData);
+        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName), sConfigurationData, m_pCoreResourcePackage);
     } 
     catch (std::exception & E) {
         m_pSystemState->logger()->logMessage(std::string ("Driver error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);

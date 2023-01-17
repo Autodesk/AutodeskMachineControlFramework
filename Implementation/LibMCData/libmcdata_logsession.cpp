@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "libmcdata_logsession.hpp"
 #include "libmcdata_interfaceexception.hpp"
+#include "libmcdata_logentrylist.hpp"
 
 // Include custom headers here.
 #include "amcdata_sqlhandler_sqlite.hpp"
@@ -74,5 +75,33 @@ void CLogSession::AddEntry(const std::string & sMessage, const std::string & sSu
 
 	m_LogID++;
 
+}
+
+LibMCData_uint32 CLogSession::GetMaxLogEntryID()
+{
+	return m_LogID;
+}
+
+ILogEntryList* CLogSession::RetrieveLogEntriesByID(const LibMCData_uint32 nMinLogID, const LibMCData_uint32 nMaxLogID, const LibMCData::eLogLevel eMinLogLevel)
+{
+	auto pLogEntryList = std::make_unique<CLogEntryList> ();
+
+	std::string sQuery = "SELECT logindex, loglevel, timestamp, subsystem, message FROM logs WHERE logindex >= ? AND logindex <= ? AND loglevel <= ?";
+	auto pStatement = m_pSQLHandler->prepareStatement(sQuery);
+	pStatement->setInt(1, nMinLogID);
+	pStatement->setInt(2, nMaxLogID);
+	pStatement->setInt(3, (int)eMinLogLevel);
+	while (pStatement->nextRow()) {
+		int32_t nLogID = pStatement->getColumnInt(1);
+		int32_t nLogLevel = pStatement->getColumnInt(2);
+		std::string sTimeStamp = pStatement->getColumnString(3);
+		std::string sSubSystem = pStatement->getColumnString(4);
+		std::string sMessage = pStatement->getColumnString(5);
+
+		pLogEntryList->addEntry (nLogID, sMessage, sSubSystem, (eLogLevel) nLogLevel, sTimeStamp);
+	}
+	pStatement = nullptr;
+
+	return pLogEntryList.release();
 }
 

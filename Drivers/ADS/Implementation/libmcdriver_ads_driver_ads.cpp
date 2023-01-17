@@ -208,6 +208,7 @@ PDriver_ADSParameter readParameterFromXMLNode(pugi::xml_node& node)
 }
 
 
+
 void CDriver_ADS::Configure(const std::string& sConfigurationString)
 {
     m_pDriverEnvironment->LogMessage("Configuring ADS driver!");
@@ -220,7 +221,12 @@ void CDriver_ADS::Configure(const std::string& sConfigurationString)
     if (!result)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_COULDNOTPARSEDRIVERPROTOCOL);
 
-    pugi::xml_node adsprotocolNode = doc.child("adsprotocol");
+    pugi::xml_node adsprotocolNode = doc.child("driverconfiguration");
+    // Depreciated fallback: root Node was called "adsprotocol" in earlier versions.
+    // Going forward, the driver configurations should all be "driverconfiguration"
+    if (adsprotocolNode.empty())
+        adsprotocolNode = doc.child("adsprotocol");
+
     if (adsprotocolNode.empty())
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDDRIVERPROTOCOL);
 
@@ -389,6 +395,11 @@ bool CDriver_ADS::IsSimulationMode()
 	return m_bSimulationMode;
 }
 
+void CDriver_ADS::SetCustomSDKResource(const std::string& sResourceName)
+{
+    m_sCustomSDKResource = sResourceName;
+}
+
 void CDriver_ADS::Connect(const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout)
 {
     Disconnect();
@@ -399,10 +410,31 @@ void CDriver_ADS::Connect(const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_
     m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
 
 #ifdef _WIN32
-    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcadsdll_win64.dll", "tcadsdll_win64");
+    std::string sFileNameOnDisk = "tcadsdll_win64.dll";
+    std::string sResourceName = "tcadsdll_win64";
 #else
-    m_pADSDLLFile = m_pWorkingDirectory->StoreDriverData("tcadsdll_linux64.so", "tcadsdll_linux64");
+    std::string sFileNameOnDisk = "tcadsdll_linux64.so";
+    std::string sResourceName = "tcadsdll_linux64";
 #endif
+   
+    if (!m_sCustomSDKResource.empty())
+        sResourceName = m_sCustomSDKResource;
+
+    std::vector<uint8_t> DataBuffer;
+    if (m_pDriverEnvironment->MachineHasResourceData(sResourceName)) {
+
+        m_pDriverEnvironment->RetrieveMachineResourceData(sResourceName, DataBuffer);
+
+    }
+    else {
+
+        m_pDriverEnvironment->RetrieveDriverResourceData(sResourceName, DataBuffer);
+    }
+
+    if (DataBuffer.empty())
+        throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDADSSDKRESOURCE);
+
+    m_pADSDLLFile = m_pWorkingDirectory->StoreCustomData (sFileNameOnDisk, DataBuffer);
 
     m_pADSSDK = std::make_shared<CADSSDK>(m_pADSDLLFile->GetAbsoluteFileName());
     m_pADSClient = std::make_shared<CADSClient>(m_pADSSDK);
@@ -522,7 +554,7 @@ void CDriver_ADS::WriteIntegerValue(const std::string& sVariableName, const LibM
 LibMCDriver_ADS_double CDriver_ADS::ReadFloatValue(const std::string& sVariableName)
 {
     if (m_bSimulationMode)
-        return 0;
+        return 0.0;
 
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
@@ -550,7 +582,7 @@ void CDriver_ADS::WriteFloatValue(const std::string& sVariableName, const LibMCD
 bool CDriver_ADS::ReadBoolValue(const std::string& sVariableName)
 {
     if (m_bSimulationMode)
-        return 0;
+        return false;
 
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);
@@ -576,7 +608,7 @@ void CDriver_ADS::WriteBoolValue(const std::string& sVariableName, const bool bV
 std::string CDriver_ADS::ReadStringValue(const std::string& sVariableName)
 {
     if (m_bSimulationMode)
-        return 0;
+        return "";
 
     if (m_pADSClient.get() == nullptr)
         throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_DRIVERNOTCONFIGURED);

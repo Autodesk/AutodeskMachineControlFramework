@@ -137,6 +137,7 @@ typedef void * LibMCDriver_ADS_pvoid;
 #define LIBMCDRIVER_ADS_ERROR_STRINGLENGTHEXCEEDSBUFFERSIZE 1029 /** string length exceeds buffer size */
 #define LIBMCDRIVER_ADS_ERROR_STRINGLENGTHMISSING 1030 /** string length missing */
 #define LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGLENGTH 1031 /** invalid string length */
+#define LIBMCDRIVER_ADS_ERROR_INVALIDADSSDKRESOURCE 1032 /** invalid ads sdk resource */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ADS
@@ -186,6 +187,7 @@ inline const char * LIBMCDRIVER_ADS_GETERRORSTRING (LibMCDriver_ADSResult nError
     case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHEXCEEDSBUFFERSIZE: return "string length exceeds buffer size";
     case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHMISSING: return "string length missing";
     case LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGLENGTH: return "invalid string length";
+    case LIBMCDRIVER_ADS_ERROR_INVALIDADSSDKRESOURCE: return "invalid ads sdk resource";
     default: return "unknown error";
   }
 }

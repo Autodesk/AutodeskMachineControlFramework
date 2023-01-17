@@ -84,7 +84,7 @@
 		<error name="INVALIDMAXLASERPOWER" code="1031" description="Invalid max laser power." />
 		<error name="INVALIDLASERDELAY" code="1032" description="Invalid laser delay." />
 		<error name="INVALIDSCANNERDELAY" code="1033" description="Invalid scanner delay." />
-		
+		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />
 		
 		
 		

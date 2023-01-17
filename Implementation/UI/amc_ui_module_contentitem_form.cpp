@@ -441,7 +441,7 @@ void CUIModule_ContentForm::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 }
 
 
-void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_ContentForm::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 	CJSONWriterArray entityArray(writer);
 	for (auto pEntity : m_Entities) {

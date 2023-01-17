@@ -946,6 +946,84 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentinfo(LibMCEnv_ToolpathLayer pToo
 	}
 }
 
+LibMCEnvResult libmcenv_toolpathlayer_getsegmenttype(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, eLibMCEnvToolpathSegmentType * pType)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pType == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pType = pIToolpathLayer->GetSegmentType(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointcount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pHatchCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHatchCount = pIToolpathLayer->GetSegmentPointCount(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getsegmenthatchcount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if (pHatchCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHatchCount = pIToolpathLayer->GetSegmentHatchCount(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_toolpathlayer_getsegmentprofileuuid(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint32 nProfileUUIDBufferSize, LibMCEnv_uint32* pProfileUUIDNeededChars, char * pProfileUUIDBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pToolpathLayer;
@@ -1131,6 +1209,84 @@ LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointdata(LibMCEnv_ToolpathLayer
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIToolpathLayer->GetSegmentPointData(nIndex, nPointDataBufferSize, pPointDataNeededCount, pPointDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getsegmenthatchdata(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, sLibMCEnvHatch2D * pHatchDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if ((!pHatchDataBuffer) && !(pHatchDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIToolpathLayer->GetSegmentHatchData(nIndex, nHatchDataBufferSize, pHatchDataNeededCount, pHatchDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointdatainmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, sLibMCEnvFloatPosition2D * pPointDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if ((!pPointDataBuffer) && !(pPointDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIToolpathLayer->GetSegmentPointDataInMM(nIndex, nPointDataBufferSize, pPointDataNeededCount, pPointDataBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathlayer_getsegmenthatchdatainmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, sLibMCEnvFloatHatch2D * pHatchDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathLayer;
+
+	try {
+		if ((!pHatchDataBuffer) && !(pHatchDataNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathLayer* pIToolpathLayer = dynamic_cast<IToolpathLayer*>(pIBaseClass);
+		if (!pIToolpathLayer)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIToolpathLayer->GetSegmentHatchDataInMM(nIndex, nHatchDataBufferSize, pHatchDataNeededCount, pHatchDataBuffer);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -1567,6 +1723,110 @@ LibMCEnvResult libmcenv_toolpathaccessor_findpartbyuuid(LibMCEnv_ToolpathAccesso
 		pBasePart = pIToolpathAccessor->FindPartByUUID(sPartUUID);
 
 		*pPart = (IBase*)(pBasePart);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getbuildheightinunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_int32 * pBuildHeight)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pBuildHeight == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pBuildHeight = pIToolpathAccessor->GetBuildHeightInUnits();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_int32 * pZValue)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pZValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pZValue = pIToolpathAccessor->GetZValueInUnits(nLayerIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getbuildheightinmm(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pBuildHeight)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pBuildHeight == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pBuildHeight = pIToolpathAccessor->GetBuildHeightInMM();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinmm(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue)
+{
+	IBase* pIBaseClass = (IBase *)pToolpathAccessor;
+
+	try {
+		if (pZValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IToolpathAccessor* pIToolpathAccessor = dynamic_cast<IToolpathAccessor*>(pIBaseClass);
+		if (!pIToolpathAccessor)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pZValue = pIToolpathAccessor->GetZValueInMM(nLayerIndex);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -2555,6 +2815,107 @@ LibMCEnvResult libmcenv_workingdirectory_storedriverdata(LibMCEnv_WorkingDirecto
 	}
 }
 
+LibMCEnvResult libmcenv_workingdirectory_storecustomdataintempfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pExtension == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pDataBufferBuffer) && (nDataBufferBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExtension(pExtension);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->StoreCustomDataInTempFile(sExtension, nDataBufferBufferSize, pDataBufferBuffer);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_storecustomstringintempfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pExtension == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pDataString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExtension(pExtension);
+		std::string sDataString(pDataString);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->StoreCustomStringInTempFile(sExtension, sDataString);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_workingdirectory_storedriverdataintempfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile)
+{
+	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
+
+	try {
+		if (pExtension == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pWorkingFile == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sExtension(pExtension);
+		std::string sIdentifier(pIdentifier);
+		IBase* pBaseWorkingFile(nullptr);
+		IWorkingDirectory* pIWorkingDirectory = dynamic_cast<IWorkingDirectory*>(pIBaseClass);
+		if (!pIWorkingDirectory)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseWorkingFile = pIWorkingDirectory->StoreDriverDataInTempFile(sExtension, sIdentifier);
+
+		*pWorkingFile = (IBase*)(pBaseWorkingFile);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_workingdirectory_cleanup(LibMCEnv_WorkingDirectory pWorkingDirectory, bool * pSuccess)
 {
 	IBase* pIBaseClass = (IBase *)pWorkingDirectory;
@@ -2754,6 +3115,64 @@ LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_Driver
 	}
 }
 
+LibMCEnvResult libmcenv_driverenvironment_driverhasresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHasResourceData == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasResourceData = pIDriverEnvironment->DriverHasResourceData(sIdentifier);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_machinehasresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pHasResourceData == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pHasResourceData = pIDriverEnvironment->MachineHasResourceData(sIdentifier);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -2769,6 +3188,64 @@ LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvi
 			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
 		
 		pIDriverEnvironment->RetrieveDriverData(sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_retrievedriverresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ((!pDataBufferBuffer) && !(pDataBufferNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RetrieveDriverResourceData(sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_retrievemachineresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pIdentifier == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ((!pDataBufferBuffer) && !(pDataBufferNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIdentifier(pIdentifier);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverEnvironment->RetrieveMachineResourceData(sIdentifier, nDataBufferBufferSize, pDataBufferNeededCount, pDataBufferBuffer);
 
 		return LIBMCENV_SUCCESS;
 	}
@@ -5204,6 +5681,57 @@ LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironm
 	}
 }
 
+LibMCEnvResult libmcenv_stateenvironment_loadresourcestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pStateEnvironment;
+
+	try {
+		if (pResourceName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if ( (!pResourceDataBuffer) && !(pResourceDataNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sResourceName(pResourceName);
+		std::string sResourceData("");
+		IStateEnvironment* pIStateEnvironment = dynamic_cast<IStateEnvironment*>(pIBaseClass);
+		if (!pIStateEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pResourceDataBuffer == nullptr);
+		if (isCacheCall) {
+			sResourceData = pIStateEnvironment->LoadResourceString(sResourceName);
+
+			pIStateEnvironment->_setCache (new ParameterCache_1<std::string> (sResourceData));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIStateEnvironment->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sResourceData);
+			pIStateEnvironment->_setCache (nullptr);
+		}
+		
+		if (pResourceDataNeededChars)
+			*pResourceDataNeededChars = (LibMCEnv_uint32) (sResourceData.size()+1);
+		if (pResourceDataBuffer) {
+			if (sResourceData.size() >= nResourceDataBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iResourceData = 0; iResourceData < sResourceData.size(); iResourceData++)
+				pResourceDataBuffer[iResourceData] = sResourceData[iResourceData];
+			pResourceDataBuffer[sResourceData.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_stateenvironment_createemptyimage(LibMCEnv_StateEnvironment pStateEnvironment, LibMCEnv_uint32 nPixelSizeX, LibMCEnv_uint32 nPixelSizeY, LibMCEnv_double dDPIValueX, LibMCEnv_double dDPIValueY, eLibMCEnvImagePixelFormat ePixelFormat, LibMCEnv_ImageData * pImageDataInstance)
 {
 	IBase* pIBaseClass = (IBase *)pStateEnvironment;
@@ -6589,6 +7117,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentcount;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentinfo") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentinfo;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmenttype") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmenttype;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmentpointcount") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpointcount;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmenthatchcount") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmenthatchcount;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentprofileuuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentprofileuuid;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentprofilevalue") 
@@ -6599,6 +7133,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpartuuid;
 	if (sProcName == "libmcenv_toolpathlayer_getsegmentpointdata") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpointdata;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmenthatchdata") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmenthatchdata;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmentpointdatainmm") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmentpointdatainmm;
+	if (sProcName == "libmcenv_toolpathlayer_getsegmenthatchdatainmm") 
+		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getsegmenthatchdatainmm;
 	if (sProcName == "libmcenv_toolpathlayer_getzvalue") 
 		*ppProcAddress = (void*) &libmcenv_toolpathlayer_getzvalue;
 	if (sProcName == "libmcenv_toolpathlayer_getzvalueinmm") 
@@ -6625,6 +7165,14 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getpart;
 	if (sProcName == "libmcenv_toolpathaccessor_findpartbyuuid") 
 		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_findpartbyuuid;
+	if (sProcName == "libmcenv_toolpathaccessor_getbuildheightinunits") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getbuildheightinunits;
+	if (sProcName == "libmcenv_toolpathaccessor_getzvalueinunits") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getzvalueinunits;
+	if (sProcName == "libmcenv_toolpathaccessor_getbuildheightinmm") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getbuildheightinmm;
+	if (sProcName == "libmcenv_toolpathaccessor_getzvalueinmm") 
+		*ppProcAddress = (void*) &libmcenv_toolpathaccessor_getzvalueinmm;
 	if (sProcName == "libmcenv_build_getname") 
 		*ppProcAddress = (void*) &libmcenv_build_getname;
 	if (sProcName == "libmcenv_build_getbuilduuid") 
@@ -6681,6 +7229,12 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomstring;
 	if (sProcName == "libmcenv_workingdirectory_storedriverdata") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_storedriverdata;
+	if (sProcName == "libmcenv_workingdirectory_storecustomdataintempfile") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomdataintempfile;
+	if (sProcName == "libmcenv_workingdirectory_storecustomstringintempfile") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_storecustomstringintempfile;
+	if (sProcName == "libmcenv_workingdirectory_storedriverdataintempfile") 
+		*ppProcAddress = (void*) &libmcenv_workingdirectory_storedriverdataintempfile;
 	if (sProcName == "libmcenv_workingdirectory_cleanup") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_cleanup;
 	if (sProcName == "libmcenv_workingdirectory_addmanagedfile") 
@@ -6695,8 +7249,16 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrieveallfiles;
 	if (sProcName == "libmcenv_driverenvironment_createworkingdirectory") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createworkingdirectory;
+	if (sProcName == "libmcenv_driverenvironment_driverhasresourcedata") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_driverhasresourcedata;
+	if (sProcName == "libmcenv_driverenvironment_machinehasresourcedata") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_machinehasresourcedata;
 	if (sProcName == "libmcenv_driverenvironment_retrievedriverdata") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_retrievedriverdata;
+	if (sProcName == "libmcenv_driverenvironment_retrievedriverresourcedata") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_retrievedriverresourcedata;
+	if (sProcName == "libmcenv_driverenvironment_retrievemachineresourcedata") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_retrievemachineresourcedata;
 	if (sProcName == "libmcenv_driverenvironment_createtoolpathaccessor") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createtoolpathaccessor;
 	if (sProcName == "libmcenv_driverenvironment_registerstringparameter") 
@@ -6845,6 +7407,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_getboolparameter;
 	if (sProcName == "libmcenv_stateenvironment_loadresourcedata") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcedata;
+	if (sProcName == "libmcenv_stateenvironment_loadresourcestring") 
+		*ppProcAddress = (void*) &libmcenv_stateenvironment_loadresourcestring;
 	if (sProcName == "libmcenv_stateenvironment_createemptyimage") 
 		*ppProcAddress = (void*) &libmcenv_stateenvironment_createemptyimage;
 	if (sProcName == "libmcenv_stateenvironment_loadpngimage") 

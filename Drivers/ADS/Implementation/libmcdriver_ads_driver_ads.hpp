@@ -137,6 +137,8 @@ private:
 	std::mutex m_driverEnvironmentMutex;
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
+	std::string m_sCustomSDKResource;
+
 	PADSSDK m_pADSSDK;
 	PADSClient m_pADSClient;
 
@@ -162,6 +164,8 @@ public:
 	CDriver_ADS(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
 	virtual ~CDriver_ADS();
+
+	void SetCustomSDKResource(const std::string& sResourceName) override;
 
 	void Configure(const std::string& sConfigurationString) override;
 

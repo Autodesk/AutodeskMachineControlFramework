@@ -11,6 +11,7 @@
     "@mdi/font": "^6.5.95",
     "asmcrypto-lite": "^1.1.0",
     "axios": "^0.24.0",
+    "luxon": "^3.1.0",
     "roboto-fontface": "^0.10.0",
     "three": "^0.136.0",
     "three-svg-loader": "^0.3.1",

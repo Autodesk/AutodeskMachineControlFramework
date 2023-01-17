@@ -254,7 +254,7 @@ void CDriver_TCPIPSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, 
         }
 
         if (totalBytesReceived != nCount)
-            Buffer.resize(oldSize + nCount);
+            Buffer.resize(oldSize + totalBytesReceived);
     }
 }
 

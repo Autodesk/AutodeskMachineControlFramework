@@ -127,7 +127,7 @@ void InitialiseScanlabDriver(LibMCEnv::PStateEnvironment pStateEnvironment, PDri
 
 
 	pStateEnvironment->LogMessage("Configuring laser...");
-	pDriver->ConfigureLaserMode(LibMCDriver_ScanLab::eLaserMode::YAG1, LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1, dMaxLaserPower, false, false, true, true, false, false);
+	pDriver->ConfigureLaserMode(LibMCDriver_ScanLab::eLaserMode::YAG1, LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1, dMaxLaserPower, false, false, false, false, false, false);
 
 	pStateEnvironment->LogMessage("Configuring delays...");
 	pDriver->ConfigureDelays(dLaserOnDelay, dLaserOffDelay, dMarkDelay, dJumpDelay, dPolygonDelay);
@@ -196,16 +196,32 @@ __DECLARESTATE(exposure)
 	auto pBuildJob = pStateEnvironment->GetBuildJob(pSignalHandler->GetString("jobuuid"));
 	auto nLayerIndex = (uint32_t)pSignalHandler->GetInteger("layerindex");
 
+
 	std::string sCardType = pStateEnvironment->GetStringParameter("cardconfig", "cardtype");
 	if (sCardType == "scanlab")
 	{
 		auto pDriver = __acquireDriver(ScanLab_RTC6);
+
+		if (pDriver->IsSimulationMode()) {
+			pStateEnvironment->LogMessage("Simulation mode delay of 2 seconds..");
+			pStateEnvironment->Sleep(2000);
+		}
+
 		pDriver->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
 	}
 	else if (sCardType == "raylase") {
 		auto pDriver = __acquireDriver(Raylase);
+
+		if (pDriver->IsSimulationMode()) {
+			pStateEnvironment->LogMessage("Simulation mode delay of 2 seconds..");
+			pStateEnvironment->Sleep(2000);
+		}
+
+		pStateEnvironment->LogMessage("Get Connected Card...");
 		auto pCard = pDriver->GetConnectedCard("card1");
+		pStateEnvironment->LogMessage("Drawing Layer...");
 		pCard->DrawLayer(pBuildJob->GetStorageUUID(), nLayerIndex);
+		pStateEnvironment->LogMessage("Drawing Layer successful...");
 	}
 
 	pSignalHandler->SetBoolResult("success", true);

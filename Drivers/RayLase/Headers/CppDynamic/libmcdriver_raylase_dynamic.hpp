@@ -188,6 +188,7 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_CARDNOTREGISTERED: return "CARDNOTREGISTERED";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT: return "INVALIDPOINTCOUNT";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER: return "INVALIDLASERPOWER";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK: return "INVALIDRAYLASESDK";
 		}
 		return "UNKNOWN";
 	}
@@ -214,6 +215,7 @@ public:
 			case LIBMCDRIVER_RAYLASE_ERROR_CARDNOTREGISTERED: return "Card not registered";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDPOINTCOUNT: return "Invalid point count";
 			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDLASERPOWER: return "Invalid laser power";
+			case LIBMCDRIVER_RAYLASE_ERROR_INVALIDRAYLASESDK: return "Invalid Raylase SDK";
 		}
 		return "unknown error";
 	}
@@ -464,6 +466,7 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
+	inline void SetCustomSDKResource(const std::string & sResourceName);
 	inline void LoadSDK();
 	inline PRaylaseCard ConnectByIP(const std::string & sCardName, const std::string & sCardIP, const LibMCDriver_Raylase_uint32 nPort, const LibMCDriver_Raylase_double dMaxLaserPowerInWatts);
 	inline PRaylaseCard GetConnectedCard(const std::string & sCardName);
@@ -609,6 +612,7 @@ public:
 		pWrapperTable->m_RaylaseCard_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_Raylase_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_Raylase_IsSimulationMode = nullptr;
+		pWrapperTable->m_Driver_Raylase_SetCustomSDKResource = nullptr;
 		pWrapperTable->m_Driver_Raylase_LoadSDK = nullptr;
 		pWrapperTable->m_Driver_Raylase_ConnectByIP = nullptr;
 		pWrapperTable->m_Driver_Raylase_GetConnectedCard = nullptr;
@@ -841,6 +845,15 @@ public:
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_Raylase_SetCustomSDKResource = (PLibMCDriver_RaylaseDriver_Raylase_SetCustomSDKResourcePtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_setcustomsdkresource");
+		#else // _WIN32
+		pWrapperTable->m_Driver_Raylase_SetCustomSDKResource = (PLibMCDriver_RaylaseDriver_Raylase_SetCustomSDKResourcePtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_setcustomsdkresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_Raylase_SetCustomSDKResource == nullptr)
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_Raylase_LoadSDK = (PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPtr) GetProcAddress(hLibrary, "libmcdriver_raylase_driver_raylase_loadsdk");
 		#else // _WIN32
 		pWrapperTable->m_Driver_Raylase_LoadSDK = (PLibMCDriver_RaylaseDriver_Raylase_LoadSDKPtr) dlsym(hLibrary, "libmcdriver_raylase_driver_raylase_loadsdk");
@@ -1020,6 +1033,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_issimulationmode", (void**)&(pWrapperTable->m_Driver_Raylase_IsSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_IsSimulationMode == nullptr) )
+			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_setcustomsdkresource", (void**)&(pWrapperTable->m_Driver_Raylase_SetCustomSDKResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_Raylase_SetCustomSDKResource == nullptr) )
 			return LIBMCDRIVER_RAYLASE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_raylase_driver_raylase_loadsdk", (void**)&(pWrapperTable->m_Driver_Raylase_LoadSDK));
@@ -1291,6 +1308,15 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_IsSimulationMode(m_pHandle, &resultIsSimulationMode));
 		
 		return resultIsSimulationMode;
+	}
+	
+	/**
+	* CDriver_Raylase::SetCustomSDKResource - Sets the machine resource name of the SDK to load. MUST be called before LoadSDK or it has no effect.
+	* @param[in] sResourceName - Resource name of core machine package. Empty means standard naming applies.
+	*/
+	void CDriver_Raylase::SetCustomSDKResource(const std::string & sResourceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_Raylase_SetCustomSDKResource(m_pHandle, sResourceName.c_str()));
 	}
 	
 	/**

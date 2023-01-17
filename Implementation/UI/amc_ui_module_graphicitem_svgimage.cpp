@@ -168,7 +168,7 @@ CUIModule_GraphicSVGImage::~CUIModule_GraphicSVGImage()
 }
 
 
-void CUIModule_GraphicSVGImage::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_GraphicSVGImage::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 	auto pStateMachineData = m_pUIModuleEnvironment->stateMachineData();
 

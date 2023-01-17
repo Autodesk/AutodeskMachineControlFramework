@@ -75,7 +75,22 @@ void CDriver_ScanLab::LoadSDK(const std::string& sResourceName)
 #endif
 
     m_pWorkingDirectory = m_pDriverEnvironment->CreateWorkingDirectory();
-    m_pSDKLibraryFile = m_pWorkingDirectory->StoreDriverData(sFileName, sResourceName);    
+
+    if (m_pDriverEnvironment->MachineHasResourceData(sResourceName)) {
+        std::vector<uint8_t> SDKBuffer;
+        m_pDriverEnvironment->RetrieveMachineResourceData(sResourceName, SDKBuffer);
+        if (SDKBuffer.size () == 0)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK);
+
+        m_pSDKLibraryFile = m_pWorkingDirectory->StoreCustomData(sFileName, LibMCEnv::CInputVector<uint8_t>(SDKBuffer.data(), SDKBuffer.size ()));
+    }
+    else {
+        m_pSDKLibraryFile = m_pWorkingDirectory->StoreDriverData(sFileName, sResourceName);
+    }
+
+    if (m_pSDKLibraryFile->GetSize () == 0)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK);
+
     m_pScanLabSDK = std::make_shared<CScanLabSDK>(m_pSDKLibraryFile->GetAbsoluteFileName());
 
 }
@@ -84,6 +99,9 @@ void CDriver_ScanLab::LoadCustomSDK(const LibMCDriver_ScanLab_uint64 nScanlabDLL
 {
     if (m_pScanLabSDK.get() != nullptr)
         throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_SCANLABSDKALREADYLOADED);
+
+    if ((pScanlabDLLBuffer == nullptr) || (nScanlabDLLBufferSize == 0))
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK);
 
     std::string sFileName;
 #ifdef _WIN32

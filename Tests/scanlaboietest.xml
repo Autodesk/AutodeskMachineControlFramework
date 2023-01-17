@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+	<driver name="scanlab_rtc6" library="driver_scanlab" type="scanlab-rtc6"/>
+	<driver name="scanlab_oie" library="driver_scanlaboie" type="scanlab-oie2"/>
+
+	<statemachine name="scanlaboietest" description="OIE Test" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_scanlaboietest">
+	
+		<state name="init" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="success" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="100">
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+	<libraries>
+		<library name="plugin_scanlaboietest" dll="%githash%_test_scanlaboietest" />
+		<library name="driver_scanlab" dll="%githash%_driver_scanlab" />
+		<library name="driver_scanlaboie" dll="%githash%_driver_scanlaboie" />
+	</libraries>
+		
+	<test description="Test of SCANLAB OIE Driver">			
+	
+		<instance name="scanlaboietest" />
+		
+	</test>
+	
+			
+
+</testdefinition>

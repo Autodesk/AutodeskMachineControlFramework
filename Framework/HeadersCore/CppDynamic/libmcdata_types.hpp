@@ -358,6 +358,8 @@ typedef void * LibMCData_pvoid;
 #define LIBMCDATA_ERROR_INVALIDNAMESTRING 331 /** Invalid name string */
 #define LIBMCDATA_ERROR_NAMESTRINGMISMATCH 332 /** Name string mismatch */
 #define LIBMCDATA_ERROR_DATATYPEMISMATCH 333 /** Datatype mismatch */
+#define LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY 334 /** Could not find log entry */
+#define LIBMCDATA_ERROR_NOLOGCALLBACK 335 /** No log callback */
 
 /*************************************************************************************************************************
  Error strings for LibMCData
@@ -628,6 +630,8 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
     case LIBMCDATA_ERROR_INVALIDNAMESTRING: return "Invalid name string";
     case LIBMCDATA_ERROR_NAMESTRINGMISMATCH: return "Name string mismatch";
     case LIBMCDATA_ERROR_DATATYPEMISMATCH: return "Datatype mismatch";
+    case LIBMCDATA_ERROR_COULDNOTFINDLOGENTRY: return "Could not find log entry";
+    case LIBMCDATA_ERROR_NOLOGCALLBACK: return "No log callback";
     default: return "unknown error";
   }
 }
@@ -638,6 +642,7 @@ inline const char * LIBMCDATA_GETERRORSTRING (LibMCDataResult nErrorCode) {
 
 typedef LibMCDataHandle LibMCData_Base;
 typedef LibMCDataHandle LibMCData_Iterator;
+typedef LibMCDataHandle LibMCData_LogEntryList;
 typedef LibMCDataHandle LibMCData_LogSession;
 typedef LibMCDataHandle LibMCData_StorageStream;
 typedef LibMCDataHandle LibMCData_Storage;
@@ -704,6 +709,17 @@ namespace LibMCData {
   **************************************************************************************************************************/
   
   /**
+  * LogCallback - A callback function for external logging systems
+  *
+  * @param[in] pLogMessage - Log message to be logged.
+  * @param[in] pSubSystem - SubSystem of Log Message.
+  * @param[in] eLogLevel - Log Level to be used.
+  * @param[in] pTimestamp - Timestamp of the log message.
+  * @param[in] pUserData - Userdata that is passed to the callback function
+  */
+  typedef void(*LogCallback)(const char *, const char *, LibMCData::eLogLevel, const char *, LibMCData_pvoid);
+  
+  /**
   * StreamReadCallback - Callback to call for reading a data chunk
   *
   * @param[in] pByteData - Pointer to a buffer to read data into
@@ -730,6 +746,7 @@ typedef LibMCData::eDataBaseType eLibMCDataDataBaseType;
 typedef LibMCData::eParameterDataType eLibMCDataParameterDataType;
 typedef LibMCData::eBuildJobStatus eLibMCDataBuildJobStatus;
 typedef LibMCData::eBuildJobDataType eLibMCDataBuildJobDataType;
+typedef LibMCData::LogCallback LibMCDataLogCallback;
 typedef LibMCData::StreamReadCallback LibMCDataStreamReadCallback;
 typedef LibMCData::StreamSeekCallback LibMCDataStreamSeekCallback;
 

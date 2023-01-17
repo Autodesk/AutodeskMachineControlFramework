@@ -101,6 +101,7 @@ namespace AMC {
 
 		// Resizes Buffer array to right size
 		void readEntry(const std::string& sName, std::vector<uint8_t>& Buffer);
+		std::string readEntryUTF8String (const std::string& sName);
 
 		// Needs allocated memory passed
 		void readEntryEx(const std::string& sName, uint8_t * pBuffer, const uint64_t nBufferSize);

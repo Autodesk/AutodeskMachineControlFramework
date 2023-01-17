@@ -256,6 +256,15 @@ LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_drive
 LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_issimulationmode(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, bool * pIsSimulationMode);
 
 /**
+* Sets the machine resource name of the SDK to load. MUST be called before LoadSDK or it has no effect.
+*
+* @param[in] pDriver_Raylase - Driver_Raylase instance.
+* @param[in] pResourceName - Resource name of core machine package. Empty means standard naming applies.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_RAYLASE_DECLSPEC LibMCDriver_RaylaseResult libmcdriver_raylase_driver_raylase_setcustomsdkresource(LibMCDriver_Raylase_Driver_Raylase pDriver_Raylase, const char * pResourceName);
+
+/**
 * Initializes the Raylase SDK.
 *
 * @param[in] pDriver_Raylase - Driver_Raylase instance.

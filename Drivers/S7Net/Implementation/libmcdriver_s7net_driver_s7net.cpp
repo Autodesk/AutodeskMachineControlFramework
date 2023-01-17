@@ -347,7 +347,12 @@ void CDriver_S7Net::Configure(const std::string& sConfigurationString)
     if (!result)
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_COULDNOTPARSEDRIVERPROTOCOL);
 
-    pugi::xml_node s7protocolNode = doc.child("s7protocol");
+    pugi::xml_node s7protocolNode = doc.child("driverconfiguration");
+    // Depreciated fallback: root Node was called "s7protocol" in earlier versions.
+    // Going forward, the driver configurations should all be "driverconfiguration"
+    if (s7protocolNode.empty())
+        s7protocolNode = doc.child("s7protocol");
+
     if (s7protocolNode.empty())
         throw ELibMCDriver_S7NetInterfaceException(LIBMCDRIVER_S7NET_ERROR_INVALIDDRIVERPROTOCOL);
 

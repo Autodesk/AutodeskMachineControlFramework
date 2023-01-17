@@ -121,7 +121,7 @@ void CUIModule_Graphic::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriterOb
 	CJSONWriterArray itemsNode(writer);
 	for (auto item : m_Items) {
 		CJSONWriterObject itemObject(writer);
-		item->addContentToJSON(writer, itemObject, pClientVariableHandler);
+		item->addContentToJSON(writer, itemObject, pClientVariableHandler, 0);
 		itemsNode.addObject(itemObject);
 	}
 	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);

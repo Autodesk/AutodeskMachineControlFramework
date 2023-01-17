@@ -63,9 +63,12 @@ CDriverHandler::~CDriverHandler()
 }
 
 
-void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string& sResourcePath, const std::string& sDriverConfigurationData)
+void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string& sResourcePath, const std::string& sDriverConfigurationData, AMC::PResourcePackage pMachineResourcePackage)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+	if (pMachineResourcePackage.get() == nullptr)
+		throw ELibMCCustomException(LIBMC_ERROR_INVALIDPARAM, "no machine package");
 
 	if (findDriver(sName, false) != nullptr)
 		throw ELibMCCustomException(LIBMC_ERROR_DRIVERALREADYREGISTERED, sName);
@@ -73,22 +76,22 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 	if (m_sTempBasePath.empty ())
 		throw ELibMCInterfaceException(LIBMC_ERROR_TEMPBASEPATHEMPTY);
 
-	PResourcePackage pResourcePackage;
+	PResourcePackage pDriverResourcePackage;
 	if (!sResourcePath.empty()) {
 		auto pStream = std::make_shared <AMCCommon::CImportStream_Native> (sResourcePath);
-		pResourcePackage = CResourcePackage::makeFromStream(pStream, sResourcePath, AMCPACKAGE_SCHEMANAMESPACE);
+		pDriverResourcePackage = CResourcePackage::makeFromStream(pStream, sResourcePath, AMCPACKAGE_SCHEMANAMESPACE);
 	}
 	else {
-		pResourcePackage = CResourcePackage::makeEmpty(sResourcePath);
+		pDriverResourcePackage = CResourcePackage::makeEmpty(sResourcePath);
 	}
 
 	auto pParameterGroup = std::make_shared<CParameterGroup>();
 
-	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pResourcePackage, m_pToolpathHandler, m_sTempBasePath, m_pLogger, sName);
+	auto pInternalEnvironment = std::make_shared<LibMCEnv::Impl::CDriverEnvironment>(pParameterGroup, pDriverResourcePackage, pMachineResourcePackage, m_pToolpathHandler, m_sTempBasePath, m_pLogger, sName);
 
 	pInternalEnvironment->setIsInitializing(true);
 
-	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibraryPath, pResourcePackage, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
+	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibraryPath, pDriverResourcePackage, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
 	m_DriverList.push_back(pDriver);
 	m_DriverMap.insert(std::make_pair(sName, pDriver));	
 

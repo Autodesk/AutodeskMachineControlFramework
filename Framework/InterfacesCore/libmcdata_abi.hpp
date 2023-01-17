@@ -101,13 +101,75 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_iterator_getcurrent(LibMCData_Itera
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_iterator_clone(LibMCData_Iterator pIterator, LibMCData_Iterator * pOutIterator);
 
 /**
-* Returns the number of resoucres the iterator captures.
+* Returns the number of resources the iterator captures.
 *
 * @param[in] pIterator - Iterator instance.
 * @param[out] pCount - returns the number of resources the iterator captures.
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_iterator_count(LibMCData_Iterator pIterator, LibMCData_uint64 * pCount);
+
+/*************************************************************************************************************************
+ Class definition for LogEntryList
+**************************************************************************************************************************/
+
+/**
+* Returns the number of log entries in the list.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[out] pCount - returns the number of retrieved log entries.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logentrylist_count(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 * pCount);
+
+/**
+* Returns a log entry in the list by its index.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nIndex - Index of log entry, 0-based.
+* @param[out] pID - ID of log entry.
+* @param[in] nMessageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMessageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMessageBuffer -  buffer of Log Message, may be NULL
+* @param[in] nSubSystemBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubSystemNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubSystemBuffer -  buffer of Sub System identifier, may be NULL
+* @param[out] pLogLevel - Log Level
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logentrylist_getentrybyindex(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nIndex, LibMCData_uint32 * pID, const LibMCData_uint32 nMessageBufferSize, LibMCData_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCData_uint32 nSubSystemBufferSize, LibMCData_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, LibMCData::eLogLevel * pLogLevel, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Returns a log entry in the list by its ID.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nID - ID of log entry.
+* @param[in] nMessageBufferSize - size of the buffer (including trailing 0)
+* @param[out] pMessageNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pMessageBuffer -  buffer of Log Message, may be NULL
+* @param[in] nSubSystemBufferSize - size of the buffer (including trailing 0)
+* @param[out] pSubSystemNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pSubSystemBuffer -  buffer of Sub System identifier, may be NULL
+* @param[out] pLogLevel - Log Level
+* @param[in] nTimestampBufferSize - size of the buffer (including trailing 0)
+* @param[out] pTimestampNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pTimestampBuffer -  buffer of Timestamp in ISO8601 UTC format, may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logentrylist_getentrybyid(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nID, const LibMCData_uint32 nMessageBufferSize, LibMCData_uint32* pMessageNeededChars, char * pMessageBuffer, const LibMCData_uint32 nSubSystemBufferSize, LibMCData_uint32* pSubSystemNeededChars, char * pSubSystemBuffer, LibMCData::eLogLevel * pLogLevel, const LibMCData_uint32 nTimestampBufferSize, LibMCData_uint32* pTimestampNeededChars, char * pTimestampBuffer);
+
+/**
+* Returns if a log entry in the list exists.
+*
+* @param[in] pLogEntryList - LogEntryList instance.
+* @param[in] nID - ID of log entry.
+* @param[out] pValue - Returns if a list exists.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logentrylist_hasentry(LibMCData_LogEntryList pLogEntryList, LibMCData_uint32 nID, bool * pValue);
 
 /*************************************************************************************************************************
  Class definition for LogSession
@@ -124,6 +186,27 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_iterator_count(LibMCData_Iterator p
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_addentry(LibMCData_LogSession pLogSession, const char * pMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestamp);
+
+/**
+* retrieves the maximum log entry ID in the log.
+*
+* @param[in] pLogSession - LogSession instance.
+* @param[out] pMaxLogID - Log entry ID
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_getmaxlogentryid(LibMCData_LogSession pLogSession, LibMCData_uint32 * pMaxLogID);
+
+/**
+* retrieves an excerpt of the log.
+*
+* @param[in] pLogSession - LogSession instance.
+* @param[in] nMinLogID - Minimum log entry ID to receive.
+* @param[in] nMaxLogID - Maximum log entry ID to receive. MUST be between (MinLogID + 1) and (MinLogID + 65536).
+* @param[in] eMinLogLevel - Minimum Log Level to return.
+* @param[out] pLogEntryList - Log Entry List.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_logsession_retrievelogentriesbyid(LibMCData_LogSession pLogSession, LibMCData_uint32 nMinLogID, LibMCData_uint32 nMaxLogID, LibMCData::eLogLevel eMinLogLevel, LibMCData_LogEntryList * pLogEntryList);
 
 /*************************************************************************************************************************
  Class definition for StorageStream
@@ -996,6 +1079,45 @@ LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_setbasetempdirectory(LibM
 * @return error code or 0 (success)
 */
 LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_getbasetempdirectory(LibMCData_DataModel pDataModel, const LibMCData_uint32 nTempDirectoryBufferSize, LibMCData_uint32* pTempDirectoryNeededChars, char * pTempDirectoryBuffer);
+
+/**
+* Sets a log callback to be used for the execution.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pLogCallback - LogCallback.
+* @param[in] pUserData - Userdata that is passed to the callback function
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_setlogcallback(LibMCData_DataModel pDataModel, LibMCData::LogCallback pLogCallback, LibMCData_pvoid pUserData);
+
+/**
+* Resets the log callback to be used for the execution.
+*
+* @param[in] pDataModel - DataModel instance.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_clearlogcallback(LibMCData_DataModel pDataModel);
+
+/**
+* Returns if a log callback has been set.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[out] pHasCallback - Flag if log callback has been set.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_haslogcallback(LibMCData_DataModel pDataModel, bool * pHasCallback);
+
+/**
+* Triggers the log callback. Fails if no log callback has been set.
+*
+* @param[in] pDataModel - DataModel instance.
+* @param[in] pLogMessage - Log message to be logged.
+* @param[in] pSubSystem - SubSystem of Log Message.
+* @param[in] eLogLevel - Log Level to be used.
+* @param[in] pTimestamp - Timestamp of the log message.
+* @return error code or 0 (success)
+*/
+LIBMCDATA_DECLSPEC LibMCDataResult libmcdata_datamodel_triggerlogcallback(LibMCData_DataModel pDataModel, const char * pLogMessage, const char * pSubSystem, LibMCData::eLogLevel eLogLevel, const char * pTimestamp);
 
 /*************************************************************************************************************************
  Global functions

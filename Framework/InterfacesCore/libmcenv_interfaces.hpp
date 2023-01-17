@@ -494,12 +494,33 @@ public:
 	virtual LibMCEnv_uint32 GetSegmentCount() = 0;
 
 	/**
-	* IToolpathLayer::GetSegmentInfo - Retrieves the segment type information .
+	* IToolpathLayer::GetSegmentInfo - Retrieves the segment type and point count information .
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] eType - Segment Type
 	* @param[out] nPointCount - Point count of segment.
 	*/
 	virtual void GetSegmentInfo(const LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentType - Retrieves the segment type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Segment Type
+	*/
+	virtual LibMCEnv::eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	virtual LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentHatchCount - Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	virtual LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex) = 0;
 
 	/**
 	* IToolpathLayer::GetSegmentProfileUUID - Retrieves the assigned segment profile uuid.
@@ -539,6 +560,33 @@ public:
 	* @param[out] pPointDataBuffer - Position2D buffer of The point data array. Positions are absolute in units.
 	*/
 	virtual void GetSegmentPointData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentHatchData - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nHatchDataBufferSize - Number of elements in buffer
+	* @param[out] pHatchDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pHatchDataBuffer - Hatch2D buffer of The hatch data array. Positions are absolute in units.
+	*/
+	virtual void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentPointDataInMM - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nPointDataBufferSize - Number of elements in buffer
+	* @param[out] pPointDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pPointDataBuffer - FloatPosition2D buffer of The point data array. Positions are absolute in mm.
+	*/
+	virtual void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer) = 0;
+
+	/**
+	* IToolpathLayer::GetSegmentHatchDataInMM - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[in] nHatchDataBufferSize - Number of elements in buffer
+	* @param[out] pHatchDataNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pHatchDataBuffer - FloatHatch2D buffer of The hatch data array. Positions are absolute in mm.
+	*/
+	virtual void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer) = 0;
 
 	/**
 	* IToolpathLayer::GetZValue - Retrieves the layers Z Value in units.
@@ -637,6 +685,32 @@ public:
 	* @return Part Instance. Returns null if part does not exist.
 	*/
 	virtual IToolpathPart * FindPartByUUID(const std::string & sPartUUID) = 0;
+
+	/**
+	* IToolpathAccessor::GetBuildHeightInUnits - Retrieves the build height in units.
+	* @return Build height in units.
+	*/
+	virtual LibMCEnv_int32 GetBuildHeightInUnits() = 0;
+
+	/**
+	* IToolpathAccessor::GetZValueInUnits - Retrieves the layers Z Value in units.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in units.
+	*/
+	virtual LibMCEnv_int32 GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex) = 0;
+
+	/**
+	* IToolpathAccessor::GetBuildHeightInMM - Retrieves the build height in mm.
+	* @return Build height in mm.
+	*/
+	virtual LibMCEnv_double GetBuildHeightInMM() = 0;
+
+	/**
+	* IToolpathAccessor::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in mm.
+	*/
+	virtual LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex) = 0;
 
 };
 
@@ -845,7 +919,7 @@ public:
 	virtual std::string GetAbsoluteFilePath() = 0;
 
 	/**
-	* IWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* IWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] nDataBufferBufferSize - Number of elements in buffer
 	* @param[in] pDataBufferBuffer - file data to store to.
@@ -854,7 +928,7 @@ public:
 	virtual IWorkingFile * StoreCustomData(const std::string & sFileName, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
 
 	/**
-	* IWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* IWorkingDirectory::StoreCustomString - Stores a string in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] sDataString - file data to store to.
 	* @return working file instance.
@@ -868,6 +942,31 @@ public:
 	* @return working file instance.
 	*/
 	virtual IWorkingFile * StoreDriverData(const std::string & sFileName, const std::string & sIdentifier) = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomDataInTempFile - Stores a data buffer in a temporary file with a generated name.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[in] pDataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomDataInTempFile(const std::string & sExtension, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IWorkingDirectory::StoreCustomStringInTempFile - Stores a string in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreCustomStringInTempFile(const std::string & sExtension, const std::string & sDataString) = 0;
+
+	/**
+	* IWorkingDirectory::StoreDriverDataInTempFile - Stores attached driver data in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	virtual IWorkingFile * StoreDriverDataInTempFile(const std::string & sExtension, const std::string & sIdentifier) = 0;
 
 	/**
 	* IWorkingDirectory::CleanUp - Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
@@ -924,13 +1023,45 @@ public:
 	virtual IWorkingDirectory * CreateWorkingDirectory() = 0;
 
 	/**
-	* IDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* IDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool DriverHasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	virtual bool MachineHasResourceData(const std::string & sIdentifier) = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveDriverData - retrieves attached driver resource data into a memory buffer. (depreciated, equivalent to RetrieveDriverResourceData)
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @param[in] nDataBufferBufferSize - Number of elements in buffer
 	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
 	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
 	*/
 	virtual void RetrieveDriverData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveDriverResourceData - retrieves attached driver resource data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+	*/
+	virtual void RetrieveDriverResourceData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
+
+	/**
+	* IDriverEnvironment::RetrieveMachineResourceData - retrieves a machine resource data (Plugins Directory) driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @param[in] nDataBufferBufferSize - Number of elements in buffer
+	* @param[out] pDataBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pDataBufferBuffer - uint8 buffer of buffer data.
+	*/
+	virtual void RetrieveMachineResourceData(const std::string & sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer) = 0;
 
 	/**
 	* IDriverEnvironment::CreateToolpathAccessor - Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
@@ -1487,6 +1618,13 @@ public:
 	* @param[out] pResourceDataBuffer - uint8 buffer of Resource Data Buffer.
 	*/
 	virtual void LoadResourceData(const std::string & sResourceName, LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer) = 0;
+
+	/**
+	* IStateEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	virtual std::string LoadResourceString(const std::string & sResourceName) = 0;
 
 	/**
 	* IStateEnvironment::CreateEmptyImage - creates an empty image object.

@@ -72,7 +72,7 @@ void CUIModule_ContentItem::addDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 
 }
 
-void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_ContentItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 
 }

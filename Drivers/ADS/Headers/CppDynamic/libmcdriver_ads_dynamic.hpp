@@ -207,6 +207,7 @@ public:
 			case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHEXCEEDSBUFFERSIZE: return "STRINGLENGTHEXCEEDSBUFFERSIZE";
 			case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHMISSING: return "STRINGLENGTHMISSING";
 			case LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGLENGTH: return "INVALIDSTRINGLENGTH";
+			case LIBMCDRIVER_ADS_ERROR_INVALIDADSSDKRESOURCE: return "INVALIDADSSDKRESOURCE";
 		}
 		return "UNKNOWN";
 	}
@@ -256,6 +257,7 @@ public:
 			case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHEXCEEDSBUFFERSIZE: return "string length exceeds buffer size";
 			case LIBMCDRIVER_ADS_ERROR_STRINGLENGTHMISSING: return "string length missing";
 			case LIBMCDRIVER_ADS_ERROR_INVALIDSTRINGLENGTH: return "invalid string length";
+			case LIBMCDRIVER_ADS_ERROR_INVALIDADSSDKRESOURCE: return "invalid ads sdk resource";
 		}
 		return "unknown error";
 	}
@@ -478,6 +480,7 @@ public:
 	
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
+	inline void SetCustomSDKResource(const std::string & sResourceName);
 	inline void Connect(const LibMCDriver_ADS_uint32 nPort, const LibMCDriver_ADS_uint32 nTimeout);
 	inline void Disconnect();
 	inline bool VariableExists(const std::string & sVariableName);
@@ -621,6 +624,7 @@ public:
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
 		pWrapperTable->m_Driver_ADS_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_ADS_IsSimulationMode = nullptr;
+		pWrapperTable->m_Driver_ADS_SetCustomSDKResource = nullptr;
 		pWrapperTable->m_Driver_ADS_Connect = nullptr;
 		pWrapperTable->m_Driver_ADS_Disconnect = nullptr;
 		pWrapperTable->m_Driver_ADS_VariableExists = nullptr;
@@ -760,6 +764,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ADS_IsSimulationMode == nullptr)
+			return LIBMCDRIVER_ADS_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ADS_SetCustomSDKResource = (PLibMCDriver_ADSDriver_ADS_SetCustomSDKResourcePtr) GetProcAddress(hLibrary, "libmcdriver_ads_driver_ads_setcustomsdkresource");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ADS_SetCustomSDKResource = (PLibMCDriver_ADSDriver_ADS_SetCustomSDKResourcePtr) dlsym(hLibrary, "libmcdriver_ads_driver_ads_setcustomsdkresource");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ADS_SetCustomSDKResource == nullptr)
 			return LIBMCDRIVER_ADS_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -981,6 +994,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ADS_IsSimulationMode == nullptr) )
 			return LIBMCDRIVER_ADS_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_ads_driver_ads_setcustomsdkresource", (void**)&(pWrapperTable->m_Driver_ADS_SetCustomSDKResource));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ADS_SetCustomSDKResource == nullptr) )
+			return LIBMCDRIVER_ADS_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_ads_driver_ads_connect", (void**)&(pWrapperTable->m_Driver_ADS_Connect));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ADS_Connect == nullptr) )
 			return LIBMCDRIVER_ADS_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1175,6 +1192,15 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ADS_IsSimulationMode(m_pHandle, &resultSimulationModeEnabled));
 		
 		return resultSimulationModeEnabled;
+	}
+	
+	/**
+	* CDriver_ADS::SetCustomSDKResource - Sets the machine resource name of the ADS SDK to load. MUST be called before Connect or it has no effect.
+	* @param[in] sResourceName - Resource name of core machine package. Empty means standard naming applies.
+	*/
+	void CDriver_ADS::SetCustomSDKResource(const std::string & sResourceName)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ADS_SetCustomSDKResource(m_pHandle, sResourceName.c_str()));
 	}
 	
 	/**

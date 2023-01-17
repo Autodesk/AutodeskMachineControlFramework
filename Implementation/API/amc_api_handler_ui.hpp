@@ -54,12 +54,12 @@ namespace AMC {
 		
 		PSystemState m_pSystemState;
 
-		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sParameterUUID);
+		APIHandler_UIType parseRequest(const std::string& sURI, const eAPIRequestType requestType, std::string & sParameterUUID, uint32_t & sParameterStateID);
 
 		void handleConfigurationRequest(CJSONWriter& writer, PAPIAuth pAuth);
 		void handleStateRequest(CJSONWriter& writer, PAPIAuth pAuth);
 		PAPIResponse handleImageRequest(const std::string & sParameterUUID, PAPIAuth pAuth);		
-		void handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth);
+		void handleContentItemRequest(CJSONWriter& writer, const std::string& sParameterUUID, PAPIAuth pAuth, uint32_t nStateID);
 		void handleEventRequest(CJSONWriter& writer, const uint8_t* pBodyData, const size_t nBodyDataSize, PAPIAuth pAuth);
 
 	public:

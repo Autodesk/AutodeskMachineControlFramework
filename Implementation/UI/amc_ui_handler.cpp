@@ -312,16 +312,20 @@ PUIDialog CUIHandler::findDialog(const std::string& sName)
 
 }
 
-
-
-void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResourcePackage, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
+void CUIHandler::setCoreResourcePackage(PResourcePackage pCoreResourcePackage)
 {
-    if (pResourcePackage.get() == nullptr)
-        throw ELibMCInterfaceException(LIBMC_ERROR_INVALIDPARAM);
+    m_pCoreResourcePackage = pCoreResourcePackage;
+
+}
+
+
+void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, const std::string& sUILibraryPath, LibMCData::PBuildJobHandler pBuildJobHandler)
+{
+    if (m_pCoreResourcePackage.get() == nullptr)
+        throw ELibMCInterfaceException(LIBMC_ERROR_NOCORERESOURCEPACKAGE);
 
     m_sAppName = "";
     m_sCopyrightString = "";
-    m_pCoreResourcePackage = pResourcePackage;
 
     try {
         auto pUIPluginWrapper = LibMCUI::CWrapper::loadLibrary(sUILibraryPath);
@@ -416,7 +420,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         if (resourceAttrib.empty ())
             throw ELibMCInterfaceException(LIBMC_ERROR_MISSINGLOGORESOURCE);
 
-        auto pResourceEntry = pResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
+        auto pResourceEntry = m_pCoreResourcePackage->findEntryByName(resourceAttrib.as_string(), true);
         m_sLogoUUID = pResourceEntry->getUUID ();
 
         auto aspectratioAttrib = logoNode.attribute("aspectratio");
@@ -444,7 +448,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         auto pageChildren = pageNode.children();
         for (pugi::xml_node pageChild : pageChildren) {
             
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get());
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pPage.get(), m_pLogger);
             auto pModule = CUIModuleFactory::createModule(pageChild, sPageName, pModuleEnvironment);
             pPage->addModule(pModule);
 
@@ -469,7 +473,7 @@ void CUIHandler::loadFromXML(pugi::xml_node& xmlNode, PResourcePackage pResource
         auto dialogChildren = dialogNode.children();
         for (pugi::xml_node dialogChild : dialogChildren) {
 
-            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get());
+            auto pModuleEnvironment = std::make_shared<CUIModuleEnvironment>(m_pStateMachineData, m_pCoreResourcePackage, pBuildJobHandler, pDialog.get(), m_pLogger);
             auto pModule = CUIModuleFactory::createModule(dialogChild, sDialogName, pModuleEnvironment);
             pDialog->addModule(pModule);
 

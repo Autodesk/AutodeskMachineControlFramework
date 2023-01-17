@@ -136,7 +136,7 @@ void CUIModule_ContentButton::writeVariablesToJSON(CJSONWriter& writer, CJSONWri
 	object.addString(AMC_API_KEY_UI_BUTTONUUID, getUUID());
 	object.addString(AMC_API_KEY_UI_BUTTONCAPTION, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONCAPTION));
 	object.addBool(AMC_API_KEY_UI_BUTTONDISABLED, pGroup->getBoolParameterValueByName(AMC_API_KEY_UI_BUTTONDISABLED));
-	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONCAPTION));
+	object.addString(AMC_API_KEY_UI_BUTTONTARGETPAGE, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONTARGETPAGE));
 	object.addString(AMC_API_KEY_UI_BUTTONEVENT, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONEVENT));
 	object.addString(AMC_API_KEY_UI_BUTTONICON, pGroup->getParameterValueByName(AMC_API_KEY_UI_BUTTONICON));
 
@@ -251,8 +251,28 @@ void CUIModule_ContentButtonGroup::addDefinitionToJSON(CJSONWriter& writer, CJSO
 
 }
 
-void CUIModule_ContentButtonGroup::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_ContentButtonGroup::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
+	object.addString(AMC_API_KEY_UI_ITEMTYPE, "buttongroup");
+	object.addString(AMC_API_KEY_UI_ITEMUUID, m_sUUID);
+	object.addString(AMC_API_KEY_UI_BUTTONDISTRIBUTION, buttonDistributionToString(m_ButtonDistribution));
+
+	CJSONWriterArray buttonArray(writer);
+
+	for (auto pButton : m_Buttons) {
+		CJSONWriterObject buttonobject(writer);
+		pButton->syncClientVariables(pClientVariableHandler);
+		pButton->writeVariablesToJSON(writer, buttonobject, pClientVariableHandler);
+
+		CJSONWriterArray buttonEventFormValues(writer);
+		pButton->writeFormValuesToJSON(buttonEventFormValues);
+		buttonobject.addArray(AMC_API_KEY_UI_BUTTONEVENTFORMVALUES, buttonEventFormValues);
+
+		buttonArray.addObject(buttonobject);
+	}
+
+
+	object.addArray(AMC_API_KEY_UI_ITEMBUTTONS, buttonArray);
 
 }
 

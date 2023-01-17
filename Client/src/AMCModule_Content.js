@@ -48,6 +48,8 @@ class AMCApplicationItem_Content_ParameterList extends Common.AMCApplicationItem
 		// TODO: check validity
 		this.headers = itemJSON.headers;
 		
+		this.stateid = 1;
+		
 		this.loadingtext = "";
 		this.entriesperpage = 25;
 		
@@ -304,6 +306,18 @@ class AMCApplicationItem_Content_ButtonGroup extends Common.AMCApplicationItem {
 		this.setRefreshFlag ();
 		
 				
+	}
+	
+	
+	updateFromJSON (updateJSON)
+	{
+		Assert.ObjectValue (updateJSON);
+		
+		if (updateJSON.buttons) {
+			// TODO: parse input	
+			this.buttons = updateJSON.buttons;
+		}
+		
 	}
 		
 }

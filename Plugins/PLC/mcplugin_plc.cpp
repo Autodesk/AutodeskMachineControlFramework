@@ -66,16 +66,18 @@ __DECLARESTATE(init)
 	pStateEnvironment->LogMessage("Connecting to PLC...");
 	pDriver->Connect(sIPAddress, (uint32_t) nPort, (uint32_t) nTimeout);
 	pStateEnvironment->LogMessage("successful...");
+	pStateEnvironment->LogMessage("Initializing machine..");
+	pDriver->ReinitializeMachine();
+	pStateEnvironment->LogMessage("Successfully Initialized machine..");
+
 
 	auto pPLCCommandList = pDriver->CreateCommandList();
-
-	pStateEnvironment->LogMessage("Turning on printer..");
 
 	auto pPLCCommand_TurnOn = pDriver->CreateCommand("turnon");
 	pPLCCommandList->AddCommand(pPLCCommand_TurnOn);
 
 	auto pPLCCommand_Home = pDriver->CreateCommand("home");
-	pPLCCommandList->AddCommand(pPLCCommand_Home);
+	pPLCCommandList->AddCommand(pPLCCommand_Home);  
 
 
 	pPLCCommandList->FinishList();
@@ -96,7 +98,7 @@ __DECLARESTATE(init)
 	}
 	else {
 		pStateEnvironment->LogMessage("Timeout while turning on printer!");
-	} 
+	}
 
 	pStateEnvironment->SetNextState("idle");
 }
@@ -109,18 +111,6 @@ __DECLARESTATE(idle)
 	auto pDriver = __acquireDriver(BuR);
 	pDriver->QueryParameters();
 
-	double dAxisValue;
-	uint64_t nTimer = pStateEnvironment->GetGlobalTimerInMilliseconds();
-	int nTimeInterval = (nTimer % 20000);
-	dAxisValue = sin((nTimeInterval / 10000.0) * 3.1415) * 50.0 + 50.0;
-	/*if (nTimeInterval < 10000)
-		dAxisValue = nTimeInterval * 0.01;
-	else
-		dAxisValue = 100.0 - (nTimeInterval - 10000) * 0.01; */
-
-
-	pStateEnvironment->SetDoubleParameter ("axisvalues", "recoateraxis", dAxisValue);
-
 
 
 	LibMCEnv::PSignalHandler pHandlerInstance;
@@ -129,6 +119,40 @@ __DECLARESTATE(idle)
 		pStateEnvironment->StoreSignal ("recoatsignal", pHandlerInstance);
 
 		pStateEnvironment->SetNextState("recoating");
+
+	} else if (pStateEnvironment->WaitForSignal("signal_laserpointer", 0, pHandlerInstance)) {
+
+		bool bLaserOn = pHandlerInstance->GetBool("laseron");
+
+		if (bLaserOn) {
+			pStateEnvironment->LogMessage("Turning laser pointer on");
+		}
+		else {
+			pStateEnvironment->LogMessage("Turning laser pointer off");
+		}
+
+		auto pPLCCommandList = pDriver->CreateCommandList();
+
+		auto pPLCCommand_LaserPointerOn = pDriver->CreateCommand("setlaserpointer");
+		pPLCCommand_LaserPointerOn->SetIntegerParameter("laseron", (int)bLaserOn);
+		pPLCCommandList->AddCommand(pPLCCommand_LaserPointerOn);
+		pPLCCommandList->FinishList();
+		pPLCCommandList->ExecuteList();
+
+		if (pPLCCommandList->WaitForList(300, 10000)) {
+			pStateEnvironment->LogMessage("Laser pointer state changed");
+			pHandlerInstance->SetBoolResult("success", true);
+			pStateEnvironment->SetNextState("idle");
+
+		}
+		else {
+			pStateEnvironment->LogMessage("Timeout while laser pointer state change!");
+			pHandlerInstance->SetBoolResult("success", false);
+			pStateEnvironment->SetNextState("fatalerror");
+
+		}
+
+		pHandlerInstance->SignalHandled();
 
 	}
 	else {
@@ -143,55 +167,58 @@ __DECLARESTATE(recoating)
 	pStateEnvironment->LogMessage("Recoating...");
 		
 	auto pDriver = __acquireDriver(BuR);
-		
+
+	if (pDriver->IsSimulationMode()) {
+		pStateEnvironment->LogMessage ("Simulation mode delay of 0.4 seconds..");
+		pStateEnvironment->Sleep (400);
+	}
+
+
 	auto pPLCCommandList = pDriver->CreateCommandList();
 
+	auto pPLCCommand_MoveRecoater = pDriver->CreateCommand("moverecoater");
+	pPLCCommand_MoveRecoater->SetIntegerParameter("targetposition", 50000);
+	pPLCCommand_MoveRecoater->SetIntegerParameter("targetspeed", 10000);
+	pPLCCommand_MoveRecoater->SetIntegerParameter("acceleration", 60000);
+	pPLCCommandList->AddCommand(pPLCCommand_MoveRecoater);
 
-	for (uint32_t nIndex = 0; nIndex < 1; nIndex++) {
-		auto pPLCCommand1 = pDriver->CreateCommand("move");
-		pPLCCommand1->SetIntegerParameter("targetx", 100000);
-		pPLCCommand1->SetIntegerParameter("targety", 100000);
-		pPLCCommand1->SetIntegerParameter("targetz", 0);
-		pPLCCommand1->SetIntegerParameter("velocity", 10000);
-		pPLCCommandList->AddCommand(pPLCCommand1);
-
-		auto pPLCCommand2 = pDriver->CreateCommand("move");
-		pPLCCommand2->SetIntegerParameter("targetx", 200000);
-		pPLCCommand2->SetIntegerParameter("targety", 100000);
-		pPLCCommand2->SetIntegerParameter("targetz", 0);
-		pPLCCommand2->SetIntegerParameter("velocity", 10000);
-		pPLCCommandList->AddCommand(pPLCCommand2);
-
-		auto pPLCCommand3 = pDriver->CreateCommand("move");
-		pPLCCommand3->SetIntegerParameter("targetx", 200000);
-		pPLCCommand3->SetIntegerParameter("targety", 200000);
-		pPLCCommand3->SetIntegerParameter("targetz", 0);
-		pPLCCommand3->SetIntegerParameter("velocity", 10000);
-		pPLCCommandList->AddCommand(pPLCCommand3);
-
-		auto pPLCCommand4 = pDriver->CreateCommand("move");
-		pPLCCommand4->SetIntegerParameter("targetx", 100000);
-		pPLCCommand4->SetIntegerParameter("targety", 200000);
-		pPLCCommand4->SetIntegerParameter("targetz", 0);
-		pPLCCommand4->SetIntegerParameter("velocity", 10000);
-		pPLCCommandList->AddCommand(pPLCCommand4);
-
-	}
-
+	auto pPLCCommand_MoveRecoater2 = pDriver->CreateCommand("moverecoater");
+	pPLCCommand_MoveRecoater2->SetIntegerParameter("targetposition", 00000);
+	pPLCCommand_MoveRecoater2->SetIntegerParameter("targetspeed", 10000);
+	pPLCCommand_MoveRecoater2->SetIntegerParameter("acceleration", 60000);
+	pPLCCommandList->AddCommand(pPLCCommand_MoveRecoater2);
 
 	pPLCCommandList->FinishList();
-	pPLCCommandList->ExecuteList();
+	pPLCCommandList->ExecuteList(); 
+
+	bool bReady = false;
+	for (uint32_t nIndex = 0; nIndex < 1000; nIndex++) {
+		pDriver->QueryParameters();
+
+		if (pPLCCommandList->WaitForList(300, 100)) {
+			bReady = true;
+			break;
+		}
+	}
 
 
-	if (pPLCCommandList->WaitForList(300, 100000)) {
-		pStateEnvironment->LogMessage("Printer turned on");
+
+	if (bReady) {
+		pStateEnvironment->LogMessage("Recoating finished");
+
+		auto pSignalHandler = pStateEnvironment->RetrieveSignal("recoatsignal");
+		pSignalHandler->SetBoolResult("success", true);
+		pSignalHandler->SignalHandled();
 	}
 	else {
-		pStateEnvironment->LogMessage("Timeout while turning on printer!");
-	}
-	auto pSignalHandler = pStateEnvironment->RetrieveSignal("recoatsignal");
-	pSignalHandler->SetBoolResult("success", true);
-	pSignalHandler->SignalHandled(); 
+		pStateEnvironment->LogMessage("Timeout while recoating!");
+
+		auto pSignalHandler = pStateEnvironment->RetrieveSignal("recoatsignal");
+		pSignalHandler->SetBoolResult("success", false);
+		pSignalHandler->SignalHandled();
+
+	} 
+
 
 	pStateEnvironment->SetNextState("idle");
 }

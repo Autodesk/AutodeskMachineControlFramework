@@ -161,7 +161,7 @@ public:
 #endif // _WIN32
 
 CServer::CServer(PServerIO pServerIO)
-	: m_pServerIO (pServerIO)
+	: m_pServerIO (pServerIO), m_pListeningServerInstance (nullptr)
 {
 	if (pServerIO.get() == nullptr)
 		throw LibMC::ELibMCException(LIBMC_ERROR_INVALIDPARAM, "invalid parameter");
@@ -185,12 +185,25 @@ CServer::~CServer()
 
 }
 
+void onLogMessage(const char* pLogMessage, const char* pSubSystem, LibMCData::eLogLevel eLogLevel, const char* pTimeStamp, LibMCData_pvoid pUserData)
+{
+	if ((pLogMessage != nullptr) && (pSubSystem != nullptr) && (pTimeStamp != nullptr) && (pUserData != nullptr)) {
+		std::string sLogMessage(pLogMessage);
+		std::string sSubSystem(pSubSystem);
+		std::string sTimeStamp(pTimeStamp);
+		CServer* pServer = (CServer*)pUserData;
+
+		pServer->log(sTimeStamp + " | " + sLogMessage);
+	}
+}
+
 void CServer::executeBlocking(const std::string& sConfigurationFileName)
 {
 	m_pContext = nullptr;
 	m_pWrapper = nullptr;
 	m_pDataModel = nullptr;
 	m_pDataWrapper = nullptr;
+	m_pListeningServerInstance = nullptr;
 
 	try {
 		uint32_t nMajorDataVersion = 0;
@@ -225,6 +238,8 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 		log("Found framework interface " + std::to_string(nMajorFrameworkVersion) + "." + std::to_string(nMinorFrameworkVersion) + "." + std::to_string(nMicroFrameworkVersion));
 
 		m_pWrapper->InjectComponent("LibMCData", m_pDataWrapper->GetSymbolLookupMethod());
+
+		m_pDataModel->SetLogCallback (onLogMessage, this);
 
 		log("Initializing framework...");
 		m_pContext = m_pWrapper->CreateMCContext(m_pDataModel);
@@ -341,11 +356,16 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 					sslsvr.Get("(.*?)", requestHandler);
 					sslsvr.Post("(.*?)", requestHandler);
 					sslsvr.Put("(.*?)", requestHandler);
+
+					m_pListeningServerInstance = &sslsvr;
 					sslsvr.listen(sHostName.c_str(), nPort);
+					m_pListeningServerInstance = nullptr;
+
 					m_pContext->TerminateAllThreads();
 
 				}
 				catch (std::exception & E) {
+					m_pListeningServerInstance = nullptr;
 					this->log("Fatal error: " + std::string(E.what()));
 
 					m_pContext->TerminateAllThreads();
@@ -362,7 +382,9 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 				svr.Get("(.*?)", requestHandler);
 				svr.Post("(.*?)", requestHandler);
 				svr.Put("(.*?)", requestHandler);
+				m_pListeningServerInstance = &svr;
 				svr.listen(sHostName.c_str(), nPort);
+				m_pListeningServerInstance = nullptr;
 
 				m_pContext->TerminateAllThreads();
 			}
@@ -374,6 +396,7 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 		}
 		catch (std::exception& E) {
 
+			m_pListeningServerInstance = nullptr;
 			this->log("Fatal error while listening on " + sHostName + ":" + std::to_string(nPort));
 			this->log(E.what());
 		}
@@ -388,5 +411,18 @@ void CServer::executeBlocking(const std::string& sConfigurationFileName)
 void CServer::log(const std::string& sMessage)
 {
 	m_pServerIO->logMessageString(sMessage);
+}
+
+PServerIO CServer::getServerIO()
+{
+	return m_pServerIO;
+}
+
+void CServer::stopListening()
+{
+	if (m_pListeningServerInstance != nullptr) {
+		httplib::Server* pServerInstance = (httplib::Server*)m_pListeningServerInstance;
+		pServerInstance->stop();
+	}
 }
 

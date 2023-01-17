@@ -59,6 +59,7 @@ namespace AMC {
 		Lib3MF::PModel m_p3MFModel;
 		Lib3MF::PReader m_p3MFReader;
 		Lib3MF::PToolpath m_pToolpath;
+		Lib3MF::PPersistentReaderSource m_pPersistentSource;
 
 		std::map<std::string, PToolpathPart> m_PartMap;
 		std::vector<PToolpathPart> m_PartList;

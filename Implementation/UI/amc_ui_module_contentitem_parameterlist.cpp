@@ -165,7 +165,7 @@ void CUIModule_ContentParameterList::addDefinitionToJSON(CJSONWriter& writer, CJ
 }
 
 
-void CUIModule_ContentParameterList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_ContentParameterList::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 
 	CJSONWriterArray entryArray(writer);

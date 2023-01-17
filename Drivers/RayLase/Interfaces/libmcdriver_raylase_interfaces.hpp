@@ -404,6 +404,12 @@ public:
 	virtual bool IsSimulationMode() = 0;
 
 	/**
+	* IDriver_Raylase::SetCustomSDKResource - Sets the machine resource name of the SDK to load. MUST be called before LoadSDK or it has no effect.
+	* @param[in] sResourceName - Resource name of core machine package. Empty means standard naming applies.
+	*/
+	virtual void SetCustomSDKResource(const std::string & sResourceName) = 0;
+
+	/**
 	* IDriver_Raylase::LoadSDK - Initializes the Raylase SDK.
 	*/
 	virtual void LoadSDK() = 0;

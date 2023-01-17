@@ -80,9 +80,13 @@
 		<error name="INVALIDTESTOUTPUTNAME" code="39" description="Invalid test output name." />		
 		<error name="TOOLPATHNOTLOADED" code="40" description="Toolpath has not been loaded." />
 		<error name="INVALIDLAYERINDEX" code="41" description="Invalid layer index." />
+		<error name="INVALIDHATCHCOUNT" code="42" description="Invalid hatch count." />
+		<error name="SEGMENTISNOTOFTYPEHATCH" code="43" description="Segment is not of type hatch." />		
+		<error name="TEMPFILEEXTENSIONEXCEEDS64CHARACTERS" code="44" description="Temp file extension exceeds 64 characters." />
+		<error name="TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS" code="45" description="Temp file extension contains invalid characters." />
+		<error name="COULDNOTGENERATETEMPFILENAME" code="46" description="Could not generate temp file name." />
 		
-				
-					
+							
 	</errors>
 
 
@@ -129,6 +133,25 @@
 	<struct name="Position2D">
 		<member name="Coordinates" type="int32" rows="2"/>
 	</struct>
+
+	<struct name="Hatch2D">
+		<member name="X1" type="int32" />
+		<member name="Y1" type="int32" />
+		<member name="X2" type="int32" />
+		<member name="Y2" type="int32" />
+	</struct>
+
+	<struct name="FloatPosition2D">
+		<member name="Coordinates" type="double" rows="2"/>
+	</struct>
+
+	<struct name="FloatHatch2D">
+		<member name="X1" type="double" />
+		<member name="Y1" type="double" />
+		<member name="X2" type="double" />
+		<member name="Y2" type="double" />
+	</struct>
+
 
 	<struct name="ToolpathPartTransform">
 		<member name="Matrix" type="double" rows="3" columns="3"/>
@@ -290,12 +313,27 @@
 			<param name="Count" type="uint32" pass="return" description="Count" />
 		</method>
 		
-		<method name="GetSegmentInfo" description="Retrieves the segment type information .">
+		<method name="GetSegmentInfo" description="Retrieves the segment type and point count information .">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="Type" type="enum" class="ToolpathSegmentType" pass="out" description="Segment Type" />
 			<param name="PointCount" type="uint32" pass="out" description="Point count of segment." />
 		</method>
-				
+
+		<method name="GetSegmentType" description="Retrieves the segment type.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="Type" type="enum" class="ToolpathSegmentType" pass="return" description="Segment Type" />
+		</method>
+
+		<method name="GetSegmentPointCount" description="Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchCount" type="uint32" pass="return" description="Hatch count of segment." />
+		</method>
+		
+		<method name="GetSegmentHatchCount" description="Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchCount" type="uint32" pass="return" description="Hatch count of segment." />
+		</method>
+		
 		<method name="GetSegmentProfileUUID" description="Retrieves the assigned segment profile uuid.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="ProfileUUID" type="string" pass="return" description="Segment Profile UUID" />
@@ -313,16 +351,29 @@
 			<param name="Value" type="double" pass="return" description="Double Value" />
 		</method>
 
-		
 		<method name="GetSegmentPartUUID" description="Retrieves the assigned segment part uuid.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PartUUID" type="string" pass="return" description="Segment Part UUID" />
 		</method>
 	
-
 		<method name="GetSegmentPointData" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
 			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
 			<param name="PointData" type="structarray" class="Position2D" pass="out" description="The point data array. Positions are absolute in units." />
+		</method>
+		
+		<method name="GetSegmentHatchData" description="Retrieves the assigned segment hatch list. Fails if segment type is not hatch.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchData" type="structarray" class="Hatch2D" pass="out" description="The hatch data array. Positions are absolute in units." />
+		</method>
+
+		<method name="GetSegmentPointDataInMM" description="Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="PointData" type="structarray" class="FloatPosition2D" pass="out" description="The point data array. Positions are absolute in mm." />
+		</method>
+		
+		<method name="GetSegmentHatchDataInMM" description="Retrieves the assigned segment hatch list. Fails if segment type is not hatch.">
+			<param name="Index" type="uint32" pass="in" description="Index. Must be between 0 and Count - 1." />
+			<param name="HatchData" type="structarray" class="FloatHatch2D" pass="out" description="The hatch data array. Positions are absolute in mm." />
 		</method>
 		
 		<method name="GetZValue" description="Retrieves the layers Z Value in units.">
@@ -390,6 +441,24 @@
 			<param name="PartUUID" type="string" pass="in" description="UUID of part." />
 			<param name="Part" type="optionalclass" class="ToolpathPart" pass="return" description="Part Instance. Returns null if part does not exist." />
 		</method>
+		
+		<method name="GetBuildHeightInUnits" description="Retrieves the build height in units.">
+			<param name="BuildHeight" type="int32" pass="return" description="Build height in units." />
+		</method>
+
+		<method name="GetZValueInUnits" description="Retrieves the layers Z Value in units.">
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index to return." />
+			<param name="ZValue" type="int32" pass="return" description="Z Value of the layer in units." />
+		</method>		
+		
+		<method name="GetBuildHeightInMM" description="Retrieves the build height in mm.">
+			<param name="BuildHeight" type="double" pass="return" description="Build height in mm." />
+		</method>
+
+		<method name="GetZValueInMM" description="Retrieves the layers Z Value in mm.">
+			<param name="LayerIndex" type="uint32" pass="in" description="Layer Index to return." />
+			<param name="ZValue" type="double" pass="return" description="Z Value of the layer in mm." />
+		</method>		
 
 	</class>
 
@@ -515,13 +584,13 @@
 			<param name="FilePath" type="string" pass="return" description="global path of the directory, including path delimiter." />
 		</method>
 
-		<method name="StoreCustomData" description = "Stores a data buffer in a temporary file.">
+		<method name="StoreCustomData" description = "Stores a data buffer in a temporary file with a given name.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
 			<param name="DataBuffer" type="basicarray" class="uint8" pass="in" description="file data to store to." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
 		</method>
 
-		<method name="StoreCustomString" description = "Stores a string in a temporary file.">
+		<method name="StoreCustomString" description = "Stores a string in a temporary file with a given name.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
 			<param name="DataString" type="string" pass="in" description="file data to store to." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
@@ -529,6 +598,24 @@
 
 		<method name="StoreDriverData" description = "Stores attached driver data in a temporary file.">
 			<param name="FileName" type="string" pass="in" description="filename to store to. Can not include any path delimiters or .." />
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreCustomDataInTempFile" description = "Stores a data buffer in a temporary file with a generated name.">
+			<param name="Extension" type="string" pass="in" description="extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreCustomStringInTempFile" description = "Stores a string in a temporary file.">
+			<param name="Extension" type="string" pass="in" description="extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters." />
+			<param name="DataString" type="string" pass="in" description="file data to store to." />
+			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
+		</method>
+
+		<method name="StoreDriverDataInTempFile" description = "Stores attached driver data in a temporary file.">
+			<param name="Extension" type="string" pass="in" description="extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters." />
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
 			<param name="WorkingFile" type="class" class="WorkingFile" pass="return" description="working file instance." />
 		</method>
@@ -566,8 +653,28 @@
 			<param name="WorkingDirectory" type="class" class="WorkingDirectory" pass="return" description="creates a working directory" />
 		</method>
 
-		<method name="RetrieveDriverData" description = "retrieves attached driver data into a memory buffer.">
+		<method name="DriverHasResourceData" description = "retrieves if attached driver has data with the given identifier.">
 			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
+		</method>
+
+		<method name="MachineHasResourceData" description = "retrieves if attached driver has data with the given identifier.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="HasResourceData" type="bool" pass="return" description="returns true if the resource exists in the machine resource package." />
+		</method>
+
+		<method name="RetrieveDriverData" description = "retrieves attached driver resource data into a memory buffer. (depreciated, equivalent to RetrieveDriverResourceData)">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
+		</method>
+
+		<method name="RetrieveDriverResourceData" description = "retrieves attached driver resource data into a memory buffer.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the driver package." />
+			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
+		</method>
+
+		<method name="RetrieveMachineResourceData" description = "retrieves a machine resource data (Plugins Directory) driver data into a memory buffer.">
+			<param name="Identifier" type="string" pass="in" description="identifier of the binary data in the machine resource package." />
 			<param name="DataBuffer" type="basicarray" class="uint8" pass="out" description="buffer data." />
 		</method>
 		
@@ -966,6 +1073,11 @@
 		<method name="LoadResourceData" description="loads a plugin resource file into memory.">
 			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
 			<param name="ResourceData" type="basicarray" class="uint8" pass="out" description="Resource Data Buffer." />
+		</method>
+
+		<method name="LoadResourceString" description="loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.">
+			<param name="ResourceName" type="string" pass="in" description="Name of the resource." />
+			<param name="ResourceData" type="string" pass="return" description="Resource Data String." />
 		</method>
 
 		<method name="CreateEmptyImage" description="creates an empty image object.">

@@ -362,6 +362,18 @@ void CStateEnvironment::LoadResourceData(const std::string& sResourceName, LibMC
 
 }
 
+std::string CStateEnvironment::LoadResourceString(const std::string& sResourceName)
+{
+	auto pUIHandler = m_pSystemState->uiHandler();
+	if (pUIHandler == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	auto pResourcePackage = pUIHandler->getCoreResourcePackage();
+	if (pResourcePackage.get() == nullptr)
+		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
+
+	pResourcePackage->readEntryUTF8String(sResourceName);
+}
 
 
 

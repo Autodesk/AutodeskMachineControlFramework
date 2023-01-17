@@ -262,6 +262,11 @@ public:
 			case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "INVALIDTESTOUTPUTNAME";
 			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "TOOLPATHNOTLOADED";
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "INVALIDLAYERINDEX";
+			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "INVALIDHATCHCOUNT";
+			case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "SEGMENTISNOTOFTYPEHATCH";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "TEMPFILEEXTENSIONEXCEEDS64CHARACTERS";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS";
+			case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "COULDNOTGENERATETEMPFILENAME";
 		}
 		return "UNKNOWN";
 	}
@@ -311,6 +316,11 @@ public:
 			case LIBMCENV_ERROR_INVALIDTESTOUTPUTNAME: return "Invalid test output name.";
 			case LIBMCENV_ERROR_TOOLPATHNOTLOADED: return "Toolpath has not been loaded.";
 			case LIBMCENV_ERROR_INVALIDLAYERINDEX: return "Invalid layer index.";
+			case LIBMCENV_ERROR_INVALIDHATCHCOUNT: return "Invalid hatch count.";
+			case LIBMCENV_ERROR_SEGMENTISNOTOFTYPEHATCH: return "Segment is not of type hatch.";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "Temp file extension exceeds 64 characters.";
+			case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "Temp file extension contains invalid characters.";
+			case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "Could not generate temp file name.";
 		}
 		return "unknown error";
 	}
@@ -611,11 +621,17 @@ public:
 	inline std::string GetLayerDataUUID();
 	inline LibMCEnv_uint32 GetSegmentCount();
 	inline void GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount);
+	inline eToolpathSegmentType GetSegmentType(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSegmentPointCount(const LibMCEnv_uint32 nIndex);
+	inline LibMCEnv_uint32 GetSegmentHatchCount(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileUUID(const LibMCEnv_uint32 nIndex);
 	inline std::string GetSegmentProfileValue(const LibMCEnv_uint32 nIndex, const std::string & sValueName);
 	inline LibMCEnv_double GetSegmentProfileTypedValue(const LibMCEnv_uint32 nIndex, const eToolpathProfileValueType eValueType);
 	inline std::string GetSegmentPartUUID(const LibMCEnv_uint32 nIndex);
 	inline void GetSegmentPointData(const LibMCEnv_uint32 nIndex, std::vector<sPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer);
+	inline void GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer);
+	inline void GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer);
 	inline LibMCEnv_int32 GetZValue();
 	inline LibMCEnv_double GetZValueInMM();
 	inline LibMCEnv_double GetUnits();
@@ -645,6 +661,10 @@ public:
 	inline LibMCEnv_uint32 GetPartCount();
 	inline PToolpathPart GetPart(const LibMCEnv_uint32 nPartIndex);
 	inline PToolpathPart FindPartByUUID(const std::string & sPartUUID);
+	inline LibMCEnv_int32 GetBuildHeightInUnits();
+	inline LibMCEnv_int32 GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex);
+	inline LibMCEnv_double GetBuildHeightInMM();
+	inline LibMCEnv_double GetZValueInMM(const LibMCEnv_uint32 nLayerIndex);
 };
 	
 /*************************************************************************************************************************
@@ -753,6 +773,9 @@ public:
 	inline PWorkingFile StoreCustomData(const std::string & sFileName, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
 	inline PWorkingFile StoreCustomString(const std::string & sFileName, const std::string & sDataString);
 	inline PWorkingFile StoreDriverData(const std::string & sFileName, const std::string & sIdentifier);
+	inline PWorkingFile StoreCustomDataInTempFile(const std::string & sExtension, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline PWorkingFile StoreCustomStringInTempFile(const std::string & sExtension, const std::string & sDataString);
+	inline PWorkingFile StoreDriverDataInTempFile(const std::string & sExtension, const std::string & sIdentifier);
 	inline bool CleanUp();
 	inline PWorkingFile AddManagedFile(const std::string & sFileName);
 	inline bool HasUnmanagedFiles();
@@ -776,7 +799,11 @@ public:
 	}
 	
 	inline PWorkingDirectory CreateWorkingDirectory();
+	inline bool DriverHasResourceData(const std::string & sIdentifier);
+	inline bool MachineHasResourceData(const std::string & sIdentifier);
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline void RetrieveDriverResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
+	inline void RetrieveMachineResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
 	inline PToolpathAccessor CreateToolpathAccessor(const std::string & sStreamUUID);
 	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
@@ -899,6 +926,7 @@ public:
 	inline LibMCEnv_int64 GetIntegerParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline bool GetBoolParameter(const std::string & sParameterGroup, const std::string & sParameterName);
 	inline void LoadResourceData(const std::string & sResourceName, std::vector<LibMCEnv_uint8> & ResourceDataBuffer);
+	inline std::string LoadResourceString(const std::string & sResourceName);
 	inline PImageData CreateEmptyImage(const LibMCEnv_uint32 nPixelSizeX, const LibMCEnv_uint32 nPixelSizeY, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline PImageData LoadPNGImage(const CInputVector<LibMCEnv_uint8> & PNGDataBuffer, const LibMCEnv_double dDPIValueX, const LibMCEnv_double dDPIValueY, const eImagePixelFormat ePixelFormat);
 	inline LibMCEnv_uint64 GetGlobalTimerInMilliseconds();
@@ -1065,11 +1093,17 @@ public:
 		pWrapperTable->m_ToolpathLayer_GetLayerDataUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentInfo = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentType = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileTypedValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPartUUID = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetSegmentPointData = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = nullptr;
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValue = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetZValueInMM = nullptr;
 		pWrapperTable->m_ToolpathLayer_GetUnits = nullptr;
@@ -1083,6 +1117,10 @@ public:
 		pWrapperTable->m_ToolpathAccessor_GetPartCount = nullptr;
 		pWrapperTable->m_ToolpathAccessor_GetPart = nullptr;
 		pWrapperTable->m_ToolpathAccessor_FindPartByUUID = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetZValueInUnits = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM = nullptr;
+		pWrapperTable->m_ToolpathAccessor_GetZValueInMM = nullptr;
 		pWrapperTable->m_Build_GetName = nullptr;
 		pWrapperTable->m_Build_GetBuildUUID = nullptr;
 		pWrapperTable->m_Build_GetStorageUUID = nullptr;
@@ -1111,6 +1149,9 @@ public:
 		pWrapperTable->m_WorkingDirectory_StoreCustomData = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreCustomString = nullptr;
 		pWrapperTable->m_WorkingDirectory_StoreDriverData = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile = nullptr;
+		pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile = nullptr;
 		pWrapperTable->m_WorkingDirectory_CleanUp = nullptr;
 		pWrapperTable->m_WorkingDirectory_AddManagedFile = nullptr;
 		pWrapperTable->m_WorkingDirectory_HasUnmanagedFiles = nullptr;
@@ -1118,7 +1159,11 @@ public:
 		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
+		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = nullptr;
+		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData = nullptr;
+		pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
@@ -1193,6 +1238,7 @@ public:
 		pWrapperTable->m_StateEnvironment_GetIntegerParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_GetBoolParameter = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadResourceData = nullptr;
+		pWrapperTable->m_StateEnvironment_LoadResourceString = nullptr;
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = nullptr;
 		pWrapperTable->m_StateEnvironment_LoadPNGImage = nullptr;
 		pWrapperTable->m_StateEnvironment_GetGlobalTimerInMilliseconds = nullptr;
@@ -1548,6 +1594,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentType = (PLibMCEnvToolpathLayer_GetSegmentTypePtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenttype");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentType = (PLibMCEnvToolpathLayer_GetSegmentTypePtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenttype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = (PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentpointcount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointCount = (PLibMCEnvToolpathLayer_GetSegmentPointCountPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentpointcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = (PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchcount");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount = (PLibMCEnvToolpathLayer_GetSegmentHatchCountPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = (PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileuuid");
 		#else // _WIN32
 		pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID = (PLibMCEnvToolpathLayer_GetSegmentProfileUUIDPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentprofileuuid");
@@ -1590,6 +1663,33 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = (PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdata");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchData = (PLibMCEnvToolpathLayer_GetSegmentHatchDataPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = (PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmentpointdatainmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM = (PLibMCEnvToolpathLayer_GetSegmentPointDataInMMPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmentpointdatainmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = (PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdatainmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM = (PLibMCEnvToolpathLayer_GetSegmentHatchDataInMMPtr) dlsym(hLibrary, "libmcenv_toolpathlayer_getsegmenthatchdatainmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1707,6 +1807,42 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_ToolpathAccessor_FindPartByUUID == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits = (PLibMCEnvToolpathAccessor_GetBuildHeightInUnitsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinunits");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits = (PLibMCEnvToolpathAccessor_GetBuildHeightInUnitsPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInUnits = (PLibMCEnvToolpathAccessor_GetZValueInUnitsPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getzvalueinunits");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInUnits = (PLibMCEnvToolpathAccessor_GetZValueInUnitsPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getzvalueinunits");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetZValueInUnits == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM = (PLibMCEnvToolpathAccessor_GetBuildHeightInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM = (PLibMCEnvToolpathAccessor_GetBuildHeightInMMPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getbuildheightinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInMM = (PLibMCEnvToolpathAccessor_GetZValueInMMPtr) GetProcAddress(hLibrary, "libmcenv_toolpathaccessor_getzvalueinmm");
+		#else // _WIN32
+		pWrapperTable->m_ToolpathAccessor_GetZValueInMM = (PLibMCEnvToolpathAccessor_GetZValueInMMPtr) dlsym(hLibrary, "libmcenv_toolpathaccessor_getzvalueinmm");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ToolpathAccessor_GetZValueInMM == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1962,6 +2098,33 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomDataInTempFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storecustomdataintempfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomDataInTempFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_storecustomdataintempfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomStringInTempFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storecustomstringintempfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile = (PLibMCEnvWorkingDirectory_StoreCustomStringInTempFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_storecustomstringintempfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile = (PLibMCEnvWorkingDirectory_StoreDriverDataInTempFilePtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_storedriverdataintempfile");
+		#else // _WIN32
+		pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile = (PLibMCEnvWorkingDirectory_StoreDriverDataInTempFilePtr) dlsym(hLibrary, "libmcenv_workingdirectory_storedriverdataintempfile");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_WorkingDirectory_CleanUp = (PLibMCEnvWorkingDirectory_CleanUpPtr) GetProcAddress(hLibrary, "libmcenv_workingdirectory_cleanup");
 		#else // _WIN32
 		pWrapperTable->m_WorkingDirectory_CleanUp = (PLibMCEnvWorkingDirectory_CleanUpPtr) dlsym(hLibrary, "libmcenv_workingdirectory_cleanup");
@@ -2025,12 +2188,48 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = (PLibMCEnvDriverEnvironment_DriverHasResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_driverhasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_DriverHasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = (PLibMCEnvDriverEnvironment_MachineHasResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_machinehasresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = (PLibMCEnvDriverEnvironment_MachineHasResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_machinehasresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_MachineHasResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_retrievedriverdata");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = (PLibMCEnvDriverEnvironment_RetrieveDriverDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_retrievedriverdata");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData = (PLibMCEnvDriverEnvironment_RetrieveDriverResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_retrievedriverresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData = (PLibMCEnvDriverEnvironment_RetrieveDriverResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_retrievedriverresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData = (PLibMCEnvDriverEnvironment_RetrieveMachineResourceDataPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_retrievemachineresourcedata");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData = (PLibMCEnvDriverEnvironment_RetrieveMachineResourceDataPtr) dlsym(hLibrary, "libmcenv_driverenvironment_retrievemachineresourcedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -2700,6 +2899,15 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceString = (PLibMCEnvStateEnvironment_LoadResourceStringPtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_loadresourcestring");
+		#else // _WIN32
+		pWrapperTable->m_StateEnvironment_LoadResourceString = (PLibMCEnvStateEnvironment_LoadResourceStringPtr) dlsym(hLibrary, "libmcenv_stateenvironment_loadresourcestring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_StateEnvironment_LoadResourceString == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) GetProcAddress(hLibrary, "libmcenv_stateenvironment_createemptyimage");
 		#else // _WIN32
 		pWrapperTable->m_StateEnvironment_CreateEmptyImage = (PLibMCEnvStateEnvironment_CreateEmptyImagePtr) dlsym(hLibrary, "libmcenv_stateenvironment_createemptyimage");
@@ -3218,6 +3426,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentInfo == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenttype", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentType == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointcount", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchcount", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentprofileuuid", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentProfileUUID == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3236,6 +3456,18 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointdata", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchdata", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmentpointdatainmm", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentPointDataInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getsegmenthatchdatainmm", (void**)&(pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathLayer_GetSegmentHatchDataInMM == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathlayer_getzvalue", (void**)&(pWrapperTable->m_ToolpathLayer_GetZValue));
@@ -3288,6 +3520,22 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_findpartbyuuid", (void**)&(pWrapperTable->m_ToolpathAccessor_FindPartByUUID));
 		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_FindPartByUUID == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbuildheightinunits", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInUnits == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getzvalueinunits", (void**)&(pWrapperTable->m_ToolpathAccessor_GetZValueInUnits));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetZValueInUnits == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getbuildheightinmm", (void**)&(pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetBuildHeightInMM == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_toolpathaccessor_getzvalueinmm", (void**)&(pWrapperTable->m_ToolpathAccessor_GetZValueInMM));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ToolpathAccessor_GetZValueInMM == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_build_getname", (void**)&(pWrapperTable->m_Build_GetName));
@@ -3402,6 +3650,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storecustomdataintempfile", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomDataInTempFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storecustomstringintempfile", (void**)&(pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreCustomStringInTempFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_workingdirectory_storedriverdataintempfile", (void**)&(pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile));
+		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_StoreDriverDataInTempFile == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_workingdirectory_cleanup", (void**)&(pWrapperTable->m_WorkingDirectory_CleanUp));
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_CleanUp == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -3430,8 +3690,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_driverhasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_DriverHasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_DriverHasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_machinehasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_MachineHasResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_MachineHasResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievedriverdata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievedriverresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_retrievemachineresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createtoolpathaccessor", (void**)&(pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor));
@@ -3728,6 +4004,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcedata", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceData));
 		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_stateenvironment_loadresourcestring", (void**)&(pWrapperTable->m_StateEnvironment_LoadResourceString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_StateEnvironment_LoadResourceString == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_stateenvironment_createemptyimage", (void**)&(pWrapperTable->m_StateEnvironment_CreateEmptyImage));
@@ -4269,7 +4549,7 @@ public:
 	}
 	
 	/**
-	* CToolpathLayer::GetSegmentInfo - Retrieves the segment type information .
+	* CToolpathLayer::GetSegmentInfo - Retrieves the segment type and point count information .
 	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
 	* @param[out] eType - Segment Type
 	* @param[out] nPointCount - Point count of segment.
@@ -4277,6 +4557,45 @@ public:
 	void CToolpathLayer::GetSegmentInfo(const LibMCEnv_uint32 nIndex, eToolpathSegmentType & eType, LibMCEnv_uint32 & nPointCount)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentInfo(m_pHandle, nIndex, &eType, &nPointCount));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentType - Retrieves the segment type.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Segment Type
+	*/
+	eToolpathSegmentType CToolpathLayer::GetSegmentType(const LibMCEnv_uint32 nIndex)
+	{
+		eToolpathSegmentType resultType = (eToolpathSegmentType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentType(m_pHandle, nIndex, &resultType));
+		
+		return resultType;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentPointCount - Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentPointCount(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 resultHatchCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointCount(m_pHandle, nIndex, &resultHatchCount));
+		
+		return resultHatchCount;
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchCount - Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @return Hatch count of segment.
+	*/
+	LibMCEnv_uint32 CToolpathLayer::GetSegmentHatchCount(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint32 resultHatchCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchCount(m_pHandle, nIndex, &resultHatchCount));
+		
+		return resultHatchCount;
 	}
 	
 	/**
@@ -4354,6 +4673,48 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
 		PointDataBuffer.resize((size_t) elementsNeededPointData);
 		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointData(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchData - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in units.
+	*/
+	void CToolpathLayer::GetSegmentHatchData(const LibMCEnv_uint32 nIndex, std::vector<sHatch2D> & HatchDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededHatchData = 0;
+		LibMCEnv_uint64 elementsWrittenHatchData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchData(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentPointDataInMM - Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[out] PointDataBuffer - The point data array. Positions are absolute in mm.
+	*/
+	void CToolpathLayer::GetSegmentPointDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatPosition2D> & PointDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededPointData = 0;
+		LibMCEnv_uint64 elementsWrittenPointData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, 0, &elementsNeededPointData, nullptr));
+		PointDataBuffer.resize((size_t) elementsNeededPointData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentPointDataInMM(m_pHandle, nIndex, elementsNeededPointData, &elementsWrittenPointData, PointDataBuffer.data()));
+	}
+	
+	/**
+	* CToolpathLayer::GetSegmentHatchDataInMM - Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+	* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+	* @param[out] HatchDataBuffer - The hatch data array. Positions are absolute in mm.
+	*/
+	void CToolpathLayer::GetSegmentHatchDataInMM(const LibMCEnv_uint32 nIndex, std::vector<sFloatHatch2D> & HatchDataBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededHatchData = 0;
+		LibMCEnv_uint64 elementsWrittenHatchData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, 0, &elementsNeededHatchData, nullptr));
+		HatchDataBuffer.resize((size_t) elementsNeededHatchData);
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathLayer_GetSegmentHatchDataInMM(m_pHandle, nIndex, elementsNeededHatchData, &elementsWrittenHatchData, HatchDataBuffer.data()));
 	}
 	
 	/**
@@ -4542,6 +4903,56 @@ public:
 		} else {
 			return nullptr;
 		}
+	}
+	
+	/**
+	* CToolpathAccessor::GetBuildHeightInUnits - Retrieves the build height in units.
+	* @return Build height in units.
+	*/
+	LibMCEnv_int32 CToolpathAccessor::GetBuildHeightInUnits()
+	{
+		LibMCEnv_int32 resultBuildHeight = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildHeightInUnits(m_pHandle, &resultBuildHeight));
+		
+		return resultBuildHeight;
+	}
+	
+	/**
+	* CToolpathAccessor::GetZValueInUnits - Retrieves the layers Z Value in units.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in units.
+	*/
+	LibMCEnv_int32 CToolpathAccessor::GetZValueInUnits(const LibMCEnv_uint32 nLayerIndex)
+	{
+		LibMCEnv_int32 resultZValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetZValueInUnits(m_pHandle, nLayerIndex, &resultZValue));
+		
+		return resultZValue;
+	}
+	
+	/**
+	* CToolpathAccessor::GetBuildHeightInMM - Retrieves the build height in mm.
+	* @return Build height in mm.
+	*/
+	LibMCEnv_double CToolpathAccessor::GetBuildHeightInMM()
+	{
+		LibMCEnv_double resultBuildHeight = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetBuildHeightInMM(m_pHandle, &resultBuildHeight));
+		
+		return resultBuildHeight;
+	}
+	
+	/**
+	* CToolpathAccessor::GetZValueInMM - Retrieves the layers Z Value in mm.
+	* @param[in] nLayerIndex - Layer Index to return.
+	* @return Z Value of the layer in mm.
+	*/
+	LibMCEnv_double CToolpathAccessor::GetZValueInMM(const LibMCEnv_uint32 nLayerIndex)
+	{
+		LibMCEnv_double resultZValue = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ToolpathAccessor_GetZValueInMM(m_pHandle, nLayerIndex, &resultZValue));
+		
+		return resultZValue;
 	}
 	
 	/**
@@ -4889,7 +5300,7 @@ public:
 	}
 	
 	/**
-	* CWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file.
+	* CWorkingDirectory::StoreCustomData - Stores a data buffer in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] DataBufferBuffer - file data to store to.
 	* @return working file instance.
@@ -4906,7 +5317,7 @@ public:
 	}
 	
 	/**
-	* CWorkingDirectory::StoreCustomString - Stores a string in a temporary file.
+	* CWorkingDirectory::StoreCustomString - Stores a string in a temporary file with a given name.
 	* @param[in] sFileName - filename to store to. Can not include any path delimiters or ..
 	* @param[in] sDataString - file data to store to.
 	* @return working file instance.
@@ -4932,6 +5343,57 @@ public:
 	{
 		LibMCEnvHandle hWorkingFile = nullptr;
 		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreDriverData(m_pHandle, sFileName.c_str(), sIdentifier.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreCustomDataInTempFile - Stores a data buffer in a temporary file with a generated name.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] DataBufferBuffer - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomDataInTempFile(const std::string & sExtension, const CInputVector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomDataInTempFile(m_pHandle, sExtension.c_str(), (LibMCEnv_uint64)DataBufferBuffer.size(), DataBufferBuffer.data(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreCustomStringInTempFile - Stores a string in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sDataString - file data to store to.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreCustomStringInTempFile(const std::string & sExtension, const std::string & sDataString)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreCustomStringInTempFile(m_pHandle, sExtension.c_str(), sDataString.c_str(), &hWorkingFile));
+		
+		if (!hWorkingFile) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CWorkingFile>(m_pWrapper, hWorkingFile);
+	}
+	
+	/**
+	* CWorkingDirectory::StoreDriverDataInTempFile - Stores attached driver data in a temporary file.
+	* @param[in] sExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return working file instance.
+	*/
+	PWorkingFile CWorkingDirectory::StoreDriverDataInTempFile(const std::string & sExtension, const std::string & sIdentifier)
+	{
+		LibMCEnvHandle hWorkingFile = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_WorkingDirectory_StoreDriverDataInTempFile(m_pHandle, sExtension.c_str(), sIdentifier.c_str(), &hWorkingFile));
 		
 		if (!hWorkingFile) {
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
@@ -5044,7 +5506,33 @@ public:
 	}
 	
 	/**
-	* CDriverEnvironment::RetrieveDriverData - retrieves attached driver data into a memory buffer.
+	* CDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CDriverEnvironment::DriverHasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_DriverHasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
+	* CDriverEnvironment::MachineHasResourceData - retrieves if attached driver has data with the given identifier.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @return returns true if the resource exists in the machine resource package.
+	*/
+	bool CDriverEnvironment::MachineHasResourceData(const std::string & sIdentifier)
+	{
+		bool resultHasResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_MachineHasResourceData(m_pHandle, sIdentifier.c_str(), &resultHasResourceData));
+		
+		return resultHasResourceData;
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveDriverData - retrieves attached driver resource data into a memory buffer. (depreciated, equivalent to RetrieveDriverResourceData)
 	* @param[in] sIdentifier - identifier of the binary data in the driver package.
 	* @param[out] DataBufferBuffer - buffer data.
 	*/
@@ -5055,6 +5543,34 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
 		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
 		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveDriverResourceData - retrieves attached driver resource data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the driver package.
+	* @param[out] DataBufferBuffer - buffer data.
+	*/
+	void CDriverEnvironment::RetrieveDriverResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededDataBuffer = 0;
+		LibMCEnv_uint64 elementsWrittenDataBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverResourceData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
+		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveDriverResourceData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
+	}
+	
+	/**
+	* CDriverEnvironment::RetrieveMachineResourceData - retrieves a machine resource data (Plugins Directory) driver data into a memory buffer.
+	* @param[in] sIdentifier - identifier of the binary data in the machine resource package.
+	* @param[out] DataBufferBuffer - buffer data.
+	*/
+	void CDriverEnvironment::RetrieveMachineResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededDataBuffer = 0;
+		LibMCEnv_uint64 elementsWrittenDataBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveMachineResourceData(m_pHandle, sIdentifier.c_str(), 0, &elementsNeededDataBuffer, nullptr));
+		DataBufferBuffer.resize((size_t) elementsNeededDataBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_RetrieveMachineResourceData(m_pHandle, sIdentifier.c_str(), elementsNeededDataBuffer, &elementsWrittenDataBuffer, DataBufferBuffer.data()));
 	}
 	
 	/**
@@ -5975,6 +6491,22 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), 0, &elementsNeededResourceData, nullptr));
 		ResourceDataBuffer.resize((size_t) elementsNeededResourceData);
 		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceData(m_pHandle, sResourceName.c_str(), elementsNeededResourceData, &elementsWrittenResourceData, ResourceDataBuffer.data()));
+	}
+	
+	/**
+	* CStateEnvironment::LoadResourceString - loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+	* @param[in] sResourceName - Name of the resource.
+	* @return Resource Data String.
+	*/
+	std::string CStateEnvironment::LoadResourceString(const std::string & sResourceName)
+	{
+		LibMCEnv_uint32 bytesNeededResourceData = 0;
+		LibMCEnv_uint32 bytesWrittenResourceData = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), 0, &bytesNeededResourceData, nullptr));
+		std::vector<char> bufferResourceData(bytesNeededResourceData);
+		CheckError(m_pWrapper->m_WrapperTable.m_StateEnvironment_LoadResourceString(m_pHandle, sResourceName.c_str(), bytesNeededResourceData, &bytesWrittenResourceData, &bufferResourceData[0]));
+		
+		return std::string(&bufferResourceData[0]);
 	}
 	
 	/**

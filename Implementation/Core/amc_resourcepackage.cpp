@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "common_utils.hpp"
 #include "Libraries/libzip/zip.h"
-#include "Libraries/pugixml/pugixml.hpp"
+#include "Libraries/PugiXML/pugixml.hpp"
 #include "libmc_exceptiontypes.hpp"
 #include <map>
 
@@ -456,6 +456,29 @@ namespace AMC {
 		auto sFileName = iIter->second->getFileName ();
 		m_pResourcePackageZIP->unzipFile(sFileName, Buffer);
 
+	}
+
+	std::string CResourcePackage::readEntryUTF8String(const std::string& sName)
+	{
+
+		std::lock_guard<std::mutex> lockGuard(m_Mutex);
+
+		auto iIter = m_NameMap.find(sName);
+		if (iIter == m_NameMap.end())
+			throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYNOTFOUND, m_sPackageDebugName + "/" + sName);
+
+		auto sFileName = iIter->second->getFileName();
+		std::vector <uint8_t> Buffer;
+		m_pResourcePackageZIP->unzipFile(sFileName, Buffer);
+
+		Buffer.push_back(0);
+
+		std::string sUTF8String ((char*)Buffer.data());
+
+		if (!AMCCommon::CUtils::UTF8StringIsValid (sUTF8String))
+			throw ELibMCCustomException(LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING, m_sPackageDebugName + "/" + sName);
+
+		return sUTF8String;
 	}
 
 

@@ -50,6 +50,9 @@ namespace AMC {
 		std::lock_guard<std::mutex> lockguard(m_LoggersMutex);
 		m_Loggers.push_back(pLogger);
 
+		if (pLogger->supportsLogMessagesRetrieval())
+			m_RetrievalLogger = pLogger;
+
 	}
 
 	void CLogger_Multi::logMessageEx(const std::string& sMessage, const std::string& sSubSystem, const eLogLevel logLevel, const std::string& sTimeStamp)
@@ -61,27 +64,31 @@ namespace AMC {
 
 	bool CLogger_Multi::supportsLogMessagesRetrieval()
 	{
-		std::lock_guard<std::mutex> lockguard(m_LoggersMutex);
-		for (auto logger : m_Loggers) {
-			if (logger->supportsLogMessagesRetrieval())
-				return true;
-		}			
-
-		return false;
+		std::lock_guard<std::mutex> lockguard(m_LoggersMutex);		
+		return (m_RetrievalLogger.get () != nullptr);
 	}
 
 
 	void CLogger_Multi::retrieveLogMessages(std::vector<CLoggerEntry>& entryBuffer, const uint32_t startID, const uint32_t endID, const eLogLevel eMinLogLevel)
 	{
+
 		std::lock_guard<std::mutex> lockguard(m_LoggersMutex);
-		for (auto logger : m_Loggers) {
-			if (logger->supportsLogMessagesRetrieval()) {
-				logger->retrieveLogMessages (entryBuffer, startID, endID, eMinLogLevel);
-				return;
-			}
+		if (m_RetrievalLogger.get() != nullptr)
+		{
+			m_RetrievalLogger->retrieveLogMessages(entryBuffer, startID, endID, eMinLogLevel);			
 		}
 
-		throw ELibMCInterfaceException(LIBMC_ERROR_NOTIMPLEMENTED);
+	}
+
+	uint32_t CLogger_Multi::getLogMessageHeadID()
+	{
+		std::lock_guard<std::mutex> lockguard(m_LoggersMutex);
+		if (m_RetrievalLogger.get() != nullptr)
+		{
+			return m_RetrievalLogger->getLogMessageHeadID();
+		}
+
+		return 0;
 	}
 
 

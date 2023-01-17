@@ -154,6 +154,15 @@ LIBMCDRIVER_ADS_DECLSPEC LibMCDriver_ADSResult libmcdriver_ads_driver_ads_settos
 LIBMCDRIVER_ADS_DECLSPEC LibMCDriver_ADSResult libmcdriver_ads_driver_ads_issimulationmode(LibMCDriver_ADS_Driver_ADS pDriver_ADS, bool * pSimulationModeEnabled);
 
 /**
+* Sets the machine resource name of the ADS SDK to load. MUST be called before Connect or it has no effect.
+*
+* @param[in] pDriver_ADS - Driver_ADS instance.
+* @param[in] pResourceName - Resource name of core machine package. Empty means standard naming applies.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_ADS_DECLSPEC LibMCDriver_ADSResult libmcdriver_ads_driver_ads_setcustomsdkresource(LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pResourceName);
+
+/**
 * Connects to a ADS PLC Controller.
 *
 * @param[in] pDriver_ADS - Driver_ADS instance.

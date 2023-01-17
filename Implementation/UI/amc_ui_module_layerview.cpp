@@ -71,7 +71,7 @@ std::string CUIModule_LayerViewPlatformItem::findElementPathByUUID(const std::st
 	return "";
 }
 
-void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler)
+void CUIModule_LayerViewPlatformItem::addContentToJSON(CJSONWriter& writer, CJSONWriterObject& object, CParameterHandler* pClientVariableHandler, uint32_t nStateID)
 {
 	auto pGroup = pClientVariableHandler->findGroup(getItemPath (), true);
 
@@ -189,7 +189,7 @@ void CUIModule_LayerView::writeDefinitionToJSON(CJSONWriter& writer, CJSONWriter
 	CJSONWriterObject itemObject(writer);
 	itemObject.addString(AMC_API_KEY_UI_ITEMTYPE, "platform");
 	itemObject.addString(AMC_API_KEY_UI_ITEMUUID, m_PlatformItem->getUUID ());
-	m_PlatformItem->addContentToJSON(writer, itemObject, pClientVariableHandler);
+	m_PlatformItem->addContentToJSON(writer, itemObject, pClientVariableHandler, 0);
 	itemsNode.addObject(itemObject);
 
 	moduleObject.addArray(AMC_API_KEY_UI_ITEMS, itemsNode);

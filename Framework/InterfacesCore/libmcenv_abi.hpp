@@ -365,7 +365,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getlayerdatauuid(LibMCEn
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentcount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 * pCount);
 
 /**
-* Retrieves the segment type information .
+* Retrieves the segment type and point count information .
 *
 * @param[in] pToolpathLayer - ToolpathLayer instance.
 * @param[in] nIndex - Index. Must be between 0 and Count - 1.
@@ -374,6 +374,36 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentcount(LibMCEnv
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentinfo(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType, LibMCEnv_uint32 * pPointCount);
+
+/**
+* Retrieves the segment type.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pType - Segment Type
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmenttype(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv::eToolpathSegmentType * pType);
+
+/**
+* Retrieves the number of points in the segment. For type hatch, the points are taken pairwise.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pHatchCount - Hatch count of segment.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointcount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
+
+/**
+* Retrieves the number of hatches in the segment (i.e. PointCount / 2). Returns 0 if segment is not of type hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[out] pHatchCount - Hatch count of segment.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmenthatchcount(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, LibMCEnv_uint32 * pHatchCount);
 
 /**
 * Retrieves the assigned segment profile uuid.
@@ -434,6 +464,42 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpartuuid(LibMC
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointdata(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sPosition2D * pPointDataBuffer);
+
+/**
+* Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nHatchDataBufferSize - Number of elements in buffer
+* @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pHatchDataBuffer - Hatch2D  buffer of The hatch data array. Positions are absolute in units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmenthatchdata(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sHatch2D * pHatchDataBuffer);
+
+/**
+* Retrieves the assigned segment point list. For type hatch, the points are taken pairwise.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nPointDataBufferSize - Number of elements in buffer
+* @param[out] pPointDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pPointDataBuffer - FloatPosition2D  buffer of The point data array. Positions are absolute in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmentpointdatainmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nPointDataBufferSize, LibMCEnv_uint64* pPointDataNeededCount, LibMCEnv::sFloatPosition2D * pPointDataBuffer);
+
+/**
+* Retrieves the assigned segment hatch list. Fails if segment type is not hatch.
+*
+* @param[in] pToolpathLayer - ToolpathLayer instance.
+* @param[in] nIndex - Index. Must be between 0 and Count - 1.
+* @param[in] nHatchDataBufferSize - Number of elements in buffer
+* @param[out] pHatchDataNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pHatchDataBuffer - FloatHatch2D  buffer of The hatch data array. Positions are absolute in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathlayer_getsegmenthatchdatainmm(LibMCEnv_ToolpathLayer pToolpathLayer, LibMCEnv_uint32 nIndex, const LibMCEnv_uint64 nHatchDataBufferSize, LibMCEnv_uint64* pHatchDataNeededCount, LibMCEnv::sFloatHatch2D * pHatchDataBuffer);
 
 /**
 * Retrieves the layers Z Value in units.
@@ -570,6 +636,44 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getpart(LibMCEnv_Tool
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_findpartbyuuid(LibMCEnv_ToolpathAccessor pToolpathAccessor, const char * pPartUUID, LibMCEnv_ToolpathPart * pPart);
+
+/**
+* Retrieves the build height in units.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pBuildHeight - Build height in units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuildheightinunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_int32 * pBuildHeight);
+
+/**
+* Retrieves the layers Z Value in units.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nLayerIndex - Layer Index to return.
+* @param[out] pZValue - Z Value of the layer in units.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinunits(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_int32 * pZValue);
+
+/**
+* Retrieves the build height in mm.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[out] pBuildHeight - Build height in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getbuildheightinmm(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_double * pBuildHeight);
+
+/**
+* Retrieves the layers Z Value in mm.
+*
+* @param[in] pToolpathAccessor - ToolpathAccessor instance.
+* @param[in] nLayerIndex - Layer Index to return.
+* @param[out] pZValue - Z Value of the layer in mm.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_toolpathaccessor_getzvalueinmm(LibMCEnv_ToolpathAccessor pToolpathAccessor, LibMCEnv_uint32 nLayerIndex, LibMCEnv_double * pZValue);
 
 /*************************************************************************************************************************
  Class definition for Build
@@ -836,7 +940,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_isactive(LibMCEnv_Wor
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_getabsolutefilepath(LibMCEnv_WorkingDirectory pWorkingDirectory, const LibMCEnv_uint32 nFilePathBufferSize, LibMCEnv_uint32* pFilePathNeededChars, char * pFilePathBuffer);
 
 /**
-* Stores a data buffer in a temporary file.
+* Stores a data buffer in a temporary file with a given name.
 *
 * @param[in] pWorkingDirectory - WorkingDirectory instance.
 * @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
@@ -848,7 +952,7 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_getabsolutefilepath(L
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomdata(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
 
 /**
-* Stores a string in a temporary file.
+* Stores a string in a temporary file with a given name.
 *
 * @param[in] pWorkingDirectory - WorkingDirectory instance.
 * @param[in] pFileName - filename to store to. Can not include any path delimiters or ..
@@ -868,6 +972,40 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomstring(Lib
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storedriverdata(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pFileName, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores a data buffer in a temporary file with a generated name.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[in] pDataBufferBuffer - uint8 buffer of file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomdataintempfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8 * pDataBufferBuffer, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores a string in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+* @param[in] pDataString - file data to store to.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storecustomstringintempfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, const char * pDataString, LibMCEnv_WorkingFile * pWorkingFile);
+
+/**
+* Stores attached driver data in a temporary file.
+*
+* @param[in] pWorkingDirectory - WorkingDirectory instance.
+* @param[in] pExtension - extension of the file to store. MAY be an empty string. MUST only include up to 64 alphanumeric characters.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pWorkingFile - working file instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_storedriverdataintempfile(LibMCEnv_WorkingDirectory pWorkingDirectory, const char * pExtension, const char * pIdentifier, LibMCEnv_WorkingFile * pWorkingFile);
 
 /**
 * Deletes all managed files in the directory and the directory. No storing is possible after a cleanup.
@@ -938,7 +1076,27 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibM
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_WorkingDirectory * pWorkingDirectory);
 
 /**
-* retrieves attached driver data into a memory buffer.
+* retrieves if attached driver has data with the given identifier.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_driverhasresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
+* retrieves if attached driver has data with the given identifier.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[out] pHasResourceData - returns true if the resource exists in the machine resource package.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_machinehasresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, bool * pHasResourceData);
+
+/**
+* retrieves attached driver resource data into a memory buffer. (depreciated, equivalent to RetrieveDriverResourceData)
 *
 * @param[in] pDriverEnvironment - DriverEnvironment instance.
 * @param[in] pIdentifier - identifier of the binary data in the driver package.
@@ -948,6 +1106,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirecto
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievedriverdata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* retrieves attached driver resource data into a memory buffer.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the driver package.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[out] pDataBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBufferBuffer - uint8  buffer of buffer data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievedriverresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
+
+/**
+* retrieves a machine resource data (Plugins Directory) driver data into a memory buffer.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIdentifier - identifier of the binary data in the machine resource package.
+* @param[in] nDataBufferBufferSize - Number of elements in buffer
+* @param[out] pDataBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pDataBufferBuffer - uint8  buffer of buffer data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievemachineresourcedata(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIdentifier, const LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8 * pDataBufferBuffer);
 
 /**
 * Creates an accessor object for a toolpath. Toolpath MUST have been loaded into memory before.
@@ -1731,6 +1913,18 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_getboolparameter(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcedata(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint64 nResourceDataBufferSize, LibMCEnv_uint64* pResourceDataNeededCount, LibMCEnv_uint8 * pResourceDataBuffer);
+
+/**
+* loads a plugin resource file into a string. Fails if content is not a valid UTF8 string.
+*
+* @param[in] pStateEnvironment - StateEnvironment instance.
+* @param[in] pResourceName - Name of the resource.
+* @param[in] nResourceDataBufferSize - size of the buffer (including trailing 0)
+* @param[out] pResourceDataNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pResourceDataBuffer -  buffer of Resource Data String., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_stateenvironment_loadresourcestring(LibMCEnv_StateEnvironment pStateEnvironment, const char * pResourceName, const LibMCEnv_uint32 nResourceDataBufferSize, LibMCEnv_uint32* pResourceDataNeededChars, char * pResourceDataBuffer);
 
 /**
 * creates an empty image object.

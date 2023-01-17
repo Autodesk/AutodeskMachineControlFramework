@@ -141,6 +141,15 @@ typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_SetToSimulationModePt
 typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_IsSimulationModePtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, bool * pSimulationModeEnabled);
 
 /**
+* Sets the machine resource name of the ADS SDK to load. MUST be called before Connect or it has no effect.
+*
+* @param[in] pDriver_ADS - Driver_ADS instance.
+* @param[in] pResourceName - Resource name of core machine package. Empty means standard naming applies.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_ADS_SetCustomSDKResourcePtr) (LibMCDriver_ADS_Driver_ADS pDriver_ADS, const char * pResourceName);
+
+/**
 * Connects to a ADS PLC Controller.
 *
 * @param[in] pDriver_ADS - Driver_ADS instance.
@@ -345,6 +354,7 @@ typedef struct {
 	PLibMCDriver_ADSDriver_QueryParametersPtr m_Driver_QueryParameters;
 	PLibMCDriver_ADSDriver_ADS_SetToSimulationModePtr m_Driver_ADS_SetToSimulationMode;
 	PLibMCDriver_ADSDriver_ADS_IsSimulationModePtr m_Driver_ADS_IsSimulationMode;
+	PLibMCDriver_ADSDriver_ADS_SetCustomSDKResourcePtr m_Driver_ADS_SetCustomSDKResource;
 	PLibMCDriver_ADSDriver_ADS_ConnectPtr m_Driver_ADS_Connect;
 	PLibMCDriver_ADSDriver_ADS_DisconnectPtr m_Driver_ADS_Disconnect;
 	PLibMCDriver_ADSDriver_ADS_VariableExistsPtr m_Driver_ADS_VariableExists;

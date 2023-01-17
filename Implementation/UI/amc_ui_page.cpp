@@ -110,7 +110,7 @@ void CUIPage::writeModulesToJSON(CJSONWriter& writer, CJSONWriterArray& moduleAr
 	}
 }
 
-void CUIPage::writeModuleItemUpdatesToJSON(CJSONWriter& writer, CJSONWriterArray& itemArray, CParameterHandler* pClientVariableHandler)
+/*void CUIPage::writeModuleItemUpdatesToJSON(CJSONWriter& writer, CJSONWriterArray& itemArray, CParameterHandler* pClientVariableHandler)
 {
 	for (auto module : m_Modules) {
 		std::map <std::string, PUIModuleItem> itemMap;
@@ -127,7 +127,7 @@ void CUIPage::writeModuleItemUpdatesToJSON(CJSONWriter& writer, CJSONWriterArray
 		}
 	}
 
-}
+} */
 
 
 PUIModuleItem CUIPage::findModuleItemByUUID(const std::string& sUUID)
@@ -169,6 +169,9 @@ void CUIPage::ensureUIEventExists(const std::string& sEventName)
 void CUIPage::populateClientVariables(CParameterHandler* pParameterHandler)
 {
 	LibMCAssertNotNull(pParameterHandler);
+	auto pGroup = pParameterHandler->addGroup(m_sName, "page");
+	pGroup->addNewStringParameter ("custom", "custom page parameter", "");
+
 	for (auto pModule : m_Modules) {
 		pModule->populateClientVariables(pParameterHandler);
 	}

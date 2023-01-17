@@ -110,6 +110,7 @@ export class AMCApplicationModule extends AMCObject {
 		this.name = Assert.IdentifierString (name);
 		this.caption = Assert.StringValue (caption);
 		this.onDataHasChanged = null;
+		this.stateid = 0;
 	}
 	
 	callDataHasChanged ()

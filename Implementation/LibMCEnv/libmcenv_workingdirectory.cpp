@@ -47,14 +47,14 @@ using namespace LibMCEnv::Impl;
 **************************************************************************************************************************/
 
 CWorkingDirectory::CWorkingDirectory(const std::string& sBasePath, AMC::PResourcePackage pResourcePackage)
-    : m_pResourcePackage (pResourcePackage)
+    : m_pResourcePackage (pResourcePackage), m_sTempFileNamePrefix ("amcf_")
 {
     if (pResourcePackage.get() == nullptr)
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
     if (sBasePath.empty ())
         throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDPARAM);
 
-    auto sWorkingDirectoryPath = AMCCommon::CUtils::findTemporaryFileName(sBasePath, "amcf_", "", 1024);
+    auto sWorkingDirectoryPath = AMCCommon::CUtils::findTemporaryFileName(sBasePath, m_sTempFileNamePrefix, "", 1024);
     AMCCommon::CUtils::createDirectoryOnDisk(sWorkingDirectoryPath);
 
     m_pWorkingFileMonitor = std::make_shared<CWorkingFileMonitor> (sWorkingDirectoryPath);
@@ -131,6 +131,51 @@ IWorkingFile * CWorkingDirectory::StoreDriverData(const std::string & sFileName,
     pStream.reset();
 
     return new CWorkingFile(sFileName, m_pWorkingFileMonitor);
+
+}
+
+std::string CWorkingDirectory::generateFileNameForExtension(const std::string& sExtension)
+{
+    std::string sFilteredExtension = sExtension;
+    if (!sFilteredExtension.empty()) {
+        if (sExtension.length () > 64)
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS);
+
+        if (!AMCCommon::CUtils::stringIsValidAlphanumericNameString (sExtension))
+            throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS);
+
+        sFilteredExtension = "." + sExtension;
+    }
+    
+    uint32_t nMaxIterations = 64;
+    for (uint32_t nIndex = 0; nIndex < nMaxIterations; nIndex++) {
+        std::string sFileName = m_sTempFileNamePrefix + AMCCommon::CUtils::createUUID() + sFilteredExtension;
+        std::string sAbsoluteFileName = m_pWorkingFileMonitor->getAbsoluteFileName(sFileName);
+
+        if (!AMCCommon::CUtils::fileOrPathExistsOnDisk(sAbsoluteFileName))
+            return sFileName;
+    }
+
+    throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME);
+
+}
+
+IWorkingFile* CWorkingDirectory::StoreCustomDataInTempFile(const std::string& sExtension, const LibMCEnv_uint64 nDataBufferBufferSize, const LibMCEnv_uint8* pDataBufferBuffer)
+{
+    std::string sFileName = generateFileNameForExtension(sExtension);
+    return StoreCustomData(sFileName, nDataBufferBufferSize, pDataBufferBuffer);
+}
+
+IWorkingFile* CWorkingDirectory::StoreCustomStringInTempFile(const std::string& sExtension, const std::string& sDataString)
+{
+    std::string sFileName = generateFileNameForExtension(sExtension);
+    return StoreCustomString(sFileName, sDataString);
+}
+
+IWorkingFile* CWorkingDirectory::StoreDriverDataInTempFile(const std::string& sExtension, const std::string& sIdentifier)
+{
+    std::string sFileName = generateFileNameForExtension(sExtension);
+    return StoreDriverData (sFileName, sIdentifier);
 
 }
 
