@@ -142,6 +142,39 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS 44 /** Temp file extension exceeds 64 characters. */
 #define LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS 45 /** Temp file extension contains invalid characters. */
 #define LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME 46 /** Could not generate temp file name. */
+#define LIBMCENV_ERROR_EMPTYTCPIPPACKET 47 /** Empty TCP/IP Packet. */
+#define LIBMCENV_ERROR_COULDNOTGETADDRESSINFO 48 /** Could not get address info. */
+#define LIBMCENV_ERROR_COULDNOTCREATESOCKET 49 /** Could not create socket. */
+#define LIBMCENV_ERROR_COULDNOTCONNECT 50 /** Could not connect. */
+#define LIBMCENV_ERROR_SENDERROR 51 /** Send error. */
+#define LIBMCENV_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM 52 /** Receive count exceeds maximum. */
+#define LIBMCENV_ERROR_CONNECTIONCLOSED 53 /** Connection closed. */
+#define LIBMCENV_ERROR_RECEIVEERROR 54 /** Receive error. */
+#define LIBMCENV_ERROR_SENDCOUNTEXCEEDSMAXIMUM 55 /** Send count exceeds maximum. */
+#define LIBMCENV_ERROR_SOCKETNOTCONNECTED 56 /** Socket not connected. */
+#define LIBMCENV_ERROR_INVALIDSENDBUFFER 57 /** Invalid send buffer. */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPPAYLOADSIZE 58 /** Invalid modbus TCP payload size */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPREQUEST 59 /** Invalid modbus TCP request */
+#define LIBMCENV_ERROR_INSUFFICIENTMODBUSTCPRESPONSEHEADER 60 /** Insufficient modbus tcp response header */
+#define LIBMCENV_ERROR_MODBUSTCPRESPONSEOVERFLOW 61 /** modbus tcp response overflow */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPTRANSACTIONIDRESPONSE 62 /** invalid modbus tcp transaction ID response */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPPROTOCOLIDRESPONSE 63 /** invalid modbus tcp protocol ID response */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE 64 /** invalid modbus tcp unit identifier response */
+#define LIBMCENV_ERROR_MODBUSTCPRESPONSELENGTHMISMATCH 65 /** modbus tcp response length mismatch */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSBITCOUNT 66 /** modbus TCP Invalid coils status bit count. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSE 67 /** modbus TCP Invalid coils status response. */
+#define LIBMCENV_ERROR_MODBUSTCPCOILSTATUSRESPONSEEMPTY 68 /** modbus TCP coils status response empty. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE 69 /** modbus TCP invalid coil status response size. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSBITCOUNT 70 /** modbus TCP invalid input status bit count. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSE 71 /** modbus TCP invalid input status response. */
+#define LIBMCENV_ERROR_MODBUSTCPINPUTSTATUSRESPONSEEMPTY 72 /** modbus TCP input status response empty. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE 73 /** modbus TCP invalid input status response size. */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT 74 /** invalid modbus tcp coil count. */
+#define LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT 75 /** invalid modbus tcp register count. */
+#define LIBMCENV_ERROR_INVALIDMODBUSIOINDEX 76 /** invalid modbus IO index. */
+#define LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY 77 /** modbus io status empty. */
+#define LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX 78 /** invalid modbus register index. */
+#define LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY 79 /** modbus register status empty. */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -196,6 +229,39 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "Temp file extension exceeds 64 characters.";
     case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "Temp file extension contains invalid characters.";
     case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "Could not generate temp file name.";
+    case LIBMCENV_ERROR_EMPTYTCPIPPACKET: return "Empty TCP/IP Packet.";
+    case LIBMCENV_ERROR_COULDNOTGETADDRESSINFO: return "Could not get address info.";
+    case LIBMCENV_ERROR_COULDNOTCREATESOCKET: return "Could not create socket.";
+    case LIBMCENV_ERROR_COULDNOTCONNECT: return "Could not connect.";
+    case LIBMCENV_ERROR_SENDERROR: return "Send error.";
+    case LIBMCENV_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM: return "Receive count exceeds maximum.";
+    case LIBMCENV_ERROR_CONNECTIONCLOSED: return "Connection closed.";
+    case LIBMCENV_ERROR_RECEIVEERROR: return "Receive error.";
+    case LIBMCENV_ERROR_SENDCOUNTEXCEEDSMAXIMUM: return "Send count exceeds maximum.";
+    case LIBMCENV_ERROR_SOCKETNOTCONNECTED: return "Socket not connected.";
+    case LIBMCENV_ERROR_INVALIDSENDBUFFER: return "Invalid send buffer.";
+    case LIBMCENV_ERROR_INVALIDMODBUSTCPPAYLOADSIZE: return "Invalid modbus TCP payload size";
+    case LIBMCENV_ERROR_INVALIDMODBUSTCPREQUEST: return "Invalid modbus TCP request";
+    case LIBMCENV_ERROR_INSUFFICIENTMODBUSTCPRESPONSEHEADER: return "Insufficient modbus tcp response header";
+    case LIBMCENV_ERROR_MODBUSTCPRESPONSEOVERFLOW: return "modbus tcp response overflow";
+    case LIBMCENV_ERROR_INVALIDMODBUSTCPTRANSACTIONIDRESPONSE: return "invalid modbus tcp transaction ID response";
+    case LIBMCENV_ERROR_INVALIDMODBUSTCPPROTOCOLIDRESPONSE: return "invalid modbus tcp protocol ID response";
+    case LIBMCENV_ERROR_INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE: return "invalid modbus tcp unit identifier response";
+    case LIBMCENV_ERROR_MODBUSTCPRESPONSELENGTHMISMATCH: return "modbus tcp response length mismatch";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSBITCOUNT: return "modbus TCP Invalid coils status bit count.";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSE: return "modbus TCP Invalid coils status response.";
+    case LIBMCENV_ERROR_MODBUSTCPCOILSTATUSRESPONSEEMPTY: return "modbus TCP coils status response empty.";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE: return "modbus TCP invalid coil status response size.";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSBITCOUNT: return "modbus TCP invalid input status bit count.";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSE: return "modbus TCP invalid input status response.";
+    case LIBMCENV_ERROR_MODBUSTCPINPUTSTATUSRESPONSEEMPTY: return "modbus TCP input status response empty.";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE: return "modbus TCP invalid input status response size.";
+    case LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT: return "invalid modbus tcp coil count.";
+    case LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT: return "invalid modbus tcp register count.";
+    case LIBMCENV_ERROR_INVALIDMODBUSIOINDEX: return "invalid modbus IO index.";
+    case LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY: return "modbus io status empty.";
+    case LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX: return "invalid modbus register index.";
+    case LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY: return "modbus register status empty.";
     default: return "unknown error";
   }
 }
@@ -216,6 +282,11 @@ typedef LibMCEnvHandle LibMCEnv_WorkingFileExecution;
 typedef LibMCEnvHandle LibMCEnv_WorkingFile;
 typedef LibMCEnvHandle LibMCEnv_WorkingFileIterator;
 typedef LibMCEnvHandle LibMCEnv_WorkingDirectory;
+typedef LibMCEnvHandle LibMCEnv_TCPIPPacket;
+typedef LibMCEnvHandle LibMCEnv_TCPIPConnection;
+typedef LibMCEnvHandle LibMCEnv_ModbusTCPDigitalIOStatus;
+typedef LibMCEnvHandle LibMCEnv_ModbusTCPRegisterStatus;
+typedef LibMCEnvHandle LibMCEnv_ModbusTCPConnection;
 typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;

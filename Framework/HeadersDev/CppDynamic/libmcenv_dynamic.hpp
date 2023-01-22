@@ -71,6 +71,11 @@ class CWorkingFileExecution;
 class CWorkingFile;
 class CWorkingFileIterator;
 class CWorkingDirectory;
+class CTCPIPPacket;
+class CTCPIPConnection;
+class CModbusTCPDigitalIOStatus;
+class CModbusTCPRegisterStatus;
+class CModbusTCPConnection;
 class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
@@ -93,6 +98,11 @@ typedef CWorkingFileExecution CLibMCEnvWorkingFileExecution;
 typedef CWorkingFile CLibMCEnvWorkingFile;
 typedef CWorkingFileIterator CLibMCEnvWorkingFileIterator;
 typedef CWorkingDirectory CLibMCEnvWorkingDirectory;
+typedef CTCPIPPacket CLibMCEnvTCPIPPacket;
+typedef CTCPIPConnection CLibMCEnvTCPIPConnection;
+typedef CModbusTCPDigitalIOStatus CLibMCEnvModbusTCPDigitalIOStatus;
+typedef CModbusTCPRegisterStatus CLibMCEnvModbusTCPRegisterStatus;
+typedef CModbusTCPConnection CLibMCEnvModbusTCPConnection;
 typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
@@ -115,6 +125,11 @@ typedef std::shared_ptr<CWorkingFileExecution> PWorkingFileExecution;
 typedef std::shared_ptr<CWorkingFile> PWorkingFile;
 typedef std::shared_ptr<CWorkingFileIterator> PWorkingFileIterator;
 typedef std::shared_ptr<CWorkingDirectory> PWorkingDirectory;
+typedef std::shared_ptr<CTCPIPPacket> PTCPIPPacket;
+typedef std::shared_ptr<CTCPIPConnection> PTCPIPConnection;
+typedef std::shared_ptr<CModbusTCPDigitalIOStatus> PModbusTCPDigitalIOStatus;
+typedef std::shared_ptr<CModbusTCPRegisterStatus> PModbusTCPRegisterStatus;
+typedef std::shared_ptr<CModbusTCPConnection> PModbusTCPConnection;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
@@ -137,6 +152,11 @@ typedef PWorkingFileExecution PLibMCEnvWorkingFileExecution;
 typedef PWorkingFile PLibMCEnvWorkingFile;
 typedef PWorkingFileIterator PLibMCEnvWorkingFileIterator;
 typedef PWorkingDirectory PLibMCEnvWorkingDirectory;
+typedef PTCPIPPacket PLibMCEnvTCPIPPacket;
+typedef PTCPIPConnection PLibMCEnvTCPIPConnection;
+typedef PModbusTCPDigitalIOStatus PLibMCEnvModbusTCPDigitalIOStatus;
+typedef PModbusTCPRegisterStatus PLibMCEnvModbusTCPRegisterStatus;
+typedef PModbusTCPConnection PLibMCEnvModbusTCPConnection;
 typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
@@ -267,6 +287,39 @@ public:
 			case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "TEMPFILEEXTENSIONEXCEEDS64CHARACTERS";
 			case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS";
 			case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "COULDNOTGENERATETEMPFILENAME";
+			case LIBMCENV_ERROR_EMPTYTCPIPPACKET: return "EMPTYTCPIPPACKET";
+			case LIBMCENV_ERROR_COULDNOTGETADDRESSINFO: return "COULDNOTGETADDRESSINFO";
+			case LIBMCENV_ERROR_COULDNOTCREATESOCKET: return "COULDNOTCREATESOCKET";
+			case LIBMCENV_ERROR_COULDNOTCONNECT: return "COULDNOTCONNECT";
+			case LIBMCENV_ERROR_SENDERROR: return "SENDERROR";
+			case LIBMCENV_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM: return "RECEIVECOUNTEXCEEDSMAXIMUM";
+			case LIBMCENV_ERROR_CONNECTIONCLOSED: return "CONNECTIONCLOSED";
+			case LIBMCENV_ERROR_RECEIVEERROR: return "RECEIVEERROR";
+			case LIBMCENV_ERROR_SENDCOUNTEXCEEDSMAXIMUM: return "SENDCOUNTEXCEEDSMAXIMUM";
+			case LIBMCENV_ERROR_SOCKETNOTCONNECTED: return "SOCKETNOTCONNECTED";
+			case LIBMCENV_ERROR_INVALIDSENDBUFFER: return "INVALIDSENDBUFFER";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPPAYLOADSIZE: return "INVALIDMODBUSTCPPAYLOADSIZE";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPREQUEST: return "INVALIDMODBUSTCPREQUEST";
+			case LIBMCENV_ERROR_INSUFFICIENTMODBUSTCPRESPONSEHEADER: return "INSUFFICIENTMODBUSTCPRESPONSEHEADER";
+			case LIBMCENV_ERROR_MODBUSTCPRESPONSEOVERFLOW: return "MODBUSTCPRESPONSEOVERFLOW";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPTRANSACTIONIDRESPONSE: return "INVALIDMODBUSTCPTRANSACTIONIDRESPONSE";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPPROTOCOLIDRESPONSE: return "INVALIDMODBUSTCPPROTOCOLIDRESPONSE";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE: return "INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE";
+			case LIBMCENV_ERROR_MODBUSTCPRESPONSELENGTHMISMATCH: return "MODBUSTCPRESPONSELENGTHMISMATCH";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSBITCOUNT: return "MODBUSTCPINVALIDCOILSTATUSBITCOUNT";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSE: return "MODBUSTCPINVALIDCOILSTATUSRESPONSE";
+			case LIBMCENV_ERROR_MODBUSTCPCOILSTATUSRESPONSEEMPTY: return "MODBUSTCPCOILSTATUSRESPONSEEMPTY";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE: return "MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSBITCOUNT: return "MODBUSTCPINVALIDINPUTSTATUSBITCOUNT";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSE: return "MODBUSTCPINVALIDINPUTSTATUSRESPONSE";
+			case LIBMCENV_ERROR_MODBUSTCPINPUTSTATUSRESPONSEEMPTY: return "MODBUSTCPINPUTSTATUSRESPONSEEMPTY";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE: return "MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT: return "INVALIDMODBUSTCPCOILCOUNT";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT: return "INVALIDMODBUSTCPREGISTERCOUNT";
+			case LIBMCENV_ERROR_INVALIDMODBUSIOINDEX: return "INVALIDMODBUSIOINDEX";
+			case LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY: return "MODBUSIOSTATUSEMPTY";
+			case LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX: return "INVALIDMODBUSREGISTERINDEX";
+			case LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY: return "MODBUSREGISTERSTATUSEMPTY";
 		}
 		return "UNKNOWN";
 	}
@@ -321,6 +374,39 @@ public:
 			case LIBMCENV_ERROR_TEMPFILEEXTENSIONEXCEEDS64CHARACTERS: return "Temp file extension exceeds 64 characters.";
 			case LIBMCENV_ERROR_TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS: return "Temp file extension contains invalid characters.";
 			case LIBMCENV_ERROR_COULDNOTGENERATETEMPFILENAME: return "Could not generate temp file name.";
+			case LIBMCENV_ERROR_EMPTYTCPIPPACKET: return "Empty TCP/IP Packet.";
+			case LIBMCENV_ERROR_COULDNOTGETADDRESSINFO: return "Could not get address info.";
+			case LIBMCENV_ERROR_COULDNOTCREATESOCKET: return "Could not create socket.";
+			case LIBMCENV_ERROR_COULDNOTCONNECT: return "Could not connect.";
+			case LIBMCENV_ERROR_SENDERROR: return "Send error.";
+			case LIBMCENV_ERROR_RECEIVECOUNTEXCEEDSMAXIMUM: return "Receive count exceeds maximum.";
+			case LIBMCENV_ERROR_CONNECTIONCLOSED: return "Connection closed.";
+			case LIBMCENV_ERROR_RECEIVEERROR: return "Receive error.";
+			case LIBMCENV_ERROR_SENDCOUNTEXCEEDSMAXIMUM: return "Send count exceeds maximum.";
+			case LIBMCENV_ERROR_SOCKETNOTCONNECTED: return "Socket not connected.";
+			case LIBMCENV_ERROR_INVALIDSENDBUFFER: return "Invalid send buffer.";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPPAYLOADSIZE: return "Invalid modbus TCP payload size";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPREQUEST: return "Invalid modbus TCP request";
+			case LIBMCENV_ERROR_INSUFFICIENTMODBUSTCPRESPONSEHEADER: return "Insufficient modbus tcp response header";
+			case LIBMCENV_ERROR_MODBUSTCPRESPONSEOVERFLOW: return "modbus tcp response overflow";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPTRANSACTIONIDRESPONSE: return "invalid modbus tcp transaction ID response";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPPROTOCOLIDRESPONSE: return "invalid modbus tcp protocol ID response";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE: return "invalid modbus tcp unit identifier response";
+			case LIBMCENV_ERROR_MODBUSTCPRESPONSELENGTHMISMATCH: return "modbus tcp response length mismatch";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSBITCOUNT: return "modbus TCP Invalid coils status bit count.";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSE: return "modbus TCP Invalid coils status response.";
+			case LIBMCENV_ERROR_MODBUSTCPCOILSTATUSRESPONSEEMPTY: return "modbus TCP coils status response empty.";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE: return "modbus TCP invalid coil status response size.";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSBITCOUNT: return "modbus TCP invalid input status bit count.";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSE: return "modbus TCP invalid input status response.";
+			case LIBMCENV_ERROR_MODBUSTCPINPUTSTATUSRESPONSEEMPTY: return "modbus TCP input status response empty.";
+			case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE: return "modbus TCP invalid input status response size.";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT: return "invalid modbus tcp coil count.";
+			case LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT: return "invalid modbus tcp register count.";
+			case LIBMCENV_ERROR_INVALIDMODBUSIOINDEX: return "invalid modbus IO index.";
+			case LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY: return "modbus io status empty.";
+			case LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX: return "invalid modbus register index.";
+			case LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY: return "modbus register status empty.";
 		}
 		return "unknown error";
 	}
@@ -449,6 +535,11 @@ private:
 	friend class CWorkingFile;
 	friend class CWorkingFileIterator;
 	friend class CWorkingDirectory;
+	friend class CTCPIPPacket;
+	friend class CTCPIPConnection;
+	friend class CModbusTCPDigitalIOStatus;
+	friend class CModbusTCPRegisterStatus;
+	friend class CModbusTCPConnection;
 	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
@@ -785,6 +876,120 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CTCPIPPacket 
+**************************************************************************************************************************/
+class CTCPIPPacket : public CBase {
+public:
+	
+	/**
+	* CTCPIPPacket::CTCPIPPacket - Constructor for TCPIPPacket class.
+	*/
+	CTCPIPPacket(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline bool IsEmpty();
+	inline LibMCEnv_uint32 GetSize();
+	inline void GetData(std::vector<LibMCEnv_uint8> & BufferBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CTCPIPConnection 
+**************************************************************************************************************************/
+class CTCPIPConnection : public CBase {
+public:
+	
+	/**
+	* CTCPIPConnection::CTCPIPConnection - Constructor for TCPIPConnection class.
+	*/
+	CTCPIPConnection(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetIPAddress();
+	inline LibMCEnv_uint32 GetPort();
+	inline LibMCEnv_uint32 GetTimeout();
+	inline bool IsConnected();
+	inline void Disconnect();
+	inline void Reconnect();
+	inline void SendBuffer(const CInputVector<LibMCEnv_uint8> & BufferBuffer);
+	inline bool WaitForData(const LibMCEnv_uint32 nTimeOutInMS);
+	inline PTCPIPPacket ReceiveFixedPacket(const LibMCEnv_uint32 nPacketSize, const LibMCEnv_uint32 nTimeOutInMS);
+	inline PTCPIPPacket ReceiveData(const LibMCEnv_uint32 nDataSize, const LibMCEnv_uint32 nTimeOutInMS);
+};
+	
+/*************************************************************************************************************************
+ Class CModbusTCPDigitalIOStatus 
+**************************************************************************************************************************/
+class CModbusTCPDigitalIOStatus : public CBase {
+public:
+	
+	/**
+	* CModbusTCPDigitalIOStatus::CModbusTCPDigitalIOStatus - Constructor for ModbusTCPDigitalIOStatus class.
+	*/
+	CModbusTCPDigitalIOStatus(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint32 GetCount();
+	inline LibMCEnv_uint32 GetBaseAddress();
+	inline bool GetValue(const LibMCEnv_uint32 nIndex);
+	inline void GetValues(std::vector<LibMCEnv_uint8> & StateArrayBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CModbusTCPRegisterStatus 
+**************************************************************************************************************************/
+class CModbusTCPRegisterStatus : public CBase {
+public:
+	
+	/**
+	* CModbusTCPRegisterStatus::CModbusTCPRegisterStatus - Constructor for ModbusTCPRegisterStatus class.
+	*/
+	CModbusTCPRegisterStatus(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCEnv_uint32 GetCount();
+	inline LibMCEnv_uint32 GetBaseAddress();
+	inline LibMCEnv_uint16 GetValue(const LibMCEnv_uint32 nIndex);
+	inline void GetValues(std::vector<LibMCEnv_uint16> & StateArrayBuffer);
+};
+	
+/*************************************************************************************************************************
+ Class CModbusTCPConnection 
+**************************************************************************************************************************/
+class CModbusTCPConnection : public CBase {
+public:
+	
+	/**
+	* CModbusTCPConnection::CModbusTCPConnection - Constructor for ModbusTCPConnection class.
+	*/
+	CModbusTCPConnection(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline std::string GetIPAddress();
+	inline LibMCEnv_uint32 GetPort();
+	inline LibMCEnv_uint32 GetTimeout();
+	inline bool IsConnected();
+	inline void Disconnect();
+	inline void Reconnect();
+	inline LibMCEnv_uint16 DiagnosisCall(const LibMCEnv_uint16 nSubFunction, const LibMCEnv_uint16 nDataField);
+	inline PModbusTCPDigitalIOStatus ReadCoilStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount);
+	inline PModbusTCPDigitalIOStatus ReadInputStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount);
+	inline PModbusTCPRegisterStatus ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
+	inline PModbusTCPRegisterStatus ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
+	inline void ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint8> & BufferBuffer);
+	inline void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint16> & BufferBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CDriverEnvironment 
 **************************************************************************************************************************/
 class CDriverEnvironment : public CBase {
@@ -799,6 +1004,8 @@ public:
 	}
 	
 	inline PWorkingDirectory CreateWorkingDirectory();
+	inline PTCPIPConnection CreateTCPIPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS);
+	inline PModbusTCPConnection CreateModbusTCPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS);
 	inline bool DriverHasResourceData(const std::string & sIdentifier);
 	inline bool MachineHasResourceData(const std::string & sIdentifier);
 	inline void RetrieveDriverData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
@@ -1158,7 +1365,43 @@ public:
 		pWrapperTable->m_WorkingDirectory_RetrieveUnmanagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveManagedFiles = nullptr;
 		pWrapperTable->m_WorkingDirectory_RetrieveAllFiles = nullptr;
+		pWrapperTable->m_TCPIPPacket_IsEmpty = nullptr;
+		pWrapperTable->m_TCPIPPacket_GetSize = nullptr;
+		pWrapperTable->m_TCPIPPacket_GetData = nullptr;
+		pWrapperTable->m_TCPIPConnection_GetIPAddress = nullptr;
+		pWrapperTable->m_TCPIPConnection_GetPort = nullptr;
+		pWrapperTable->m_TCPIPConnection_GetTimeout = nullptr;
+		pWrapperTable->m_TCPIPConnection_IsConnected = nullptr;
+		pWrapperTable->m_TCPIPConnection_Disconnect = nullptr;
+		pWrapperTable->m_TCPIPConnection_Reconnect = nullptr;
+		pWrapperTable->m_TCPIPConnection_SendBuffer = nullptr;
+		pWrapperTable->m_TCPIPConnection_WaitForData = nullptr;
+		pWrapperTable->m_TCPIPConnection_ReceiveFixedPacket = nullptr;
+		pWrapperTable->m_TCPIPConnection_ReceiveData = nullptr;
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetCount = nullptr;
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetBaseAddress = nullptr;
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValue = nullptr;
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValues = nullptr;
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetCount = nullptr;
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetBaseAddress = nullptr;
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetValue = nullptr;
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetValues = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_GetIPAddress = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_GetPort = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_GetTimeout = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_IsConnected = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_Disconnect = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_Reconnect = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_DiagnosisCall = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_ReadCoilStatus = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_ReadInputStatus = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_ReadHoldingRegisters = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_ReadInputRegisters = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_ForceMultipleCoils = nullptr;
+		pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection = nullptr;
 		pWrapperTable->m_DriverEnvironment_DriverHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_MachineHasResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverData = nullptr;
@@ -2179,12 +2422,336 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_TCPIPPacket_IsEmpty = (PLibMCEnvTCPIPPacket_IsEmptyPtr) GetProcAddress(hLibrary, "libmcenv_tcpippacket_isempty");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPPacket_IsEmpty = (PLibMCEnvTCPIPPacket_IsEmptyPtr) dlsym(hLibrary, "libmcenv_tcpippacket_isempty");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPPacket_IsEmpty == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPPacket_GetSize = (PLibMCEnvTCPIPPacket_GetSizePtr) GetProcAddress(hLibrary, "libmcenv_tcpippacket_getsize");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPPacket_GetSize = (PLibMCEnvTCPIPPacket_GetSizePtr) dlsym(hLibrary, "libmcenv_tcpippacket_getsize");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPPacket_GetSize == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPPacket_GetData = (PLibMCEnvTCPIPPacket_GetDataPtr) GetProcAddress(hLibrary, "libmcenv_tcpippacket_getdata");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPPacket_GetData = (PLibMCEnvTCPIPPacket_GetDataPtr) dlsym(hLibrary, "libmcenv_tcpippacket_getdata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPPacket_GetData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_GetIPAddress = (PLibMCEnvTCPIPConnection_GetIPAddressPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_getipaddress");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_GetIPAddress = (PLibMCEnvTCPIPConnection_GetIPAddressPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_getipaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_GetIPAddress == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_GetPort = (PLibMCEnvTCPIPConnection_GetPortPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_getport");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_GetPort = (PLibMCEnvTCPIPConnection_GetPortPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_getport");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_GetPort == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_GetTimeout = (PLibMCEnvTCPIPConnection_GetTimeoutPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_gettimeout");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_GetTimeout = (PLibMCEnvTCPIPConnection_GetTimeoutPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_gettimeout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_GetTimeout == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_IsConnected = (PLibMCEnvTCPIPConnection_IsConnectedPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_isconnected");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_IsConnected = (PLibMCEnvTCPIPConnection_IsConnectedPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_isconnected");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_IsConnected == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_Disconnect = (PLibMCEnvTCPIPConnection_DisconnectPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_disconnect");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_Disconnect = (PLibMCEnvTCPIPConnection_DisconnectPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_disconnect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_Disconnect == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_Reconnect = (PLibMCEnvTCPIPConnection_ReconnectPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_reconnect");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_Reconnect = (PLibMCEnvTCPIPConnection_ReconnectPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_reconnect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_Reconnect == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_SendBuffer = (PLibMCEnvTCPIPConnection_SendBufferPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_sendbuffer");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_SendBuffer = (PLibMCEnvTCPIPConnection_SendBufferPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_sendbuffer");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_SendBuffer == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_WaitForData = (PLibMCEnvTCPIPConnection_WaitForDataPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_waitfordata");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_WaitForData = (PLibMCEnvTCPIPConnection_WaitForDataPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_waitfordata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_WaitForData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_ReceiveFixedPacket = (PLibMCEnvTCPIPConnection_ReceiveFixedPacketPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_receivefixedpacket");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_ReceiveFixedPacket = (PLibMCEnvTCPIPConnection_ReceiveFixedPacketPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_receivefixedpacket");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_ReceiveFixedPacket == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_TCPIPConnection_ReceiveData = (PLibMCEnvTCPIPConnection_ReceiveDataPtr) GetProcAddress(hLibrary, "libmcenv_tcpipconnection_receivedata");
+		#else // _WIN32
+		pWrapperTable->m_TCPIPConnection_ReceiveData = (PLibMCEnvTCPIPConnection_ReceiveDataPtr) dlsym(hLibrary, "libmcenv_tcpipconnection_receivedata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_TCPIPConnection_ReceiveData == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetCount = (PLibMCEnvModbusTCPDigitalIOStatus_GetCountPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpdigitaliostatus_getcount");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetCount = (PLibMCEnvModbusTCPDigitalIOStatus_GetCountPtr) dlsym(hLibrary, "libmcenv_modbustcpdigitaliostatus_getcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetBaseAddress = (PLibMCEnvModbusTCPDigitalIOStatus_GetBaseAddressPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpdigitaliostatus_getbaseaddress");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetBaseAddress = (PLibMCEnvModbusTCPDigitalIOStatus_GetBaseAddressPtr) dlsym(hLibrary, "libmcenv_modbustcpdigitaliostatus_getbaseaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetBaseAddress == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValue = (PLibMCEnvModbusTCPDigitalIOStatus_GetValuePtr) GetProcAddress(hLibrary, "libmcenv_modbustcpdigitaliostatus_getvalue");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValue = (PLibMCEnvModbusTCPDigitalIOStatus_GetValuePtr) dlsym(hLibrary, "libmcenv_modbustcpdigitaliostatus_getvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValues = (PLibMCEnvModbusTCPDigitalIOStatus_GetValuesPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpdigitaliostatus_getvalues");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValues = (PLibMCEnvModbusTCPDigitalIOStatus_GetValuesPtr) dlsym(hLibrary, "libmcenv_modbustcpdigitaliostatus_getvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetCount = (PLibMCEnvModbusTCPRegisterStatus_GetCountPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpregisterstatus_getcount");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetCount = (PLibMCEnvModbusTCPRegisterStatus_GetCountPtr) dlsym(hLibrary, "libmcenv_modbustcpregisterstatus_getcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPRegisterStatus_GetCount == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetBaseAddress = (PLibMCEnvModbusTCPRegisterStatus_GetBaseAddressPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpregisterstatus_getbaseaddress");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetBaseAddress = (PLibMCEnvModbusTCPRegisterStatus_GetBaseAddressPtr) dlsym(hLibrary, "libmcenv_modbustcpregisterstatus_getbaseaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPRegisterStatus_GetBaseAddress == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetValue = (PLibMCEnvModbusTCPRegisterStatus_GetValuePtr) GetProcAddress(hLibrary, "libmcenv_modbustcpregisterstatus_getvalue");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetValue = (PLibMCEnvModbusTCPRegisterStatus_GetValuePtr) dlsym(hLibrary, "libmcenv_modbustcpregisterstatus_getvalue");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPRegisterStatus_GetValue == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetValues = (PLibMCEnvModbusTCPRegisterStatus_GetValuesPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpregisterstatus_getvalues");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPRegisterStatus_GetValues = (PLibMCEnvModbusTCPRegisterStatus_GetValuesPtr) dlsym(hLibrary, "libmcenv_modbustcpregisterstatus_getvalues");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPRegisterStatus_GetValues == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_GetIPAddress = (PLibMCEnvModbusTCPConnection_GetIPAddressPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_getipaddress");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_GetIPAddress = (PLibMCEnvModbusTCPConnection_GetIPAddressPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_getipaddress");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_GetIPAddress == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_GetPort = (PLibMCEnvModbusTCPConnection_GetPortPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_getport");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_GetPort = (PLibMCEnvModbusTCPConnection_GetPortPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_getport");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_GetPort == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_GetTimeout = (PLibMCEnvModbusTCPConnection_GetTimeoutPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_gettimeout");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_GetTimeout = (PLibMCEnvModbusTCPConnection_GetTimeoutPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_gettimeout");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_GetTimeout == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_IsConnected = (PLibMCEnvModbusTCPConnection_IsConnectedPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_isconnected");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_IsConnected = (PLibMCEnvModbusTCPConnection_IsConnectedPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_isconnected");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_IsConnected == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_Disconnect = (PLibMCEnvModbusTCPConnection_DisconnectPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_disconnect");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_Disconnect = (PLibMCEnvModbusTCPConnection_DisconnectPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_disconnect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_Disconnect == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_Reconnect = (PLibMCEnvModbusTCPConnection_ReconnectPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_reconnect");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_Reconnect = (PLibMCEnvModbusTCPConnection_ReconnectPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_reconnect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_Reconnect == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_DiagnosisCall = (PLibMCEnvModbusTCPConnection_DiagnosisCallPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_diagnosiscall");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_DiagnosisCall = (PLibMCEnvModbusTCPConnection_DiagnosisCallPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_diagnosiscall");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_DiagnosisCall == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadCoilStatus = (PLibMCEnvModbusTCPConnection_ReadCoilStatusPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_readcoilstatus");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadCoilStatus = (PLibMCEnvModbusTCPConnection_ReadCoilStatusPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_readcoilstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_ReadCoilStatus == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadInputStatus = (PLibMCEnvModbusTCPConnection_ReadInputStatusPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_readinputstatus");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadInputStatus = (PLibMCEnvModbusTCPConnection_ReadInputStatusPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_readinputstatus");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_ReadInputStatus == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadHoldingRegisters = (PLibMCEnvModbusTCPConnection_ReadHoldingRegistersPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_readholdingregisters");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadHoldingRegisters = (PLibMCEnvModbusTCPConnection_ReadHoldingRegistersPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_readholdingregisters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_ReadHoldingRegisters == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadInputRegisters = (PLibMCEnvModbusTCPConnection_ReadInputRegistersPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_readinputregisters");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ReadInputRegisters = (PLibMCEnvModbusTCPConnection_ReadInputRegistersPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_readinputregisters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_ReadInputRegisters == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ForceMultipleCoils = (PLibMCEnvModbusTCPConnection_ForceMultipleCoilsPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_forcemultiplecoils");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_ForceMultipleCoils = (PLibMCEnvModbusTCPConnection_ForceMultipleCoilsPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_forcemultiplecoils");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_ForceMultipleCoils == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters = (PLibMCEnvModbusTCPConnection_PresetMultipleRegistersPtr) GetProcAddress(hLibrary, "libmcenv_modbustcpconnection_presetmultipleregisters");
+		#else // _WIN32
+		pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters = (PLibMCEnvModbusTCPConnection_PresetMultipleRegistersPtr) dlsym(hLibrary, "libmcenv_modbustcpconnection_presetmultipleregisters");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createworkingdirectory");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createworkingdirectory");
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = (PLibMCEnvDriverEnvironment_CreateTCPIPConnectionPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createtcpipconnection");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = (PLibMCEnvDriverEnvironment_CreateTCPIPConnectionPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createtcpipconnection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection = (PLibMCEnvDriverEnvironment_CreateModbusTCPConnectionPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createmodbustcpconnection");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection = (PLibMCEnvDriverEnvironment_CreateModbusTCPConnectionPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createmodbustcpconnection");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -3686,8 +4253,152 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_WorkingDirectory_RetrieveAllFiles == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_tcpippacket_isempty", (void**)&(pWrapperTable->m_TCPIPPacket_IsEmpty));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPPacket_IsEmpty == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpippacket_getsize", (void**)&(pWrapperTable->m_TCPIPPacket_GetSize));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPPacket_GetSize == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpippacket_getdata", (void**)&(pWrapperTable->m_TCPIPPacket_GetData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPPacket_GetData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_getipaddress", (void**)&(pWrapperTable->m_TCPIPConnection_GetIPAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_GetIPAddress == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_getport", (void**)&(pWrapperTable->m_TCPIPConnection_GetPort));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_GetPort == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_gettimeout", (void**)&(pWrapperTable->m_TCPIPConnection_GetTimeout));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_GetTimeout == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_isconnected", (void**)&(pWrapperTable->m_TCPIPConnection_IsConnected));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_IsConnected == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_disconnect", (void**)&(pWrapperTable->m_TCPIPConnection_Disconnect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_Disconnect == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_reconnect", (void**)&(pWrapperTable->m_TCPIPConnection_Reconnect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_Reconnect == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_sendbuffer", (void**)&(pWrapperTable->m_TCPIPConnection_SendBuffer));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_SendBuffer == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_waitfordata", (void**)&(pWrapperTable->m_TCPIPConnection_WaitForData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_WaitForData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_receivefixedpacket", (void**)&(pWrapperTable->m_TCPIPConnection_ReceiveFixedPacket));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_ReceiveFixedPacket == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_tcpipconnection_receivedata", (void**)&(pWrapperTable->m_TCPIPConnection_ReceiveData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_TCPIPConnection_ReceiveData == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpdigitaliostatus_getcount", (void**)&(pWrapperTable->m_ModbusTCPDigitalIOStatus_GetCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpdigitaliostatus_getbaseaddress", (void**)&(pWrapperTable->m_ModbusTCPDigitalIOStatus_GetBaseAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetBaseAddress == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpdigitaliostatus_getvalue", (void**)&(pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpdigitaliostatus_getvalues", (void**)&(pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPDigitalIOStatus_GetValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpregisterstatus_getcount", (void**)&(pWrapperTable->m_ModbusTCPRegisterStatus_GetCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPRegisterStatus_GetCount == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpregisterstatus_getbaseaddress", (void**)&(pWrapperTable->m_ModbusTCPRegisterStatus_GetBaseAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPRegisterStatus_GetBaseAddress == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpregisterstatus_getvalue", (void**)&(pWrapperTable->m_ModbusTCPRegisterStatus_GetValue));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPRegisterStatus_GetValue == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpregisterstatus_getvalues", (void**)&(pWrapperTable->m_ModbusTCPRegisterStatus_GetValues));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPRegisterStatus_GetValues == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_getipaddress", (void**)&(pWrapperTable->m_ModbusTCPConnection_GetIPAddress));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_GetIPAddress == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_getport", (void**)&(pWrapperTable->m_ModbusTCPConnection_GetPort));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_GetPort == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_gettimeout", (void**)&(pWrapperTable->m_ModbusTCPConnection_GetTimeout));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_GetTimeout == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_isconnected", (void**)&(pWrapperTable->m_ModbusTCPConnection_IsConnected));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_IsConnected == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_disconnect", (void**)&(pWrapperTable->m_ModbusTCPConnection_Disconnect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_Disconnect == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_reconnect", (void**)&(pWrapperTable->m_ModbusTCPConnection_Reconnect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_Reconnect == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_diagnosiscall", (void**)&(pWrapperTable->m_ModbusTCPConnection_DiagnosisCall));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_DiagnosisCall == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_readcoilstatus", (void**)&(pWrapperTable->m_ModbusTCPConnection_ReadCoilStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_ReadCoilStatus == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_readinputstatus", (void**)&(pWrapperTable->m_ModbusTCPConnection_ReadInputStatus));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_ReadInputStatus == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_readholdingregisters", (void**)&(pWrapperTable->m_ModbusTCPConnection_ReadHoldingRegisters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_ReadHoldingRegisters == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_readinputregisters", (void**)&(pWrapperTable->m_ModbusTCPConnection_ReadInputRegisters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_ReadInputRegisters == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_forcemultiplecoils", (void**)&(pWrapperTable->m_ModbusTCPConnection_ForceMultipleCoils));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_ForceMultipleCoils == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_modbustcpconnection_presetmultipleregisters", (void**)&(pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createworkingdirectory", (void**)&(pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createtcpipconnection", (void**)&(pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createmodbustcpconnection", (void**)&(pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_driverhasresourcedata", (void**)&(pWrapperTable->m_DriverEnvironment_DriverHasResourceData));
@@ -5487,6 +6198,455 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CTCPIPPacket
+	 */
+	
+	/**
+	* CTCPIPPacket::IsEmpty - Returns if packet is empty.
+	* @return Flag if packet is empty.
+	*/
+	bool CTCPIPPacket::IsEmpty()
+	{
+		bool resultPacketIsEmpty = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPPacket_IsEmpty(m_pHandle, &resultPacketIsEmpty));
+		
+		return resultPacketIsEmpty;
+	}
+	
+	/**
+	* CTCPIPPacket::GetSize - Returns the size of the packet. Returns 0 if packet is empty.
+	* @return returns size of packet.
+	*/
+	LibMCEnv_uint32 CTCPIPPacket::GetSize()
+	{
+		LibMCEnv_uint32 resultPacketSize = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPPacket_GetSize(m_pHandle, &resultPacketSize));
+		
+		return resultPacketSize;
+	}
+	
+	/**
+	* CTCPIPPacket::GetData - Returns the data of the packet. Fails if packet is empty.
+	* @param[out] BufferBuffer - packet data.
+	*/
+	void CTCPIPPacket::GetData(std::vector<LibMCEnv_uint8> & BufferBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededBuffer = 0;
+		LibMCEnv_uint64 elementsWrittenBuffer = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPPacket_GetData(m_pHandle, 0, &elementsNeededBuffer, nullptr));
+		BufferBuffer.resize((size_t) elementsNeededBuffer);
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPPacket_GetData(m_pHandle, elementsNeededBuffer, &elementsWrittenBuffer, BufferBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CTCPIPConnection
+	 */
+	
+	/**
+	* CTCPIPConnection::GetIPAddress - Returns the IP Address of the Connection.
+	* @return IP Address.
+	*/
+	std::string CTCPIPConnection::GetIPAddress()
+	{
+		LibMCEnv_uint32 bytesNeededIPAddress = 0;
+		LibMCEnv_uint32 bytesWrittenIPAddress = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_GetIPAddress(m_pHandle, 0, &bytesNeededIPAddress, nullptr));
+		std::vector<char> bufferIPAddress(bytesNeededIPAddress);
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_GetIPAddress(m_pHandle, bytesNeededIPAddress, &bytesWrittenIPAddress, &bufferIPAddress[0]));
+		
+		return std::string(&bufferIPAddress[0]);
+	}
+	
+	/**
+	* CTCPIPConnection::GetPort - Returns the Port of the Connection.
+	* @return Port.
+	*/
+	LibMCEnv_uint32 CTCPIPConnection::GetPort()
+	{
+		LibMCEnv_uint32 resultPort = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_GetPort(m_pHandle, &resultPort));
+		
+		return resultPort;
+	}
+	
+	/**
+	* CTCPIPConnection::GetTimeout - Returns the Timeout of the Connection.
+	* @return Timeout in milliseconds.
+	*/
+	LibMCEnv_uint32 CTCPIPConnection::GetTimeout()
+	{
+		LibMCEnv_uint32 resultTimeout = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_GetTimeout(m_pHandle, &resultTimeout));
+		
+		return resultTimeout;
+	}
+	
+	/**
+	* CTCPIPConnection::IsConnected - Returns if the instance is connected.
+	* @return .
+	*/
+	bool CTCPIPConnection::IsConnected()
+	{
+		bool resultIsConnected = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_IsConnected(m_pHandle, &resultIsConnected));
+		
+		return resultIsConnected;
+	}
+	
+	/**
+	* CTCPIPConnection::Disconnect - Disconnects from the Server, if connected.
+	*/
+	void CTCPIPConnection::Disconnect()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* CTCPIPConnection::Reconnect - Disconnects and Connects to the Server.
+	*/
+	void CTCPIPConnection::Reconnect()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_Reconnect(m_pHandle));
+	}
+	
+	/**
+	* CTCPIPConnection::SendBuffer - Sends a buffer of bytes to the Server.
+	* @param[in] BufferBuffer - packet payload.
+	*/
+	void CTCPIPConnection::SendBuffer(const CInputVector<LibMCEnv_uint8> & BufferBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_SendBuffer(m_pHandle, (LibMCEnv_uint64)BufferBuffer.size(), BufferBuffer.data()));
+	}
+	
+	/**
+	* CTCPIPConnection::WaitForData - Waits for a server packet to arrive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Flag if a new packet has arrived.
+	*/
+	bool CTCPIPConnection::WaitForData(const LibMCEnv_uint32 nTimeOutInMS)
+	{
+		bool resultDataAvailable = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_WaitForData(m_pHandle, nTimeOutInMS, &resultDataAvailable));
+		
+		return resultDataAvailable;
+	}
+	
+	/**
+	* CTCPIPConnection::ReceiveFixedPacket - Receives a fixed length packet. Blocks until expected number of bytes arrives or timeout is hit. Fails if there is a connection error. Returns empty packet if timeout is hit.
+	* @param[in] nPacketSize - Size of packet to receive. MUST be larger than 0.
+	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+	* @return Packet instance. Returns empty packet if timeout is hit
+	*/
+	PTCPIPPacket CTCPIPConnection::ReceiveFixedPacket(const LibMCEnv_uint32 nPacketSize, const LibMCEnv_uint32 nTimeOutInMS)
+	{
+		LibMCEnvHandle hPacketInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_ReceiveFixedPacket(m_pHandle, nPacketSize, nTimeOutInMS, &hPacketInstance));
+		
+		if (!hPacketInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTCPIPPacket>(m_pWrapper, hPacketInstance);
+	}
+	
+	/**
+	* CTCPIPConnection::ReceiveData - Receives data. Fails if there is a connection error. Returns empty packet if timeout is hit.
+	* @param[in] nDataSize - Size of data to receive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Packet instance. Size will be between 0 and DataSize.
+	*/
+	PTCPIPPacket CTCPIPConnection::ReceiveData(const LibMCEnv_uint32 nDataSize, const LibMCEnv_uint32 nTimeOutInMS)
+	{
+		LibMCEnvHandle hPacketInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_TCPIPConnection_ReceiveData(m_pHandle, nDataSize, nTimeOutInMS, &hPacketInstance));
+		
+		if (!hPacketInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTCPIPPacket>(m_pWrapper, hPacketInstance);
+	}
+	
+	/**
+	 * Method definitions for class CModbusTCPDigitalIOStatus
+	 */
+	
+	/**
+	* CModbusTCPDigitalIOStatus::GetCount - Returns the number of Digital IOs in the instance.
+	* @return Count.
+	*/
+	LibMCEnv_uint32 CModbusTCPDigitalIOStatus::GetCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPDigitalIOStatus_GetCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CModbusTCPDigitalIOStatus::GetBaseAddress - Returns the base address of Digital IOs in the instance.
+	* @return Base Address.
+	*/
+	LibMCEnv_uint32 CModbusTCPDigitalIOStatus::GetBaseAddress()
+	{
+		LibMCEnv_uint32 resultAddress = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPDigitalIOStatus_GetBaseAddress(m_pHandle, &resultAddress));
+		
+		return resultAddress;
+	}
+	
+	/**
+	* CModbusTCPDigitalIOStatus::GetValue - Returns the cached state of the Digital IO in the instance.
+	* @param[in] nIndex - Index of IO Value. 0-based.
+	* @return State Value.
+	*/
+	bool CModbusTCPDigitalIOStatus::GetValue(const LibMCEnv_uint32 nIndex)
+	{
+		bool resultState = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPDigitalIOStatus_GetValue(m_pHandle, nIndex, &resultState));
+		
+		return resultState;
+	}
+	
+	/**
+	* CModbusTCPDigitalIOStatus::GetValues - Returns all Digital IOs of the instance as byte array.
+	* @param[out] StateArrayBuffer - State Value Array.
+	*/
+	void CModbusTCPDigitalIOStatus::GetValues(std::vector<LibMCEnv_uint8> & StateArrayBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededStateArray = 0;
+		LibMCEnv_uint64 elementsWrittenStateArray = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPDigitalIOStatus_GetValues(m_pHandle, 0, &elementsNeededStateArray, nullptr));
+		StateArrayBuffer.resize((size_t) elementsNeededStateArray);
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPDigitalIOStatus_GetValues(m_pHandle, elementsNeededStateArray, &elementsWrittenStateArray, StateArrayBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CModbusTCPRegisterStatus
+	 */
+	
+	/**
+	* CModbusTCPRegisterStatus::GetCount - Returns the number of registers in the instance.
+	* @return Count.
+	*/
+	LibMCEnv_uint32 CModbusTCPRegisterStatus::GetCount()
+	{
+		LibMCEnv_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPRegisterStatus_GetCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CModbusTCPRegisterStatus::GetBaseAddress - Returns the base address of registers in the instance.
+	* @return Base Address.
+	*/
+	LibMCEnv_uint32 CModbusTCPRegisterStatus::GetBaseAddress()
+	{
+		LibMCEnv_uint32 resultAddress = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPRegisterStatus_GetBaseAddress(m_pHandle, &resultAddress));
+		
+		return resultAddress;
+	}
+	
+	/**
+	* CModbusTCPRegisterStatus::GetValue - Returns the cached state of the registers in the instance.
+	* @param[in] nIndex - Index of IO Value. 0-based.
+	* @return State Value.
+	*/
+	LibMCEnv_uint16 CModbusTCPRegisterStatus::GetValue(const LibMCEnv_uint32 nIndex)
+	{
+		LibMCEnv_uint16 resultState = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPRegisterStatus_GetValue(m_pHandle, nIndex, &resultState));
+		
+		return resultState;
+	}
+	
+	/**
+	* CModbusTCPRegisterStatus::GetValues - Returns all registers of the instance as word array.
+	* @param[out] StateArrayBuffer - State Value Array.
+	*/
+	void CModbusTCPRegisterStatus::GetValues(std::vector<LibMCEnv_uint16> & StateArrayBuffer)
+	{
+		LibMCEnv_uint64 elementsNeededStateArray = 0;
+		LibMCEnv_uint64 elementsWrittenStateArray = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPRegisterStatus_GetValues(m_pHandle, 0, &elementsNeededStateArray, nullptr));
+		StateArrayBuffer.resize((size_t) elementsNeededStateArray);
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPRegisterStatus_GetValues(m_pHandle, elementsNeededStateArray, &elementsWrittenStateArray, StateArrayBuffer.data()));
+	}
+	
+	/**
+	 * Method definitions for class CModbusTCPConnection
+	 */
+	
+	/**
+	* CModbusTCPConnection::GetIPAddress - Returns the IP Address of the Connection.
+	* @return IP Address.
+	*/
+	std::string CModbusTCPConnection::GetIPAddress()
+	{
+		LibMCEnv_uint32 bytesNeededIPAddress = 0;
+		LibMCEnv_uint32 bytesWrittenIPAddress = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_GetIPAddress(m_pHandle, 0, &bytesNeededIPAddress, nullptr));
+		std::vector<char> bufferIPAddress(bytesNeededIPAddress);
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_GetIPAddress(m_pHandle, bytesNeededIPAddress, &bytesWrittenIPAddress, &bufferIPAddress[0]));
+		
+		return std::string(&bufferIPAddress[0]);
+	}
+	
+	/**
+	* CModbusTCPConnection::GetPort - Returns the Port of the Connection.
+	* @return Port.
+	*/
+	LibMCEnv_uint32 CModbusTCPConnection::GetPort()
+	{
+		LibMCEnv_uint32 resultPort = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_GetPort(m_pHandle, &resultPort));
+		
+		return resultPort;
+	}
+	
+	/**
+	* CModbusTCPConnection::GetTimeout - Returns the Timeout of the Connection.
+	* @return Timeout in milliseconds.
+	*/
+	LibMCEnv_uint32 CModbusTCPConnection::GetTimeout()
+	{
+		LibMCEnv_uint32 resultTimeout = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_GetTimeout(m_pHandle, &resultTimeout));
+		
+		return resultTimeout;
+	}
+	
+	/**
+	* CModbusTCPConnection::IsConnected - Returns if the instance is connected.
+	* @return .
+	*/
+	bool CModbusTCPConnection::IsConnected()
+	{
+		bool resultIsConnected = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_IsConnected(m_pHandle, &resultIsConnected));
+		
+		return resultIsConnected;
+	}
+	
+	/**
+	* CModbusTCPConnection::Disconnect - Disconnects from the Server.
+	*/
+	void CModbusTCPConnection::Disconnect()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* CModbusTCPConnection::Reconnect - Disconnects and Connects to the Server.
+	*/
+	void CModbusTCPConnection::Reconnect()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_Reconnect(m_pHandle));
+	}
+	
+	/**
+	* CModbusTCPConnection::DiagnosisCall - Sends a diagnosis call to the Server.
+	* @param[in] nSubFunction - Modbus TCP Subfunction ID.
+	* @param[in] nDataField - Modbus TCP Data Field.
+	* @return Modbus TCP Data Response.
+	*/
+	LibMCEnv_uint16 CModbusTCPConnection::DiagnosisCall(const LibMCEnv_uint16 nSubFunction, const LibMCEnv_uint16 nDataField)
+	{
+		LibMCEnv_uint16 resultDataResponse = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_DiagnosisCall(m_pHandle, nSubFunction, nDataField, &resultDataResponse));
+		
+		return resultDataResponse;
+	}
+	
+	/**
+	* CModbusTCPConnection::ReadCoilStatus - Reads coil status of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nBitCount - Number of coils to read. MUST be larger than 0.
+	* @return Coil status instance.
+	*/
+	PModbusTCPDigitalIOStatus CModbusTCPConnection::ReadCoilStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount)
+	{
+		LibMCEnvHandle hCoilStatus = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_ReadCoilStatus(m_pHandle, nStartAddress, nBitCount, &hCoilStatus));
+		
+		if (!hCoilStatus) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModbusTCPDigitalIOStatus>(m_pWrapper, hCoilStatus);
+	}
+	
+	/**
+	* CModbusTCPConnection::ReadInputStatus - Reads input status of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nBitCount - Number of inputs to read. MUST be larger than 0.
+	* @return Input status instance.
+	*/
+	PModbusTCPDigitalIOStatus CModbusTCPConnection::ReadInputStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount)
+	{
+		LibMCEnvHandle hInputStatus = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_ReadInputStatus(m_pHandle, nStartAddress, nBitCount, &hInputStatus));
+		
+		if (!hInputStatus) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModbusTCPDigitalIOStatus>(m_pWrapper, hInputStatus);
+	}
+	
+	/**
+	* CModbusTCPConnection::ReadHoldingRegisters - Reads holding registers of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nRegisterCount - Number of registers. MUST be larger than 0.
+	* @return Holding register instance.
+	*/
+	PModbusTCPRegisterStatus CModbusTCPConnection::ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount)
+	{
+		LibMCEnvHandle hRegisterInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_ReadHoldingRegisters(m_pHandle, nStartAddress, nRegisterCount, &hRegisterInstance));
+		
+		if (!hRegisterInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModbusTCPRegisterStatus>(m_pWrapper, hRegisterInstance);
+	}
+	
+	/**
+	* CModbusTCPConnection::ReadInputRegisters - Reads input registers of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nRegisterCount - Number of registers. MUST be larger than 0.
+	* @return Input register instance.
+	*/
+	PModbusTCPRegisterStatus CModbusTCPConnection::ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount)
+	{
+		LibMCEnvHandle hRegisterInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_ReadInputRegisters(m_pHandle, nStartAddress, nRegisterCount, &hRegisterInstance));
+		
+		if (!hRegisterInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModbusTCPRegisterStatus>(m_pWrapper, hRegisterInstance);
+	}
+	
+	/**
+	* CModbusTCPConnection::ForceMultipleCoils - Forces multiple coils on Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] BufferBuffer - Input coil array. One byte per Input. MUST NOT be empty
+	*/
+	void CModbusTCPConnection::ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint8> & BufferBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_ForceMultipleCoils(m_pHandle, nStartAddress, (LibMCEnv_uint64)BufferBuffer.size(), BufferBuffer.data()));
+	}
+	
+	/**
+	* CModbusTCPConnection::PresetMultipleRegisters - Forces multiple registers on Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] BufferBuffer - Input register array. One word per Input. MUST NOT be empty
+	*/
+	void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint16> & BufferBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_PresetMultipleRegisters(m_pHandle, nStartAddress, (LibMCEnv_uint64)BufferBuffer.size(), BufferBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CDriverEnvironment
 	 */
 	
@@ -5503,6 +6663,42 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CWorkingDirectory>(m_pWrapper, hWorkingDirectory);
+	}
+	
+	/**
+	* CDriverEnvironment::CreateTCPIPConnection - creates a TCP/IP Connection for a specific IP address and port.
+	* @param[in] sIPAddress - IP Address.
+	* @param[in] nPort - Port.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return connects to the given IP Address
+	*/
+	PTCPIPConnection CDriverEnvironment::CreateTCPIPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS)
+	{
+		LibMCEnvHandle hConnectionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateTCPIPConnection(m_pHandle, sIPAddress.c_str(), nPort, nTimeOutInMS, &hConnectionInstance));
+		
+		if (!hConnectionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CTCPIPConnection>(m_pWrapper, hConnectionInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::CreateModbusTCPConnection - creates a Modbus TCP Connection for a specific IP address and port.
+	* @param[in] sIPAddress - IP Address.
+	* @param[in] nPort - Port.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return connects to the given IP Address
+	*/
+	PModbusTCPConnection CDriverEnvironment::CreateModbusTCPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS)
+	{
+		LibMCEnvHandle hConnectionInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateModbusTCPConnection(m_pHandle, sIPAddress.c_str(), nPort, nTimeOutInMS, &hConnectionInstance));
+		
+		if (!hConnectionInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CModbusTCPConnection>(m_pWrapper, hConnectionInstance);
 	}
 	
 	/**

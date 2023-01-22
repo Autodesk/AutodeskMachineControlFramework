@@ -36,6 +36,8 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_workingdirectory.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_tcpipconnection.hpp"
+#include "libmcenv_modbustcpconnection.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -80,6 +82,16 @@ CDriverEnvironment::~CDriverEnvironment()
 IWorkingDirectory* CDriverEnvironment::CreateWorkingDirectory()
 {
     return new CWorkingDirectory(m_sBaseTempPath, m_pDriverResourcePackage);
+}
+
+ITCPIPConnection* CDriverEnvironment::CreateTCPIPConnection(const std::string& sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS)
+{
+    return new CTCPIPConnection(sIPAddress, nPort, nTimeOutInMS);
+}
+
+IModbusTCPConnection* CDriverEnvironment::CreateModbusTCPConnection(const std::string& sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS)
+{
+    return new CModbusTCPConnection(sIPAddress, nPort, nTimeOutInMS);
 }
 
 
