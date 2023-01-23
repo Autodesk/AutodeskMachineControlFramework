@@ -28,12 +28,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ]]
 
+
 cmake_minimum_required(VERSION 3.5)
 
-project("AMC Unit Tests")
+##########################################################################################
+### Change the next line for making a new driver
+##########################################################################################
 
-add_subdirectory(RayLaseTest)
-add_subdirectory(BuRTest)
-add_subdirectory(RasterizerTest)
-add_subdirectory(ScanlabOIETest)
-add_subdirectory(BK9xxxTest)
+set (DRIVERPROJECT BK9xxx)
+
+include (../CMakeDriverCommon.txt)
+
+##########################################################################################
+### Add custom code below
+##########################################################################################
+
