@@ -148,7 +148,7 @@ Custom implementation
 -->
 
 
-	<class name="Driver_ADS" parent="Driver" description="A Driver for a BR Automation PLC.">
+	<class name="Driver_ADS" parent="Driver" description="A Driver for a Beckhoff ADS PLC.">
 
 		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
 		</method>
