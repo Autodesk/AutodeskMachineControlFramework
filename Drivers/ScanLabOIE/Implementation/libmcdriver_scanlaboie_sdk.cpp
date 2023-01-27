@@ -172,6 +172,14 @@ CScanLabOIESDK::CScanLabOIESDK(const std::string& sDLLNameUTF8, const std::strin
 	this->oie_set_packet_listener = (PScanLabOIEPtr_oie_set_packet_listener)_loadScanLabOIEAddress(hLibrary, "oie_set_packet_listener");
 	this->oie_set_runtime_error_listener = (PScanLabOIEPtr_oie_set_runtime_error_listener)_loadScanLabOIEAddress(hLibrary, "oie_set_runtime_error_listener");
 
+	this->oie_pkt_get_rtc_signal_count = (PScanLabOIEPtr_oie_pkt_get_rtc_signal_count)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_rtc_signal_count");
+	this->oie_pkt_get_sensor_signal_count = (PScanLabOIEPtr_oie_pkt_get_sensor_signal_count)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_sensor_signal_count");
+	this->oie_pkt_get_app_data_count = (PScanLabOIEPtr_oie_pkt_get_app_data_count)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_app_data_count");
+	this->oie_pkt_get_rtc_signal = (PScanLabOIEPtr_oie_pkt_get_rtc_signal)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_rtc_signal");
+	this->oie_pkt_get_sensor_signal = (PScanLabOIEPtr_oie_pkt_get_sensor_signal)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_sensor_signal");
+	this->oie_pkt_get_app_data = (PScanLabOIEPtr_oie_pkt_get_app_data)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_app_data");
+	this->oie_pkt_get_xy = (PScanLabOIEPtr_oie_pkt_get_xy)_loadScanLabOIEAddress(hLibrary, "oie_pkt_get_xy");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -259,6 +267,13 @@ void CScanLabOIESDK::resetFunctionPtrs()
 	oie_get_sensor_signals = nullptr;
 	oie_set_packet_listener = nullptr;
 	oie_set_runtime_error_listener = nullptr;
+	this->oie_pkt_get_rtc_signal_count = nullptr;
+	this->oie_pkt_get_sensor_signal_count = nullptr;
+	this->oie_pkt_get_app_data_count = nullptr;
+	this->oie_pkt_get_rtc_signal = nullptr;
+	this->oie_pkt_get_sensor_signal = nullptr;
+	this->oie_pkt_get_app_data = nullptr;
+	this->oie_pkt_get_xy = nullptr;
 
 }
 

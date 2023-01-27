@@ -481,6 +481,7 @@ public:
 	inline std::string GetAppName(const LibMCDriver_ScanLabOIE_uint32 nIndex);
 	inline void GetAppVersion(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
 	inline void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
+	inline void SetRTCCorrectionData(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & CorrectionDataBuffer);
 	inline void StartAppByName(const std::string & sName, const std::string & sDeviceConfig);
 	inline void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig);
 	inline void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig);
@@ -660,6 +661,7 @@ public:
 		pWrapperTable->m_OIEDevice_GetAppName = nullptr;
 		pWrapperTable->m_OIEDevice_GetAppVersion = nullptr;
 		pWrapperTable->m_OIEDevice_GetAppInfo = nullptr;
+		pWrapperTable->m_OIEDevice_SetRTCCorrectionData = nullptr;
 		pWrapperTable->m_OIEDevice_StartAppByName = nullptr;
 		pWrapperTable->m_OIEDevice_StartAppByIndex = nullptr;
 		pWrapperTable->m_OIEDevice_StartAppByMajorVersion = nullptr;
@@ -915,6 +917,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_OIEDevice_GetAppInfo == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_OIEDevice_SetRTCCorrectionData = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTCCorrectionDataPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata");
+		#else // _WIN32
+		pWrapperTable->m_OIEDevice_SetRTCCorrectionData = (PLibMCDriver_ScanLabOIEOIEDevice_SetRTCCorrectionDataPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_OIEDevice_SetRTCCorrectionData == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1254,6 +1265,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_getappinfo", (void**)&(pWrapperTable->m_OIEDevice_GetAppInfo));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetAppInfo == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata", (void**)&(pWrapperTable->m_OIEDevice_SetRTCCorrectionData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_SetRTCCorrectionData == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_startappbyname", (void**)&(pWrapperTable->m_OIEDevice_StartAppByName));
@@ -1630,6 +1645,15 @@ public:
 		std::vector<char> bufferName(bytesNeededName);
 		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_GetAppInfo(m_pHandle, nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0], &nMajor, &nMinor, &nPatch));
 		sName = std::string(&bufferName[0]);
+	}
+	
+	/**
+	* COIEDevice::SetRTCCorrectionData - Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.
+	* @param[in] CorrectionDataBuffer - Patch version of the app.
+	*/
+	void COIEDevice::SetRTCCorrectionData(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & CorrectionDataBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_SetRTCCorrectionData(m_pHandle, (LibMCDriver_ScanLabOIE_uint64)CorrectionDataBuffer.size(), CorrectionDataBuffer.data()));
 	}
 	
 	/**

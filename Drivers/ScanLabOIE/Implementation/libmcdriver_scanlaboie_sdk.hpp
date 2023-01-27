@@ -104,6 +104,14 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_packet_listener) (oie_device pDevice, oie_pkt_listener pListener, void * pUserData);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_runtime_error_listener) (oie_device pDevice, oie_err_listener pListener, void* pUserData);
 
+		typedef uint32_t(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_rtc_signal_count) (const oie_pkt* pPacket);
+		typedef uint32_t(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_sensor_signal_count) (const oie_pkt* pPacket);
+		typedef uint32_t(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_app_data_count) (const oie_pkt* pPacket);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_rtc_signal) (const oie_pkt* pPacket, uint32_t nIndex, int32_t* pValue);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_sensor_signal) (const oie_pkt* pPacket, uint32_t nIndex, int32_t* pValue);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_app_data) (const oie_pkt* pPacket, uint32_t nIndex, int32_t* pValue);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_xy) (const oie_pkt* pPacket, double * dX, double * dY);
+
 		class CScanLabOIESDK_DLLDirectoryCache {
 		private:
 #ifdef _WIN32
@@ -159,6 +167,13 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_get_sensor_signals oie_get_sensor_signals = nullptr;
 			PScanLabOIEPtr_oie_set_packet_listener oie_set_packet_listener = nullptr;
 			PScanLabOIEPtr_oie_set_runtime_error_listener oie_set_runtime_error_listener = nullptr;
+			PScanLabOIEPtr_oie_pkt_get_rtc_signal_count oie_pkt_get_rtc_signal_count = nullptr;
+			PScanLabOIEPtr_oie_pkt_get_sensor_signal_count oie_pkt_get_sensor_signal_count = nullptr;
+			PScanLabOIEPtr_oie_pkt_get_app_data_count oie_pkt_get_app_data_count = nullptr;
+			PScanLabOIEPtr_oie_pkt_get_rtc_signal oie_pkt_get_rtc_signal = nullptr;
+			PScanLabOIEPtr_oie_pkt_get_sensor_signal oie_pkt_get_sensor_signal = nullptr;
+			PScanLabOIEPtr_oie_pkt_get_app_data oie_pkt_get_app_data = nullptr;
+			PScanLabOIEPtr_oie_pkt_get_xy oie_pkt_get_xy = nullptr;
 
 			CScanLabOIESDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);
 			~CScanLabOIESDK();
