@@ -123,6 +123,8 @@ public:
 		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
 		pRTC6Driver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
 
+		pRTC6Driver->SetCommunicationTimeouts(100, 3000, 1.2);
+
 		std::string sFirmwareResource;
 		if (sIP.empty()) {
 			pStateEnvironment->LogMessage("Loading RTC PCI firmware...");
@@ -138,6 +140,7 @@ public:
 		std::vector<uint8_t> CorrectionFileBuffer;
 		pStateEnvironment->LogMessage("Loading correction file...");
 		pStateEnvironment->LoadResourceData(sCorrectionResourceName, CorrectionFileBuffer);
+		pStateEnvironment->LogMessage("correction file size: " + std::to_string (CorrectionFileBuffer.size()));
 
 		pRTC6Driver->SetCorrectionFile(CorrectionFileBuffer, nTableIndex, nDimension, nTableNumberHeadA, nTableNumberHeadB);
 
@@ -149,7 +152,11 @@ public:
 		pStateEnvironment->LogMessage("Initialising done..");
 
 		pStateEnvironment->LogMessage("Initializing for OIE..");
-		pRTC6Driver->InitializeForOIE(6000000, 3);
+		std::vector<uint32_t> signals;
+		signals.push_back(1);
+		signals.push_back(2);
+		signals.push_back(39);
+		pRTC6Driver->InitializeForOIE(signals);
 		pStateEnvironment->Sleep(1000);
 
 		pStateEnvironment->LogMessage("Loading OIE Device Config...");
@@ -167,8 +174,10 @@ public:
 		pOIEDriver->SetDependencyResourceNames("libssl-1_1-x64", "libcrypto-1_1-x64", "qt5core-x64", "qt5network-x64");
 		pOIEDriver->InitializeSDK("liboie-x64");
 
+
 		pStateEnvironment->LogMessage("Adding Device...");
 		auto pDevice = pOIEDriver->AddDevice("oie1", "192.168.5.8", 21072, 200000);
+		pDevice->SetRTCCorrectionData(CorrectionFileBuffer);
 
 		pStateEnvironment->LogMessage("  Device Name: " + pDevice->GetDeviceName ());
 		pStateEnvironment->LogMessage("  Device ID: " + std::to_string(pDevice->GetDeviceID()));
@@ -191,7 +200,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByName("AIB", sDeviceConfig);
+		pDevice->StartAppByMinorVersion("AIB", 2, 0, sDeviceConfig);
 
 		pStateEnvironment->LogMessage("Waiting..");
 		pStateEnvironment->Sleep(1000);

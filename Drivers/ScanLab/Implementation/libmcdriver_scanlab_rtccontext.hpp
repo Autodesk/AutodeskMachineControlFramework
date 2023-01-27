@@ -42,6 +42,7 @@ protected:
 	double m_dZCorrectionFactor;
 	eLaserPort m_LaserPort;
 	bool m_bIsNetwork;
+	std::vector<uint32_t> m_MCBSPSignalChannels;
 
 	LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
 
@@ -112,6 +113,18 @@ public:
 	void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier) override;
 
 	void GetCommunicationTimeouts(LibMCDriver_ScanLab_double& dInitialTimeout, LibMCDriver_ScanLab_double& dMaxTimeout, LibMCDriver_ScanLab_double& dMultiplier) override;
+
+	void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer) override;
+
+	void EnableOIE() override;
+
+	void DisableOIE() override;
+
+	void StartOIEMeasurement() override;
+
+	void StopOIEMeasurement() override;
+
+	void OIETest() override;
 
 
 };

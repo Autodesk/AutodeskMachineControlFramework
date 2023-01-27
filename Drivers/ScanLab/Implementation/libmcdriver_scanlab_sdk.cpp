@@ -207,6 +207,9 @@ CScanLabSDK::CScanLabSDK(const std::string& sDLLNameUTF8)
 	this->n_micro_vector_abs = (PScanLabPtr_n_micro_vector_abs)_loadScanLabAddress(hLibrary, "n_micro_vector_abs", false);
 	this->n_micro_vector_rel = (PScanLabPtr_n_micro_vector_rel)_loadScanLabAddress(hLibrary, "n_micro_vector_rel", false);
 
+	this->n_get_error = (PScanLabPtr_n_get_error)_loadScanLabAddress(hLibrary, "n_get_error");
+	this->n_reset_error = (PScanLabPtr_n_reset_error)_loadScanLabAddress(hLibrary, "n_reset_error");
+
 	m_LibraryHandle = (void*) hLibrary;
 }
 
@@ -236,6 +239,7 @@ void CScanLabSDK::initDLL()
 
 		init_rtc6_dll();
 		m_bIsInitialized = true;
+
 	}
 }
 
@@ -244,6 +248,19 @@ void CScanLabSDK::checkError(uint32_t nRTCError)
 	if (nRTCError != 0)
 		throw std::runtime_error("RTC Error: " + std::to_string (nRTCError));
 }
+
+void CScanLabSDK::checkLastErrorOfCard(uint32_t nCardNo)
+{
+	checkError(n_get_last_error(nCardNo));
+}
+
+void CScanLabSDK::checkGlobalErrorOfCard(uint32_t nCardNo)
+{
+	uint32_t nError = n_get_error(nCardNo);
+	std::cout << "checking global error of card #" << nCardNo << ": " << nError << std::endl;
+	checkError(nError);
+}
+
 
 void CScanLabSDK::resetFunctionPtrs()
 {
@@ -351,5 +368,8 @@ void CScanLabSDK::resetFunctionPtrs()
 	n_micro_vector_rel_3d = nullptr;
 	n_micro_vector_abs = nullptr;
 	n_micro_vector_rel = nullptr;
+	n_get_error = nullptr;
+	n_reset_error = nullptr;
+
 }
 

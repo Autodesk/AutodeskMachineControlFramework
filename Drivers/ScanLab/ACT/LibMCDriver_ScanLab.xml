@@ -86,6 +86,9 @@
 		<error name="INVALIDSCANNERDELAY" code="1033" description="Invalid scanner delay." />
 		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />
 		
+		<error name="INVALIDOIESIGNALBUFFERARRAY" code="1035" description="Invalid OIE Signal buffer array." />
+		
+		
 		
 		
 	</errors>
@@ -350,6 +353,25 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 		
+		<method name="InitializeForOIE" description="Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.">
+			<param name="SignalChannels" type="basicarray" class="uint32" pass="in" description="Array of signal channels. MUST NOT be empty" />
+		</method>
+				
+		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
+		</method>
+
+		<method name="DisableOIE" description="Writes an OIE disabling command block to the open list.">
+		</method>
+				
+		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
+		</method>
+
+		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
+		</method>
+
+		<method name="OIETest" description="Runs a OIE test...">
+		</method>
+		
 	</class>
 
 	
@@ -492,6 +514,13 @@ Custom implementation
 			<param name="InitialTimeout" type="double" pass="out" description="Initial timeout in ms" />
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
+		</method>
+		
+		<method name="InitializeForOIE" description="Initializes the RTC card for the Open Interface Extension">
+			<param name="SignalChannels" type="basicarray" class="uint32" pass="in" description="Array of signal channels. MUST NOT BE empty" />
+		</method>
+				
+		<method name="OIETest" description="Runs a OIE test...">
 		</method>
 		
 	</class>
