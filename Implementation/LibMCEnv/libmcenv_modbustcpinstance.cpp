@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <cstring>
 
 #define MODBUSTCP_MAX_PAYLOADSIZE 1024
 #define MODBUSTCP_MAX_COILCOUNT 1024
