@@ -98,6 +98,67 @@ public:
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 		
 		
+		pStateEnvironment->LogMessage("Initialising Scanlab Driver");
+		auto pRTC6Driver = m_pPluginData->acquireRTC6(pStateEnvironment);
+		pRTC6Driver->LoadSDK("rtc6dllx64");
+
+		std::string sIP = "192.168.5.2";
+		std::string sNetmask = "255.255.255.0";
+		uint32_t nTimeout = 1000;
+		uint32_t nSerial = 356266;
+		double dMaxLaserPower = 300;
+		double dLaserOnDelay = 100;
+		double dLaserOffDelay = 100;
+		double dMarkDelay = 10;
+		double dJumpDelay = 10;
+		double dPolygonDelay = 10;
+
+		std::string  sCorrectionResourceName = "d3_2889";
+		uint32_t nTableIndex = 1;
+		uint32_t nDimension = 3;
+		uint32_t nTableNumberHeadA = 1;
+		uint32_t nTableNumberHeadB = 0;
+
+
+		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
+		pRTC6Driver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
+
+		pRTC6Driver->SetCommunicationTimeouts(100, 3000, 1.2);
+
+		std::string sFirmwareResource;
+		if (sIP.empty()) {
+			pStateEnvironment->LogMessage("Loading RTC PCI firmware...");
+			sFirmwareResource = "rtc6out";
+		}
+		else {
+			pStateEnvironment->LogMessage("Loading RTC Ethernet firmware...");
+			sFirmwareResource = "rtc6eth";
+		}
+
+		pRTC6Driver->LoadFirmware(sFirmwareResource, "rtc6rbf", "rtc6dat");
+
+		std::vector<uint8_t> CorrectionFileBuffer;
+		pStateEnvironment->LogMessage("Loading correction file...");
+		pStateEnvironment->LoadResourceData(sCorrectionResourceName, CorrectionFileBuffer);
+		pStateEnvironment->LogMessage("correction file size: " + std::to_string (CorrectionFileBuffer.size()));
+
+		pRTC6Driver->SetCorrectionFile(CorrectionFileBuffer, nTableIndex, nDimension, nTableNumberHeadA, nTableNumberHeadB);
+
+		pStateEnvironment->LogMessage("Configuring laser...");
+		pRTC6Driver->ConfigureLaserMode(LibMCDriver_ScanLab::eLaserMode::YAG1, LibMCDriver_ScanLab::eLaserPort::Port12BitAnalog1, dMaxLaserPower, false, false, true, true, false, false);
+
+		pStateEnvironment->LogMessage("Configuring delays...");
+		pRTC6Driver->ConfigureDelays(dLaserOnDelay, dLaserOffDelay, dMarkDelay, dJumpDelay, dPolygonDelay);
+		pStateEnvironment->LogMessage("Initialising done..");
+
+		pStateEnvironment->LogMessage("Initializing for OIE..");
+		std::vector<uint32_t> signals;
+		signals.push_back(1);
+		signals.push_back(2);
+		signals.push_back(39);
+		pRTC6Driver->InitializeForOIE(signals);
+		pStateEnvironment->Sleep(1000);
+
 		pStateEnvironment->LogMessage("Loading OIE Device Config...");
 		std::vector<uint8_t> buffer;
 		pStateEnvironment->LoadResourceData("oie_test1", buffer);
@@ -113,8 +174,10 @@ public:
 		pOIEDriver->SetDependencyResourceNames("libssl-1_1-x64", "libcrypto-1_1-x64", "qt5core-x64", "qt5network-x64");
 		pOIEDriver->InitializeSDK("liboie-x64");
 
+
 		pStateEnvironment->LogMessage("Adding Device...");
 		auto pDevice = pOIEDriver->AddDevice("oie1", "192.168.5.8", 21072, 200000);
+		pDevice->SetRTCCorrectionData(CorrectionFileBuffer);
 
 		pStateEnvironment->LogMessage("  Device Name: " + pDevice->GetDeviceName ());
 		pStateEnvironment->LogMessage("  Device ID: " + std::to_string(pDevice->GetDeviceID()));
@@ -137,10 +200,10 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByName("AIB", sDeviceConfig);
+		pDevice->StartAppByMinorVersion("AIB", 2, 0, sDeviceConfig);
 
 		pStateEnvironment->LogMessage("Waiting..");
-		pStateEnvironment->Sleep(3000);
+		pStateEnvironment->Sleep(1000);
 
 		pStateEnvironment->LogMessage("App is running:  " + std::to_string ((uint32_t)pDevice->AppIsRunning()));
 		std::string sName;
@@ -150,8 +213,13 @@ public:
 		pDevice->GetRunningApp(sName, nMajor, nMinor, nPatch);
 		pStateEnvironment->LogMessage("  Running app: " + sName + " (" + std::to_string(nMajor) + "." + std::to_string(nMinor) + "." + std::to_string(nPatch) + ")");
 
+
+
+		pStateEnvironment->LogMessage("Running OIE Test..");
+		pRTC6Driver->OIETest();
+
 		pStateEnvironment->LogMessage("Waiting..");
-		pStateEnvironment->Sleep(3000);
+		pStateEnvironment->Sleep(10000);
 
 		pStateEnvironment->LogMessage("Disconnecting Device");
 		pDevice->Disconnect();

@@ -222,6 +222,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY: return "INVALIDLASERDELAY";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY: return "INVALIDSCANNERDELAY";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK: return "INVALIDSCANLABSDK";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY: return "INVALIDOIESIGNALBUFFERARRAY";
 		}
 		return "UNKNOWN";
 	}
@@ -274,6 +275,7 @@ public:
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY: return "Invalid laser delay.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY: return "Invalid scanner delay.";
 			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK: return "Invalid SCANLAB SDK.";
+			case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY: return "Invalid OIE Signal buffer array.";
 		}
 		return "unknown error";
 	}
@@ -527,6 +529,12 @@ public:
 	inline void GetRTCVersion(LibMCDriver_ScanLab_uint32 & nRTCVersion, LibMCDriver_ScanLab_uint32 & nRTCType, LibMCDriver_ScanLab_uint32 & nDLLVersion, LibMCDriver_ScanLab_uint32 & nHEXVersion, LibMCDriver_ScanLab_uint32 & nBIOSVersion);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer);
+	inline void EnableOIE();
+	inline void DisableOIE();
+	inline void StartOIEMeasurement();
+	inline void StopOIEMeasurement();
+	inline void OIETest();
 };
 	
 /*************************************************************************************************************************
@@ -597,6 +605,8 @@ public:
 	inline void DrawLayer(const std::string & sStreamUUID, const LibMCDriver_ScanLab_uint32 nLayerIndex);
 	inline void SetCommunicationTimeouts(const LibMCDriver_ScanLab_double dInitialTimeout, const LibMCDriver_ScanLab_double dMaxTimeout, const LibMCDriver_ScanLab_double dMultiplier);
 	inline void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier);
+	inline void InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer);
+	inline void OIETest();
 };
 	
 	/**
@@ -756,6 +766,12 @@ public:
 		pWrapperTable->m_RTCContext_GetRTCVersion = nullptr;
 		pWrapperTable->m_RTCContext_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_RTCContext_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_RTCContext_InitializeForOIE = nullptr;
+		pWrapperTable->m_RTCContext_EnableOIE = nullptr;
+		pWrapperTable->m_RTCContext_DisableOIE = nullptr;
+		pWrapperTable->m_RTCContext_StartOIEMeasurement = nullptr;
+		pWrapperTable->m_RTCContext_StopOIEMeasurement = nullptr;
+		pWrapperTable->m_RTCContext_OIETest = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCards = nullptr;
 		pWrapperTable->m_RTCSelector_SearchCardsByRange = nullptr;
 		pWrapperTable->m_RTCSelector_GetCardCount = nullptr;
@@ -778,6 +794,8 @@ public:
 		pWrapperTable->m_Driver_ScanLab_RTC6_DrawLayer = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_SetCommunicationTimeouts = nullptr;
 		pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_InitializeForOIE = nullptr;
+		pWrapperTable->m_Driver_ScanLab_RTC6_OIETest = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1160,6 +1178,60 @@ public:
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_InitializeForOIE = (PLibMCDriver_ScanLabRTCContext_InitializeForOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_initializeforoie");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_InitializeForOIE = (PLibMCDriver_ScanLabRTCContext_InitializeForOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_initializeforoie");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_InitializeForOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_EnableOIE = (PLibMCDriver_ScanLabRTCContext_EnableOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_enableoie");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_EnableOIE = (PLibMCDriver_ScanLabRTCContext_EnableOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_enableoie");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_EnableOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_DisableOIE = (PLibMCDriver_ScanLabRTCContext_DisableOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_disableoie");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_DisableOIE = (PLibMCDriver_ScanLabRTCContext_DisableOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_disableoie");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_DisableOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_StartOIEMeasurement = (PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_startoiemeasurement");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_StartOIEMeasurement = (PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_startoiemeasurement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_StartOIEMeasurement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_StopOIEMeasurement = (PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_stopoiemeasurement");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_StopOIEMeasurement = (PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_stopoiemeasurement");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_StopOIEMeasurement == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_RTCContext_OIETest = (PLibMCDriver_ScanLabRTCContext_OIETestPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtccontext_oietest");
+		#else // _WIN32
+		pWrapperTable->m_RTCContext_OIETest = (PLibMCDriver_ScanLabRTCContext_OIETestPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtccontext_oietest");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_RTCContext_OIETest == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
 		#else // _WIN32
 		pWrapperTable->m_RTCSelector_SearchCards = (PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr) dlsym(hLibrary, "libmcdriver_scanlab_rtcselector_searchcards");
@@ -1355,6 +1427,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_InitializeForOIE = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitializeForOIEPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_initializeforoie");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_InitializeForOIE = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitializeForOIEPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_initializeforoie");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_InitializeForOIE == nullptr)
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_OIETest = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_OIETestPtr) GetProcAddress(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_oietest");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_RTC6_OIETest = (PLibMCDriver_ScanLabDriver_ScanLab_RTC6_OIETestPtr) dlsym(hLibrary, "libmcdriver_scanlab_driver_scanlab_rtc6_oietest");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_RTC6_OIETest == nullptr)
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1580,6 +1670,30 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_GetCommunicationTimeouts == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_initializeforoie", (void**)&(pWrapperTable->m_RTCContext_InitializeForOIE));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_InitializeForOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_enableoie", (void**)&(pWrapperTable->m_RTCContext_EnableOIE));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_EnableOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_disableoie", (void**)&(pWrapperTable->m_RTCContext_DisableOIE));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_DisableOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_startoiemeasurement", (void**)&(pWrapperTable->m_RTCContext_StartOIEMeasurement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StartOIEMeasurement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_stopoiemeasurement", (void**)&(pWrapperTable->m_RTCContext_StopOIEMeasurement));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_StopOIEMeasurement == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_rtccontext_oietest", (void**)&(pWrapperTable->m_RTCContext_OIETest));
+		if ( (eLookupError != 0) || (pWrapperTable->m_RTCContext_OIETest == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_rtcselector_searchcards", (void**)&(pWrapperTable->m_RTCSelector_SearchCards));
 		if ( (eLookupError != 0) || (pWrapperTable->m_RTCSelector_SearchCards == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1666,6 +1780,14 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_GetCommunicationTimeouts == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_initializeforoie", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_InitializeForOIE));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_InitializeForOIE == nullptr) )
+			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlab_driver_scanlab_rtc6_oietest", (void**)&(pWrapperTable->m_Driver_ScanLab_RTC6_OIETest));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_RTC6_OIETest == nullptr) )
 			return LIBMCDRIVER_SCANLAB_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlab_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -2126,6 +2248,55 @@ public:
 	}
 	
 	/**
+	* CRTCContext::InitializeForOIE - Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.
+	* @param[in] SignalChannelsBuffer - Array of signal channels. MUST NOT be empty
+	*/
+	void CRTCContext::InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_InitializeForOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)SignalChannelsBuffer.size(), SignalChannelsBuffer.data()));
+	}
+	
+	/**
+	* CRTCContext::EnableOIE - Writes an OIE enabling command block to the open list.
+	*/
+	void CRTCContext::EnableOIE()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_EnableOIE(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::DisableOIE - Writes an OIE disabling command block to the open list.
+	*/
+	void CRTCContext::DisableOIE()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_DisableOIE(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::StartOIEMeasurement - Writes an OIE measurement start command block to the open list.
+	*/
+	void CRTCContext::StartOIEMeasurement()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_StartOIEMeasurement(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::StopOIEMeasurement - Writes an OIE measurement start command block to the open list.
+	*/
+	void CRTCContext::StopOIEMeasurement()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_StopOIEMeasurement(m_pHandle));
+	}
+	
+	/**
+	* CRTCContext::OIETest - Runs a OIE test...
+	*/
+	void CRTCContext::OIETest()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_RTCContext_OIETest(m_pHandle));
+	}
+	
+	/**
 	 * Method definitions for class CRTCSelector
 	 */
 	
@@ -2415,6 +2586,23 @@ public:
 	void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_GetCommunicationTimeouts(m_pHandle, &dInitialTimeout, &dMaxTimeout, &dMultiplier));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::InitializeForOIE - Initializes the RTC card for the Open Interface Extension
+	* @param[in] SignalChannelsBuffer - Array of signal channels. MUST NOT BE empty
+	*/
+	void CDriver_ScanLab_RTC6::InitializeForOIE(const CInputVector<LibMCDriver_ScanLab_uint32> & SignalChannelsBuffer)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_InitializeForOIE(m_pHandle, (LibMCDriver_ScanLab_uint64)SignalChannelsBuffer.size(), SignalChannelsBuffer.data()));
+	}
+	
+	/**
+	* CDriver_ScanLab_RTC6::OIETest - Runs a OIE test...
+	*/
+	void CDriver_ScanLab_RTC6::OIETest()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_RTC6_OIETest(m_pHandle));
 	}
 
 } // namespace LibMCDriver_ScanLab

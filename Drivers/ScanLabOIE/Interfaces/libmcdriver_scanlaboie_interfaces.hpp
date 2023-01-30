@@ -408,6 +408,13 @@ public:
 	virtual void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch) = 0;
 
 	/**
+	* IOIEDevice::SetRTCCorrectionData - Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.
+	* @param[in] nCorrectionDataBufferSize - Number of elements in buffer
+	* @param[in] pCorrectionDataBuffer - Patch version of the app.
+	*/
+	virtual void SetRTCCorrectionData(const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer) = 0;
+
+	/**
 	* IOIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] sDeviceConfig - Device config string.

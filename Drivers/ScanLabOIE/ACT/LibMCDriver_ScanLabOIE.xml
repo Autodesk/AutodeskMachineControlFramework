@@ -205,6 +205,10 @@ Custom implementation
 			<param name="Patch" type="uint32" pass="out" description="Patch version of the app." />
 		</method>
 		
+		<method name="SetRTCCorrectionData" description="Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.">
+			<param name="CorrectionData" type="basicarray" class="uint8"  pass="in" description="Patch version of the app." />
+		</method>		
+		
 		<method name="StartAppByName" description="Starts an app by its name. Fails if an app is already running.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
 			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />

@@ -278,6 +278,16 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getappinfo(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex, const LibMCDriver_ScanLabOIE_uint32 nNameBufferSize, LibMCDriver_ScanLabOIE_uint32* pNameNeededChars, char * pNameBuffer, LibMCDriver_ScanLabOIE_uint32 * pMajor, LibMCDriver_ScanLabOIE_uint32 * pMinor, LibMCDriver_ScanLabOIE_uint32 * pPatch);
 
 /**
+* Sets the RTC6 correction file data. If this function is not called, inverse coordinate transformation will be disabled.
+*
+* @param[in] pOIEDevice - OIEDevice instance.
+* @param[in] nCorrectionDataBufferSize - Number of elements in buffer
+* @param[in] pCorrectionDataBuffer - uint8 buffer of Patch version of the app.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer);
+
+/**
 * Starts an app by its name. Fails if an app is already running.
 *
 * @param[in] pOIEDevice - OIEDevice instance.

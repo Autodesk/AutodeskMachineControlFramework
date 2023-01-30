@@ -449,6 +449,56 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_SetCommunicat
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
 
+/**
+* Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @param[in] nSignalChannelsBufferSize - Number of elements in buffer
+* @param[in] pSignalChannelsBuffer - uint32 buffer of Array of signal channels. MUST NOT be empty
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_InitializeForOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer);
+
+/**
+* Writes an OIE enabling command block to the open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_EnableOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Writes an OIE disabling command block to the open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_DisableOIEPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Writes an OIE measurement start command block to the open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Writes an OIE measurement start command block to the open list.
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
+/**
+* Runs a OIE test...
+*
+* @param[in] pRTCContext - RTCContext instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabRTCContext_OIETestPtr) (LibMCDriver_ScanLab_RTCContext pRTCContext);
+
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -701,6 +751,24 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetC
 */
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
 
+/**
+* Initializes the RTC card for the Open Interface Extension
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[in] nSignalChannelsBufferSize - Number of elements in buffer
+* @param[in] pSignalChannelsBuffer - uint32 buffer of Array of signal channels. MUST NOT BE empty
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitializeForOIEPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer);
+
+/**
+* Runs a OIE test...
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_OIETestPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
+
 /*************************************************************************************************************************
  Global functions
 **************************************************************************************************************************/
@@ -813,6 +881,12 @@ typedef struct {
 	PLibMCDriver_ScanLabRTCContext_GetRTCVersionPtr m_RTCContext_GetRTCVersion;
 	PLibMCDriver_ScanLabRTCContext_SetCommunicationTimeoutsPtr m_RTCContext_SetCommunicationTimeouts;
 	PLibMCDriver_ScanLabRTCContext_GetCommunicationTimeoutsPtr m_RTCContext_GetCommunicationTimeouts;
+	PLibMCDriver_ScanLabRTCContext_InitializeForOIEPtr m_RTCContext_InitializeForOIE;
+	PLibMCDriver_ScanLabRTCContext_EnableOIEPtr m_RTCContext_EnableOIE;
+	PLibMCDriver_ScanLabRTCContext_DisableOIEPtr m_RTCContext_DisableOIE;
+	PLibMCDriver_ScanLabRTCContext_StartOIEMeasurementPtr m_RTCContext_StartOIEMeasurement;
+	PLibMCDriver_ScanLabRTCContext_StopOIEMeasurementPtr m_RTCContext_StopOIEMeasurement;
+	PLibMCDriver_ScanLabRTCContext_OIETestPtr m_RTCContext_OIETest;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsPtr m_RTCSelector_SearchCards;
 	PLibMCDriver_ScanLabRTCSelector_SearchCardsByRangePtr m_RTCSelector_SearchCardsByRange;
 	PLibMCDriver_ScanLabRTCSelector_GetCardCountPtr m_RTCSelector_GetCardCount;
@@ -835,6 +909,8 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_DrawLayerPtr m_Driver_ScanLab_RTC6_DrawLayer;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_SetCommunicationTimeouts;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetCommunicationTimeoutsPtr m_Driver_ScanLab_RTC6_GetCommunicationTimeouts;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitializeForOIEPtr m_Driver_ScanLab_RTC6_InitializeForOIE;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_OIETestPtr m_Driver_ScanLab_RTC6_OIETest;
 	PLibMCDriver_ScanLabGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabReleaseInstancePtr m_ReleaseInstance;

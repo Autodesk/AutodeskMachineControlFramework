@@ -94,6 +94,10 @@ protected:
 
 	std::vector<POIEDeviceApp> m_AppList;
 
+	// RTC 6 Correction File Data
+	std::vector<uint8_t> m_RTC6CorrectionData;
+	bool m_bHasCorrectionData;
+
 	std::mutex m_PacketMutex;
 
 	void ensureConnectivity();
@@ -166,6 +170,8 @@ public:
 
 	void onErrorEvent (oie_device device, oie_error error, int32_t value);
 
+	std::vector<uint8_t> & getRTC6CorrectionData ();
+
 };
 
 typedef std::shared_ptr<COIEDeviceInstance> POIEDeviceInstance;
@@ -200,6 +206,8 @@ public:
 	void Connect(const std::string & sUserName, const std::string & sPassword) override;
 
 	void Disconnect() override;
+
+	void SetRTCCorrectionData(const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8* pCorrectionDataBuffer) override;
 
 	LibMCDriver_ScanLabOIE_uint32 GetAppCount() override;
 

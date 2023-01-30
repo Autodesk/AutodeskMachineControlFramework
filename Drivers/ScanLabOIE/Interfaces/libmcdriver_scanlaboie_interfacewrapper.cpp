@@ -809,6 +809,32 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_getappinfo(LibMCDr
 	}
 }
 
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pOIEDevice;
+
+	try {
+		if ( (!pCorrectionDataBuffer) && (nCorrectionDataBufferSize>0))
+			throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		IOIEDevice* pIOIEDevice = dynamic_cast<IOIEDevice*>(pIBaseClass);
+		if (!pIOIEDevice)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDCAST);
+		
+		pIOIEDevice->SetRTCCorrectionData(nCorrectionDataBufferSize, pCorrectionDataBuffer);
+
+		return LIBMCDRIVER_SCANLABOIE_SUCCESS;
+	}
+	catch (ELibMCDriver_ScanLabOIEInterfaceException & Exception) {
+		return handleLibMCDriver_ScanLabOIEException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyname(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, const char * pDeviceConfig)
 {
 	IBase* pIBaseClass = (IBase *)pOIEDevice;
@@ -1459,6 +1485,8 @@ LibMCDriver_ScanLabOIEResult LibMCDriver_ScanLabOIE::Impl::LibMCDriver_ScanLabOI
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_getappversion;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_getappinfo") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_getappinfo;
+	if (sProcName == "libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata") 
+		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_setrtccorrectiondata;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_startappbyname") 
 		*ppProcAddress = (void*) &libmcdriver_scanlaboie_oiedevice_startappbyname;
 	if (sProcName == "libmcdriver_scanlaboie_oiedevice_startappbyindex") 

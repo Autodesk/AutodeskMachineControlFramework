@@ -140,6 +140,7 @@ typedef void * LibMCDriver_ScanLab_pvoid;
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY 1032 /** Invalid laser delay. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY 1033 /** Invalid scanner delay. */
 #define LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK 1034 /** Invalid SCANLAB SDK. */
+#define LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY 1035 /** Invalid OIE Signal buffer array. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLab
@@ -192,6 +193,7 @@ inline const char * LIBMCDRIVER_SCANLAB_GETERRORSTRING (LibMCDriver_ScanLabResul
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDLASERDELAY: return "Invalid laser delay.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANNERDELAY: return "Invalid scanner delay.";
     case LIBMCDRIVER_SCANLAB_ERROR_INVALIDSCANLABSDK: return "Invalid SCANLAB SDK.";
+    case LIBMCDRIVER_SCANLAB_ERROR_INVALIDOIESIGNALBUFFERARRAY: return "Invalid OIE Signal buffer array.";
     default: return "unknown error";
   }
 }
