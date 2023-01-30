@@ -88,6 +88,10 @@ public:
 
 	IWorkingDirectory* CreateWorkingDirectory() override;
 
+	ITCPIPConnection* CreateTCPIPConnection(const std::string& sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS) override;
+
+	IModbusTCPConnection* CreateModbusTCPConnection(const std::string& sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS) override;
+
 	void retrieveDriverDataFromPackage(AMC::PResourcePackage pResourcePackage, const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer);
 
 	bool DriverHasResourceData(const std::string& sIdentifier) override;

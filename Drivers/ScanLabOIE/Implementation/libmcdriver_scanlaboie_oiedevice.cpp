@@ -35,7 +35,10 @@ Abstract: This is a stub class definition of COIEDevice
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
 
 #include <array>
+#include <algorithm>
 #include <iostream>
+#include <cstring>
+#include <sstream>
 
 // Include custom headers here.
 using namespace LibMCDriver_ScanLabOIE::Impl;
@@ -104,7 +107,8 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	  m_nPort (nPort),
 	  m_bIsConnected (false),
 	  m_pWorkingDirectory (pWorkingDirectory),
-	  m_nDeviceID (0)
+	  m_nDeviceID (0),
+	  m_bHasCorrectionData (false)
 {
 	if ((pOIESDK.get() == nullptr) || (pInstance == nullptr) || (pWorkingDirectory.get () == nullptr))
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
@@ -124,6 +128,7 @@ COIEDeviceInstance::COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pIns
 	m_pOIESDK->oie_set_reply_timeout(m_pDevice, nResponseTimeOut);
 
 	m_pOIESDK->oie_set_packet_listener(m_pDevice, oieDevicePacketListener, this);
+
 	m_pOIESDK->oie_set_runtime_error_listener(m_pDevice, oieErrorListener, this);
 
 }
@@ -320,6 +325,24 @@ void COIEDeviceInstance::GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, 
 
 }
 
+bool checkIniKey(const std::string & sLine, const std::string & sKey)
+{
+	std::string sLowerLine = sLine;
+	std::transform(sLowerLine.begin(), sLowerLine.end(), sLowerLine.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+
+	std::string sKeyWithEqual = sKey + "=";
+	std::transform(sKeyWithEqual.begin(), sKeyWithEqual.end(), sKeyWithEqual.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+
+	if (sLowerLine.length() >= sKeyWithEqual.length()) {
+		if (sLowerLine.substr(0, sKeyWithEqual.length()) == sKeyWithEqual)
+			return true;
+	}
+
+	return false;
+}
+
 void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig)
 {
 	ensureConnectivity();
@@ -327,8 +350,40 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 	if (sName.empty())
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPNAME);
 
+	LibMCEnv::PWorkingFile pCorrectionFile;
+	std::string sCorrectionFileName;
 
-	auto pDeviceConfigFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ini", sDeviceConfig);
+	if (!m_RTC6CorrectionData.empty()) {
+		pCorrectionFile = m_pWorkingDirectory->StoreCustomDataInTempFile("ct5", m_RTC6CorrectionData);
+		sCorrectionFileName = pCorrectionFile->GetAbsoluteFileName();
+		m_bHasCorrectionData = true;
+
+		std::replace(sCorrectionFileName.begin(), sCorrectionFileName.end(), '\\', '/');
+	}
+	else {
+		m_bHasCorrectionData = false;
+	}
+
+	std::stringstream sRawDeviceConfigStream (sDeviceConfig);
+	std::stringstream sFilteredDeviceConfigStream;
+	std::string sLine;
+	while (std::getline(sRawDeviceConfigStream, sLine, '\n')) {
+		
+		if (checkIniKey(sLine, "BackwardTransformation\\CorrectionTable5")) {
+			sLine = "BackwardTransformation\\CorrectionTable5=" + sCorrectionFileName;
+		}
+		
+		if (checkIniKey(sLine, "BackwardTransformation\\enabled")) {
+			if (sCorrectionFileName.empty())
+				sLine = "BackwardTransformation\\enabled=false";
+		}
+
+		sFilteredDeviceConfigStream << sLine << std::endl;
+	}
+
+
+
+	auto pDeviceConfigFile = m_pWorkingDirectory->StoreCustomStringInTempFile("ini", sFilteredDeviceConfigStream.str ());
 	std::string sDeviceConfigFileName = pDeviceConfigFile->GetAbsoluteFileName();
 
 	try {
@@ -509,14 +564,48 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 {
 	try {
 		if ((device == m_pDevice) && (pkt != nullptr)) {
+
 			std::lock_guard<std::mutex> lockGuard(m_PacketMutex);
 			std::cout << "Packet event: " << pkt->pktNr << " id: " << pkt->id << std::endl;
+
+			double dX = 0.0;
+			double dY = 0.0;
+
+			if (m_bHasCorrectionData) {
+				m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY));
+				std::cout << "  - Absolute Position: " << dX << "/" << dY << std::endl;
+			}
+
+			uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
+			for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
+			{
+				int32_t nValue = 0;
+				m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
+				std::cout << "  - RTC Signal #" << rtcSignalIndex << ": " << nValue << std::endl;
+			}
+
+			uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
+			for (uint32_t sensorSignalIndex = 0; sensorSignalIndex < sensorSignalCount; sensorSignalIndex++)
+			{
+				int32_t nValue = 0;
+				m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_sensor_signal(pkt, sensorSignalIndex, &nValue));
+				std::cout << "  - Sensor Signal #" << sensorSignalIndex << ": " << nValue << std::endl;
+			}
+
+
+		}
+		else {
+			std::cout << "Packet event: with null" << std::endl;
 		}
 
 	}
-	catch (...)
+	catch (std::exception & E)
 	{
+		std::cout << "error getting data:" << E.what () << std::endl;
 
+	}
+	catch (...) {
+		std::cout << "error getting data" << std::endl;
 	}
 }
 
@@ -533,7 +622,10 @@ void COIEDeviceInstance::onErrorEvent(oie_device device, oie_error error, int32_
 	}
 }
 
-
+std::vector<uint8_t>& COIEDeviceInstance::getRTC6CorrectionData()
+{
+	return m_RTC6CorrectionData;
+}
 
 COIEDevice::COIEDevice(POIEDeviceInstance pDeviceInstance)
 {
@@ -597,6 +689,25 @@ void COIEDevice::Connect(const std::string & sUserName, const std::string & sPas
 {
 	lockInstance()->Connect(sUserName, sPassword);
 }
+
+
+void COIEDevice::SetRTCCorrectionData(const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8* pCorrectionDataBuffer)
+{
+	if (pCorrectionDataBuffer == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+	auto pInstance = lockInstance();
+	auto & correctionData = pInstance->getRTC6CorrectionData();
+	correctionData.clear();
+
+	if (nCorrectionDataBufferSize > 0) {
+		correctionData.resize(nCorrectionDataBufferSize);
+		for (size_t nIndex = 0; nIndex < nCorrectionDataBufferSize; nIndex++) {
+			correctionData.at(nIndex) = pCorrectionDataBuffer[nIndex];
+		}
+	}
+}
+
 
 void COIEDevice::Disconnect()
 {

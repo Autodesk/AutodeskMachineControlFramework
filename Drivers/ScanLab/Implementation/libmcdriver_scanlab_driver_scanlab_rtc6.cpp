@@ -101,6 +101,7 @@ bool CDriver_ScanLab_RTC6::IsSimulationMode()
 
 void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber)
 {
+
     if (m_SimulationMode) {
         m_pDriverEnvironment->SetIntegerParameter("rtc_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("card_type", 1);
@@ -387,6 +388,8 @@ void CDriver_ScanLab_RTC6::updateCardStatus()
 {
 
     if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
         bool Busy = true;
         uint32_t ListPosition = 0;
@@ -448,4 +451,27 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
         dMultiplier = 1.3;
     }
 
+}
+
+
+void CDriver_ScanLab_RTC6::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer)
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->InitializeForOIE(nSignalChannelsBufferSize, pSignalChannelsBuffer);
+
+    }
+}
+
+void CDriver_ScanLab_RTC6::OIETest()
+{
+    if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+        m_pRTCContext->OIETest();
+
+    }
 }
