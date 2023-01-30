@@ -117,10 +117,14 @@
 		<error name="INVALIDMODBUSIOINDEX" code="76" description="invalid modbus IO index." />
 		<error name="MODBUSIOSTATUSEMPTY" code="77" description="modbus io status empty." />
 		<error name="INVALIDMODBUSREGISTERINDEX" code="78" description="invalid modbus register index." />
-		<error name="MODBUSREGISTERSTATUSEMPTY" code="79" description="modbus register status empty." />
-		
-		
-		
+		<error name="MODBUSREGISTERSTATUSEMPTY" code="79" description="modbus register status empty." />		
+		<error name="MODBUSTCPINVALIDINPUTREGISTERSRESPONSE" code="80" description="modbus TCP invalid input registers response" />
+		<error name="MODBUSTCPINPUTREGISTERSRESPONSEEMPTY" code="81" description="modbus TCP input registers response empty" />
+		<error name="MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE" code="83" description="modbus TCP invalid input registers response size" />
+		<error name="MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE" code="84" description="modbus TCP invalid holding registers response" />
+		<error name="MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY" code="85" description="modbus TCP holding registers response empty" />
+		<error name="MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE" code="86" description="modbus TCP invalid holding registers response size" />
+						
 					
 							
 	</errors>

@@ -222,7 +222,7 @@ namespace LibMCEnv {
                 for (uint32_t nBitIndex = 0; nBitIndex < 8; nBitIndex++) {
                     uint32_t nCoilIndex = nByteIndex * 8 + nBitIndex;
                     if (nCoilIndex < coilStatus.size()) {
-                        if (nByteValue & (1UL << nBitIndex) != 0)
+                        if ((nByteValue & (1UL << nBitIndex)) != 0)
                             coilStatus.at(nCoilIndex) = true;
                         else
                             coilStatus.at(nCoilIndex) = false;
@@ -248,25 +248,29 @@ namespace LibMCEnv {
 
             uint32_t nPayloadSize = getPayloadLength(modBusResponse);
 
-            if (modBusResponse.m_FunctionCode != MODBUSTCP_FUNCTION_READCOILSTATUS)
+            if (modBusResponse.m_FunctionCode != MODBUSTCP_FUNCTION_READINPUTSTATUS)
                 throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSE);
             if (nPayloadSize < 2)
                 throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINPUTSTATUSRESPONSEEMPTY);
 
             inputStatus.resize(nBitCount);
             uint32_t nByteCount = modBusResponse.m_PayloadData[0];
-            if (nPayloadSize + 1 != nByteCount)
+            uint32_t nDesiredByteCount = (nBitCount + 7) / 8;
+
+            if (nByteCount != nDesiredByteCount)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE);
+            if (nPayloadSize != (nByteCount + 1))
                 throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE);
 
             for (uint32_t nByteIndex = 0; nByteIndex < nByteCount; nByteIndex++) {
                 uint8_t nByteValue = modBusResponse.m_PayloadData[1 + nByteIndex];
                 for (uint32_t nBitIndex = 0; nBitIndex < 8; nBitIndex++) {
-                    uint32_t nCoilIndex = nByteIndex * 8 + nBitIndex;
-                    if (nCoilIndex < inputStatus.size()) {
-                        if (nByteValue & (1UL << nBitIndex) != 0)
-                            inputStatus.at(nCoilIndex) = true;
+                    uint32_t nInputIndex = nByteIndex * 8 + nBitIndex;
+                    if (nInputIndex < inputStatus.size()) {
+                        if ((nByteValue & (1UL << nBitIndex)) != 0)
+                            inputStatus.at(nInputIndex) = true;
                         else
-                            inputStatus.at(nCoilIndex) = false;
+                            inputStatus.at(nInputIndex) = false;
                     }
 
                 }
@@ -283,6 +287,33 @@ namespace LibMCEnv {
             sModbusTCPResponse modBusResponse = sendRequest(modBusRequest);
             debugPacket(modBusResponse, "readHoldingRegisters response");
 
+            uint32_t nPayloadSize = getPayloadLength(modBusResponse);
+
+            if (modBusResponse.m_FunctionCode != MODBUSTCP_FUNCTION_READHOLDINGREGISTERS)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE);
+            if (nPayloadSize < 2)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY);
+
+            uint32_t nByteCount = modBusResponse.m_PayloadData[0];
+
+            if (nPayloadSize != (nByteCount + 1))
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE);
+
+            if ((nRegisterCount * 2) != nByteCount)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE);
+
+            holdingRegisters.resize(nRegisterCount);
+
+            for (uint32_t nRegisterIndex = 0; nRegisterIndex < nRegisterCount; nRegisterIndex++)
+            {
+                uint32_t nHighByte = modBusResponse.m_PayloadData[1 + nRegisterIndex * 2];
+                uint32_t nLowByte = modBusResponse.m_PayloadData[2 + nRegisterIndex * 2];
+                uint32_t nValue = (nHighByte << 8) | nLowByte;
+                holdingRegisters.at(nRegisterIndex) = nValue;
+
+            }
+
+
         }
 
         void CModbusTCPConnectionInstance::readInputRegisters(uint16_t nStartAddress, uint16_t nRegisterCount, std::vector<uint16_t>& inputRegisters)
@@ -292,6 +323,32 @@ namespace LibMCEnv {
 
             sModbusTCPResponse modBusResponse = sendRequest(modBusRequest);
             debugPacket(modBusResponse, "readInputRegisters response");
+
+            uint32_t nPayloadSize = getPayloadLength(modBusResponse);
+
+            if (modBusResponse.m_FunctionCode != MODBUSTCP_FUNCTION_READINPUTREGISTERS)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSE);
+            if (nPayloadSize < 2)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINPUTREGISTERSRESPONSEEMPTY);
+
+            uint32_t nByteCount = modBusResponse.m_PayloadData[0];
+
+            if (nPayloadSize != (nByteCount + 1))
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE);
+
+            if ((nRegisterCount * 2) != nByteCount)
+                throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE);
+
+            inputRegisters.resize(nRegisterCount);
+
+            for (uint32_t nRegisterIndex = 0; nRegisterIndex < nRegisterCount; nRegisterIndex++) 
+            {
+               uint32_t nHighByte = modBusResponse.m_PayloadData[1 + nRegisterIndex * 2];
+               uint32_t nLowByte = modBusResponse.m_PayloadData[2 + nRegisterIndex * 2];
+               uint32_t nValue = (nHighByte << 8) | nLowByte;
+               inputRegisters.at(nRegisterIndex) = nValue;
+
+            }
 
         }
 

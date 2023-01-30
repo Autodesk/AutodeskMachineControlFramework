@@ -112,6 +112,48 @@ typedef void * LibMCDriver_BK9xxx_pvoid;
 #define LIBMCDRIVER_BK9XXX_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1004 /** could not parse driver protocol */
 #define LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED 1005 /** Not connected */
 #define LIBMCDRIVER_BK9XXX_ERROR_SETSIMULATIONMODEBEFORECONNECTING 1006 /** Set error simulation mode before connecting. */
+#define LIBMCDRIVER_BK9XXX_ERROR_NOVERSIONDEFINITION 1007 /** no version definition */
+#define LIBMCDRIVER_BK9XXX_ERROR_NOMAJORVERSION 1008 /** no major version */
+#define LIBMCDRIVER_BK9XXX_ERROR_NOMINORVERSION 1009 /** no minor version */
+#define LIBMCDRIVER_BK9XXX_ERROR_NOPATCHVERSION 1010 /** no patch version */
+#define LIBMCDRIVER_BK9XXX_ERROR_NOCONFIGURATIONSCHEMA 1011 /** no configuration schema */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDCONFIGURATIONSCHEMA 1012 /** invalid configuration schema */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIOOFFSET 1013 /** missing digital IO offset */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOOFFSET 1014 /** invalid digital IO offset */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIONAME 1015 /** missing digitial IO name */
+#define LIBMCDRIVER_BK9XXX_ERROR_EMPTYDIGITALIONAME 1016 /** empty digitial IO name */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOINDEX 1017 /** invalid digital IO index */
+#define LIBMCDRIVER_BK9XXX_ERROR_DIGITALIONOTFOUND 1018 /** digital IO not found */
+#define LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEDIGITALINPUT 1019 /** duplicate digital input */
+#define LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEDIGITALOUTPUT 1020 /** duplicate digital output */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIOSTARTADDRESS 1021 /** missing digitial io start address */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOSTARTADDRESS 1022 /** invalid digital io start address */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIOBITCOUNT 1023 /** missing digital io bit count */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOBITCOUNT 1024 /** invalid digital io bit count */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOOFFSET 1025 /** missing analog IO offset */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOOFFSET 1026 /** invalid analog IO offset */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIONAME 1027 /** missing analog IO name */
+#define LIBMCDRIVER_BK9XXX_ERROR_EMPTYANALOGIONAME 1028 /** empty analog IO name */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOINDEX 1029 /** invalid analog IO index */
+#define LIBMCDRIVER_BK9XXX_ERROR_ANALOGIONOTFOUND 1030 /** analog IO not found */
+#define LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEANALOGINPUT 1031 /** duplicate analog input */
+#define LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEANALOGOUTPUT 1032 /** duplicate analog output */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOSTARTADDRESS 1033 /** missing analog io start address */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSTARTADDRESS 1034 /** invalid analog io start address */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOREGISTERCOUNT 1035 /** missing analog io register count */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOREGISTERCOUNT 1036 /** invalid analog io register count */
+#define LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEVARIABLENAME 1037 /** duplicate variable name */
+#define LIBMCDRIVER_BK9XXX_ERROR_VARIABLENOTFOUND 1038 /** variable not found */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIORAWMINVALUE 1039 /** missing analog io raw min value */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIORAWMAXVALUE 1040 /** missing analog io raw max value */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIORAWMINVALUE 1041 /** invalid analog io raw min value */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIORAWMAXVALUE 1042 /** invalid analog io raw max value */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIORAWINTERVAL 1043 /** invalid analog io raw interval */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOSCALEDMINVALUE 1044 /** missing analog io scaled min value */
+#define LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOSCALEDMAXVALUE 1045 /** missing analog io scaled max value */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMINVALUE 1046 /** invalid analog io scaled min value */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMAXVALUE 1047 /** invalid analog io scaled max value */
+#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDINTERVAL 1048 /** invalid analog io scaled interval */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_BK9xxx
@@ -136,6 +178,48 @@ inline const char * LIBMCDRIVER_BK9XXX_GETERRORSTRING (LibMCDriver_BK9xxxResult 
     case LIBMCDRIVER_BK9XXX_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
     case LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED: return "Not connected";
     case LIBMCDRIVER_BK9XXX_ERROR_SETSIMULATIONMODEBEFORECONNECTING: return "Set error simulation mode before connecting.";
+    case LIBMCDRIVER_BK9XXX_ERROR_NOVERSIONDEFINITION: return "no version definition";
+    case LIBMCDRIVER_BK9XXX_ERROR_NOMAJORVERSION: return "no major version";
+    case LIBMCDRIVER_BK9XXX_ERROR_NOMINORVERSION: return "no minor version";
+    case LIBMCDRIVER_BK9XXX_ERROR_NOPATCHVERSION: return "no patch version";
+    case LIBMCDRIVER_BK9XXX_ERROR_NOCONFIGURATIONSCHEMA: return "no configuration schema";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDCONFIGURATIONSCHEMA: return "invalid configuration schema";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIOOFFSET: return "missing digital IO offset";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOOFFSET: return "invalid digital IO offset";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIONAME: return "missing digitial IO name";
+    case LIBMCDRIVER_BK9XXX_ERROR_EMPTYDIGITALIONAME: return "empty digitial IO name";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOINDEX: return "invalid digital IO index";
+    case LIBMCDRIVER_BK9XXX_ERROR_DIGITALIONOTFOUND: return "digital IO not found";
+    case LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEDIGITALINPUT: return "duplicate digital input";
+    case LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEDIGITALOUTPUT: return "duplicate digital output";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIOSTARTADDRESS: return "missing digitial io start address";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOSTARTADDRESS: return "invalid digital io start address";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGDIGITALIOBITCOUNT: return "missing digital io bit count";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDDIGITALIOBITCOUNT: return "invalid digital io bit count";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOOFFSET: return "missing analog IO offset";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOOFFSET: return "invalid analog IO offset";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIONAME: return "missing analog IO name";
+    case LIBMCDRIVER_BK9XXX_ERROR_EMPTYANALOGIONAME: return "empty analog IO name";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOINDEX: return "invalid analog IO index";
+    case LIBMCDRIVER_BK9XXX_ERROR_ANALOGIONOTFOUND: return "analog IO not found";
+    case LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEANALOGINPUT: return "duplicate analog input";
+    case LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEANALOGOUTPUT: return "duplicate analog output";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOSTARTADDRESS: return "missing analog io start address";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSTARTADDRESS: return "invalid analog io start address";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOREGISTERCOUNT: return "missing analog io register count";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOREGISTERCOUNT: return "invalid analog io register count";
+    case LIBMCDRIVER_BK9XXX_ERROR_DUPLICATEVARIABLENAME: return "duplicate variable name";
+    case LIBMCDRIVER_BK9XXX_ERROR_VARIABLENOTFOUND: return "variable not found";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIORAWMINVALUE: return "missing analog io raw min value";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIORAWMAXVALUE: return "missing analog io raw max value";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIORAWMINVALUE: return "invalid analog io raw min value";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIORAWMAXVALUE: return "invalid analog io raw max value";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIORAWINTERVAL: return "invalid analog io raw interval";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOSCALEDMINVALUE: return "missing analog io scaled min value";
+    case LIBMCDRIVER_BK9XXX_ERROR_MISSINGANALOGIOSCALEDMAXVALUE: return "missing analog io scaled max value";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMINVALUE: return "invalid analog io scaled min value";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMAXVALUE: return "invalid analog io scaled max value";
+    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDINTERVAL: return "invalid analog io scaled interval";
     default: return "unknown error";
   }
 }

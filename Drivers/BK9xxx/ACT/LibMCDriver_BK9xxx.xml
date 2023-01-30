@@ -58,9 +58,61 @@
 		
 		<error name="NOTCONNECTED" code="1005" description="Not connected" />
 		<error name="SETSIMULATIONMODEBEFORECONNECTING" code="1006" description="Set error simulation mode before connecting." />
+		<error name="NOVERSIONDEFINITION" code="1007" description="no version definition" />
+		<error name="NOMAJORVERSION" code="1008" description="no major version" />
+		<error name="NOMINORVERSION" code="1009" description="no minor version" />
+		<error name="NOPATCHVERSION" code="1010" description="no patch version" />
+		<error name="NOCONFIGURATIONSCHEMA" code="1011" description="no configuration schema" />
+		<error name="INVALIDCONFIGURATIONSCHEMA" code="1012" description="invalid configuration schema" />
+		
+		<error name="MISSINGDIGITALIOOFFSET" code="1013" description="missing digital IO offset" />
+		<error name="INVALIDDIGITALIOOFFSET" code="1014" description="invalid digital IO offset" />
+		<error name="MISSINGDIGITALIONAME" code="1015" description="missing digitial IO name" />
+		<error name="EMPTYDIGITALIONAME" code="1016" description="empty digitial IO name" />
+		<error name="INVALIDDIGITALIOINDEX" code="1017" description="invalid digital IO index" />
+		<error name="DIGITALIONOTFOUND" code="1018" description="digital IO not found" />		
+		<error name="DUPLICATEDIGITALINPUT" code="1019" description="duplicate digital input" />
+		<error name="DUPLICATEDIGITALOUTPUT" code="1020" description="duplicate digital output" />		
+		<error name="MISSINGDIGITALIOSTARTADDRESS" code="1021" description="missing digitial io start address"/>
+		<error name="INVALIDDIGITALIOSTARTADDRESS" code="1022" description="invalid digital io start address" />
+		<error name="MISSINGDIGITALIOBITCOUNT" code="1023" description="missing digital io bit count" />
+		<error name="INVALIDDIGITALIOBITCOUNT" code="1024" description="invalid digital io bit count" />
+		<error name="MISSINGANALOGIOOFFSET" code="1025" description="missing analog IO offset" />
+		<error name="INVALIDANALOGIOOFFSET" code="1026" description="invalid analog IO offset" />
+		<error name="MISSINGANALOGIONAME" code="1027" description="missing analog IO name" />
+		<error name="EMPTYANALOGIONAME" code="1028" description="empty analog IO name" />
+		<error name="INVALIDANALOGIOINDEX" code="1029" description="invalid analog IO index" />
+		<error name="ANALOGIONOTFOUND" code="1030" description="analog IO not found" />		
+		<error name="DUPLICATEANALOGINPUT" code="1031" description="duplicate analog input" />
+		<error name="DUPLICATEANALOGOUTPUT" code="1032" description="duplicate analog output" />		
+		<error name="MISSINGANALOGIOSTARTADDRESS" code="1033" description="missing analog io start address"/>
+		<error name="INVALIDANALOGIOSTARTADDRESS" code="1034" description="invalid analog io start address" />
+		<error name="MISSINGANALOGIOREGISTERCOUNT" code="1035" description="missing analog io register count" />
+		<error name="INVALIDANALOGIOREGISTERCOUNT" code="1036" description="invalid analog io register count" />
+		<error name="DUPLICATEVARIABLENAME" code="1037" description="duplicate variable name" />
+		<error name="VARIABLENOTFOUND" code="1038" description="variable not found" />
+		<error name="MISSINGANALOGIORAWMINVALUE" code="1039" description="missing analog io raw min value" />
+		<error name="MISSINGANALOGIORAWMAXVALUE" code="1040" description="missing analog io raw max value" />
+		<error name="INVALIDANALOGIORAWMINVALUE" code="1041" description="invalid analog io raw min value" />
+		<error name="INVALIDANALOGIORAWMAXVALUE" code="1042" description="invalid analog io raw max value" />
+		<error name="INVALIDANALOGIORAWINTERVAL" code="1043" description="invalid analog io raw interval" />
+		<error name="MISSINGANALOGIOSCALEDMINVALUE" code="1044" description="missing analog io scaled min value" />
+		<error name="MISSINGANALOGIOSCALEDMAXVALUE" code="1045" description="missing analog io scaled max value" />
+		<error name="INVALIDANALOGIOSCALEDMINVALUE" code="1046" description="invalid analog io scaled min value" />
+		<error name="INVALIDANALOGIOSCALEDMAXVALUE" code="1047" description="invalid analog io scaled max value" />
+		<error name="INVALIDANALOGIOSCALEDINTERVAL" code="1048" description="invalid analog io scaled interval" />
 		
 		
-						
+		
+		
+		
+		
+		
+		
+		
+		
+		
+								
 	</errors>
 
 	

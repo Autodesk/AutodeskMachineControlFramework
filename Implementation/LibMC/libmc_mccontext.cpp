@@ -323,8 +323,6 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
         config_document.save(config_writer);
 
         sConfigurationData = config_writer.resultStream.str();
-
-        std::cout << sConfigurationData << std::endl;
     }
 
     if (!sConfigResource.empty()) {

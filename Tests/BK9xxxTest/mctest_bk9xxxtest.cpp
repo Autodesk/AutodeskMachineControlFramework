@@ -104,17 +104,48 @@ public:
 		
 		auto pDriver = m_pPluginData->acquireBK9100(pStateEnvironment);
 
-		pDriver->Connect ("192.168.5.100.2", 502, 3000);
+		pStateEnvironment->LogMessage("Starting test");
 
-		if (!pDriver->IsConnected())
-			throw std::runtime_error("connection failed!");
-		
-		pDriver->AnalogInputExists ("magnetic_valve_position");
+		if (pDriver->GetDigitalInput("laser1_psa_active"))
+		{
+			pStateEnvironment->LogMessage("laser1 PSA is active (no connection)!");
+		}
+		else {
+			pStateEnvironment->LogMessage("laser1 PSA is NOT active (no connection)!");
+		}
+
 		int64_t analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
 		double analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
 
+		pStateEnvironment->LogMessage("Magnetic Valve raw value (no connection): " + std::to_string(analog_input_raw));
+		pStateEnvironment->LogMessage("Magnetic Valve scaled value (no connection): " + std::to_string(analog_input_scaled));
+
+		pStateEnvironment->LogMessage("Connecting..");
+
+		pDriver->Connect ("192.168.100.3", 502, 3000);
+
+		if (!pDriver->IsConnected())
+			throw std::runtime_error("connection failed!");
+
+		pStateEnvironment->LogMessage("Querying parameters..");
+
+		pDriver->QueryParameters();
+
+		pStateEnvironment->LogMessage("Getting parameters");
+
+		if (pDriver->GetDigitalInput("laser1_psa_active"))
+		{
+			pStateEnvironment->LogMessage ("laser1 PSA is active!");
+		}
+		else {
+			pStateEnvironment->LogMessage("laser1 PSA is NOT active!");
+		}
+		
+		analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
+		analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
+
 		pStateEnvironment->LogMessage("Magnetic Valve raw value: " + std::to_string (analog_input_raw));
-		pStateEnvironment->LogMessage("Magnetic Valve scaled value: " + std::to_string(analog_input_scaled));
+		pStateEnvironment->LogMessage("Magnetic Valve scaled value: " + std::to_string(analog_input_scaled)); 
 
 		pStateEnvironment->SetNextState("success");
 	}

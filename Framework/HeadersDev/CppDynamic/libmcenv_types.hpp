@@ -175,6 +175,12 @@ typedef void * LibMCEnv_pvoid;
 #define LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY 77 /** modbus io status empty. */
 #define LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX 78 /** invalid modbus register index. */
 #define LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY 79 /** modbus register status empty. */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSE 80 /** modbus TCP invalid input registers response */
+#define LIBMCENV_ERROR_MODBUSTCPINPUTREGISTERSRESPONSEEMPTY 81 /** modbus TCP input registers response empty */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE 83 /** modbus TCP invalid input registers response size */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE 84 /** modbus TCP invalid holding registers response */
+#define LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY 85 /** modbus TCP holding registers response empty */
+#define LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE 86 /** modbus TCP invalid holding registers response size */
 
 /*************************************************************************************************************************
  Error strings for LibMCEnv
@@ -262,6 +268,12 @@ inline const char * LIBMCENV_GETERRORSTRING (LibMCEnvResult nErrorCode) {
     case LIBMCENV_ERROR_MODBUSIOSTATUSEMPTY: return "modbus io status empty.";
     case LIBMCENV_ERROR_INVALIDMODBUSREGISTERINDEX: return "invalid modbus register index.";
     case LIBMCENV_ERROR_MODBUSREGISTERSTATUSEMPTY: return "modbus register status empty.";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSE: return "modbus TCP invalid input registers response";
+    case LIBMCENV_ERROR_MODBUSTCPINPUTREGISTERSRESPONSEEMPTY: return "modbus TCP input registers response empty";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE: return "modbus TCP invalid input registers response size";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE: return "modbus TCP invalid holding registers response";
+    case LIBMCENV_ERROR_MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY: return "modbus TCP holding registers response empty";
+    case LIBMCENV_ERROR_MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE: return "modbus TCP invalid holding registers response size";
     default: return "unknown error";
   }
 }
