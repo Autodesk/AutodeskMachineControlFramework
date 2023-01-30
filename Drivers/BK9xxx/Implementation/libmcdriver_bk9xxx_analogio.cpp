@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libmcdriver_bk9xxx_analogio.hpp"
 #include "libmcdriver_bk9xxx_interfaceexception.hpp"
 
+#include <cmath>
 
 using namespace LibMCDriver_BK9xxx::Impl;
 
