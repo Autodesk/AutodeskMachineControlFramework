@@ -29,7 +29,7 @@ TODO
 * build_clean_win64.bat should build the binaries and dev packages on Windows. The results are located in "build/Output".
 
 ## For core development on the HMI client code:
-* Get and install nodejs: https://nodejs.org/en/download/ with optional chocolatey install (will install Phython as well)
+* Get and install nodejs: https://nodejs.org/en/download/ 
 * Artifacts/build_client_clean.bat should build the client artifacts.
 
 ## Dependencies / Prerequisites / Compilation (on x64-Linux)
