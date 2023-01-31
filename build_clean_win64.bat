@@ -11,6 +11,7 @@ set outputdir=%builddir%\Output
 if not exist "%builddir%" (mkdir "%builddir%")
 if not exist "%outputdir%" (mkdir "%outputdir%")
 if not exist "%outputdir%\data" (mkdir "%outputdir%\data")
+if not exist "%builddir%\Artifacts" (mkdir "%builddir%\Artifacts")
 if not exist "%builddir%\DevPackage" (mkdir "%builddir%\DevPackage")
 if not exist "%builddir%\DevPackage\Framework" (mkdir "%builddir%\DevPackage\Framework")
 if not exist "%builddir%\DevPackage\Framework\HeadersDev" (mkdir "%builddir%\DevPackage\Framework\HeadersDev")
@@ -116,6 +117,8 @@ del Framework\Dist\%GITHASH%_core.data
 
 cd %builddir%
 go run "%basepath%/BuildScripts/createDevPackage.go" .\DevPackage\Framework .\DevPackage\ %LONGGITHASH% win64
+
+cp "%builddir%/DevPackage/amcf_win64_%LONGGITHASH%.zip" "%builddir%/Artifacts/devpackage_win64.zip" /Y
 
 echo "Build done!"
 
