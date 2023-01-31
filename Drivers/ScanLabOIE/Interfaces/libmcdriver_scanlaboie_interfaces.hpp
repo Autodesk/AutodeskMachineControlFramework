@@ -58,6 +58,7 @@ namespace Impl {
 class IBase;
 class IDriver;
 class IOIEDevice;
+class IDeviceConfiguration;
 class IDriver_ScanLab_OIE;
 
 
@@ -505,6 +506,39 @@ typedef IBaseSharedPtr<IOIEDevice> PIOIEDevice;
 
 
 /*************************************************************************************************************************
+ Class interface for DeviceConfiguration 
+**************************************************************************************************************************/
+
+class IDeviceConfiguration : public virtual IBase {
+public:
+	/**
+	* IDeviceConfiguration::GetDeviceType - Returns if the device is configured to work with an RTC5 or RTC6 card.
+	* @return Configured device Type
+	*/
+	virtual LibMCDriver_ScanLabOIE::eRTCDeviceType GetDeviceType() = 0;
+
+	/**
+	* IDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
+	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSignalIDsBuffer - uint32 buffer of RTC Signal IDs
+	*/
+	virtual void GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
+
+	/**
+	* IDeviceConfiguration::GetSensorSignalIDs - Returns the configured Sensor signal IDs of the configuration.
+	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSignalIDsBuffer - uint32 buffer of Sensor Signal IDs
+	*/
+	virtual void GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDeviceConfiguration> PIDeviceConfiguration;
+
+
+/*************************************************************************************************************************
  Class interface for Driver_ScanLab_OIE 
 **************************************************************************************************************************/
 
@@ -567,6 +601,13 @@ public:
 	* @param[in] sName - Name of the device.
 	*/
 	virtual void RemoveDeviceByName(const std::string & sName) = 0;
+
+	/**
+	* IDriver_ScanLab_OIE::ParseDeviceConfiguration - Reads the configuration information from a device configuration string.
+	* @param[in] sDeviceConfigString - Device config string.
+	* @return Device configuration instance.
+	*/
+	virtual IDeviceConfiguration * ParseDeviceConfiguration(const std::string & sDeviceConfigString) = 0;
 
 };
 

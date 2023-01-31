@@ -411,6 +411,41 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_uninstallappbyminorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
 
 /*************************************************************************************************************************
+ Class definition for DeviceConfiguration
+**************************************************************************************************************************/
+
+/**
+* Returns if the device is configured to work with an RTC5 or RTC6 card.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[out] pDeviceType - Configured device Type
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getdevicetype(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE::eRTCDeviceType * pDeviceType);
+
+/**
+* Returns the configured RTC signal IDs of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+* @param[out] pSignalIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pSignalIDsBuffer - uint32  buffer of RTC Signal IDs
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer);
+
+/**
+* Returns the configured Sensor signal IDs of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+* @param[out] pSignalIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pSignalIDsBuffer - uint32  buffer of Sensor Signal IDs
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer);
+
+/*************************************************************************************************************************
  Class definition for Driver_ScanLab_OIE
 **************************************************************************************************************************/
 
@@ -495,6 +530,16 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_removedevicebyname(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName);
+
+/**
+* Reads the configuration information from a device configuration string.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pDeviceConfigString - Device config string.
+* @param[out] pDeviceConfigInstance - Device configuration instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_driver_scanlab_oie_parsedeviceconfiguration(LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pDeviceConfigString, LibMCDriver_ScanLabOIE_DeviceConfiguration * pDeviceConfigInstance);
 
 /*************************************************************************************************************************
  Global functions

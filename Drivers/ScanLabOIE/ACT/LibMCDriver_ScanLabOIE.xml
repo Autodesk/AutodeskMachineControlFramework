@@ -85,6 +85,12 @@
 			
 	</errors>
 	
+	<enum name="RTCDeviceType">
+		<option name="Unknown" value="0" />
+		<option name="RTC5" value="1" />
+		<option name="RTC6" value="2" />
+	</enum>
+	
 	
 <!--
 
@@ -270,6 +276,23 @@ Custom implementation
 		</method>
 		
 	</class>
+	
+	
+	<class name="DeviceConfiguration" parent="Base" description="An object holding a OIE device configuration">
+	
+		<method name="GetDeviceType" description="Returns if the device is configured to work with an RTC5 or RTC6 card.">
+			<param name="DeviceType" type="enum" class="RTCDeviceType" pass="return" description="Configured device Type" />
+		</method>	
+	
+		<method name="GetRTCSignalIDs" description="Returns the configured RTC signal IDs of the configuration.">
+			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="RTC Signal IDs" />
+		</method>	
+
+		<method name="GetSensorSignalIDs" description="Returns the configured Sensor signal IDs of the configuration.">
+			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="Sensor Signal IDs" />
+		</method>	
+
+	</class>
 
 
 
@@ -314,6 +337,11 @@ Custom implementation
 	
 		<method name="RemoveDeviceByName" description="Removes a device from the OIE by name. Does nothing if the device does not exist.">
 			<param name="Name" type="string" pass="in" description="Name of the device." />
+		</method>
+
+		<method name="ParseDeviceConfiguration" description="Reads the configuration information from a device configuration string.">
+			<param name="DeviceConfigString" type="string" pass="in" description="Device config string." />
+			<param name="DeviceConfigInstance" type="class" class="DeviceConfiguration" pass="return" description="Device configuration instance." />
 		</method>
 		
 	</class>

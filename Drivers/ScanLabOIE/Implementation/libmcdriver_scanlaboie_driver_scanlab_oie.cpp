@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CDriver_ScanLab_OIE
 #include "libmcdriver_scanlaboie_driver_scanlab_oie.hpp"
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
 #include "libmcdriver_scanlaboie_oiedevice.hpp"
+#include "libmcdriver_scanlaboie_deviceconfiguration.hpp"
 
 // Include custom headers here.
 #define __STRINGIZE(x) #x
@@ -347,5 +348,15 @@ void CDriver_ScanLab_OIE::releaseInstance()
 	m_pLibCryptoResourceFile = nullptr;
 	m_pQT5CoreResourceFile = nullptr;
 	m_pQT5NetworkResourceFile = nullptr;
+}
+
+
+IDeviceConfiguration* CDriver_ScanLab_OIE::ParseDeviceConfiguration(const std::string& sDeviceConfigString)
+{
+	if ((m_pInstance == nullptr) || (m_pOIESDK.get() == nullptr))
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED);
+
+	return new CDeviceConfiguration(m_pOIESDK, sDeviceConfigString, m_pDriverEnvironment);
+
 }
 

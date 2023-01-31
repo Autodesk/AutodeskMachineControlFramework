@@ -398,6 +398,41 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_Uninstal
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEOIEDevice_UninstallAppByMinorVersionPtr) (LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
 
 /*************************************************************************************************************************
+ Class definition for DeviceConfiguration
+**************************************************************************************************************************/
+
+/**
+* Returns if the device is configured to work with an RTC5 or RTC6 card.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[out] pDeviceType - Configured device Type
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE::eRTCDeviceType * pDeviceType);
+
+/**
+* Returns the configured RTC signal IDs of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+* @param[out] pSignalIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pSignalIDsBuffer - uint32  buffer of RTC Signal IDs
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer);
+
+/**
+* Returns the configured Sensor signal IDs of the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+* @param[out] pSignalIDsNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pSignalIDsBuffer - uint32  buffer of Sensor Signal IDs
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) (LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer);
+
+/*************************************************************************************************************************
  Class definition for Driver_ScanLab_OIE
 **************************************************************************************************************************/
 
@@ -482,6 +517,16 @@ typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE
 * @return error code or 0 (success)
 */
 typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_RemoveDeviceByNamePtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pName);
+
+/**
+* Reads the configuration information from a device configuration string.
+*
+* @param[in] pDriver_ScanLab_OIE - Driver_ScanLab_OIE instance.
+* @param[in] pDeviceConfigString - Device config string.
+* @param[out] pDeviceConfigInstance - Device configuration instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabOIEResult (*PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_ParseDeviceConfigurationPtr) (LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE pDriver_ScanLab_OIE, const char * pDeviceConfigString, LibMCDriver_ScanLabOIE_DeviceConfiguration * pDeviceConfigInstance);
 
 /*************************************************************************************************************************
  Global functions
@@ -592,6 +637,9 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEOIEDevice_UninstallAppByIndexPtr m_OIEDevice_UninstallAppByIndex;
 	PLibMCDriver_ScanLabOIEOIEDevice_UninstallAppByMajorVersionPtr m_OIEDevice_UninstallAppByMajorVersion;
 	PLibMCDriver_ScanLabOIEOIEDevice_UninstallAppByMinorVersionPtr m_OIEDevice_UninstallAppByMinorVersion;
+	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr m_DeviceConfiguration_GetDeviceType;
+	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr m_DeviceConfiguration_GetRTCSignalIDs;
+	PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr m_DeviceConfiguration_GetSensorSignalIDs;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr m_Driver_ScanLab_OIE_SetDependencyResourceNames;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_InitializeSDKPtr m_Driver_ScanLab_OIE_InitializeSDK;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_InitializeCustomSDKPtr m_Driver_ScanLab_OIE_InitializeCustomSDK;
@@ -600,6 +648,7 @@ typedef struct {
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_FindDevicePtr m_Driver_ScanLab_OIE_FindDevice;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_RemoveDevicePtr m_Driver_ScanLab_OIE_RemoveDevice;
 	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_RemoveDeviceByNamePtr m_Driver_ScanLab_OIE_RemoveDeviceByName;
+	PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_ParseDeviceConfigurationPtr m_Driver_ScanLab_OIE_ParseDeviceConfiguration;
 	PLibMCDriver_ScanLabOIEGetVersionPtr m_GetVersion;
 	PLibMCDriver_ScanLabOIEGetLastErrorPtr m_GetLastError;
 	PLibMCDriver_ScanLabOIEReleaseInstancePtr m_ReleaseInstance;

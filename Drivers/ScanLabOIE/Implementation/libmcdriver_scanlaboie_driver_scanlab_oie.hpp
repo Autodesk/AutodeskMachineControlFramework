@@ -124,6 +124,8 @@ public:
 
 	static std::string getTypeString();
 
+	IDeviceConfiguration* ParseDeviceConfiguration(const std::string& sDeviceConfigString) override;
+
 
 };
 

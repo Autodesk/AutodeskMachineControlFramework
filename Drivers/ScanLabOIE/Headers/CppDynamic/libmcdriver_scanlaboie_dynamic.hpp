@@ -63,6 +63,7 @@ class CWrapper;
 class CBase;
 class CDriver;
 class COIEDevice;
+class CDeviceConfiguration;
 class CDriver_ScanLab_OIE;
 
 /*************************************************************************************************************************
@@ -72,6 +73,7 @@ typedef CWrapper CLibMCDriver_ScanLabOIEWrapper;
 typedef CBase CLibMCDriver_ScanLabOIEBase;
 typedef CDriver CLibMCDriver_ScanLabOIEDriver;
 typedef COIEDevice CLibMCDriver_ScanLabOIEOIEDevice;
+typedef CDeviceConfiguration CLibMCDriver_ScanLabOIEDeviceConfiguration;
 typedef CDriver_ScanLab_OIE CLibMCDriver_ScanLabOIEDriver_ScanLab_OIE;
 
 /*************************************************************************************************************************
@@ -81,6 +83,7 @@ typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
 typedef std::shared_ptr<COIEDevice> POIEDevice;
+typedef std::shared_ptr<CDeviceConfiguration> PDeviceConfiguration;
 typedef std::shared_ptr<CDriver_ScanLab_OIE> PDriver_ScanLab_OIE;
 
 /*************************************************************************************************************************
@@ -90,6 +93,7 @@ typedef PWrapper PLibMCDriver_ScanLabOIEWrapper;
 typedef PBase PLibMCDriver_ScanLabOIEBase;
 typedef PDriver PLibMCDriver_ScanLabOIEDriver;
 typedef POIEDevice PLibMCDriver_ScanLabOIEOIEDevice;
+typedef PDeviceConfiguration PLibMCDriver_ScanLabOIEDeviceConfiguration;
 typedef PDriver_ScanLab_OIE PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE;
 
 
@@ -370,6 +374,7 @@ private:
 	friend class CBase;
 	friend class CDriver;
 	friend class COIEDevice;
+	friend class CDeviceConfiguration;
 	friend class CDriver_ScanLab_OIE;
 
 };
@@ -497,6 +502,25 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDeviceConfiguration 
+**************************************************************************************************************************/
+class CDeviceConfiguration : public CBase {
+public:
+	
+	/**
+	* CDeviceConfiguration::CDeviceConfiguration - Constructor for DeviceConfiguration class.
+	*/
+	CDeviceConfiguration(CWrapper* pWrapper, LibMCDriver_ScanLabOIEHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline eRTCDeviceType GetDeviceType();
+	inline void GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
+	inline void GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
+};
+	
+/*************************************************************************************************************************
  Class CDriver_ScanLab_OIE 
 **************************************************************************************************************************/
 class CDriver_ScanLab_OIE : public CDriver {
@@ -518,6 +542,7 @@ public:
 	inline POIEDevice FindDevice(const std::string & sName);
 	inline void RemoveDevice(classParam<COIEDevice> pDeviceInstance);
 	inline void RemoveDeviceByName(const std::string & sName);
+	inline PDeviceConfiguration ParseDeviceConfiguration(const std::string & sDeviceConfigString);
 };
 	
 	/**
@@ -674,6 +699,9 @@ public:
 		pWrapperTable->m_OIEDevice_UninstallAppByIndex = nullptr;
 		pWrapperTable->m_OIEDevice_UninstallAppByMajorVersion = nullptr;
 		pWrapperTable->m_OIEDevice_UninstallAppByMinorVersion = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetDeviceType = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeCustomSDK = nullptr;
@@ -682,6 +710,7 @@ public:
 		pWrapperTable->m_Driver_ScanLab_OIE_FindDevice = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDevice = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName = nullptr;
+		pWrapperTable->m_Driver_ScanLab_OIE_ParseDeviceConfiguration = nullptr;
 		pWrapperTable->m_GetVersion = nullptr;
 		pWrapperTable->m_GetLastError = nullptr;
 		pWrapperTable->m_ReleaseInstance = nullptr;
@@ -1037,6 +1066,33 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceType = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdevicetype");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceType = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdevicetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetDeviceType == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames");
 		#else // _WIN32
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_SetDependencyResourceNamesPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames");
@@ -1106,6 +1162,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_ParseDeviceConfiguration = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_ParseDeviceConfigurationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_parsedeviceconfiguration");
+		#else // _WIN32
+		pWrapperTable->m_Driver_ScanLab_OIE_ParseDeviceConfiguration = (PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE_ParseDeviceConfigurationPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_driver_scanlab_oie_parsedeviceconfiguration");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_ScanLab_OIE_ParseDeviceConfiguration == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1319,6 +1384,18 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_UninstallAppByMinorVersion == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getdevicetype", (void**)&(pWrapperTable->m_DeviceConfiguration_GetDeviceType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetDeviceType == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1349,6 +1426,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_removedevicebyname", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_RemoveDeviceByName == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_parsedeviceconfiguration", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_ParseDeviceConfiguration));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_ScanLab_OIE_ParseDeviceConfiguration == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_getversion", (void**)&(pWrapperTable->m_GetVersion));
@@ -1785,6 +1866,48 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CDeviceConfiguration
+	 */
+	
+	/**
+	* CDeviceConfiguration::GetDeviceType - Returns if the device is configured to work with an RTC5 or RTC6 card.
+	* @return Configured device Type
+	*/
+	eRTCDeviceType CDeviceConfiguration::GetDeviceType()
+	{
+		eRTCDeviceType resultDeviceType = (eRTCDeviceType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceType(m_pHandle, &resultDeviceType));
+		
+		return resultDeviceType;
+	}
+	
+	/**
+	* CDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
+	* @param[out] SignalIDsBuffer - RTC Signal IDs
+	*/
+	void CDeviceConfiguration::GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignalIDs = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignalIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
+		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
+	}
+	
+	/**
+	* CDeviceConfiguration::GetSensorSignalIDs - Returns the configured Sensor signal IDs of the configuration.
+	* @param[out] SignalIDsBuffer - Sensor Signal IDs
+	*/
+	void CDeviceConfiguration::GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignalIDs = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignalIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
+		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
+	}
+	
+	/**
 	 * Method definitions for class CDriver_ScanLab_OIE
 	 */
 	
@@ -1883,6 +2006,22 @@ public:
 	void CDriver_ScanLab_OIE::RemoveDeviceByName(const std::string & sName)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_RemoveDeviceByName(m_pHandle, sName.c_str()));
+	}
+	
+	/**
+	* CDriver_ScanLab_OIE::ParseDeviceConfiguration - Reads the configuration information from a device configuration string.
+	* @param[in] sDeviceConfigString - Device config string.
+	* @return Device configuration instance.
+	*/
+	PDeviceConfiguration CDriver_ScanLab_OIE::ParseDeviceConfiguration(const std::string & sDeviceConfigString)
+	{
+		LibMCDriver_ScanLabOIEHandle hDeviceConfigInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_ScanLab_OIE_ParseDeviceConfiguration(m_pHandle, sDeviceConfigString.c_str(), &hDeviceConfigInstance));
+		
+		if (!hDeviceConfigInstance) {
+			CheckError(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDeviceConfiguration>(m_pWrapper, hDeviceConfigInstance);
 	}
 
 } // namespace LibMCDriver_ScanLabOIE

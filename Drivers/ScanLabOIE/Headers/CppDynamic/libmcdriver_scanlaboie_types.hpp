@@ -183,12 +183,24 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
 typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_Base;
 typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_Driver;
 typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_OIEDevice;
+typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_DeviceConfiguration;
 typedef LibMCDriver_ScanLabOIEHandle LibMCDriver_ScanLabOIE_Driver_ScanLab_OIE;
 
 namespace LibMCDriver_ScanLabOIE {
 
+  /*************************************************************************************************************************
+   Declaration of enums
+  **************************************************************************************************************************/
+  
+  enum class eRTCDeviceType : LibMCDriver_ScanLabOIE_int32 {
+    Unknown = 0,
+    RTC5 = 1,
+    RTC6 = 2
+  };
+  
 } // namespace LibMCDriver_ScanLabOIE;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCDriver_ScanLabOIE::eRTCDeviceType eLibMCDriver_ScanLabOIERTCDeviceType;
 
 #endif // __LIBMCDRIVER_SCANLABOIE_TYPES_HEADER_CPP
