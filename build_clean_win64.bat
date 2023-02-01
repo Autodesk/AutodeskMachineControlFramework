@@ -118,7 +118,7 @@ del Framework\Dist\%GITHASH%_core.data
 cd %builddir%
 go run "%basepath%/BuildScripts/createDevPackage.go" .\DevPackage\Framework .\DevPackage\ %LONGGITHASH% win64
 
-copy "%builddir%/DevPackage/amcf_win64_%LONGGITHASH%.zip" "%builddir%/Artifacts/devpackage_win64.zip" /Y
+copy "%builddir%\DevPackage\amcf_win64_%LONGGITHASH%.zip" "%builddir%\Artifacts\devpackage_win64.zip" /Y
 
 echo "Build done!"
 
