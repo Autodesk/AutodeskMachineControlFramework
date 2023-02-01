@@ -565,6 +565,7 @@ set_target_properties(amc_server
 ]]
 
 if(WIN32)
+if(MSVC)
 
 file(GLOB SERVER_WIN32_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server.cpp
@@ -621,6 +622,7 @@ set_target_properties(amc_win32
 )
 
 
+endif(MSVC)
 endif(WIN32)
 
 
