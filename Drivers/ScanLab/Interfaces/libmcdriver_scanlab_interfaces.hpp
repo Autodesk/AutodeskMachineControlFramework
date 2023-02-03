@@ -852,6 +852,18 @@ public:
 	virtual void Initialise(const std::string & sIP, const std::string & sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber) = 0;
 
 	/**
+	* IDriver_ScanLab_RTC6::GetContext - Returns the RTC Context Instance. Fails if it card has not been initialised.
+	* @return RTC Context Instance.
+	*/
+	virtual IRTCContext * GetContext() = 0;
+
+	/**
+	* IDriver_ScanLab_RTC6::GetSelector - Returns the RTC Selector Instance. Fails if it card has not been initialised.
+	* @return RTC Selector Instance.
+	*/
+	virtual IRTCSelector * GetSelector() = 0;
+
+	/**
 	* IDriver_ScanLab_RTC6::LoadFirmware - Loads the firmware from the driver resources.
 	* @param[in] sFirmwareResource - resource name of the firmware program file.
 	* @param[in] sFPGAResource - resource name of the firmware FPGA file.

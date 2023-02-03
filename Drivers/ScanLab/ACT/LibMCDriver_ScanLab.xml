@@ -457,6 +457,13 @@ Custom implementation
 			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
 		</method>
 
+		<method name="GetContext" description="Returns the RTC Context Instance. Fails if it card has not been initialised.">
+			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
+		</method>
+				
+		<method name="GetSelector" description="Returns the RTC Selector Instance. Fails if it card has not been initialised.">
+			<param name="SelectorInstance" type="class" class="RTCSelector" pass="return" description="RTC Selector Instance." />
+		</method>
 
 		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
@@ -523,6 +530,7 @@ Custom implementation
 		<method name="OIETest" description="Runs a OIE test...">
 		</method>
 		
+
 	</class>
 
 

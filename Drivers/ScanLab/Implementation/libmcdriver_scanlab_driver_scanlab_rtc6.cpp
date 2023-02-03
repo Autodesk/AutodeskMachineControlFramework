@@ -117,14 +117,14 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
 
         m_pRTCContext = nullptr;
 
-        m_pRTCSelector = std::shared_ptr<IRTCSelector>(CreateRTCSelector());
+        m_pRTCSelector = act_managed_ptr<IRTCSelector>(CreateRTCSelector());
 
         if (sIP.empty()) {
-            m_pRTCContext = std::shared_ptr<IRTCContext>(m_pRTCSelector->AcquireCardBySerial(nSerialNumber));
+            m_pRTCContext = act_managed_ptr<IRTCContext>(m_pRTCSelector->AcquireCardBySerial(nSerialNumber));
         }
         else {
             m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
-            m_pRTCContext = std::shared_ptr<IRTCContext>(m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber));
+            m_pRTCContext = act_managed_ptr<IRTCContext>(m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber));
         }
 
         uint32_t nRTCVersion = 0;
@@ -141,6 +141,26 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
     } 
 
 }
+
+
+IRTCContext* CDriver_ScanLab_RTC6::GetContext()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    return m_pRTCContext.get();
+}
+
+IRTCSelector* CDriver_ScanLab_RTC6::GetSelector()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+    if (m_pRTCSelector.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    return m_pRTCSelector.get();
+}
+
 
 void CDriver_ScanLab_RTC6::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
 {

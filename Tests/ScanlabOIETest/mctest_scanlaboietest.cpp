@@ -36,6 +36,8 @@ using namespace LibMCPlugin::Impl;
 
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <thread>
 
 
 /*************************************************************************************************************************
@@ -224,7 +226,44 @@ public:
 
 
 		pStateEnvironment->LogMessage("Running OIE Test..");
-		pRTC6Driver->OIETest();
+		auto pRTCContext = pRTC6Driver->GetContext();
+
+		pRTCContext->SetStartList(1, 0);
+		pRTCContext->EnableOIE();
+		pRTCContext->StartOIEMeasurement();
+
+		std::vector<LibMCDriver_ScanLab::sPoint2D> ContourPoints;
+		//ContourPoints.resize(1000);
+		for (int32_t nIndex = 0; nIndex < 1000; nIndex++) {
+			float T = (float)(nIndex - 500) / 500.0f * 3.14159f;
+			float dX = nIndex * 0.05f;
+			float dY = sin(T) * 20.0f;
+			ContourPoints.push_back(LibMCDriver_ScanLab::sPoint2D{ dX, dY });
+
+			//std::cout << "Point X: " << dX << " " << dY << std::endl;
+		}
+
+		std::cout << "How many points? " << ContourPoints.size() << std::endl;
+
+
+		pRTCContext->DrawPolyline(ContourPoints, 10.0, 100.0, 1.0, 0.0);
+
+		pRTCContext->StopOIEMeasurement();
+		pRTCContext->DisableOIE();
+
+		//pRTC6Driver->OIETest();
+
+		bool bBusy = true;
+		while (bBusy) {
+			uint32_t nPosition = 0;
+			pRTCContext->GetStatus (bBusy, nPosition);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+			std::cout << "List Position: " << nPosition << std::endl;
+
+		}
+
 
 		pStateEnvironment->LogMessage("Waiting..");
 		pStateEnvironment->Sleep(10000);

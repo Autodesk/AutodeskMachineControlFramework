@@ -706,6 +706,8 @@ void CRTCContext::OIETest()
 		std::cout << "Point X: " << dX << " " << dY << std::endl;
 	}
 
+	std::cout << "How many points? " << ContourPoints.size() << std::endl;
+
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
 
 	DrawPolyline(ContourPoints.size(), ContourPoints.data(), 10.0, 100.0, 1.0, 0.0);

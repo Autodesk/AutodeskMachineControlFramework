@@ -651,6 +651,24 @@ typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSi
 typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, const char * pIP, const char * pNetmask, LibMCDriver_ScanLab_uint32 nTimeout, LibMCDriver_ScanLab_uint32 nSerialNumber);
 
 /**
+* Returns the RTC Context Instance. Fails if it card has not been initialised.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[out] pContextInstance - RTC Context Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetContextPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_RTCContext * pContextInstance);
+
+/**
+* Returns the RTC Selector Instance. Fails if it card has not been initialised.
+*
+* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
+* @param[out] pSelectorInstance - RTC Selector Instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ScanLabResult (*PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetSelectorPtr) (LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_RTCSelector * pSelectorInstance);
+
+/**
 * Loads the firmware from the driver resources.
 *
 * @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
@@ -901,6 +919,8 @@ typedef struct {
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetToSimulationModePtr m_Driver_ScanLab_RTC6_SetToSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_IsSimulationModePtr m_Driver_ScanLab_RTC6_IsSimulationMode;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_InitialisePtr m_Driver_ScanLab_RTC6_Initialise;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetContextPtr m_Driver_ScanLab_RTC6_GetContext;
+	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_GetSelectorPtr m_Driver_ScanLab_RTC6_GetSelector;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadFirmwarePtr m_Driver_ScanLab_RTC6_LoadFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_LoadCustomFirmwarePtr m_Driver_ScanLab_RTC6_LoadCustomFirmware;
 	PLibMCDriver_ScanLabDriver_ScanLab_RTC6_SetCorrectionFilePtr m_Driver_ScanLab_RTC6_SetCorrectionFile;
