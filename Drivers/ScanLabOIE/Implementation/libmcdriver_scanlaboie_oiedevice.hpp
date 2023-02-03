@@ -46,6 +46,7 @@ Abstract: This is the class declaration of COIEDevice
 
 // Include custom headers here.
 #include "libmcdriver_scanlaboie_sdk.hpp"
+#include "libmcdriver_scanlaboie_datarecording.hpp"
 #include <mutex>
 
 namespace LibMCDriver_ScanLabOIE {
@@ -98,15 +99,17 @@ protected:
 	std::vector<uint8_t> m_RTC6CorrectionData;
 	bool m_bHasCorrectionData;
 
-	std::mutex m_PacketMutex;
+	std::mutex m_RecordingMutex;
 
 	void ensureConnectivity();
 	void removeDevice(bool bCheckForError);
 
 	static std::string getNameFromAppInfo(const oie_appinfo& appInfo);
 
-	void startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig);
+	void startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
 	void uninstallAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion);
+
+	std::shared_ptr<CDataRecording> m_pCurrentDataRecording;
 
 public:
 
@@ -142,13 +145,13 @@ public:
 
 	void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string& sName, LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nPatch);
 
-	void StartAppByName(const std::string& sName, const std::string& sDeviceConfig);
+	void StartAppByName(const std::string& sName, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
 
-	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string& sDeviceConfig);
+	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
 
-	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string& sDeviceConfig);
+	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
 
-	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string& sDeviceConfig);
+	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
 
 	void StopApp();
 

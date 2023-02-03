@@ -130,6 +130,12 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND 1023 /** Device has not been found. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING 1024 /** Device is already existing. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME 1025 /** Empty device name. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERPACKET 1026 /** Invalid values per packet. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE 1027 /** Invalid buffer size. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_PACKETISNOTRECORDING 1028 /** Packet is not recording. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_TOOMANYVALUESINPACKET 1029 /** Too many values in packet. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_NOTENOUGHVALUESINPACKET 1030 /** Not enough values in packet. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_BUFFEROVERFLOW 1031 /** Buffer overflow. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -172,6 +178,12 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND: return "Device has not been found.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING: return "Device is already existing.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME: return "Empty device name.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERPACKET: return "Invalid values per packet.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE: return "Invalid buffer size.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_PACKETISNOTRECORDING: return "Packet is not recording.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_TOOMANYVALUESINPACKET: return "Too many values in packet.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_NOTENOUGHVALUESINPACKET: return "Not enough values in packet.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_BUFFEROVERFLOW: return "Buffer overflow.";
     default: return "unknown error";
   }
 }

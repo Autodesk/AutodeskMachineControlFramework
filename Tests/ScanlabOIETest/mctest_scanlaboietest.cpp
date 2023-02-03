@@ -266,6 +266,7 @@ public:
 
 		}
 
+		pDevice->StopApp();
 
 		pStateEnvironment->LogMessage("Waiting..");
 

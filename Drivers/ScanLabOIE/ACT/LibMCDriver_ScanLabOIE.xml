@@ -80,9 +80,14 @@
 		<error name="DEVICEISALREADYEXISTING" code="1024" description="Device is already existing." />	
 		<error name="EMPTYDEVICENAME" code="1025" description="Empty device name." />	
 		
+		<error name="INVALIDVALUESPERPACKET" code="1026" description="Invalid values per packet." />	
+		<error name="INVALIDBUFFERSIZE" code="1027" description="Invalid buffer size." />	
+		<error name="PACKETISNOTRECORDING" code="1028" description="Packet is not recording." />	
+		<error name="TOOMANYVALUESINPACKET" code="1029" description="Too many values in packet." />	
+		<error name="NOTENOUGHVALUESINPACKET" code="1030" description="Not enough values in packet." />	
+		<error name="BUFFEROVERFLOW" code="1031" description="Buffer overflow." />	
 		
-		
-			
+
 	</errors>
 	
 	<enum name="RTCDeviceType">
