@@ -696,12 +696,14 @@ void CRTCContext::OIETest()
 
 	std::cout << "OIETest4" << std::endl;
 	std::vector<sPoint2D> ContourPoints;
-	ContourPoints.resize(1000);
+	//ContourPoints.resize(1000);
 	for (int32_t nIndex = 0; nIndex < 1000; nIndex++) {		
 		float T = (float)(nIndex - 500) / 500.0f * 3.14159f;
-		float dX = nIndex * 0.01f;
-		float dY = sin(T) * 10.0f;
+		float dX = nIndex * 0.05f;
+		float dY = sin(T) * 20.0f;
 		ContourPoints.push_back(sPoint2D{ dX, dY });
+
+		std::cout << "Point X: " << dX << " " << dY << std::endl;
 	}
 
 	m_pScanLabSDK->checkGlobalErrorOfCard(m_CardNo);
