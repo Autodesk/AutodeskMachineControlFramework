@@ -101,6 +101,7 @@ call cmake --build . --config Release
 echo "Building Developer Package"
 cd "%builddir%\DevPackage"
 copy ..\githash.txt Framework\Dist\disthash.txt
+copy ..\Output\amc_win32.exe Framework\Dist\
 copy ..\Output\amc_server.exe Framework\Dist\
 copy ..\Output\amc_server.xml Framework\Dist\
 copy ..\Output\%GITHASH%_core_libmc.dll Framework\Dist\
