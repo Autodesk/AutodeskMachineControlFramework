@@ -42,6 +42,7 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
 #define DATARECORDING_MAXBUFFERSIZEINPACKETS (1024 * 1024)
 
 #include <iostream>
+#include <cstring>
 
 CDataRecordingBuffer::CDataRecordingBuffer(size_t nBufferSizeInValues)
     : m_nCurrentPosition(0)
