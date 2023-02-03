@@ -38,6 +38,7 @@ using namespace LibMCPlugin::Impl;
 #include <fstream>
 #include <chrono>
 #include <thread>
+#include <cmath>
 
 
 /*************************************************************************************************************************
