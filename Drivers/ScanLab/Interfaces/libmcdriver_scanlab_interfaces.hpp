@@ -716,11 +716,6 @@ public:
 	*/
 	virtual void StopOIEMeasurement() = 0;
 
-	/**
-	* IRTCContext::OIETest - Runs a OIE test...
-	*/
-	virtual void OIETest() = 0;
-
 };
 
 typedef IBaseSharedPtr<IRTCContext> PIRTCContext;
@@ -939,18 +934,6 @@ public:
 	* @param[out] dMultiplier - Multiplier
 	*/
 	virtual void GetCommunicationTimeouts(LibMCDriver_ScanLab_double & dInitialTimeout, LibMCDriver_ScanLab_double & dMaxTimeout, LibMCDriver_ScanLab_double & dMultiplier) = 0;
-
-	/**
-	* IDriver_ScanLab_RTC6::InitializeForOIE - Initializes the RTC card for the Open Interface Extension
-	* @param[in] nSignalChannelsBufferSize - Number of elements in buffer
-	* @param[in] pSignalChannelsBuffer - Array of signal channels. MUST NOT BE empty
-	*/
-	virtual void InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer) = 0;
-
-	/**
-	* IDriver_ScanLab_RTC6::OIETest - Runs a OIE test...
-	*/
-	virtual void OIETest() = 0;
 
 };
 

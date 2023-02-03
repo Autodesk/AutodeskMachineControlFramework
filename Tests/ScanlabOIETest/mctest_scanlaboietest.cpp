@@ -181,8 +181,8 @@ public:
 		pStateEnvironment->LogMessage("Initialising done..");
 
 		pStateEnvironment->LogMessage("Initializing for OIE..");
-		pRTC6Driver->InitializeForOIE(signals);
-		pStateEnvironment->Sleep(1000);
+		auto pRTCContext = pRTC6Driver->GetContext();
+		pRTCContext->InitializeForOIE(signals);
 
 
 		pStateEnvironment->LogMessage("Adding Device...");
@@ -213,7 +213,6 @@ public:
 		pDevice->StartAppByName("AIB", sDeviceConfig);
 
 		pStateEnvironment->LogMessage("Waiting..");
-		pStateEnvironment->Sleep(1000);
 
 		pStateEnvironment->LogMessage("App is running:  " + std::to_string ((uint32_t)pDevice->AppIsRunning()));
 		std::string sName;
@@ -226,7 +225,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Running OIE Test..");
-		auto pRTCContext = pRTC6Driver->GetContext();
+
 
 		pRTCContext->SetStartList(1, 0);
 		pRTCContext->EnableOIE();
@@ -251,6 +250,9 @@ public:
 		pRTCContext->StopOIEMeasurement();
 		pRTCContext->DisableOIE();
 
+		pRTCContext->SetEndOfList();
+		pRTCContext->ExecuteList(1, 0);
+
 		//pRTC6Driver->OIETest();
 
 		bool bBusy = true;
@@ -266,7 +268,6 @@ public:
 
 
 		pStateEnvironment->LogMessage("Waiting..");
-		pStateEnvironment->Sleep(10000);
 
 		pStateEnvironment->LogMessage("Disconnecting Device");
 		pDevice->Disconnect();

@@ -368,9 +368,6 @@ Custom implementation
 
 		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
 		</method>
-
-		<method name="OIETest" description="Runs a OIE test...">
-		</method>
 		
 	</class>
 
@@ -522,14 +519,7 @@ Custom implementation
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
-		
-		<method name="InitializeForOIE" description="Initializes the RTC card for the Open Interface Extension">
-			<param name="SignalChannels" type="basicarray" class="uint32" pass="in" description="Array of signal channels. MUST NOT BE empty" />
-		</method>
-				
-		<method name="OIETest" description="Runs a OIE test...">
-		</method>
-		
+						
 
 	</class>
 

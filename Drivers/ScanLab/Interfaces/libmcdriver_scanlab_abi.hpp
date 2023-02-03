@@ -504,14 +504,6 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtcco
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_stopoiemeasurement(LibMCDriver_ScanLab_RTCContext pRTCContext);
 
-/**
-* Runs a OIE test...
-*
-* @param[in] pRTCContext - RTCContext instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_rtccontext_oietest(LibMCDriver_ScanLab_RTCContext pRTCContext);
-
 /*************************************************************************************************************************
  Class definition for RTCSelector
 **************************************************************************************************************************/
@@ -781,24 +773,6 @@ LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_drive
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_getcommunicationtimeouts(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_double * pInitialTimeout, LibMCDriver_ScanLab_double * pMaxTimeout, LibMCDriver_ScanLab_double * pMultiplier);
-
-/**
-* Initializes the RTC card for the Open Interface Extension
-*
-* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @param[in] nSignalChannelsBufferSize - Number of elements in buffer
-* @param[in] pSignalChannelsBuffer - uint32 buffer of Array of signal channels. MUST NOT BE empty
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_initializeforoie(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6, LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32 * pSignalChannelsBuffer);
-
-/**
-* Runs a OIE test...
-*
-* @param[in] pDriver_ScanLab_RTC6 - Driver_ScanLab_RTC6 instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_SCANLAB_DECLSPEC LibMCDriver_ScanLabResult libmcdriver_scanlab_driver_scanlab_rtc6_oietest(LibMCDriver_ScanLab_Driver_ScanLab_RTC6 pDriver_ScanLab_RTC6);
 
 /*************************************************************************************************************************
  Global functions

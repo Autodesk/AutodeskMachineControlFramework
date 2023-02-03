@@ -474,24 +474,3 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
 }
 
 
-void CDriver_ScanLab_RTC6::InitializeForOIE(const LibMCDriver_ScanLab_uint64 nSignalChannelsBufferSize, const LibMCDriver_ScanLab_uint32* pSignalChannelsBuffer)
-{
-    if (!m_SimulationMode) {
-        if (m_pRTCContext.get() == nullptr)
-            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-
-        m_pRTCContext->InitializeForOIE(nSignalChannelsBufferSize, pSignalChannelsBuffer);
-
-    }
-}
-
-void CDriver_ScanLab_RTC6::OIETest()
-{
-    if (!m_SimulationMode) {
-        if (m_pRTCContext.get() == nullptr)
-            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
-
-        m_pRTCContext->OIETest();
-
-    }
-}
