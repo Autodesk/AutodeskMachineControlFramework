@@ -217,25 +217,25 @@ Custom implementation
 		
 		<method name="StartAppByName" description="Starts an app by its name. Fails if an app is already running.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
-			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 		
 		<method name="StartAppByIndex" description="Starts an app by its index. Fails if an app is already running.">
 			<param name="Index" type="uint32" pass="in" description="Index of App, 0-based" />
-			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 
 		<method name="StartAppByMajorVersion" description="Starts an app by its major version. Fails if an app is already running.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
 			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be started. Fails if app does not exist or only with wrong major number." />
-			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 
 		<method name="StartAppByMinorVersion" description="Starts an app by its major version. Fails if an app is already running.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
 			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be started. Fails if app does not exist or only with wrong major number." />
 			<param name="MinorVersion" type="uint32" pass="in" description="Minor version of app to be started. Fails if app does not exist or only with wrong minor number." />
-			<param name="DeviceConfig" type="string" pass="in" description="Device config string." />
+			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 
 		<method name="StopApp" description="Stops the currently running app. Does nothing if no app is running.">
@@ -284,12 +284,24 @@ Custom implementation
 			<param name="DeviceType" type="enum" class="RTCDeviceType" pass="return" description="Configured device Type" />
 		</method>	
 	
+		<method name="GetRTCSignalCount" description="Returns the configured RTC signal count the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="RTC Signal Count" />
+		</method>	
+
+		<method name="GetSensorSignalCount" description="Returns the configured Sensor signal count the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
+		</method>	
+		
 		<method name="GetRTCSignalIDs" description="Returns the configured RTC signal IDs of the configuration.">
 			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="RTC Signal IDs" />
 		</method>	
 
 		<method name="GetSensorSignalIDs" description="Returns the configured Sensor signal IDs of the configuration.">
 			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="Sensor Signal IDs" />
+		</method>	
+
+		<method name="GetDeviceConfigurationString" description="Returns the device configuration string.">
+			<param name="DeviceConfigurationString" type="string" pass="return" description="Device configuration string." />
 		</method>	
 
 	</class>

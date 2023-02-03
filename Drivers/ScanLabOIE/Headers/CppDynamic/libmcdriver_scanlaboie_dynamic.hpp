@@ -487,10 +487,10 @@ public:
 	inline void GetAppVersion(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
 	inline void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
 	inline void SetRTCCorrectionData(const CInputVector<LibMCDriver_ScanLabOIE_uint8> & CorrectionDataBuffer);
-	inline void StartAppByName(const std::string & sName, const std::string & sDeviceConfig);
-	inline void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig);
-	inline void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig);
-	inline void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string & sDeviceConfig);
+	inline void StartAppByName(const std::string & sName, classParam<CDeviceConfiguration> pDeviceConfig);
+	inline void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, classParam<CDeviceConfiguration> pDeviceConfig);
+	inline void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, classParam<CDeviceConfiguration> pDeviceConfig);
+	inline void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, classParam<CDeviceConfiguration> pDeviceConfig);
 	inline void StopApp();
 	inline bool AppIsRunning();
 	inline void GetRunningApp(std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch);
@@ -516,8 +516,11 @@ public:
 	}
 	
 	inline eRTCDeviceType GetDeviceType();
+	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
+	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
 	inline void GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
 	inline void GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
+	inline std::string GetDeviceConfigurationString();
 };
 	
 /*************************************************************************************************************************
@@ -700,8 +703,11 @@ public:
 		pWrapperTable->m_OIEDevice_UninstallAppByMajorVersion = nullptr;
 		pWrapperTable->m_OIEDevice_UninstallAppByMinorVersion = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetDeviceType = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = nullptr;
 		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeCustomSDK = nullptr;
@@ -1075,6 +1081,24 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
 		#else // _WIN32
 		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
@@ -1090,6 +1114,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceConfigurationStringPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceConfigurationStringPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1388,12 +1421,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetDeviceType == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring", (void**)&(pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames));
@@ -1740,32 +1785,35 @@ public:
 	/**
 	* COIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByName(const std::string & sName, const std::string & sDeviceConfig)
+	void COIEDevice::StartAppByName(const std::string & sName, classParam<CDeviceConfiguration> pDeviceConfig)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByName(m_pHandle, sName.c_str(), sDeviceConfig.c_str()));
+		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByName(m_pHandle, sName.c_str(), hDeviceConfig));
 	}
 	
 	/**
 	* COIEDevice::StartAppByIndex - Starts an app by its index. Fails if an app is already running.
 	* @param[in] nIndex - Index of App, 0-based
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig)
+	void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, classParam<CDeviceConfiguration> pDeviceConfig)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByIndex(m_pHandle, nIndex, sDeviceConfig.c_str()));
+		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByIndex(m_pHandle, nIndex, hDeviceConfig));
 	}
 	
 	/**
 	* COIEDevice::StartAppByMajorVersion - Starts an app by its major version. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig)
+	void COIEDevice::StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, classParam<CDeviceConfiguration> pDeviceConfig)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMajorVersion(m_pHandle, sName.c_str(), nMajorVersion, sDeviceConfig.c_str()));
+		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMajorVersion(m_pHandle, sName.c_str(), nMajorVersion, hDeviceConfig));
 	}
 	
 	/**
@@ -1773,11 +1821,12 @@ public:
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
 	* @param[in] nMinorVersion - Minor version of app to be started. Fails if app does not exist or only with wrong minor number.
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	void COIEDevice::StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string & sDeviceConfig)
+	void COIEDevice::StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, classParam<CDeviceConfiguration> pDeviceConfig)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMinorVersion(m_pHandle, sName.c_str(), nMajorVersion, nMinorVersion, sDeviceConfig.c_str()));
+		LibMCDriver_ScanLabOIEHandle hDeviceConfig = pDeviceConfig.GetHandle();
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_StartAppByMinorVersion(m_pHandle, sName.c_str(), nMajorVersion, nMinorVersion, hDeviceConfig));
 	}
 	
 	/**
@@ -1882,6 +1931,30 @@ public:
 	}
 	
 	/**
+	* CDeviceConfiguration::GetRTCSignalCount - Returns the configured RTC signal count the configuration.
+	* @return RTC Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetRTCSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
+	* CDeviceConfiguration::GetSensorSignalCount - Returns the configured Sensor signal count the configuration.
+	* @return Sensor Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetSensorSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
 	* CDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
 	* @param[out] SignalIDsBuffer - RTC Signal IDs
 	*/
@@ -1905,6 +1978,21 @@ public:
 		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
 		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
 		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
+	}
+	
+	/**
+	* CDeviceConfiguration::GetDeviceConfigurationString - Returns the device configuration string.
+	* @return Device configuration string.
+	*/
+	std::string CDeviceConfiguration::GetDeviceConfigurationString()
+	{
+		LibMCDriver_ScanLabOIE_uint32 bytesNeededDeviceConfigurationString = 0;
+		LibMCDriver_ScanLabOIE_uint32 bytesWrittenDeviceConfigurationString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceConfigurationString(m_pHandle, 0, &bytesNeededDeviceConfigurationString, nullptr));
+		std::vector<char> bufferDeviceConfigurationString(bytesNeededDeviceConfigurationString);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceConfigurationString(m_pHandle, bytesNeededDeviceConfigurationString, &bytesWrittenDeviceConfigurationString, &bufferDeviceConfigurationString[0]));
+		
+		return std::string(&bufferDeviceConfigurationString[0]);
 	}
 	
 	/**

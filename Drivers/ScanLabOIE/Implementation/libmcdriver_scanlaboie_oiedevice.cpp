@@ -734,25 +734,42 @@ void COIEDevice::GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::str
 	return lockInstance()->GetAppInfo(nIndex, sName, nMajor, nMinor, nPatch);
 }
 
-void COIEDevice::StartAppByName(const std::string & sName, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByName(const std::string& sName, IDeviceConfiguration* pDeviceConfig)
 {
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+
 	lockInstance()->StartAppByName(sName, sDeviceConfig);
 }
 
-void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, IDeviceConfiguration* pDeviceConfig)
 {
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+
 	lockInstance()->StartAppByIndex(nIndex, sDeviceConfig);
 }
 
-void COIEDevice::StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, IDeviceConfiguration* pDeviceConfig)
 {
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+
 	lockInstance()->StartAppByMajorVersion(sName, nMajorVersion, sDeviceConfig);
 }
 
-void COIEDevice::StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, IDeviceConfiguration* pDeviceConfig)
 {
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+
 	lockInstance()->StartAppByMinorVersion(sName, nMajorVersion, nMinorVersion, sDeviceConfig);
 }
+
 
 void COIEDevice::StopApp()
 {

@@ -46,7 +46,7 @@ using namespace LibMCDriver_ScanLabOIE::Impl;
 **************************************************************************************************************************/
 
 CDeviceConfiguration::CDeviceConfiguration(PScanLabOIESDK pSDK, const std::string& sDeviceConfigString, LibMCEnv::PDriverEnvironment pDriverEnvironment)
-    : m_pSDK (pSDK), m_RTCDeviceType (LibMCDriver_ScanLabOIE::eRTCDeviceType::Unknown)
+    : m_pSDK (pSDK), m_RTCDeviceType (LibMCDriver_ScanLabOIE::eRTCDeviceType::Unknown), m_sDeviceConfigString (sDeviceConfigString)
 {
     if (pSDK.get () == nullptr)
         throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
@@ -96,6 +96,17 @@ LibMCDriver_ScanLabOIE::eRTCDeviceType CDeviceConfiguration::GetDeviceType()
     return m_RTCDeviceType;
 }
 
+
+LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetRTCSignalCount()
+{
+    return (uint32_t)m_RTCSignalIDs.size();
+}
+
+LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetSensorSignalCount()
+{
+    return (uint32_t)m_SensorSignalIDs.size();
+}
+
 void CDeviceConfiguration::GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer)
 {
     if (pSignalIDsNeededCount != nullptr)
@@ -127,3 +138,8 @@ void CDeviceConfiguration::GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSig
     }
 }
 
+
+std::string CDeviceConfiguration::GetDeviceConfigurationString()
+{
+    return m_sDeviceConfigString;
+}

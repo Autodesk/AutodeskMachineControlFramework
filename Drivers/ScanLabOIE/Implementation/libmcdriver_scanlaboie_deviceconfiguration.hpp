@@ -61,6 +61,8 @@ private:
 
     PScanLabOIESDK m_pSDK;
 
+    std::string m_sDeviceConfigString;
+
 	LibMCDriver_ScanLabOIE::eRTCDeviceType m_RTCDeviceType;
 
 	std::vector<uint32_t> m_RTCSignalIDs;
@@ -76,9 +78,15 @@ public:
 
 	LibMCDriver_ScanLabOIE::eRTCDeviceType GetDeviceType() override;
 
+	LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount() override;
+
+	LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() override;
+
 	void GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) override;
 
 	void GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) override;
+
+    std::string GetDeviceConfigurationString() override;
 
 };
 

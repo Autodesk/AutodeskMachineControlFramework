@@ -217,13 +217,13 @@ public:
 
 	void GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::string & sName, LibMCDriver_ScanLabOIE_uint32 & nMajor, LibMCDriver_ScanLabOIE_uint32 & nMinor, LibMCDriver_ScanLabOIE_uint32 & nPatch) override;
 
-	void StartAppByName(const std::string & sName, const std::string & sDeviceConfig) override;
+	void StartAppByName(const std::string& sName, IDeviceConfiguration* pDeviceConfig) override;
 
-	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig) override;
+	void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, IDeviceConfiguration* pDeviceConfig) override;
 
-	void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig) override;
+	void StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, IDeviceConfiguration* pDeviceConfig) override;
 
-	void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string & sDeviceConfig) override;
+	void StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, IDeviceConfiguration* pDeviceConfig) override;
 
 	void StopApp() override;
 

@@ -210,7 +210,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByName("AIB", sDeviceConfig);
+		pDevice->StartAppByName("AIB", pDeviceConfigurationInstance);
 
 		pStateEnvironment->LogMessage("Waiting..");
 

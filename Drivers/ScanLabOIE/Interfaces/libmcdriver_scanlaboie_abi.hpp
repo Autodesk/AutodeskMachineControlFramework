@@ -292,20 +292,20 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 *
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[in] pName - Name of app to be started.
-* @param[in] pDeviceConfig - Device config string.
+* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyname(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, const char * pDeviceConfig);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyname(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
 
 /**
 * Starts an app by its index. Fails if an app is already running.
 *
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[in] nIndex - Index of App, 0-based
-* @param[in] pDeviceConfig - Device config string.
+* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyindex(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex, const char * pDeviceConfig);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyindex(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
 
 /**
 * Starts an app by its major version. Fails if an app is already running.
@@ -313,10 +313,10 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @param[in] pOIEDevice - OIEDevice instance.
 * @param[in] pName - Name of app to be started.
 * @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
-* @param[in] pDeviceConfig - Device config string.
+* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbymajorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const char * pDeviceConfig);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbymajorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
 
 /**
 * Starts an app by its major version. Fails if an app is already running.
@@ -325,10 +325,10 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @param[in] pName - Name of app to be started.
 * @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
 * @param[in] nMinorVersion - Minor version of app to be started. Fails if app does not exist or only with wrong minor number.
-* @param[in] pDeviceConfig - Device config string.
+* @param[in] pDeviceConfig - Device configuration instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyminorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const char * pDeviceConfig);
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_oiedevice_startappbyminorversion(LibMCDriver_ScanLabOIE_OIEDevice pOIEDevice, const char * pName, LibMCDriver_ScanLabOIE_uint32 nMajorVersion, LibMCDriver_ScanLabOIE_uint32 nMinorVersion, LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfig);
 
 /**
 * Stops the currently running app. Does nothing if no app is running.
@@ -424,6 +424,24 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getdevicetype(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE::eRTCDeviceType * pDeviceType);
 
 /**
+* Returns the configured RTC signal count the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[out] pSignalCount - RTC Signal Count
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 * pSignalCount);
+
+/**
+* Returns the configured Sensor signal count the configuration.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[out] pSignalCount - Sensor Signal Count
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, LibMCDriver_ScanLabOIE_uint32 * pSignalCount);
+
+/**
 * Returns the configured RTC signal IDs of the configuration.
 *
 * @param[in] pDeviceConfiguration - DeviceConfiguration instance.
@@ -444,6 +462,17 @@ LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlab
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer);
+
+/**
+* Returns the device configuration string.
+*
+* @param[in] pDeviceConfiguration - DeviceConfiguration instance.
+* @param[in] nDeviceConfigurationStringBufferSize - size of the buffer (including trailing 0)
+* @param[out] pDeviceConfigurationStringNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pDeviceConfigurationStringBuffer -  buffer of Device configuration string., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_SCANLABOIE_DECLSPEC LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring(LibMCDriver_ScanLabOIE_DeviceConfiguration pDeviceConfiguration, const LibMCDriver_ScanLabOIE_uint32 nDeviceConfigurationStringBufferSize, LibMCDriver_ScanLabOIE_uint32* pDeviceConfigurationStringNeededChars, char * pDeviceConfigurationStringBuffer);
 
 /*************************************************************************************************************************
  Class definition for Driver_ScanLab_OIE

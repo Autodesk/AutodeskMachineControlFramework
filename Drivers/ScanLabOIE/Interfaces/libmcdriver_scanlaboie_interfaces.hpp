@@ -418,33 +418,33 @@ public:
 	/**
 	* IOIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByName(const std::string & sName, const std::string & sDeviceConfig) = 0;
+	virtual void StartAppByName(const std::string & sName, IDeviceConfiguration* pDeviceConfig) = 0;
 
 	/**
 	* IOIEDevice::StartAppByIndex - Starts an app by its index. Fails if an app is already running.
 	* @param[in] nIndex - Index of App, 0-based
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig) = 0;
+	virtual void StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, IDeviceConfiguration* pDeviceConfig) = 0;
 
 	/**
 	* IOIEDevice::StartAppByMajorVersion - Starts an app by its major version. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig) = 0;
+	virtual void StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, IDeviceConfiguration* pDeviceConfig) = 0;
 
 	/**
 	* IOIEDevice::StartAppByMinorVersion - Starts an app by its major version. Fails if an app is already running.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] nMajorVersion - Major version of app to be started. Fails if app does not exist or only with wrong major number.
 	* @param[in] nMinorVersion - Minor version of app to be started. Fails if app does not exist or only with wrong minor number.
-	* @param[in] sDeviceConfig - Device config string.
+	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
-	virtual void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string & sDeviceConfig) = 0;
+	virtual void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, IDeviceConfiguration* pDeviceConfig) = 0;
 
 	/**
 	* IOIEDevice::StopApp - Stops the currently running app. Does nothing if no app is running.
@@ -518,6 +518,18 @@ public:
 	virtual LibMCDriver_ScanLabOIE::eRTCDeviceType GetDeviceType() = 0;
 
 	/**
+	* IDeviceConfiguration::GetRTCSignalCount - Returns the configured RTC signal count the configuration.
+	* @return RTC Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount() = 0;
+
+	/**
+	* IDeviceConfiguration::GetSensorSignalCount - Returns the configured Sensor signal count the configuration.
+	* @return Sensor Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() = 0;
+
+	/**
 	* IDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
 	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
 	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
@@ -532,6 +544,12 @@ public:
 	* @param[out] pSignalIDsBuffer - uint32 buffer of Sensor Signal IDs
 	*/
 	virtual void GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
+
+	/**
+	* IDeviceConfiguration::GetDeviceConfigurationString - Returns the device configuration string.
+	* @return Device configuration string.
+	*/
+	virtual std::string GetDeviceConfigurationString() = 0;
 
 };
 
