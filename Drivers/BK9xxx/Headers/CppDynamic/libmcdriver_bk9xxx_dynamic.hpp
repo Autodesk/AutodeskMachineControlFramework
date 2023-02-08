@@ -174,7 +174,7 @@ public:
 			case LIBMCDRIVER_BK9XXX_ERROR_COULDNOTLOADLIBRARY: return "COULDNOTLOADLIBRARY";
 			case LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT: return "COULDNOTFINDLIBRARYEXPORT";
 			case LIBMCDRIVER_BK9XXX_ERROR_INCOMPATIBLEBINARYVERSION: return "INCOMPATIBLEBINARYVERSION";
-			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDSTATENAME: return "INVALIDSTATENAME";
+			case LIBMCDRIVER_BK9XXX_ERROR_UNKNOWNEXCEPTION: return "UNKNOWNEXCEPTION";
 			case LIBMCDRIVER_BK9XXX_ERROR_DRIVERERROR: return "DRIVERERROR";
 			case LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTINITIALISED: return "DRIVERNOTINITIALISED";
 			case LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTCONNECTED: return "DRIVERNOTCONNECTED";
@@ -224,6 +224,10 @@ public:
 			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMINVALUE: return "INVALIDANALOGIOSCALEDMINVALUE";
 			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMAXVALUE: return "INVALIDANALOGIOSCALEDMAXVALUE";
 			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDINTERVAL: return "INVALIDANALOGIOSCALEDINTERVAL";
+			case LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOOFFSETOUTOFRANGE: return "DIGITALIOOFFSETOUTOFRANGE";
+			case LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOOFFSETOUTOFRANGE: return "ANALOGIOOFFSETOUTOFRANGE";
+			case LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOWRITETIMEOUT: return "DIGITALIOWRITETIMEOUT";
+			case LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOWRITETIMEOUT: return "ANALOGIOWRITETIMEOUT";
 		}
 		return "UNKNOWN";
 	}
@@ -240,7 +244,7 @@ public:
 			case LIBMCDRIVER_BK9XXX_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
 			case LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
 			case LIBMCDRIVER_BK9XXX_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
-			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDSTATENAME: return "invalid state name";
+			case LIBMCDRIVER_BK9XXX_ERROR_UNKNOWNEXCEPTION: return "an unknown exception occurred";
 			case LIBMCDRIVER_BK9XXX_ERROR_DRIVERERROR: return "a driver error occured";
 			case LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
 			case LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
@@ -290,6 +294,10 @@ public:
 			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMINVALUE: return "invalid analog io scaled min value";
 			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMAXVALUE: return "invalid analog io scaled max value";
 			case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDINTERVAL: return "invalid analog io scaled interval";
+			case LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOOFFSETOUTOFRANGE: return "digital io offset is out of range";
+			case LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOOFFSETOUTOFRANGE: return "analog io offset is out of range";
+			case LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOWRITETIMEOUT: return "digital io write timeout";
+			case LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOWRITETIMEOUT: return "analog io write timeout";
 		}
 		return "unknown error";
 	}
@@ -535,9 +543,9 @@ public:
 	inline LibMCDriver_BK9xxx_uint32 GetAnalogOutputRaw(const std::string & sVariableName);
 	inline LibMCDriver_BK9xxx_double GetAnalogInput(const std::string & sVariableName);
 	inline LibMCDriver_BK9xxx_double GetAnalogOutput(const std::string & sVariableName);
-	inline void SetDigitalOutput(const std::string & sVariableName, const bool bValue);
-	inline void SetAnalogOutputRaw(const std::string & sVariableName, const LibMCDriver_BK9xxx_uint32 nValue);
-	inline void SetAnalogOutput(const std::string & sVariableName, const LibMCDriver_BK9xxx_double dValue);
+	inline void SetDigitalOutput(const std::string & sVariableName, const bool bValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
+	inline void SetAnalogOutputRaw(const std::string & sVariableName, const LibMCDriver_BK9xxx_uint32 nValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
+	inline void SetAnalogOutput(const std::string & sVariableName, const LibMCDriver_BK9xxx_double dValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
 };
 	
 	/**
@@ -1699,30 +1707,33 @@ public:
 	* CDriver_BK9xxx::SetDigitalOutput - Writes a value to a digital output variable. Fails if variable does not exist.
 	* @param[in] sVariableName - Name of variable.
 	* @param[in] bValue - Value to be set.
+	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	void CDriver_BK9xxx::SetDigitalOutput(const std::string & sVariableName, const bool bValue)
+	void CDriver_BK9xxx::SetDigitalOutput(const std::string & sVariableName, const bool bValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_SetDigitalOutput(m_pHandle, sVariableName.c_str(), bValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_SetDigitalOutput(m_pHandle, sVariableName.c_str(), bValue, nTimeOutInMs));
 	}
 	
 	/**
 	* CDriver_BK9xxx::SetAnalogOutputRaw - Writes a raw value to an analog output variable. Fails if variable does not exist.
 	* @param[in] sVariableName - Name of variable.
 	* @param[in] nValue - Value to be set.
+	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	void CDriver_BK9xxx::SetAnalogOutputRaw(const std::string & sVariableName, const LibMCDriver_BK9xxx_uint32 nValue)
+	void CDriver_BK9xxx::SetAnalogOutputRaw(const std::string & sVariableName, const LibMCDriver_BK9xxx_uint32 nValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_SetAnalogOutputRaw(m_pHandle, sVariableName.c_str(), nValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_SetAnalogOutputRaw(m_pHandle, sVariableName.c_str(), nValue, nTimeOutInMs));
 	}
 	
 	/**
 	* CDriver_BK9xxx::SetAnalogOutput - Writes a scaled value to an analog output variable. Fails if variable does not exist.
 	* @param[in] sVariableName - Name of variable.
 	* @param[in] dValue - Value to be set.
+	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	void CDriver_BK9xxx::SetAnalogOutput(const std::string & sVariableName, const LibMCDriver_BK9xxx_double dValue)
+	void CDriver_BK9xxx::SetAnalogOutput(const std::string & sVariableName, const LibMCDriver_BK9xxx_double dValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_SetAnalogOutput(m_pHandle, sVariableName.c_str(), dValue));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_BK9xxx_SetAnalogOutput(m_pHandle, sVariableName.c_str(), dValue, nTimeOutInMs));
 	}
 
 } // namespace LibMCDriver_BK9xxx

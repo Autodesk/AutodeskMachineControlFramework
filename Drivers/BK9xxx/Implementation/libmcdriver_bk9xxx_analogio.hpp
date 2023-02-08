@@ -71,7 +71,9 @@ namespace Impl {
 
 			std::string m_sDescription;
 
-			uint32_t m_nRawValue;
+			uint32_t m_nActualRawValue;
+
+			uint32_t m_nTargetRawValue;
 
 			uint32_t m_nRawMin;
 
@@ -90,19 +92,27 @@ namespace Impl {
 
 			virtual ~CDriver_BK9xxx_AnalogIODefinition();
 
-			uint32_t getOffset();
+			uint32_t getOffset() const;
 
-			std::string getName();
+			std::string getName() const;
 
-			std::string getDescription();
+			std::string getDescription() const;
 
-			uint32_t getRawValue();
+			uint32_t getActualRawValue() const;
 
-			void setRawValue(int64_t nRawValue);
+			// Clips value to boundary range
+			// Returns value that has been set as actual.
+			uint32_t setActualRawValue(int64_t nRawValue);
 
-			double getScaledValue();
+			uint32_t getTargetRawValue() const;
 
-			void setScaledValue(double dScaledValue);
+			// Clips value to boundary range
+			// Returns value that has been set as target.
+			uint32_t setTargetRawValue(int64_t nRawValue);
+
+			double rawValueToScaledValue(int64_t nRawValue) const;
+
+			uint32_t scaledValueToRawValue(double dScaledValue) const;
 
 		};
 

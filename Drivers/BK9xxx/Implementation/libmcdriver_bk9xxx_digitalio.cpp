@@ -43,7 +43,7 @@ using namespace LibMCDriver_BK9xxx::Impl;
 
 
 CDriver_BK9xxx_DigitalIODefinition::CDriver_BK9xxx_DigitalIODefinition(pugi::xml_node& xmlNode)
-	: m_nOffset(0), m_bValue(false)
+	: m_nOffset(0), m_bActualValue(false), m_bTargetValue (false)
 {
 
 	auto offsetAttrib = xmlNode.attribute("offset");
@@ -72,29 +72,39 @@ CDriver_BK9xxx_DigitalIODefinition::~CDriver_BK9xxx_DigitalIODefinition()
 
 }
 
-uint32_t CDriver_BK9xxx_DigitalIODefinition::getOffset()
+uint32_t CDriver_BK9xxx_DigitalIODefinition::getOffset() const
 {
 	return m_nOffset;
 }
 
-std::string CDriver_BK9xxx_DigitalIODefinition::getName()
+std::string CDriver_BK9xxx_DigitalIODefinition::getName() const
 {
 	return m_sName;
 }
 
-std::string CDriver_BK9xxx_DigitalIODefinition::getDescription()
+std::string CDriver_BK9xxx_DigitalIODefinition::getDescription() const
 {
 	return m_sDescription;
 }
 
-bool CDriver_BK9xxx_DigitalIODefinition::getValue()
+bool CDriver_BK9xxx_DigitalIODefinition::getActualValue() const
 {
-	return m_bValue;
+	return m_bActualValue;
 }
 
-void CDriver_BK9xxx_DigitalIODefinition::setValue(bool bValue)
+void CDriver_BK9xxx_DigitalIODefinition::setActualValue(bool bValue)
 {
-	m_bValue = bValue;
+	m_bActualValue = bValue;
+}
+
+bool CDriver_BK9xxx_DigitalIODefinition::getTargetValue() const
+{
+	return m_bTargetValue;
+}
+
+void CDriver_BK9xxx_DigitalIODefinition::setTargetValue(bool bValue)
+{
+	m_bTargetValue = bValue;
 }
 
 
@@ -120,9 +130,13 @@ CDriver_BK9xxx_DigitalIODefinitionBlock::CDriver_BK9xxx_DigitalIODefinitionBlock
 	auto digitalIONodes = xmlNode.children(sNodeName.c_str());
 	for (auto digitalIONode : digitalIONodes) {
 		auto pDigitalIO = std::make_shared<CDriver_BK9xxx_DigitalIODefinition>(digitalIONode);
+		if (pDigitalIO->getOffset () >= m_nBitCount)
+			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOOFFSETOUTOFRANGE);
+
 		std::string sName = pDigitalIO->getName();
 		m_IODefinitions.push_back(pDigitalIO);
 		m_IODefinitionMap.insert(std::make_pair(sName, pDigitalIO));
+
 	}
 
 }

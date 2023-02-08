@@ -104,7 +104,7 @@ typedef void * LibMCDriver_BK9xxx_pvoid;
 #define LIBMCDRIVER_BK9XXX_ERROR_COULDNOTLOADLIBRARY 6 /** the library could not be loaded */
 #define LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT 7 /** a required exported symbol could not be found in the library */
 #define LIBMCDRIVER_BK9XXX_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
-#define LIBMCDRIVER_BK9XXX_ERROR_INVALIDSTATENAME 9 /** invalid state name */
+#define LIBMCDRIVER_BK9XXX_ERROR_UNKNOWNEXCEPTION 9 /** an unknown exception occurred */
 #define LIBMCDRIVER_BK9XXX_ERROR_DRIVERERROR 1000 /** a driver error occured */
 #define LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTINITIALISED 1001 /** the driver is not initialised */
 #define LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTCONNECTED 1002 /** the driver is not connected */
@@ -154,6 +154,10 @@ typedef void * LibMCDriver_BK9xxx_pvoid;
 #define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMINVALUE 1046 /** invalid analog io scaled min value */
 #define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMAXVALUE 1047 /** invalid analog io scaled max value */
 #define LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDINTERVAL 1048 /** invalid analog io scaled interval */
+#define LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOOFFSETOUTOFRANGE 1049 /** digital io offset is out of range */
+#define LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOOFFSETOUTOFRANGE 1050 /** analog io offset is out of range */
+#define LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOWRITETIMEOUT 1051 /** digital io write timeout */
+#define LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOWRITETIMEOUT 1052 /** analog io write timeout */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_BK9xxx
@@ -170,7 +174,7 @@ inline const char * LIBMCDRIVER_BK9XXX_GETERRORSTRING (LibMCDriver_BK9xxxResult 
     case LIBMCDRIVER_BK9XXX_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
     case LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBMCDRIVER_BK9XXX_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
-    case LIBMCDRIVER_BK9XXX_ERROR_INVALIDSTATENAME: return "invalid state name";
+    case LIBMCDRIVER_BK9XXX_ERROR_UNKNOWNEXCEPTION: return "an unknown exception occurred";
     case LIBMCDRIVER_BK9XXX_ERROR_DRIVERERROR: return "a driver error occured";
     case LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
     case LIBMCDRIVER_BK9XXX_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
@@ -220,6 +224,10 @@ inline const char * LIBMCDRIVER_BK9XXX_GETERRORSTRING (LibMCDriver_BK9xxxResult 
     case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMINVALUE: return "invalid analog io scaled min value";
     case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDMAXVALUE: return "invalid analog io scaled max value";
     case LIBMCDRIVER_BK9XXX_ERROR_INVALIDANALOGIOSCALEDINTERVAL: return "invalid analog io scaled interval";
+    case LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOOFFSETOUTOFRANGE: return "digital io offset is out of range";
+    case LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOOFFSETOUTOFRANGE: return "analog io offset is out of range";
+    case LIBMCDRIVER_BK9XXX_ERROR_DIGITALIOWRITETIMEOUT: return "digital io write timeout";
+    case LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOWRITETIMEOUT: return "analog io write timeout";
     default: return "unknown error";
   }
 }

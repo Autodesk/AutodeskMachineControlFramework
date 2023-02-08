@@ -368,9 +368,10 @@ typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_GetAnalogOut
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
 * @param[in] pVariableName - Name of variable.
 * @param[in] bValue - Value to be set.
+* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetDigitalOutputPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, bool bValue);
+typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetDigitalOutputPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, bool bValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
 
 /**
 * Writes a raw value to an analog output variable. Fails if variable does not exist.
@@ -378,9 +379,10 @@ typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetDigitalOu
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
 * @param[in] pVariableName - Name of variable.
 * @param[in] nValue - Value to be set.
+* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetAnalogOutputRawPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_uint32 nValue);
+typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetAnalogOutputRawPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_uint32 nValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
 
 /**
 * Writes a scaled value to an analog output variable. Fails if variable does not exist.
@@ -388,9 +390,10 @@ typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetAnalogOut
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
 * @param[in] pVariableName - Name of variable.
 * @param[in] dValue - Value to be set.
+* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetAnalogOutputPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_double dValue);
+typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_BK9xxx_SetAnalogOutputPtr) (LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_double dValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
 
 /*************************************************************************************************************************
  Global functions

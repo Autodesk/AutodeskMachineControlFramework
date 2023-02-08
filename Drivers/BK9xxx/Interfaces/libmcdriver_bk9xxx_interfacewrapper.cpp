@@ -1047,7 +1047,7 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_getanalogoutput(LibMCD
 	}
 }
 
-LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setdigitaloutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, bool bValue)
+LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setdigitaloutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, bool bValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_BK9xxx;
 
@@ -1059,7 +1059,7 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setdigitaloutput(LibMC
 		if (!pIDriver_BK9xxx)
 			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDCAST);
 		
-		pIDriver_BK9xxx->SetDigitalOutput(sVariableName, bValue);
+		pIDriver_BK9xxx->SetDigitalOutput(sVariableName, bValue, nTimeOutInMs);
 
 		return LIBMCDRIVER_BK9XXX_SUCCESS;
 	}
@@ -1074,7 +1074,7 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setdigitaloutput(LibMC
 	}
 }
 
-LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutputraw(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_uint32 nValue)
+LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutputraw(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_uint32 nValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_BK9xxx;
 
@@ -1086,7 +1086,7 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutputraw(Lib
 		if (!pIDriver_BK9xxx)
 			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDCAST);
 		
-		pIDriver_BK9xxx->SetAnalogOutputRaw(sVariableName, nValue);
+		pIDriver_BK9xxx->SetAnalogOutputRaw(sVariableName, nValue, nTimeOutInMs);
 
 		return LIBMCDRIVER_BK9XXX_SUCCESS;
 	}
@@ -1101,7 +1101,7 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutputraw(Lib
 	}
 }
 
-LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_double dValue)
+LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_double dValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_BK9xxx;
 
@@ -1113,7 +1113,7 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutput(LibMCD
 		if (!pIDriver_BK9xxx)
 			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDCAST);
 		
-		pIDriver_BK9xxx->SetAnalogOutput(sVariableName, dValue);
+		pIDriver_BK9xxx->SetAnalogOutput(sVariableName, dValue, nTimeOutInMs);
 
 		return LIBMCDRIVER_BK9XXX_SUCCESS;
 	}

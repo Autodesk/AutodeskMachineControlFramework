@@ -48,7 +48,7 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
-		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
+		<error name="UNKNOWNEXCEPTION" code="9" description="an unknown exception occurred" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
 		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
@@ -101,16 +101,10 @@
 		<error name="INVALIDANALOGIOSCALEDMINVALUE" code="1046" description="invalid analog io scaled min value" />
 		<error name="INVALIDANALOGIOSCALEDMAXVALUE" code="1047" description="invalid analog io scaled max value" />
 		<error name="INVALIDANALOGIOSCALEDINTERVAL" code="1048" description="invalid analog io scaled interval" />
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		<error name="DIGITALIOOFFSETOUTOFRANGE" code="1049" description="digital io offset is out of range" />
+		<error name="ANALOGIOOFFSETOUTOFRANGE" code="1050" description="analog io offset is out of range" />
+		<error name="DIGITALIOWRITETIMEOUT" code="1051" description="digital io write timeout" />
+		<error name="ANALOGIOWRITETIMEOUT" code="1052" description="analog io write timeout" />
 		
 								
 	</errors>
@@ -305,16 +299,19 @@ Custom implementation
 		<method name="SetDigitalOutput" description="Writes a value to a digital output variable. Fails if variable does not exist.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
 			<param name="Value" type="bool" pass="in" description="Value to be set." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
 		</method>		
 
 		<method name="SetAnalogOutputRaw" description="Writes a raw value to an analog output variable. Fails if variable does not exist.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
 			<param name="Value" type="uint32" pass="in" description="Value to be set." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
 		</method>		
 
 		<method name="SetAnalogOutput" description="Writes a scaled value to an analog output variable. Fails if variable does not exist.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
 			<param name="Value" type="double" pass="in" description="Value to be set." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
 		</method>		
 
 

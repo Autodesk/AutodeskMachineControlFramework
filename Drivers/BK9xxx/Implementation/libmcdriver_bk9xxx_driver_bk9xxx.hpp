@@ -49,7 +49,7 @@ Abstract: This is the class declaration of CDriver_BK9xxx
 #include <set>
 
 #include "pugixml.hpp"
-
+#include <mutex>
 #include "libmcdriver_bk9xxx_digitalio.hpp"
 #include "libmcdriver_bk9xxx_analogio.hpp"
 
@@ -62,6 +62,23 @@ namespace LibMCDriver_BK9xxx {
 		/*************************************************************************************************************************
 		 Class declaration of CDriver_BK9xxx
 		**************************************************************************************************************************/
+
+		class CDriver_BK9xxxThreadState {
+		public:
+			std::mutex m_ModBusConnectionMutex;
+			std::atomic<bool> m_ModBusConnectionThreadShallFinish;
+			LibMCEnv::PModbusTCPConnection m_pModBusTCPConnection;
+			std::vector<std::pair<uint32_t, std::string>> m_Exceptions;
+
+			CDriver_BK9xxxThreadState (LibMCEnv::PModbusTCPConnection pModBusTCPConnection);
+			virtual ~CDriver_BK9xxxThreadState();
+
+			void disconnect();
+			bool isConnected();
+
+			void handleException(uint32_t nErrorCode, const std::string & sMessage);
+
+		};
 
 		class CDriver_BK9xxx : public virtual IDriver_BK9xxx, public virtual CDriver {
 		protected:
@@ -78,7 +95,11 @@ namespace LibMCDriver_BK9xxx {
 			uint32_t m_nPatchVersion;
 
 			LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
-			LibMCEnv::PModbusTCPConnection m_pModBusTCPConnection;
+
+			std::thread m_ModBusConnectionThread;
+			std::shared_ptr<CDriver_BK9xxxThreadState> m_ModBusConnectionThreadState;
+			
+			
 
 			std::set<std::string> m_ReservedNames;
 			std::vector<PDriver_BK9xxx_DigitalInputsDefinition> m_pDigitalInputBlocks;
@@ -157,11 +178,11 @@ namespace LibMCDriver_BK9xxx {
 
 			LibMCDriver_BK9xxx_double GetAnalogOutput(const std::string& sVariableName) override;
 
-			void SetDigitalOutput(const std::string& sVariableName, const bool bValue) override;
+			void SetDigitalOutput(const std::string& sVariableName, const bool bValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) override;
 
-			void SetAnalogOutputRaw(const std::string& sVariableName, const LibMCDriver_BK9xxx_uint32 nValue) override;
+			void SetAnalogOutputRaw(const std::string& sVariableName, const LibMCDriver_BK9xxx_uint32 nValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) override;
 
-			void SetAnalogOutput(const std::string& sVariableName, const LibMCDriver_BK9xxx_double dValue) override;
+			void SetAnalogOutput(const std::string& sVariableName, const LibMCDriver_BK9xxx_double dValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) override;
 
 		};
 

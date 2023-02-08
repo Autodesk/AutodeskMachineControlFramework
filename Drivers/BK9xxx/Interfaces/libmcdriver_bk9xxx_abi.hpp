@@ -381,9 +381,10 @@ LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_b
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
 * @param[in] pVariableName - Name of variable.
 * @param[in] bValue - Value to be set.
+* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setdigitaloutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, bool bValue);
+LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setdigitaloutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, bool bValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
 
 /**
 * Writes a raw value to an analog output variable. Fails if variable does not exist.
@@ -391,9 +392,10 @@ LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_b
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
 * @param[in] pVariableName - Name of variable.
 * @param[in] nValue - Value to be set.
+* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutputraw(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_uint32 nValue);
+LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutputraw(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_uint32 nValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
 
 /**
 * Writes a scaled value to an analog output variable. Fails if variable does not exist.
@@ -401,9 +403,10 @@ LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_b
 * @param[in] pDriver_BK9xxx - Driver_BK9xxx instance.
 * @param[in] pVariableName - Name of variable.
 * @param[in] dValue - Value to be set.
+* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_double dValue);
+LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_bk9xxx_setanalogoutput(LibMCDriver_BK9xxx_Driver_BK9xxx pDriver_BK9xxx, const char * pVariableName, LibMCDriver_BK9xxx_double dValue, LibMCDriver_BK9xxx_uint32 nTimeOutInMs);
 
 /*************************************************************************************************************************
  Global functions

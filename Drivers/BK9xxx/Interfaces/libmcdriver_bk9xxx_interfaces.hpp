@@ -481,22 +481,25 @@ public:
 	* IDriver_BK9xxx::SetDigitalOutput - Writes a value to a digital output variable. Fails if variable does not exist.
 	* @param[in] sVariableName - Name of variable.
 	* @param[in] bValue - Value to be set.
+	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	virtual void SetDigitalOutput(const std::string & sVariableName, const bool bValue) = 0;
+	virtual void SetDigitalOutput(const std::string & sVariableName, const bool bValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) = 0;
 
 	/**
 	* IDriver_BK9xxx::SetAnalogOutputRaw - Writes a raw value to an analog output variable. Fails if variable does not exist.
 	* @param[in] sVariableName - Name of variable.
 	* @param[in] nValue - Value to be set.
+	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	virtual void SetAnalogOutputRaw(const std::string & sVariableName, const LibMCDriver_BK9xxx_uint32 nValue) = 0;
+	virtual void SetAnalogOutputRaw(const std::string & sVariableName, const LibMCDriver_BK9xxx_uint32 nValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) = 0;
 
 	/**
 	* IDriver_BK9xxx::SetAnalogOutput - Writes a scaled value to an analog output variable. Fails if variable does not exist.
 	* @param[in] sVariableName - Name of variable.
 	* @param[in] dValue - Value to be set.
+	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	virtual void SetAnalogOutput(const std::string & sVariableName, const LibMCDriver_BK9xxx_double dValue) = 0;
+	virtual void SetAnalogOutput(const std::string & sVariableName, const LibMCDriver_BK9xxx_double dValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) = 0;
 
 };
 

@@ -215,7 +215,7 @@ namespace LibMCEnv {
 
             coilStatus.resize(nBitCount);
             uint32_t nByteCount = modBusResponse.m_PayloadData[0];
-            if (nPayloadSize + 1 != nByteCount)
+            if (nPayloadSize != (nByteCount + 1))
                 throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE);
 
             for (uint32_t nByteIndex = 0; nByteIndex < nByteCount; nByteIndex++) {
@@ -355,7 +355,7 @@ namespace LibMCEnv {
 
 
 
-        void CModbusTCPConnectionInstance::forceMultipleCoils(uint16_t nStartAddress, std::vector<bool> coilStatus)
+        void CModbusTCPConnectionInstance::forceMultipleCoils(uint16_t nStartAddress, const std::vector<uint8_t>& coilStatus)
         {
             if (coilStatus.size() > MODBUSTCP_MAX_COILCOUNT)
                 throw std::runtime_error("modbus tcp invalid coil count");
