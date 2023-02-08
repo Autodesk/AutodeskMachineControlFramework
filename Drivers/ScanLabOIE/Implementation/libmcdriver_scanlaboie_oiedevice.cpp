@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of COIEDevice
 */
 
 #include "libmcdriver_scanlaboie_oiedevice.hpp"
+#include "libmcdriver_scanlaboie_datarecording.hpp"
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
 
 #include <array>
@@ -345,6 +346,11 @@ bool checkIniKey(const std::string & sLine, const std::string & sKey)
 
 void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount)
 {
+	if (nRTCSignalCount == 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCSIGNALCOUNT);
+	if (nSensorSignalCount == 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORSIGNALCOUNT);
+
 	ensureConnectivity();
 
 	if (sName.empty())
@@ -405,7 +411,7 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 
 	{
 		std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
-		m_pCurrentDataRecording = std::make_shared<CDataRecording>(nRTCSignalCount + nSensorSignalCount, 1024);
+		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(nRTCSignalCount + nSensorSignalCount, nRTCSignalCount, 1024);
 	}
 
 }
@@ -641,6 +647,53 @@ std::vector<uint8_t>& COIEDeviceInstance::getRTC6CorrectionData()
 	return m_RTC6CorrectionData;
 }
 
+PDataRecordingInstance COIEDeviceInstance::RetrieveCurrentRecording()
+{
+	PDataRecordingInstance pRecordingInstance = nullptr;
+	{
+		std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
+
+		if (m_pCurrentDataRecording.get() != nullptr) {
+
+			pRecordingInstance = m_pCurrentDataRecording;
+
+			clearCurrentRecordingUnderMutex();
+		}
+		else {
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE);
+		}
+	}
+
+	return pRecordingInstance;
+
+}
+
+void COIEDeviceInstance::clearCurrentRecordingUnderMutex()
+{
+	if (m_pCurrentDataRecording.get() != nullptr) {
+		uint32_t nValuesPerRecord = m_pCurrentDataRecording->getValuesPerRecord();
+		uint32_t nBufferSizeInRecords = m_pCurrentDataRecording->getBufferSizeInRecords();
+		uint32_t nRTCValuesPerRecord = m_pCurrentDataRecording->getRTCValuesPerRecord();
+		m_pCurrentDataRecording = nullptr;
+
+		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(nValuesPerRecord, nRTCValuesPerRecord, nBufferSizeInRecords);
+	}
+
+}
+
+
+void COIEDeviceInstance::ClearCurrentRecording()
+{
+	std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
+	clearCurrentRecordingUnderMutex();
+}
+
+PDataRecordingInstance COIEDeviceInstance::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+
+
 COIEDevice::COIEDevice(POIEDeviceInstance pDeviceInstance)
 {
 	if (pDeviceInstance.get() == nullptr)
@@ -837,4 +890,21 @@ void COIEDevice::UninstallAppByMinorVersion(const std::string & sName, const Lib
 void COIEDevice::RefreshAppList()
 {
 	lockInstance()->RefreshAppList();
+}
+
+IDataRecording* COIEDevice::RetrieveCurrentRecording()
+{
+	auto pRecordingInstance = lockInstance()->RetrieveCurrentRecording();
+	return new CDataRecording (pRecordingInstance);
+}
+
+void COIEDevice::ClearCurrentRecording()
+{
+	lockInstance()->ClearCurrentRecording();
+}
+
+IDataRecording* COIEDevice::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
+{
+	auto pRecordingInstance = lockInstance()->LoadRecordingFromBuild(pBuild, sDataUUID);
+	return new CDataRecording(pRecordingInstance);
 }

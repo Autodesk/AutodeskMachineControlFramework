@@ -27,69 +27,26 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is a stub class definition of CDeviceConfiguration
+Abstract: This is a stub class definition of CDataRecording
 
 */
 
 #include "libmcdriver_scanlaboie_datarecording.hpp"
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
 
-#include <stdexcept>
+// Include custom headers here.
+
 using namespace LibMCDriver_ScanLabOIE::Impl;
 
-#define DATARECORDING_MINBUFFERSIZEINVALUES 256
-#define DATARECORDING_MINBUFFERSIZEINPACKETS 256
-#define DATARECORDING_MAXBUFFERSIZEINPACKETS (1024 * 1024)
+/*************************************************************************************************************************
+ Class definition of CDataRecording 
+**************************************************************************************************************************/
 
-#include <iostream>
-#include <cstring>
-
-CDataRecordingBuffer::CDataRecordingBuffer(size_t nBufferSizeInValues)
-    : m_nCurrentPosition(0)
+CDataRecording::CDataRecording(PDataRecordingInstance pDataRecordingInstance)
+	: m_pDataRecordingInstance (pDataRecordingInstance)
 {
-    m_RawData.resize(nBufferSizeInValues);
-}
-
-CDataRecordingBuffer::~CDataRecordingBuffer()
-{
-
-}
-
-bool CDataRecordingBuffer::hasSpace(size_t nValueCount)
-{
-    if (nValueCount == 0)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
-
-    return (m_nCurrentPosition + nValueCount) <= m_RawData.size();
-}
-
-int32_t* CDataRecordingBuffer::allocData(size_t nValueCount)
-{
-    if (nValueCount == 0)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
-    if ((m_nCurrentPosition + nValueCount) > m_RawData.size())
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFEROVERFLOW);
-
-    int32_t * pData = &m_RawData.at(m_nCurrentPosition);
-    m_nCurrentPosition += nValueCount;
-
-    return pData;
-
-}
-
-
-CDataRecording::CDataRecording(uint32_t nValuesPerPacket, uint32_t nBufferSizeInPackets)
-    : m_nValuesPerPacket (nValuesPerPacket), m_nBufferSizeInPackets (nBufferSizeInPackets)
-{
-    if (nValuesPerPacket <= 0)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERPACKET);
-    if (nBufferSizeInPackets < DATARECORDING_MINBUFFERSIZEINPACKETS)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE);
-    if (nBufferSizeInPackets > DATARECORDING_MAXBUFFERSIZEINPACKETS)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE);
-
-    m_nValueCountPerBuffer = (size_t)nValuesPerPacket * (size_t)nBufferSizeInPackets;
-    memset((void*)&m_CurrentEntry, 0, sizeof(m_CurrentEntry));
+	if (pDataRecordingInstance.get() == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
 }
 
 CDataRecording::~CDataRecording()
@@ -97,73 +54,62 @@ CDataRecording::~CDataRecording()
 
 }
 
-void CDataRecording::startRecord(uint32_t nPacketNumber, double dX, double dY)
-{
-    if (m_pCurrentBuffer.get() == nullptr) {
-        m_pCurrentBuffer = std::make_shared<CDataRecordingBuffer>(m_nValueCountPerBuffer);
-        m_Buffers.push_back(m_pCurrentBuffer);
-    }
-    
-    m_CurrentEntry.m_dX = dX;
-    m_CurrentEntry.m_dY = dY;
-    m_CurrentEntry.m_nPacketNumber = nPacketNumber;
-    m_CurrentEntry.m_pData = m_pCurrentBuffer->allocData (m_nValuesPerPacket);
-    m_nCurrentEntryDataIndex = 0;
 
-    // If buffer is full, alloc a new buffer the next iteration
-    if (!m_pCurrentBuffer->hasSpace(m_nValuesPerPacket))
-        m_pCurrentBuffer = nullptr;
+LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRTCSignalCount()
+{
+	return m_pDataRecordingInstance->getRTCValuesPerRecord();
 }
 
-void CDataRecording::recordValue(int32_t nValue)
+LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetSensorSignalCount()
 {
-    if (m_nCurrentEntryDataIndex >= m_nValuesPerPacket) 
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_TOOMANYVALUESINPACKET);
-    if (m_CurrentEntry.m_pData == nullptr)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_PACKETISNOTRECORDING);
-
-    m_CurrentEntry.m_pData[m_nCurrentEntryDataIndex] = nValue;
-    m_nCurrentEntryDataIndex++;
-
+	return m_pDataRecordingInstance->getSensorValuesPerRecord();
 }
 
-void CDataRecording::finishRecord()
+LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRecordCount()
 {
-    //std::cout << "finishing record: " << m_nCurrentEntryDataIndex << " of " << m_nValuesPerPacket << std::endl;
-
-    //if (m_nCurrentEntryDataIndex < m_nValuesPerPacket)
-        //throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTENOUGHVALUESINPACKET);
-    if (m_CurrentEntry.m_pData == nullptr)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_PACKETISNOTRECORDING);
-
-    m_Entries.push_back(m_CurrentEntry);
-    m_CurrentEntry.m_pData = nullptr;
+	return m_pDataRecordingInstance->getRecordCount();
 }
 
-size_t CDataRecording::getRecordCount()
+void CDataRecording::GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY)
 {
-    return m_Entries.size();
+	auto pRecord = m_pDataRecordingInstance->getRecord(nIndex);
+	nPacketNumber = pRecord->m_nPacketNumber;
+	dX = pRecord->m_dX;
+	dY = pRecord->m_dY;
 }
 
-
-void CDataRecording::writeToFile(const std::string& sFileName)
+void CDataRecording::GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nRTCSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pRTCSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pRTCSignalsBuffer)
 {
-    std::ofstream fStream;
-    fStream.open (sFileName);
-    if (!fStream.is_open())
-        throw std::runtime_error ("could not write file");
-
-    fStream << "packet number, X, Y, value 0, value 1, ...." << std::endl;
-
-    for (auto & entry : m_Entries) {
-        fStream << entry.m_nPacketNumber << ", " << entry.m_dX << ", " << entry.m_dY;
-        for (uint32_t nIndex = 0; nIndex < m_nValuesPerPacket; nIndex++)
-            fStream << ", " << entry.m_pData[nIndex];
-
-        fStream << std::endl;
-
-    }
-
-
-    fStream.close();
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
 }
+
+void CDataRecording::GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nSensorSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSensorSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSensorSignalsBuffer)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+
+void CDataRecording::GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pXArrayNeededCount, LibMCDriver_ScanLabOIE_double * pXArrayBuffer, LibMCDriver_ScanLabOIE_uint64 nYArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pYArrayNeededCount, LibMCDriver_ScanLabOIE_double * pYArrayBuffer)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+
+void CDataRecording::GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+
+void CDataRecording::GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+
+void CDataRecording::GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+
+std::string CDataRecording::StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+

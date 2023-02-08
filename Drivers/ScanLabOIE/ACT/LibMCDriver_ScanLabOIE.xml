@@ -80,12 +80,19 @@
 		<error name="DEVICEISALREADYEXISTING" code="1024" description="Device is already existing." />	
 		<error name="EMPTYDEVICENAME" code="1025" description="Empty device name." />	
 		
-		<error name="INVALIDVALUESPERPACKET" code="1026" description="Invalid values per packet." />	
+		<error name="INVALIDVALUESPERRECORD" code="1026" description="Invalid values per record." />	
 		<error name="INVALIDBUFFERSIZE" code="1027" description="Invalid buffer size." />	
 		<error name="PACKETISNOTRECORDING" code="1028" description="Packet is not recording." />	
 		<error name="TOOMANYVALUESINPACKET" code="1029" description="Too many values in packet." />	
 		<error name="NOTENOUGHVALUESINPACKET" code="1030" description="Not enough values in packet." />	
 		<error name="BUFFEROVERFLOW" code="1031" description="Buffer overflow." />	
+		<error name="INVALIDRTCSIGNALCOUNT" code="1032" description="Invalid RTC signal count." />	
+		<error name="INVALIDSENSORSIGNALCOUNT" code="1033" description="Invalid Sensor signal count." />	
+		<error name="NODATARECORDINGAVAILABLE" code="1034" description="No data recording available." />	
+		<error name="INVALIDRTCVALUESPERRECORD" code="1035" description="Invalid RTC values per record." />	
+		<error name="INVALIDRECORDINDEX" code="1036" description="Invalid record index." />	
+		
+		
 		
 
 	</errors>
@@ -149,6 +156,94 @@ End Interface
 Custom implementation
 
 -->
+	<class name="DeviceConfiguration" parent="Base" description="An object holding a OIE device configuration">
+	
+		<method name="GetDeviceType" description="Returns if the device is configured to work with an RTC5 or RTC6 card.">
+			<param name="DeviceType" type="enum" class="RTCDeviceType" pass="return" description="Configured device Type" />
+		</method>	
+	
+		<method name="GetRTCSignalCount" description="Returns the configured RTC signal count of the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="RTC Signal Count" />
+		</method>	
+
+		<method name="GetSensorSignalCount" description="Returns the configured Sensor signal count of the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
+		</method>	
+		
+		<method name="GetRTCSignalIDs" description="Returns the configured RTC signal IDs of the configuration.">
+			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="RTC Signal IDs" />
+		</method>	
+
+		<method name="GetSensorSignalIDs" description="Returns the configured Sensor signal IDs of the configuration.">
+			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="Sensor Signal IDs" />
+		</method>	
+
+		<method name="GetDeviceConfigurationString" description="Returns the device configuration string.">
+			<param name="DeviceConfigurationString" type="string" pass="return" description="Device configuration string." />
+		</method>	
+
+	</class>
+
+
+	<class name="DataRecording" parent="Base" description="An object holding the content of a recording session recording.">
+		
+		<method name="GetRTCSignalCount" description="Returns the configured RTC signal count of the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="RTC Signal Count" />
+		</method>	
+
+		<method name="GetSensorSignalCount" description="Returns the configured Sensor signal count of the configuration.">
+			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
+		</method>	
+		
+		<method name="GetRecordCount" description="Returns the number of records in the recording.">
+			<param name="Record" type="uint32" pass="return" description="Number of records in the recording" />
+		</method>	
+
+		<method name="GetRecordInformation" description="Returns the information about a specific record.">
+			<param name="Index" type="uint32" pass="in" description="Index of the record. 0-based. MUST be smaller than RecordCount." />
+			<param name="PacketNumber" type="uint32" pass="out" description="Packet Number of the record." />
+			<param name="X" type="double" pass="out" description="X Coordinate of the record." />
+			<param name="Y" type="double" pass="out" description="Y Coordinate of the record." />
+		</method>	
+
+		<method name="GetRTCSignalsOfRecord" description="Returns the RTC signals of a specific record.">
+			<param name="Index" type="uint32" pass="in" description="Index of the record. 0-based. MUST be smaller than RecordCount." />
+			<param name="RTCSignals" type="basicarray" class="int32" pass="out" description="Recorded RTC Signals" />
+		</method>	
+
+		<method name="GetSensorSignalsOfRecord" description="Returns the sensor signals of a specific record.">
+			<param name="Index" type="uint32" pass="in" description="Index of the record. 0-based. MUST be smaller than RecordCount." />
+			<param name="SensorSignals" type="basicarray" class="int32" pass="out" description="Recorded Sensor Signals" />
+		</method>	
+		
+		<method name="GetAllCoordinates" description="Returns an array of all coordinates.">
+			<param name="XArray" type="basicarray" class="double" pass="out" description="Array of X Coordinates of all records." />
+			<param name="YArray" type="basicarray" class="double" pass="out" description="Array of Y Coordinates of all records." />
+		</method>	
+		
+		<method name="GetAllPacketNumbers" description="Returns an array of all packet numbers.">
+			<param name="PacketNumers" type="basicarray" class="uint32" pass="out" description="Array of Packet Numbers of all records." />
+		</method>	
+
+		<method name="GetAllRTCSignals" description="Returns an array of all RTC signals of a specific index.">
+			<param name="RTCIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount." />
+			<param name="Signals" type="basicarray" class="int32" pass="out" description="Array of the Indexed Sensor Signal of all records." />
+		</method>	
+
+		<method name="GetAllSensorSignals" description="Returns an array of all sensor signals of a specific index.">
+			<param name="SignalIndex" type="uint32" pass="in" description="Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount." />
+			<param name="Signals" type="basicarray" class="int32" pass="out" description="Array of the Indexed RTC Signal of all records." />
+		</method>	
+		
+		<method name="StoreAsBuildData" description="Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.">
+			<param name="Name" type="string" pass="in" description="Name of the recording to be stored." />
+			<param name="Build" type="class" class="LibMCEnv:Build" pass="in" description="Build that should store the data." />
+			<param name="DataUUID" type="string" pass="return" description="Data UUID of the build data." />
+		</method>	
+		
+
+	</class>
+
 
 	<class name="OIEDevice" parent="Base" description="An attached device of the Open Interface Extension.">
 
@@ -220,7 +315,7 @@ Custom implementation
 			<param name="CorrectionData" type="basicarray" class="uint8"  pass="in" description="Patch version of the app." />
 		</method>		
 		
-		<method name="StartAppByName" description="Starts an app by its name. Fails if an app is already running.">
+		<method name="StartAppByName" description="Starts an app by its name. Fails if an app is already running. Starts recording of signals.">
 			<param name="Name" type="string" pass="in" description="Name of app to be started." />
 			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
@@ -243,7 +338,7 @@ Custom implementation
 			<param name="DeviceConfig" type="class" class="DeviceConfiguration" pass="in" description="Device configuration instance." />
 		</method>
 
-		<method name="StopApp" description="Stops the currently running app. Does nothing if no app is running.">
+		<method name="StopApp" description="Stops the currently running app. Does nothing if no app is running. Stops recording of signals.">
 		</method>
 		
 		<method name="AppIsRunning" description="Returns if the device is running an app.">
@@ -279,38 +374,23 @@ Custom implementation
 			<param name="MajorVersion" type="uint32" pass="in" description="Major version of app to be uninstalled." />
 			<param name="MinorVersion" type="uint32" pass="in" description="Minor version of app to be uninstalled." />
 		</method>
+
+		<method name="RetrieveCurrentRecording" description="Retrieves a copy of the current recording DataRecording Instance and continues recording into a new empty instance.">
+			<param name="RecordingInstance" type="class" class="DataRecording" pass="return" description="Recording instance" />
+		</method>
+		
+		<method name="ClearCurrentRecording" description="Clears the current recording data and continues recording into a new empty instance.">
+		</method>
+		
+		<method name="LoadRecordingFromBuild" description="Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.">
+			<param name="Build" type="class" class="LibMCEnv:Build" pass="in" description="Build that contains the data." />
+			<param name="DataUUID" type="string" pass="in" description="Data UUID of the build data." />
+			<param name="RecordingInstance" type="class" class="DataRecording" pass="return" description="Recording instance" />
+		</method>
 		
 	</class>
 	
 	
-	<class name="DeviceConfiguration" parent="Base" description="An object holding a OIE device configuration">
-	
-		<method name="GetDeviceType" description="Returns if the device is configured to work with an RTC5 or RTC6 card.">
-			<param name="DeviceType" type="enum" class="RTCDeviceType" pass="return" description="Configured device Type" />
-		</method>	
-	
-		<method name="GetRTCSignalCount" description="Returns the configured RTC signal count the configuration.">
-			<param name="SignalCount" type="uint32" pass="return" description="RTC Signal Count" />
-		</method>	
-
-		<method name="GetSensorSignalCount" description="Returns the configured Sensor signal count the configuration.">
-			<param name="SignalCount" type="uint32" pass="return" description="Sensor Signal Count" />
-		</method>	
-		
-		<method name="GetRTCSignalIDs" description="Returns the configured RTC signal IDs of the configuration.">
-			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="RTC Signal IDs" />
-		</method>	
-
-		<method name="GetSensorSignalIDs" description="Returns the configured Sensor signal IDs of the configuration.">
-			<param name="SignalIDs" type="basicarray" class="uint32" pass="out" description="Sensor Signal IDs" />
-		</method>	
-
-		<method name="GetDeviceConfigurationString" description="Returns the device configuration string.">
-			<param name="DeviceConfigurationString" type="string" pass="return" description="Device configuration string." />
-		</method>	
-
-	</class>
-
 
 
 	<class name="Driver_ScanLab_OIE" parent="Driver" description="A Driver for the ScanLab OIE Extension.">

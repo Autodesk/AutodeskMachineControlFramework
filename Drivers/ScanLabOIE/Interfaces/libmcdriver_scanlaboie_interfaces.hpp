@@ -57,8 +57,9 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
-class IOIEDevice;
 class IDeviceConfiguration;
+class IDataRecording;
+class IOIEDevice;
 class IDriver_ScanLab_OIE;
 
 
@@ -312,6 +313,158 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
+ Class interface for DeviceConfiguration 
+**************************************************************************************************************************/
+
+class IDeviceConfiguration : public virtual IBase {
+public:
+	/**
+	* IDeviceConfiguration::GetDeviceType - Returns if the device is configured to work with an RTC5 or RTC6 card.
+	* @return Configured device Type
+	*/
+	virtual LibMCDriver_ScanLabOIE::eRTCDeviceType GetDeviceType() = 0;
+
+	/**
+	* IDeviceConfiguration::GetRTCSignalCount - Returns the configured RTC signal count of the configuration.
+	* @return RTC Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount() = 0;
+
+	/**
+	* IDeviceConfiguration::GetSensorSignalCount - Returns the configured Sensor signal count of the configuration.
+	* @return Sensor Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() = 0;
+
+	/**
+	* IDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
+	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSignalIDsBuffer - uint32 buffer of RTC Signal IDs
+	*/
+	virtual void GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
+
+	/**
+	* IDeviceConfiguration::GetSensorSignalIDs - Returns the configured Sensor signal IDs of the configuration.
+	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
+	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSignalIDsBuffer - uint32 buffer of Sensor Signal IDs
+	*/
+	virtual void GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
+
+	/**
+	* IDeviceConfiguration::GetDeviceConfigurationString - Returns the device configuration string.
+	* @return Device configuration string.
+	*/
+	virtual std::string GetDeviceConfigurationString() = 0;
+
+};
+
+typedef IBaseSharedPtr<IDeviceConfiguration> PIDeviceConfiguration;
+
+
+/*************************************************************************************************************************
+ Class interface for DataRecording 
+**************************************************************************************************************************/
+
+class IDataRecording : public virtual IBase {
+public:
+	/**
+	* IDataRecording::GetRTCSignalCount - Returns the configured RTC signal count of the configuration.
+	* @return RTC Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount() = 0;
+
+	/**
+	* IDataRecording::GetSensorSignalCount - Returns the configured Sensor signal count of the configuration.
+	* @return Sensor Signal Count
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() = 0;
+
+	/**
+	* IDataRecording::GetRecordCount - Returns the number of records in the recording.
+	* @return Number of records in the recording
+	*/
+	virtual LibMCDriver_ScanLabOIE_uint32 GetRecordCount() = 0;
+
+	/**
+	* IDataRecording::GetRecordInformation - Returns the information about a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[out] nPacketNumber - Packet Number of the record.
+	* @param[out] dX - X Coordinate of the record.
+	* @param[out] dY - Y Coordinate of the record.
+	*/
+	virtual void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY) = 0;
+
+	/**
+	* IDataRecording::GetRTCSignalsOfRecord - Returns the RTC signals of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[in] nRTCSignalsBufferSize - Number of elements in buffer
+	* @param[out] pRTCSignalsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pRTCSignalsBuffer - int32 buffer of Recorded RTC Signals
+	*/
+	virtual void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nRTCSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pRTCSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pRTCSignalsBuffer) = 0;
+
+	/**
+	* IDataRecording::GetSensorSignalsOfRecord - Returns the sensor signals of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[in] nSensorSignalsBufferSize - Number of elements in buffer
+	* @param[out] pSensorSignalsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSensorSignalsBuffer - int32 buffer of Recorded Sensor Signals
+	*/
+	virtual void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nSensorSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSensorSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSensorSignalsBuffer) = 0;
+
+	/**
+	* IDataRecording::GetAllCoordinates - Returns an array of all coordinates.
+	* @param[in] nXArrayBufferSize - Number of elements in buffer
+	* @param[out] pXArrayNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pXArrayBuffer - double buffer of Array of X Coordinates of all records.
+	* @param[in] nYArrayBufferSize - Number of elements in buffer
+	* @param[out] pYArrayNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pYArrayBuffer - double buffer of Array of Y Coordinates of all records.
+	*/
+	virtual void GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pXArrayNeededCount, LibMCDriver_ScanLabOIE_double * pXArrayBuffer, LibMCDriver_ScanLabOIE_uint64 nYArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pYArrayNeededCount, LibMCDriver_ScanLabOIE_double * pYArrayBuffer) = 0;
+
+	/**
+	* IDataRecording::GetAllPacketNumbers - Returns an array of all packet numbers.
+	* @param[in] nPacketNumersBufferSize - Number of elements in buffer
+	* @param[out] pPacketNumersNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pPacketNumersBuffer - uint32 buffer of Array of Packet Numbers of all records.
+	*/
+	virtual void GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer) = 0;
+
+	/**
+	* IDataRecording::GetAllRTCSignals - Returns an array of all RTC signals of a specific index.
+	* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+	* @param[in] nSignalsBufferSize - Number of elements in buffer
+	* @param[out] pSignalsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSignalsBuffer - int32 buffer of Array of the Indexed Sensor Signal of all records.
+	*/
+	virtual void GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) = 0;
+
+	/**
+	* IDataRecording::GetAllSensorSignals - Returns an array of all sensor signals of a specific index.
+	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+	* @param[in] nSignalsBufferSize - Number of elements in buffer
+	* @param[out] pSignalsNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pSignalsBuffer - int32 buffer of Array of the Indexed RTC Signal of all records.
+	*/
+	virtual void GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) = 0;
+
+	/**
+	* IDataRecording::StoreAsBuildData - Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.
+	* @param[in] sName - Name of the recording to be stored.
+	* @param[in] pBuild - Build that should store the data.
+	* @return Data UUID of the build data.
+	*/
+	virtual std::string StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDataRecording> PIDataRecording;
+
+
+/*************************************************************************************************************************
  Class interface for OIEDevice 
 **************************************************************************************************************************/
 
@@ -416,7 +569,7 @@ public:
 	virtual void SetRTCCorrectionData(const LibMCDriver_ScanLabOIE_uint64 nCorrectionDataBufferSize, const LibMCDriver_ScanLabOIE_uint8 * pCorrectionDataBuffer) = 0;
 
 	/**
-	* IOIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running.
+	* IOIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running. Starts recording of signals.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
@@ -447,7 +600,7 @@ public:
 	virtual void StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, IDeviceConfiguration* pDeviceConfig) = 0;
 
 	/**
-	* IOIEDevice::StopApp - Stops the currently running app. Does nothing if no app is running.
+	* IOIEDevice::StopApp - Stops the currently running app. Does nothing if no app is running. Stops recording of signals.
 	*/
 	virtual void StopApp() = 0;
 
@@ -500,60 +653,28 @@ public:
 	*/
 	virtual void UninstallAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion) = 0;
 
+	/**
+	* IOIEDevice::RetrieveCurrentRecording - Retrieves a copy of the current recording DataRecording Instance and continues recording into a new empty instance.
+	* @return Recording instance
+	*/
+	virtual IDataRecording * RetrieveCurrentRecording() = 0;
+
+	/**
+	* IOIEDevice::ClearCurrentRecording - Clears the current recording data and continues recording into a new empty instance.
+	*/
+	virtual void ClearCurrentRecording() = 0;
+
+	/**
+	* IOIEDevice::LoadRecordingFromBuild - Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.
+	* @param[in] pBuild - Build that contains the data.
+	* @param[in] sDataUUID - Data UUID of the build data.
+	* @return Recording instance
+	*/
+	virtual IDataRecording * LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string & sDataUUID) = 0;
+
 };
 
 typedef IBaseSharedPtr<IOIEDevice> PIOIEDevice;
-
-
-/*************************************************************************************************************************
- Class interface for DeviceConfiguration 
-**************************************************************************************************************************/
-
-class IDeviceConfiguration : public virtual IBase {
-public:
-	/**
-	* IDeviceConfiguration::GetDeviceType - Returns if the device is configured to work with an RTC5 or RTC6 card.
-	* @return Configured device Type
-	*/
-	virtual LibMCDriver_ScanLabOIE::eRTCDeviceType GetDeviceType() = 0;
-
-	/**
-	* IDeviceConfiguration::GetRTCSignalCount - Returns the configured RTC signal count the configuration.
-	* @return RTC Signal Count
-	*/
-	virtual LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount() = 0;
-
-	/**
-	* IDeviceConfiguration::GetSensorSignalCount - Returns the configured Sensor signal count the configuration.
-	* @return Sensor Signal Count
-	*/
-	virtual LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() = 0;
-
-	/**
-	* IDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
-	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
-	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pSignalIDsBuffer - uint32 buffer of RTC Signal IDs
-	*/
-	virtual void GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
-
-	/**
-	* IDeviceConfiguration::GetSensorSignalIDs - Returns the configured Sensor signal IDs of the configuration.
-	* @param[in] nSignalIDsBufferSize - Number of elements in buffer
-	* @param[out] pSignalIDsNeededCount - will be filled with the count of the written structs, or needed buffer size.
-	* @param[out] pSignalIDsBuffer - uint32 buffer of Sensor Signal IDs
-	*/
-	virtual void GetSensorSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer) = 0;
-
-	/**
-	* IDeviceConfiguration::GetDeviceConfigurationString - Returns the device configuration string.
-	* @return Device configuration string.
-	*/
-	virtual std::string GetDeviceConfigurationString() = 0;
-
-};
-
-typedef IBaseSharedPtr<IDeviceConfiguration> PIDeviceConfiguration;
 
 
 /*************************************************************************************************************************

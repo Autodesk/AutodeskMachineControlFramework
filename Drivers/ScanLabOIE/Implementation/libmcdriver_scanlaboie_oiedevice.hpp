@@ -46,7 +46,7 @@ Abstract: This is the class declaration of COIEDevice
 
 // Include custom headers here.
 #include "libmcdriver_scanlaboie_sdk.hpp"
-#include "libmcdriver_scanlaboie_datarecording.hpp"
+#include "libmcdriver_scanlaboie_datarecordinginstance.hpp"
 #include <mutex>
 
 namespace LibMCDriver_ScanLabOIE {
@@ -109,7 +109,9 @@ protected:
 	void startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount);
 	void uninstallAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion);
 
-	std::shared_ptr<CDataRecording> m_pCurrentDataRecording;
+	PDataRecordingInstance m_pCurrentDataRecording;
+
+	void clearCurrentRecordingUnderMutex();
 
 public:
 
@@ -174,6 +176,12 @@ public:
 	void onErrorEvent (oie_device device, oie_error error, int32_t value);
 
 	std::vector<uint8_t> & getRTC6CorrectionData ();
+
+	PDataRecordingInstance RetrieveCurrentRecording();
+
+	void ClearCurrentRecording();
+
+	PDataRecordingInstance LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID);
 
 };
 
@@ -245,6 +253,13 @@ public:
 	void UninstallAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion) override;
 
 	void RefreshAppList() override;
+
+	IDataRecording* RetrieveCurrentRecording() override;
+
+	void ClearCurrentRecording() override;
+
+	IDataRecording* LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID) override;
+
 
 };
 

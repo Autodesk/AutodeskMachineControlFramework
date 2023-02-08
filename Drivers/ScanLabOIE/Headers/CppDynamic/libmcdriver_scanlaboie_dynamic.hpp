@@ -62,8 +62,9 @@ namespace LibMCDriver_ScanLabOIE {
 class CWrapper;
 class CBase;
 class CDriver;
-class COIEDevice;
 class CDeviceConfiguration;
+class CDataRecording;
+class COIEDevice;
 class CDriver_ScanLab_OIE;
 
 /*************************************************************************************************************************
@@ -72,8 +73,9 @@ class CDriver_ScanLab_OIE;
 typedef CWrapper CLibMCDriver_ScanLabOIEWrapper;
 typedef CBase CLibMCDriver_ScanLabOIEBase;
 typedef CDriver CLibMCDriver_ScanLabOIEDriver;
-typedef COIEDevice CLibMCDriver_ScanLabOIEOIEDevice;
 typedef CDeviceConfiguration CLibMCDriver_ScanLabOIEDeviceConfiguration;
+typedef CDataRecording CLibMCDriver_ScanLabOIEDataRecording;
+typedef COIEDevice CLibMCDriver_ScanLabOIEOIEDevice;
 typedef CDriver_ScanLab_OIE CLibMCDriver_ScanLabOIEDriver_ScanLab_OIE;
 
 /*************************************************************************************************************************
@@ -82,8 +84,9 @@ typedef CDriver_ScanLab_OIE CLibMCDriver_ScanLabOIEDriver_ScanLab_OIE;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
-typedef std::shared_ptr<COIEDevice> POIEDevice;
 typedef std::shared_ptr<CDeviceConfiguration> PDeviceConfiguration;
+typedef std::shared_ptr<CDataRecording> PDataRecording;
+typedef std::shared_ptr<COIEDevice> POIEDevice;
 typedef std::shared_ptr<CDriver_ScanLab_OIE> PDriver_ScanLab_OIE;
 
 /*************************************************************************************************************************
@@ -92,8 +95,9 @@ typedef std::shared_ptr<CDriver_ScanLab_OIE> PDriver_ScanLab_OIE;
 typedef PWrapper PLibMCDriver_ScanLabOIEWrapper;
 typedef PBase PLibMCDriver_ScanLabOIEBase;
 typedef PDriver PLibMCDriver_ScanLabOIEDriver;
-typedef POIEDevice PLibMCDriver_ScanLabOIEOIEDevice;
 typedef PDeviceConfiguration PLibMCDriver_ScanLabOIEDeviceConfiguration;
+typedef PDataRecording PLibMCDriver_ScanLabOIEDataRecording;
+typedef POIEDevice PLibMCDriver_ScanLabOIEOIEDevice;
 typedef PDriver_ScanLab_OIE PLibMCDriver_ScanLabOIEDriver_ScanLab_OIE;
 
 
@@ -208,12 +212,17 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND: return "DEVICEHASNOTBEENFOUND";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING: return "DEVICEISALREADYEXISTING";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME: return "EMPTYDEVICENAME";
-			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERPACKET: return "INVALIDVALUESPERPACKET";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERRECORD: return "INVALIDVALUESPERRECORD";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE: return "INVALIDBUFFERSIZE";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_PACKETISNOTRECORDING: return "PACKETISNOTRECORDING";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_TOOMANYVALUESINPACKET: return "TOOMANYVALUESINPACKET";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOTENOUGHVALUESINPACKET: return "NOTENOUGHVALUESINPACKET";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_BUFFEROVERFLOW: return "BUFFEROVERFLOW";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCSIGNALCOUNT: return "INVALIDRTCSIGNALCOUNT";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORSIGNALCOUNT: return "INVALIDSENSORSIGNALCOUNT";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE: return "NODATARECORDINGAVAILABLE";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD: return "INVALIDRTCVALUESPERRECORD";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX: return "INVALIDRECORDINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -256,12 +265,17 @@ public:
 			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEHASNOTBEENFOUND: return "Device has not been found.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_DEVICEISALREADYEXISTING: return "Device is already existing.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_EMPTYDEVICENAME: return "Empty device name.";
-			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERPACKET: return "Invalid values per packet.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDVALUESPERRECORD: return "Invalid values per record.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDBUFFERSIZE: return "Invalid buffer size.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_PACKETISNOTRECORDING: return "Packet is not recording.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_TOOMANYVALUESINPACKET: return "Too many values in packet.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_NOTENOUGHVALUESINPACKET: return "Not enough values in packet.";
 			case LIBMCDRIVER_SCANLABOIE_ERROR_BUFFEROVERFLOW: return "Buffer overflow.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCSIGNALCOUNT: return "Invalid RTC signal count.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORSIGNALCOUNT: return "Invalid Sensor signal count.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE: return "No data recording available.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD: return "Invalid RTC values per record.";
+			case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX: return "Invalid record index.";
 		}
 		return "unknown error";
 	}
@@ -385,8 +399,9 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
-	friend class COIEDevice;
 	friend class CDeviceConfiguration;
+	friend class CDataRecording;
+	friend class COIEDevice;
 	friend class CDriver_ScanLab_OIE;
 
 };
@@ -471,6 +486,55 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDeviceConfiguration 
+**************************************************************************************************************************/
+class CDeviceConfiguration : public CBase {
+public:
+	
+	/**
+	* CDeviceConfiguration::CDeviceConfiguration - Constructor for DeviceConfiguration class.
+	*/
+	CDeviceConfiguration(CWrapper* pWrapper, LibMCDriver_ScanLabOIEHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline eRTCDeviceType GetDeviceType();
+	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
+	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
+	inline void GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
+	inline void GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
+	inline std::string GetDeviceConfigurationString();
+};
+	
+/*************************************************************************************************************************
+ Class CDataRecording 
+**************************************************************************************************************************/
+class CDataRecording : public CBase {
+public:
+	
+	/**
+	* CDataRecording::CDataRecording - Constructor for DataRecording class.
+	*/
+	CDataRecording(CWrapper* pWrapper, LibMCDriver_ScanLabOIEHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
+	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
+	inline LibMCDriver_ScanLabOIE_uint32 GetRecordCount();
+	inline void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY);
+	inline void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & RTCSignalsBuffer);
+	inline void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SensorSignalsBuffer);
+	inline void GetAllCoordinates(std::vector<LibMCDriver_ScanLabOIE_double> & XArrayBuffer, std::vector<LibMCDriver_ScanLabOIE_double> & YArrayBuffer);
+	inline void GetAllPacketNumbers(std::vector<LibMCDriver_ScanLabOIE_uint32> & PacketNumersBuffer);
+	inline void GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
+	inline void GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer);
+	inline std::string StoreAsBuildData(const std::string & sName, classParam<LibMCEnv::CBuild> pBuild);
+};
+	
+/*************************************************************************************************************************
  Class COIEDevice 
 **************************************************************************************************************************/
 class COIEDevice : public CBase {
@@ -511,28 +575,9 @@ public:
 	inline void UninstallAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex);
 	inline void UninstallAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion);
 	inline void UninstallAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion);
-};
-	
-/*************************************************************************************************************************
- Class CDeviceConfiguration 
-**************************************************************************************************************************/
-class CDeviceConfiguration : public CBase {
-public:
-	
-	/**
-	* CDeviceConfiguration::CDeviceConfiguration - Constructor for DeviceConfiguration class.
-	*/
-	CDeviceConfiguration(CWrapper* pWrapper, LibMCDriver_ScanLabOIEHandle pHandle)
-		: CBase(pWrapper, pHandle)
-	{
-	}
-	
-	inline eRTCDeviceType GetDeviceType();
-	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
-	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
-	inline void GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
-	inline void GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer);
-	inline std::string GetDeviceConfigurationString();
+	inline PDataRecording RetrieveCurrentRecording();
+	inline void ClearCurrentRecording();
+	inline PDataRecording LoadRecordingFromBuild(classParam<LibMCEnv::CBuild> pBuild, const std::string & sDataUUID);
 };
 	
 /*************************************************************************************************************************
@@ -687,6 +732,23 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetDeviceType = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = nullptr;
+		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = nullptr;
+		pWrapperTable->m_DataRecording_GetRTCSignalCount = nullptr;
+		pWrapperTable->m_DataRecording_GetSensorSignalCount = nullptr;
+		pWrapperTable->m_DataRecording_GetRecordCount = nullptr;
+		pWrapperTable->m_DataRecording_GetRecordInformation = nullptr;
+		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = nullptr;
+		pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord = nullptr;
+		pWrapperTable->m_DataRecording_GetAllCoordinates = nullptr;
+		pWrapperTable->m_DataRecording_GetAllPacketNumbers = nullptr;
+		pWrapperTable->m_DataRecording_GetAllRTCSignals = nullptr;
+		pWrapperTable->m_DataRecording_GetAllSensorSignals = nullptr;
+		pWrapperTable->m_DataRecording_StoreAsBuildData = nullptr;
 		pWrapperTable->m_OIEDevice_GetDeviceName = nullptr;
 		pWrapperTable->m_OIEDevice_SetHostName = nullptr;
 		pWrapperTable->m_OIEDevice_GetHostName = nullptr;
@@ -714,12 +776,9 @@ public:
 		pWrapperTable->m_OIEDevice_UninstallAppByIndex = nullptr;
 		pWrapperTable->m_OIEDevice_UninstallAppByMajorVersion = nullptr;
 		pWrapperTable->m_OIEDevice_UninstallAppByMinorVersion = nullptr;
-		pWrapperTable->m_DeviceConfiguration_GetDeviceType = nullptr;
-		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = nullptr;
-		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = nullptr;
-		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = nullptr;
-		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = nullptr;
-		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = nullptr;
+		pWrapperTable->m_OIEDevice_RetrieveCurrentRecording = nullptr;
+		pWrapperTable->m_OIEDevice_ClearCurrentRecording = nullptr;
+		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeSDK = nullptr;
 		pWrapperTable->m_Driver_ScanLab_OIE_InitializeCustomSDK = nullptr;
@@ -838,6 +897,159 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceType = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdevicetype");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceType = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdevicetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetDeviceType == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceConfigurationStringPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring");
+		#else // _WIN32
+		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceConfigurationStringPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetRTCSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDataRecording_GetSensorSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getsensorsignalcount");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDataRecording_GetSensorSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getsensorsignalcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetSensorSignalCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetRecordCount = (PLibMCDriver_ScanLabOIEDataRecording_GetRecordCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getrecordcount");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetRecordCount = (PLibMCDriver_ScanLabOIEDataRecording_GetRecordCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getrecordcount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetRecordCount == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetRecordInformation = (PLibMCDriver_ScanLabOIEDataRecording_GetRecordInformationPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getrecordinformation");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetRecordInformation = (PLibMCDriver_ScanLabOIEDataRecording_GetRecordInformationPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getrecordinformation");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetRecordInformation == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalsOfRecordPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetRTCSignalsOfRecordPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetSensorSignalsOfRecordPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getsensorsignalsofrecord");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord = (PLibMCDriver_ScanLabOIEDataRecording_GetSensorSignalsOfRecordPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getsensorsignalsofrecord");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAllCoordinates = (PLibMCDriver_ScanLabOIEDataRecording_GetAllCoordinatesPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallcoordinates");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAllCoordinates = (PLibMCDriver_ScanLabOIEDataRecording_GetAllCoordinatesPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallcoordinates");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAllCoordinates == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAllPacketNumbers = (PLibMCDriver_ScanLabOIEDataRecording_GetAllPacketNumbersPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallpacketnumbers");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAllPacketNumbers = (PLibMCDriver_ScanLabOIEDataRecording_GetAllPacketNumbersPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallpacketnumbers");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAllPacketNumbers == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAllRTCSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllRTCSignalsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallrtcsignals");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAllRTCSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllRTCSignalsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallrtcsignals");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAllRTCSignals == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_GetAllSensorSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllSensorSignalsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_getallsensorsignals");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_GetAllSensorSignals = (PLibMCDriver_ScanLabOIEDataRecording_GetAllSensorSignalsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_getallsensorsignals");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_GetAllSensorSignals == nullptr)
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DataRecording_StoreAsBuildData = (PLibMCDriver_ScanLabOIEDataRecording_StoreAsBuildDataPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_datarecording_storeasbuilddata");
+		#else // _WIN32
+		pWrapperTable->m_DataRecording_StoreAsBuildData = (PLibMCDriver_ScanLabOIEDataRecording_StoreAsBuildDataPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_datarecording_storeasbuilddata");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DataRecording_StoreAsBuildData == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1084,57 +1296,30 @@ public:
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetDeviceType = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdevicetype");
+		pWrapperTable->m_OIEDevice_RetrieveCurrentRecording = (PLibMCDriver_ScanLabOIEOIEDevice_RetrieveCurrentRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_retrievecurrentrecording");
 		#else // _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetDeviceType = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceTypePtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdevicetype");
+		pWrapperTable->m_OIEDevice_RetrieveCurrentRecording = (PLibMCDriver_ScanLabOIEOIEDevice_RetrieveCurrentRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_retrievecurrentrecording");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DeviceConfiguration_GetDeviceType == nullptr)
+		if (pWrapperTable->m_OIEDevice_RetrieveCurrentRecording == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount");
+		pWrapperTable->m_OIEDevice_ClearCurrentRecording = (PLibMCDriver_ScanLabOIEOIEDevice_ClearCurrentRecordingPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_clearcurrentrecording");
 		#else // _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount");
+		pWrapperTable->m_OIEDevice_ClearCurrentRecording = (PLibMCDriver_ScanLabOIEOIEDevice_ClearCurrentRecordingPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_clearcurrentrecording");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount == nullptr)
+		if (pWrapperTable->m_OIEDevice_ClearCurrentRecording == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount");
+		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = (PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_oiedevice_loadrecordingfrombuild");
 		#else // _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalCountPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount");
+		pWrapperTable->m_OIEDevice_LoadRecordingFromBuild = (PLibMCDriver_ScanLabOIEOIEDevice_LoadRecordingFromBuildPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_oiedevice_loadrecordingfrombuild");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount == nullptr)
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
-		#else // _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetRTCSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr)
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids");
-		#else // _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetSensorSignalIDsPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr)
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		#ifdef _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceConfigurationStringPtr) GetProcAddress(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring");
-		#else // _WIN32
-		pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString = (PLibMCDriver_ScanLabOIEDeviceConfiguration_GetDeviceConfigurationStringPtr) dlsym(hLibrary, "libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring");
-		dlerror();
-		#endif // _WIN32
-		if (pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString == nullptr)
+		if (pWrapperTable->m_OIEDevice_LoadRecordingFromBuild == nullptr)
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1321,6 +1506,74 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getdevicetype", (void**)&(pWrapperTable->m_DeviceConfiguration_GetDeviceType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetDeviceType == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring", (void**)&(pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getrtcsignalcount", (void**)&(pWrapperTable->m_DataRecording_GetRTCSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRTCSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getsensorsignalcount", (void**)&(pWrapperTable->m_DataRecording_GetSensorSignalCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetSensorSignalCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getrecordcount", (void**)&(pWrapperTable->m_DataRecording_GetRecordCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRecordCount == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getrecordinformation", (void**)&(pWrapperTable->m_DataRecording_GetRecordInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRecordInformation == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getrtcsignalsofrecord", (void**)&(pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetRTCSignalsOfRecord == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getsensorsignalsofrecord", (void**)&(pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetSensorSignalsOfRecord == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallcoordinates", (void**)&(pWrapperTable->m_DataRecording_GetAllCoordinates));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllCoordinates == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallpacketnumbers", (void**)&(pWrapperTable->m_DataRecording_GetAllPacketNumbers));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllPacketNumbers == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallrtcsignals", (void**)&(pWrapperTable->m_DataRecording_GetAllRTCSignals));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllRTCSignals == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_getallsensorsignals", (void**)&(pWrapperTable->m_DataRecording_GetAllSensorSignals));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_GetAllSensorSignals == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_datarecording_storeasbuilddata", (void**)&(pWrapperTable->m_DataRecording_StoreAsBuildData));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DataRecording_StoreAsBuildData == nullptr) )
+			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_getdevicename", (void**)&(pWrapperTable->m_OIEDevice_GetDeviceName));
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_GetDeviceName == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1429,28 +1682,16 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_UninstallAppByMinorVersion == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getdevicetype", (void**)&(pWrapperTable->m_DeviceConfiguration_GetDeviceType));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetDeviceType == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_retrievecurrentrecording", (void**)&(pWrapperTable->m_OIEDevice_RetrieveCurrentRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_RetrieveCurrentRecording == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalcount", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalCount == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_clearcurrentrecording", (void**)&(pWrapperTable->m_OIEDevice_ClearCurrentRecording));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_ClearCurrentRecording == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalcount", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalCount == nullptr) )
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getrtcsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetRTCSignalIDs == nullptr) )
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getsensorsignalids", (void**)&(pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetSensorSignalIDs == nullptr) )
-			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
-		
-		eLookupError = (*pLookup)("libmcdriver_scanlaboie_deviceconfiguration_getdeviceconfigurationstring", (void**)&(pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString));
-		if ( (eLookupError != 0) || (pWrapperTable->m_DeviceConfiguration_GetDeviceConfigurationString == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_scanlaboie_oiedevice_loadrecordingfrombuild", (void**)&(pWrapperTable->m_OIEDevice_LoadRecordingFromBuild));
+		if ( (eLookupError != 0) || (pWrapperTable->m_OIEDevice_LoadRecordingFromBuild == nullptr) )
 			return LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_scanlaboie_driver_scanlab_oie_setdependencyresourcenames", (void**)&(pWrapperTable->m_Driver_ScanLab_OIE_SetDependencyResourceNames));
@@ -1611,6 +1852,243 @@ public:
 	void CDriver::QueryParameters()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParameters(m_pHandle));
+	}
+	
+	/**
+	 * Method definitions for class CDeviceConfiguration
+	 */
+	
+	/**
+	* CDeviceConfiguration::GetDeviceType - Returns if the device is configured to work with an RTC5 or RTC6 card.
+	* @return Configured device Type
+	*/
+	eRTCDeviceType CDeviceConfiguration::GetDeviceType()
+	{
+		eRTCDeviceType resultDeviceType = (eRTCDeviceType) 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceType(m_pHandle, &resultDeviceType));
+		
+		return resultDeviceType;
+	}
+	
+	/**
+	* CDeviceConfiguration::GetRTCSignalCount - Returns the configured RTC signal count of the configuration.
+	* @return RTC Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetRTCSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
+	* CDeviceConfiguration::GetSensorSignalCount - Returns the configured Sensor signal count of the configuration.
+	* @return Sensor Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetSensorSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
+	* CDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
+	* @param[out] SignalIDsBuffer - RTC Signal IDs
+	*/
+	void CDeviceConfiguration::GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignalIDs = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignalIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
+		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
+	}
+	
+	/**
+	* CDeviceConfiguration::GetSensorSignalIDs - Returns the configured Sensor signal IDs of the configuration.
+	* @param[out] SignalIDsBuffer - Sensor Signal IDs
+	*/
+	void CDeviceConfiguration::GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignalIDs = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignalIDs = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
+		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
+	}
+	
+	/**
+	* CDeviceConfiguration::GetDeviceConfigurationString - Returns the device configuration string.
+	* @return Device configuration string.
+	*/
+	std::string CDeviceConfiguration::GetDeviceConfigurationString()
+	{
+		LibMCDriver_ScanLabOIE_uint32 bytesNeededDeviceConfigurationString = 0;
+		LibMCDriver_ScanLabOIE_uint32 bytesWrittenDeviceConfigurationString = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceConfigurationString(m_pHandle, 0, &bytesNeededDeviceConfigurationString, nullptr));
+		std::vector<char> bufferDeviceConfigurationString(bytesNeededDeviceConfigurationString);
+		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceConfigurationString(m_pHandle, bytesNeededDeviceConfigurationString, &bytesWrittenDeviceConfigurationString, &bufferDeviceConfigurationString[0]));
+		
+		return std::string(&bufferDeviceConfigurationString[0]);
+	}
+	
+	/**
+	 * Method definitions for class CDataRecording
+	 */
+	
+	/**
+	* CDataRecording::GetRTCSignalCount - Returns the configured RTC signal count of the configuration.
+	* @return RTC Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRTCSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetRTCSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
+	* CDataRecording::GetSensorSignalCount - Returns the configured Sensor signal count of the configuration.
+	* @return Sensor Signal Count
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetSensorSignalCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetSensorSignalCount(m_pHandle, &resultSignalCount));
+		
+		return resultSignalCount;
+	}
+	
+	/**
+	* CDataRecording::GetRecordCount - Returns the number of records in the recording.
+	* @return Number of records in the recording
+	*/
+	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRecordCount()
+	{
+		LibMCDriver_ScanLabOIE_uint32 resultRecord = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetRecordCount(m_pHandle, &resultRecord));
+		
+		return resultRecord;
+	}
+	
+	/**
+	* CDataRecording::GetRecordInformation - Returns the information about a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[out] nPacketNumber - Packet Number of the record.
+	* @param[out] dX - X Coordinate of the record.
+	* @param[out] dY - Y Coordinate of the record.
+	*/
+	void CDataRecording::GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetRecordInformation(m_pHandle, nIndex, &nPacketNumber, &dX, &dY));
+	}
+	
+	/**
+	* CDataRecording::GetRTCSignalsOfRecord - Returns the RTC signals of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[out] RTCSignalsBuffer - Recorded RTC Signals
+	*/
+	void CDataRecording::GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & RTCSignalsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededRTCSignals = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenRTCSignals = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetRTCSignalsOfRecord(m_pHandle, nIndex, 0, &elementsNeededRTCSignals, nullptr));
+		RTCSignalsBuffer.resize((size_t) elementsNeededRTCSignals);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetRTCSignalsOfRecord(m_pHandle, nIndex, elementsNeededRTCSignals, &elementsWrittenRTCSignals, RTCSignalsBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetSensorSignalsOfRecord - Returns the sensor signals of a specific record.
+	* @param[in] nIndex - Index of the record. 0-based. MUST be smaller than RecordCount.
+	* @param[out] SensorSignalsBuffer - Recorded Sensor Signals
+	*/
+	void CDataRecording::GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SensorSignalsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSensorSignals = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSensorSignals = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetSensorSignalsOfRecord(m_pHandle, nIndex, 0, &elementsNeededSensorSignals, nullptr));
+		SensorSignalsBuffer.resize((size_t) elementsNeededSensorSignals);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetSensorSignalsOfRecord(m_pHandle, nIndex, elementsNeededSensorSignals, &elementsWrittenSensorSignals, SensorSignalsBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetAllCoordinates - Returns an array of all coordinates.
+	* @param[out] XArrayBuffer - Array of X Coordinates of all records.
+	* @param[out] YArrayBuffer - Array of Y Coordinates of all records.
+	*/
+	void CDataRecording::GetAllCoordinates(std::vector<LibMCDriver_ScanLabOIE_double> & XArrayBuffer, std::vector<LibMCDriver_ScanLabOIE_double> & YArrayBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededXArray = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenXArray = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededYArray = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenYArray = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllCoordinates(m_pHandle, 0, &elementsNeededXArray, nullptr, 0, &elementsNeededYArray, nullptr));
+		XArrayBuffer.resize((size_t) elementsNeededXArray);
+		YArrayBuffer.resize((size_t) elementsNeededYArray);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllCoordinates(m_pHandle, elementsNeededXArray, &elementsWrittenXArray, XArrayBuffer.data(), elementsNeededYArray, &elementsWrittenYArray, YArrayBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetAllPacketNumbers - Returns an array of all packet numbers.
+	* @param[out] PacketNumersBuffer - Array of Packet Numbers of all records.
+	*/
+	void CDataRecording::GetAllPacketNumbers(std::vector<LibMCDriver_ScanLabOIE_uint32> & PacketNumersBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededPacketNumers = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenPacketNumers = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllPacketNumbers(m_pHandle, 0, &elementsNeededPacketNumers, nullptr));
+		PacketNumersBuffer.resize((size_t) elementsNeededPacketNumers);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllPacketNumbers(m_pHandle, elementsNeededPacketNumers, &elementsWrittenPacketNumers, PacketNumersBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetAllRTCSignals - Returns an array of all RTC signals of a specific index.
+	* @param[in] nRTCIndex - Index of the signal to return. 0-based. MUST be smaller than RTCSignalCount.
+	* @param[out] SignalsBuffer - Array of the Indexed Sensor Signal of all records.
+	*/
+	void CDataRecording::GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignals = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignals = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllRTCSignals(m_pHandle, nRTCIndex, 0, &elementsNeededSignals, nullptr));
+		SignalsBuffer.resize((size_t) elementsNeededSignals);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllRTCSignals(m_pHandle, nRTCIndex, elementsNeededSignals, &elementsWrittenSignals, SignalsBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::GetAllSensorSignals - Returns an array of all sensor signals of a specific index.
+	* @param[in] nSignalIndex - Index of the signal to return. 0-based. MUST be smaller than SensorSignalCount.
+	* @param[out] SignalsBuffer - Array of the Indexed RTC Signal of all records.
+	*/
+	void CDataRecording::GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SignalsBuffer)
+	{
+		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignals = 0;
+		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignals = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllSensorSignals(m_pHandle, nSignalIndex, 0, &elementsNeededSignals, nullptr));
+		SignalsBuffer.resize((size_t) elementsNeededSignals);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetAllSensorSignals(m_pHandle, nSignalIndex, elementsNeededSignals, &elementsWrittenSignals, SignalsBuffer.data()));
+	}
+	
+	/**
+	* CDataRecording::StoreAsBuildData - Stores the recording attached to a build data object. The mime-type of the data will be application/scanlaboie-1.0.
+	* @param[in] sName - Name of the recording to be stored.
+	* @param[in] pBuild - Build that should store the data.
+	* @return Data UUID of the build data.
+	*/
+	std::string CDataRecording::StoreAsBuildData(const std::string & sName, classParam<LibMCEnv::CBuild> pBuild)
+	{
+		LibMCEnvHandle hBuild = pBuild.GetHandle();
+		LibMCDriver_ScanLabOIE_uint32 bytesNeededDataUUID = 0;
+		LibMCDriver_ScanLabOIE_uint32 bytesWrittenDataUUID = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_StoreAsBuildData(m_pHandle, sName.c_str(), hBuild, 0, &bytesNeededDataUUID, nullptr));
+		std::vector<char> bufferDataUUID(bytesNeededDataUUID);
+		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_StoreAsBuildData(m_pHandle, sName.c_str(), hBuild, bytesNeededDataUUID, &bytesWrittenDataUUID, &bufferDataUUID[0]));
+		
+		return std::string(&bufferDataUUID[0]);
 	}
 	
 	/**
@@ -1795,7 +2273,7 @@ public:
 	}
 	
 	/**
-	* COIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running.
+	* COIEDevice::StartAppByName - Starts an app by its name. Fails if an app is already running. Starts recording of signals.
 	* @param[in] sName - Name of app to be started.
 	* @param[in] pDeviceConfig - Device configuration instance.
 	*/
@@ -1842,7 +2320,7 @@ public:
 	}
 	
 	/**
-	* COIEDevice::StopApp - Stops the currently running app. Does nothing if no app is running.
+	* COIEDevice::StopApp - Stops the currently running app. Does nothing if no app is running. Stops recording of signals.
 	*/
 	void COIEDevice::StopApp()
 	{
@@ -1927,84 +2405,44 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CDeviceConfiguration
-	 */
-	
-	/**
-	* CDeviceConfiguration::GetDeviceType - Returns if the device is configured to work with an RTC5 or RTC6 card.
-	* @return Configured device Type
+	* COIEDevice::RetrieveCurrentRecording - Retrieves a copy of the current recording DataRecording Instance and continues recording into a new empty instance.
+	* @return Recording instance
 	*/
-	eRTCDeviceType CDeviceConfiguration::GetDeviceType()
+	PDataRecording COIEDevice::RetrieveCurrentRecording()
 	{
-		eRTCDeviceType resultDeviceType = (eRTCDeviceType) 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceType(m_pHandle, &resultDeviceType));
+		LibMCDriver_ScanLabOIEHandle hRecordingInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_RetrieveCurrentRecording(m_pHandle, &hRecordingInstance));
 		
-		return resultDeviceType;
+		if (!hRecordingInstance) {
+			CheckError(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataRecording>(m_pWrapper, hRecordingInstance);
 	}
 	
 	/**
-	* CDeviceConfiguration::GetRTCSignalCount - Returns the configured RTC signal count the configuration.
-	* @return RTC Signal Count
+	* COIEDevice::ClearCurrentRecording - Clears the current recording data and continues recording into a new empty instance.
 	*/
-	LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetRTCSignalCount()
+	void COIEDevice::ClearCurrentRecording()
 	{
-		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalCount(m_pHandle, &resultSignalCount));
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_ClearCurrentRecording(m_pHandle));
+	}
+	
+	/**
+	* COIEDevice::LoadRecordingFromBuild - Loads a recording from a previously stored build data. The mime-type of the data MUST be application/scanlaboie-1.0.
+	* @param[in] pBuild - Build that contains the data.
+	* @param[in] sDataUUID - Data UUID of the build data.
+	* @return Recording instance
+	*/
+	PDataRecording COIEDevice::LoadRecordingFromBuild(classParam<LibMCEnv::CBuild> pBuild, const std::string & sDataUUID)
+	{
+		LibMCEnvHandle hBuild = pBuild.GetHandle();
+		LibMCDriver_ScanLabOIEHandle hRecordingInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_OIEDevice_LoadRecordingFromBuild(m_pHandle, hBuild, sDataUUID.c_str(), &hRecordingInstance));
 		
-		return resultSignalCount;
-	}
-	
-	/**
-	* CDeviceConfiguration::GetSensorSignalCount - Returns the configured Sensor signal count the configuration.
-	* @return Sensor Signal Count
-	*/
-	LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetSensorSignalCount()
-	{
-		LibMCDriver_ScanLabOIE_uint32 resultSignalCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalCount(m_pHandle, &resultSignalCount));
-		
-		return resultSignalCount;
-	}
-	
-	/**
-	* CDeviceConfiguration::GetRTCSignalIDs - Returns the configured RTC signal IDs of the configuration.
-	* @param[out] SignalIDsBuffer - RTC Signal IDs
-	*/
-	void CDeviceConfiguration::GetRTCSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer)
-	{
-		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignalIDs = 0;
-		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignalIDs = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
-		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetRTCSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
-	}
-	
-	/**
-	* CDeviceConfiguration::GetSensorSignalIDs - Returns the configured Sensor signal IDs of the configuration.
-	* @param[out] SignalIDsBuffer - Sensor Signal IDs
-	*/
-	void CDeviceConfiguration::GetSensorSignalIDs(std::vector<LibMCDriver_ScanLabOIE_uint32> & SignalIDsBuffer)
-	{
-		LibMCDriver_ScanLabOIE_uint64 elementsNeededSignalIDs = 0;
-		LibMCDriver_ScanLabOIE_uint64 elementsWrittenSignalIDs = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, 0, &elementsNeededSignalIDs, nullptr));
-		SignalIDsBuffer.resize((size_t) elementsNeededSignalIDs);
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetSensorSignalIDs(m_pHandle, elementsNeededSignalIDs, &elementsWrittenSignalIDs, SignalIDsBuffer.data()));
-	}
-	
-	/**
-	* CDeviceConfiguration::GetDeviceConfigurationString - Returns the device configuration string.
-	* @return Device configuration string.
-	*/
-	std::string CDeviceConfiguration::GetDeviceConfigurationString()
-	{
-		LibMCDriver_ScanLabOIE_uint32 bytesNeededDeviceConfigurationString = 0;
-		LibMCDriver_ScanLabOIE_uint32 bytesWrittenDeviceConfigurationString = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceConfigurationString(m_pHandle, 0, &bytesNeededDeviceConfigurationString, nullptr));
-		std::vector<char> bufferDeviceConfigurationString(bytesNeededDeviceConfigurationString);
-		CheckError(m_pWrapper->m_WrapperTable.m_DeviceConfiguration_GetDeviceConfigurationString(m_pHandle, bytesNeededDeviceConfigurationString, &bytesWrittenDeviceConfigurationString, &bufferDeviceConfigurationString[0]));
-		
-		return std::string(&bufferDeviceConfigurationString[0]);
+		if (!hRecordingInstance) {
+			CheckError(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDataRecording>(m_pWrapper, hRecordingInstance);
 	}
 	
 	/**

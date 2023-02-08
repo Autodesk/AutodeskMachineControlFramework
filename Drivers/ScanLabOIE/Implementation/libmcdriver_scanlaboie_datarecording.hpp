@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CDeviceConfiguration
+Abstract: This is the class declaration of CDataRecording
 
 */
 
@@ -36,7 +36,6 @@ Abstract: This is the class declaration of CDeviceConfiguration
 #define __LIBMCDRIVER_SCANLABOIE_DATARECORDING
 
 #include "libmcdriver_scanlaboie_interfaces.hpp"
-#include "libmcdriver_scanlaboie_sdk.hpp"
 
 // Parent classes
 #include "libmcdriver_scanlaboie_base.hpp"
@@ -46,82 +45,49 @@ Abstract: This is the class declaration of CDeviceConfiguration
 #endif
 
 // Include custom headers here.
-#include <vector>
-#include <list>
-#include <fstream>
+#include "libmcdriver_scanlaboie_datarecordinginstance.hpp"
 
 namespace LibMCDriver_ScanLabOIE {
 namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CDeviceConfiguration 
+ Class declaration of CDataRecording 
 **************************************************************************************************************************/
 
-
-class CDataRecordingBuffer {
-private:
-    std::vector<int32_t> m_RawData;
-    size_t m_nCurrentPosition;
-public:
-
-    CDataRecordingBuffer(size_t nBufferSizeInValues);
-
-    virtual ~CDataRecordingBuffer();
-
-    bool hasSpace(size_t nValueCount);
-
-    int32_t* allocData(size_t nValueCount);
-
-
-};
-
-typedef std::shared_ptr<CDataRecordingBuffer> PDataRecordingBuffer;
-
-typedef struct _sDataRecordingEntry
-{
-    uint32_t m_nPacketNumber;
-    double m_dX;
-    double m_dY;
-    int32_t* m_pData;
-
-} sDataRecordingEntry;
-
-
-class CDataRecording {
+class CDataRecording : public virtual IDataRecording, public virtual CBase {
 private:
 
-    std::vector<PDataRecordingBuffer> m_Buffers;
-    PDataRecordingBuffer m_pCurrentBuffer;
-
-    std::list<sDataRecordingEntry> m_Entries;
-    sDataRecordingEntry m_CurrentEntry;
-    uint32_t m_nCurrentEntryDataIndex;
-
-    uint32_t m_nValuesPerPacket;
-    uint32_t m_nBufferSizeInPackets;
-    size_t m_nValueCountPerBuffer;
-    
+	PDataRecordingInstance m_pDataRecordingInstance;
 
 public:
+	CDataRecording (PDataRecordingInstance pDataRecordingInstance);
 
-    CDataRecording(uint32_t nValuesPerPacket, uint32_t nBufferSizeInPackets);
+	virtual ~CDataRecording();
 
-    virtual ~CDataRecording();
+	LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount() override;
 
-    void startRecord(uint32_t nPacketNumber, double dX, double dY);
+	LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount() override;
 
-    void recordValue (int32_t nValue);
+	LibMCDriver_ScanLabOIE_uint32 GetRecordCount() override;
 
-    void finishRecord();
+	void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY) override;
 
-    size_t getRecordCount();
+	void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nRTCSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pRTCSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pRTCSignalsBuffer) override;
 
-    void writeToFile(const std::string & sFileName);
+	void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nSensorSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSensorSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSensorSignalsBuffer) override;
+
+	void GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pXArrayNeededCount, LibMCDriver_ScanLabOIE_double * pXArrayBuffer, LibMCDriver_ScanLabOIE_uint64 nYArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pYArrayNeededCount, LibMCDriver_ScanLabOIE_double * pYArrayBuffer) override;
+
+	void GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer) override;
+
+	void GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) override;
+
+	void GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer) override;
+
+	std::string StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild) override;
 
 };
-
-typedef std::shared_ptr<CDataRecording> PDataRecording;
 
 } // namespace Impl
 } // namespace LibMCDriver_ScanLabOIE
