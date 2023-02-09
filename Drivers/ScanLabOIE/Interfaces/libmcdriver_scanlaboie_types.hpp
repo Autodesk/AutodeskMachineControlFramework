@@ -141,6 +141,7 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE 1034 /** No data recording available. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD 1035 /** Invalid RTC values per record. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX 1036 /** Invalid record index. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX 1037 /** Invalid signal index. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -194,6 +195,7 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE: return "No data recording available.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD: return "Invalid RTC values per record.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX: return "Invalid record index.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX: return "Invalid signal index.";
     default: return "unknown error";
   }
 }

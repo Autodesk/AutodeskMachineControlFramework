@@ -111,8 +111,6 @@ protected:
 
 	PDataRecordingInstance m_pCurrentDataRecording;
 
-	void clearCurrentRecordingUnderMutex();
-
 public:
 
 	COIEDeviceInstance(PScanLabOIESDK pOIESDK, oie_instance pInstance, const std::string & sDeviceName, const std::string& sHostName, const LibMCDriver_ScanLabOIE_uint32 nPort, uint32_t nResponseTimeOut, LibMCEnv::PWorkingDirectory pWorkingDirectory);

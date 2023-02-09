@@ -80,22 +80,65 @@ void CDataRecording::GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nI
 
 void CDataRecording::GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nRTCSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pRTCSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pRTCSignalsBuffer)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	if (nIndex >= m_pDataRecordingInstance->getRecordCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX);
+
+	uint32_t nRTCValueCount = m_pDataRecordingInstance->getRTCValuesPerRecord();
+
+	if (pRTCSignalsNeededCount != nullptr)
+		*pRTCSignalsNeededCount = nRTCValueCount;
+
+	if (pRTCSignalsBuffer != nullptr) {
+		if (nRTCSignalsBufferSize < (size_t) nRTCValueCount)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+		m_pDataRecordingInstance->copyRTCSignals (nIndex, pRTCSignalsBuffer, nRTCSignalsBufferSize);
+	}
+
 }
 
 void CDataRecording::GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint64 nSensorSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSensorSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSensorSignalsBuffer)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	if (nIndex >= m_pDataRecordingInstance->getRecordCount())
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX);
+
+	uint32_t nSensorValueCount = m_pDataRecordingInstance->getRTCValuesPerRecord();
+
+	if (pSensorSignalsNeededCount != nullptr)
+		*pSensorSignalsNeededCount = nSensorValueCount;
+
+	if (pSensorSignalsBuffer != nullptr) {
+		if (nSensorSignalsBufferSize < (size_t)nSensorValueCount)
+			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+		m_pDataRecordingInstance->copySensorSignals(nIndex, pSensorSignalsBuffer, nSensorSignalsBufferSize);
+	}
+
 }
 
 void CDataRecording::GetAllCoordinates(LibMCDriver_ScanLabOIE_uint64 nXArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pXArrayNeededCount, LibMCDriver_ScanLabOIE_double * pXArrayBuffer, LibMCDriver_ScanLabOIE_uint64 nYArrayBufferSize, LibMCDriver_ScanLabOIE_uint64* pYArrayNeededCount, LibMCDriver_ScanLabOIE_double * pYArrayBuffer)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (pXArrayNeededCount != nullptr)
+		*pXArrayNeededCount = nRecordCount;
+	if (pYArrayNeededCount != nullptr)
+		*pYArrayNeededCount = nRecordCount;
+
+	if (pXArrayBuffer != nullptr)
+		m_pDataRecordingInstance->copyXCoordinates(pXArrayBuffer, nXArrayBufferSize);
+	if (pYArrayBuffer != nullptr)
+		m_pDataRecordingInstance->copyYCoordinates(pYArrayBuffer, nYArrayBufferSize);
+
 }
 
 void CDataRecording::GetAllPacketNumbers(LibMCDriver_ScanLabOIE_uint64 nPacketNumersBufferSize, LibMCDriver_ScanLabOIE_uint64* pPacketNumersNeededCount, LibMCDriver_ScanLabOIE_uint32 * pPacketNumersBuffer)
 {
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+	size_t nRecordCount = m_pDataRecordingInstance->getRecordCount();
+	if (pPacketNumersNeededCount != nullptr)
+		*pPacketNumersNeededCount = nRecordCount;
+
+	if (pPacketNumersBuffer != nullptr)
+		m_pDataRecordingInstance->copyPacketNumbers(pPacketNumersBuffer, nPacketNumersBufferSize);
 }
 
 void CDataRecording::GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer)

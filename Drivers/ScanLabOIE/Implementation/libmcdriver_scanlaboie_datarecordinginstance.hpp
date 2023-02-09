@@ -89,6 +89,9 @@ typedef struct _sDataRecordingEntry
 
 
 
+class CDataRecordingInstance;
+
+typedef std::shared_ptr<CDataRecordingInstance> PDataRecordingInstance;
 
 class CDataRecordingInstance {
 private:
@@ -106,6 +109,8 @@ private:
     uint32_t m_nBufferSizeInRecords;
     size_t m_nValueCountPerBuffer;
     
+    int32_t* getRTCData (uint32_t nRecordIndex);
+    int32_t* getSensorData(uint32_t nRecordIndex);
 
 public:
 
@@ -129,13 +134,24 @@ public:
 
     uint32_t getBufferSizeInRecords ();
 
+    void copyRTCSignals (uint32_t nRecordIndex, int32_t * pRTCSignalBuffer, size_t nRTCSignalBufferSize);
+
+    void copySensorSignals(uint32_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
+
+    void copyXCoordinates(double * pCoordinateBuffer, size_t nCoordinateBufferSize);
+
+    void copyYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize);
+
+    void copyPacketNumbers(uint32_t* pPacketNumberBuffer, size_t nPacketNumberBufferSize);
+
     void writeToFile(const std::string & sFileName);
 
     sDataRecordingEntry* getRecord (uint32_t nIndex);
 
+    PDataRecordingInstance createEmptyDuplicate ();
+
 };
 
-typedef std::shared_ptr<CDataRecordingInstance> PDataRecordingInstance;
 
 } // namespace Impl
 } // namespace LibMCDriver_ScanLabOIE

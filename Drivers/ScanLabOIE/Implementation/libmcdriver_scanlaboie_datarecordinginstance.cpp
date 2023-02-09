@@ -210,3 +210,112 @@ sDataRecordingEntry* CDataRecordingInstance::getRecord(uint32_t nIndex)
 
     return m_Entries.getData(nIndex);
 }
+
+PDataRecordingInstance CDataRecordingInstance::createEmptyDuplicate()
+{
+    return std::make_shared<CDataRecordingInstance>(m_nValuesPerRecord, m_nRTCValuesPerRecord, m_nBufferSizeInRecords);
+}
+
+int32_t* CDataRecordingInstance::getRTCData(uint32_t nRecordIndex)
+{
+    auto pRecord = m_Entries.getData(nRecordIndex);
+    return &pRecord->m_pData[0];
+}
+
+int32_t* CDataRecordingInstance::getSensorData(uint32_t nRecordIndex)
+{
+    auto pRecord = m_Entries.getData(nRecordIndex);
+    return &pRecord->m_pData[m_nRTCValuesPerRecord];
+}
+
+
+void CDataRecordingInstance::copyRTCSignals(uint32_t nRecordIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize)
+{
+    uint32_t nRTCValuesPerRecord = getRTCValuesPerRecord();
+    int32_t* pRTCData = getRTCData(nRecordIndex);
+
+    if (nRTCSignalBufferSize < (size_t)nRTCValuesPerRecord)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    for (uint32_t nIndex = 0; nIndex < nRTCValuesPerRecord; nIndex++)
+        pRTCSignalBuffer[nIndex] = pRTCData[nIndex];
+
+}
+
+
+void CDataRecordingInstance::copySensorSignals(uint32_t nRecordIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize)
+{
+    uint32_t nSensorValuesPerRecord = getSensorValuesPerRecord();
+    int32_t* pSensorData = getSensorData(nRecordIndex);
+
+    if (nSensorSignalBufferSize < (size_t)nSensorValuesPerRecord)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    for (uint32_t nIndex = 0; nIndex < nSensorValuesPerRecord; nIndex++)
+        pSensorSignalBuffer[nIndex] = pSensorData[nIndex];
+
+}
+
+void CDataRecordingInstance::copyXCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (pCoordinateBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nCoordinateBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    double * pTarget = pCoordinateBuffer;
+    for (size_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+        auto pRecord = m_Entries.getData(nIndex);
+        *pTarget = pRecord->m_dX;
+        pTarget++;
+    }
+
+}
+
+void CDataRecordingInstance::copyYCoordinates(double* pCoordinateBuffer, size_t nCoordinateBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (pCoordinateBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nCoordinateBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    double* pTarget = pCoordinateBuffer;
+    for (size_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+        auto pRecord = m_Entries.getData(nIndex);
+        *pTarget = pRecord->m_dY;
+        pTarget++;
+    }
+
+}
+
+void CDataRecordingInstance::copyPacketNumbers(uint32_t * pPacketNumberBuffer, size_t nPacketNumberBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (pPacketNumberBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nPacketNumberBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    uint32_t* pTarget = pPacketNumberBuffer;
+    for (size_t nIndex = 0; nIndex < nRecordCount; nIndex++) {
+        auto pRecord = m_Entries.getData(nIndex);
+        *pTarget = pRecord->m_nPacketNumber;
+        pTarget++;
+    }
+
+}
+

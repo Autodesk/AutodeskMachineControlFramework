@@ -649,43 +649,34 @@ std::vector<uint8_t>& COIEDeviceInstance::getRTC6CorrectionData()
 
 PDataRecordingInstance COIEDeviceInstance::RetrieveCurrentRecording()
 {
-	PDataRecordingInstance pRecordingInstance = nullptr;
-	{
-		std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
+	std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
 
-		if (m_pCurrentDataRecording.get() != nullptr) {
-
-			pRecordingInstance = m_pCurrentDataRecording;
-
-			clearCurrentRecordingUnderMutex();
-		}
-		else {
-			throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE);
-		}
-	}
-
-	return pRecordingInstance;
-
-}
-
-void COIEDeviceInstance::clearCurrentRecordingUnderMutex()
-{
 	if (m_pCurrentDataRecording.get() != nullptr) {
-		uint32_t nValuesPerRecord = m_pCurrentDataRecording->getValuesPerRecord();
-		uint32_t nBufferSizeInRecords = m_pCurrentDataRecording->getBufferSizeInRecords();
-		uint32_t nRTCValuesPerRecord = m_pCurrentDataRecording->getRTCValuesPerRecord();
-		m_pCurrentDataRecording = nullptr;
 
-		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(nValuesPerRecord, nRTCValuesPerRecord, nBufferSizeInRecords);
+		auto pOldRecording = m_pCurrentDataRecording;
+		m_pCurrentDataRecording = nullptr;
+		m_pCurrentDataRecording = pOldRecording->createEmptyDuplicate();
+
+		return pOldRecording;
+	}
+	else {
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE);
 	}
 
+
 }
+
 
 
 void COIEDeviceInstance::ClearCurrentRecording()
 {
 	std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
-	clearCurrentRecordingUnderMutex();
+	if (m_pCurrentDataRecording.get() != nullptr) {
+		auto pOldRecording = m_pCurrentDataRecording;
+		m_pCurrentDataRecording = nullptr;
+		m_pCurrentDataRecording = pOldRecording->createEmptyDuplicate();
+
+	}
 }
 
 PDataRecordingInstance COIEDeviceInstance::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)

@@ -90,10 +90,8 @@
 		<error name="INVALIDSENSORSIGNALCOUNT" code="1033" description="Invalid Sensor signal count." />	
 		<error name="NODATARECORDINGAVAILABLE" code="1034" description="No data recording available." />	
 		<error name="INVALIDRTCVALUESPERRECORD" code="1035" description="Invalid RTC values per record." />	
-		<error name="INVALIDRECORDINDEX" code="1036" description="Invalid record index." />	
-		
-		
-		
+		<error name="INVALIDRECORDINDEX" code="1036" description="Invalid record index." />			
+		<error name="INVALIDSIGNALINDEX" code="1037" description="Invalid signal index." />	
 
 	</errors>
 	
