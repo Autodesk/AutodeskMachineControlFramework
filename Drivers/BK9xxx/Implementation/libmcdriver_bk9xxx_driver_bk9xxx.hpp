@@ -47,6 +47,7 @@ Abstract: This is the class declaration of CDriver_BK9xxx
 // Include custom headers here.
 #include <map>
 #include <set>
+#include <atomic>
 
 #include "pugixml.hpp"
 #include <mutex>

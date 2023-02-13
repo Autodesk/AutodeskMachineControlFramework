@@ -34,7 +34,7 @@ Abstract: This is a stub class definition of CDriver_BK9xxx
 #include "libmcdriver_bk9xxx_driver_bk9xxx.hpp"
 #include "libmcdriver_bk9xxx_interfaceexception.hpp"
 #include <iostream>
-#include <atomic>
+
 
 // Include custom headers here.
 #define __STRINGIZE(x) #x
