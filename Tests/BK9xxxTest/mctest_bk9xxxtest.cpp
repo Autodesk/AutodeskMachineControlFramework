@@ -129,25 +129,31 @@ public:
 
 		pStateEnvironment->LogMessage("Querying parameters..");
 
-		pDriver->QueryParameters();
+		for (uint32_t nIndex = 0; nIndex < 100; nIndex++) {
 
-		pStateEnvironment->LogMessage("Getting parameters");
+			pDriver->QueryParameters();
 
-		if (pDriver->GetDigitalInput("laser1_psa_active"))
-		{
-			pStateEnvironment->LogMessage ("laser1 PSA is active!");
+			pStateEnvironment->LogMessage("Getting parameters");
+
+			if (pDriver->GetDigitalInput("laser1_psa_active"))
+			{
+				pStateEnvironment->LogMessage("laser1 PSA is active!");
+			}
+			else {
+				pStateEnvironment->LogMessage("laser1 PSA is NOT active!");
+			}
+
+			analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
+			analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
+
+			pStateEnvironment->LogMessage("Magnetic Valve raw value: " + std::to_string(analog_input_raw));
+			pStateEnvironment->LogMessage("Magnetic Valve scaled value: " + std::to_string(analog_input_scaled));
+
+			pStateEnvironment->Sleep(500);
+
 		}
-		else {
-			pStateEnvironment->LogMessage("laser1 PSA is NOT active!");
-		}
-		
-		analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
-		analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
-
-		pStateEnvironment->LogMessage("Magnetic Valve raw value: " + std::to_string (analog_input_raw));
-		pStateEnvironment->LogMessage("Magnetic Valve scaled value: " + std::to_string(analog_input_scaled)); 
-
 		pStateEnvironment->SetNextState("success");
+
 	}
 
 };

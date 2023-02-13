@@ -283,9 +283,10 @@ std::string CDriver_BuR::GetType()
 
 void CDriver_BuR::GetVersion(LibMCDriver_BuR_uint32& nMajor, LibMCDriver_BuR_uint32& nMinor, LibMCDriver_BuR_uint32& nMicro, std::string& sBuild)
 {
-    nMajor = 1;
-    nMinor = 0;
-    nMicro = 0;
+    nMajor = LIBMCDRIVER_BUR_VERSION_MAJOR;
+    nMinor = LIBMCDRIVER_BUR_VERSION_MINOR;
+    nMicro = LIBMCDRIVER_BUR_VERSION_MICRO;
+    sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_BuR::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)

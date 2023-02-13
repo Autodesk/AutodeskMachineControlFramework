@@ -34,8 +34,11 @@ Abstract: This is a stub class definition of CDriver_BK9xxx
 #include "libmcdriver_bk9xxx_driver_bk9xxx.hpp"
 #include "libmcdriver_bk9xxx_interfaceexception.hpp"
 #include <iostream>
+#include <atomic>
 
 // Include custom headers here.
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 #define B9XXX_CONFIGURATIONSCHEMA "http://schemas.autodesk.com/amc/bk9xxxprotocol/2023/01"
 
@@ -52,7 +55,7 @@ using namespace LibMCDriver_BK9xxx::Impl;
 **************************************************************************************************************************/
 
 CDriver_BK9xxxThreadState::CDriver_BK9xxxThreadState(LibMCEnv::PModbusTCPConnection pModBusTCPConnection)
-	: m_ModBusConnectionThreadShallFinish (false)
+	: m_ModBusConnectionThreadShallFinish (false), m_bDebugMode (false)
 {
 	if (pModBusTCPConnection.get() == nullptr)
 		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDPARAM);
@@ -90,6 +93,9 @@ bool CDriver_BK9xxxThreadState::isConnected()
 
 void CDriver_BK9xxxThreadState::handleException(uint32_t nErrorCode, const std::string& sMessage)
 {
+	if (m_bDebugMode) {
+		std::cout << "B9XXX: An exception occured: " << sMessage << std::endl;
+	}
 	m_Exceptions.push_back(std::make_pair (nErrorCode, sMessage));
 }
 
@@ -278,6 +284,7 @@ void CDriver_BK9xxx::GetVersion(LibMCDriver_BK9xxx_uint32& nMajor, LibMCDriver_B
 	nMajor = LIBMCDRIVER_BK9XXX_VERSION_MAJOR;
 	nMinor = LIBMCDRIVER_BK9XXX_VERSION_MINOR;
 	nMicro = LIBMCDRIVER_BK9XXX_VERSION_MICRO;
+	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_BK9xxx::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)

@@ -309,9 +309,10 @@ std::string CDriver_ADS::GetType()
 
 void CDriver_ADS::GetVersion(LibMCDriver_ADS_uint32& nMajor, LibMCDriver_ADS_uint32& nMinor, LibMCDriver_ADS_uint32& nMicro, std::string& sBuild)
 {
-    nMajor = 1;
-    nMinor = 0;
-    nMicro = 0;
+    nMajor = LIBMCDRIVER_ADS_VERSION_MAJOR;
+    nMinor = LIBMCDRIVER_ADS_VERSION_MINOR;
+    nMicro = LIBMCDRIVER_ADS_VERSION_MICRO;
+    sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_ADS::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)

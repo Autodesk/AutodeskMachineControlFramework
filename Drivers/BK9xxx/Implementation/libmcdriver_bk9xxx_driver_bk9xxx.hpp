@@ -65,6 +65,8 @@ namespace LibMCDriver_BK9xxx {
 
 		class CDriver_BK9xxxThreadState {
 		public:
+			bool m_bDebugMode;
+
 			std::mutex m_ModBusConnectionMutex;
 			std::atomic<bool> m_ModBusConnectionThreadShallFinish;
 			LibMCEnv::PModbusTCPConnection m_pModBusTCPConnection;
