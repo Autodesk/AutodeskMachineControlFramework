@@ -55,19 +55,21 @@ using namespace LibMCDriver_BK9xxx::Impl;
 **************************************************************************************************************************/
 
 CDriver_BK9xxxThreadState::CDriver_BK9xxxThreadState(LibMCEnv::PModbusTCPConnection pModBusTCPConnection)
-	: m_ModBusConnectionThreadShallFinish (false), m_bDebugMode (false)
+	: m_ModBusConnectionThreadShallFinish (false), m_bDebugMode (true), m_bIsConnectedCache (false)
 {
 	if (pModBusTCPConnection.get() == nullptr)
 		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDPARAM);
 
-	std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
 	m_pModBusTCPConnection = pModBusTCPConnection;
 
+	updateConnectionState();
 }
 
 CDriver_BK9xxxThreadState::~CDriver_BK9xxxThreadState()
 {
 	m_pModBusTCPConnection = nullptr;
+	m_bIsConnectedCache = false;
+
 }
 
 void CDriver_BK9xxxThreadState::disconnect()
@@ -76,19 +78,27 @@ void CDriver_BK9xxxThreadState::disconnect()
 	m_pModBusTCPConnection->Disconnect();
 	m_pModBusTCPConnection = nullptr;
 
+	m_bIsConnectedCache = false;
+
 	m_ModBusConnectionThreadShallFinish = true;
 
 }
 
 bool CDriver_BK9xxxThreadState::isConnected()
 {
-	std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
-	if (m_pModBusTCPConnection.get() != nullptr)
-		return m_pModBusTCPConnection->IsConnected();
-
-	return false;
+	return m_bIsConnectedCache;
 }
 
+void CDriver_BK9xxxThreadState::updateConnectionState()
+{
+	if (m_pModBusTCPConnection.get() != nullptr) {
+		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
+		m_bIsConnectedCache = m_pModBusTCPConnection->IsConnected();
+	}
+	else {
+		m_bIsConnectedCache = false;
+	}
+}
 
 
 void CDriver_BK9xxxThreadState::handleException(uint32_t nErrorCode, const std::string& sMessage)
@@ -99,6 +109,81 @@ void CDriver_BK9xxxThreadState::handleException(uint32_t nErrorCode, const std::
 	m_Exceptions.push_back(std::make_pair (nErrorCode, sMessage));
 }
 
+LibMCEnv::PModbusTCPDigitalIOStatus CDriver_BK9xxxThreadState::ReadCoilStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount)
+{
+	if (m_pModBusTCPConnection.get() != nullptr) {
+		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
+		return m_pModBusTCPConnection->ReadCoilStatus(nStartAddress, nBitCount);
+	}
+	else {
+		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED);
+	}
+}
+
+LibMCEnv::PModbusTCPDigitalIOStatus CDriver_BK9xxxThreadState::ReadInputStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount)
+{
+	if (m_pModBusTCPConnection.get() != nullptr) {
+		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
+		return m_pModBusTCPConnection->ReadInputStatus(nStartAddress, nBitCount);
+	}
+	else {
+		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED);
+	}
+
+}
+
+LibMCEnv::PModbusTCPRegisterStatus CDriver_BK9xxxThreadState::ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount)
+{
+	if (m_pModBusTCPConnection.get() != nullptr) {
+		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
+		return m_pModBusTCPConnection->ReadHoldingRegisters(nStartAddress, nRegisterCount);
+	}
+	else {
+		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED);
+	}
+
+}
+
+LibMCEnv::PModbusTCPRegisterStatus CDriver_BK9xxxThreadState::ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount)
+{
+	if (m_pModBusTCPConnection.get() != nullptr) {
+		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
+		return m_pModBusTCPConnection->ReadInputRegisters(nStartAddress, nRegisterCount);
+	}
+	else {
+		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED);
+	}
+
+}
+
+void CDriver_BK9xxxThreadState::ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, const std::vector<uint8_t>& BufferBuffer)
+{
+	if (m_pModBusTCPConnection.get() != nullptr) {
+		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
+		m_pModBusTCPConnection->ForceMultipleCoils(nStartAddress, BufferBuffer);
+	}
+	else {
+		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED);
+	}
+
+}
+
+void CDriver_BK9xxxThreadState::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const std::vector<uint16_t>& BufferBuffer)
+{
+	if (m_pModBusTCPConnection.get() != nullptr) {
+		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
+		m_pModBusTCPConnection->PresetMultipleRegisters(nStartAddress, BufferBuffer);
+	}
+	else {
+		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_NOTCONNECTED);
+	}
+
+}
+
+bool CDriver_BK9xxxThreadState::shallFinish()
+{
+	return m_ModBusConnectionThreadShallFinish;
+}
 
 
 CDriver_BK9xxx::CDriver_BK9xxx(const std::string& sName, LibMCEnv::PDriverEnvironment pDriverEnvironment)
@@ -436,9 +521,8 @@ void CDriver_BK9xxx::Reconnect()
 
 				bool bShallFinish = false;
 				while (!bShallFinish) {
-					std::lock_guard<std::mutex> lockGuard(pModBusConnectionThreadState->m_ModBusConnectionMutex);
 
-					if (pModBusConnectionThreadState->m_pModBusTCPConnection.get() != nullptr) {
+					if (pModBusConnectionThreadState->isConnected ()) {
 
 						for (auto pDigitalOutputBlock : pDigitalOutputBlocks) {
 							std::vector<uint8_t> coilStatus;
@@ -446,7 +530,7 @@ void CDriver_BK9xxx::Reconnect()
 							coilStatus.reserve(nBitCount);
 
 							for (uint32_t nIndex = 0; nIndex < nBitCount; nIndex++)
-								coilStatus.at(nIndex) = 0;
+								coilStatus.push_back(0);
 
 							uint32_t nCount = pDigitalOutputBlock->getCount();
 							for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
@@ -455,12 +539,29 @@ void CDriver_BK9xxx::Reconnect()
 									coilStatus.at(pIODefinition->getOffset()) = 1;
 							}
 
-							pModBusConnectionThreadState->m_pModBusTCPConnection->ForceMultipleCoils(0, coilStatus);
+							pModBusConnectionThreadState->ForceMultipleCoils(pDigitalOutputBlock->getStartAddress (), coilStatus);
+						}
+
+						for (auto pAnalogOutputBlock : pAnalogOutputBlocks) {
+							std::vector<uint16_t> registerValues;
+							uint32_t nRegisterCount = pAnalogOutputBlock->getRegisterCount();
+							registerValues.reserve(nRegisterCount);
+
+							for (uint32_t nIndex = 0; nIndex < nRegisterCount; nIndex++)
+								registerValues.push_back(0);
+
+							uint32_t nCount = pAnalogOutputBlock->getCount();
+							for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+								auto pIODefinition = pAnalogOutputBlock->getIODefinition(nIndex);								
+									registerValues.at(pIODefinition->getOffset()) = pIODefinition->getTargetRawValue ();
+							}
+
+							pModBusConnectionThreadState->PresetMultipleRegisters(pAnalogOutputBlock->getStartAddress () + 0x0800, registerValues);
 						}
 
 
 						for (auto pDigitalInputBlock : pDigitalInputBlocks) {
-							auto pIOStatus = pModBusConnectionThreadState->m_pModBusTCPConnection->ReadInputStatus(pDigitalInputBlock->getStartAddress(), pDigitalInputBlock->getBitCount());
+							auto pIOStatus = pModBusConnectionThreadState->ReadInputStatus(pDigitalInputBlock->getStartAddress(), pDigitalInputBlock->getBitCount());
 							uint32_t nCount = pDigitalInputBlock->getCount();
 							for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 								auto pIODefinition = pDigitalInputBlock->getIODefinition(nIndex);
@@ -472,7 +573,7 @@ void CDriver_BK9xxx::Reconnect()
 						}
 
 						for (auto pDigitalOutputBlock : pDigitalOutputBlocks) {
-							auto pIOStatus = pModBusConnectionThreadState->m_pModBusTCPConnection->ReadCoilStatus(pDigitalOutputBlock->getStartAddress(), pDigitalOutputBlock->getBitCount());
+							auto pIOStatus = pModBusConnectionThreadState->ReadCoilStatus(pDigitalOutputBlock->getStartAddress(), pDigitalOutputBlock->getBitCount());
 							uint32_t nCount = pDigitalOutputBlock->getCount();
 							for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 								auto pIODefinition = pDigitalOutputBlock->getIODefinition(nIndex);
@@ -483,9 +584,8 @@ void CDriver_BK9xxx::Reconnect()
 
 						}
 
-
 						for (auto pAnalogInputBlock : pAnalogInputBlocks) {
-							auto pIOStatus = pModBusConnectionThreadState->m_pModBusTCPConnection->ReadHoldingRegisters(pAnalogInputBlock->getStartAddress(), pAnalogInputBlock->getRegisterCount());
+							auto pIOStatus = pModBusConnectionThreadState->ReadHoldingRegisters(pAnalogInputBlock->getStartAddress(), pAnalogInputBlock->getRegisterCount());
 							uint32_t nCount = pAnalogInputBlock->getCount();
 							for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 								auto pIODefinition = pAnalogInputBlock->getIODefinition(nIndex);
@@ -493,14 +593,28 @@ void CDriver_BK9xxx::Reconnect()
 
 								pIODefinition->setActualRawValue(nRawValue);
 							}
+						}
+
+						for (auto pAnalogOutputBlock : pAnalogOutputBlocks) {
+							auto pIOStatus = pModBusConnectionThreadState->ReadHoldingRegisters(pAnalogOutputBlock->getStartAddress() + 0x0800, pAnalogOutputBlock->getRegisterCount());
+							uint32_t nCount = pAnalogOutputBlock->getCount();
+							for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
+								auto pIODefinition = pAnalogOutputBlock->getIODefinition(nIndex);
+								uint32_t nRawValue = pIOStatus->GetValue(pIODefinition->getOffset());
+
+								pIODefinition->setActualRawValue(nRawValue);
+							}
 
 						}
+
 					}
+
+
 
 
 					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-					bShallFinish = pModBusConnectionThreadState->m_ModBusConnectionThreadShallFinish;
+					bShallFinish = pModBusConnectionThreadState->shallFinish ();
 				}
 			}
 			catch (ELibMCDriver_BK9xxxInterfaceException & DriverException) {
@@ -684,8 +798,8 @@ void CDriver_BK9xxx::SetDigitalOutput(const std::string& sVariableName, const bo
 
 void CDriver_BK9xxx::SetAnalogOutputRaw(const std::string& sVariableName, const LibMCDriver_BK9xxx_uint32 nValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 {
-	auto iIter = m_AnalogInputIOMap.find(sVariableName);
-	if (iIter == m_AnalogInputIOMap.end())
+	auto iIter = m_AnalogOutputIOMap.find(sVariableName);
+	if (iIter == m_AnalogOutputIOMap.end())
 		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_ANALOGIONOTFOUND, "analog IO not found: " + sVariableName);
 
 	auto pIODefinition = iIter->second;
@@ -715,8 +829,8 @@ void CDriver_BK9xxx::SetAnalogOutputRaw(const std::string& sVariableName, const 
 
 void CDriver_BK9xxx::SetAnalogOutput(const std::string& sVariableName, const LibMCDriver_BK9xxx_double dValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs)
 {
-	auto iIter = m_AnalogInputIOMap.find(sVariableName);
-	if (iIter == m_AnalogInputIOMap.end())
+	auto iIter = m_AnalogOutputIOMap.find(sVariableName);
+	if (iIter == m_AnalogOutputIOMap.end())
 		throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_ANALOGIONOTFOUND, "analog IO not found: " + sVariableName);
 
 	auto pIODefinition = iIter->second;

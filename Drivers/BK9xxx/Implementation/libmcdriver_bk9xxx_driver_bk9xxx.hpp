@@ -66,13 +66,16 @@ namespace LibMCDriver_BK9xxx {
 		**************************************************************************************************************************/
 
 		class CDriver_BK9xxxThreadState {
-		public:
+		private:
 			bool m_bDebugMode;
 
 			std::mutex m_ModBusConnectionMutex;
 			std::atomic<bool> m_ModBusConnectionThreadShallFinish;
+			std::atomic<bool> m_bIsConnectedCache;
 			LibMCEnv::PModbusTCPConnection m_pModBusTCPConnection;
 			std::vector<std::pair<uint32_t, std::string>> m_Exceptions;
+
+		public:
 
 			CDriver_BK9xxxThreadState (LibMCEnv::PModbusTCPConnection pModBusTCPConnection);
 			virtual ~CDriver_BK9xxxThreadState();
@@ -80,7 +83,19 @@ namespace LibMCDriver_BK9xxx {
 			void disconnect();
 			bool isConnected();
 
+			void updateConnectionState();
+
 			void handleException(uint32_t nErrorCode, const std::string & sMessage);
+
+			LibMCEnv::PModbusTCPDigitalIOStatus ReadCoilStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount);
+			LibMCEnv::PModbusTCPDigitalIOStatus ReadInputStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount);
+			LibMCEnv::PModbusTCPRegisterStatus ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
+			LibMCEnv::PModbusTCPRegisterStatus ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
+			void ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, const std::vector<uint8_t>& BufferBuffer);
+			void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const std::vector<uint16_t>& BufferBuffer);
+
+			bool shallFinish();
+
 
 		};
 

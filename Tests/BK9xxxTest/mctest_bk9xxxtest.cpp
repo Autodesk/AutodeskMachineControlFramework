@@ -106,19 +106,19 @@ public:
 
 		pStateEnvironment->LogMessage("Starting test");
 
-		if (pDriver->GetDigitalInput("laser1_psa_active"))
+		/*if (pDriver->GetDigitalInput("laser1_psa_active"))
 		{
 			pStateEnvironment->LogMessage("laser1 PSA is active (no connection)!");
 		}
 		else {
 			pStateEnvironment->LogMessage("laser1 PSA is NOT active (no connection)!");
-		}
+		} */
 
 		int64_t analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
 		double analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
 
 		pStateEnvironment->LogMessage("Magnetic Valve raw value (no connection): " + std::to_string(analog_input_raw));
-		pStateEnvironment->LogMessage("Magnetic Valve scaled value (no connection): " + std::to_string(analog_input_scaled));
+		pStateEnvironment->LogMessage("Magnetic Valve scaled value (no connection): " + std::to_string(analog_input_scaled)); 
 
 		pStateEnvironment->LogMessage("Connecting..");
 
@@ -135,7 +135,7 @@ public:
 
 			pStateEnvironment->LogMessage("Getting parameters");
 
-			if (pDriver->GetDigitalInput("laser1_psa_active"))
+			/*if (pDriver->GetDigitalInput("laser1_psa_active"))
 			{
 				pStateEnvironment->LogMessage("laser1 PSA is active!");
 			}
@@ -143,13 +143,42 @@ public:
 				pStateEnvironment->LogMessage("laser1 PSA is NOT active!");
 			}
 
+			if (nIndex % 2 == 0) {
+
+				pDriver->SetDigitalOutput("laser1_guide", true, 1000);
+				pDriver->SetDigitalOutput("laser2_guide", false, 1000);
+
+
+			}
+			else {
+
+				pDriver->SetDigitalOutput("laser1_guide", false, 1000);
+				pDriver->SetDigitalOutput("laser2_guide", true, 1000);
+
+			}
+			*/
+
 			analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
 			analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
 
 			pStateEnvironment->LogMessage("Magnetic Valve raw value: " + std::to_string(analog_input_raw));
-			pStateEnvironment->LogMessage("Magnetic Valve scaled value: " + std::to_string(analog_input_scaled));
+			pStateEnvironment->LogMessage("Magnetic Valve scaled value: " + std::to_string(analog_input_scaled)); 
 
-			pStateEnvironment->Sleep(500);
+				if (nIndex % 2 == 0) {
+
+					pDriver->SetAnalogOutput("led1intensity", 1.0, 1000);
+					pDriver->SetAnalogOutput("led2intensity", 20.0, 1000);
+
+
+				}
+				else {
+
+					pDriver->SetAnalogOutput("led1intensity", 20.0, 1000);
+					pDriver->SetAnalogOutput("led2intensity", 1.0, 1000);
+
+				}
+
+			pStateEnvironment->Sleep(1500);
 
 		}
 		pStateEnvironment->SetNextState("success");
