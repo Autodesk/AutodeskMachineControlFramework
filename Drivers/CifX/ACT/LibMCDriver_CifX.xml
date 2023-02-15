@@ -54,6 +54,15 @@
 		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />
 		<error name="DRIVERTYPENOTFOUND" code="1003" description="the driver type has not been found" />
 		
+		<error name="SDKALREADYLOADED" code="1004" description="SDK already loaded" />
+		<error name="INVALIDSDKRESOURCE" code="1005" description="invalid SDK Resource" />
+		<error name="OUTPUTVALUENOTFOUND" code="1006" description="output value not found" />
+		<error name="INPUTVALUENOTFOUND" code="1007" description="input value not found" />		
+		<error name="VALUENOTFOUND" code="1008" description="value not found" />		
+		
+		<error name="INVALIDDRIVERPROTOCOL" code="1009" description="invalid driver protocol" />		
+		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1010" description="could not parse driver protocol" />		
+		
 		
 						
 	</errors>

@@ -166,15 +166,15 @@ public:
 
 				if (nIndex % 2 == 0) {
 
-					pDriver->SetAnalogOutput("led1intensity", 1.0, 1000);
-					pDriver->SetAnalogOutput("led2intensity", 20.0, 1000);
+					pDriver->SetAnalogOutput("led1intensity", 1.0, 0);
+					pDriver->SetAnalogOutput("led2intensity", 20.0, 0);
 
 
 				}
 				else {
 
-					pDriver->SetAnalogOutput("led1intensity", 20.0, 1000);
-					pDriver->SetAnalogOutput("led2intensity", 1.0, 1000);
+					pDriver->SetAnalogOutput("led1intensity", 20.0, 0);
+					pDriver->SetAnalogOutput("led2intensity", 1.0, 0);
 
 				}
 
