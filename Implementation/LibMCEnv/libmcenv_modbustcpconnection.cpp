@@ -150,20 +150,20 @@ void CModbusTCPConnection::ForceMultipleCoils(const LibMCEnv_uint32 nStartAddres
 	m_pModbusConnectionInstance->forceMultipleCoils(nStartAddress, coilStatus);
 }
 
-void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer)
+void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint32 * pBufferBuffer)
 {
 	std::vector<uint16_t> registerStatus;
-	if ((nBufferBufferSize == 0) || (pBufferBuffer == 0))
+	if ((nBufferBufferSize == 0) || (pBufferBuffer == nullptr))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT);
 
 	if (nBufferBufferSize > MODBUSTCP_MAX_REGISTERCOUNT)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT);
 
-	registerStatus.resize(nBufferBufferSize);
-	for (uint32_t nIndex = 0; nIndex < nBufferBufferSize; nIndex)
-		registerStatus.at(nIndex) = pBufferBuffer[nIndex];
+	registerStatus.reserve(nBufferBufferSize);
+	for (uint32_t nIndex = 0; nIndex < nBufferBufferSize; nIndex++)
+		registerStatus.push_back (pBufferBuffer[nIndex]);
 
-	m_pModbusConnectionInstance->presetMultipleRegisters(nStartAddress, registerStatus);
+	m_pModbusConnectionInstance->presetMultipleRegisters(nStartAddress, registerStatus); 
 
 }
 

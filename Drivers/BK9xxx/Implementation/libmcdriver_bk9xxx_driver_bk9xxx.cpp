@@ -48,6 +48,8 @@ Abstract: This is a stub class definition of CDriver_BK9xxx
 #define B9XXX_DIAGNOSISFUNCTION_BUSCOMMUNICATIONANSWERS 11
 #define B9XXX_DIAGNOSISFUNCTION_ERRORANSWERCOUNTER 13
 
+#define BK9XXX_ANALOGOUTPUTADDRESS 0x0800
+
 using namespace LibMCDriver_BK9xxx::Impl;
 
 /*************************************************************************************************************************
@@ -168,7 +170,7 @@ void CDriver_BK9xxxThreadState::ForceMultipleCoils(const LibMCEnv_uint32 nStartA
 
 }
 
-void CDriver_BK9xxxThreadState::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, std::vector<uint16_t> BufferBuffer)
+void CDriver_BK9xxxThreadState::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, std::vector<uint32_t> BufferBuffer)
 {
 	if (m_pModBusTCPConnection.get() != nullptr) {
 		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
@@ -547,7 +549,7 @@ void CDriver_BK9xxx::Reconnect()
 						//std::cout << "writing analog output blocks" << std::endl;
 
 						for (auto pAnalogOutputBlock : pAnalogOutputBlocks) {
-							std::vector<uint16_t> registerValues;
+							std::vector<uint32_t> registerValues;
 							uint32_t nRegisterCount = pAnalogOutputBlock->getRegisterCount();
 							registerValues.reserve(nRegisterCount);
 
@@ -564,11 +566,7 @@ void CDriver_BK9xxx::Reconnect()
 
 							}
 
-							//std::cout << "PresetMultipleRegisters A" << std::endl;
-
-							//pModBusConnectionThreadState->m_pModBusTCPConnection->PresetMultipleRegisters(pAnalogOutputBlock->getStartAddress (), registerValues);
-
-							//std::cout << "PresetMultipleRegisters B" << std::endl;
+							pModBusConnectionThreadState->PresetMultipleRegisters(pAnalogOutputBlock->getStartAddress () + BK9XXX_ANALOGOUTPUTADDRESS, registerValues);
 						}
 
 						for (auto pDigitalInputBlock : pDigitalInputBlocks) {
@@ -607,7 +605,7 @@ void CDriver_BK9xxx::Reconnect()
 						}
 
 						for (auto pAnalogOutputBlock : pAnalogOutputBlocks) {
-							auto pIOStatus = pModBusConnectionThreadState->ReadHoldingRegisters(pAnalogOutputBlock->getStartAddress() + 0x0800, pAnalogOutputBlock->getRegisterCount());
+							auto pIOStatus = pModBusConnectionThreadState->ReadHoldingRegisters(pAnalogOutputBlock->getStartAddress() + BK9XXX_ANALOGOUTPUTADDRESS, pAnalogOutputBlock->getRegisterCount());
 							uint32_t nCount = pAnalogOutputBlock->getCount();
 							for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 								auto pIODefinition = pAnalogOutputBlock->getIODefinition(nIndex);

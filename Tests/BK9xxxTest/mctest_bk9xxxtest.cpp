@@ -117,6 +117,8 @@ public:
 		int64_t analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
 		double analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
 
+
+
 		pStateEnvironment->LogMessage("Magnetic Valve raw value (no connection): " + std::to_string(analog_input_raw));
 		pStateEnvironment->LogMessage("Magnetic Valve scaled value (no connection): " + std::to_string(analog_input_scaled)); 
 
@@ -161,8 +163,13 @@ public:
 			analog_input_raw = pDriver->GetAnalogInputRaw("magnetic_valve_position");
 			analog_input_scaled = pDriver->GetAnalogInput("magnetic_valve_position");
 
+			int64_t analog_output_raw = pDriver->GetAnalogOutputRaw("led1intensity");
+			double analog_output_scaled = pDriver->GetAnalogOutput("led1intensity");
+
 			pStateEnvironment->LogMessage("Magnetic Valve raw value: " + std::to_string(analog_input_raw));
 			pStateEnvironment->LogMessage("Magnetic Valve scaled value: " + std::to_string(analog_input_scaled)); 
+			pStateEnvironment->LogMessage("LED Intensity raw value: " + std::to_string(analog_output_raw));
+			pStateEnvironment->LogMessage("LED Intensity scaled value: " + std::to_string(analog_output_scaled));
 
 				if (nIndex % 2 == 0) {
 

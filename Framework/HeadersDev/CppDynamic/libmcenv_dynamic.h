@@ -1398,10 +1398,10 @@ typedef LibMCEnvResult (*PLibMCEnvModbusTCPConnection_ForceMultipleCoilsPtr) (Li
 * @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
 * @param[in] nStartAddress - Start Address.
 * @param[in] nBufferBufferSize - Number of elements in buffer
-* @param[in] pBufferBuffer - uint16 buffer of Input register array. One word per Input. MUST NOT be empty
+* @param[in] pBufferBuffer - uint32 buffer of Input register array. One word per Input. MUST NOT be empty
 * @return error code or 0 (success)
 */
-typedef LibMCEnvResult (*PLibMCEnvModbusTCPConnection_PresetMultipleRegistersPtr) (LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer);
+typedef LibMCEnvResult (*PLibMCEnvModbusTCPConnection_PresetMultipleRegistersPtr) (LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint32 * pBufferBuffer);
 
 /*************************************************************************************************************************
  Class definition for DriverEnvironment

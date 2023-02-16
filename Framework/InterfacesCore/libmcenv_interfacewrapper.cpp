@@ -4009,7 +4009,7 @@ LibMCEnvResult libmcenv_modbustcpconnection_forcemultiplecoils(LibMCEnv_ModbusTC
 	}
 }
 
-LibMCEnvResult libmcenv_modbustcpconnection_presetmultipleregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer)
+LibMCEnvResult libmcenv_modbustcpconnection_presetmultipleregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint32 * pBufferBuffer)
 {
 	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
 
