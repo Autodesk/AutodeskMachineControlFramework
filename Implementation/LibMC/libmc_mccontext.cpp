@@ -330,7 +330,7 @@ void CMCContext::addDriver(const pugi::xml_node& xmlNode)
     }
 
     try {
-        m_pSystemState->driverHandler()->registerDriver(sName, sType, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName), sConfigurationData, m_pCoreResourcePackage);
+        m_pSystemState->driverHandler()->registerDriver(sName, sType, sLibraryName, m_pSystemState->getLibraryPath(sLibraryName), m_pSystemState->getLibraryResourcePath(sLibraryName), sConfigurationData, m_pCoreResourcePackage);
     } 
     catch (std::exception & E) {
         m_pSystemState->logger()->logMessage(std::string ("Driver error: ") + E.what(), LOG_SUBSYSTEM_SYSTEM, AMC::eLogLevel::FatalError);

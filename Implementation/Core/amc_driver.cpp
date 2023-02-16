@@ -48,21 +48,20 @@ template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_p
 }
 
 
-CDriver::CDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment)
-	: m_sName(sName), m_sType(sType), m_sLibraryPath(sLibraryPath), m_pDriverResourcePackage (pDriverResourcePackage), m_pParameterGroup(pParameterGroup)
+CDriver::CDriver(const std::string& sName, const std::string& sType, LibMCDriver::PWrapper pDriverWrapper, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment)
+	: m_sName(sName), m_sType(sType), m_pDriverWrapper(pDriverWrapper), m_pDriverResourcePackage (pDriverResourcePackage), m_pParameterGroup(pParameterGroup)
 {
 	LibMCAssertNotNull(pParameterGroup.get());
 	LibMCAssertNotNull(pDriverEnvironment.get());
 	LibMCAssertNotNull(pMCEnvWrapper.get());
 	LibMCAssertNotNull(pDriverResourcePackage.get());
+	LibMCAssertNotNull(pDriverWrapper.get());
 
 	m_pDriverEnvironment = pDriverEnvironment;
 	m_pMCEnvWrapper = pMCEnvWrapper;
-
-	m_pDriverWrapper = LibMCDriver::CWrapper::loadLibrary (sLibraryPath);
+	m_pDriverWrapper = pDriverWrapper;
 	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCEnv::CDriverEnvironment>(pDriverEnvironment, m_pMCEnvWrapper);
 
-	m_pDriverWrapper->InjectComponent("LibMCEnv", m_pMCEnvWrapper->GetSymbolLookupMethod());
 	m_pDriverInstance = m_pDriverWrapper->CreateDriver (sName, sType, pExternalEnvironment.get());
 }
 

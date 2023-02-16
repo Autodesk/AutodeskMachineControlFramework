@@ -47,6 +47,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace AMC;
 
+
+template <class C> std::shared_ptr<C> mapInternalDriverEnvInstance(std::shared_ptr<LibMCEnv::Impl::IBase> pImplInstance, LibMCEnv::PWrapper pWrapper)
+{
+	LibMCAssertNotNull(pWrapper.get());
+
+	auto pExternalInstance = std::make_shared <C>(pWrapper.get(), (LibMCEnv::Impl::IBase*)(pImplInstance.get()));
+	pImplInstance->IncRefCount();
+	return pExternalInstance;
+}
+
 CDriverHandler::CDriverHandler(LibMCEnv::PWrapper pEnvironmentWrapper, PToolpathHandler pToolpathHandler, PLogger pLogger)
 	: m_pEnvironmentWrapper (pEnvironmentWrapper), m_pToolpathHandler (pToolpathHandler), m_pLogger (pLogger)
 {
@@ -63,7 +73,7 @@ CDriverHandler::~CDriverHandler()
 }
 
 
-void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string& sResourcePath, const std::string& sDriverConfigurationData, AMC::PResourcePackage pMachineResourcePackage)
+void CDriverHandler::registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryName, const std::string& sLibraryPath, const std::string& sResourcePath, const std::string& sDriverConfigurationData, AMC::PResourcePackage pMachineResourcePackage)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
@@ -91,7 +101,20 @@ void CDriverHandler::registerDriver(const std::string& sName, const std::string&
 
 	pInternalEnvironment->setIsInitializing(true);
 
-	PDriver pDriver = std::make_shared <CDriver>(sName, sType, sLibraryPath, pDriverResourcePackage, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
+	LibMCDriver::PWrapper pLibraryWrapper;
+	auto iDLLIter = m_DriverWrapperMap.find(sLibraryName);
+	if (iDLLIter != m_DriverWrapperMap.end()) {
+		pLibraryWrapper = iDLLIter->second;
+	}
+	else {
+		pLibraryWrapper = LibMCDriver::CWrapper::loadLibrary(sLibraryPath);
+		pLibraryWrapper->InjectComponent("LibMCEnv", m_pEnvironmentWrapper->GetSymbolLookupMethod());
+
+		m_DriverWrapperMap.insert(std::make_pair (sLibraryName, pLibraryWrapper));
+	}
+	
+
+	PDriver pDriver = std::make_shared <CDriver>(sName, sType, pLibraryWrapper, pDriverResourcePackage, pParameterGroup, m_pEnvironmentWrapper, pInternalEnvironment);
 	m_DriverList.push_back(pDriver);
 	m_DriverMap.insert(std::make_pair(sName, pDriver));	
 
