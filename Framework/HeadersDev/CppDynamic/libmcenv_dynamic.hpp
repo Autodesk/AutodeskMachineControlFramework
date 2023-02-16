@@ -998,7 +998,7 @@ public:
 	inline PModbusTCPRegisterStatus ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
 	inline PModbusTCPRegisterStatus ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
 	inline void ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint8> & BufferBuffer);
-	inline void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint32> & BufferBuffer);
+	inline void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint16> & BufferBuffer);
 };
 	
 /*************************************************************************************************************************
@@ -6653,7 +6653,7 @@ public:
 	* @param[in] nStartAddress - Start Address.
 	* @param[in] BufferBuffer - Input register array. One word per Input. MUST NOT be empty
 	*/
-	void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint32> & BufferBuffer)
+	void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const CInputVector<LibMCEnv_uint16> & BufferBuffer)
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_ModbusTCPConnection_PresetMultipleRegisters(m_pHandle, nStartAddress, (LibMCEnv_uint64)BufferBuffer.size(), BufferBuffer.data()));
 	}

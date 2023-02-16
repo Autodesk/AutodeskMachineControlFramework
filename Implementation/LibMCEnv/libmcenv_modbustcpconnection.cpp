@@ -150,7 +150,7 @@ void CModbusTCPConnection::ForceMultipleCoils(const LibMCEnv_uint32 nStartAddres
 	m_pModbusConnectionInstance->forceMultipleCoils(nStartAddress, coilStatus);
 }
 
-void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint32 * pBufferBuffer)
+void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer)
 {
 	std::vector<uint16_t> registerStatus;
 	if ((nBufferBufferSize == 0) || (pBufferBuffer == nullptr))

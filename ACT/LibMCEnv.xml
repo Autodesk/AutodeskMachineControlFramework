@@ -855,7 +855,7 @@
 
 		<method name="PresetMultipleRegisters" description= "Forces multiple registers on Server.">
 			<param name="StartAddress" type="uint32" pass="in" description="Start Address." />
-			<param name="Buffer" type="basicarray" class="uint32" pass="in" description="Input register array. One word per Input. MUST NOT be empty" />
+			<param name="Buffer" type="basicarray" class="uint16" pass="in" description="Input register array. One word per Input. MUST NOT be empty" />
 		</method>
 		
 	</class>	

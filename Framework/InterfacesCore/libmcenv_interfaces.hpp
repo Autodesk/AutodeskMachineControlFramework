@@ -1291,7 +1291,7 @@ public:
 	* @param[in] nBufferBufferSize - Number of elements in buffer
 	* @param[in] pBufferBuffer - Input register array. One word per Input. MUST NOT be empty
 	*/
-	virtual void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint32 * pBufferBuffer) = 0;
+	virtual void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer) = 0;
 
 };
 

@@ -170,7 +170,7 @@ void CDriver_BK9xxxThreadState::ForceMultipleCoils(const LibMCEnv_uint32 nStartA
 
 }
 
-void CDriver_BK9xxxThreadState::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, std::vector<uint32_t> BufferBuffer)
+void CDriver_BK9xxxThreadState::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, std::vector<uint16_t> BufferBuffer)
 {
 	if (m_pModBusTCPConnection.get() != nullptr) {
 		std::lock_guard<std::mutex> lockGuard(m_ModBusConnectionMutex);
@@ -549,7 +549,7 @@ void CDriver_BK9xxx::Reconnect()
 						//std::cout << "writing analog output blocks" << std::endl;
 
 						for (auto pAnalogOutputBlock : pAnalogOutputBlocks) {
-							std::vector<uint32_t> registerValues;
+							std::vector<uint16_t> registerValues;
 							uint32_t nRegisterCount = pAnalogOutputBlock->getRegisterCount();
 							registerValues.reserve(nRegisterCount);
 

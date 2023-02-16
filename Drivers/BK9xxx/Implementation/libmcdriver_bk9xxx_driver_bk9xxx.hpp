@@ -92,7 +92,7 @@ namespace LibMCDriver_BK9xxx {
 			LibMCEnv::PModbusTCPRegisterStatus ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
 			LibMCEnv::PModbusTCPRegisterStatus ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
 			void ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, std::vector<uint8_t> BufferBuffer);
-			void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, std::vector<uint32_t> BufferBuffer);
+			void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, std::vector<uint16_t> BufferBuffer);
 			
 			bool shallFinish();
 
