@@ -345,6 +345,7 @@ void CDriver_CifXChannelThreadState::stopThread(uint32_t nHostStateTimeOut, uint
 {
 	m_CancelFlag = true;
 
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
 	if ((m_hChannel != nullptr) && (m_pCifXSDK.get () != nullptr)) {
 
 		uint32_t nState = 0;
@@ -824,6 +825,10 @@ void CDriver_CifX::Connect()
 void CDriver_CifX::Disconnect()
 {
 	if (m_hDriverHandle != nullptr) {
+		for (auto pChannel : m_Channels) {
+			pChannel->stopSyncThread();
+		}
+
 		m_pCifXSDK->xDriverClose(m_hDriverHandle);
 		m_hDriverHandle = nullptr;
 	}
