@@ -2,11 +2,22 @@
 
 <testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
 
-	<driver name="cifx" library="driver_cifx" type="cifx-1.0" configurationschema="http://schemas.autodesk.com/amc/bk9xxxprotocol/2023/01">
+	<driver name="cifx" library="driver_cifx" type="cifx-1.0" configurationschema="http://schemas.autodesk.com/amc/cifxprotocol/2023/01">
 	
 		<version major="1" minor="0" patch="0" />
 		
+		<channel board="cifX0" channelindex="0" >
+		  <input_io size="192">
+			<bool address="0" bit="0" name="plccycle_start_ackn" description="Acknowledge for Start" default="false" />
+			<uint16 address="58" name="aaxis_act_state" description="A Axis State of Axis" />
+		  </input_io>
 
+		  <output_io size="192">
+			<bool name="plccycle_start_cmd" address="0" bit="0"  description="Command to start cycle on PLC" default="false" />
+			<bool name="pc_alive" address="1" bit="7" description="Mirror of plc_alive" default="false" />
+		  </output_io>
+		  
+		</channel>
 	
 	</driver>
 

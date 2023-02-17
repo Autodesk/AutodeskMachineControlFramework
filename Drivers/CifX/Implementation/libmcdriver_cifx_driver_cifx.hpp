@@ -49,6 +49,7 @@ Abstract: This is the class declaration of CDriver_CifX
 #include <map>
 #include <pugixml.hpp>
 #include <mutex>
+#include <atomic>
 #include <thread>
 
 namespace LibMCDriver_CifX {
