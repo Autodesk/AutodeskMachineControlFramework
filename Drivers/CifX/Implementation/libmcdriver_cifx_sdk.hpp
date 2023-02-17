@@ -45,6 +45,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define CIFX_MAXDATASIZE 1556
 
+#define CIFX_HOST_STATE_NOT_READY 0
+#define CIFX_HOST_STATE_READY 1
+#define CIFX_HOST_STATE_READ 2
+
+#define CIFX_BUS_STATE_OFF 0
+#define CIFX_BUS_STATE_ON 1
+#define CIFX_BUS_STATE_GETSTATE 2
+
 namespace LibMCDriver_CifX {
 	namespace Impl {
 
@@ -83,9 +91,9 @@ namespace LibMCDriver_CifX {
 		typedef cifxError(CIFX_CALLINGCONVENTION* PxDriverEnumBoards) (cifxHandle hDriver, uint32_t nBoard, uint32_t nSize, void * pBoardInfo);
 		typedef cifxError(CIFX_CALLINGCONVENTION* PxDriverEnumChannels) (cifxHandle hDriver, uint32_t nBoard, uint32_t nChannel, uint32_t nSize, void * pChannelInfo);
 		typedef cifxError(CIFX_CALLINGCONVENTION* PxDriverMemoryPointer) (cifxHandle hDriver, uint32_t nBoard, uint32_t nCommandId, void * pMemoryInfo);
-		typedef cifxError(CIFX_CALLINGCONVENTION* PxDriverRestartDevice) (cifxHandle hDriver, char * pszBoardName, void * pData);
+		typedef cifxError(CIFX_CALLINGCONVENTION* PxDriverRestartDevice) (cifxHandle hDriver, const char * pszBoardName, void * pData);
 		
-		typedef cifxError(CIFX_CALLINGCONVENTION* PxChannelOpen) (cifxHandle hDriver, char* pszBoardName, uint32_t nChannel, cifxHandle * phChannel);
+		typedef cifxError(CIFX_CALLINGCONVENTION* PxChannelOpen) (cifxHandle hDriver, const char* pszBoardName, uint32_t nChannel, cifxHandle * phChannel);
 		typedef cifxError(CIFX_CALLINGCONVENTION* PxChannelClose) (cifxHandle hChannel);
 		typedef cifxError(CIFX_CALLINGCONVENTION* PxChannelHostState) (cifxHandle hChannel, uint32_t nCommand, uint32_t * pnState, uint32_t nTimeout);
 		typedef cifxError(CIFX_CALLINGCONVENTION* PxChannelBusState) (cifxHandle hChannel, uint32_t nCommand, uint32_t* pnState, uint32_t nTimeout);

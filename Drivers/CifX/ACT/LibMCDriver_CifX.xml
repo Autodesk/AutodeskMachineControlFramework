@@ -62,6 +62,27 @@
 		
 		<error name="INVALIDDRIVERPROTOCOL" code="1009" description="invalid driver protocol" />		
 		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1010" description="could not parse driver protocol" />		
+		<error name="NOVERSIONDEFINITION" code="1011" description="no version definition" />		
+		<error name="NOMAJORVERSION" code="1012" description="no major version" />		
+		<error name="NOMINORVERSION" code="1013" description="no minor version" />		
+		<error name="NOPATCHVERSION" code="1014" description="no patch version" />		
+		<error name="NOBOARDATTRIBUTE" code="1015" description="no board attribute" />		
+		<error name="NOCHANNELINDEXATTRIBUTE" code="1016" description="no channel index attribute" />		
+		<error name="INVALIDCHANNELINDEXATTRIBUTE" code="1017" description="invalid channel index attribute" />		
+		<error name="NOINPUTIOSIZEATTRIBUTE" code="1018" description="no input io size attribute" />		
+		<error name="INVALIDINPUTIOSIZEATTRIBUTE" code="1019" description="invalid input io size attribute" />		
+		<error name="NOOUTPUTIOSIZEATTRIBUTE" code="1020" description="no output io size attribute" />		
+		<error name="INVALIDOUTPUTIOSIZEATTRIBUTE" code="1021" description="invalid output io size attribute" />		
+		<error name="MISSINGADDRESSATTRIBUTE" code="1022" description="missing address attribute" />		
+		<error name="INVALIDADDRESSATTRIBUTE" code="1023" description="invalid address attribute" />		
+		<error name="DUPLICATEINPUTIO" code="1024" description="duplicate input io" />		
+		<error name="DUPLICATEOUTPUTIO" code="1025" description="duplicate output io" />		
+		<error name="INVALIDHOSTSTATETIMEOUT" code="1026" description="invalid host state timeout" />		
+		<error name="INVALIDBUSSTATETIMEOUT" code="1027" description="invalid bus state timeout" />		
+		<error name="CHANNELALREADYOPEN" code="1028" description="channel already open" />		
+		<error name="UNKNOWNEXCEPTION" code="1029" description="an unknown exception occured" />		
+		
+		
 		
 		
 						

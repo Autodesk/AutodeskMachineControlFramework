@@ -108,6 +108,32 @@ typedef void * LibMCDriver_CifX_pvoid;
 #define LIBMCDRIVER_CIFX_ERROR_DRIVERNOTINITIALISED 1001 /** the driver is not initialised */
 #define LIBMCDRIVER_CIFX_ERROR_DRIVERNOTCONNECTED 1002 /** the driver is not connected */
 #define LIBMCDRIVER_CIFX_ERROR_DRIVERTYPENOTFOUND 1003 /** the driver type has not been found */
+#define LIBMCDRIVER_CIFX_ERROR_SDKALREADYLOADED 1004 /** SDK already loaded */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDSDKRESOURCE 1005 /** invalid SDK Resource */
+#define LIBMCDRIVER_CIFX_ERROR_OUTPUTVALUENOTFOUND 1006 /** output value not found */
+#define LIBMCDRIVER_CIFX_ERROR_INPUTVALUENOTFOUND 1007 /** input value not found */
+#define LIBMCDRIVER_CIFX_ERROR_VALUENOTFOUND 1008 /** value not found */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDDRIVERPROTOCOL 1009 /** invalid driver protocol */
+#define LIBMCDRIVER_CIFX_ERROR_COULDNOTPARSEDRIVERPROTOCOL 1010 /** could not parse driver protocol */
+#define LIBMCDRIVER_CIFX_ERROR_NOVERSIONDEFINITION 1011 /** no version definition */
+#define LIBMCDRIVER_CIFX_ERROR_NOMAJORVERSION 1012 /** no major version */
+#define LIBMCDRIVER_CIFX_ERROR_NOMINORVERSION 1013 /** no minor version */
+#define LIBMCDRIVER_CIFX_ERROR_NOPATCHVERSION 1014 /** no patch version */
+#define LIBMCDRIVER_CIFX_ERROR_NOBOARDATTRIBUTE 1015 /** no board attribute */
+#define LIBMCDRIVER_CIFX_ERROR_NOCHANNELINDEXATTRIBUTE 1016 /** no channel index attribute */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEXATTRIBUTE 1017 /** invalid channel index attribute */
+#define LIBMCDRIVER_CIFX_ERROR_NOINPUTIOSIZEATTRIBUTE 1018 /** no input io size attribute */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDINPUTIOSIZEATTRIBUTE 1019 /** invalid input io size attribute */
+#define LIBMCDRIVER_CIFX_ERROR_NOOUTPUTIOSIZEATTRIBUTE 1020 /** no output io size attribute */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTIOSIZEATTRIBUTE 1021 /** invalid output io size attribute */
+#define LIBMCDRIVER_CIFX_ERROR_MISSINGADDRESSATTRIBUTE 1022 /** missing address attribute */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSATTRIBUTE 1023 /** invalid address attribute */
+#define LIBMCDRIVER_CIFX_ERROR_DUPLICATEINPUTIO 1024 /** duplicate input io */
+#define LIBMCDRIVER_CIFX_ERROR_DUPLICATEOUTPUTIO 1025 /** duplicate output io */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDHOSTSTATETIMEOUT 1026 /** invalid host state timeout */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDBUSSTATETIMEOUT 1027 /** invalid bus state timeout */
+#define LIBMCDRIVER_CIFX_ERROR_CHANNELALREADYOPEN 1028 /** channel already open */
+#define LIBMCDRIVER_CIFX_ERROR_UNKNOWNEXCEPTION 1029 /** an unknown exception occured */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_CifX
@@ -128,6 +154,32 @@ inline const char * LIBMCDRIVER_CIFX_GETERRORSTRING (LibMCDriver_CifXResult nErr
     case LIBMCDRIVER_CIFX_ERROR_DRIVERNOTINITIALISED: return "the driver is not initialised";
     case LIBMCDRIVER_CIFX_ERROR_DRIVERNOTCONNECTED: return "the driver is not connected";
     case LIBMCDRIVER_CIFX_ERROR_DRIVERTYPENOTFOUND: return "the driver type has not been found";
+    case LIBMCDRIVER_CIFX_ERROR_SDKALREADYLOADED: return "SDK already loaded";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDSDKRESOURCE: return "invalid SDK Resource";
+    case LIBMCDRIVER_CIFX_ERROR_OUTPUTVALUENOTFOUND: return "output value not found";
+    case LIBMCDRIVER_CIFX_ERROR_INPUTVALUENOTFOUND: return "input value not found";
+    case LIBMCDRIVER_CIFX_ERROR_VALUENOTFOUND: return "value not found";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDDRIVERPROTOCOL: return "invalid driver protocol";
+    case LIBMCDRIVER_CIFX_ERROR_COULDNOTPARSEDRIVERPROTOCOL: return "could not parse driver protocol";
+    case LIBMCDRIVER_CIFX_ERROR_NOVERSIONDEFINITION: return "no version definition";
+    case LIBMCDRIVER_CIFX_ERROR_NOMAJORVERSION: return "no major version";
+    case LIBMCDRIVER_CIFX_ERROR_NOMINORVERSION: return "no minor version";
+    case LIBMCDRIVER_CIFX_ERROR_NOPATCHVERSION: return "no patch version";
+    case LIBMCDRIVER_CIFX_ERROR_NOBOARDATTRIBUTE: return "no board attribute";
+    case LIBMCDRIVER_CIFX_ERROR_NOCHANNELINDEXATTRIBUTE: return "no channel index attribute";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEXATTRIBUTE: return "invalid channel index attribute";
+    case LIBMCDRIVER_CIFX_ERROR_NOINPUTIOSIZEATTRIBUTE: return "no input io size attribute";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDINPUTIOSIZEATTRIBUTE: return "invalid input io size attribute";
+    case LIBMCDRIVER_CIFX_ERROR_NOOUTPUTIOSIZEATTRIBUTE: return "no output io size attribute";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTIOSIZEATTRIBUTE: return "invalid output io size attribute";
+    case LIBMCDRIVER_CIFX_ERROR_MISSINGADDRESSATTRIBUTE: return "missing address attribute";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSATTRIBUTE: return "invalid address attribute";
+    case LIBMCDRIVER_CIFX_ERROR_DUPLICATEINPUTIO: return "duplicate input io";
+    case LIBMCDRIVER_CIFX_ERROR_DUPLICATEOUTPUTIO: return "duplicate output io";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDHOSTSTATETIMEOUT: return "invalid host state timeout";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDBUSSTATETIMEOUT: return "invalid bus state timeout";
+    case LIBMCDRIVER_CIFX_ERROR_CHANNELALREADYOPEN: return "channel already open";
+    case LIBMCDRIVER_CIFX_ERROR_UNKNOWNEXCEPTION: return "an unknown exception occured";
     default: return "unknown error";
   }
 }
