@@ -81,8 +81,12 @@
 		<error name="INVALIDBUSSTATETIMEOUT" code="1027" description="invalid bus state timeout" />		
 		<error name="CHANNELALREADYOPEN" code="1028" description="channel already open" />		
 		<error name="UNKNOWNEXCEPTION" code="1029" description="an unknown exception occured" />		
-		
-		
+		<error name="INVALIDADDRESSREAD" code="1030" description="invalid address read" />		
+		<error name="INVALIDADDRESSREADBIT" code="1031" description="invalid address read bit" />		
+		<error name="INVALIDADDRESSWRITE" code="1032" description="invalid address write" />		
+		<error name="INVALIDADDRESSWRITEBIT" code="1033" description="invalid address write bit" />		
+		<error name="INVALIDBITINDEX" code="1034" description="invalid bit index" />		
+		<error name="INVALIDBOOLPARAMETERCAST" code="1035" description="invalid bool parameter cast" />		
 		
 		
 						

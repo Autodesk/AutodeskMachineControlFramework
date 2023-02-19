@@ -170,6 +170,11 @@ void CDriver_CifXParameter::SetTargetBoolValue(bool bValue)
 		SetTargetIntegerValue(0);
 }
 
+uint32_t CDriver_CifXParameter::getAddress()
+{
+	return m_nAddress;
+}
+
 
 CDriver_CifXParameter_Integer::CDriver_CifXParameter_Integer(const std::string& sName, const std::string& sDescription, eDriver_CifXParameterType Type, const uint32_t nAddress)
 	: CDriver_CifXParameter (sName, sDescription, Type, nAddress), m_nActualValue (0), m_nTargetValue(0)
@@ -235,9 +240,10 @@ void CDriver_CifXParameter_Double::SetTargetDoubleValue(double dValue)
 }
 
 CDriver_CifXParameter_Bool::CDriver_CifXParameter_Bool(const std::string& sName, const std::string& sDescription, eDriver_CifXParameterType Type, const uint32_t nAddress, const uint32_t nBit)
-	: CDriver_CifXParameter_Integer (sName, sDescription, Type, nAddress), m_nBit (0)
+	: CDriver_CifXParameter_Integer (sName, sDescription, Type, nAddress), m_nBit (nBit)
 {
-
+	if (nBit >= 8)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDBITINDEX);
 }
 
 CDriver_CifXParameter_Bool::~CDriver_CifXParameter_Bool()
@@ -245,6 +251,10 @@ CDriver_CifXParameter_Bool::~CDriver_CifXParameter_Bool()
 
 }
 
+uint32_t CDriver_CifXParameter_Bool::getBit()
+{
+	return m_nBit;
+}
 
 
 PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node & node)
@@ -288,8 +298,202 @@ PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node & node)
 }
 
 
+
+CDriver_CifXChannelBuffer::CDriver_CifXChannelBuffer(uint32_t nSize)
+{
+	m_Data.resize(nSize);
+	clear();
+
+}
+
+CDriver_CifXChannelBuffer::~CDriver_CifXChannelBuffer()
+{
+
+}
+
+void CDriver_CifXChannelBuffer::clear()
+{
+	for (auto& iIter : m_Data)
+		iIter = 0;
+}
+
+
+uint8_t CDriver_CifXChannelBuffer::readUint8(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof (uint8_t)) > m_Data.size ())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((uint8_t*)&m_Data.at(nAddress));
+}
+
+uint16_t CDriver_CifXChannelBuffer::readUint16(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof(uint16_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((uint16_t*) &m_Data.at(nAddress));
+
+}
+
+uint32_t CDriver_CifXChannelBuffer::readUint32(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof(uint32_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((uint32_t*)&m_Data.at(nAddress));
+
+}
+
+int8_t CDriver_CifXChannelBuffer::readInt8(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof(int8_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((int8_t*)&m_Data.at(nAddress));
+
+}
+
+int16_t CDriver_CifXChannelBuffer::readInt16(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof(int16_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((int16_t*)&m_Data.at(nAddress));
+
+}
+
+int32_t CDriver_CifXChannelBuffer::readInt32(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof(int32_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((int32_t*)&m_Data.at(nAddress));
+
+}
+
+bool CDriver_CifXChannelBuffer::readBool(uint32_t nAddress, uint32_t nBit)
+{
+	if (((size_t)nAddress + sizeof(uint8_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+	if (nBit >= 8)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREADBIT);
+
+	uint8_t nValue = m_Data.at(nAddress);
+
+	return ((nValue & (1UL << nBit)) != 0);
+}
+
+float CDriver_CifXChannelBuffer::readFloat(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof(float)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((float*)&m_Data.at(nAddress));
+
+}
+
+double CDriver_CifXChannelBuffer::readDouble(uint32_t nAddress)
+{
+	if (((size_t)nAddress + sizeof(double)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD);
+
+	return *((double*)&m_Data.at(nAddress));
+
+}
+
+void CDriver_CifXChannelBuffer::writeUint8(uint32_t nAddress, uint8_t nValue)
+{
+	if (((size_t)nAddress + sizeof(uint8_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((uint8_t*)&m_Data.at(nAddress)) = nValue;
+
+}
+
+void CDriver_CifXChannelBuffer::writeUint16(uint32_t nAddress, uint16_t nValue)
+{
+	if (((size_t)nAddress + sizeof(uint16_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((uint16_t*)&m_Data.at(nAddress)) = nValue;
+
+}
+
+void CDriver_CifXChannelBuffer::writeUint32(uint32_t nAddress, uint32_t nValue)
+{
+	if (((size_t)nAddress + sizeof(uint32_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((uint32_t*)&m_Data.at(nAddress)) = nValue;
+
+}
+
+void CDriver_CifXChannelBuffer::writeInt8(uint32_t nAddress, int8_t nValue)
+{
+	if (((size_t)nAddress + sizeof(int8_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((int8_t*)&m_Data.at(nAddress)) = nValue;
+
+}
+
+void CDriver_CifXChannelBuffer::writeInt16(uint32_t nAddress, int16_t nValue)
+{
+	if (((size_t)nAddress + sizeof(int16_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((int16_t*)&m_Data.at(nAddress)) = nValue;
+
+}
+
+void CDriver_CifXChannelBuffer::writeInt32(uint32_t nAddress, int32_t nValue)
+{
+	if (((size_t)nAddress + sizeof(int32_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((int32_t*)&m_Data.at(nAddress)) = nValue;
+
+}
+
+void CDriver_CifXChannelBuffer::writeBool(uint32_t nAddress, uint32_t nBit, bool bValue)
+{
+	if (((size_t)nAddress + sizeof(uint8_t)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+	if (nBit >= 8)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT);
+
+	*((int16_t*)&m_Data.at(nAddress)) |= (1UL << nBit);
+
+}
+
+void CDriver_CifXChannelBuffer::writeFloat(uint32_t nAddress, float fValue)
+{
+	if (((size_t)nAddress + sizeof(float)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((float*)&m_Data.at(nAddress)) = fValue;
+
+}
+
+void CDriver_CifXChannelBuffer::writeDouble(uint32_t nAddress, double dValue)
+{
+	if (((size_t)nAddress + sizeof(double)) > m_Data.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE);
+
+	*((double*)&m_Data.at(nAddress)) = dValue;
+
+}
+
+
+
+std::vector<uint8_t>& CDriver_CifXChannelBuffer::getBuffer()
+{
+	return m_Data;
+}
+
+
 CDriver_CifXChannelThreadState::CDriver_CifXChannelThreadState(PCifXSDK pCifXSDK, uint32_t nInputSize, uint32_t nOutputSize, cifxHandle hChannel)
-	: m_pCifXSDK (pCifXSDK), m_hChannel (hChannel), m_bDebugMode (true)
+	: m_pCifXSDK (pCifXSDK), m_hChannel (hChannel), m_bDebugMode (true), m_InputBuffer (nInputSize), m_OutputBuffer (nOutputSize)
 {
 	if (pCifXSDK.get() == nullptr)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
@@ -302,13 +506,6 @@ CDriver_CifXChannelThreadState::CDriver_CifXChannelThreadState(PCifXSDK pCifXSDK
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTIOSIZEATTRIBUTE);
 
 
-	m_InputData.resize(nInputSize);
-	m_OutputData.resize(nOutputSize);
-
-	for (auto& iInputIter : m_InputData)
-		iInputIter = 0;
-	for (auto& iOutputIter : m_OutputData)
-		iOutputIter = 0;
 }
 
 CDriver_CifXChannelThreadState::~CDriver_CifXChannelThreadState()
@@ -319,10 +516,12 @@ CDriver_CifXChannelThreadState::~CDriver_CifXChannelThreadState()
 void CDriver_CifXChannelThreadState::executeThread(uint32_t nReadTimeOut, uint32_t nWriteTimeOut)
 {
 	std::lock_guard<std::mutex> lockGuard(m_Mutex);
-	if (m_InputData.size() > 0) 
-		m_pCifXSDK->checkError(m_pCifXSDK->xChannelIORead(m_hChannel, 0, 0, (uint32_t) m_InputData.size(), m_InputData.data(), nReadTimeOut));
-	if (m_OutputData.size() > 0)
-		m_pCifXSDK->checkError(m_pCifXSDK->xChannelIOWrite(m_hChannel, 0, 0, (uint32_t) m_OutputData.size(), m_OutputData.data(), nWriteTimeOut));
+	auto& inputBuffer = m_InputBuffer.getBuffer();
+	if (inputBuffer.size() > 0)
+		m_pCifXSDK->checkError(m_pCifXSDK->xChannelIORead(m_hChannel, 0, 0, (uint32_t)inputBuffer.size(), inputBuffer.data(), nReadTimeOut));
+	auto& outputBuffer = m_OutputBuffer.getBuffer();
+	if (outputBuffer.size() > 0)
+		m_pCifXSDK->checkError(m_pCifXSDK->xChannelIOWrite(m_hChannel, 0, 0, (uint32_t)outputBuffer.size(), outputBuffer.data(), nWriteTimeOut));
 
 }
 
@@ -341,6 +540,7 @@ bool CDriver_CifXChannelThreadState::threadShallBeCanceled()
 }
 
 
+
 void CDriver_CifXChannelThreadState::stopThread(uint32_t nHostStateTimeOut, uint32_t nBusStateTimeOut)
 {
 	m_CancelFlag = true;
@@ -355,6 +555,179 @@ void CDriver_CifXChannelThreadState::stopThread(uint32_t nHostStateTimeOut, uint
 		m_hChannel = nullptr;
 	}
 }
+
+
+
+void CDriver_CifXChannelThreadState::readInputParameter(CDriver_CifXParameter* pParameter)
+{
+	if (pParameter == nullptr)
+		return;
+
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+	uint32_t nAddress = pParameter->getAddress();
+	CDriver_CifXParameter_Bool* pBoolParameter;
+
+	switch (pParameter->getType()) {
+	case eDriver_CifXParameterType::CifXParameter_BOOL:
+		pBoolParameter = dynamic_cast<CDriver_CifXParameter_Bool*> (pParameter);
+		if (pBoolParameter == nullptr)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST);
+		pParameter->SetActualBoolValue(m_InputBuffer.readBool(nAddress, pBoolParameter->getBit()));
+		break;
+	case eDriver_CifXParameterType::CifXParameter_UINT8:
+		pParameter->SetActualIntegerValue (m_InputBuffer.readUint8(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_UINT16:
+		pParameter->SetActualIntegerValue(m_InputBuffer.readUint16(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_UINT32:
+		pParameter->SetActualIntegerValue(m_InputBuffer.readUint32(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT8:
+		pParameter->SetActualIntegerValue(m_InputBuffer.readInt8(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT16:
+		pParameter->SetActualIntegerValue(m_InputBuffer.readInt16(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT32:
+		pParameter->SetActualIntegerValue(m_InputBuffer.readInt32(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_FLOAT:
+		pParameter->SetActualDoubleValue(m_InputBuffer.readFloat(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_DOUBLE:
+		pParameter->SetActualDoubleValue(m_InputBuffer.readDouble(nAddress));
+		break;
+	}
+
+
+}
+
+void CDriver_CifXChannelThreadState::readOutputParameter(CDriver_CifXParameter* pParameter)
+{
+	if (pParameter == nullptr)
+		return;
+
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+	uint32_t nAddress = pParameter->getAddress();
+	CDriver_CifXParameter_Bool* pBoolParameter;
+
+	switch (pParameter->getType()) {
+	case eDriver_CifXParameterType::CifXParameter_BOOL:
+		pBoolParameter = dynamic_cast<CDriver_CifXParameter_Bool*> (pParameter);
+		if (pBoolParameter == nullptr)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST);
+		pParameter->SetActualBoolValue(m_OutputBuffer.readBool(nAddress, pBoolParameter->getBit()));
+		break;
+	case eDriver_CifXParameterType::CifXParameter_UINT8:
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readUint8(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_UINT16:
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readUint16(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_UINT32:
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readUint32(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT8:
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readInt8(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT16:
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readInt16(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT32:
+		pParameter->SetActualIntegerValue(m_OutputBuffer.readInt32(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_FLOAT:
+		pParameter->SetActualDoubleValue(m_OutputBuffer.readFloat(nAddress));
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_DOUBLE:
+		pParameter->SetActualDoubleValue(m_OutputBuffer.readDouble(nAddress));
+		break;
+	}
+
+}
+
+void CDriver_CifXChannelThreadState::writeOutputParameter(CDriver_CifXParameter* pParameter)
+{
+	if (pParameter == nullptr)
+		return;
+
+	std::lock_guard<std::mutex> lockGuard(m_Mutex);
+	uint32_t nAddress = pParameter->getAddress();
+	CDriver_CifXParameter_Bool* pBoolParameter;
+	int64_t nValue;
+	double dValue;
+
+	switch (pParameter->getType()) {
+	case eDriver_CifXParameterType::CifXParameter_BOOL:
+		pBoolParameter = dynamic_cast<CDriver_CifXParameter_Bool*> (pParameter);
+		if (pBoolParameter == nullptr)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST);
+		m_OutputBuffer.writeBool(nAddress, pBoolParameter->getBit(), pParameter->GetTargetBoolValue());
+		break;
+	case eDriver_CifXParameterType::CifXParameter_UINT8:
+		nValue = pParameter->GetTargetIntegerValue();
+		if ((nValue >= 0) && (nValue <= (int64_t)UINT8_MAX))
+			m_OutputBuffer.writeUint8(nAddress, (uint8_t)nValue);
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_UINT16:
+		nValue = pParameter->GetTargetIntegerValue();
+		if ((nValue >= 0) && (nValue <= (int64_t)UINT16_MAX))
+			m_OutputBuffer.writeUint16(nAddress, (uint16_t)nValue);
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_UINT32:
+		nValue = pParameter->GetTargetIntegerValue();
+		if ((nValue >= 0) && (nValue <= (int64_t)UINT32_MAX))
+			m_OutputBuffer.writeUint32(nAddress, (uint32_t)nValue);
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT8:
+		nValue = pParameter->GetTargetIntegerValue();
+		if ((nValue >= (int64_t)INT8_MIN) && (nValue <= (int64_t)INT8_MAX))
+			m_OutputBuffer.writeInt8(nAddress, (int8_t)nValue);
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT16:
+		nValue = pParameter->GetTargetIntegerValue();
+		if ((nValue >= (int64_t)INT16_MIN) && (nValue <= (int64_t)INT16_MAX))
+			m_OutputBuffer.writeInt16(nAddress, (int16_t)nValue);
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_INT32:
+		nValue = pParameter->GetTargetIntegerValue();
+		if ((nValue >= (int64_t)INT32_MIN) && (nValue <= (int64_t)INT32_MAX))
+			m_OutputBuffer.writeInt32(nAddress, (int32_t)nValue);
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_FLOAT:
+		dValue = pParameter->GetTargetDoubleValue();
+		m_OutputBuffer.writeFloat(nAddress, (float)dValue);
+		break;
+
+	case eDriver_CifXParameterType::CifXParameter_DOUBLE:
+		dValue = pParameter->GetTargetDoubleValue();
+		m_OutputBuffer.writeDouble(nAddress, dValue);
+		break;
+	}
+
+}
+
 
 
 CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
@@ -538,7 +911,15 @@ void CDriver_CifXChannel::startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverH
 		try
 		{
 			while (!pThreadState->threadShallBeCanceled()) {
+				for (auto pOutput : pOutputs)
+					pThreadState->writeOutputParameter(pOutput.get());
+
 				pThreadState->executeThread(nReadTimeout, nWriteTimeout);
+
+				for (auto pInput : pInputs) 
+					pThreadState->readInputParameter(pInput.get());
+				for (auto pOutput : pOutputs)
+					pThreadState->readInputParameter(pOutput.get());
 
 				// TODO: Sync Variables
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));

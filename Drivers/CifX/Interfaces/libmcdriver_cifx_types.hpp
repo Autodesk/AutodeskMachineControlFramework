@@ -134,6 +134,12 @@ typedef void * LibMCDriver_CifX_pvoid;
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDBUSSTATETIMEOUT 1027 /** invalid bus state timeout */
 #define LIBMCDRIVER_CIFX_ERROR_CHANNELALREADYOPEN 1028 /** channel already open */
 #define LIBMCDRIVER_CIFX_ERROR_UNKNOWNEXCEPTION 1029 /** an unknown exception occured */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD 1030 /** invalid address read */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREADBIT 1031 /** invalid address read bit */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE 1032 /** invalid address write */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT 1033 /** invalid address write bit */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDBITINDEX 1034 /** invalid bit index */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST 1035 /** invalid bool parameter cast */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_CifX
@@ -180,6 +186,12 @@ inline const char * LIBMCDRIVER_CIFX_GETERRORSTRING (LibMCDriver_CifXResult nErr
     case LIBMCDRIVER_CIFX_ERROR_INVALIDBUSSTATETIMEOUT: return "invalid bus state timeout";
     case LIBMCDRIVER_CIFX_ERROR_CHANNELALREADYOPEN: return "channel already open";
     case LIBMCDRIVER_CIFX_ERROR_UNKNOWNEXCEPTION: return "an unknown exception occured";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREAD: return "invalid address read";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSREADBIT: return "invalid address read bit";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITE: return "invalid address write";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT: return "invalid address write bit";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDBITINDEX: return "invalid bit index";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST: return "invalid bool parameter cast";
     default: return "unknown error";
   }
 }

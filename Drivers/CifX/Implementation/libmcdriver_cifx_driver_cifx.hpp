@@ -109,6 +109,8 @@ namespace Impl {
 		eDriver_CifXParameterType getType();
 		eDriver_AbstractParameterType getAbstractType();
 
+		uint32_t getAddress ();
+
 	};
 
 	typedef std::shared_ptr<CDriver_CifXParameter> PDriver_CifXParameter;
@@ -163,13 +165,50 @@ namespace Impl {
 
 		virtual ~CDriver_CifXParameter_Bool();
 
+		uint32_t getBit();
+
+	};
+
+
+	class CDriver_CifXChannelBuffer {
+	private:
+		std::vector<uint8_t> m_Data;
+
+	public:
+		CDriver_CifXChannelBuffer(uint32_t nSize);
+		~CDriver_CifXChannelBuffer();
+
+		void clear();
+
+		uint8_t readUint8(uint32_t nAddress);
+		uint16_t readUint16(uint32_t nAddress);
+		uint32_t readUint32(uint32_t nAddress);
+		int8_t readInt8(uint32_t nAddress);
+		int16_t readInt16(uint32_t nAddress);
+		int32_t readInt32(uint32_t nAddress);
+		bool readBool(uint32_t nAddress, uint32_t nBit);
+		float readFloat(uint32_t nAddress);
+		double readDouble(uint32_t nAddress);
+
+		void writeUint8(uint32_t nAddress, uint8_t nValue);
+		void writeUint16(uint32_t nAddress, uint16_t nValue);
+		void writeUint32(uint32_t nAddress, uint32_t nValue);
+		void writeInt8(uint32_t nAddress, int8_t nValue);
+		void writeInt16(uint32_t nAddress, int16_t nValue);
+		void writeInt32(uint32_t nAddress, int32_t nValue);
+		void writeBool(uint32_t nAddress, uint32_t nBit, bool bValue);
+		void writeFloat(uint32_t nAddress, float fValue);
+		void writeDouble(uint32_t nAddress, double dValue);
+
+		std::vector<uint8_t> & getBuffer();
 	};
 
 
 	class CDriver_CifXChannelThreadState {
 		private:
-			std::vector<uint8_t> m_InputData;
-			std::vector<uint8_t> m_OutputData;
+			CDriver_CifXChannelBuffer m_InputBuffer;
+			CDriver_CifXChannelBuffer m_OutputBuffer;
+
 			PCifXSDK m_pCifXSDK;
 			cifxHandle m_hChannel;
 
@@ -194,6 +233,10 @@ namespace Impl {
 			void stopThread(uint32_t nHostStateTimeOut, uint32_t nBusStateTimeOut);
 
 			bool threadShallBeCanceled();
+
+			void readInputParameter (CDriver_CifXParameter * pParameter);
+			void readOutputParameter(CDriver_CifXParameter* pParameter);
+			void writeOutputParameter(CDriver_CifXParameter* pParameter);
 
 	};
 
