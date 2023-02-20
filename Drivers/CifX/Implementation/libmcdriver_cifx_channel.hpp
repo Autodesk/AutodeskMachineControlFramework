@@ -155,13 +155,19 @@ namespace Impl {
 
 		void RegisterVariables(LibMCEnv::PDriverEnvironment pDriverEnvironment);
 
-		std::vector<PDriver_CifXParameter> getInputs();
-		std::vector<PDriver_CifXParameter> getOutputs();
+		uint32_t getInputCount();
+		uint32_t getOutputCount();
+		PDriver_CifXParameter getInputByIndex(uint32_t nIndex);
+		PDriver_CifXParameter getOutputByIndex(uint32_t nIndex);
 
 		void stopSyncThread();
 		void startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverHandle);
 
 		bool isConnected();
+
+		PDriver_CifXParameter findInputValue(const std::string& sName);
+		PDriver_CifXParameter findOutputValue(const std::string& sName);
+
 	};
 
 	typedef std::shared_ptr<CDriver_CifXChannel> PDriver_CifXChannel;

@@ -84,36 +84,93 @@ void CChannelInformation::GetConnectionStatistics(LibMCDriver_CifX_uint32 & nNum
 
 bool CChannelInformation::ValueExists(const std::string & sName)
 {
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOTIMPLEMENTED);
+	auto pInputValue = m_pChannel->findInputValue(sName);
+	if (pInputValue.get() != nullptr)
+		return true;
+
+	auto pOutputValue = m_pChannel->findOutputValue(sName);
+	if (pOutputValue.get() != nullptr)
+		return true;
+
+	return false;
 }
 
 void CChannelInformation::GetValueType(const std::string & sName, LibMCDriver_CifX::eValueType & eValueType, bool & bIsInput, bool & bIsOutput)
 {
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOTIMPLEMENTED);
+	PDriver_CifXParameter pValue;
+	bIsInput = false;
+	bIsOutput = false;
+	eValueType = LibMCDriver_CifX::eValueType::Unknown;
+
+	auto pInputValue = m_pChannel->findInputValue(sName);
+	if (pInputValue.get() != nullptr) {
+		pValue = pInputValue;
+		bIsInput = true;
+	}
+
+	auto pOutputValue = m_pChannel->findOutputValue(sName);
+	if (pOutputValue.get() != nullptr) {
+		pValue = pOutputValue;
+		bIsOutput = true;
+	}
+
+	if (pValue.get () == nullptr)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_VALUENOTFOUND, "value not found: " + sName);
+
+	switch (pValue->getAbstractType()) {
+		case eDriver_AbstractParameterType::CifXAbstractParameter_BOOL:
+			eValueType = LibMCDriver_CifX::eValueType::BoolValue;
+			break;
+		case eDriver_AbstractParameterType::CifXAbstractParameter_INT:
+			eValueType = LibMCDriver_CifX::eValueType::IntegerValue;
+			break;
+		case eDriver_AbstractParameterType::CifXAbstractParameter_DOUBLE:
+			eValueType = LibMCDriver_CifX::eValueType::DoubleValue;
+			break;
+		default:
+			break;
+	}
+	
+
 }
 
 void CChannelInformation::GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue)
 {
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOTIMPLEMENTED);
+	PDriver_CifXParameter pValue;
+
+	auto pInputValue = m_pChannel->findInputValue(sName);
+	if (pInputValue.get() != nullptr) 
+		pValue = pInputValue;
+
+	auto pOutputValue = m_pChannel->findOutputValue(sName);
+	if (pOutputValue.get() != nullptr) 
+		pValue = pOutputValue;
+
+	if (pValue.get() == nullptr)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_VALUENOTFOUND, "value not found: " + sName);
+
+	pValue->getValueRange(nMinValue, nMaxValue);
 }
 
 LibMCDriver_CifX_uint32 CChannelInformation::GetInputValueCount()
 {
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOTIMPLEMENTED);
+	return m_pChannel->getInputCount();
 }
 
 std::string CChannelInformation::GetInputValueName(const LibMCDriver_CifX_uint32 nIndex)
 {
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOTIMPLEMENTED);
+	auto pInput = m_pChannel->getInputByIndex(nIndex);
+	return pInput->getName ();
 }
 
 LibMCDriver_CifX_uint32 CChannelInformation::GetOutputValueCount()
 {
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOTIMPLEMENTED);
+	return m_pChannel->getOutputCount();
 }
 
 std::string CChannelInformation::GetOutputValueName(const LibMCDriver_CifX_uint32 nIndex)
 {
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOTIMPLEMENTED);
+	auto pOutput = m_pChannel->getInputByIndex(nIndex);
+	return pOutput->getName();
 }
 

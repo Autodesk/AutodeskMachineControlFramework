@@ -89,6 +89,11 @@
 		<error name="INVALIDBOOLPARAMETERCAST" code="1035" description="invalid bool parameter cast" />		
 		<error name="INVALIDNAMEATTRIBUTE" code="1036" description="invalid name attribute" />		
 		<error name="INVALIDCHANNELINDEX" code="1037" description="invalid channel index" />		
+		<error name="INVALIDINPUTINDEX" code="1038" description="invalid input index" />		
+		<error name="INVALIDOUTPUTINDEX" code="1039" description="invalid output index" />		
+		<error name="NOCONFIGURATIONSCHEMA" code="1040" description="no configuration schema" />		
+		<error name="INVALIDCONFIGURATIONSCHEMA" code="1041" description="invalid configuration schema" />		
+		
 		
 		
 		

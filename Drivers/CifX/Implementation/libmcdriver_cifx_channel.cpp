@@ -571,7 +571,7 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 		m_nBusStateTimeOut = nBusStateTimeout;
 	}
 
-	auto& inputIONode = channelNode.child("input_io");
+	auto inputIONode = channelNode.child("input_io");
 	if (!inputIONode.empty()) {
 
 		auto sizeAttrib = inputIONode.attribute("size");
@@ -592,7 +592,7 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 		}
 	}
 
-	auto& outputIONode = channelNode.child("output_io");
+	auto outputIONode = channelNode.child("output_io");
 	if (!outputIONode.empty()) {
 
 		auto sizeAttrib = outputIONode.attribute("size");
@@ -672,14 +672,31 @@ void CDriver_CifXChannel::RegisterVariables(LibMCEnv::PDriverEnvironment pDriver
 	}
 }
 
-std::vector<PDriver_CifXParameter> CDriver_CifXChannel::getInputs()
+uint32_t CDriver_CifXChannel::getInputCount()
 {
-	return m_Inputs;
+	return (uint32_t)m_Inputs.size();
 }
 
-std::vector<PDriver_CifXParameter> CDriver_CifXChannel::getOutputs()
+uint32_t CDriver_CifXChannel::getOutputCount()
 {
-	return m_Outputs;
+	return (uint32_t)m_Outputs.size();
+}
+
+PDriver_CifXParameter CDriver_CifXChannel::getInputByIndex(uint32_t nIndex)
+{
+	if ((size_t)nIndex >= m_Inputs.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDINPUTINDEX);
+
+	return m_Inputs.at(nIndex);
+}
+
+PDriver_CifXParameter CDriver_CifXChannel::getOutputByIndex(uint32_t nIndex)
+{
+	if ((size_t)nIndex >= m_Outputs.size())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTINDEX);
+
+	return m_Outputs.at(nIndex);
+
 }
 
 bool CDriver_CifXChannel::isConnected()
@@ -690,6 +707,22 @@ bool CDriver_CifXChannel::isConnected()
 	}
 
 	return false;
+}
+
+PDriver_CifXParameter CDriver_CifXChannel::findInputValue(const std::string& sName)
+{
+	auto iIter = m_InputMap.find(sName);
+	if (iIter != m_InputMap.end())
+		return iIter->second;
+	return nullptr;
+}
+
+PDriver_CifXParameter CDriver_CifXChannel::findOutputValue(const std::string& sName)
+{
+	auto iIter = m_OutputMap.find(sName);
+	if (iIter != m_OutputMap.end())
+		return iIter->second;
+	return nullptr;
 }
 
 

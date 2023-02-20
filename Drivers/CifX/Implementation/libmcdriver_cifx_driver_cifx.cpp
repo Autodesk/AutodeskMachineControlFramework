@@ -42,7 +42,7 @@ Abstract: This is a stub class definition of CDriver_CifX
 #include <iostream>
 
 
-
+#define CIFX_CONFIGURATIONSCHEMA "http://schemas.autodesk.com/amc/cifxprotocol/2023/01"
 
 
 using namespace LibMCDriver_CifX::Impl;
@@ -79,12 +79,19 @@ void CDriver_CifX::Configure(const std::string& sConfigurationString)
 	if (!result)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_COULDNOTPARSEDRIVERPROTOCOL);
 
-	pugi::xml_node protocolNode = doc.child("driverconfiguration");
+	pugi::xml_node configurationNode = doc.child("driverconfiguration");
 
-	if (protocolNode.empty())
+	if (configurationNode.empty())
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDDRIVERPROTOCOL);
 
-	pugi::xml_node versionNode = protocolNode.child("version");
+	pugi::xml_attribute xmlnsAttrib = configurationNode.attribute("xmlns");
+	if (xmlnsAttrib.empty())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOCONFIGURATIONSCHEMA);
+	std::string sXMLNs = xmlnsAttrib.as_string();
+	if (sXMLNs != CIFX_CONFIGURATIONSCHEMA)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCONFIGURATIONSCHEMA);
+
+	pugi::xml_node versionNode = configurationNode.child("version");
 	if (versionNode.empty())
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOVERSIONDEFINITION);
 
@@ -103,7 +110,7 @@ void CDriver_CifX::Configure(const std::string& sConfigurationString)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_NOPATCHVERSION);
 	m_nPatchVersion = patchversionAttrib.as_uint(0);
 
-	auto channelNodes = protocolNode.children("channel");
+	auto channelNodes = configurationNode.children("channel");
 	for (pugi::xml_node channelNode : channelNodes)
 	{
 		PDriver_CifXChannel pChannel = std::make_shared<CDriver_CifXChannel>(channelNode);
@@ -111,16 +118,19 @@ void CDriver_CifX::Configure(const std::string& sConfigurationString)
 
 		pChannel->RegisterVariables(m_pDriverEnvironment);
 
-		auto pInputs = pChannel->getInputs();
-		for (auto pInput : pInputs) {
+		uint32_t nInputCount = pChannel->getInputCount();
+		for (uint32_t nInputIndex = 0; nInputIndex < nInputCount; nInputIndex++) {
+			auto pInput = pChannel->getInputByIndex(nInputIndex);
 			std::string sName = pInput->getName();
 			if (m_GlobalInputMap.find (sName) != m_GlobalInputMap.end ())
 				throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_DUPLICATEINPUTIO, "duplicate input io: " + sName);
 			m_GlobalInputMap.insert(std::make_pair (sName, pInput));
 		}
 
-		auto pOutputs = pChannel->getOutputs();
-		for (auto pOutput : pOutputs) {
+		uint32_t nOutputCount = pChannel->getOutputCount();
+		for (uint32_t nOutputIndex = 0; nOutputIndex < nOutputCount; nOutputIndex++) {
+			auto pOutput = pChannel->getOutputByIndex(nOutputIndex);
+
 			std::string sName = pOutput->getName();
 			if (m_GlobalOutputMap.find(sName) != m_GlobalOutputMap.end())
 				throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_DUPLICATEOUTPUTIO, "duplicate output io: " + sName);

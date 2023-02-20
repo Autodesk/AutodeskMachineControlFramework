@@ -142,6 +142,10 @@ typedef void * LibMCDriver_CifX_pvoid;
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST 1035 /** invalid bool parameter cast */
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE 1036 /** invalid name attribute */
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEX 1037 /** invalid channel index */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDINPUTINDEX 1038 /** invalid input index */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTINDEX 1039 /** invalid output index */
+#define LIBMCDRIVER_CIFX_ERROR_NOCONFIGURATIONSCHEMA 1040 /** no configuration schema */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDCONFIGURATIONSCHEMA 1041 /** invalid configuration schema */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_CifX
@@ -196,6 +200,10 @@ inline const char * LIBMCDRIVER_CIFX_GETERRORSTRING (LibMCDriver_CifXResult nErr
     case LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST: return "invalid bool parameter cast";
     case LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE: return "invalid name attribute";
     case LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEX: return "invalid channel index";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDINPUTINDEX: return "invalid input index";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTINDEX: return "invalid output index";
+    case LIBMCDRIVER_CIFX_ERROR_NOCONFIGURATIONSCHEMA: return "no configuration schema";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDCONFIGURATIONSCHEMA: return "invalid configuration schema";
     default: return "unknown error";
   }
 }
