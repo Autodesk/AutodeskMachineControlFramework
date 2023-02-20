@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-Abstract: This is the class declaration of CBoardInformation
+Abstract: This is the class declaration of CChannelInformation
 
 */
 
 
-#ifndef __LIBMCDRIVER_CIFX_BOARDINFORMATION
-#define __LIBMCDRIVER_CIFX_BOARDINFORMATION
+#ifndef __LIBMCDRIVER_CIFX_CHANNELINFORMATION
+#define __LIBMCDRIVER_CIFX_CHANNELINFORMATION
 
 #include "libmcdriver_cifx_interfaces.hpp"
 
@@ -45,6 +45,7 @@ Abstract: This is the class declaration of CBoardInformation
 #endif
 
 // Include custom headers here.
+#include "libmcdriver_cifx_channel.hpp"
 
 
 namespace LibMCDriver_CifX {
@@ -52,32 +53,42 @@ namespace Impl {
 
 
 /*************************************************************************************************************************
- Class declaration of CBoardInformation 
+ Class declaration of CChannelInformation 
 **************************************************************************************************************************/
 
-class CBoardInformation : public virtual IBoardInformation, public virtual CBase {
+class CChannelInformation : public virtual IChannelInformation, public virtual CBase {
 private:
-
-	/**
-	* Put private members here.
-	*/
-
-protected:
-
-	/**
-	* Put protected members here.
-	*/
+	PDriver_CifXChannel m_pChannel;
 
 public:
 
-	/**
-	* Put additional public members here. They will not be visible in the external API.
-	*/
+	CChannelInformation(PDriver_CifXChannel pChannel);
 
+	virtual ~CChannelInformation();
 
-	/**
-	* Public member functions to implement.
-	*/
+	std::string GetBoardName() override;
+
+	LibMCDriver_CifX_uint32 GetChannelIndex() override;
+
+	bool IsConnected() override;
+
+	LibMCDriver_CifX_uint32 GetMillisecondsSinceLastUpdate() override;
+
+	void GetConnectionStatistics(LibMCDriver_CifX_uint32 & nNumberOfSucceededUpdates, LibMCDriver_CifX_uint32 & nNumberOfUpdateErrors, LibMCDriver_CifX_double & dMinimumUpdateDurationInMs, LibMCDriver_CifX_double & dMaximumUpdateDurationInMs, LibMCDriver_CifX_double & dAverageUpdateDurationInMs, LibMCDriver_CifX_double & dUpdateDurationVarianceInMs) override;
+
+	bool ValueExists(const std::string & sName) override;
+
+	void GetValueType(const std::string & sName, LibMCDriver_CifX::eValueType & eValueType, bool & bIsInput, bool & bIsOutput) override;
+
+	void GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue) override;
+
+	LibMCDriver_CifX_uint32 GetInputValueCount() override;
+
+	std::string GetInputValueName(const LibMCDriver_CifX_uint32 nIndex) override;
+
+	LibMCDriver_CifX_uint32 GetOutputValueCount() override;
+
+	std::string GetOutputValueName(const LibMCDriver_CifX_uint32 nIndex) override;
 
 };
 
@@ -87,4 +98,4 @@ public:
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#endif // __LIBMCDRIVER_CIFX_BOARDINFORMATION
+#endif // __LIBMCDRIVER_CIFX_CHANNELINFORMATION

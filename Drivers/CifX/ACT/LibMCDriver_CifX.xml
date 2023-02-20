@@ -87,11 +87,21 @@
 		<error name="INVALIDADDRESSWRITEBIT" code="1033" description="invalid address write bit" />		
 		<error name="INVALIDBITINDEX" code="1034" description="invalid bit index" />		
 		<error name="INVALIDBOOLPARAMETERCAST" code="1035" description="invalid bool parameter cast" />		
+		<error name="INVALIDNAMEATTRIBUTE" code="1036" description="invalid name attribute" />		
+		<error name="INVALIDCHANNELINDEX" code="1037" description="invalid channel index" />		
+		
 		
 		
 						
 	</errors>
 
+	
+	<enum name="ValueType">
+		<option name="Unknown" value="0"/>
+		<option name="IntegerValue" value="1"/>
+		<option name="BoolValue" value="2"/>
+		<option name="DoubleValue" value="3"/>
+	</enum>		
 	
 <!--
 
@@ -148,8 +158,69 @@ Custom implementation
 -->
 
 
-	<class name="BoardInformation" parent="Base" description="The information about a board.">
+	<class name="ChannelInformation" parent="Base" description="The information about a board.">
 
+		<method name="GetBoardName" description="Returns the name of the board that it is connected to.">
+			<param name="BoardName" type="string" pass="return" description="Board name." />
+		</method>
+
+		<method name="GetChannelIndex" description="Returns the channel index of the board that it is connected to.">
+			<param name="ChannelIndex" type="uint32" pass="return" description="Channel Index." />
+		</method>
+		
+		<method name="IsConnected" description="Returns if the driver is connected and updates are being received.">
+			<param name="ChannelIsConnected" type="bool" pass="return" description="The channel is connected." />
+		</method>
+
+		<method name="GetMillisecondsSinceLastUpdate" description="Returns how many milliseconds ago the last channel update was received.">
+			<param name="MillisecondsSinceLastUpdate" type="uint32" pass="return" description="Returns 0, if no update has ever been received or channel is not connected." />
+		</method>			
+
+		<method name="GetConnectionStatistics" description="Returns connection statistics for this channel.">
+			<param name="NumberOfSucceededUpdates" type="uint32" pass="out" description="Returns number of successful state updates." />
+			<param name="NumberOfUpdateErrors" type="uint32" pass="out" description="Returns number of update errors." />
+			<param name="MinimumUpdateDurationInMs" type="double" pass="out" description="Returns minium update duration in milliseconds." />
+			<param name="MaximumUpdateDurationInMs" type="double" pass="out" description="Returns maximum update duration in milliseconds." />
+			<param name="AverageUpdateDurationInMs" type="double" pass="out" description="Returns average update duration in milliseconds." />
+			<param name="UpdateDurationVarianceInMs" type="double" pass="out" description="Returns the variance of update durations in milliseconds." />
+		</method>			
+
+		<method name="ValueExists" description="Returns if a value exists in this channel.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Exists" type="bool" pass="return" description="Returns if a value exist." />
+		</method>	
+		
+		<method name="GetValueType" description="Returns the type of a value. Fails if value does not exist in this channel.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="ValueType" type="enum" class="ValueType" pass="out" description="Type of value." />
+			<param name="IsInput" type="bool" pass="out" description="Returns true if value is an input value." />
+			<param name="IsOutput" type="bool" pass="out" description="Returns true if value is an output value." />
+		</method>			
+
+		<method name="GetIntegerValueRange" description="Returns the possible range of an integer value.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist in this channel." />
+			<param name="MinValue" type="int64" pass="out" description="Minimum integer value this variable can hold. Returns 0 if variable is of float type." />
+			<param name="MaxValue" type="int64" pass="out" description="Maximum integer value this variable can hold. Returns 0 if variable is of float type." />
+		</method>	
+		
+		<method name="GetInputValueCount" description="Returns number of input variables on this channel.">
+			<param name="Count" type="uint32" pass="return" description="Number of input variables." />
+		</method>
+
+		<method name="GetInputValueName" description="Returns the name of an input variable on this channel.">
+			<param name="Index" type="uint32" pass="in" description="Index of input variable. 0-based. Fails if larger or equal than the count." />
+			<param name="Name" type="string" pass="return" description="Name of value." />
+		</method>
+		
+		<method name="GetOutputValueCount" description="Returns number of output variables on this channel.">
+			<param name="Count" type="uint32" pass="return" description="Number of input variables." />
+		</method>
+
+		<method name="GetOutputValueName" description="Returns the name of an output variable on this channel.">
+			<param name="Index" type="uint32" pass="in" description="Index of output variable. 0-based. Fails if larger or equal than the count." />
+			<param name="Name" type="string" pass="return" description="Name of value." />
+		</method>
+		
 	</class>
 
 
@@ -166,19 +237,22 @@ Custom implementation
 			<param name="ResourceName" type="string" pass="in" description="Resource name of core machine package. Empty means standard naming applies." />
 		</method>
 
-		<method name="EnumerateBoards" description= "Enumerates the boards attached to the system.">
-			<param name="BoardCount" type="uint32" pass="return" description="Returns the number of boards." />
+		<method name="GetChannelCount" description= "Returns the number of configured channels.">
+			<param name="ChannelCount" type="uint32" pass="return" description="Returns the number of channels." />
 		</method>
 
-		<method name="GetBoardInformation" description= "Returns the board information by index.">
-			<param name="BoardIndex" type="uint32" pass="in" description="Index of the board. MUST be between 0 and GetBoardCount - 1." />
-			<param name="BoardInformationInstance" type="class" class="BoardInformation" pass="return" description="Board Information Instance." />
+		<method name="GetChannelInformation" description= "Returns the channel information by index.">
+			<param name="ChannelIndex" type="uint32" pass="in" description="Index of the board. MUST be between 0 and GetBoardCount - 1." />
+			<param name="ChannelInformationInstance" type="class" class="ChannelInformation" pass="return" description="Channel Information Instance." />
 		</method>
 
 		<method name="Connect" description= "Connects to a cifX board by configuration.">
 		</method>
 
 		<method name="Disconnect" description= "Disconnects from cifX board.">
+		</method>
+
+		<method name="Reconnect" description= "Reconnects to the cifX board.">
 		</method>
 		
 		<method name="IsConnected" description="Returns if the driver is connected.">		
@@ -189,10 +263,24 @@ Custom implementation
 			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
 			<param name="Exists" type="bool" pass="return" description="Returns if a value exist." />
 		</method>	
+		
+		<method name="GetValueType" description="Returns the type of a value. Fails if value does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="ValueType" type="enum" class="ValueType" pass="out" description="Type of value." />
+			<param name="IsInput" type="bool" pass="out" description="Returns true if value is an input value." />
+			<param name="IsOutput" type="bool" pass="out" description="Returns true if value is an output value." />
+		</method>			
+
+		<method name="GetIntegerValueRange" description="Returns the possible range of an integer value.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="MinValue" type="int64" pass="out" description="Minimum integer value this variable can hold. Returns 0 if variable is of float type." />
+			<param name="MaxValue" type="int64" pass="out" description="Maximum integer value this variable can hold. Returns 0 if variable is of float type." />
+		</method>	
 
 		<method name="WriteIntegerValue" description="Writes an output integer value. Value MUST be within the bit-range of the value type defined by the configuration.">		
 			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
 			<param name="Value" type="int64" pass="in" description="Value to set. The named value MUST be of type integer or boolean. If value is of boolean type, 0 means false and every other value means true." />
+			<param name="ClampToRange" type="bool" pass="in" description="If Integer value is outside of the permissible range, should they be clamped the value to the boundaries (ClampToRange is true) or an error raised (ClampToRange is false)." />
 			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
 		</method>	
 

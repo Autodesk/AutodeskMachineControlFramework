@@ -57,7 +57,7 @@ namespace Impl {
 */
 class IBase;
 class IDriver;
-class IBoardInformation;
+class IChannelInformation;
 class IDriver_CifX;
 
 
@@ -140,6 +140,54 @@ template <class T1, class T2, class T3, class T4> class ParameterCache_4 : publi
 			param2 = m_param2;
 			param3 = m_param3;
 			param4 = m_param4;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5> class ParameterCache_5 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+	public:
+		ParameterCache_5 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+		}
+};
+
+template <class T1, class T2, class T3, class T4, class T5, class T6> class ParameterCache_6 : public ParameterCache {
+	private:
+		T1 m_param1;
+		T2 m_param2;
+		T3 m_param3;
+		T4 m_param4;
+		T5 m_param5;
+		T6 m_param6;
+	public:
+		ParameterCache_6 (const T1 & param1, const T2 & param2, const T3 & param3, const T4 & param4, const T5 & param5, const T6 & param6)
+			: m_param1 (param1), m_param2 (param2), m_param3 (param3), m_param4 (param4), m_param5 (param5), m_param6 (param6)
+		{
+		}
+
+		void retrieveData (T1 & param1, T2 & param2, T3 & param3, T4 & param4, T5 & param5, T6 & param6)
+		{
+			param1 = m_param1;
+			param2 = m_param2;
+			param3 = m_param3;
+			param4 = m_param4;
+			param5 = m_param5;
+			param6 = m_param6;
 		}
 };
 
@@ -311,14 +359,99 @@ typedef IBaseSharedPtr<IDriver> PIDriver;
 
 
 /*************************************************************************************************************************
- Class interface for BoardInformation 
+ Class interface for ChannelInformation 
 **************************************************************************************************************************/
 
-class IBoardInformation : public virtual IBase {
+class IChannelInformation : public virtual IBase {
 public:
+	/**
+	* IChannelInformation::GetBoardName - Returns the name of the board that it is connected to.
+	* @return Board name.
+	*/
+	virtual std::string GetBoardName() = 0;
+
+	/**
+	* IChannelInformation::GetChannelIndex - Returns the channel index of the board that it is connected to.
+	* @return Channel Index.
+	*/
+	virtual LibMCDriver_CifX_uint32 GetChannelIndex() = 0;
+
+	/**
+	* IChannelInformation::IsConnected - Returns if the driver is connected and updates are being received.
+	* @return The channel is connected.
+	*/
+	virtual bool IsConnected() = 0;
+
+	/**
+	* IChannelInformation::GetMillisecondsSinceLastUpdate - Returns how many milliseconds ago the last channel update was received.
+	* @return Returns 0, if no update has ever been received or channel is not connected.
+	*/
+	virtual LibMCDriver_CifX_uint32 GetMillisecondsSinceLastUpdate() = 0;
+
+	/**
+	* IChannelInformation::GetConnectionStatistics - Returns connection statistics for this channel.
+	* @param[out] nNumberOfSucceededUpdates - Returns number of successful state updates.
+	* @param[out] nNumberOfUpdateErrors - Returns number of update errors.
+	* @param[out] dMinimumUpdateDurationInMs - Returns minium update duration in milliseconds.
+	* @param[out] dMaximumUpdateDurationInMs - Returns maximum update duration in milliseconds.
+	* @param[out] dAverageUpdateDurationInMs - Returns average update duration in milliseconds.
+	* @param[out] dUpdateDurationVarianceInMs - Returns the variance of update durations in milliseconds.
+	*/
+	virtual void GetConnectionStatistics(LibMCDriver_CifX_uint32 & nNumberOfSucceededUpdates, LibMCDriver_CifX_uint32 & nNumberOfUpdateErrors, LibMCDriver_CifX_double & dMinimumUpdateDurationInMs, LibMCDriver_CifX_double & dMaximumUpdateDurationInMs, LibMCDriver_CifX_double & dAverageUpdateDurationInMs, LibMCDriver_CifX_double & dUpdateDurationVarianceInMs) = 0;
+
+	/**
+	* IChannelInformation::ValueExists - Returns if a value exists in this channel.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @return Returns if a value exist.
+	*/
+	virtual bool ValueExists(const std::string & sName) = 0;
+
+	/**
+	* IChannelInformation::GetValueType - Returns the type of a value. Fails if value does not exist in this channel.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @param[out] eValueType - Type of value.
+	* @param[out] bIsInput - Returns true if value is an input value.
+	* @param[out] bIsOutput - Returns true if value is an output value.
+	*/
+	virtual void GetValueType(const std::string & sName, LibMCDriver_CifX::eValueType & eValueType, bool & bIsInput, bool & bIsOutput) = 0;
+
+	/**
+	* IChannelInformation::GetIntegerValueRange - Returns the possible range of an integer value.
+	* @param[in] sName - Name of value. Call fails if value does not exist in this channel.
+	* @param[out] nMinValue - Minimum integer value this variable can hold. Returns 0 if variable is of float type.
+	* @param[out] nMaxValue - Maximum integer value this variable can hold. Returns 0 if variable is of float type.
+	*/
+	virtual void GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue) = 0;
+
+	/**
+	* IChannelInformation::GetInputValueCount - Returns number of input variables on this channel.
+	* @return Number of input variables.
+	*/
+	virtual LibMCDriver_CifX_uint32 GetInputValueCount() = 0;
+
+	/**
+	* IChannelInformation::GetInputValueName - Returns the name of an input variable on this channel.
+	* @param[in] nIndex - Index of input variable. 0-based. Fails if larger or equal than the count.
+	* @return Name of value.
+	*/
+	virtual std::string GetInputValueName(const LibMCDriver_CifX_uint32 nIndex) = 0;
+
+	/**
+	* IChannelInformation::GetOutputValueCount - Returns number of output variables on this channel.
+	* @return Number of input variables.
+	*/
+	virtual LibMCDriver_CifX_uint32 GetOutputValueCount() = 0;
+
+	/**
+	* IChannelInformation::GetOutputValueName - Returns the name of an output variable on this channel.
+	* @param[in] nIndex - Index of output variable. 0-based. Fails if larger or equal than the count.
+	* @return Name of value.
+	*/
+	virtual std::string GetOutputValueName(const LibMCDriver_CifX_uint32 nIndex) = 0;
+
 };
 
-typedef IBaseSharedPtr<IBoardInformation> PIBoardInformation;
+typedef IBaseSharedPtr<IChannelInformation> PIChannelInformation;
 
 
 /*************************************************************************************************************************
@@ -345,17 +478,17 @@ public:
 	virtual void SetCustomSDKResource(const std::string & sResourceName) = 0;
 
 	/**
-	* IDriver_CifX::EnumerateBoards - Enumerates the boards attached to the system.
-	* @return Returns the number of boards.
+	* IDriver_CifX::GetChannelCount - Returns the number of configured channels.
+	* @return Returns the number of channels.
 	*/
-	virtual LibMCDriver_CifX_uint32 EnumerateBoards() = 0;
+	virtual LibMCDriver_CifX_uint32 GetChannelCount() = 0;
 
 	/**
-	* IDriver_CifX::GetBoardInformation - Returns the board information by index.
-	* @param[in] nBoardIndex - Index of the board. MUST be between 0 and GetBoardCount - 1.
-	* @return Board Information Instance.
+	* IDriver_CifX::GetChannelInformation - Returns the channel information by index.
+	* @param[in] nChannelIndex - Index of the board. MUST be between 0 and GetBoardCount - 1.
+	* @return Channel Information Instance.
 	*/
-	virtual IBoardInformation * GetBoardInformation(const LibMCDriver_CifX_uint32 nBoardIndex) = 0;
+	virtual IChannelInformation * GetChannelInformation(const LibMCDriver_CifX_uint32 nChannelIndex) = 0;
 
 	/**
 	* IDriver_CifX::Connect - Connects to a cifX board by configuration.
@@ -366,6 +499,11 @@ public:
 	* IDriver_CifX::Disconnect - Disconnects from cifX board.
 	*/
 	virtual void Disconnect() = 0;
+
+	/**
+	* IDriver_CifX::Reconnect - Reconnects to the cifX board.
+	*/
+	virtual void Reconnect() = 0;
 
 	/**
 	* IDriver_CifX::IsConnected - Returns if the driver is connected.
@@ -381,12 +519,30 @@ public:
 	virtual bool ValueExists(const std::string & sName) = 0;
 
 	/**
+	* IDriver_CifX::GetValueType - Returns the type of a value. Fails if value does not exist.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @param[out] eValueType - Type of value.
+	* @param[out] bIsInput - Returns true if value is an input value.
+	* @param[out] bIsOutput - Returns true if value is an output value.
+	*/
+	virtual void GetValueType(const std::string & sName, LibMCDriver_CifX::eValueType & eValueType, bool & bIsInput, bool & bIsOutput) = 0;
+
+	/**
+	* IDriver_CifX::GetIntegerValueRange - Returns the possible range of an integer value.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @param[out] nMinValue - Minimum integer value this variable can hold. Returns 0 if variable is of float type.
+	* @param[out] nMaxValue - Maximum integer value this variable can hold. Returns 0 if variable is of float type.
+	*/
+	virtual void GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue) = 0;
+
+	/**
 	* IDriver_CifX::WriteIntegerValue - Writes an output integer value. Value MUST be within the bit-range of the value type defined by the configuration.
 	* @param[in] sName - Name of value. Call fails if value does not exist.
 	* @param[in] nValue - Value to set. The named value MUST be of type integer or boolean. If value is of boolean type, 0 means false and every other value means true.
+	* @param[in] bClampToRange - If Integer value is outside of the permissible range, should they be clamped the value to the boundaries (ClampToRange is true) or an error raised (ClampToRange is false).
 	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	virtual void WriteIntegerValue(const std::string & sName, const LibMCDriver_CifX_int64 nValue, const LibMCDriver_CifX_uint32 nTimeOutInMs) = 0;
+	virtual void WriteIntegerValue(const std::string & sName, const LibMCDriver_CifX_int64 nValue, const bool bClampToRange, const LibMCDriver_CifX_uint32 nTimeOutInMs) = 0;
 
 	/**
 	* IDriver_CifX::WriteBoolValue - Writes an output boolean value.

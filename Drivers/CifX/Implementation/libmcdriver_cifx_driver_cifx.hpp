@@ -46,11 +46,7 @@ Abstract: This is the class declaration of CDriver_CifX
 
 // Include custom headers here.
 #include "libmcdriver_cifx_sdk.hpp"
-#include <map>
-#include <pugixml.hpp>
-#include <mutex>
-#include <atomic>
-#include <thread>
+#include "libmcdriver_cifx_channel.hpp"
 
 namespace LibMCDriver_CifX {
 namespace Impl {
@@ -60,224 +56,7 @@ namespace Impl {
  Class declaration of CDriver_CifX 
 **************************************************************************************************************************/
 
-	enum class eDriver_CifXParameterType : int32_t {
-		CifXParameter_Unknown = 0,
-		CifXParameter_BOOL = 1,
-		CifXParameter_UINT8 = 2,
-		CifXParameter_UINT16 = 3,
-		CifXParameter_UINT32 = 4,
-		CifXParameter_INT8 = 5,
-		CifXParameter_INT16 = 6,
-		CifXParameter_INT32 = 7,
-		CifXParameter_FLOAT = 8,
-		CifXParameter_DOUBLE = 9,
-	};
-
-	enum class eDriver_AbstractParameterType : int32_t {
-		CifXAbstractParameter_Unknown = 0,
-		CifXAbstractParameter_BOOL = 1,
-		CifXAbstractParameter_INT = 2,
-		CifXAbstractParameter_DOUBLE = 3
-	};
-
-	class CDriver_CifXParameter {
-	private:
-		std::string m_sName;
-		std::string m_sDescription;
-		eDriver_CifXParameterType m_eType;
-		uint32_t m_nAddress;
-	public:
-		CDriver_CifXParameter(const std::string& sName, const std::string& sDescription, eDriver_CifXParameterType Type, const uint32_t nAddress);
-		virtual ~CDriver_CifXParameter();
-
-		std::string getName();
-		std::string getDescription();
-
-		virtual double GetActualDoubleValue();
-		virtual int64_t GetActualIntegerValue();
-		bool GetActualBoolValue();
-		virtual void SetActualDoubleValue(double dValue);
-		virtual void SetActualIntegerValue(int64_t nValue);
-		void SetActualBoolValue(bool bValue);
-		virtual double GetTargetDoubleValue();
-		virtual int64_t GetTargetIntegerValue();
-		bool GetTargetBoolValue();
-		virtual void SetTargetDoubleValue(double dValue);
-		virtual void SetTargetIntegerValue(int64_t nValue);
-		void SetTargetBoolValue(bool bValue);
-
-		eDriver_CifXParameterType getType();
-		eDriver_AbstractParameterType getAbstractType();
-
-		uint32_t getAddress ();
-
-	};
-
-	typedef std::shared_ptr<CDriver_CifXParameter> PDriver_CifXParameter;
-
-
-	class CDriver_CifXParameter_Integer : public CDriver_CifXParameter {
-	private:
-		int64_t m_nActualValue;
-		int64_t m_nTargetValue;
-
-	public:
-		CDriver_CifXParameter_Integer(const std::string& sName, const std::string& sDescription, eDriver_CifXParameterType Type, const uint32_t nAddress);
-
-		virtual ~CDriver_CifXParameter_Integer();
-
-		virtual int64_t GetActualIntegerValue() override;
-
-		virtual void SetActualIntegerValue(int64_t nValue) override;
-
-		virtual int64_t GetTargetIntegerValue() override;
-
-		virtual void SetTargetIntegerValue(int64_t nValue) override;
-	};
-
-
-	class CDriver_CifXParameter_Double : public CDriver_CifXParameter {
-	private:
-		double m_dActualValue;
-		double m_dTargetValue;
-
-	public:
-		CDriver_CifXParameter_Double(const std::string& sName, const std::string& sDescription, eDriver_CifXParameterType Type, const uint32_t nAddress);
-
-		virtual ~CDriver_CifXParameter_Double();
-
-		virtual double GetActualDoubleValue() override;
-
-		virtual void SetActualDoubleValue(double dValue) override;
-
-		virtual double GetTargetDoubleValue() override;
-
-		virtual void SetTargetDoubleValue(double dValue) override;
-	};
-
-
-	class CDriver_CifXParameter_Bool : public CDriver_CifXParameter_Integer {
-	private:
-		uint32_t m_nBit;
-
-	public:
-		CDriver_CifXParameter_Bool(const std::string& sName, const std::string& sDescription, eDriver_CifXParameterType Type, const uint32_t nAddress, const uint32_t nBit);
-
-		virtual ~CDriver_CifXParameter_Bool();
-
-		uint32_t getBit();
-
-	};
-
-
-	class CDriver_CifXChannelBuffer {
-	private:
-		std::vector<uint8_t> m_Data;
-
-	public:
-		CDriver_CifXChannelBuffer(uint32_t nSize);
-		~CDriver_CifXChannelBuffer();
-
-		void clear();
-
-		uint8_t readUint8(uint32_t nAddress);
-		uint16_t readUint16(uint32_t nAddress);
-		uint32_t readUint32(uint32_t nAddress);
-		int8_t readInt8(uint32_t nAddress);
-		int16_t readInt16(uint32_t nAddress);
-		int32_t readInt32(uint32_t nAddress);
-		bool readBool(uint32_t nAddress, uint32_t nBit);
-		float readFloat(uint32_t nAddress);
-		double readDouble(uint32_t nAddress);
-
-		void writeUint8(uint32_t nAddress, uint8_t nValue);
-		void writeUint16(uint32_t nAddress, uint16_t nValue);
-		void writeUint32(uint32_t nAddress, uint32_t nValue);
-		void writeInt8(uint32_t nAddress, int8_t nValue);
-		void writeInt16(uint32_t nAddress, int16_t nValue);
-		void writeInt32(uint32_t nAddress, int32_t nValue);
-		void writeBool(uint32_t nAddress, uint32_t nBit, bool bValue);
-		void writeFloat(uint32_t nAddress, float fValue);
-		void writeDouble(uint32_t nAddress, double dValue);
-
-		std::vector<uint8_t> & getBuffer();
-	};
-
-
-	class CDriver_CifXChannelThreadState {
-		private:
-			CDriver_CifXChannelBuffer m_InputBuffer;
-			CDriver_CifXChannelBuffer m_OutputBuffer;
-
-			PCifXSDK m_pCifXSDK;
-			cifxHandle m_hChannel;
-
-			std::mutex m_Mutex;
-
-			std::atomic<bool> m_CancelFlag;
-
-			bool m_bDebugMode;
-			std::vector<std::pair<uint32_t, std::string>> m_Exceptions;
-
-
-		public:
-			
-			CDriver_CifXChannelThreadState(PCifXSDK pCifXSDK, uint32_t nInputSize, uint32_t nOutputSize, cifxHandle hChannel);
-
-			virtual ~CDriver_CifXChannelThreadState();
-
-			void executeThread(uint32_t nReadTimeOut, uint32_t nWriteTimeOut);
-
-			void handleException(uint32_t nErrorCode, const std::string& sMessage);
-
-			void stopThread(uint32_t nHostStateTimeOut, uint32_t nBusStateTimeOut);
-
-			bool threadShallBeCanceled();
-
-			void readInputParameter (CDriver_CifXParameter * pParameter);
-			void readOutputParameter(CDriver_CifXParameter* pParameter);
-			void writeOutputParameter(CDriver_CifXParameter* pParameter);
-
-	};
-
-
-	class CDriver_CifXChannel {
-	private:
-		std::string m_sBoardName;
-		uint32_t m_nChannelIndex;
-		uint32_t m_nInputSize;
-		uint32_t m_nOutputSize;
-
-		uint32_t m_nHostStateTimeOut;
-		uint32_t m_nBusStateTimeOut;
-
-		std::shared_ptr<CDriver_CifXChannelThreadState> m_pThreadState;
-
-		std::thread m_SyncThread;
-
-		std::vector<PDriver_CifXParameter> m_Inputs;
-		std::map<std::string, PDriver_CifXParameter> m_InputMap;
-		std::vector<PDriver_CifXParameter> m_Outputs;
-		std::map<std::string, PDriver_CifXParameter> m_OutputMap;
-
-	public:
-
-		CDriver_CifXChannel(pugi::xml_node& channelNode);
-		virtual ~CDriver_CifXChannel ();
-
-		std::string getBoardName(); 
-		uint32_t getChannelIndex();
-
-		void RegisterVariables(LibMCEnv::PDriverEnvironment pDriverEnvironment);
-
-		std::vector<PDriver_CifXParameter> getInputs ();
-		std::vector<PDriver_CifXParameter> getOutputs();
-
-		void stopSyncThread();
-		void startSyncThread(PCifXSDK pCifXSDK, cifxHandle hDriverHandle);
-	};
-
-	typedef std::shared_ptr<CDriver_CifXChannel> PDriver_CifXChannel;
+	
 
 
 class CDriver_CifX : public virtual IDriver_CifX, public virtual CDriver {
@@ -331,11 +110,13 @@ public:
 
 	void SetCustomSDKResource(const std::string & sResourceName) override;
 
-	LibMCDriver_CifX_uint32 EnumerateBoards() override;
+	LibMCDriver_CifX_uint32 GetChannelCount() override;
 
-	IBoardInformation * GetBoardInformation(const LibMCDriver_CifX_uint32 nBoardIndex) override;
+	IChannelInformation* GetChannelInformation(const LibMCDriver_CifX_uint32 nChannelIndex) override;
 
 	void Connect() override;
+
+	void Reconnect() override;
 
 	void Disconnect() override;
 
@@ -343,7 +124,11 @@ public:
 
 	bool ValueExists(const std::string& sName) override;
 
-	void WriteIntegerValue(const std::string& sName, const LibMCDriver_CifX_int64 nValue, const LibMCDriver_CifX_uint32 nTimeOutInMs) override;
+	void GetValueType(const std::string& sName, LibMCDriver_CifX::eValueType& eValueType, bool& bIsInput, bool& bIsOutput) override;
+
+	void GetIntegerValueRange(const std::string& sName, LibMCDriver_CifX_int64& nMinValue, LibMCDriver_CifX_int64& nMaxValue) override;
+
+	void WriteIntegerValue(const std::string& sName, const LibMCDriver_CifX_int64 nValue, const bool bClampToRange, const LibMCDriver_CifX_uint32 nTimeOutInMs) override;
 
 	void WriteBoolValue(const std::string& sName, const bool bValue, const LibMCDriver_CifX_uint32 nTimeOutInMs) override;
 

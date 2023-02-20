@@ -133,8 +133,135 @@ LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_gethead
 LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_queryparameters(LibMCDriver_CifX_Driver pDriver);
 
 /*************************************************************************************************************************
- Class definition for BoardInformation
+ Class definition for ChannelInformation
 **************************************************************************************************************************/
+
+/**
+* Returns the name of the board that it is connected to.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[in] nBoardNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pBoardNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pBoardNameBuffer -  buffer of Board name., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getboardname(LibMCDriver_CifX_ChannelInformation pChannelInformation, const LibMCDriver_CifX_uint32 nBoardNameBufferSize, LibMCDriver_CifX_uint32* pBoardNameNeededChars, char * pBoardNameBuffer);
+
+/**
+* Returns the channel index of the board that it is connected to.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[out] pChannelIndex - Channel Index.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getchannelindex(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pChannelIndex);
+
+/**
+* Returns if the driver is connected and updates are being received.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[out] pChannelIsConnected - The channel is connected.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_isconnected(LibMCDriver_CifX_ChannelInformation pChannelInformation, bool * pChannelIsConnected);
+
+/**
+* Returns how many milliseconds ago the last channel update was received.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[out] pMillisecondsSinceLastUpdate - Returns 0, if no update has ever been received or channel is not connected.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getmillisecondssincelastupdate(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pMillisecondsSinceLastUpdate);
+
+/**
+* Returns connection statistics for this channel.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[out] pNumberOfSucceededUpdates - Returns number of successful state updates.
+* @param[out] pNumberOfUpdateErrors - Returns number of update errors.
+* @param[out] pMinimumUpdateDurationInMs - Returns minium update duration in milliseconds.
+* @param[out] pMaximumUpdateDurationInMs - Returns maximum update duration in milliseconds.
+* @param[out] pAverageUpdateDurationInMs - Returns average update duration in milliseconds.
+* @param[out] pUpdateDurationVarianceInMs - Returns the variance of update durations in milliseconds.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getconnectionstatistics(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pNumberOfSucceededUpdates, LibMCDriver_CifX_uint32 * pNumberOfUpdateErrors, LibMCDriver_CifX_double * pMinimumUpdateDurationInMs, LibMCDriver_CifX_double * pMaximumUpdateDurationInMs, LibMCDriver_CifX_double * pAverageUpdateDurationInMs, LibMCDriver_CifX_double * pUpdateDurationVarianceInMs);
+
+/**
+* Returns if a value exists in this channel.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[in] pName - Name of value. Call fails if value does not exist.
+* @param[out] pExists - Returns if a value exist.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_valueexists(LibMCDriver_CifX_ChannelInformation pChannelInformation, const char * pName, bool * pExists);
+
+/**
+* Returns the type of a value. Fails if value does not exist in this channel.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[in] pName - Name of value. Call fails if value does not exist.
+* @param[out] pValueType - Type of value.
+* @param[out] pIsInput - Returns true if value is an input value.
+* @param[out] pIsOutput - Returns true if value is an output value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getvaluetype(LibMCDriver_CifX_ChannelInformation pChannelInformation, const char * pName, LibMCDriver_CifX::eValueType * pValueType, bool * pIsInput, bool * pIsOutput);
+
+/**
+* Returns the possible range of an integer value.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[in] pName - Name of value. Call fails if value does not exist in this channel.
+* @param[out] pMinValue - Minimum integer value this variable can hold. Returns 0 if variable is of float type.
+* @param[out] pMaxValue - Maximum integer value this variable can hold. Returns 0 if variable is of float type.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getintegervaluerange(LibMCDriver_CifX_ChannelInformation pChannelInformation, const char * pName, LibMCDriver_CifX_int64 * pMinValue, LibMCDriver_CifX_int64 * pMaxValue);
+
+/**
+* Returns number of input variables on this channel.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[out] pCount - Number of input variables.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getinputvaluecount(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pCount);
+
+/**
+* Returns the name of an input variable on this channel.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[in] nIndex - Index of input variable. 0-based. Fails if larger or equal than the count.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getinputvaluename(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 nIndex, const LibMCDriver_CifX_uint32 nNameBufferSize, LibMCDriver_CifX_uint32* pNameNeededChars, char * pNameBuffer);
+
+/**
+* Returns number of output variables on this channel.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[out] pCount - Number of input variables.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getoutputvaluecount(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pCount);
+
+/**
+* Returns the name of an output variable on this channel.
+*
+* @param[in] pChannelInformation - ChannelInformation instance.
+* @param[in] nIndex - Index of output variable. 0-based. Fails if larger or equal than the count.
+* @param[in] nNameBufferSize - size of the buffer (including trailing 0)
+* @param[out] pNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pNameBuffer -  buffer of Name of value., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getoutputvaluename(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 nIndex, const LibMCDriver_CifX_uint32 nNameBufferSize, LibMCDriver_CifX_uint32* pNameNeededChars, char * pNameBuffer);
 
 /*************************************************************************************************************************
  Class definition for Driver_CifX
@@ -167,23 +294,23 @@ LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_is
 LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_setcustomsdkresource(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pResourceName);
 
 /**
-* Enumerates the boards attached to the system.
+* Returns the number of configured channels.
 *
 * @param[in] pDriver_CifX - Driver_CifX instance.
-* @param[out] pBoardCount - Returns the number of boards.
+* @param[out] pChannelCount - Returns the number of channels.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_enumerateboards(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 * pBoardCount);
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getchannelcount(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 * pChannelCount);
 
 /**
-* Returns the board information by index.
+* Returns the channel information by index.
 *
 * @param[in] pDriver_CifX - Driver_CifX instance.
-* @param[in] nBoardIndex - Index of the board. MUST be between 0 and GetBoardCount - 1.
-* @param[out] pBoardInformationInstance - Board Information Instance.
+* @param[in] nChannelIndex - Index of the board. MUST be between 0 and GetBoardCount - 1.
+* @param[out] pChannelInformationInstance - Channel Information Instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getboardinformation(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 nBoardIndex, LibMCDriver_CifX_BoardInformation * pBoardInformationInstance);
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getchannelinformation(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 nChannelIndex, LibMCDriver_CifX_ChannelInformation * pChannelInformationInstance);
 
 /**
 * Connects to a cifX board by configuration.
@@ -200,6 +327,14 @@ LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_co
 * @return error code or 0 (success)
 */
 LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_disconnect(LibMCDriver_CifX_Driver_CifX pDriver_CifX);
+
+/**
+* Reconnects to the cifX board.
+*
+* @param[in] pDriver_CifX - Driver_CifX instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_reconnect(LibMCDriver_CifX_Driver_CifX pDriver_CifX);
 
 /**
 * Returns if the driver is connected.
@@ -221,15 +356,39 @@ LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_is
 LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_valueexists(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, bool * pExists);
 
 /**
+* Returns the type of a value. Fails if value does not exist.
+*
+* @param[in] pDriver_CifX - Driver_CifX instance.
+* @param[in] pName - Name of value. Call fails if value does not exist.
+* @param[out] pValueType - Type of value.
+* @param[out] pIsInput - Returns true if value is an input value.
+* @param[out] pIsOutput - Returns true if value is an output value.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getvaluetype(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, LibMCDriver_CifX::eValueType * pValueType, bool * pIsInput, bool * pIsOutput);
+
+/**
+* Returns the possible range of an integer value.
+*
+* @param[in] pDriver_CifX - Driver_CifX instance.
+* @param[in] pName - Name of value. Call fails if value does not exist.
+* @param[out] pMinValue - Minimum integer value this variable can hold. Returns 0 if variable is of float type.
+* @param[out] pMaxValue - Maximum integer value this variable can hold. Returns 0 if variable is of float type.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getintegervaluerange(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, LibMCDriver_CifX_int64 * pMinValue, LibMCDriver_CifX_int64 * pMaxValue);
+
+/**
 * Writes an output integer value. Value MUST be within the bit-range of the value type defined by the configuration.
 *
 * @param[in] pDriver_CifX - Driver_CifX instance.
 * @param[in] pName - Name of value. Call fails if value does not exist.
 * @param[in] nValue - Value to set. The named value MUST be of type integer or boolean. If value is of boolean type, 0 means false and every other value means true.
+* @param[in] bClampToRange - If Integer value is outside of the permissible range, should they be clamped the value to the boundaries (ClampToRange is true) or an error raised (ClampToRange is false).
 * @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_writeintegervalue(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, LibMCDriver_CifX_int64 nValue, LibMCDriver_CifX_uint32 nTimeOutInMs);
+LIBMCDRIVER_CIFX_DECLSPEC LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_writeintegervalue(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, LibMCDriver_CifX_int64 nValue, bool bClampToRange, LibMCDriver_CifX_uint32 nTimeOutInMs);
 
 /**
 * Writes an output boolean value.

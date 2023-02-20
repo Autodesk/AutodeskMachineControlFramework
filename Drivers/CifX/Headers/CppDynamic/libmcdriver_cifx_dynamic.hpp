@@ -62,7 +62,7 @@ namespace LibMCDriver_CifX {
 class CWrapper;
 class CBase;
 class CDriver;
-class CBoardInformation;
+class CChannelInformation;
 class CDriver_CifX;
 
 /*************************************************************************************************************************
@@ -71,7 +71,7 @@ class CDriver_CifX;
 typedef CWrapper CLibMCDriver_CifXWrapper;
 typedef CBase CLibMCDriver_CifXBase;
 typedef CDriver CLibMCDriver_CifXDriver;
-typedef CBoardInformation CLibMCDriver_CifXBoardInformation;
+typedef CChannelInformation CLibMCDriver_CifXChannelInformation;
 typedef CDriver_CifX CLibMCDriver_CifXDriver_CifX;
 
 /*************************************************************************************************************************
@@ -80,7 +80,7 @@ typedef CDriver_CifX CLibMCDriver_CifXDriver_CifX;
 typedef std::shared_ptr<CWrapper> PWrapper;
 typedef std::shared_ptr<CBase> PBase;
 typedef std::shared_ptr<CDriver> PDriver;
-typedef std::shared_ptr<CBoardInformation> PBoardInformation;
+typedef std::shared_ptr<CChannelInformation> PChannelInformation;
 typedef std::shared_ptr<CDriver_CifX> PDriver_CifX;
 
 /*************************************************************************************************************************
@@ -89,7 +89,7 @@ typedef std::shared_ptr<CDriver_CifX> PDriver_CifX;
 typedef PWrapper PLibMCDriver_CifXWrapper;
 typedef PBase PLibMCDriver_CifXBase;
 typedef PDriver PLibMCDriver_CifXDriver;
-typedef PBoardInformation PLibMCDriver_CifXBoardInformation;
+typedef PChannelInformation PLibMCDriver_CifXChannelInformation;
 typedef PDriver_CifX PLibMCDriver_CifXDriver_CifX;
 
 
@@ -214,6 +214,8 @@ public:
 			case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT: return "INVALIDADDRESSWRITEBIT";
 			case LIBMCDRIVER_CIFX_ERROR_INVALIDBITINDEX: return "INVALIDBITINDEX";
 			case LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST: return "INVALIDBOOLPARAMETERCAST";
+			case LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE: return "INVALIDNAMEATTRIBUTE";
+			case LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEX: return "INVALIDCHANNELINDEX";
 		}
 		return "UNKNOWN";
 	}
@@ -266,6 +268,8 @@ public:
 			case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT: return "invalid address write bit";
 			case LIBMCDRIVER_CIFX_ERROR_INVALIDBITINDEX: return "invalid bit index";
 			case LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST: return "invalid bool parameter cast";
+			case LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE: return "invalid name attribute";
+			case LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEX: return "invalid channel index";
 		}
 		return "unknown error";
 	}
@@ -389,7 +393,7 @@ private:
 
 	friend class CBase;
 	friend class CDriver;
-	friend class CBoardInformation;
+	friend class CChannelInformation;
 	friend class CDriver_CifX;
 
 };
@@ -474,19 +478,31 @@ public:
 };
 	
 /*************************************************************************************************************************
- Class CBoardInformation 
+ Class CChannelInformation 
 **************************************************************************************************************************/
-class CBoardInformation : public CBase {
+class CChannelInformation : public CBase {
 public:
 	
 	/**
-	* CBoardInformation::CBoardInformation - Constructor for BoardInformation class.
+	* CChannelInformation::CChannelInformation - Constructor for ChannelInformation class.
 	*/
-	CBoardInformation(CWrapper* pWrapper, LibMCDriver_CifXHandle pHandle)
+	CChannelInformation(CWrapper* pWrapper, LibMCDriver_CifXHandle pHandle)
 		: CBase(pWrapper, pHandle)
 	{
 	}
 	
+	inline std::string GetBoardName();
+	inline LibMCDriver_CifX_uint32 GetChannelIndex();
+	inline bool IsConnected();
+	inline LibMCDriver_CifX_uint32 GetMillisecondsSinceLastUpdate();
+	inline void GetConnectionStatistics(LibMCDriver_CifX_uint32 & nNumberOfSucceededUpdates, LibMCDriver_CifX_uint32 & nNumberOfUpdateErrors, LibMCDriver_CifX_double & dMinimumUpdateDurationInMs, LibMCDriver_CifX_double & dMaximumUpdateDurationInMs, LibMCDriver_CifX_double & dAverageUpdateDurationInMs, LibMCDriver_CifX_double & dUpdateDurationVarianceInMs);
+	inline bool ValueExists(const std::string & sName);
+	inline void GetValueType(const std::string & sName, eValueType & eValueType, bool & bIsInput, bool & bIsOutput);
+	inline void GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue);
+	inline LibMCDriver_CifX_uint32 GetInputValueCount();
+	inline std::string GetInputValueName(const LibMCDriver_CifX_uint32 nIndex);
+	inline LibMCDriver_CifX_uint32 GetOutputValueCount();
+	inline std::string GetOutputValueName(const LibMCDriver_CifX_uint32 nIndex);
 };
 	
 /*************************************************************************************************************************
@@ -506,13 +522,16 @@ public:
 	inline void SetToSimulationMode();
 	inline bool IsSimulationMode();
 	inline void SetCustomSDKResource(const std::string & sResourceName);
-	inline LibMCDriver_CifX_uint32 EnumerateBoards();
-	inline PBoardInformation GetBoardInformation(const LibMCDriver_CifX_uint32 nBoardIndex);
+	inline LibMCDriver_CifX_uint32 GetChannelCount();
+	inline PChannelInformation GetChannelInformation(const LibMCDriver_CifX_uint32 nChannelIndex);
 	inline void Connect();
 	inline void Disconnect();
+	inline void Reconnect();
 	inline bool IsConnected();
 	inline bool ValueExists(const std::string & sName);
-	inline void WriteIntegerValue(const std::string & sName, const LibMCDriver_CifX_int64 nValue, const LibMCDriver_CifX_uint32 nTimeOutInMs);
+	inline void GetValueType(const std::string & sName, eValueType & eValueType, bool & bIsInput, bool & bIsOutput);
+	inline void GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue);
+	inline void WriteIntegerValue(const std::string & sName, const LibMCDriver_CifX_int64 nValue, const bool bClampToRange, const LibMCDriver_CifX_uint32 nTimeOutInMs);
 	inline void WriteBoolValue(const std::string & sName, const bool bValue, const LibMCDriver_CifX_uint32 nTimeOutInMs);
 	inline void WriteDoubleValue(const std::string & sName, const LibMCDriver_CifX_double dValue, const LibMCDriver_CifX_uint32 nTimeOutInMs);
 	inline LibMCDriver_CifX_int64 ReadIntegerValue(const std::string & sName);
@@ -647,15 +666,30 @@ public:
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_GetHeaderInformation = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_ChannelInformation_GetBoardName = nullptr;
+		pWrapperTable->m_ChannelInformation_GetChannelIndex = nullptr;
+		pWrapperTable->m_ChannelInformation_IsConnected = nullptr;
+		pWrapperTable->m_ChannelInformation_GetMillisecondsSinceLastUpdate = nullptr;
+		pWrapperTable->m_ChannelInformation_GetConnectionStatistics = nullptr;
+		pWrapperTable->m_ChannelInformation_ValueExists = nullptr;
+		pWrapperTable->m_ChannelInformation_GetValueType = nullptr;
+		pWrapperTable->m_ChannelInformation_GetIntegerValueRange = nullptr;
+		pWrapperTable->m_ChannelInformation_GetInputValueCount = nullptr;
+		pWrapperTable->m_ChannelInformation_GetInputValueName = nullptr;
+		pWrapperTable->m_ChannelInformation_GetOutputValueCount = nullptr;
+		pWrapperTable->m_ChannelInformation_GetOutputValueName = nullptr;
 		pWrapperTable->m_Driver_CifX_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_CifX_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_CifX_SetCustomSDKResource = nullptr;
-		pWrapperTable->m_Driver_CifX_EnumerateBoards = nullptr;
-		pWrapperTable->m_Driver_CifX_GetBoardInformation = nullptr;
+		pWrapperTable->m_Driver_CifX_GetChannelCount = nullptr;
+		pWrapperTable->m_Driver_CifX_GetChannelInformation = nullptr;
 		pWrapperTable->m_Driver_CifX_Connect = nullptr;
 		pWrapperTable->m_Driver_CifX_Disconnect = nullptr;
+		pWrapperTable->m_Driver_CifX_Reconnect = nullptr;
 		pWrapperTable->m_Driver_CifX_IsConnected = nullptr;
 		pWrapperTable->m_Driver_CifX_ValueExists = nullptr;
+		pWrapperTable->m_Driver_CifX_GetValueType = nullptr;
+		pWrapperTable->m_Driver_CifX_GetIntegerValueRange = nullptr;
 		pWrapperTable->m_Driver_CifX_WriteIntegerValue = nullptr;
 		pWrapperTable->m_Driver_CifX_WriteBoolValue = nullptr;
 		pWrapperTable->m_Driver_CifX_WriteDoubleValue = nullptr;
@@ -774,6 +808,114 @@ public:
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetBoardName = (PLibMCDriver_CifXChannelInformation_GetBoardNamePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getboardname");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetBoardName = (PLibMCDriver_CifXChannelInformation_GetBoardNamePtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getboardname");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetBoardName == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetChannelIndex = (PLibMCDriver_CifXChannelInformation_GetChannelIndexPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getchannelindex");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetChannelIndex = (PLibMCDriver_CifXChannelInformation_GetChannelIndexPtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getchannelindex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetChannelIndex == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_IsConnected = (PLibMCDriver_CifXChannelInformation_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_isconnected");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_IsConnected = (PLibMCDriver_CifXChannelInformation_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_isconnected");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_IsConnected == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetMillisecondsSinceLastUpdate = (PLibMCDriver_CifXChannelInformation_GetMillisecondsSinceLastUpdatePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getmillisecondssincelastupdate");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetMillisecondsSinceLastUpdate = (PLibMCDriver_CifXChannelInformation_GetMillisecondsSinceLastUpdatePtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getmillisecondssincelastupdate");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetMillisecondsSinceLastUpdate == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetConnectionStatistics = (PLibMCDriver_CifXChannelInformation_GetConnectionStatisticsPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getconnectionstatistics");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetConnectionStatistics = (PLibMCDriver_CifXChannelInformation_GetConnectionStatisticsPtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getconnectionstatistics");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetConnectionStatistics == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_ValueExists = (PLibMCDriver_CifXChannelInformation_ValueExistsPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_valueexists");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_ValueExists = (PLibMCDriver_CifXChannelInformation_ValueExistsPtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_valueexists");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_ValueExists == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetValueType = (PLibMCDriver_CifXChannelInformation_GetValueTypePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getvaluetype");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetValueType = (PLibMCDriver_CifXChannelInformation_GetValueTypePtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getvaluetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetValueType == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetIntegerValueRange = (PLibMCDriver_CifXChannelInformation_GetIntegerValueRangePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getintegervaluerange");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetIntegerValueRange = (PLibMCDriver_CifXChannelInformation_GetIntegerValueRangePtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getintegervaluerange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetIntegerValueRange == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetInputValueCount = (PLibMCDriver_CifXChannelInformation_GetInputValueCountPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getinputvaluecount");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetInputValueCount = (PLibMCDriver_CifXChannelInformation_GetInputValueCountPtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getinputvaluecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetInputValueCount == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetInputValueName = (PLibMCDriver_CifXChannelInformation_GetInputValueNamePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getinputvaluename");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetInputValueName = (PLibMCDriver_CifXChannelInformation_GetInputValueNamePtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getinputvaluename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetInputValueName == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetOutputValueCount = (PLibMCDriver_CifXChannelInformation_GetOutputValueCountPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getoutputvaluecount");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetOutputValueCount = (PLibMCDriver_CifXChannelInformation_GetOutputValueCountPtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getoutputvaluecount");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetOutputValueCount == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_ChannelInformation_GetOutputValueName = (PLibMCDriver_CifXChannelInformation_GetOutputValueNamePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_channelinformation_getoutputvaluename");
+		#else // _WIN32
+		pWrapperTable->m_ChannelInformation_GetOutputValueName = (PLibMCDriver_CifXChannelInformation_GetOutputValueNamePtr) dlsym(hLibrary, "libmcdriver_cifx_channelinformation_getoutputvaluename");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_ChannelInformation_GetOutputValueName == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_CifX_SetToSimulationMode = (PLibMCDriver_CifXDriver_CifX_SetToSimulationModePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_settosimulationmode");
 		#else // _WIN32
 		pWrapperTable->m_Driver_CifX_SetToSimulationMode = (PLibMCDriver_CifXDriver_CifX_SetToSimulationModePtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_settosimulationmode");
@@ -801,21 +943,21 @@ public:
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_CifX_EnumerateBoards = (PLibMCDriver_CifXDriver_CifX_EnumerateBoardsPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_enumerateboards");
+		pWrapperTable->m_Driver_CifX_GetChannelCount = (PLibMCDriver_CifXDriver_CifX_GetChannelCountPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_getchannelcount");
 		#else // _WIN32
-		pWrapperTable->m_Driver_CifX_EnumerateBoards = (PLibMCDriver_CifXDriver_CifX_EnumerateBoardsPtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_enumerateboards");
+		pWrapperTable->m_Driver_CifX_GetChannelCount = (PLibMCDriver_CifXDriver_CifX_GetChannelCountPtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_getchannelcount");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_CifX_EnumerateBoards == nullptr)
+		if (pWrapperTable->m_Driver_CifX_GetChannelCount == nullptr)
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
-		pWrapperTable->m_Driver_CifX_GetBoardInformation = (PLibMCDriver_CifXDriver_CifX_GetBoardInformationPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_getboardinformation");
+		pWrapperTable->m_Driver_CifX_GetChannelInformation = (PLibMCDriver_CifXDriver_CifX_GetChannelInformationPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_getchannelinformation");
 		#else // _WIN32
-		pWrapperTable->m_Driver_CifX_GetBoardInformation = (PLibMCDriver_CifXDriver_CifX_GetBoardInformationPtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_getboardinformation");
+		pWrapperTable->m_Driver_CifX_GetChannelInformation = (PLibMCDriver_CifXDriver_CifX_GetChannelInformationPtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_getchannelinformation");
 		dlerror();
 		#endif // _WIN32
-		if (pWrapperTable->m_Driver_CifX_GetBoardInformation == nullptr)
+		if (pWrapperTable->m_Driver_CifX_GetChannelInformation == nullptr)
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -837,6 +979,15 @@ public:
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_Driver_CifX_Reconnect = (PLibMCDriver_CifXDriver_CifX_ReconnectPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_reconnect");
+		#else // _WIN32
+		pWrapperTable->m_Driver_CifX_Reconnect = (PLibMCDriver_CifXDriver_CifX_ReconnectPtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_reconnect");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_CifX_Reconnect == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_Driver_CifX_IsConnected = (PLibMCDriver_CifXDriver_CifX_IsConnectedPtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_isconnected");
 		#else // _WIN32
 		pWrapperTable->m_Driver_CifX_IsConnected = (PLibMCDriver_CifXDriver_CifX_IsConnectedPtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_isconnected");
@@ -852,6 +1003,24 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_CifX_ValueExists == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_CifX_GetValueType = (PLibMCDriver_CifXDriver_CifX_GetValueTypePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_getvaluetype");
+		#else // _WIN32
+		pWrapperTable->m_Driver_CifX_GetValueType = (PLibMCDriver_CifXDriver_CifX_GetValueTypePtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_getvaluetype");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_CifX_GetValueType == nullptr)
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_CifX_GetIntegerValueRange = (PLibMCDriver_CifXDriver_CifX_GetIntegerValueRangePtr) GetProcAddress(hLibrary, "libmcdriver_cifx_driver_cifx_getintegervaluerange");
+		#else // _WIN32
+		pWrapperTable->m_Driver_CifX_GetIntegerValueRange = (PLibMCDriver_CifXDriver_CifX_GetIntegerValueRangePtr) dlsym(hLibrary, "libmcdriver_cifx_driver_cifx_getintegervaluerange");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_CifX_GetIntegerValueRange == nullptr)
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1011,6 +1180,54 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getboardname", (void**)&(pWrapperTable->m_ChannelInformation_GetBoardName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetBoardName == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getchannelindex", (void**)&(pWrapperTable->m_ChannelInformation_GetChannelIndex));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetChannelIndex == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_isconnected", (void**)&(pWrapperTable->m_ChannelInformation_IsConnected));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_IsConnected == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getmillisecondssincelastupdate", (void**)&(pWrapperTable->m_ChannelInformation_GetMillisecondsSinceLastUpdate));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetMillisecondsSinceLastUpdate == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getconnectionstatistics", (void**)&(pWrapperTable->m_ChannelInformation_GetConnectionStatistics));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetConnectionStatistics == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_valueexists", (void**)&(pWrapperTable->m_ChannelInformation_ValueExists));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_ValueExists == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getvaluetype", (void**)&(pWrapperTable->m_ChannelInformation_GetValueType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetValueType == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getintegervaluerange", (void**)&(pWrapperTable->m_ChannelInformation_GetIntegerValueRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetIntegerValueRange == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getinputvaluecount", (void**)&(pWrapperTable->m_ChannelInformation_GetInputValueCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetInputValueCount == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getinputvaluename", (void**)&(pWrapperTable->m_ChannelInformation_GetInputValueName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetInputValueName == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getoutputvaluecount", (void**)&(pWrapperTable->m_ChannelInformation_GetOutputValueCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetOutputValueCount == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_channelinformation_getoutputvaluename", (void**)&(pWrapperTable->m_ChannelInformation_GetOutputValueName));
+		if ( (eLookupError != 0) || (pWrapperTable->m_ChannelInformation_GetOutputValueName == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_settosimulationmode", (void**)&(pWrapperTable->m_Driver_CifX_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1023,12 +1240,12 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_SetCustomSDKResource == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_enumerateboards", (void**)&(pWrapperTable->m_Driver_CifX_EnumerateBoards));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_EnumerateBoards == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_getchannelcount", (void**)&(pWrapperTable->m_Driver_CifX_GetChannelCount));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_GetChannelCount == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
-		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_getboardinformation", (void**)&(pWrapperTable->m_Driver_CifX_GetBoardInformation));
-		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_GetBoardInformation == nullptr) )
+		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_getchannelinformation", (void**)&(pWrapperTable->m_Driver_CifX_GetChannelInformation));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_GetChannelInformation == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_connect", (void**)&(pWrapperTable->m_Driver_CifX_Connect));
@@ -1039,12 +1256,24 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_Disconnect == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_reconnect", (void**)&(pWrapperTable->m_Driver_CifX_Reconnect));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_Reconnect == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_isconnected", (void**)&(pWrapperTable->m_Driver_CifX_IsConnected));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_IsConnected == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_valueexists", (void**)&(pWrapperTable->m_Driver_CifX_ValueExists));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_ValueExists == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_getvaluetype", (void**)&(pWrapperTable->m_Driver_CifX_GetValueType));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_GetValueType == nullptr) )
+			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_getintegervaluerange", (void**)&(pWrapperTable->m_Driver_CifX_GetIntegerValueRange));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_CifX_GetIntegerValueRange == nullptr) )
 			return LIBMCDRIVER_CIFX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcdriver_cifx_driver_cifx_writeintegervalue", (void**)&(pWrapperTable->m_Driver_CifX_WriteIntegerValue));
@@ -1196,8 +1425,165 @@ public:
 	}
 	
 	/**
-	 * Method definitions for class CBoardInformation
+	 * Method definitions for class CChannelInformation
 	 */
+	
+	/**
+	* CChannelInformation::GetBoardName - Returns the name of the board that it is connected to.
+	* @return Board name.
+	*/
+	std::string CChannelInformation::GetBoardName()
+	{
+		LibMCDriver_CifX_uint32 bytesNeededBoardName = 0;
+		LibMCDriver_CifX_uint32 bytesWrittenBoardName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetBoardName(m_pHandle, 0, &bytesNeededBoardName, nullptr));
+		std::vector<char> bufferBoardName(bytesNeededBoardName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetBoardName(m_pHandle, bytesNeededBoardName, &bytesWrittenBoardName, &bufferBoardName[0]));
+		
+		return std::string(&bufferBoardName[0]);
+	}
+	
+	/**
+	* CChannelInformation::GetChannelIndex - Returns the channel index of the board that it is connected to.
+	* @return Channel Index.
+	*/
+	LibMCDriver_CifX_uint32 CChannelInformation::GetChannelIndex()
+	{
+		LibMCDriver_CifX_uint32 resultChannelIndex = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetChannelIndex(m_pHandle, &resultChannelIndex));
+		
+		return resultChannelIndex;
+	}
+	
+	/**
+	* CChannelInformation::IsConnected - Returns if the driver is connected and updates are being received.
+	* @return The channel is connected.
+	*/
+	bool CChannelInformation::IsConnected()
+	{
+		bool resultChannelIsConnected = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_IsConnected(m_pHandle, &resultChannelIsConnected));
+		
+		return resultChannelIsConnected;
+	}
+	
+	/**
+	* CChannelInformation::GetMillisecondsSinceLastUpdate - Returns how many milliseconds ago the last channel update was received.
+	* @return Returns 0, if no update has ever been received or channel is not connected.
+	*/
+	LibMCDriver_CifX_uint32 CChannelInformation::GetMillisecondsSinceLastUpdate()
+	{
+		LibMCDriver_CifX_uint32 resultMillisecondsSinceLastUpdate = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetMillisecondsSinceLastUpdate(m_pHandle, &resultMillisecondsSinceLastUpdate));
+		
+		return resultMillisecondsSinceLastUpdate;
+	}
+	
+	/**
+	* CChannelInformation::GetConnectionStatistics - Returns connection statistics for this channel.
+	* @param[out] nNumberOfSucceededUpdates - Returns number of successful state updates.
+	* @param[out] nNumberOfUpdateErrors - Returns number of update errors.
+	* @param[out] dMinimumUpdateDurationInMs - Returns minium update duration in milliseconds.
+	* @param[out] dMaximumUpdateDurationInMs - Returns maximum update duration in milliseconds.
+	* @param[out] dAverageUpdateDurationInMs - Returns average update duration in milliseconds.
+	* @param[out] dUpdateDurationVarianceInMs - Returns the variance of update durations in milliseconds.
+	*/
+	void CChannelInformation::GetConnectionStatistics(LibMCDriver_CifX_uint32 & nNumberOfSucceededUpdates, LibMCDriver_CifX_uint32 & nNumberOfUpdateErrors, LibMCDriver_CifX_double & dMinimumUpdateDurationInMs, LibMCDriver_CifX_double & dMaximumUpdateDurationInMs, LibMCDriver_CifX_double & dAverageUpdateDurationInMs, LibMCDriver_CifX_double & dUpdateDurationVarianceInMs)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetConnectionStatistics(m_pHandle, &nNumberOfSucceededUpdates, &nNumberOfUpdateErrors, &dMinimumUpdateDurationInMs, &dMaximumUpdateDurationInMs, &dAverageUpdateDurationInMs, &dUpdateDurationVarianceInMs));
+	}
+	
+	/**
+	* CChannelInformation::ValueExists - Returns if a value exists in this channel.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @return Returns if a value exist.
+	*/
+	bool CChannelInformation::ValueExists(const std::string & sName)
+	{
+		bool resultExists = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_ValueExists(m_pHandle, sName.c_str(), &resultExists));
+		
+		return resultExists;
+	}
+	
+	/**
+	* CChannelInformation::GetValueType - Returns the type of a value. Fails if value does not exist in this channel.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @param[out] eValueType - Type of value.
+	* @param[out] bIsInput - Returns true if value is an input value.
+	* @param[out] bIsOutput - Returns true if value is an output value.
+	*/
+	void CChannelInformation::GetValueType(const std::string & sName, eValueType & eValueType, bool & bIsInput, bool & bIsOutput)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetValueType(m_pHandle, sName.c_str(), &eValueType, &bIsInput, &bIsOutput));
+	}
+	
+	/**
+	* CChannelInformation::GetIntegerValueRange - Returns the possible range of an integer value.
+	* @param[in] sName - Name of value. Call fails if value does not exist in this channel.
+	* @param[out] nMinValue - Minimum integer value this variable can hold. Returns 0 if variable is of float type.
+	* @param[out] nMaxValue - Maximum integer value this variable can hold. Returns 0 if variable is of float type.
+	*/
+	void CChannelInformation::GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetIntegerValueRange(m_pHandle, sName.c_str(), &nMinValue, &nMaxValue));
+	}
+	
+	/**
+	* CChannelInformation::GetInputValueCount - Returns number of input variables on this channel.
+	* @return Number of input variables.
+	*/
+	LibMCDriver_CifX_uint32 CChannelInformation::GetInputValueCount()
+	{
+		LibMCDriver_CifX_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetInputValueCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CChannelInformation::GetInputValueName - Returns the name of an input variable on this channel.
+	* @param[in] nIndex - Index of input variable. 0-based. Fails if larger or equal than the count.
+	* @return Name of value.
+	*/
+	std::string CChannelInformation::GetInputValueName(const LibMCDriver_CifX_uint32 nIndex)
+	{
+		LibMCDriver_CifX_uint32 bytesNeededName = 0;
+		LibMCDriver_CifX_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetInputValueName(m_pHandle, nIndex, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetInputValueName(m_pHandle, nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
+	
+	/**
+	* CChannelInformation::GetOutputValueCount - Returns number of output variables on this channel.
+	* @return Number of input variables.
+	*/
+	LibMCDriver_CifX_uint32 CChannelInformation::GetOutputValueCount()
+	{
+		LibMCDriver_CifX_uint32 resultCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetOutputValueCount(m_pHandle, &resultCount));
+		
+		return resultCount;
+	}
+	
+	/**
+	* CChannelInformation::GetOutputValueName - Returns the name of an output variable on this channel.
+	* @param[in] nIndex - Index of output variable. 0-based. Fails if larger or equal than the count.
+	* @return Name of value.
+	*/
+	std::string CChannelInformation::GetOutputValueName(const LibMCDriver_CifX_uint32 nIndex)
+	{
+		LibMCDriver_CifX_uint32 bytesNeededName = 0;
+		LibMCDriver_CifX_uint32 bytesWrittenName = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetOutputValueName(m_pHandle, nIndex, 0, &bytesNeededName, nullptr));
+		std::vector<char> bufferName(bytesNeededName);
+		CheckError(m_pWrapper->m_WrapperTable.m_ChannelInformation_GetOutputValueName(m_pHandle, nIndex, bytesNeededName, &bytesWrittenName, &bufferName[0]));
+		
+		return std::string(&bufferName[0]);
+	}
 	
 	/**
 	 * Method definitions for class CDriver_CifX
@@ -1233,31 +1619,31 @@ public:
 	}
 	
 	/**
-	* CDriver_CifX::EnumerateBoards - Enumerates the boards attached to the system.
-	* @return Returns the number of boards.
+	* CDriver_CifX::GetChannelCount - Returns the number of configured channels.
+	* @return Returns the number of channels.
 	*/
-	LibMCDriver_CifX_uint32 CDriver_CifX::EnumerateBoards()
+	LibMCDriver_CifX_uint32 CDriver_CifX::GetChannelCount()
 	{
-		LibMCDriver_CifX_uint32 resultBoardCount = 0;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_EnumerateBoards(m_pHandle, &resultBoardCount));
+		LibMCDriver_CifX_uint32 resultChannelCount = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_GetChannelCount(m_pHandle, &resultChannelCount));
 		
-		return resultBoardCount;
+		return resultChannelCount;
 	}
 	
 	/**
-	* CDriver_CifX::GetBoardInformation - Returns the board information by index.
-	* @param[in] nBoardIndex - Index of the board. MUST be between 0 and GetBoardCount - 1.
-	* @return Board Information Instance.
+	* CDriver_CifX::GetChannelInformation - Returns the channel information by index.
+	* @param[in] nChannelIndex - Index of the board. MUST be between 0 and GetBoardCount - 1.
+	* @return Channel Information Instance.
 	*/
-	PBoardInformation CDriver_CifX::GetBoardInformation(const LibMCDriver_CifX_uint32 nBoardIndex)
+	PChannelInformation CDriver_CifX::GetChannelInformation(const LibMCDriver_CifX_uint32 nChannelIndex)
 	{
-		LibMCDriver_CifXHandle hBoardInformationInstance = nullptr;
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_GetBoardInformation(m_pHandle, nBoardIndex, &hBoardInformationInstance));
+		LibMCDriver_CifXHandle hChannelInformationInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_GetChannelInformation(m_pHandle, nChannelIndex, &hChannelInformationInstance));
 		
-		if (!hBoardInformationInstance) {
+		if (!hChannelInformationInstance) {
 			CheckError(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
 		}
-		return std::make_shared<CBoardInformation>(m_pWrapper, hBoardInformationInstance);
+		return std::make_shared<CChannelInformation>(m_pWrapper, hChannelInformationInstance);
 	}
 	
 	/**
@@ -1274,6 +1660,14 @@ public:
 	void CDriver_CifX::Disconnect()
 	{
 		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_Disconnect(m_pHandle));
+	}
+	
+	/**
+	* CDriver_CifX::Reconnect - Reconnects to the cifX board.
+	*/
+	void CDriver_CifX::Reconnect()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_Reconnect(m_pHandle));
 	}
 	
 	/**
@@ -1302,14 +1696,38 @@ public:
 	}
 	
 	/**
+	* CDriver_CifX::GetValueType - Returns the type of a value. Fails if value does not exist.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @param[out] eValueType - Type of value.
+	* @param[out] bIsInput - Returns true if value is an input value.
+	* @param[out] bIsOutput - Returns true if value is an output value.
+	*/
+	void CDriver_CifX::GetValueType(const std::string & sName, eValueType & eValueType, bool & bIsInput, bool & bIsOutput)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_GetValueType(m_pHandle, sName.c_str(), &eValueType, &bIsInput, &bIsOutput));
+	}
+	
+	/**
+	* CDriver_CifX::GetIntegerValueRange - Returns the possible range of an integer value.
+	* @param[in] sName - Name of value. Call fails if value does not exist.
+	* @param[out] nMinValue - Minimum integer value this variable can hold. Returns 0 if variable is of float type.
+	* @param[out] nMaxValue - Maximum integer value this variable can hold. Returns 0 if variable is of float type.
+	*/
+	void CDriver_CifX::GetIntegerValueRange(const std::string & sName, LibMCDriver_CifX_int64 & nMinValue, LibMCDriver_CifX_int64 & nMaxValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_GetIntegerValueRange(m_pHandle, sName.c_str(), &nMinValue, &nMaxValue));
+	}
+	
+	/**
 	* CDriver_CifX::WriteIntegerValue - Writes an output integer value. Value MUST be within the bit-range of the value type defined by the configuration.
 	* @param[in] sName - Name of value. Call fails if value does not exist.
 	* @param[in] nValue - Value to set. The named value MUST be of type integer or boolean. If value is of boolean type, 0 means false and every other value means true.
+	* @param[in] bClampToRange - If Integer value is outside of the permissible range, should they be clamped the value to the boundaries (ClampToRange is true) or an error raised (ClampToRange is false).
 	* @param[in] nTimeOutInMs - If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet.
 	*/
-	void CDriver_CifX::WriteIntegerValue(const std::string & sName, const LibMCDriver_CifX_int64 nValue, const LibMCDriver_CifX_uint32 nTimeOutInMs)
+	void CDriver_CifX::WriteIntegerValue(const std::string & sName, const LibMCDriver_CifX_int64 nValue, const bool bClampToRange, const LibMCDriver_CifX_uint32 nTimeOutInMs)
 	{
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_WriteIntegerValue(m_pHandle, sName.c_str(), nValue, nTimeOutInMs));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_CifX_WriteIntegerValue(m_pHandle, sName.c_str(), nValue, bClampToRange, nTimeOutInMs));
 	}
 	
 	/**

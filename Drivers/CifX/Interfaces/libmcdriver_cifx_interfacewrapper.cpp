@@ -346,8 +346,411 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_queryparameters(LibMCDriver_CifX_
 
 
 /*************************************************************************************************************************
- Class implementation for BoardInformation
+ Class implementation for ChannelInformation
 **************************************************************************************************************************/
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getboardname(LibMCDriver_CifX_ChannelInformation pChannelInformation, const LibMCDriver_CifX_uint32 nBoardNameBufferSize, LibMCDriver_CifX_uint32* pBoardNameNeededChars, char * pBoardNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if ( (!pBoardNameBuffer) && !(pBoardNameNeededChars) )
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sBoardName("");
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pBoardNameBuffer == nullptr);
+		if (isCacheCall) {
+			sBoardName = pIChannelInformation->GetBoardName();
+
+			pIChannelInformation->_setCache (new ParameterCache_1<std::string> (sBoardName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIChannelInformation->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+			cache->retrieveData (sBoardName);
+			pIChannelInformation->_setCache (nullptr);
+		}
+		
+		if (pBoardNameNeededChars)
+			*pBoardNameNeededChars = (LibMCDriver_CifX_uint32) (sBoardName.size()+1);
+		if (pBoardNameBuffer) {
+			if (sBoardName.size() >= nBoardNameBufferSize)
+				throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_BUFFERTOOSMALL);
+			for (size_t iBoardName = 0; iBoardName < sBoardName.size(); iBoardName++)
+				pBoardNameBuffer[iBoardName] = sBoardName[iBoardName];
+			pBoardNameBuffer[sBoardName.size()] = 0;
+		}
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getchannelindex(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pChannelIndex)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pChannelIndex == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		*pChannelIndex = pIChannelInformation->GetChannelIndex();
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_isconnected(LibMCDriver_CifX_ChannelInformation pChannelInformation, bool * pChannelIsConnected)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pChannelIsConnected == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		*pChannelIsConnected = pIChannelInformation->IsConnected();
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getmillisecondssincelastupdate(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pMillisecondsSinceLastUpdate)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pMillisecondsSinceLastUpdate == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		*pMillisecondsSinceLastUpdate = pIChannelInformation->GetMillisecondsSinceLastUpdate();
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getconnectionstatistics(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pNumberOfSucceededUpdates, LibMCDriver_CifX_uint32 * pNumberOfUpdateErrors, LibMCDriver_CifX_double * pMinimumUpdateDurationInMs, LibMCDriver_CifX_double * pMaximumUpdateDurationInMs, LibMCDriver_CifX_double * pAverageUpdateDurationInMs, LibMCDriver_CifX_double * pUpdateDurationVarianceInMs)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (!pNumberOfSucceededUpdates)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pNumberOfUpdateErrors)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pMinimumUpdateDurationInMs)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pMaximumUpdateDurationInMs)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pAverageUpdateDurationInMs)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pUpdateDurationVarianceInMs)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		pIChannelInformation->GetConnectionStatistics(*pNumberOfSucceededUpdates, *pNumberOfUpdateErrors, *pMinimumUpdateDurationInMs, *pMaximumUpdateDurationInMs, *pAverageUpdateDurationInMs, *pUpdateDurationVarianceInMs);
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_valueexists(LibMCDriver_CifX_ChannelInformation pChannelInformation, const char * pName, bool * pExists)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (pExists == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		*pExists = pIChannelInformation->ValueExists(sName);
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getvaluetype(LibMCDriver_CifX_ChannelInformation pChannelInformation, const char * pName, eLibMCDriver_CifXValueType * pValueType, bool * pIsInput, bool * pIsOutput)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pValueType)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pIsInput)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pIsOutput)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		pIChannelInformation->GetValueType(sName, *pValueType, *pIsInput, *pIsOutput);
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getintegervaluerange(LibMCDriver_CifX_ChannelInformation pChannelInformation, const char * pName, LibMCDriver_CifX_int64 * pMinValue, LibMCDriver_CifX_int64 * pMaxValue)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pMinValue)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pMaxValue)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		pIChannelInformation->GetIntegerValueRange(sName, *pMinValue, *pMaxValue);
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getinputvaluecount(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		*pCount = pIChannelInformation->GetInputValueCount();
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getinputvaluename(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 nIndex, const LibMCDriver_CifX_uint32 nNameBufferSize, LibMCDriver_CifX_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			sName = pIChannelInformation->GetInputValueName(nIndex);
+
+			pIChannelInformation->_setCache (new ParameterCache_1<std::string> (sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIChannelInformation->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+			cache->retrieveData (sName);
+			pIChannelInformation->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCDriver_CifX_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getoutputvaluecount(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		*pCount = pIChannelInformation->GetOutputValueCount();
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_channelinformation_getoutputvaluename(LibMCDriver_CifX_ChannelInformation pChannelInformation, LibMCDriver_CifX_uint32 nIndex, const LibMCDriver_CifX_uint32 nNameBufferSize, LibMCDriver_CifX_uint32* pNameNeededChars, char * pNameBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pChannelInformation;
+
+	try {
+		if ( (!pNameBuffer) && !(pNameNeededChars) )
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sName("");
+		IChannelInformation* pIChannelInformation = dynamic_cast<IChannelInformation*>(pIBaseClass);
+		if (!pIChannelInformation)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pNameBuffer == nullptr);
+		if (isCacheCall) {
+			sName = pIChannelInformation->GetOutputValueName(nIndex);
+
+			pIChannelInformation->_setCache (new ParameterCache_1<std::string> (sName));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIChannelInformation->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+			cache->retrieveData (sName);
+			pIChannelInformation->_setCache (nullptr);
+		}
+		
+		if (pNameNeededChars)
+			*pNameNeededChars = (LibMCDriver_CifX_uint32) (sName.size()+1);
+		if (pNameBuffer) {
+			if (sName.size() >= nNameBufferSize)
+				throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_BUFFERTOOSMALL);
+			for (size_t iName = 0; iName < sName.size(); iName++)
+				pNameBuffer[iName] = sName[iName];
+			pNameBuffer[sName.size()] = 0;
+		}
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 
 /*************************************************************************************************************************
  Class implementation for Driver_CifX
@@ -429,18 +832,18 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_setcustomsdkresource(LibMCDr
 	}
 }
 
-LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_enumerateboards(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 * pBoardCount)
+LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getchannelcount(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 * pChannelCount)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_CifX;
 
 	try {
-		if (pBoardCount == nullptr)
+		if (pChannelCount == nullptr)
 			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
 		IDriver_CifX* pIDriver_CifX = dynamic_cast<IDriver_CifX*>(pIBaseClass);
 		if (!pIDriver_CifX)
 			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
 		
-		*pBoardCount = pIDriver_CifX->EnumerateBoards();
+		*pChannelCount = pIDriver_CifX->GetChannelCount();
 
 		return LIBMCDRIVER_CIFX_SUCCESS;
 	}
@@ -455,21 +858,21 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_enumerateboards(LibMCDriver_
 	}
 }
 
-LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getboardinformation(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 nBoardIndex, LibMCDriver_CifX_BoardInformation * pBoardInformationInstance)
+LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getchannelinformation(LibMCDriver_CifX_Driver_CifX pDriver_CifX, LibMCDriver_CifX_uint32 nChannelIndex, LibMCDriver_CifX_ChannelInformation * pChannelInformationInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_CifX;
 
 	try {
-		if (pBoardInformationInstance == nullptr)
+		if (pChannelInformationInstance == nullptr)
 			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
-		IBase* pBaseBoardInformationInstance(nullptr);
+		IBase* pBaseChannelInformationInstance(nullptr);
 		IDriver_CifX* pIDriver_CifX = dynamic_cast<IDriver_CifX*>(pIBaseClass);
 		if (!pIDriver_CifX)
 			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
 		
-		pBaseBoardInformationInstance = pIDriver_CifX->GetBoardInformation(nBoardIndex);
+		pBaseChannelInformationInstance = pIDriver_CifX->GetChannelInformation(nChannelIndex);
 
-		*pBoardInformationInstance = (IBase*)(pBaseBoardInformationInstance);
+		*pChannelInformationInstance = (IBase*)(pBaseChannelInformationInstance);
 		return LIBMCDRIVER_CIFX_SUCCESS;
 	}
 	catch (ELibMCDriver_CifXInterfaceException & Exception) {
@@ -517,6 +920,30 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_disconnect(LibMCDriver_CifX_
 			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
 		
 		pIDriver_CifX->Disconnect();
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_reconnect(LibMCDriver_CifX_Driver_CifX pDriver_CifX)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_CifX;
+
+	try {
+		IDriver_CifX* pIDriver_CifX = dynamic_cast<IDriver_CifX*>(pIBaseClass);
+		if (!pIDriver_CifX)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		pIDriver_CifX->Reconnect();
 
 		return LIBMCDRIVER_CIFX_SUCCESS;
 	}
@@ -586,7 +1013,71 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_valueexists(LibMCDriver_CifX
 	}
 }
 
-LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_writeintegervalue(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, LibMCDriver_CifX_int64 nValue, LibMCDriver_CifX_uint32 nTimeOutInMs)
+LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getvaluetype(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, eLibMCDriver_CifXValueType * pValueType, bool * pIsInput, bool * pIsOutput)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_CifX;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pValueType)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pIsInput)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pIsOutput)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IDriver_CifX* pIDriver_CifX = dynamic_cast<IDriver_CifX*>(pIBaseClass);
+		if (!pIDriver_CifX)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		pIDriver_CifX->GetValueType(sName, *pValueType, *pIsInput, *pIsOutput);
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_getintegervaluerange(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, LibMCDriver_CifX_int64 * pMinValue, LibMCDriver_CifX_int64 * pMaxValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriver_CifX;
+
+	try {
+		if (pName == nullptr)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pMinValue)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		if (!pMaxValue)
+			throw ELibMCDriver_CifXInterfaceException (LIBMCDRIVER_CIFX_ERROR_INVALIDPARAM);
+		std::string sName(pName);
+		IDriver_CifX* pIDriver_CifX = dynamic_cast<IDriver_CifX*>(pIBaseClass);
+		if (!pIDriver_CifX)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		pIDriver_CifX->GetIntegerValueRange(sName, *pMinValue, *pMaxValue);
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_writeintegervalue(LibMCDriver_CifX_Driver_CifX pDriver_CifX, const char * pName, LibMCDriver_CifX_int64 nValue, bool bClampToRange, LibMCDriver_CifX_uint32 nTimeOutInMs)
 {
 	IBase* pIBaseClass = (IBase *)pDriver_CifX;
 
@@ -598,7 +1089,7 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_cifx_writeintegervalue(LibMCDrive
 		if (!pIDriver_CifX)
 			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
 		
-		pIDriver_CifX->WriteIntegerValue(sName, nValue, nTimeOutInMs);
+		pIDriver_CifX->WriteIntegerValue(sName, nValue, bClampToRange, nTimeOutInMs);
 
 		return LIBMCDRIVER_CIFX_SUCCESS;
 	}
@@ -781,24 +1272,54 @@ LibMCDriver_CifXResult LibMCDriver_CifX::Impl::LibMCDriver_CifX_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_getheaderinformation;
 	if (sProcName == "libmcdriver_cifx_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_queryparameters;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getboardname") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getboardname;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getchannelindex") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getchannelindex;
+	if (sProcName == "libmcdriver_cifx_channelinformation_isconnected") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_isconnected;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getmillisecondssincelastupdate") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getmillisecondssincelastupdate;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getconnectionstatistics") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getconnectionstatistics;
+	if (sProcName == "libmcdriver_cifx_channelinformation_valueexists") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_valueexists;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getvaluetype") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getvaluetype;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getintegervaluerange") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getintegervaluerange;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getinputvaluecount") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getinputvaluecount;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getinputvaluename") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getinputvaluename;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getoutputvaluecount") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getoutputvaluecount;
+	if (sProcName == "libmcdriver_cifx_channelinformation_getoutputvaluename") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getoutputvaluename;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_settosimulationmode;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_issimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_issimulationmode;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_setcustomsdkresource") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_setcustomsdkresource;
-	if (sProcName == "libmcdriver_cifx_driver_cifx_enumerateboards") 
-		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_enumerateboards;
-	if (sProcName == "libmcdriver_cifx_driver_cifx_getboardinformation") 
-		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_getboardinformation;
+	if (sProcName == "libmcdriver_cifx_driver_cifx_getchannelcount") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_getchannelcount;
+	if (sProcName == "libmcdriver_cifx_driver_cifx_getchannelinformation") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_getchannelinformation;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_connect") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_connect;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_disconnect") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_disconnect;
+	if (sProcName == "libmcdriver_cifx_driver_cifx_reconnect") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_reconnect;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_isconnected") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_isconnected;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_valueexists") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_valueexists;
+	if (sProcName == "libmcdriver_cifx_driver_cifx_getvaluetype") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_getvaluetype;
+	if (sProcName == "libmcdriver_cifx_driver_cifx_getintegervaluerange") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_getintegervaluerange;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_writeintegervalue") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_cifx_writeintegervalue;
 	if (sProcName == "libmcdriver_cifx_driver_cifx_writeboolvalue") 

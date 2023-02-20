@@ -140,6 +140,8 @@ typedef void * LibMCDriver_CifX_pvoid;
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT 1033 /** invalid address write bit */
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDBITINDEX 1034 /** invalid bit index */
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST 1035 /** invalid bool parameter cast */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE 1036 /** invalid name attribute */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEX 1037 /** invalid channel index */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_CifX
@@ -192,6 +194,8 @@ inline const char * LIBMCDRIVER_CIFX_GETERRORSTRING (LibMCDriver_CifXResult nErr
     case LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT: return "invalid address write bit";
     case LIBMCDRIVER_CIFX_ERROR_INVALIDBITINDEX: return "invalid bit index";
     case LIBMCDRIVER_CIFX_ERROR_INVALIDBOOLPARAMETERCAST: return "invalid bool parameter cast";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE: return "invalid name attribute";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEX: return "invalid channel index";
     default: return "unknown error";
   }
 }
@@ -202,13 +206,25 @@ inline const char * LIBMCDRIVER_CIFX_GETERRORSTRING (LibMCDriver_CifXResult nErr
 
 typedef LibMCDriver_CifXHandle LibMCDriver_CifX_Base;
 typedef LibMCDriver_CifXHandle LibMCDriver_CifX_Driver;
-typedef LibMCDriver_CifXHandle LibMCDriver_CifX_BoardInformation;
+typedef LibMCDriver_CifXHandle LibMCDriver_CifX_ChannelInformation;
 typedef LibMCDriver_CifXHandle LibMCDriver_CifX_Driver_CifX;
 
 namespace LibMCDriver_CifX {
 
+  /*************************************************************************************************************************
+   Declaration of enums
+  **************************************************************************************************************************/
+  
+  enum class eValueType : LibMCDriver_CifX_int32 {
+    Unknown = 0,
+    IntegerValue = 1,
+    BoolValue = 2,
+    DoubleValue = 3
+  };
+  
 } // namespace LibMCDriver_CifX;
 
 // define legacy C-names for enums, structs and function types
+typedef LibMCDriver_CifX::eValueType eLibMCDriver_CifXValueType;
 
 #endif // __LIBMCDRIVER_CIFX_TYPES_HEADER_CPP
