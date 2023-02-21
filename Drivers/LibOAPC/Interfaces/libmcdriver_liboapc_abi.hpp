@@ -102,13 +102,21 @@ LIBMCDRIVER_LIBOAPC_DECLSPEC LibMCDriver_LibOAPCResult libmcdriver_liboapc_drive
 LIBMCDRIVER_LIBOAPC_DECLSPEC LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_getversion(LibMCDriver_LibOAPC_Driver pDriver, LibMCDriver_LibOAPC_uint32 * pMajor, LibMCDriver_LibOAPC_uint32 * pMinor, LibMCDriver_LibOAPC_uint32 * pMicro, const LibMCDriver_LibOAPC_uint32 nBuildBufferSize, LibMCDriver_LibOAPC_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_LIBOAPC_DECLSPEC LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_queryparameters(LibMCDriver_LibOAPC_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_LIBOAPC_DECLSPEC LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_queryparameters(LibMCDriver_LibOAPC_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+LIBMCDRIVER_LIBOAPC_DECLSPEC LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_queryparametersex(LibMCDriver_LibOAPC_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_E1701

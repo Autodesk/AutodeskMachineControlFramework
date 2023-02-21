@@ -89,13 +89,21 @@ typedef LibMCDriver_LibOAPCResult (*PLibMCDriver_LibOAPCDriver_GetTypePtr) (LibM
 typedef LibMCDriver_LibOAPCResult (*PLibMCDriver_LibOAPCDriver_GetVersionPtr) (LibMCDriver_LibOAPC_Driver pDriver, LibMCDriver_LibOAPC_uint32 * pMajor, LibMCDriver_LibOAPC_uint32 * pMinor, LibMCDriver_LibOAPC_uint32 * pMicro, const LibMCDriver_LibOAPC_uint32 nBuildBufferSize, LibMCDriver_LibOAPC_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_LibOAPCResult (*PLibMCDriver_LibOAPCDriver_QueryParametersPtr) (LibMCDriver_LibOAPC_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_LibOAPCResult (*PLibMCDriver_LibOAPCDriver_QueryParametersPtr) (LibMCDriver_LibOAPC_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+typedef LibMCDriver_LibOAPCResult (*PLibMCDriver_LibOAPCDriver_QueryParametersExPtr) (LibMCDriver_LibOAPC_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_E1701
@@ -243,6 +251,7 @@ typedef struct {
 	PLibMCDriver_LibOAPCDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_LibOAPCDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_LibOAPCDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_LibOAPCDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_LibOAPCDriver_E1701_SetCorrectionFilePtr m_Driver_E1701_SetCorrectionFile;
 	PLibMCDriver_LibOAPCDriver_E1701_SetOpticalFieldPtr m_Driver_E1701_SetOpticalField;
 	PLibMCDriver_LibOAPCDriver_E1701_SetLogicalFieldPtr m_Driver_E1701_SetLogicalField;

@@ -47,9 +47,9 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getversion(LibMCDriver
 	return libmcdriver_liboapc_driver_getversion(pDriver, pMajor, pMinor, pMicro, nBuildBufferSize, pBuildNeededChars, pBuildBuffer);
 }
 
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparametersex(LibMCDriver_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
-	return libmcdriver_liboapc_driver_queryparameters(pDriver, pDriverUpdateInstance);
+	return libmcdriver_liboapc_driver_queryparametersex(pDriver, pDriverUpdateInstance);
 }
 
 

@@ -233,7 +233,31 @@ LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_getversion(LibMCDriver_LibO
 	}
 }
 
-LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_queryparameters(LibMCDriver_LibOAPC_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
+LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_queryparameters(LibMCDriver_LibOAPC_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_LibOAPCInterfaceException(LIBMCDRIVER_LIBOAPC_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_LIBOAPC_SUCCESS;
+	}
+	catch (ELibMCDriver_LibOAPCInterfaceException & Exception) {
+		return handleLibMCDriver_LibOAPCException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_queryparametersex(LibMCDriver_LibOAPC_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
@@ -247,7 +271,7 @@ LibMCDriver_LibOAPCResult libmcdriver_liboapc_driver_queryparameters(LibMCDriver
 		if (!pIDriver)
 			throw ELibMCDriver_LibOAPCInterfaceException(LIBMCDRIVER_LIBOAPC_ERROR_INVALIDCAST);
 		
-		pIDriver->QueryParameters(pIDriverUpdateInstance);
+		pIDriver->QueryParametersEx(pIDriverUpdateInstance);
 
 		return LIBMCDRIVER_LIBOAPC_SUCCESS;
 	}
@@ -444,6 +468,8 @@ LibMCDriver_LibOAPCResult LibMCDriver_LibOAPC::Impl::LibMCDriver_LibOAPC_GetProc
 		*ppProcAddress = (void*) &libmcdriver_liboapc_driver_getversion;
 	if (sProcName == "libmcdriver_liboapc_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_liboapc_driver_queryparameters;
+	if (sProcName == "libmcdriver_liboapc_driver_queryparametersex") 
+		*ppProcAddress = (void*) &libmcdriver_liboapc_driver_queryparametersex;
 	if (sProcName == "libmcdriver_liboapc_driver_e1701_setcorrectionfile") 
 		*ppProcAddress = (void*) &libmcdriver_liboapc_driver_e1701_setcorrectionfile;
 	if (sProcName == "libmcdriver_liboapc_driver_e1701_setopticalfield") 

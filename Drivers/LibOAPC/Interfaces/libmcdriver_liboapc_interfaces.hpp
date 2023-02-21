@@ -287,10 +287,15 @@ public:
 	virtual void GetVersion(LibMCDriver_LibOAPC_uint32 & nMajor, LibMCDriver_LibOAPC_uint32 & nMinor, LibMCDriver_LibOAPC_uint32 & nMicro, std::string & sBuild) = 0;
 
 	/**
-	* IDriver::QueryParameters - Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
+	* IDriver::QueryParameters - Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+	*/
+	virtual void QueryParameters() = 0;
+
+	/**
+	* IDriver::QueryParametersEx - Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 	* @param[in] pDriverUpdateInstance - Status update instance.
 	*/
-	virtual void QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) = 0;
+	virtual void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) = 0;
 
 };
 
