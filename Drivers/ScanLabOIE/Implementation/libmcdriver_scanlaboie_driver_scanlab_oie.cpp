@@ -100,19 +100,16 @@ void CDriver_ScanLab_OIE::GetVersion(LibMCDriver_ScanLabOIE_uint32& nMajor, LibM
 	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
-void CDriver_ScanLab_OIE::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_ScanLabOIE";
-	sBaseName = "libmcdriver_scanlaboie";
-}
-
-
 void CDriver_ScanLab_OIE::QueryParameters()
 {
-	
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
 }
 
-
+void CDriver_ScanLab_OIE::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
+}
 
 void CDriver_ScanLab_OIE::SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName)
 {
