@@ -111,7 +111,7 @@ LIBMCDRIVER_ADS_DECLSPEC LibMCDriver_ADSResult libmcdriver_ads_driver_gettype(Li
 LIBMCDRIVER_ADS_DECLSPEC LibMCDriver_ADSResult libmcdriver_ads_driver_getversion(LibMCDriver_ADS_Driver pDriver, LibMCDriver_ADS_uint32 * pMajor, LibMCDriver_ADS_uint32 * pMinor, LibMCDriver_ADS_uint32 * pMicro, const LibMCDriver_ADS_uint32 nBuildBufferSize, LibMCDriver_ADS_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
-* Updates the driver parameters in the driver environment. Should be called in the driver thread.
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
 *
 * @param[in] pDriver - Driver instance.
 * @return error code or 0 (success)

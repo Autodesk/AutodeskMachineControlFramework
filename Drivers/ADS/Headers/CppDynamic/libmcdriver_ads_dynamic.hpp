@@ -1143,7 +1143,7 @@ public:
 	}
 	
 	/**
-	* CDriver::QueryParameters - Updates the driver parameters in the driver environment. Should be called in the driver thread.
+	* CDriver::QueryParameters - Updates the driver parameters in the driver environment. Should only be called in the driver thread.
 	*/
 	void CDriver::QueryParameters()
 	{

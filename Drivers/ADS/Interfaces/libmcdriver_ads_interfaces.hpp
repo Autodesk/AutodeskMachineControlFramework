@@ -293,7 +293,7 @@ public:
 	virtual void GetVersion(LibMCDriver_ADS_uint32 & nMajor, LibMCDriver_ADS_uint32 & nMinor, LibMCDriver_ADS_uint32 & nMicro, std::string & sBuild) = 0;
 
 	/**
-	* IDriver::QueryParameters - Updates the driver parameters in the driver environment. Should be called in the driver thread.
+	* IDriver::QueryParameters - Updates the driver parameters in the driver environment. Should only be called in the driver thread.
 	*/
 	virtual void QueryParameters() = 0;
 

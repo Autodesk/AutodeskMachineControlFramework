@@ -123,7 +123,7 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 			<param name="Build" type="string" pass="out" description="Build identifier." />
 		</method>
 				
-		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should be called in the driver thread.">
+		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should only be called in the driver thread.">
 		</method>
 		
 		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
