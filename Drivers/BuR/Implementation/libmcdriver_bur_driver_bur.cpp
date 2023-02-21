@@ -289,13 +289,7 @@ void CDriver_BuR::GetVersion(LibMCDriver_BuR_uint32& nMajor, LibMCDriver_BuR_uin
     sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
-void CDriver_BuR::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-    sNameSpace = "LibMCDriver_BuR";
-    sBaseName = "libmcdriver_bur";
-}
-
-void CDriver_BuR::QueryParameters()
+void CDriver_BuR::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
 
     if (m_bIsQueryingParameters)
