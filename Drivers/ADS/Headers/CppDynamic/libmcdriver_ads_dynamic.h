@@ -98,13 +98,21 @@ typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_GetTypePtr) (LibMCDriver_
 typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_GetVersionPtr) (LibMCDriver_ADS_Driver pDriver, LibMCDriver_ADS_uint32 * pMajor, LibMCDriver_ADS_uint32 * pMinor, LibMCDriver_ADS_uint32 * pMicro, const LibMCDriver_ADS_uint32 nBuildBufferSize, LibMCDriver_ADS_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_QueryParametersPtr) (LibMCDriver_ADS_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_QueryParametersPtr) (LibMCDriver_ADS_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+typedef LibMCDriver_ADSResult (*PLibMCDriver_ADSDriver_QueryParametersExPtr) (LibMCDriver_ADS_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_ADS
@@ -338,6 +346,7 @@ typedef struct {
 	PLibMCDriver_ADSDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_ADSDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_ADSDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_ADSDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_ADSDriver_ADS_SetToSimulationModePtr m_Driver_ADS_SetToSimulationMode;
 	PLibMCDriver_ADSDriver_ADS_IsSimulationModePtr m_Driver_ADS_IsSimulationMode;
 	PLibMCDriver_ADSDriver_ADS_SetCustomSDKResourcePtr m_Driver_ADS_SetCustomSDKResource;

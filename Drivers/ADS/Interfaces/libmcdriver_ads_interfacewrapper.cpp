@@ -260,7 +260,31 @@ LibMCDriver_ADSResult libmcdriver_ads_driver_getversion(LibMCDriver_ADS_Driver p
 	}
 }
 
-LibMCDriver_ADSResult libmcdriver_ads_driver_queryparameters(LibMCDriver_ADS_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
+LibMCDriver_ADSResult libmcdriver_ads_driver_queryparameters(LibMCDriver_ADS_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_ADS_SUCCESS;
+	}
+	catch (ELibMCDriver_ADSInterfaceException & Exception) {
+		return handleLibMCDriver_ADSException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_ADSResult libmcdriver_ads_driver_queryparametersex(LibMCDriver_ADS_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
@@ -274,7 +298,7 @@ LibMCDriver_ADSResult libmcdriver_ads_driver_queryparameters(LibMCDriver_ADS_Dri
 		if (!pIDriver)
 			throw ELibMCDriver_ADSInterfaceException(LIBMCDRIVER_ADS_ERROR_INVALIDCAST);
 		
-		pIDriver->QueryParameters(pIDriverUpdateInstance);
+		pIDriver->QueryParametersEx(pIDriverUpdateInstance);
 
 		return LIBMCDRIVER_ADS_SUCCESS;
 	}
@@ -752,6 +776,8 @@ LibMCDriver_ADSResult LibMCDriver_ADS::Impl::LibMCDriver_ADS_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_ads_driver_getversion;
 	if (sProcName == "libmcdriver_ads_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_ads_driver_queryparameters;
+	if (sProcName == "libmcdriver_ads_driver_queryparametersex") 
+		*ppProcAddress = (void*) &libmcdriver_ads_driver_queryparametersex;
 	if (sProcName == "libmcdriver_ads_driver_ads_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_ads_driver_ads_settosimulationmode;
 	if (sProcName == "libmcdriver_ads_driver_ads_issimulationmode") 
