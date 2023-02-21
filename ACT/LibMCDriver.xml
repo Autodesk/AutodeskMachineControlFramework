@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
 	libraryname="MC Driver Interface" namespace="LibMCDriver" copyright="Autodesk Inc." year="2020" basename="libmcdriver"
-	version="1.0.0">
+	version="2.0.0">
 	<license>
 		<line value="All rights reserved." />
 		<line value="" />
