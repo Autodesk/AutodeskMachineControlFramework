@@ -124,8 +124,6 @@ public:
 
 	void StopOIEMeasurement() override;
 
-	void OIETest() override;
-
 
 };
 

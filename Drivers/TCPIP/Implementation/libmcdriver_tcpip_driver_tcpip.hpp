@@ -83,10 +83,9 @@ public:
 
 	void GetVersion(LibMCDriver_TCPIP_uint32& nMajor, LibMCDriver_TCPIP_uint32& nMinor, LibMCDriver_TCPIP_uint32& nMicro, std::string& sBuild) override;
 
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
 	void QueryParameters() override;
 
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	void SetToSimulationMode() override;
 

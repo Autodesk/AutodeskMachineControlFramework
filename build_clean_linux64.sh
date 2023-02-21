@@ -134,7 +134,7 @@ go run "$basepath/BuildScripts/createPackageXML.go" ./Output $GITHASH $PLATFORMN
 echo "Building Core Modules"
 if test $PLATFORMNAME = "win64"
 then
-cmake -DOVERRIDE_BUILDRESOURCES=linux -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
+cmake -DOVERRIDE_BUILDRESOURCES=linux64 -DCMAKE_TOOLCHAIN_FILE=$basepath/BuildScripts/CrossCompile_Win32FromDebian.txt ..
 else
 cmake ..
 fi

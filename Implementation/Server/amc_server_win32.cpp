@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "amc_server_win32.hpp"
 #include "common_utils.hpp"
 
+#ifndef __GNUC__
 #include <SDKDDKVer.h>
+#endif
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

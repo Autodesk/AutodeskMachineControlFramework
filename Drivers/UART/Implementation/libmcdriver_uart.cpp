@@ -78,7 +78,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "uart")
 		return new CDriver_UART(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_UARTInterfaceException(LIBMCDRIVER_UART_ERROR_DRIVERERROR, "driver type not found: " + sType);
+	return nullptr;
 }
 
 

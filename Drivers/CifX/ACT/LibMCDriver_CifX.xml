@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
+	libraryname="MC Driver cifX" namespace="LibMCDriver_CifX" copyright="Autodesk Inc." year="2023" basename="libmcdriver_cifx"
+	version="2.0.0">
+	<license>
+		<line value="All rights reserved." />
+		<line value="" />
+		<line value="Redistribution and use in source and binary forms, with or without" />
+		<line value="modification, are permitted provided that the following conditions are met:" />
+		<line value="    * Redistributions of source code must retain the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer." />
+		<line value="    * Redistributions in binary form must reproduce the above copyright" />
+		<line value="      notice, this list of conditions and the following disclaimer in the" />
+		<line value="      documentation and/or other materials provided with the distribution." />
+		<line value="    * Neither the name of the Autodesk Inc. nor the" />
+		<line value="      names of its contributors may be used to endorse or promote products" />
+		<line value="      derived from this software without specific prior written permission." />
+		<line value="" />
+		<line value="THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND" />
+		<line value="ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED" />
+		<line value="WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE" />
+		<line value="DISCLAIMED. IN NO EVENT SHALL AUTODESK INC. BE LIABLE FOR ANY" />
+		<line value="DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES" />
+		<line value="(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;" />
+		<line value="LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND" />
+		<line value="ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT" />
+		<line value="(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS" />
+		<line value="SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." />
+		<line value="" />
+	</license>
+	
+	<bindings>
+		<binding language="CppDynamic" indentation="tabs" documentation="1" />
+	</bindings>
+	<implementations>
+		<implementation language="Cpp" indentation="tabs"/>
+	</implementations>
+	
+	
+	<importcomponent uri="../../../ACT/LibMCEnv.xml" namespace="LibMCEnv"/>
+	
+	<errors>
+		<error name="NOTIMPLEMENTED" code="1" description="functionality not implemented" />
+		<error name="INVALIDPARAM" code="2" description="an invalid parameter was passed" />
+		<error name="INVALIDCAST" code="3" description="a type cast failed" />
+		<error name="BUFFERTOOSMALL" code="4" description="a provided buffer is too small" />
+		<error name="GENERICEXCEPTION" code="5" description="a generic exception occurred" />
+		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
+		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
+		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
+
+		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
+		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
+		<error name="DRIVERNOTCONNECTED" code="1002" description="the driver is not connected" />
+		<error name="DRIVERTYPENOTFOUND" code="1003" description="the driver type has not been found" />
+		
+		<error name="SDKALREADYLOADED" code="1004" description="SDK already loaded" />
+		<error name="INVALIDSDKRESOURCE" code="1005" description="invalid SDK Resource" />
+		<error name="OUTPUTVALUENOTFOUND" code="1006" description="output value not found" />
+		<error name="INPUTVALUENOTFOUND" code="1007" description="input value not found" />		
+		<error name="VALUENOTFOUND" code="1008" description="value not found" />		
+		
+		<error name="INVALIDDRIVERPROTOCOL" code="1009" description="invalid driver protocol" />		
+		<error name="COULDNOTPARSEDRIVERPROTOCOL" code="1010" description="could not parse driver protocol" />		
+		<error name="NOVERSIONDEFINITION" code="1011" description="no version definition" />		
+		<error name="NOMAJORVERSION" code="1012" description="no major version" />		
+		<error name="NOMINORVERSION" code="1013" description="no minor version" />		
+		<error name="NOPATCHVERSION" code="1014" description="no patch version" />		
+		<error name="NOBOARDATTRIBUTE" code="1015" description="no board attribute" />		
+		<error name="NOCHANNELINDEXATTRIBUTE" code="1016" description="no channel index attribute" />		
+		<error name="INVALIDCHANNELINDEXATTRIBUTE" code="1017" description="invalid channel index attribute" />		
+		<error name="NOINPUTIOSIZEATTRIBUTE" code="1018" description="no input io size attribute" />		
+		<error name="INVALIDINPUTIOSIZEATTRIBUTE" code="1019" description="invalid input io size attribute" />		
+		<error name="NOOUTPUTIOSIZEATTRIBUTE" code="1020" description="no output io size attribute" />		
+		<error name="INVALIDOUTPUTIOSIZEATTRIBUTE" code="1021" description="invalid output io size attribute" />		
+		<error name="MISSINGADDRESSATTRIBUTE" code="1022" description="missing address attribute" />		
+		<error name="INVALIDADDRESSATTRIBUTE" code="1023" description="invalid address attribute" />		
+		<error name="DUPLICATEINPUTIO" code="1024" description="duplicate input io" />		
+		<error name="DUPLICATEOUTPUTIO" code="1025" description="duplicate output io" />		
+		<error name="INVALIDHOSTSTATETIMEOUT" code="1026" description="invalid host state timeout" />		
+		<error name="INVALIDBUSSTATETIMEOUT" code="1027" description="invalid bus state timeout" />		
+		<error name="CHANNELALREADYOPEN" code="1028" description="channel already open" />		
+		<error name="UNKNOWNEXCEPTION" code="1029" description="an unknown exception occured" />		
+		<error name="INVALIDADDRESSREAD" code="1030" description="invalid address read" />		
+		<error name="INVALIDADDRESSREADBIT" code="1031" description="invalid address read bit" />		
+		<error name="INVALIDADDRESSWRITE" code="1032" description="invalid address write" />		
+		<error name="INVALIDADDRESSWRITEBIT" code="1033" description="invalid address write bit" />		
+		<error name="INVALIDBITINDEX" code="1034" description="invalid bit index" />		
+		<error name="INVALIDBOOLPARAMETERCAST" code="1035" description="invalid bool parameter cast" />		
+		<error name="INVALIDNAMEATTRIBUTE" code="1036" description="invalid name attribute" />		
+		<error name="INVALIDCHANNELINDEX" code="1037" description="invalid channel index" />		
+		<error name="INVALIDINPUTINDEX" code="1038" description="invalid input index" />		
+		<error name="INVALIDOUTPUTINDEX" code="1039" description="invalid output index" />		
+		<error name="NOCONFIGURATIONSCHEMA" code="1040" description="no configuration schema" />		
+		<error name="INVALIDCONFIGURATIONSCHEMA" code="1041" description="invalid configuration schema" />		
+		
+		
+		
+		
+						
+	</errors>
+
+	
+	<enum name="ValueType">
+		<option name="Unknown" value="0"/>
+		<option name="IntegerValue" value="1"/>
+		<option name="BoolValue" value="2"/>
+		<option name="DoubleValue" value="3"/>
+	</enum>		
+	
+<!--
+
+This base Driver interface MUST be in Sync with LibMCDriver.xml
+
+-->
+	
+	<class name="Base">
+	</class>
+
+	
+	<class name="Driver" parent="Base" description="An abstract Machine Control Driver">
+
+		<method name="Configure" description = "Configures a driver with its specific configuration data.">
+			<param name="ConfigurationString" type="string" pass="in" description="Configuration data of driver." />
+		</method>
+	
+		<method name="GetName" description = "returns the name identifier of the driver">
+			<param name="Name" type="string" pass="return" description="Name of the driver." />
+		</method>
+
+		<method name="GetType" description = "returns the type identifier of the driver">
+			<param name="Type" type="string" pass="return" description="Type of the driver." />
+		</method>
+
+		<method name="GetVersion" description = "returns the version identifiers of the driver">
+			<param name="Major" type="uint32" pass="out" description="Major version." />
+			<param name="Minor" type="uint32" pass="out" description="Minor version." />
+			<param name="Micro" type="uint32" pass="out" description="Micro version." />
+			<param name="Build" type="string" pass="out" description="Build identifier." />
+		</method>
+		
+		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should only be called in the driver thread.">
+		</method>
+		
+		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
+			<param name="DriverUpdateInstance" type="class" class="LibMCEnv:DriverStatusUpdateSession" pass="in" description="Status update instance." />
+		</method>
+	
+	</class>
+
+<!--
+
+End Interface
+
+-->
+
+
+<!--
+
+Custom implementation
+
+-->
+
+
+	<class name="ChannelInformation" parent="Base" description="The information about a board.">
+
+		<method name="GetBoardName" description="Returns the name of the board that it is connected to.">
+			<param name="BoardName" type="string" pass="return" description="Board name." />
+		</method>
+
+		<method name="GetChannelIndex" description="Returns the channel index of the board that it is connected to.">
+			<param name="ChannelIndex" type="uint32" pass="return" description="Channel Index." />
+		</method>
+		
+		<method name="IsConnected" description="Returns if the driver is connected and updates are being received.">
+			<param name="ChannelIsConnected" type="bool" pass="return" description="The channel is connected." />
+		</method>
+
+		<method name="GetMillisecondsSinceLastUpdate" description="Returns how many milliseconds ago the last channel update was received.">
+			<param name="MillisecondsSinceLastUpdate" type="uint32" pass="return" description="Returns 0, if no update has ever been received or channel is not connected." />
+		</method>			
+
+		<method name="GetConnectionStatistics" description="Returns connection statistics for this channel.">
+			<param name="NumberOfSucceededUpdates" type="uint32" pass="out" description="Returns number of successful state updates." />
+			<param name="NumberOfUpdateErrors" type="uint32" pass="out" description="Returns number of update errors." />
+			<param name="MinimumUpdateDurationInMs" type="double" pass="out" description="Returns minium update duration in milliseconds." />
+			<param name="MaximumUpdateDurationInMs" type="double" pass="out" description="Returns maximum update duration in milliseconds." />
+			<param name="AverageUpdateDurationInMs" type="double" pass="out" description="Returns average update duration in milliseconds." />
+			<param name="UpdateDurationVarianceInMs" type="double" pass="out" description="Returns the variance of update durations in milliseconds." />
+		</method>			
+
+		<method name="ValueExists" description="Returns if a value exists in this channel.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Exists" type="bool" pass="return" description="Returns if a value exist." />
+		</method>	
+		
+		<method name="GetValueType" description="Returns the type of a value. Fails if value does not exist in this channel.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="ValueType" type="enum" class="ValueType" pass="out" description="Type of value." />
+			<param name="IsInput" type="bool" pass="out" description="Returns true if value is an input value." />
+			<param name="IsOutput" type="bool" pass="out" description="Returns true if value is an output value." />
+		</method>			
+
+		<method name="GetIntegerValueRange" description="Returns the possible range of an integer value.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist in this channel." />
+			<param name="MinValue" type="int64" pass="out" description="Minimum integer value this variable can hold. Returns 0 if variable is of float type." />
+			<param name="MaxValue" type="int64" pass="out" description="Maximum integer value this variable can hold. Returns 0 if variable is of float type." />
+		</method>	
+		
+		<method name="GetInputValueCount" description="Returns number of input variables on this channel.">
+			<param name="Count" type="uint32" pass="return" description="Number of input variables." />
+		</method>
+
+		<method name="GetInputValueName" description="Returns the name of an input variable on this channel.">
+			<param name="Index" type="uint32" pass="in" description="Index of input variable. 0-based. Fails if larger or equal than the count." />
+			<param name="Name" type="string" pass="return" description="Name of value." />
+		</method>
+		
+		<method name="GetOutputValueCount" description="Returns number of output variables on this channel.">
+			<param name="Count" type="uint32" pass="return" description="Number of input variables." />
+		</method>
+
+		<method name="GetOutputValueName" description="Returns the name of an output variable on this channel.">
+			<param name="Index" type="uint32" pass="in" description="Index of output variable. 0-based. Fails if larger or equal than the count." />
+			<param name="Name" type="string" pass="return" description="Name of value." />
+		</method>
+		
+	</class>
+
+
+	<class name="Driver_CifX" parent="Driver" description="A Driver for Hilscher cifX Components.">
+
+		<method name="SetToSimulationMode" description="Turns the driver into a simulation mode.">		
+		</method>
+		
+		<method name="IsSimulationMode" description="Returns if the driver is in simulation mode.">		
+			<param name="SimulationModeEnabled" type="bool" pass="return" description="Flag if driver is in simulation mode." />
+		</method>	
+		
+		<method name="SetCustomSDKResource" description="Sets the machine resource name of the cifX SDK to load. MUST be called before Connect or it has no effect.">
+			<param name="ResourceName" type="string" pass="in" description="Resource name of core machine package. Empty means standard naming applies." />
+		</method>
+
+		<method name="GetChannelCount" description= "Returns the number of configured channels.">
+			<param name="ChannelCount" type="uint32" pass="return" description="Returns the number of channels." />
+		</method>
+
+		<method name="GetChannelInformation" description= "Returns the channel information by index.">
+			<param name="ChannelIndex" type="uint32" pass="in" description="Index of the board. MUST be between 0 and GetBoardCount - 1." />
+			<param name="ChannelInformationInstance" type="class" class="ChannelInformation" pass="return" description="Channel Information Instance." />
+		</method>
+
+		<method name="Connect" description= "Connects to a cifX board by configuration.">
+		</method>
+
+		<method name="Disconnect" description= "Disconnects from cifX board.">
+		</method>
+
+		<method name="Reconnect" description= "Reconnects to the cifX board.">
+		</method>
+		
+		<method name="IsConnected" description="Returns if the driver is connected.">		
+			<param name="BoardsAreConnected" type="bool" pass="return" description="All selected boards are connected." />
+		</method>	
+		
+		<method name="ValueExists" description="Returns if a value exists.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Exists" type="bool" pass="return" description="Returns if a value exist." />
+		</method>	
+		
+		<method name="GetValueType" description="Returns the type of a value. Fails if value does not exist.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="ValueType" type="enum" class="ValueType" pass="out" description="Type of value." />
+			<param name="IsInput" type="bool" pass="out" description="Returns true if value is an input value." />
+			<param name="IsOutput" type="bool" pass="out" description="Returns true if value is an output value." />
+		</method>			
+
+		<method name="GetIntegerValueRange" description="Returns the possible range of an integer value.">
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="MinValue" type="int64" pass="out" description="Minimum integer value this variable can hold. Returns 0 if variable is of float type." />
+			<param name="MaxValue" type="int64" pass="out" description="Maximum integer value this variable can hold. Returns 0 if variable is of float type." />
+		</method>	
+
+		<method name="WriteIntegerValue" description="Writes an output integer value. Value MUST be within the bit-range of the value type defined by the configuration.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Value" type="int64" pass="in" description="Value to set. The named value MUST be of type integer or boolean. If value is of boolean type, 0 means false and every other value means true." />
+			<param name="ClampToRange" type="bool" pass="in" description="If Integer value is outside of the permissible range, should they be clamped the value to the boundaries (ClampToRange is true) or an error raised (ClampToRange is false)." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
+		</method>	
+
+		<method name="WriteBoolValue" description="Writes an output boolean value.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Value" type="bool" pass="in" description="Value to set. The named value MUST be of type boolean." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
+		</method>	
+		
+		<method name="WriteDoubleValue" description="Writes an output float value. Accuracy will be determined by the bit-range of the value defined by the configuration.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Value" type="double" pass="in" description="Value to set. The named value MUST be of type double or float." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
+		</method>	
+
+		<method name="ReadIntegerValue" description="Reads an input integer value.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Value" type="int64" pass="return" description="Value that was read." />
+		</method>	
+
+		<method name="ReadBoolValue" description="Reads an bool integer value.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Value" type="bool" pass="return" description="Value that was read." />
+		</method>	
+
+		<method name="ReadDoubleValue" description="Reads an input float value.">		
+			<param name="Name" type="string" pass="in" description="Name of value. Call fails if value does not exist." />
+			<param name="Value" type="double" pass="return" description="Value that was read." />
+		</method>	
+
+	</class>
+
+
+
+
+<!--
+
+End of Custom implementation
+
+-->
+
+		
+	<global baseclassname="Base" stringoutclassname="Base" releasemethod="ReleaseInstance" acquiremethod="AcquireInstance" versionmethod="GetVersion" errormethod="GetLastError" injectionmethod="InjectComponent" symbollookupmethod="GetSymbolLookupMethod">
+		
+		<method name="GetVersion" description = "retrieves the binary version of this library.">
+			<param name="Major" type="uint32" pass="out" description="returns the major version of this library" />
+			<param name="Minor" type="uint32" pass="out" description="returns the minor version of this library" />
+			<param name="Micro" type="uint32" pass="out" description="returns the micro version of this library" />
+		</method>
+		<method name="GetLastError" description="Returns the last error recorded on this object">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+			<param name="ErrorMessage" type="string" pass="out" description="Message of the last error" />
+			<param name="HasError" type="bool" pass="return" description="Is there a last error to query" />
+		</method>
+		<method name="ReleaseInstance" description="Releases shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="AcquireInstance" description="Acquires shared ownership of an Instance">
+			<param name="Instance" type="class" class="Base" pass="in" description="Instance Handle" />
+		</method>
+		<method name="InjectComponent" description="Injects an imported component for usage within this component">
+			<param name="NameSpace" type="string" pass="in" description="NameSpace of the injected component" />
+			<param name="SymbolAddressMethod" type="pointer" pass="in" description="Address of the SymbolAddressMethod of the injected component" />
+		</method>		
+		<method name="GetSymbolLookupMethod" description="Returns the address of the SymbolLookupMethod">
+			<param name="SymbolLookupMethod" type="pointer" pass="return" description="Address of the SymbolAddressMethod" />
+		</method>				
+		<method name="CreateDriver" description="Creates a driver instance with a specific name.">
+			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
+			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
+			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
+			<param name="Instance" type="optionalclass" class="Driver" pass="return" description="New Driver instance" />
+		</method>
+		
+	</global>
+	
+	
+</component>
+
+

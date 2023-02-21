@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
 	libraryname="MC Driver Beckhoff BK9xxx bus coupler" namespace="LibMCDriver_BK9xxx" copyright="Autodesk Inc." year="2023" basename="libmcdriver_bk9xxx"
-	version="1.0.0">
+	version="2.0.0">
 	<license>
 		<line value="All rights reserved." />
 		<line value="" />
@@ -48,7 +48,7 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
-		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
+		<error name="UNKNOWNEXCEPTION" code="9" description="an unknown exception occurred" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
 		<error name="DRIVERNOTINITIALISED" code="1001" description="the driver is not initialised" />
@@ -101,16 +101,10 @@
 		<error name="INVALIDANALOGIOSCALEDMINVALUE" code="1046" description="invalid analog io scaled min value" />
 		<error name="INVALIDANALOGIOSCALEDMAXVALUE" code="1047" description="invalid analog io scaled max value" />
 		<error name="INVALIDANALOGIOSCALEDINTERVAL" code="1048" description="invalid analog io scaled interval" />
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		<error name="DIGITALIOOFFSETOUTOFRANGE" code="1049" description="digital io offset is out of range" />
+		<error name="ANALOGIOOFFSETOUTOFRANGE" code="1050" description="analog io offset is out of range" />
+		<error name="DIGITALIOWRITETIMEOUT" code="1051" description="digital io write timeout" />
+		<error name="ANALOGIOWRITETIMEOUT" code="1052" description="analog io write timeout" />
 		
 								
 	</errors>
@@ -163,15 +157,14 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 			<param name="Micro" type="uint32" pass="out" description="Micro version." />
 			<param name="Build" type="string" pass="out" description="Build identifier." />
 		</method>
-
-		<method name="GetHeaderInformation" description = "returns the header information">
-			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
-			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
+		
+		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should only be called in the driver thread.">
 		</method>
 		
-		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
-		</method>
-	
+		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
+			<param name="DriverUpdateInstance" type="class" class="LibMCEnv:DriverStatusUpdateSession" pass="in" description="Status update instance." />
+		</method>	
+
 	</class>
 
 <!--
@@ -305,16 +298,19 @@ Custom implementation
 		<method name="SetDigitalOutput" description="Writes a value to a digital output variable. Fails if variable does not exist.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
 			<param name="Value" type="bool" pass="in" description="Value to be set." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
 		</method>		
 
 		<method name="SetAnalogOutputRaw" description="Writes a raw value to an analog output variable. Fails if variable does not exist.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
 			<param name="Value" type="uint32" pass="in" description="Value to be set." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
 		</method>		
 
 		<method name="SetAnalogOutput" description="Writes a scaled value to an analog output variable. Fails if variable does not exist.">
 			<param name="VariableName" type="string" pass="in" description="Name of variable." />
 			<param name="Value" type="double" pass="in" description="Value to be set." />
+			<param name="TimeOutInMs" type="uint32" pass="in" description="If Timeout is larger than 0, the call waits until the end point has acknowledged that the new value has been set. If timeout is 0, the call returns immediately, even if the end point might not have changed the value yet." />
 		</method>		
 
 
@@ -359,7 +355,7 @@ End of Custom implementation
 			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
 			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
 			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
-			<param name="Instance" type="class" class="Driver" pass="return" description="New Driver instance" />
+			<param name="Instance" type="optionalclass" class="Driver" pass="return" description="New Driver instance" />
 		</method>
 		
 	</global>

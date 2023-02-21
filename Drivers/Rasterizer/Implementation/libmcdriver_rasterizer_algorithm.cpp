@@ -381,7 +381,7 @@ void CRasterizationAlgorithm::addBlockToBuffer(int32_t nBlockX, int32_t nBlockY,
             __RASTERASSERT((nStartXInPixels >= 0) && (nStartXInPixels < (int32_t)m_nPixelsPerBlock), "invalid draw line start x pixel value");
             __RASTERASSERT((nEndXInPixels >= 0) && (nEndXInPixels < (int32_t)m_nPixelsPerBlock), "invalid draw line end x pixel value");
 
-            for (int nX = nStartXInPixels; nX <= nEndXInPixels; nX++)
+            for (int nX = nStartXInPixels; nX <= (int32_t) nEndXInPixels; nX++)
                 buffer[(size_t)nX + nYInPixels * (size_t)m_nPixelsPerBlock] = 255;
 
             pDrawLine = pDrawLine->m_pNext;

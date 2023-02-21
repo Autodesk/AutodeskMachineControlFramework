@@ -33,7 +33,9 @@ Abstract: This is a stub class definition of CDriver_E1701
 
 #include "libmcdriver_liboapc_driver_e1701.hpp"
 #include "libmcdriver_liboapc_interfaceexception.hpp"
+
 // Include custom headers here.
+#include <cmath>
 
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
@@ -82,23 +84,25 @@ std::string CDriver_E1701::GetType()
 
 void CDriver_E1701::GetVersion(LibMCDriver_LibOAPC_uint32& nMajor, LibMCDriver_LibOAPC_uint32& nMinor, LibMCDriver_LibOAPC_uint32& nMicro, std::string& sBuild)
 {
-    nMajor = 1;
-    nMinor = 0;
-    nMicro = 0;
+    nMajor = LIBMCDRIVER_LIBOAPC_VERSION_MAJOR;
+    nMinor = LIBMCDRIVER_LIBOAPC_VERSION_MINOR;
+    nMicro = LIBMCDRIVER_LIBOAPC_VERSION_MICRO;
     sBuild = __STRINGIZE_VALUE_OF (__GITHASH);
 }
 
-void CDriver_E1701::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{    
-    sNameSpace = "LibMCDriver_LibOAPC";
-    sBaseName = "libmcdriver_liboapc";
-}
 
 void CDriver_E1701::QueryParameters()
-{    
+{
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
 }
 
 
+void CDriver_E1701::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{    
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
+
+}
 
 
 void CDriver_E1701::SetCorrectionFile(const LibMCDriver_LibOAPC_uint64 nCorrectionFileBufferSize, const LibMCDriver_LibOAPC_uint8 * pCorrectionFileBuffer)

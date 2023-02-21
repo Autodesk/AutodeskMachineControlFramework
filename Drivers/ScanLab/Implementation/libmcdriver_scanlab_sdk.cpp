@@ -257,7 +257,6 @@ void CScanLabSDK::checkLastErrorOfCard(uint32_t nCardNo)
 void CScanLabSDK::checkGlobalErrorOfCard(uint32_t nCardNo)
 {
 	uint32_t nError = n_get_error(nCardNo);
-	std::cout << "checking global error of card #" << nCardNo << ": " << nError << std::endl;
 	checkError(nError);
 }
 

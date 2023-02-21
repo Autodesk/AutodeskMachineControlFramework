@@ -78,7 +78,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "raylase")
 		return new CDriver_Raylase(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_RaylaseInterfaceException(LIBMCDRIVER_RAYLASE_ERROR_DRIVERERROR, "driver type not found: " + sType);
+	return nullptr;
 }
 
 

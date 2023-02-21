@@ -86,6 +86,8 @@ public:
 
 	virtual ~CDriverEnvironment();
 
+	IDriverStatusUpdateSession* CreateStatusUpdateSession() override;
+
 	IWorkingDirectory* CreateWorkingDirectory() override;
 
 	ITCPIPConnection* CreateTCPIPConnection(const std::string& sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS) override;
@@ -104,7 +106,9 @@ public:
 
 	void RetrieveMachineResourceData(const std::string& sIdentifier, LibMCEnv_uint64 nDataBufferBufferSize, LibMCEnv_uint64* pDataBufferNeededCount, LibMCEnv_uint8* pDataBufferBuffer) override;
 
-	IToolpathAccessor* CreateToolpathAccessor(const std::string& sBuildUUID);
+	IToolpathAccessor* CreateToolpathAccessor(const std::string& sBuildUUID) override;
+
+	bool ParameterNameIsValid(const std::string& sParameterName) override;
 
 	void RegisterStringParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue) override;
 

@@ -68,6 +68,13 @@ namespace LibMCDriver_ScanLabOIE {
 			uint8_t flags; 
 			const void* data;
 		} oie_pkt;
+
+		typedef struct _oie_signalinfo {
+			uint32_t nr;
+			char name[128];
+		} oie_signalinfo;
+
+
 #pragma pack(pop)
 
 		typedef void (*oie_pkt_listener)(oie_device device, const oie_pkt* pkt, void* userData);
@@ -98,9 +105,6 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef int(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_is_unlocked) (oie_device pDevice, uint32_t nFeature);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_get_log) (oie_device pDevice, char * buffer, uint32_t nLength);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_device_get_board_version) (oie_device pDevice, uint32_t * pVersion);
-		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_type) (const char * pDeviceConfigFileName, int32_t * pRTCType);
-		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_signals) (const char* pDeviceConfigFileName, uint32_t* pSignals, uint32_t * pNumberOfSignals);
-		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_sensor_signals) (const char* pDeviceConfigFileName, uint32_t* pSignals, uint32_t* pNumberOfSignals);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_packet_listener) (oie_device pDevice, oie_pkt_listener pListener, void * pUserData);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_set_runtime_error_listener) (oie_device pDevice, oie_err_listener pListener, void* pUserData);
 
@@ -111,6 +115,13 @@ namespace LibMCDriver_ScanLabOIE {
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_sensor_signal) (const oie_pkt* pPacket, uint32_t nIndex, int32_t* pValue);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_app_data) (const oie_pkt* pPacket, uint32_t nIndex, int32_t* pValue);
 		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_pkt_get_xy) (const oie_pkt* pPacket, double * dX, double * dY);
+
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_type) (const char * pDeviceConfigPath, int32_t * pRTCType);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_rtc_signals) (const char* pDeviceConfigPath, uint32_t* pSignalBuffer, uint32_t * pSignalBufferSize);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_sensor_signals) (const char* pDeviceConfigPath, uint32_t* pSignalBuffer, uint32_t* pSignalBufferSize);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_additional_app_data_signals) (const char* pDeviceConfigPath, oie_signalinfo* pSignalInfoBuffer, uint32_t* pSignalBufferSize);
+		typedef oie_error(SCANLABOIE_CALLINGCONVENTION* PScanLabOIEPtr_oie_get_measurement_tag_usage) (const char* pDeviceConfigPath, uint32_t* mtagUsage);
+
 
 		class CScanLabOIESDK_DLLDirectoryCache {
 		private:
@@ -162,9 +173,6 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_device_is_unlocked oie_device_is_unlocked = nullptr;
 			PScanLabOIEPtr_oie_device_get_log oie_device_get_log = nullptr;
 			PScanLabOIEPtr_oie_device_get_board_version oie_device_get_board_version = nullptr;
-			PScanLabOIEPtr_oie_get_rtc_type oie_get_rtc_type = nullptr;
-			PScanLabOIEPtr_oie_get_rtc_signals oie_get_rtc_signals = nullptr;
-			PScanLabOIEPtr_oie_get_sensor_signals oie_get_sensor_signals = nullptr;
 			PScanLabOIEPtr_oie_set_packet_listener oie_set_packet_listener = nullptr;
 			PScanLabOIEPtr_oie_set_runtime_error_listener oie_set_runtime_error_listener = nullptr;
 			PScanLabOIEPtr_oie_pkt_get_rtc_signal_count oie_pkt_get_rtc_signal_count = nullptr;
@@ -174,6 +182,11 @@ namespace LibMCDriver_ScanLabOIE {
 			PScanLabOIEPtr_oie_pkt_get_sensor_signal oie_pkt_get_sensor_signal = nullptr;
 			PScanLabOIEPtr_oie_pkt_get_app_data oie_pkt_get_app_data = nullptr;
 			PScanLabOIEPtr_oie_pkt_get_xy oie_pkt_get_xy = nullptr;
+			PScanLabOIEPtr_oie_get_rtc_type oie_get_rtc_type = nullptr;
+			PScanLabOIEPtr_oie_get_rtc_signals oie_get_rtc_signals = nullptr;
+			PScanLabOIEPtr_oie_get_sensor_signals oie_get_sensor_signals = nullptr;
+			PScanLabOIEPtr_oie_get_additional_app_data_signals oie_get_additional_app_data_signals = nullptr;
+			PScanLabOIEPtr_oie_get_measurement_tag_usage oie_get_measurement_tag_usage = nullptr;
 
 			CScanLabOIESDK(const std::string & sDLLNameUTF8, const std::string & sDLLDirectoryUTF8);
 			~CScanLabOIESDK();

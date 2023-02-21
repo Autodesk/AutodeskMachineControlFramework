@@ -82,20 +82,19 @@ void CDriver_UART::GetVersion(LibMCDriver_UART_uint32& nMajor, LibMCDriver_UART_
 	nMajor = LIBMCDRIVER_UART_VERSION_MAJOR;
 	nMinor = LIBMCDRIVER_UART_VERSION_MINOR;
 	nMicro = LIBMCDRIVER_UART_VERSION_MICRO;
-	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);;
-}
-
-void CDriver_UART::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_UART";
-	sBaseName = "libmcdriver_uart";
+	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_UART::QueryParameters()
 {
-	
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
 }
 
+void CDriver_UART::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
+}
 
 
 void CDriver_UART::SetToSimulationMode()

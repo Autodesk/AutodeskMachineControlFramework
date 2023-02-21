@@ -78,7 +78,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "rasterizer")
 		return new CDriver_Rasterizer(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_RasterizerInterfaceException(LIBMCDRIVER_RASTERIZER_ERROR_DRIVERERROR, "driver type not found: " + sType);
+	return nullptr;
 
 }
 

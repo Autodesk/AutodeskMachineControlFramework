@@ -71,7 +71,9 @@ namespace Impl {
 
 			std::string m_sDescription;
 
-			bool m_bValue;
+			bool m_bActualValue;
+
+			bool m_bTargetValue;
 
 		public:
 
@@ -79,16 +81,21 @@ namespace Impl {
 
 			virtual ~CDriver_BK9xxx_DigitalIODefinition();
 
-			uint32_t getOffset();
+			uint32_t getOffset() const;
 
-			std::string getName();
+			std::string getName() const;
 
-			std::string getDescription();
+			std::string getDescription() const;
 
-			bool getValue();
+			// Holds received values from end point
+			bool getActualValue() const;
 
-			void setValue(bool bValue);
+			void setActualValue(bool bValue);
 
+			// Only relevant for outputs
+			bool getTargetValue() const;
+
+			void setTargetValue(bool bValue);
 		};
 
 

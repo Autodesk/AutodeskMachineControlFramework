@@ -698,8 +698,11 @@ void CDriver_S7Net::Disconnect()
 
 }
 
-void CDriver_S7Net::updateParameters()
+void CDriver_S7Net::updateParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
+
     if (m_pCommunication.get() != nullptr) {
         for (auto pParameter : m_DriverParameters) {
             auto sName = pParameter->getName();
@@ -707,51 +710,58 @@ void CDriver_S7Net::updateParameters()
             auto pRealParameter = std::dynamic_pointer_cast<CDriver_S7RealValue> (pParameter);
             if (pRealParameter.get() != nullptr) {
                 double dValue = pRealParameter->readValue(m_pCommunication.get());
-                m_pDriverEnvironment->SetDoubleParameter(sName, dValue);
+                pDriverUpdateInstance->SetDoubleParameter(sName, dValue);
             }
 
             auto pLRealParameter = std::dynamic_pointer_cast<CDriver_S7LRealValue> (pParameter);
             if (pLRealParameter.get() != nullptr) {
                 double dValue = pLRealParameter->readValue(m_pCommunication.get());
-                m_pDriverEnvironment->SetDoubleParameter(sName, dValue);
+                pDriverUpdateInstance->SetDoubleParameter(sName, dValue);
             }
 
             auto pBoolParameter = std::dynamic_pointer_cast<CDriver_S7BoolValue> (pParameter);
             if (pBoolParameter.get() != nullptr) {
                 bool bValue = pBoolParameter->readValue(m_pCommunication.get());
-                m_pDriverEnvironment->SetBoolParameter(sName, bValue);
+                pDriverUpdateInstance->SetBoolParameter(sName, bValue);
             }
 
             auto pStringParameter = std::dynamic_pointer_cast<CDriver_S7StringValue> (pParameter);
             if (pStringParameter.get() != nullptr) {
                 std::string sValue = pStringParameter->readValue(m_pCommunication.get());
-                m_pDriverEnvironment->SetStringParameter(sName, sValue);
+                pDriverUpdateInstance->SetStringParameter(sName, sValue);
             }
 
             auto pDintParameter = std::dynamic_pointer_cast<CDriver_S7DIntValue> (pParameter);
             if (pDintParameter.get() != nullptr) {
                 int32_t nValue = pDintParameter->readValue(m_pCommunication.get());
-                m_pDriverEnvironment->SetIntegerParameter(sName, nValue);
+                pDriverUpdateInstance->SetIntegerParameter(sName, nValue);
             }
 
             auto pIntParameter = std::dynamic_pointer_cast<CDriver_S7IntValue> (pParameter);
             if (pIntParameter.get() != nullptr) {
                 int32_t nValue = pIntParameter->readValue(m_pCommunication.get());
-                m_pDriverEnvironment->SetIntegerParameter(sName, nValue);
+                pDriverUpdateInstance->SetIntegerParameter(sName, nValue);
             }
         }
     }
 }
 
-
 void CDriver_S7Net::QueryParameters()
+{
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession ());
+}
+
+
+void CDriver_S7Net::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
     if (m_pCommunication.get() != nullptr) {
         m_pCommunication->RetrieveStatus();
 
-        updateParameters();
+        updateParameters(pDriverUpdateInstance);
     }
+
 }
+
 
 
 IPLCCommand* CDriver_S7Net::CreateCommand(const std::string& sCommand)

@@ -135,16 +135,17 @@ IModbusTCPRegisterStatus* CModbusTCPConnection::ReadInputRegisters(const LibMCEn
 
 void CModbusTCPConnection::ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint8 * pBufferBuffer)
 {
-	std::vector<bool> coilStatus;
-	if ((nBufferBufferSize == 0) || (pBufferBuffer == 0))
+	if ((nBufferBufferSize == 0) || (pBufferBuffer == nullptr))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT);
 
 	if (nBufferBufferSize > MODBUSTCP_MAX_COILCOUNT)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMODBUSTCPCOILCOUNT);
 
-	coilStatus.resize(nBufferBufferSize);
-	for (uint32_t nIndex = 0; nIndex < nBufferBufferSize; nIndex)
-		coilStatus.at(nIndex) = (pBufferBuffer[nIndex] != 0);
+
+	std::vector<uint8_t> coilStatus;
+	for (uint32_t nIndex = 0; nIndex < nBufferBufferSize; nIndex++)
+		coilStatus.push_back (pBufferBuffer[nIndex] != 0);
+
 
 	m_pModbusConnectionInstance->forceMultipleCoils(nStartAddress, coilStatus);
 }
@@ -152,17 +153,17 @@ void CModbusTCPConnection::ForceMultipleCoils(const LibMCEnv_uint32 nStartAddres
 void CModbusTCPConnection::PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer)
 {
 	std::vector<uint16_t> registerStatus;
-	if ((nBufferBufferSize == 0) || (pBufferBuffer == 0))
+	if ((nBufferBufferSize == 0) || (pBufferBuffer == nullptr))
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT);
 
 	if (nBufferBufferSize > MODBUSTCP_MAX_REGISTERCOUNT)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDMODBUSTCPREGISTERCOUNT);
 
-	registerStatus.resize(nBufferBufferSize);
-	for (uint32_t nIndex = 0; nIndex < nBufferBufferSize; nIndex)
-		registerStatus.at(nIndex) = pBufferBuffer[nIndex];
+	registerStatus.reserve(nBufferBufferSize);
+	for (uint32_t nIndex = 0; nIndex < nBufferBufferSize; nIndex++)
+		registerStatus.push_back (pBufferBuffer[nIndex]);
 
-	m_pModbusConnectionInstance->presetMultipleRegisters(nStartAddress, registerStatus);
+	m_pModbusConnectionInstance->presetMultipleRegisters(nStartAddress, registerStatus); 
 
 }
 

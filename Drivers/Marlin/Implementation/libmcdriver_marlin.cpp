@@ -96,7 +96,7 @@ IDriver * CWrapper::CreateDriver(const std::string& sName, const std::string& sT
 		return new CDriver_Marlin(sName, sType, bDoFirmwareQuery, bDisableHoming, bDebug, pDriverEnvironment);
 	}
 
-	throw ELibMCDriver_MarlinInterfaceException(LIBMCDRIVER_MARLIN_ERROR_DRIVERERROR);
+	return nullptr;
 	
 }
 

@@ -241,7 +241,7 @@ protected:
     std::map<std::string, PDriver_S7Command> m_CommandDefinitions;
     std::map<std::string, PDriver_S7Value> m_ControlParameterMap;
 
-    void updateParameters ();
+    void updateParameters (LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
     uint32_t findPLCToAMCIntOffset (const std::string & sName);
     uint32_t findPLCToAMCDIntOffset(const std::string& sName);
@@ -262,6 +262,8 @@ public:
 	void Disconnect() override;
 
 	void QueryParameters() override;
+
+    void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
     IPLCCommand* CreateCommand(const std::string& sCommand) override;
 

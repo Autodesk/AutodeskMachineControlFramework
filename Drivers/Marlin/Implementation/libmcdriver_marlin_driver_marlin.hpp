@@ -116,6 +116,8 @@ public:
 
 	void QueryParameters() override;
 
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+
 };
 
 } // namespace Impl

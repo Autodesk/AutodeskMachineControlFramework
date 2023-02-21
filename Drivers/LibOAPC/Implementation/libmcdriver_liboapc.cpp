@@ -79,7 +79,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "e1701")
 		return new CDriver_E1701(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_LibOAPCInterfaceException(LIBMCDRIVER_LIBOAPC_ERROR_DRIVERERROR);
+	return nullptr;
 }
 
 

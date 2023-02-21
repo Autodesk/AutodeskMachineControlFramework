@@ -51,8 +51,6 @@ public:
 
 	void GetVersion(LibMCDriver_Marlin_uint32 & nMajor, LibMCDriver_Marlin_uint32 & nMinor, LibMCDriver_Marlin_uint32 & nMicro, std::string & sBuild) override;
 
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
 };
 
 } // namespace Impl
