@@ -108,9 +108,7 @@ public:
 
     void GetVersion(LibMCDriver_LibOAPC_uint32& nMajor, LibMCDriver_LibOAPC_uint32& nMinor, LibMCDriver_LibOAPC_uint32& nMicro, std::string& sBuild) override;
 
-    void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
-    void QueryParameters() override;
+    void QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	void SetCorrectionFile(const LibMCDriver_LibOAPC_uint64 nCorrectionFileBufferSize, const LibMCDriver_LibOAPC_uint8 * pCorrectionFileBuffer) override;
 
