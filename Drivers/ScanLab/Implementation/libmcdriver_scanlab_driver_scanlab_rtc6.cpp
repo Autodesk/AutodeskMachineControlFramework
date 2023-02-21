@@ -82,11 +82,16 @@ std::string CDriver_ScanLab_RTC6::GetType()
 	return m_sType;
 }
 
-
 void CDriver_ScanLab_RTC6::QueryParameters()
 {
-    updateCardStatus();
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession ());
 }
+
+void CDriver_ScanLab_RTC6::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+    updateCardStatus(pDriverUpdateInstance);
+}
+
 
 
 void CDriver_ScanLab_RTC6::SetToSimulationMode()
@@ -392,20 +397,24 @@ void CDriver_ScanLab_RTC6::internalExecute()
     m_pRTCContext->SetEndOfList();
     m_pRTCContext->ExecuteList(1, 0);
 
+    auto pDriverUpdateInstance = m_pDriverEnvironment->CreateStatusUpdateSession();
+
     bool Busy = true;
     uint32_t Pos = 0;
 
     while (Busy) {
         m_pRTCContext->GetStatus (Busy, Pos);
-        m_pDriverEnvironment->Sleep(10);
+        pDriverUpdateInstance->Sleep(10);
 
-        updateCardStatus();
+        updateCardStatus(pDriverUpdateInstance);
     }
 
 }
 
-void CDriver_ScanLab_RTC6::updateCardStatus()
+void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
 
     if (!m_SimulationMode) {
         if (m_pRTCContext.get() == nullptr)
@@ -418,13 +427,13 @@ void CDriver_ScanLab_RTC6::updateCardStatus()
         m_pRTCContext->GetStatus(Busy, ListPosition);
         m_pRTCContext->GetHeadStatus(1, bPositionXisOK, bPositionYisOK, bTemperatureisOK, bPowerisOK);
 
-        m_pDriverEnvironment->SetBoolParameter("position_x_ok", bPositionXisOK);
-        m_pDriverEnvironment->SetBoolParameter("position_y_ok", bPositionYisOK);
-        m_pDriverEnvironment->SetBoolParameter("temperature_ok", bTemperatureisOK);
-        m_pDriverEnvironment->SetBoolParameter("power_ok", bPowerisOK);
+        pDriverUpdateInstance->SetBoolParameter("position_x_ok", bPositionXisOK);
+        pDriverUpdateInstance->SetBoolParameter("position_y_ok", bPositionYisOK);
+        pDriverUpdateInstance->SetBoolParameter("temperature_ok", bTemperatureisOK);
+        pDriverUpdateInstance->SetBoolParameter("power_ok", bPowerisOK);
 
-        m_pDriverEnvironment->SetIntegerParameter("list_position", ListPosition);
-        m_pDriverEnvironment->SetBoolParameter("card_busy", Busy);
+        pDriverUpdateInstance->SetIntegerParameter("list_position", ListPosition);
+        pDriverUpdateInstance->SetBoolParameter("card_busy", Busy);
 
         bool bLaserIsOn;
         int32_t nPositionX, nPositionY, nPositionZ;
@@ -432,15 +441,15 @@ void CDriver_ScanLab_RTC6::updateCardStatus()
         int32_t nFocusShift, nMarkSpeed;
 
         m_pRTCContext->GetStateValues(bLaserIsOn, nPositionX, nPositionY, nPositionZ, nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ, nFocusShift, nMarkSpeed);
-        m_pDriverEnvironment->SetBoolParameter("laser_on", bLaserIsOn);
-        m_pDriverEnvironment->SetIntegerParameter("position_x", nPositionX);
-        m_pDriverEnvironment->SetIntegerParameter("position_y", nPositionY);
-        m_pDriverEnvironment->SetIntegerParameter("position_z", nPositionZ);
-        m_pDriverEnvironment->SetIntegerParameter("position_x_corrected", nCorrectedPositionX);
-        m_pDriverEnvironment->SetIntegerParameter("position_y_corrected", nCorrectedPositionY);
-        m_pDriverEnvironment->SetIntegerParameter("position_z_corrected", nCorrectedPositionZ);
-        m_pDriverEnvironment->SetIntegerParameter("focus_shift", nFocusShift);
-        m_pDriverEnvironment->SetIntegerParameter("mark_speed", nMarkSpeed);
+        pDriverUpdateInstance->SetBoolParameter("laser_on", bLaserIsOn);
+        pDriverUpdateInstance->SetIntegerParameter("position_x", nPositionX);
+        pDriverUpdateInstance->SetIntegerParameter("position_y", nPositionY);
+        pDriverUpdateInstance->SetIntegerParameter("position_z", nPositionZ);
+        pDriverUpdateInstance->SetIntegerParameter("position_x_corrected", nCorrectedPositionX);
+        pDriverUpdateInstance->SetIntegerParameter("position_y_corrected", nCorrectedPositionY);
+        pDriverUpdateInstance->SetIntegerParameter("position_z_corrected", nCorrectedPositionZ);
+        pDriverUpdateInstance->SetIntegerParameter("focus_shift", nFocusShift);
+        pDriverUpdateInstance->SetIntegerParameter("mark_speed", nMarkSpeed);
 
     }
 

@@ -132,7 +132,7 @@ private:
 	void internalBegin();
 	void internalExecute();
 
-	void updateCardStatus();
+	void updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance);
 
 protected:
 
@@ -147,6 +147,8 @@ public:
 	std::string GetType() override;
 
 	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	void SetToSimulationMode() override;
 

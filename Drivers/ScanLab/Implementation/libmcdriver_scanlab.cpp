@@ -71,7 +71,7 @@ IDriver* CWrapper::CreateDriver(const std::string& sName, const std::string& sTy
 	if (sType == "scanlab-rtc6")
 		return new CDriver_ScanLab_RTC6(sName, sType, pDriverEnvironment);
 
-	throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_DRIVERERROR);
+	return nullptr;
 }
 
 
