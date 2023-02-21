@@ -73,8 +73,6 @@ public:
 
 	void GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild) override;
 
-	void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) override;
-
 
 
 };
