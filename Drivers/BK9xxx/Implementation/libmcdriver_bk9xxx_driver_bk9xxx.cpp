@@ -374,13 +374,8 @@ void CDriver_BK9xxx::GetVersion(LibMCDriver_BK9xxx_uint32& nMajor, LibMCDriver_B
 	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
-void CDriver_BK9xxx::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_BK9xxx";
-	sBaseName = "libmcdriver_bk9xxx";
-}
 
-void CDriver_BK9xxx::QueryParameters()
+void CDriver_BK9xxx::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
 	
 	if (IsConnected()) {

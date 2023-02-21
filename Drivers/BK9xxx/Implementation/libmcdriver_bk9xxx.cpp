@@ -83,7 +83,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "bk9100")
 		return new CDriver_BK9100(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_DRIVERERROR);
+	return nullptr;
 }
 
 
