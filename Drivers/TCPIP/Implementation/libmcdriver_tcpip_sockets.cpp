@@ -231,7 +231,7 @@ void CDriver_TCPIPSocketConnection::receiveBuffer(std::vector<uint8_t>& Buffer, 
         while (totalBytesReceived < nCount) {
 
             uint8_t* pData = &Buffer[oldSize + totalBytesReceived];
-	    int totalBytesToReceive = nCount - totalBytesReceived;
+	        int64_t totalBytesToReceive = nCount - totalBytesReceived;
 
             int bytesReceived = recv(m_Socket, (char*)pData, (int)totalBytesToReceive, 0);
 

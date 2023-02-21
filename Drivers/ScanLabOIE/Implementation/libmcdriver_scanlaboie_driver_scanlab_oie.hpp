@@ -102,9 +102,9 @@ public:
 
 	void GetVersion(LibMCDriver_ScanLabOIE_uint32& nMajor, LibMCDriver_ScanLabOIE_uint32& nMinor, LibMCDriver_ScanLabOIE_uint32& nMicro, std::string& sBuild) override;
 
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
 	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	void SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName) override;
 
@@ -123,6 +123,8 @@ public:
 	void RemoveDeviceByName(const std::string& sName) override;
 
 	static std::string getTypeString();
+
+	IDeviceConfiguration* ParseDeviceConfiguration(const std::string& sDeviceConfigString) override;
 
 
 };

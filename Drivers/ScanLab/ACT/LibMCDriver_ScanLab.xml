@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component xmlns="http://schemas.autodesk.com/netfabb/automaticcomponenttoolkit/2018" 
-	libraryname="MC Driver ScanLab RTC6" namespace="LibMCDriver_ScanLab" copyright="Autodesk Inc." year="2020" basename="libmcdriver_scanlab"
-	version="1.0.0">
+	libraryname="MC Driver ScanLab RTC" namespace="LibMCDriver_ScanLab" copyright="Autodesk Inc." year="2020" basename="libmcdriver_scanlab"
+	version="2.0.0">
 	<license>
 		<line value="All rights reserved." />
 		<line value="" />
@@ -48,7 +48,6 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
-		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
 		<error name="RTC6_NO_PCIE_CARD_FOUND" code="1001" description="RTC6: No PCIE Card was found" />
@@ -85,6 +84,9 @@
 		<error name="INVALIDLASERDELAY" code="1032" description="Invalid laser delay." />
 		<error name="INVALIDSCANNERDELAY" code="1033" description="Invalid scanner delay." />
 		<error name="INVALIDSCANLABSDK" code="1034" description="Invalid SCANLAB SDK." />
+		
+		<error name="INVALIDOIESIGNALBUFFERARRAY" code="1035" description="Invalid OIE Signal buffer array." />
+		
 		
 		
 		
@@ -151,12 +153,11 @@ This base Driver interface MUST be in Sync with LibMCDriver.xml
 			<param name="Build" type="string" pass="out" description="Build identifier." />
 		</method>
 
-		<method name="GetHeaderInformation" description = "returns the header information">
-			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
-			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
+		<method name="QueryParameters" description = "Updates the driver parameters in the driver environment. Should only be called in the driver thread.">
 		</method>
 
-		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
+		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
+			<param name="DriverUpdateInstance" type="class" class="LibMCEnv:DriverStatusUpdateSession" pass="in" description="Status update instance." />
 		</method>
 
 	</class>
@@ -350,6 +351,22 @@ Custom implementation
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
 		
+		<method name="InitializeForOIE" description="Initializes the RTC card for the open interface extension. MUST be called before the OIE is initialized.">
+			<param name="SignalChannels" type="basicarray" class="uint32" pass="in" description="Array of signal channels. MUST NOT be empty" />
+		</method>
+				
+		<method name="EnableOIE" description="Writes an OIE enabling command block to the open list.">
+		</method>
+
+		<method name="DisableOIE" description="Writes an OIE disabling command block to the open list.">
+		</method>
+				
+		<method name="StartOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
+		</method>
+
+		<method name="StopOIEMeasurement" description="Writes an OIE measurement start command block to the open list.">
+		</method>
+		
 	</class>
 
 	
@@ -435,6 +452,13 @@ Custom implementation
 			<param name="SerialNumber" type="uint32" pass="in" description="Desired Serial Number of card." />
 		</method>
 
+		<method name="GetContext" description="Returns the RTC Context Instance. Fails if it card has not been initialised.">
+			<param name="ContextInstance" type="class" class="RTCContext" pass="return" description="RTC Context Instance." />
+		</method>
+				
+		<method name="GetSelector" description="Returns the RTC Selector Instance. Fails if it card has not been initialised.">
+			<param name="SelectorInstance" type="class" class="RTCSelector" pass="return" description="RTC Selector Instance." />
+		</method>
 
 		<method name="LoadFirmware" description="Loads the firmware from the driver resources.">
 			<param name="FirmwareResource" type="string" pass="in" description="resource name of the firmware program file." />
@@ -493,7 +517,8 @@ Custom implementation
 			<param name="MaxTimeout" type="double" pass="out" description="Max timeout in ms" />
 			<param name="Multiplier" type="double" pass="out" description="Multiplier" />
 		</method>
-		
+						
+
 	</class>
 
 
@@ -536,7 +561,7 @@ End of Custom implementation
 			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
 			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
 			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
-			<param name="Instance" type="class" class="Driver" pass="return" description="New Driver instance" />
+			<param name="Instance" type="optionalclass" class="Driver" pass="return" description="New Driver instance" />
 		</method>
 		
 	</global>

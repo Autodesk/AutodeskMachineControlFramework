@@ -3085,8 +3085,1238 @@ LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibMCEnv_WorkingDirect
 
 
 /*************************************************************************************************************************
+ Class implementation for TCPIPPacket
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_tcpippacket_isempty(LibMCEnv_TCPIPPacket pTCPIPPacket, bool * pPacketIsEmpty)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPPacket;
+
+	try {
+		if (pPacketIsEmpty == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPPacket* pITCPIPPacket = dynamic_cast<ITCPIPPacket*>(pIBaseClass);
+		if (!pITCPIPPacket)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pPacketIsEmpty = pITCPIPPacket->IsEmpty();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpippacket_getsize(LibMCEnv_TCPIPPacket pTCPIPPacket, LibMCEnv_uint32 * pPacketSize)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPPacket;
+
+	try {
+		if (pPacketSize == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPPacket* pITCPIPPacket = dynamic_cast<ITCPIPPacket*>(pIBaseClass);
+		if (!pITCPIPPacket)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pPacketSize = pITCPIPPacket->GetSize();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpippacket_getdata(LibMCEnv_TCPIPPacket pTCPIPPacket, const LibMCEnv_uint64 nBufferBufferSize, LibMCEnv_uint64* pBufferNeededCount, LibMCEnv_uint8 * pBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPPacket;
+
+	try {
+		if ((!pBufferBuffer) && !(pBufferNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPPacket* pITCPIPPacket = dynamic_cast<ITCPIPPacket*>(pIBaseClass);
+		if (!pITCPIPPacket)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pITCPIPPacket->GetData(nBufferBufferSize, pBufferNeededCount, pBufferBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for TCPIPConnection
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_tcpipconnection_getipaddress(LibMCEnv_TCPIPConnection pTCPIPConnection, const LibMCEnv_uint32 nIPAddressBufferSize, LibMCEnv_uint32* pIPAddressNeededChars, char * pIPAddressBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if ( (!pIPAddressBuffer) && !(pIPAddressNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIPAddress("");
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIPAddressBuffer == nullptr);
+		if (isCacheCall) {
+			sIPAddress = pITCPIPConnection->GetIPAddress();
+
+			pITCPIPConnection->_setCache (new ParameterCache_1<std::string> (sIPAddress));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pITCPIPConnection->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sIPAddress);
+			pITCPIPConnection->_setCache (nullptr);
+		}
+		
+		if (pIPAddressNeededChars)
+			*pIPAddressNeededChars = (LibMCEnv_uint32) (sIPAddress.size()+1);
+		if (pIPAddressBuffer) {
+			if (sIPAddress.size() >= nIPAddressBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iIPAddress = 0; iIPAddress < sIPAddress.size(); iIPAddress++)
+				pIPAddressBuffer[iIPAddress] = sIPAddress[iIPAddress];
+			pIPAddressBuffer[sIPAddress.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_getport(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 * pPort)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if (pPort == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pPort = pITCPIPConnection->GetPort();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_gettimeout(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 * pTimeout)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if (pTimeout == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimeout = pITCPIPConnection->GetTimeout();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_isconnected(LibMCEnv_TCPIPConnection pTCPIPConnection, bool * pIsConnected)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if (pIsConnected == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsConnected = pITCPIPConnection->IsConnected();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_disconnect(LibMCEnv_TCPIPConnection pTCPIPConnection)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pITCPIPConnection->Disconnect();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_reconnect(LibMCEnv_TCPIPConnection pTCPIPConnection)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pITCPIPConnection->Reconnect();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_sendbuffer(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint8 * pBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if ( (!pBufferBuffer) && (nBufferBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pITCPIPConnection->SendBuffer(nBufferBufferSize, pBufferBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_waitfordata(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 nTimeOutInMS, bool * pDataAvailable)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if (pDataAvailable == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDataAvailable = pITCPIPConnection->WaitForData(nTimeOutInMS);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_receivefixedpacket(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 nPacketSize, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_TCPIPPacket * pPacketInstance)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if (pPacketInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBasePacketInstance(nullptr);
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBasePacketInstance = pITCPIPConnection->ReceiveFixedPacket(nPacketSize, nTimeOutInMS);
+
+		*pPacketInstance = (IBase*)(pBasePacketInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_tcpipconnection_receivedata(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 nDataSize, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_TCPIPPacket * pPacketInstance)
+{
+	IBase* pIBaseClass = (IBase *)pTCPIPConnection;
+
+	try {
+		if (pPacketInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBasePacketInstance(nullptr);
+		ITCPIPConnection* pITCPIPConnection = dynamic_cast<ITCPIPConnection*>(pIBaseClass);
+		if (!pITCPIPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBasePacketInstance = pITCPIPConnection->ReceiveData(nDataSize, nTimeOutInMS);
+
+		*pPacketInstance = (IBase*)(pBasePacketInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for ModbusTCPDigitalIOStatus
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getcount(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPDigitalIOStatus;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPDigitalIOStatus* pIModbusTCPDigitalIOStatus = dynamic_cast<IModbusTCPDigitalIOStatus*>(pIBaseClass);
+		if (!pIModbusTCPDigitalIOStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pIModbusTCPDigitalIOStatus->GetCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getbaseaddress(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, LibMCEnv_uint32 * pAddress)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPDigitalIOStatus;
+
+	try {
+		if (pAddress == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPDigitalIOStatus* pIModbusTCPDigitalIOStatus = dynamic_cast<IModbusTCPDigitalIOStatus*>(pIBaseClass);
+		if (!pIModbusTCPDigitalIOStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAddress = pIModbusTCPDigitalIOStatus->GetBaseAddress();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getvalue(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, LibMCEnv_uint32 nIndex, bool * pState)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPDigitalIOStatus;
+
+	try {
+		if (pState == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPDigitalIOStatus* pIModbusTCPDigitalIOStatus = dynamic_cast<IModbusTCPDigitalIOStatus*>(pIBaseClass);
+		if (!pIModbusTCPDigitalIOStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pState = pIModbusTCPDigitalIOStatus->GetValue(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getvalues(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, const LibMCEnv_uint64 nStateArrayBufferSize, LibMCEnv_uint64* pStateArrayNeededCount, LibMCEnv_uint8 * pStateArrayBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPDigitalIOStatus;
+
+	try {
+		if ((!pStateArrayBuffer) && !(pStateArrayNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPDigitalIOStatus* pIModbusTCPDigitalIOStatus = dynamic_cast<IModbusTCPDigitalIOStatus*>(pIBaseClass);
+		if (!pIModbusTCPDigitalIOStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIModbusTCPDigitalIOStatus->GetValues(nStateArrayBufferSize, pStateArrayNeededCount, pStateArrayBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for ModbusTCPRegisterStatus
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_modbustcpregisterstatus_getcount(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, LibMCEnv_uint32 * pCount)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPRegisterStatus;
+
+	try {
+		if (pCount == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPRegisterStatus* pIModbusTCPRegisterStatus = dynamic_cast<IModbusTCPRegisterStatus*>(pIBaseClass);
+		if (!pIModbusTCPRegisterStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pCount = pIModbusTCPRegisterStatus->GetCount();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpregisterstatus_getbaseaddress(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, LibMCEnv_uint32 * pAddress)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPRegisterStatus;
+
+	try {
+		if (pAddress == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPRegisterStatus* pIModbusTCPRegisterStatus = dynamic_cast<IModbusTCPRegisterStatus*>(pIBaseClass);
+		if (!pIModbusTCPRegisterStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pAddress = pIModbusTCPRegisterStatus->GetBaseAddress();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpregisterstatus_getvalue(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, LibMCEnv_uint32 nIndex, LibMCEnv_uint16 * pState)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPRegisterStatus;
+
+	try {
+		if (pState == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPRegisterStatus* pIModbusTCPRegisterStatus = dynamic_cast<IModbusTCPRegisterStatus*>(pIBaseClass);
+		if (!pIModbusTCPRegisterStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pState = pIModbusTCPRegisterStatus->GetValue(nIndex);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpregisterstatus_getvalues(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, const LibMCEnv_uint64 nStateArrayBufferSize, LibMCEnv_uint64* pStateArrayNeededCount, LibMCEnv_uint16 * pStateArrayBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPRegisterStatus;
+
+	try {
+		if ((!pStateArrayBuffer) && !(pStateArrayNeededCount))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPRegisterStatus* pIModbusTCPRegisterStatus = dynamic_cast<IModbusTCPRegisterStatus*>(pIBaseClass);
+		if (!pIModbusTCPRegisterStatus)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIModbusTCPRegisterStatus->GetValues(nStateArrayBufferSize, pStateArrayNeededCount, pStateArrayBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for ModbusTCPConnection
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_modbustcpconnection_getipaddress(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, const LibMCEnv_uint32 nIPAddressBufferSize, LibMCEnv_uint32* pIPAddressNeededChars, char * pIPAddressBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if ( (!pIPAddressBuffer) && !(pIPAddressNeededChars) )
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIPAddress("");
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		bool isCacheCall = (pIPAddressBuffer == nullptr);
+		if (isCacheCall) {
+			sIPAddress = pIModbusTCPConnection->GetIPAddress();
+
+			pIModbusTCPConnection->_setCache (new ParameterCache_1<std::string> (sIPAddress));
+		}
+		else {
+			auto cache = dynamic_cast<ParameterCache_1<std::string>*> (pIModbusTCPConnection->_getCache ());
+			if (cache == nullptr)
+				throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+			cache->retrieveData (sIPAddress);
+			pIModbusTCPConnection->_setCache (nullptr);
+		}
+		
+		if (pIPAddressNeededChars)
+			*pIPAddressNeededChars = (LibMCEnv_uint32) (sIPAddress.size()+1);
+		if (pIPAddressBuffer) {
+			if (sIPAddress.size() >= nIPAddressBufferSize)
+				throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_BUFFERTOOSMALL);
+			for (size_t iIPAddress = 0; iIPAddress < sIPAddress.size(); iIPAddress++)
+				pIPAddressBuffer[iIPAddress] = sIPAddress[iIPAddress];
+			pIPAddressBuffer[sIPAddress.size()] = 0;
+		}
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_getport(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 * pPort)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pPort == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pPort = pIModbusTCPConnection->GetPort();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_gettimeout(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 * pTimeout)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pTimeout == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pTimeout = pIModbusTCPConnection->GetTimeout();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_isconnected(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, bool * pIsConnected)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pIsConnected == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pIsConnected = pIModbusTCPConnection->IsConnected();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_disconnect(LibMCEnv_ModbusTCPConnection pModbusTCPConnection)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIModbusTCPConnection->Disconnect();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_reconnect(LibMCEnv_ModbusTCPConnection pModbusTCPConnection)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIModbusTCPConnection->Reconnect();
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_diagnosiscall(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint16 nSubFunction, LibMCEnv_uint16 nDataField, LibMCEnv_uint16 * pDataResponse)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pDataResponse == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pDataResponse = pIModbusTCPConnection->DiagnosisCall(nSubFunction, nDataField);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_readcoilstatus(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nBitCount, LibMCEnv_ModbusTCPDigitalIOStatus * pCoilStatus)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pCoilStatus == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseCoilStatus(nullptr);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseCoilStatus = pIModbusTCPConnection->ReadCoilStatus(nStartAddress, nBitCount);
+
+		*pCoilStatus = (IBase*)(pBaseCoilStatus);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_readinputstatus(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nBitCount, LibMCEnv_ModbusTCPDigitalIOStatus * pInputStatus)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pInputStatus == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseInputStatus(nullptr);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseInputStatus = pIModbusTCPConnection->ReadInputStatus(nStartAddress, nBitCount);
+
+		*pInputStatus = (IBase*)(pBaseInputStatus);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_readholdingregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nRegisterCount, LibMCEnv_ModbusTCPRegisterStatus * pRegisterInstance)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pRegisterInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseRegisterInstance(nullptr);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseRegisterInstance = pIModbusTCPConnection->ReadHoldingRegisters(nStartAddress, nRegisterCount);
+
+		*pRegisterInstance = (IBase*)(pBaseRegisterInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_readinputregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nRegisterCount, LibMCEnv_ModbusTCPRegisterStatus * pRegisterInstance)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if (pRegisterInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseRegisterInstance(nullptr);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseRegisterInstance = pIModbusTCPConnection->ReadInputRegisters(nStartAddress, nRegisterCount);
+
+		*pRegisterInstance = (IBase*)(pBaseRegisterInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_forcemultiplecoils(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint8 * pBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if ( (!pBufferBuffer) && (nBufferBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIModbusTCPConnection->ForceMultipleCoils(nStartAddress, nBufferBufferSize, pBufferBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_modbustcpconnection_presetmultipleregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer)
+{
+	IBase* pIBaseClass = (IBase *)pModbusTCPConnection;
+
+	try {
+		if ( (!pBufferBuffer) && (nBufferBufferSize>0))
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IModbusTCPConnection* pIModbusTCPConnection = dynamic_cast<IModbusTCPConnection*>(pIBaseClass);
+		if (!pIModbusTCPConnection)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIModbusTCPConnection->PresetMultipleRegisters(nStartAddress, nBufferBufferSize, pBufferBuffer);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
+ Class implementation for DriverStatusUpdateSession
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_driverstatusupdatesession_setstringparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sValue(pValue);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetStringParameter(sParameterName, sValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setuuidparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sValue(pValue);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetUUIDParameter(sParameterName, sValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setdoubleparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetDoubleParameter(sParameterName, dValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setintegerparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_int64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetIntegerParameter(sParameterName, nValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setboolparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetBoolParameter(sParameterName, bValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_logmessage(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pLogString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sLogString(pLogString);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->LogMessage(sLogString);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_logwarning(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pLogString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sLogString(pLogString);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->LogWarning(sLogString);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_loginfo(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pLogString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sLogString(pLogString);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->LogInfo(sLogString);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_sleep(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->Sleep(nDelay);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DriverEnvironment
 **************************************************************************************************************************/
+LibMCEnvResult libmcenv_driverenvironment_createstatusupdatesession(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DriverStatusUpdateSession * pUpdateStatusInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pUpdateStatusInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseUpdateStatusInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseUpdateStatusInstance = pIDriverEnvironment->CreateStatusUpdateSession();
+
+		*pUpdateStatusInstance = (IBase*)(pBaseUpdateStatusInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_WorkingDirectory * pWorkingDirectory)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -3102,6 +4332,68 @@ LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_Driver
 		pBaseWorkingDirectory = pIDriverEnvironment->CreateWorkingDirectory();
 
 		*pWorkingDirectory = (IBase*)(pBaseWorkingDirectory);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_createtcpipconnection(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIPAddress, LibMCEnv_uint32 nPort, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_TCPIPConnection * pConnectionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pIPAddress == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pConnectionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIPAddress(pIPAddress);
+		IBase* pBaseConnectionInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseConnectionInstance = pIDriverEnvironment->CreateTCPIPConnection(sIPAddress, nPort, nTimeOutInMS);
+
+		*pConnectionInstance = (IBase*)(pBaseConnectionInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_createmodbustcpconnection(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIPAddress, LibMCEnv_uint32 nPort, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_ModbusTCPConnection * pConnectionInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pIPAddress == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pConnectionInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sIPAddress(pIPAddress);
+		IBase* pBaseConnectionInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseConnectionInstance = pIDriverEnvironment->CreateModbusTCPConnection(sIPAddress, nPort, nTimeOutInMS);
+
+		*pConnectionInstance = (IBase*)(pBaseConnectionInstance);
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -3278,6 +4570,35 @@ LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_Driver
 		pBaseToolpathInstance = pIDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
 
 		*pToolpathInstance = (IBase*)(pBaseToolpathInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_parameternameisvalid(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool * pNameIsValid)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pNameIsValid == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pNameIsValid = pIDriverEnvironment->ParameterNameIsValid(sParameterName);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -7247,8 +8568,100 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrievemanagedfiles;
 	if (sProcName == "libmcenv_workingdirectory_retrieveallfiles") 
 		*ppProcAddress = (void*) &libmcenv_workingdirectory_retrieveallfiles;
+	if (sProcName == "libmcenv_tcpippacket_isempty") 
+		*ppProcAddress = (void*) &libmcenv_tcpippacket_isempty;
+	if (sProcName == "libmcenv_tcpippacket_getsize") 
+		*ppProcAddress = (void*) &libmcenv_tcpippacket_getsize;
+	if (sProcName == "libmcenv_tcpippacket_getdata") 
+		*ppProcAddress = (void*) &libmcenv_tcpippacket_getdata;
+	if (sProcName == "libmcenv_tcpipconnection_getipaddress") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_getipaddress;
+	if (sProcName == "libmcenv_tcpipconnection_getport") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_getport;
+	if (sProcName == "libmcenv_tcpipconnection_gettimeout") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_gettimeout;
+	if (sProcName == "libmcenv_tcpipconnection_isconnected") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_isconnected;
+	if (sProcName == "libmcenv_tcpipconnection_disconnect") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_disconnect;
+	if (sProcName == "libmcenv_tcpipconnection_reconnect") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_reconnect;
+	if (sProcName == "libmcenv_tcpipconnection_sendbuffer") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_sendbuffer;
+	if (sProcName == "libmcenv_tcpipconnection_waitfordata") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_waitfordata;
+	if (sProcName == "libmcenv_tcpipconnection_receivefixedpacket") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_receivefixedpacket;
+	if (sProcName == "libmcenv_tcpipconnection_receivedata") 
+		*ppProcAddress = (void*) &libmcenv_tcpipconnection_receivedata;
+	if (sProcName == "libmcenv_modbustcpdigitaliostatus_getcount") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpdigitaliostatus_getcount;
+	if (sProcName == "libmcenv_modbustcpdigitaliostatus_getbaseaddress") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpdigitaliostatus_getbaseaddress;
+	if (sProcName == "libmcenv_modbustcpdigitaliostatus_getvalue") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpdigitaliostatus_getvalue;
+	if (sProcName == "libmcenv_modbustcpdigitaliostatus_getvalues") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpdigitaliostatus_getvalues;
+	if (sProcName == "libmcenv_modbustcpregisterstatus_getcount") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpregisterstatus_getcount;
+	if (sProcName == "libmcenv_modbustcpregisterstatus_getbaseaddress") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpregisterstatus_getbaseaddress;
+	if (sProcName == "libmcenv_modbustcpregisterstatus_getvalue") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpregisterstatus_getvalue;
+	if (sProcName == "libmcenv_modbustcpregisterstatus_getvalues") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpregisterstatus_getvalues;
+	if (sProcName == "libmcenv_modbustcpconnection_getipaddress") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_getipaddress;
+	if (sProcName == "libmcenv_modbustcpconnection_getport") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_getport;
+	if (sProcName == "libmcenv_modbustcpconnection_gettimeout") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_gettimeout;
+	if (sProcName == "libmcenv_modbustcpconnection_isconnected") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_isconnected;
+	if (sProcName == "libmcenv_modbustcpconnection_disconnect") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_disconnect;
+	if (sProcName == "libmcenv_modbustcpconnection_reconnect") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_reconnect;
+	if (sProcName == "libmcenv_modbustcpconnection_diagnosiscall") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_diagnosiscall;
+	if (sProcName == "libmcenv_modbustcpconnection_readcoilstatus") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_readcoilstatus;
+	if (sProcName == "libmcenv_modbustcpconnection_readinputstatus") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_readinputstatus;
+	if (sProcName == "libmcenv_modbustcpconnection_readholdingregisters") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_readholdingregisters;
+	if (sProcName == "libmcenv_modbustcpconnection_readinputregisters") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_readinputregisters;
+	if (sProcName == "libmcenv_modbustcpconnection_forcemultiplecoils") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_forcemultiplecoils;
+	if (sProcName == "libmcenv_modbustcpconnection_presetmultipleregisters") 
+		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_presetmultipleregisters;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setstringparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setstringparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setuuidparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setuuidparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setdoubleparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setdoubleparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setintegerparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setintegerparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setboolparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setboolparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_logmessage") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_logmessage;
+	if (sProcName == "libmcenv_driverstatusupdatesession_logwarning") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_logwarning;
+	if (sProcName == "libmcenv_driverstatusupdatesession_loginfo") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_loginfo;
+	if (sProcName == "libmcenv_driverstatusupdatesession_sleep") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_sleep;
+	if (sProcName == "libmcenv_driverenvironment_createstatusupdatesession") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createstatusupdatesession;
 	if (sProcName == "libmcenv_driverenvironment_createworkingdirectory") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createworkingdirectory;
+	if (sProcName == "libmcenv_driverenvironment_createtcpipconnection") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createtcpipconnection;
+	if (sProcName == "libmcenv_driverenvironment_createmodbustcpconnection") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createmodbustcpconnection;
 	if (sProcName == "libmcenv_driverenvironment_driverhasresourcedata") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_driverhasresourcedata;
 	if (sProcName == "libmcenv_driverenvironment_machinehasresourcedata") 
@@ -7261,6 +8674,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_retrievemachineresourcedata;
 	if (sProcName == "libmcenv_driverenvironment_createtoolpathaccessor") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createtoolpathaccessor;
+	if (sProcName == "libmcenv_driverenvironment_parameternameisvalid") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_parameternameisvalid;
 	if (sProcName == "libmcenv_driverenvironment_registerstringparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_registerstringparameter;
 	if (sProcName == "libmcenv_driverenvironment_registeruuidparameter") 

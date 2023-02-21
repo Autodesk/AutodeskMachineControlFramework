@@ -269,9 +269,11 @@ if(WIN32)
 	if (MSVC)
 		target_link_libraries(libmc Winmm.lib)
 		target_link_libraries(libmc Shlwapi.lib)
+		target_link_libraries(libmc ws2_32.lib)
 	else()
 		target_link_libraries(libmc winmm.lib)
 		target_link_libraries(libmc shlwapi.lib)
+		target_link_libraries(libmc ws2_32.lib)
 		target_link_options(libmc PRIVATE -static-libgcc -static-libstdc++ --static )
 	endif (MSVC)
 	
@@ -563,6 +565,7 @@ set_target_properties(amc_server
 ]]
 
 if(WIN32)
+if(MSVC)
 
 file(GLOB SERVER_WIN32_SRC
 	${CMAKE_CURRENT_SOURCE_DIR}/Implementation/Server/amc_server.cpp
@@ -619,6 +622,7 @@ set_target_properties(amc_win32
 )
 
 
+endif(MSVC)
 endif(WIN32)
 
 
@@ -683,3 +687,5 @@ set_target_properties(amc_test
 	VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/Output"	
     
 )
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT amc_win32)

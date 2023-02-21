@@ -80,7 +80,7 @@ namespace AMC {
 		
 	public:
 
-		CDriver(const std::string & sName, const std::string & sType, const std::string & sLibraryPath, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment);
+		CDriver(const std::string & sName, const std::string & sType, LibMCDriver::PWrapper pDriverWrapper, PResourcePackage pDriverResourcePackage, PParameterGroup pParameterGroup, LibMCEnv::PWrapper pMCEnvWrapper, LibMCEnv::Impl::PDriverEnvironment pDriverEnvironment);
 
 		virtual ~CDriver();
 

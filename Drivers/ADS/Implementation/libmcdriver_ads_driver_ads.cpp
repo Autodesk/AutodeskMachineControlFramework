@@ -309,19 +309,23 @@ std::string CDriver_ADS::GetType()
 
 void CDriver_ADS::GetVersion(LibMCDriver_ADS_uint32& nMajor, LibMCDriver_ADS_uint32& nMinor, LibMCDriver_ADS_uint32& nMicro, std::string& sBuild)
 {
-    nMajor = 1;
-    nMinor = 0;
-    nMicro = 0;
-}
-
-void CDriver_ADS::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-    sNameSpace = "LibMCDriver_ADS";
-    sBaseName = "libmcdriver_ads";
+    nMajor = LIBMCDRIVER_ADS_VERSION_MAJOR;
+    nMinor = LIBMCDRIVER_ADS_VERSION_MINOR;
+    nMicro = LIBMCDRIVER_ADS_VERSION_MICRO;
+    sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_ADS::QueryParameters()
 {
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+
+void CDriver_ADS::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
+
     if (m_bSimulationMode)
         return;
 
@@ -340,7 +344,7 @@ void CDriver_ADS::QueryParameters()
                     case eDriver_ADSParameterType::ADSParameter_BOOL: {
                         auto pBoolVariable = dynamic_cast<CADSClientBoolVariable*> (pVariable);
                         if (pBoolVariable != nullptr)
-                            m_pDriverEnvironment->SetBoolParameter(pParameter->getName(), pBoolVariable->readBooleanValueFromPLC());
+                            pDriverUpdateInstance->SetBoolParameter(pParameter->getName(), pBoolVariable->readBooleanValueFromPLC());
                         break;
                     }
 
@@ -352,7 +356,7 @@ void CDriver_ADS::QueryParameters()
                     case eDriver_ADSParameterType::ADSParameter_UDINT: {
                         auto pIntegerVariable = dynamic_cast<CADSClientIntegerVariable*> (pVariable);
                         if (pIntegerVariable != nullptr)
-                            m_pDriverEnvironment->SetIntegerParameter(pParameter->getName(), pIntegerVariable->readValueFromPLC());
+                            pDriverUpdateInstance->SetIntegerParameter(pParameter->getName(), pIntegerVariable->readValueFromPLC());
                         break;
                     }
 
@@ -360,14 +364,14 @@ void CDriver_ADS::QueryParameters()
                     case eDriver_ADSParameterType::ADSParameter_LREAL: {
                         auto pFloatVariable = dynamic_cast<CADSClientFloatVariable*> (pVariable);
                         if (pFloatVariable != nullptr)
-                            m_pDriverEnvironment->SetDoubleParameter(pParameter->getName(), pFloatVariable->readValueFromPLC());
+                            pDriverUpdateInstance->SetDoubleParameter(pParameter->getName(), pFloatVariable->readValueFromPLC());
                         break;
                     }
 
                     case eDriver_ADSParameterType::ADSParameter_STRING: {
                         auto pStringVariable = dynamic_cast<CADSClientStringVariable*> (pVariable);
                         if (pStringVariable != nullptr)
-                            m_pDriverEnvironment->SetStringParameter(pParameter->getName(), pStringVariable->readValueFromPLC());
+                            pDriverUpdateInstance->SetStringParameter(pParameter->getName(), pStringVariable->readValueFromPLC());
                         break;
                     }
 

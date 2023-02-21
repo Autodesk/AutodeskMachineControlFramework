@@ -372,7 +372,7 @@ std::string CStateEnvironment::LoadResourceString(const std::string& sResourceNa
 	if (pResourcePackage.get() == nullptr)
 		throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INTERNALERROR);
 
-	pResourcePackage->readEntryUTF8String(sResourceName);
+	return pResourcePackage->readEntryUTF8String(sResourceName);
 }
 
 

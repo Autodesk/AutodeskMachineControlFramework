@@ -36,4 +36,5 @@ add_subdirectory(RayLaseTest)
 add_subdirectory(BuRTest)
 add_subdirectory(RasterizerTest)
 add_subdirectory(ScanlabOIETest)
-
+add_subdirectory(BK9xxxTest)
+add_subdirectory(CifXTest)

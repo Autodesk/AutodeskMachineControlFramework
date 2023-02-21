@@ -82,11 +82,16 @@ std::string CDriver_ScanLab_RTC6::GetType()
 	return m_sType;
 }
 
-
 void CDriver_ScanLab_RTC6::QueryParameters()
 {
-    updateCardStatus();
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession ());
 }
+
+void CDriver_ScanLab_RTC6::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+    updateCardStatus(pDriverUpdateInstance);
+}
+
 
 
 void CDriver_ScanLab_RTC6::SetToSimulationMode()
@@ -101,6 +106,7 @@ bool CDriver_ScanLab_RTC6::IsSimulationMode()
 
 void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string& sNetmask, const LibMCDriver_ScanLab_uint32 nTimeout, const LibMCDriver_ScanLab_uint32 nSerialNumber)
 {
+
     if (m_SimulationMode) {
         m_pDriverEnvironment->SetIntegerParameter("rtc_version", 1);
         m_pDriverEnvironment->SetIntegerParameter("card_type", 1);
@@ -116,14 +122,14 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
 
         m_pRTCContext = nullptr;
 
-        m_pRTCSelector = std::shared_ptr<IRTCSelector>(CreateRTCSelector());
+        m_pRTCSelector = act_managed_ptr<IRTCSelector>(CreateRTCSelector());
 
         if (sIP.empty()) {
-            m_pRTCContext = std::shared_ptr<IRTCContext>(m_pRTCSelector->AcquireCardBySerial(nSerialNumber));
+            m_pRTCContext = act_managed_ptr<IRTCContext>(m_pRTCSelector->AcquireCardBySerial(nSerialNumber));
         }
         else {
             m_pRTCSelector->SearchCards(sIP, sNetmask, nTimeout);
-            m_pRTCContext = std::shared_ptr<IRTCContext>(m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber));
+            m_pRTCContext = act_managed_ptr<IRTCContext>(m_pRTCSelector->AcquireEthernetCardBySerial(nSerialNumber));
         }
 
         uint32_t nRTCVersion = 0;
@@ -140,6 +146,26 @@ void CDriver_ScanLab_RTC6::Initialise(const std::string& sIP, const std::string&
     } 
 
 }
+
+
+IRTCContext* CDriver_ScanLab_RTC6::GetContext()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    return m_pRTCContext.get();
+}
+
+IRTCSelector* CDriver_ScanLab_RTC6::GetSelector()
+{
+    if (m_pRTCContext.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+    if (m_pRTCSelector.get() == nullptr)
+        throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
+
+    return m_pRTCSelector.get();
+}
+
 
 void CDriver_ScanLab_RTC6::LoadFirmware(const std::string& sFirmwareResource, const std::string& sFPGAResource, const std::string& sAuxiliaryResource)
 {
@@ -371,22 +397,28 @@ void CDriver_ScanLab_RTC6::internalExecute()
     m_pRTCContext->SetEndOfList();
     m_pRTCContext->ExecuteList(1, 0);
 
+    auto pDriverUpdateInstance = m_pDriverEnvironment->CreateStatusUpdateSession();
+
     bool Busy = true;
     uint32_t Pos = 0;
 
     while (Busy) {
         m_pRTCContext->GetStatus (Busy, Pos);
-        m_pDriverEnvironment->Sleep(10);
+        pDriverUpdateInstance->Sleep(10);
 
-        updateCardStatus();
+        updateCardStatus(pDriverUpdateInstance);
     }
 
 }
 
-void CDriver_ScanLab_RTC6::updateCardStatus()
+void CDriver_ScanLab_RTC6::updateCardStatus(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
 
     if (!m_SimulationMode) {
+        if (m_pRTCContext.get() == nullptr)
+            throw ELibMCDriver_ScanLabInterfaceException(LIBMCDRIVER_SCANLAB_ERROR_CARDNOTINITIALIZED);
 
         bool Busy = true;
         uint32_t ListPosition = 0;
@@ -395,13 +427,13 @@ void CDriver_ScanLab_RTC6::updateCardStatus()
         m_pRTCContext->GetStatus(Busy, ListPosition);
         m_pRTCContext->GetHeadStatus(1, bPositionXisOK, bPositionYisOK, bTemperatureisOK, bPowerisOK);
 
-        m_pDriverEnvironment->SetBoolParameter("position_x_ok", bPositionXisOK);
-        m_pDriverEnvironment->SetBoolParameter("position_y_ok", bPositionYisOK);
-        m_pDriverEnvironment->SetBoolParameter("temperature_ok", bTemperatureisOK);
-        m_pDriverEnvironment->SetBoolParameter("power_ok", bPowerisOK);
+        pDriverUpdateInstance->SetBoolParameter("position_x_ok", bPositionXisOK);
+        pDriverUpdateInstance->SetBoolParameter("position_y_ok", bPositionYisOK);
+        pDriverUpdateInstance->SetBoolParameter("temperature_ok", bTemperatureisOK);
+        pDriverUpdateInstance->SetBoolParameter("power_ok", bPowerisOK);
 
-        m_pDriverEnvironment->SetIntegerParameter("list_position", ListPosition);
-        m_pDriverEnvironment->SetBoolParameter("card_busy", Busy);
+        pDriverUpdateInstance->SetIntegerParameter("list_position", ListPosition);
+        pDriverUpdateInstance->SetBoolParameter("card_busy", Busy);
 
         bool bLaserIsOn;
         int32_t nPositionX, nPositionY, nPositionZ;
@@ -409,15 +441,15 @@ void CDriver_ScanLab_RTC6::updateCardStatus()
         int32_t nFocusShift, nMarkSpeed;
 
         m_pRTCContext->GetStateValues(bLaserIsOn, nPositionX, nPositionY, nPositionZ, nCorrectedPositionX, nCorrectedPositionY, nCorrectedPositionZ, nFocusShift, nMarkSpeed);
-        m_pDriverEnvironment->SetBoolParameter("laser_on", bLaserIsOn);
-        m_pDriverEnvironment->SetIntegerParameter("position_x", nPositionX);
-        m_pDriverEnvironment->SetIntegerParameter("position_y", nPositionY);
-        m_pDriverEnvironment->SetIntegerParameter("position_z", nPositionZ);
-        m_pDriverEnvironment->SetIntegerParameter("position_x_corrected", nCorrectedPositionX);
-        m_pDriverEnvironment->SetIntegerParameter("position_y_corrected", nCorrectedPositionY);
-        m_pDriverEnvironment->SetIntegerParameter("position_z_corrected", nCorrectedPositionZ);
-        m_pDriverEnvironment->SetIntegerParameter("focus_shift", nFocusShift);
-        m_pDriverEnvironment->SetIntegerParameter("mark_speed", nMarkSpeed);
+        pDriverUpdateInstance->SetBoolParameter("laser_on", bLaserIsOn);
+        pDriverUpdateInstance->SetIntegerParameter("position_x", nPositionX);
+        pDriverUpdateInstance->SetIntegerParameter("position_y", nPositionY);
+        pDriverUpdateInstance->SetIntegerParameter("position_z", nPositionZ);
+        pDriverUpdateInstance->SetIntegerParameter("position_x_corrected", nCorrectedPositionX);
+        pDriverUpdateInstance->SetIntegerParameter("position_y_corrected", nCorrectedPositionY);
+        pDriverUpdateInstance->SetIntegerParameter("position_z_corrected", nCorrectedPositionZ);
+        pDriverUpdateInstance->SetIntegerParameter("focus_shift", nFocusShift);
+        pDriverUpdateInstance->SetIntegerParameter("mark_speed", nMarkSpeed);
 
     }
 
@@ -449,3 +481,5 @@ void CDriver_ScanLab_RTC6::GetCommunicationTimeouts(LibMCDriver_ScanLab_double& 
     }
 
 }
+
+

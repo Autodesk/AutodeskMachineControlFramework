@@ -78,7 +78,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "bur-1.0")
 		return new CDriver_BuR(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_DRIVERERROR, "driver type not found: " + sType);
+	return nullptr;
 }
 
 

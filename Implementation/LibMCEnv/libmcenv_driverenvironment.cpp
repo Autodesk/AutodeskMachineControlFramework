@@ -36,6 +36,9 @@ Abstract: This is a stub class definition of CDriverEnvironment
 #include "libmcenv_workingdirectory.hpp"
 #include "libmcenv_toolpathaccessor.hpp"
 #include "libmcenv_imagedata.hpp"
+#include "libmcenv_tcpipconnection.hpp"
+#include "libmcenv_modbustcpconnection.hpp"
+#include "libmcenv_driverstatusupdatesession.hpp"
 
 // Include custom headers here.
 #include "common_utils.hpp"
@@ -77,9 +80,26 @@ CDriverEnvironment::~CDriverEnvironment()
 
 }
 
+
+IDriverStatusUpdateSession* CDriverEnvironment::CreateStatusUpdateSession()
+{
+    return new CDriverStatusUpdateSession(m_pParameterGroup, m_pLogger, m_sDriverName);
+
+}
+
 IWorkingDirectory* CDriverEnvironment::CreateWorkingDirectory()
 {
     return new CWorkingDirectory(m_sBaseTempPath, m_pDriverResourcePackage);
+}
+
+ITCPIPConnection* CDriverEnvironment::CreateTCPIPConnection(const std::string& sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS)
+{
+    return new CTCPIPConnection(sIPAddress, nPort, nTimeOutInMS);
+}
+
+IModbusTCPConnection* CDriverEnvironment::CreateModbusTCPConnection(const std::string& sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS)
+{
+    return new CModbusTCPConnection(sIPAddress, nPort, nTimeOutInMS);
 }
 
 
@@ -154,6 +174,10 @@ IToolpathAccessor* CDriverEnvironment::CreateToolpathAccessor(const std::string&
     return new CToolpathAccessor (sStreamUUID, m_pToolpathHandler);
 }
 
+bool CDriverEnvironment::ParameterNameIsValid(const std::string& sParameterName)
+{
+    return AMCCommon::CUtils::stringIsValidAlphanumericNameString(sParameterName);
+}
 
 void CDriverEnvironment::RegisterStringParameter(const std::string& sParameterName, const std::string& sDescription, const std::string& sDefaultValue)
 {

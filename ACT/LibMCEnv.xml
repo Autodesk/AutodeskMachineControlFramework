@@ -85,7 +85,47 @@
 		<error name="TEMPFILEEXTENSIONEXCEEDS64CHARACTERS" code="44" description="Temp file extension exceeds 64 characters." />
 		<error name="TEMPFILEEXTENSIONCONTAINSINVALIDCHARACTERS" code="45" description="Temp file extension contains invalid characters." />
 		<error name="COULDNOTGENERATETEMPFILENAME" code="46" description="Could not generate temp file name." />
-		
+		<error name="EMPTYTCPIPPACKET" code="47" description="Empty TCP/IP Packet." />		
+		<error name="COULDNOTGETADDRESSINFO" code="48" description="Could not get address info." />
+		<error name="COULDNOTCREATESOCKET" code="49" description="Could not create socket." />
+		<error name="COULDNOTCONNECT" code="50" description="Could not connect." />
+		<error name="SENDERROR" code="51" description="Send error." />
+		<error name="RECEIVECOUNTEXCEEDSMAXIMUM" code="52" description="Receive count exceeds maximum." />
+		<error name="CONNECTIONCLOSED" code="53" description="Connection closed." />
+		<error name="RECEIVEERROR" code="54" description="Receive error." />
+		<error name="SENDCOUNTEXCEEDSMAXIMUM" code="55" description="Send count exceeds maximum." />
+		<error name="SOCKETNOTCONNECTED" code="56" description="Socket not connected." />
+		<error name="INVALIDSENDBUFFER" code="57" description="Invalid send buffer." />
+		<error name="INVALIDMODBUSTCPPAYLOADSIZE" code="58" description="Invalid modbus TCP payload size" />
+		<error name="INVALIDMODBUSTCPREQUEST" code="59" description="Invalid modbus TCP request" />
+		<error name="INSUFFICIENTMODBUSTCPRESPONSEHEADER" code="60" description="Insufficient modbus tcp response header" />
+		<error name="MODBUSTCPRESPONSEOVERFLOW" code="61" description="modbus tcp response overflow" />
+		<error name="INVALIDMODBUSTCPTRANSACTIONIDRESPONSE" code="62" description="invalid modbus tcp transaction ID response" />
+		<error name="INVALIDMODBUSTCPPROTOCOLIDRESPONSE" code="63" description="invalid modbus tcp protocol ID response" />
+		<error name="INVALIDMODBUSTCPUNITIDENTIFIERRESPONSE" code="64" description="invalid modbus tcp unit identifier response" />
+		<error name="MODBUSTCPRESPONSELENGTHMISMATCH" code="65" description="modbus tcp response length mismatch" />		
+		<error name="MODBUSTCPINVALIDCOILSTATUSBITCOUNT" code="66" description="modbus TCP Invalid coils status bit count." />
+		<error name="MODBUSTCPINVALIDCOILSTATUSRESPONSE" code="67" description="modbus TCP Invalid coils status response." />
+		<error name="MODBUSTCPCOILSTATUSRESPONSEEMPTY" code="68" description="modbus TCP coils status response empty." />
+		<error name="MODBUSTCPINVALIDCOILSTATUSRESPONSESIZE" code="69" description="modbus TCP invalid coil status response size." />
+		<error name="MODBUSTCPINVALIDINPUTSTATUSBITCOUNT" code="70" description="modbus TCP invalid input status bit count." />
+		<error name="MODBUSTCPINVALIDINPUTSTATUSRESPONSE" code="71" description="modbus TCP invalid input status response." />
+		<error name="MODBUSTCPINPUTSTATUSRESPONSEEMPTY" code="72" description="modbus TCP input status response empty." />		
+		<error name="MODBUSTCPINVALIDINPUTSTATUSRESPONSESIZE" code="73" description="modbus TCP invalid input status response size." />
+		<error name="INVALIDMODBUSTCPCOILCOUNT" code="74" description="invalid modbus tcp coil count." />
+		<error name="INVALIDMODBUSTCPREGISTERCOUNT" code="75" description="invalid modbus tcp register count." />
+		<error name="INVALIDMODBUSIOINDEX" code="76" description="invalid modbus IO index." />
+		<error name="MODBUSIOSTATUSEMPTY" code="77" description="modbus io status empty." />
+		<error name="INVALIDMODBUSREGISTERINDEX" code="78" description="invalid modbus register index." />
+		<error name="MODBUSREGISTERSTATUSEMPTY" code="79" description="modbus register status empty." />		
+		<error name="MODBUSTCPINVALIDINPUTREGISTERSRESPONSE" code="80" description="modbus TCP invalid input registers response" />
+		<error name="MODBUSTCPINPUTREGISTERSRESPONSEEMPTY" code="81" description="modbus TCP input registers response empty" />
+		<error name="MODBUSTCPINVALIDINPUTREGISTERSRESPONSESIZE" code="83" description="modbus TCP invalid input registers response size" />
+		<error name="MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSE" code="84" description="modbus TCP invalid holding registers response" />
+		<error name="MODBUSTCPHOLDINGREGISTERSRESPONSEEMPTY" code="85" description="modbus TCP holding registers response empty" />
+		<error name="MODBUSTCPINVALIDHOLDINGREGISTERSRESPONSESIZE" code="86" description="modbus TCP invalid holding registers response size" />
+						
+					
 							
 	</errors>
 
@@ -647,10 +687,248 @@
 
 	</class>
 
-	<class name="DriverEnvironment" parent="Base" description="Environment of the driver">
+
+	<class name="TCPIPPacket" parent="Base" description="Contains a received TCPIP packet data.">
+
+		<method name="IsEmpty" description="Returns if packet is empty.">
+			<param name="PacketIsEmpty" type="bool" pass="return" description="Flag if packet is empty." />
+		</method>
+	
+		<method name="GetSize" description="Returns the size of the packet. Returns 0 if packet is empty.">
+			<param name="PacketSize" type="uint32" pass="return" description="returns size of packet." />
+		</method>
+
+		<method name="GetData" description="Returns the data of the packet. Fails if packet is empty.">
+			<param name="Buffer" type="basicarray" class="uint8" pass="out" description="packet data." />
+		</method>
+		
+	</class>
+
+
+	<class name="TCPIPConnection" parent="Base" description="A generic TCP/IP Connection.">
+
+		<method name="GetIPAddress" description= "Returns the IP Address of the Connection.">
+			<param name="IPAddress" type="string" pass="return" description="IP Address." />
+		</method>
+
+		<method name="GetPort" description= "Returns the Port of the Connection.">
+			<param name="Port" type="uint32" pass="return" description="Port." />				
+		</method>
+
+		<method name="GetTimeout" description= "Returns the Timeout of the Connection.">
+			<param name="Timeout" type="uint32" pass="return" description="Timeout in milliseconds." />				
+		</method>
+
+		<method name="IsConnected" description="Returns if the instance is connected.">		
+			<param name="IsConnected" type="bool" pass="return" description="." />
+		</method>	
+
+		<method name="Disconnect" description= "Disconnects from the Server, if connected.">
+		</method>
+
+		<method name="Reconnect" description="Disconnects and Connects to the Server.">		
+		</method>	
+
+		<method name="SendBuffer" description= "Sends a buffer of bytes to the Server.">
+			<param name="Buffer" type="basicarray" class="uint8" pass="in" description="packet payload." />		
+		</method>
+
+		<method name="WaitForData" description= "Waits for a server packet to arrive.">
+			<param name="TimeOutInMS" type="uint32" pass="in" description="timeout in Milliseconds." />		
+			<param name="DataAvailable" type="bool" pass="return" description="Flag if a new packet has arrived." />		
+		</method>
+
+		<method name="ReceiveFixedPacket" description= "Receives a fixed length packet. Blocks until expected number of bytes arrives or timeout is hit. Fails if there is a connection error. Returns empty packet if timeout is hit.">
+			<param name="PacketSize" type="uint32" pass="in" description="Size of packet to receive. MUST be larger than 0." />	
+			<param name="TimeOutInMS" type="uint32" pass="in" description="Timeout in Milliseconds." />		
+			<param name="PacketInstance" type="class" class="TCPIPPacket" pass="return" description="Packet instance. Returns empty packet if timeout is hit" />
+		</method>
+
+		<method name="ReceiveData" description= "Receives data. Fails if there is a connection error. Returns empty packet if timeout is hit.">
+			<param name="DataSize" type="uint32" pass="in" description="Size of data to receive." />	
+			<param name="TimeOutInMS" type="uint32" pass="in" description="timeout in Milliseconds." />		
+			<param name="PacketInstance" type="class" class="TCPIPPacket" pass="return" description="Packet instance. Size will be between 0 and DataSize." />
+		</method>
+				
+	</class>
+
+	<class name="ModbusTCPDigitalIOStatus" parent="Base" description="A Modbus TCP coil or input status object.">
+	
+		<method name="GetCount" description= "Returns the number of Digital IOs in the instance.">
+			<param name="Count" type="uint32" pass="return" description="Count." />				
+		</method>
+		
+		<method name="GetBaseAddress" description= "Returns the base address of Digital IOs in the instance.">
+			<param name="Address" type="uint32" pass="return" description="Base Address." />				
+		</method>
+
+		<method name="GetValue" description= "Returns the cached state of the Digital IO in the instance.">
+			<param name="Index" type="uint32" pass="in" description="Index of IO Value. 0-based." />
+			<param name="State" type="bool" pass="return" description="State Value." />				
+		</method>
+		
+		<method name="GetValues" description= "Returns all Digital IOs of the instance as byte array.">
+			<param name="StateArray" type="basicarray" class="uint8" pass="out" description="State Value Array." />
+		</method>
+		
+	</class>
+
+	<class name="ModbusTCPRegisterStatus" parent="Base" description="A Modbus TCP register status object.">
+	
+		<method name="GetCount" description= "Returns the number of registers in the instance.">
+			<param name="Count" type="uint32" pass="return" description="Count." />				
+		</method>
+		
+		<method name="GetBaseAddress" description= "Returns the base address of registers in the instance.">
+			<param name="Address" type="uint32" pass="return" description="Base Address." />				
+		</method>
+
+		<method name="GetValue" description= "Returns the cached state of the registers in the instance.">
+			<param name="Index" type="uint32" pass="in" description="Index of IO Value. 0-based." />
+			<param name="State" type="uint16" pass="return" description="State Value." />				
+		</method>
+		
+		<method name="GetValues" description= "Returns all registers of the instance as word array.">
+			<param name="StateArray" type="basicarray" class="uint16" pass="out" description="State Value Array." />
+		</method>
+		
+	</class>
+
+	<class name="ModbusTCPConnection" parent="Base" description="A generic Modbus TCP Connection.">
+
+		<method name="GetIPAddress" description= "Returns the IP Address of the Connection.">
+			<param name="IPAddress" type="string" pass="return" description="IP Address." />
+		</method>
+
+		<method name="GetPort" description= "Returns the Port of the Connection.">
+			<param name="Port" type="uint32" pass="return" description="Port." />				
+		</method>
+
+		<method name="GetTimeout" description= "Returns the Timeout of the Connection.">
+			<param name="Timeout" type="uint32" pass="return" description="Timeout in milliseconds." />				
+		</method>
+
+		<method name="IsConnected" description="Returns if the instance is connected.">		
+			<param name="IsConnected" type="bool" pass="return" description="." />
+		</method>	
+
+		<method name="Disconnect" description= "Disconnects from the Server.">
+		</method>
+
+		<method name="Reconnect" description="Disconnects and Connects to the Server.">		
+		</method>	
+
+		<method name="DiagnosisCall" description= "Sends a diagnosis call to the Server.">
+			<param name="SubFunction" type="uint16" pass="in" description="Modbus TCP Subfunction ID." />
+			<param name="DataField" type="uint16" pass="in" description="Modbus TCP Data Field." />
+			<param name="DataResponse" type="uint16" pass="return" description="Modbus TCP Data Response." />
+		</method>
+
+		<method name="ReadCoilStatus" description= "Reads coil status of Server.">
+			<param name="StartAddress" type="uint32" pass="in" description="Start Address." />
+			<param name="BitCount" type="uint32" pass="in" description="Number of coils to read. MUST be larger than 0." />
+			<param name="CoilStatus" type="class" class="ModbusTCPDigitalIOStatus" pass="return" description="Coil status instance." />
+		</method>
+		
+		<method name="ReadInputStatus" description= "Reads input status of Server.">
+			<param name="StartAddress" type="uint32" pass="in" description="Start Address." />
+			<param name="BitCount" type="uint32" pass="in" description="Number of inputs to read. MUST be larger than 0." />
+-			<param name="InputStatus" type="class" class="ModbusTCPDigitalIOStatus" pass="return" description="Input status instance." />
+		</method>
+		
+		<method name="ReadHoldingRegisters" description= "Reads holding registers of Server.">
+			<param name="StartAddress" type="uint32" pass="in" description="Start Address." />
+			<param name="RegisterCount" type="uint32" pass="in" description="Number of registers. MUST be larger than 0." />
+			<param name="RegisterInstance" type="class" class="ModbusTCPRegisterStatus" pass="return" description="Holding register instance." />
+		</method>
+		
+		<method name="ReadInputRegisters" description= "Reads input registers of Server.">
+			<param name="StartAddress" type="uint32" pass="in" description="Start Address." />
+			<param name="RegisterCount" type="uint32" pass="in" description="Number of registers. MUST be larger than 0." />
+			<param name="RegisterInstance" type="class" class="ModbusTCPRegisterStatus" pass="return" description="Input register instance." />
+		</method>
+		
+		<method name="ForceMultipleCoils" description= "Forces multiple coils on Server.">
+			<param name="StartAddress" type="uint32" pass="in" description="Start Address." />
+			<param name="Buffer" type="basicarray" class="uint8" pass="in" description="Input coil array. One byte per Input. MUST NOT be empty" />
+		</method>
+
+		<method name="PresetMultipleRegisters" description= "Forces multiple registers on Server.">
+			<param name="StartAddress" type="uint32" pass="in" description="Start Address." />
+			<param name="Buffer" type="basicarray" class="uint16" pass="in" description="Input register array. One word per Input. MUST NOT be empty" />
+		</method>
+		
+	</class>	
+
+
+	<class name="DriverStatusUpdateSession" parent="Base" description="Thread-safe class for updating the status variables of the driver">
+	
+		<method name="SetStringParameter" description="sets a string parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetUUIDParameter" description="sets a uuid parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetDoubleParameter" description="sets a double parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetIntegerParameter" description="sets an int parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetBoolParameter" description="sets a bool parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="in" description="Value to set" />
+		</method>	
+		
+		<method name="LogMessage" description="logs a string as message">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogWarning" description="logs a string as warning">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogInfo" description="logs a string as info">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="Sleep" description="Sleeps for a definite amount of time.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleep." />
+		</method>
+		
+	</class>
+
+
+	<class name="DriverEnvironment" parent="Base" description="Environment of the driver. Method calls should be mutexed by the multithreading of the driver implementation.">
 	  
+		<method name="CreateStatusUpdateSession" description = "creates a status update object which can be easily called from an independent thread.">
+			<param name="UpdateStatusInstance" type="class" class="DriverStatusUpdateSession" pass="return" description="creates a status update instance" />
+		</method>
+
 		<method name="CreateWorkingDirectory" description = "creates a temporary working directory.">
 			<param name="WorkingDirectory" type="class" class="WorkingDirectory" pass="return" description="creates a working directory" />
+		</method>
+
+		<method name="CreateTCPIPConnection" description = "creates a TCP/IP Connection for a specific IP address and port.">
+			<param name="IPAddress" type="string" pass="in" description="IP Address." />
+			<param name="Port" type="uint32" pass="in" description="Port." />				
+			<param name="TimeOutInMS" type="uint32" pass="in" description="timeout in Milliseconds." />		
+			<param name="ConnectionInstance" type="class" class="TCPIPConnection" pass="return" description="connects to the given IP Address" />
+		</method>
+
+		<method name="CreateModbusTCPConnection" description = "creates a Modbus TCP Connection for a specific IP address and port.">
+			<param name="IPAddress" type="string" pass="in" description="IP Address." />
+			<param name="Port" type="uint32" pass="in" description="Port." />				
+			<param name="TimeOutInMS" type="uint32" pass="in" description="timeout in Milliseconds." />		
+			<param name="ConnectionInstance" type="class" class="ModbusTCPConnection" pass="return" description="connects to the given IP Address" />
 		</method>
 
 		<method name="DriverHasResourceData" description = "retrieves if attached driver has data with the given identifier.">
@@ -683,6 +961,10 @@
 			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
 		</method>
 		
+		<method name="ParameterNameIsValid" description="checks if a name is a valid alphanumerical string for parameters.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="NameIsValid" type="bool" pass="return" description="returns true if the parameter name is a valid name." />
+		</method>
 		
 		<method name="RegisterStringParameter" description="registers a string parameter. Must only be called during driver creation.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />

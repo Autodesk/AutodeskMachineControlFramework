@@ -35,6 +35,8 @@ Abstract: This is a stub class definition of CDriver
 #include "libmcdriver_s7net_interfaceexception.hpp"
 
 // Include custom headers here.
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 
 using namespace LibMCDriver_S7Net::Impl;
@@ -59,9 +61,11 @@ std::string CDriver::GetType()
 
 void CDriver::GetVersion(LibMCDriver_S7Net_uint32 & nMajor, LibMCDriver_S7Net_uint32 & nMinor, LibMCDriver_S7Net_uint32 & nMicro, std::string & sBuild)
 {
+    nMajor = LIBMCDRIVER_S7NET_VERSION_MAJOR;
+    nMinor = LIBMCDRIVER_S7NET_VERSION_MINOR;
+    nMicro = LIBMCDRIVER_S7NET_VERSION_MICRO;
+    sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
+
 }
 
-void CDriver::GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName)
-{
-}
 

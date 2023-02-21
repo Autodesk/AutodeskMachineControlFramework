@@ -163,6 +163,10 @@ namespace LibMCDriver_ScanLab {
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_micro_vector_abs) (uint32_t nCardNo, int32_t nX, int32_t nY, int32_t nLasOn, int32_t nLasOff);
 		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_micro_vector_rel) (uint32_t nCardNo, int32_t ndX, int32_t ndY, int32_t nLasOn, int32_t nLasOff);
 
+		typedef uint32_t(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_get_error) (uint32_t nCardNo);
+		typedef void(SCANLAB_CALLINGCONVENTION* PScanLabPtr_n_reset_error) (uint32_t nCardNo, uint32_t nCode);
+		
+
 		class CScanLabSDK {
 		private:
 			bool m_bIsInitialized;
@@ -273,13 +277,16 @@ namespace LibMCDriver_ScanLab {
 			PScanLabPtr_n_micro_vector_rel_3d n_micro_vector_rel_3d = nullptr;
 			PScanLabPtr_n_micro_vector_abs n_micro_vector_abs = nullptr;
 			PScanLabPtr_n_micro_vector_rel n_micro_vector_rel = nullptr;
-
+			PScanLabPtr_n_get_error n_get_error = nullptr;
+			PScanLabPtr_n_reset_error n_reset_error = nullptr;
 
 			CScanLabSDK(const std::string & sDLLNameUTF8);
 			~CScanLabSDK();
 
 			void initDLL();
 			void checkError(uint32_t nRTCError);
+			void checkLastErrorOfCard(uint32_t nCardNo);
+			void checkGlobalErrorOfCard(uint32_t nCardNo);
 
 		};
 

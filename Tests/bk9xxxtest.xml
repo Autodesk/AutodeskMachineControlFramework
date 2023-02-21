@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<testdefinition xmlns="http://schemas.autodesk.com/amc/testdefinitions/2020/02">
+
+	<driver name="bk9100" library="driver_bk9xxx" type="bk9100" configurationschema="http://schemas.autodesk.com/amc/bk9xxxprotocol/2023/01">
+	
+		<version major="1" minor="0" patch="0" />
+		
+		<digital_inputs startaddress="0" bitcount="16">
+		  <input offset="1" name="laser1_psa_active" description="Laser 1 PSA Active" />
+		</digital_inputs>
+
+		<digital_outputs startaddress="0" bitcount="8">
+		  <output offset="2" name="laser1_guide" description="Laser 1 Pointer State" />
+		  <output offset="6" name="laser2_guide" description="Laser 2 Pointer State" />
+		</digital_outputs>
+
+		<analog_inputs startaddress="32" registercount="16">
+			<input offset="2" name="magnetic_valve_position" description="Magnetic valve position" raw_min="0" raw_max="32767" scaled_min="0" scaled_max="100" units="Percent" />
+		</analog_inputs>
+
+	
+	</driver>
+
+	<statemachine name="bk9100test" description="BK9xxx Test" initstate="init" failedstate="fatalerror" successstate="success" library="plugin_bk9xxxtest">
+	
+		<state name="init" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="success" repeatdelay="100">
+			<outstate target="success"/>
+		</state>
+
+		<state name="fatalerror" repeatdelay="100">
+			<outstate target="fatalerror"/>
+		</state>
+
+	</statemachine>
+
+	<libraries>
+		<library name="plugin_bk9xxxtest" dll="%githash%_test_bk9xxxtest" />
+		<library name="driver_bk9xxx" dll="%githash%_driver_bk9xxx" />
+	</libraries>
+		
+	<test description="Test of Beckhoff BK9xxx Driver">			
+	
+		<instance name="bk9100test" />
+		
+	</test>
+	
+			
+
+</testdefinition>

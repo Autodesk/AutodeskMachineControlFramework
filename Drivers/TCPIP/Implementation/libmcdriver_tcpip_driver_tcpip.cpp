@@ -78,18 +78,18 @@ void CDriver_TCPIP::GetVersion(LibMCDriver_TCPIP_uint32& nMajor, LibMCDriver_TCP
 	nMajor = LIBMCDRIVER_TCPIP_VERSION_MAJOR;
 	nMinor = LIBMCDRIVER_TCPIP_VERSION_MINOR;
 	nMicro = LIBMCDRIVER_TCPIP_VERSION_MICRO;
-	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);;
-}
-
-void CDriver_TCPIP::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_TCPIP";
-	sBaseName = "libmcdriver_tcpip";
+	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_TCPIP::QueryParameters()
 {
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession ());
+}
 
+void CDriver_TCPIP::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
 }
 
 

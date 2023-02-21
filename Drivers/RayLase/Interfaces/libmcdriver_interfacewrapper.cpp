@@ -52,15 +52,9 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getversion(LibMCDriver
 	return libmcdriver_raylase_driver_getversion(pDriver, pMajor, pMinor, pMicro, nBuildBufferSize, pBuildNeededChars, pBuildBuffer);
 }
 
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getheaderinformation(LibMCDriver_Driver pDriver, const LibMCDriver_uint32 nNameSpaceBufferSize, LibMCDriver_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_uint32 nBaseNameBufferSize, LibMCDriver_uint32* pBaseNameNeededChars, char * pBaseNameBuffer)
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparametersex(LibMCDriver_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
-	return libmcdriver_raylase_driver_getheaderinformation(pDriver, nNameSpaceBufferSize, pNameSpaceNeededChars, pNameSpaceBuffer, nNameSpaceBufferSize, pBaseNameNeededChars, pBaseNameBuffer);
-}
-
-
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver)
-{
-	return libmcdriver_raylase_driver_queryparameters(pDriver);
+	return libmcdriver_raylase_driver_queryparametersex(pDriver, pDriverUpdateInstance);
 }
 
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_getversion(LibMCDriver_uint32 * pMajor, LibMCDriver_uint32 * pMinor, LibMCDriver_uint32 * pMicro)

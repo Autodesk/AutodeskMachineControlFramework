@@ -78,7 +78,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == CDriver_ScanLab_OIE::getTypeString())
 		return new CDriver_ScanLab_OIE(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDDRIVERTYPE);
+	return nullptr;
 }
 
 

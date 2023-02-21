@@ -66,6 +66,12 @@ class IWorkingFileExecution;
 class IWorkingFile;
 class IWorkingFileIterator;
 class IWorkingDirectory;
+class ITCPIPPacket;
+class ITCPIPConnection;
+class IModbusTCPDigitalIOStatus;
+class IModbusTCPRegisterStatus;
+class IModbusTCPConnection;
+class IDriverStatusUpdateSession;
 class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
@@ -1011,16 +1017,393 @@ typedef IBaseSharedPtr<IWorkingDirectory> PIWorkingDirectory;
 
 
 /*************************************************************************************************************************
+ Class interface for TCPIPPacket 
+**************************************************************************************************************************/
+
+class ITCPIPPacket : public virtual IBase {
+public:
+	/**
+	* ITCPIPPacket::IsEmpty - Returns if packet is empty.
+	* @return Flag if packet is empty.
+	*/
+	virtual bool IsEmpty() = 0;
+
+	/**
+	* ITCPIPPacket::GetSize - Returns the size of the packet. Returns 0 if packet is empty.
+	* @return returns size of packet.
+	*/
+	virtual LibMCEnv_uint32 GetSize() = 0;
+
+	/**
+	* ITCPIPPacket::GetData - Returns the data of the packet. Fails if packet is empty.
+	* @param[in] nBufferBufferSize - Number of elements in buffer
+	* @param[out] pBufferNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pBufferBuffer - uint8 buffer of packet data.
+	*/
+	virtual void GetData(LibMCEnv_uint64 nBufferBufferSize, LibMCEnv_uint64* pBufferNeededCount, LibMCEnv_uint8 * pBufferBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITCPIPPacket> PITCPIPPacket;
+
+
+/*************************************************************************************************************************
+ Class interface for TCPIPConnection 
+**************************************************************************************************************************/
+
+class ITCPIPConnection : public virtual IBase {
+public:
+	/**
+	* ITCPIPConnection::GetIPAddress - Returns the IP Address of the Connection.
+	* @return IP Address.
+	*/
+	virtual std::string GetIPAddress() = 0;
+
+	/**
+	* ITCPIPConnection::GetPort - Returns the Port of the Connection.
+	* @return Port.
+	*/
+	virtual LibMCEnv_uint32 GetPort() = 0;
+
+	/**
+	* ITCPIPConnection::GetTimeout - Returns the Timeout of the Connection.
+	* @return Timeout in milliseconds.
+	*/
+	virtual LibMCEnv_uint32 GetTimeout() = 0;
+
+	/**
+	* ITCPIPConnection::IsConnected - Returns if the instance is connected.
+	* @return .
+	*/
+	virtual bool IsConnected() = 0;
+
+	/**
+	* ITCPIPConnection::Disconnect - Disconnects from the Server, if connected.
+	*/
+	virtual void Disconnect() = 0;
+
+	/**
+	* ITCPIPConnection::Reconnect - Disconnects and Connects to the Server.
+	*/
+	virtual void Reconnect() = 0;
+
+	/**
+	* ITCPIPConnection::SendBuffer - Sends a buffer of bytes to the Server.
+	* @param[in] nBufferBufferSize - Number of elements in buffer
+	* @param[in] pBufferBuffer - packet payload.
+	*/
+	virtual void SendBuffer(const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint8 * pBufferBuffer) = 0;
+
+	/**
+	* ITCPIPConnection::WaitForData - Waits for a server packet to arrive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Flag if a new packet has arrived.
+	*/
+	virtual bool WaitForData(const LibMCEnv_uint32 nTimeOutInMS) = 0;
+
+	/**
+	* ITCPIPConnection::ReceiveFixedPacket - Receives a fixed length packet. Blocks until expected number of bytes arrives or timeout is hit. Fails if there is a connection error. Returns empty packet if timeout is hit.
+	* @param[in] nPacketSize - Size of packet to receive. MUST be larger than 0.
+	* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+	* @return Packet instance. Returns empty packet if timeout is hit
+	*/
+	virtual ITCPIPPacket * ReceiveFixedPacket(const LibMCEnv_uint32 nPacketSize, const LibMCEnv_uint32 nTimeOutInMS) = 0;
+
+	/**
+	* ITCPIPConnection::ReceiveData - Receives data. Fails if there is a connection error. Returns empty packet if timeout is hit.
+	* @param[in] nDataSize - Size of data to receive.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return Packet instance. Size will be between 0 and DataSize.
+	*/
+	virtual ITCPIPPacket * ReceiveData(const LibMCEnv_uint32 nDataSize, const LibMCEnv_uint32 nTimeOutInMS) = 0;
+
+};
+
+typedef IBaseSharedPtr<ITCPIPConnection> PITCPIPConnection;
+
+
+/*************************************************************************************************************************
+ Class interface for ModbusTCPDigitalIOStatus 
+**************************************************************************************************************************/
+
+class IModbusTCPDigitalIOStatus : public virtual IBase {
+public:
+	/**
+	* IModbusTCPDigitalIOStatus::GetCount - Returns the number of Digital IOs in the instance.
+	* @return Count.
+	*/
+	virtual LibMCEnv_uint32 GetCount() = 0;
+
+	/**
+	* IModbusTCPDigitalIOStatus::GetBaseAddress - Returns the base address of Digital IOs in the instance.
+	* @return Base Address.
+	*/
+	virtual LibMCEnv_uint32 GetBaseAddress() = 0;
+
+	/**
+	* IModbusTCPDigitalIOStatus::GetValue - Returns the cached state of the Digital IO in the instance.
+	* @param[in] nIndex - Index of IO Value. 0-based.
+	* @return State Value.
+	*/
+	virtual bool GetValue(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IModbusTCPDigitalIOStatus::GetValues - Returns all Digital IOs of the instance as byte array.
+	* @param[in] nStateArrayBufferSize - Number of elements in buffer
+	* @param[out] pStateArrayNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pStateArrayBuffer - uint8 buffer of State Value Array.
+	*/
+	virtual void GetValues(LibMCEnv_uint64 nStateArrayBufferSize, LibMCEnv_uint64* pStateArrayNeededCount, LibMCEnv_uint8 * pStateArrayBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IModbusTCPDigitalIOStatus> PIModbusTCPDigitalIOStatus;
+
+
+/*************************************************************************************************************************
+ Class interface for ModbusTCPRegisterStatus 
+**************************************************************************************************************************/
+
+class IModbusTCPRegisterStatus : public virtual IBase {
+public:
+	/**
+	* IModbusTCPRegisterStatus::GetCount - Returns the number of registers in the instance.
+	* @return Count.
+	*/
+	virtual LibMCEnv_uint32 GetCount() = 0;
+
+	/**
+	* IModbusTCPRegisterStatus::GetBaseAddress - Returns the base address of registers in the instance.
+	* @return Base Address.
+	*/
+	virtual LibMCEnv_uint32 GetBaseAddress() = 0;
+
+	/**
+	* IModbusTCPRegisterStatus::GetValue - Returns the cached state of the registers in the instance.
+	* @param[in] nIndex - Index of IO Value. 0-based.
+	* @return State Value.
+	*/
+	virtual LibMCEnv_uint16 GetValue(const LibMCEnv_uint32 nIndex) = 0;
+
+	/**
+	* IModbusTCPRegisterStatus::GetValues - Returns all registers of the instance as word array.
+	* @param[in] nStateArrayBufferSize - Number of elements in buffer
+	* @param[out] pStateArrayNeededCount - will be filled with the count of the written structs, or needed buffer size.
+	* @param[out] pStateArrayBuffer - uint16 buffer of State Value Array.
+	*/
+	virtual void GetValues(LibMCEnv_uint64 nStateArrayBufferSize, LibMCEnv_uint64* pStateArrayNeededCount, LibMCEnv_uint16 * pStateArrayBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IModbusTCPRegisterStatus> PIModbusTCPRegisterStatus;
+
+
+/*************************************************************************************************************************
+ Class interface for ModbusTCPConnection 
+**************************************************************************************************************************/
+
+class IModbusTCPConnection : public virtual IBase {
+public:
+	/**
+	* IModbusTCPConnection::GetIPAddress - Returns the IP Address of the Connection.
+	* @return IP Address.
+	*/
+	virtual std::string GetIPAddress() = 0;
+
+	/**
+	* IModbusTCPConnection::GetPort - Returns the Port of the Connection.
+	* @return Port.
+	*/
+	virtual LibMCEnv_uint32 GetPort() = 0;
+
+	/**
+	* IModbusTCPConnection::GetTimeout - Returns the Timeout of the Connection.
+	* @return Timeout in milliseconds.
+	*/
+	virtual LibMCEnv_uint32 GetTimeout() = 0;
+
+	/**
+	* IModbusTCPConnection::IsConnected - Returns if the instance is connected.
+	* @return .
+	*/
+	virtual bool IsConnected() = 0;
+
+	/**
+	* IModbusTCPConnection::Disconnect - Disconnects from the Server.
+	*/
+	virtual void Disconnect() = 0;
+
+	/**
+	* IModbusTCPConnection::Reconnect - Disconnects and Connects to the Server.
+	*/
+	virtual void Reconnect() = 0;
+
+	/**
+	* IModbusTCPConnection::DiagnosisCall - Sends a diagnosis call to the Server.
+	* @param[in] nSubFunction - Modbus TCP Subfunction ID.
+	* @param[in] nDataField - Modbus TCP Data Field.
+	* @return Modbus TCP Data Response.
+	*/
+	virtual LibMCEnv_uint16 DiagnosisCall(const LibMCEnv_uint16 nSubFunction, const LibMCEnv_uint16 nDataField) = 0;
+
+	/**
+	* IModbusTCPConnection::ReadCoilStatus - Reads coil status of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nBitCount - Number of coils to read. MUST be larger than 0.
+	* @return Coil status instance.
+	*/
+	virtual IModbusTCPDigitalIOStatus * ReadCoilStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount) = 0;
+
+	/**
+	* IModbusTCPConnection::ReadInputStatus - Reads input status of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nBitCount - Number of inputs to read. MUST be larger than 0.
+	* @return Input status instance.
+	*/
+	virtual IModbusTCPDigitalIOStatus * ReadInputStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount) = 0;
+
+	/**
+	* IModbusTCPConnection::ReadHoldingRegisters - Reads holding registers of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nRegisterCount - Number of registers. MUST be larger than 0.
+	* @return Holding register instance.
+	*/
+	virtual IModbusTCPRegisterStatus * ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount) = 0;
+
+	/**
+	* IModbusTCPConnection::ReadInputRegisters - Reads input registers of Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nRegisterCount - Number of registers. MUST be larger than 0.
+	* @return Input register instance.
+	*/
+	virtual IModbusTCPRegisterStatus * ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount) = 0;
+
+	/**
+	* IModbusTCPConnection::ForceMultipleCoils - Forces multiple coils on Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nBufferBufferSize - Number of elements in buffer
+	* @param[in] pBufferBuffer - Input coil array. One byte per Input. MUST NOT be empty
+	*/
+	virtual void ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint8 * pBufferBuffer) = 0;
+
+	/**
+	* IModbusTCPConnection::PresetMultipleRegisters - Forces multiple registers on Server.
+	* @param[in] nStartAddress - Start Address.
+	* @param[in] nBufferBufferSize - Number of elements in buffer
+	* @param[in] pBufferBuffer - Input register array. One word per Input. MUST NOT be empty
+	*/
+	virtual void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer) = 0;
+
+};
+
+typedef IBaseSharedPtr<IModbusTCPConnection> PIModbusTCPConnection;
+
+
+/*************************************************************************************************************************
+ Class interface for DriverStatusUpdateSession 
+**************************************************************************************************************************/
+
+class IDriverStatusUpdateSession : public virtual IBase {
+public:
+	/**
+	* IDriverStatusUpdateSession::SetStringParameter - sets a string parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetDoubleParameter - sets a double parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetIntegerParameter - sets an int parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetBoolParameter - sets a bool parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogMessage(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogWarning(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogInfo(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::Sleep - Sleeps for a definite amount of time.
+	* @param[in] nDelay - Milliseconds to sleep.
+	*/
+	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriverStatusUpdateSession> PIDriverStatusUpdateSession;
+
+
+/*************************************************************************************************************************
  Class interface for DriverEnvironment 
 **************************************************************************************************************************/
 
 class IDriverEnvironment : public virtual IBase {
 public:
 	/**
+	* IDriverEnvironment::CreateStatusUpdateSession - creates a status update object which can be easily called from an independent thread.
+	* @return creates a status update instance
+	*/
+	virtual IDriverStatusUpdateSession * CreateStatusUpdateSession() = 0;
+
+	/**
 	* IDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
 	* @return creates a working directory
 	*/
 	virtual IWorkingDirectory * CreateWorkingDirectory() = 0;
+
+	/**
+	* IDriverEnvironment::CreateTCPIPConnection - creates a TCP/IP Connection for a specific IP address and port.
+	* @param[in] sIPAddress - IP Address.
+	* @param[in] nPort - Port.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return connects to the given IP Address
+	*/
+	virtual ITCPIPConnection * CreateTCPIPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS) = 0;
+
+	/**
+	* IDriverEnvironment::CreateModbusTCPConnection - creates a Modbus TCP Connection for a specific IP address and port.
+	* @param[in] sIPAddress - IP Address.
+	* @param[in] nPort - Port.
+	* @param[in] nTimeOutInMS - timeout in Milliseconds.
+	* @return connects to the given IP Address
+	*/
+	virtual IModbusTCPConnection * CreateModbusTCPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS) = 0;
 
 	/**
 	* IDriverEnvironment::DriverHasResourceData - retrieves if attached driver has data with the given identifier.
@@ -1069,6 +1452,13 @@ public:
 	* @return Toolpath instance.
 	*/
 	virtual IToolpathAccessor * CreateToolpathAccessor(const std::string & sStreamUUID) = 0;
+
+	/**
+	* IDriverEnvironment::ParameterNameIsValid - checks if a name is a valid alphanumerical string for parameters.
+	* @param[in] sParameterName - Parameter Name
+	* @return returns true if the parameter name is a valid name.
+	*/
+	virtual bool ParameterNameIsValid(const std::string & sParameterName) = 0;
 
 	/**
 	* IDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.

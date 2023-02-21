@@ -35,7 +35,8 @@ Abstract: This is a stub class definition of CDriver_Ximc
 #include "libmcdriver_ximc_interfaceexception.hpp"
 
 // Include custom headers here.
-
+#define __STRINGIZE(x) #x
+#define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
 
 using namespace LibMCDriver_Ximc::Impl;
 
@@ -83,20 +84,21 @@ std::string CDriver_Ximc::GetType()
 
 void CDriver_Ximc::GetVersion(LibMCDriver_Ximc_uint32& nMajor, LibMCDriver_Ximc_uint32& nMinor, LibMCDriver_Ximc_uint32& nMicro, std::string& sBuild)
 {
-    nMajor = 1;
-    nMinor = 0;
-    nMicro = 0;
-}
-
-void CDriver_Ximc::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-    sNameSpace = "LibMCDriver_Ximc";
-    sBaseName = "libmcdriver_ximc";
+    nMajor = LIBMCDRIVER_XIMC_VERSION_MAJOR;
+    nMinor = LIBMCDRIVER_XIMC_VERSION_MINOR;
+    nMicro = LIBMCDRIVER_XIMC_VERSION_MICRO;
+    sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_Ximc::QueryParameters()
 {
-    
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+void CDriver_Ximc::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
 }
 
 void CDriver_Ximc::findDevices()

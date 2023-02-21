@@ -1063,8 +1063,461 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrievemanagedfiles(
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibMCEnv_WorkingDirectory pWorkingDirectory, LibMCEnv_WorkingFileIterator * pIteratorInstance);
 
 /*************************************************************************************************************************
+ Class definition for TCPIPPacket
+**************************************************************************************************************************/
+
+/**
+* Returns if packet is empty.
+*
+* @param[in] pTCPIPPacket - TCPIPPacket instance.
+* @param[out] pPacketIsEmpty - Flag if packet is empty.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpippacket_isempty(LibMCEnv_TCPIPPacket pTCPIPPacket, bool * pPacketIsEmpty);
+
+/**
+* Returns the size of the packet. Returns 0 if packet is empty.
+*
+* @param[in] pTCPIPPacket - TCPIPPacket instance.
+* @param[out] pPacketSize - returns size of packet.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpippacket_getsize(LibMCEnv_TCPIPPacket pTCPIPPacket, LibMCEnv_uint32 * pPacketSize);
+
+/**
+* Returns the data of the packet. Fails if packet is empty.
+*
+* @param[in] pTCPIPPacket - TCPIPPacket instance.
+* @param[in] nBufferBufferSize - Number of elements in buffer
+* @param[out] pBufferNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pBufferBuffer - uint8  buffer of packet data.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpippacket_getdata(LibMCEnv_TCPIPPacket pTCPIPPacket, const LibMCEnv_uint64 nBufferBufferSize, LibMCEnv_uint64* pBufferNeededCount, LibMCEnv_uint8 * pBufferBuffer);
+
+/*************************************************************************************************************************
+ Class definition for TCPIPConnection
+**************************************************************************************************************************/
+
+/**
+* Returns the IP Address of the Connection.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[in] nIPAddressBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIPAddressNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIPAddressBuffer -  buffer of IP Address., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_getipaddress(LibMCEnv_TCPIPConnection pTCPIPConnection, const LibMCEnv_uint32 nIPAddressBufferSize, LibMCEnv_uint32* pIPAddressNeededChars, char * pIPAddressBuffer);
+
+/**
+* Returns the Port of the Connection.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[out] pPort - Port.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_getport(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 * pPort);
+
+/**
+* Returns the Timeout of the Connection.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[out] pTimeout - Timeout in milliseconds.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_gettimeout(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 * pTimeout);
+
+/**
+* Returns if the instance is connected.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[out] pIsConnected - .
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_isconnected(LibMCEnv_TCPIPConnection pTCPIPConnection, bool * pIsConnected);
+
+/**
+* Disconnects from the Server, if connected.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_disconnect(LibMCEnv_TCPIPConnection pTCPIPConnection);
+
+/**
+* Disconnects and Connects to the Server.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_reconnect(LibMCEnv_TCPIPConnection pTCPIPConnection);
+
+/**
+* Sends a buffer of bytes to the Server.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[in] nBufferBufferSize - Number of elements in buffer
+* @param[in] pBufferBuffer - uint8 buffer of packet payload.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_sendbuffer(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint8 * pBufferBuffer);
+
+/**
+* Waits for a server packet to arrive.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[in] nTimeOutInMS - timeout in Milliseconds.
+* @param[out] pDataAvailable - Flag if a new packet has arrived.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_waitfordata(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 nTimeOutInMS, bool * pDataAvailable);
+
+/**
+* Receives a fixed length packet. Blocks until expected number of bytes arrives or timeout is hit. Fails if there is a connection error. Returns empty packet if timeout is hit.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[in] nPacketSize - Size of packet to receive. MUST be larger than 0.
+* @param[in] nTimeOutInMS - Timeout in Milliseconds.
+* @param[out] pPacketInstance - Packet instance. Returns empty packet if timeout is hit
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_receivefixedpacket(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 nPacketSize, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_TCPIPPacket * pPacketInstance);
+
+/**
+* Receives data. Fails if there is a connection error. Returns empty packet if timeout is hit.
+*
+* @param[in] pTCPIPConnection - TCPIPConnection instance.
+* @param[in] nDataSize - Size of data to receive.
+* @param[in] nTimeOutInMS - timeout in Milliseconds.
+* @param[out] pPacketInstance - Packet instance. Size will be between 0 and DataSize.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_tcpipconnection_receivedata(LibMCEnv_TCPIPConnection pTCPIPConnection, LibMCEnv_uint32 nDataSize, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_TCPIPPacket * pPacketInstance);
+
+/*************************************************************************************************************************
+ Class definition for ModbusTCPDigitalIOStatus
+**************************************************************************************************************************/
+
+/**
+* Returns the number of Digital IOs in the instance.
+*
+* @param[in] pModbusTCPDigitalIOStatus - ModbusTCPDigitalIOStatus instance.
+* @param[out] pCount - Count.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getcount(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns the base address of Digital IOs in the instance.
+*
+* @param[in] pModbusTCPDigitalIOStatus - ModbusTCPDigitalIOStatus instance.
+* @param[out] pAddress - Base Address.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getbaseaddress(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, LibMCEnv_uint32 * pAddress);
+
+/**
+* Returns the cached state of the Digital IO in the instance.
+*
+* @param[in] pModbusTCPDigitalIOStatus - ModbusTCPDigitalIOStatus instance.
+* @param[in] nIndex - Index of IO Value. 0-based.
+* @param[out] pState - State Value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getvalue(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, LibMCEnv_uint32 nIndex, bool * pState);
+
+/**
+* Returns all Digital IOs of the instance as byte array.
+*
+* @param[in] pModbusTCPDigitalIOStatus - ModbusTCPDigitalIOStatus instance.
+* @param[in] nStateArrayBufferSize - Number of elements in buffer
+* @param[out] pStateArrayNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pStateArrayBuffer - uint8  buffer of State Value Array.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpdigitaliostatus_getvalues(LibMCEnv_ModbusTCPDigitalIOStatus pModbusTCPDigitalIOStatus, const LibMCEnv_uint64 nStateArrayBufferSize, LibMCEnv_uint64* pStateArrayNeededCount, LibMCEnv_uint8 * pStateArrayBuffer);
+
+/*************************************************************************************************************************
+ Class definition for ModbusTCPRegisterStatus
+**************************************************************************************************************************/
+
+/**
+* Returns the number of registers in the instance.
+*
+* @param[in] pModbusTCPRegisterStatus - ModbusTCPRegisterStatus instance.
+* @param[out] pCount - Count.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpregisterstatus_getcount(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, LibMCEnv_uint32 * pCount);
+
+/**
+* Returns the base address of registers in the instance.
+*
+* @param[in] pModbusTCPRegisterStatus - ModbusTCPRegisterStatus instance.
+* @param[out] pAddress - Base Address.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpregisterstatus_getbaseaddress(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, LibMCEnv_uint32 * pAddress);
+
+/**
+* Returns the cached state of the registers in the instance.
+*
+* @param[in] pModbusTCPRegisterStatus - ModbusTCPRegisterStatus instance.
+* @param[in] nIndex - Index of IO Value. 0-based.
+* @param[out] pState - State Value.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpregisterstatus_getvalue(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, LibMCEnv_uint32 nIndex, LibMCEnv_uint16 * pState);
+
+/**
+* Returns all registers of the instance as word array.
+*
+* @param[in] pModbusTCPRegisterStatus - ModbusTCPRegisterStatus instance.
+* @param[in] nStateArrayBufferSize - Number of elements in buffer
+* @param[out] pStateArrayNeededCount - will be filled with the count of the written elements, or needed buffer size.
+* @param[out] pStateArrayBuffer - uint16  buffer of State Value Array.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpregisterstatus_getvalues(LibMCEnv_ModbusTCPRegisterStatus pModbusTCPRegisterStatus, const LibMCEnv_uint64 nStateArrayBufferSize, LibMCEnv_uint64* pStateArrayNeededCount, LibMCEnv_uint16 * pStateArrayBuffer);
+
+/*************************************************************************************************************************
+ Class definition for ModbusTCPConnection
+**************************************************************************************************************************/
+
+/**
+* Returns the IP Address of the Connection.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nIPAddressBufferSize - size of the buffer (including trailing 0)
+* @param[out] pIPAddressNeededChars - will be filled with the count of the written bytes, or needed buffer size.
+* @param[out] pIPAddressBuffer -  buffer of IP Address., may be NULL
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_getipaddress(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, const LibMCEnv_uint32 nIPAddressBufferSize, LibMCEnv_uint32* pIPAddressNeededChars, char * pIPAddressBuffer);
+
+/**
+* Returns the Port of the Connection.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[out] pPort - Port.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_getport(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 * pPort);
+
+/**
+* Returns the Timeout of the Connection.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[out] pTimeout - Timeout in milliseconds.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_gettimeout(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 * pTimeout);
+
+/**
+* Returns if the instance is connected.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[out] pIsConnected - .
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_isconnected(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, bool * pIsConnected);
+
+/**
+* Disconnects from the Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_disconnect(LibMCEnv_ModbusTCPConnection pModbusTCPConnection);
+
+/**
+* Disconnects and Connects to the Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_reconnect(LibMCEnv_ModbusTCPConnection pModbusTCPConnection);
+
+/**
+* Sends a diagnosis call to the Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nSubFunction - Modbus TCP Subfunction ID.
+* @param[in] nDataField - Modbus TCP Data Field.
+* @param[out] pDataResponse - Modbus TCP Data Response.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_diagnosiscall(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint16 nSubFunction, LibMCEnv_uint16 nDataField, LibMCEnv_uint16 * pDataResponse);
+
+/**
+* Reads coil status of Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nStartAddress - Start Address.
+* @param[in] nBitCount - Number of coils to read. MUST be larger than 0.
+* @param[out] pCoilStatus - Coil status instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_readcoilstatus(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nBitCount, LibMCEnv_ModbusTCPDigitalIOStatus * pCoilStatus);
+
+/**
+* Reads input status of Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nStartAddress - Start Address.
+* @param[in] nBitCount - Number of inputs to read. MUST be larger than 0.
+* @param[out] pInputStatus - Input status instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_readinputstatus(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nBitCount, LibMCEnv_ModbusTCPDigitalIOStatus * pInputStatus);
+
+/**
+* Reads holding registers of Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nStartAddress - Start Address.
+* @param[in] nRegisterCount - Number of registers. MUST be larger than 0.
+* @param[out] pRegisterInstance - Holding register instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_readholdingregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nRegisterCount, LibMCEnv_ModbusTCPRegisterStatus * pRegisterInstance);
+
+/**
+* Reads input registers of Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nStartAddress - Start Address.
+* @param[in] nRegisterCount - Number of registers. MUST be larger than 0.
+* @param[out] pRegisterInstance - Input register instance.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_readinputregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint32 nRegisterCount, LibMCEnv_ModbusTCPRegisterStatus * pRegisterInstance);
+
+/**
+* Forces multiple coils on Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nStartAddress - Start Address.
+* @param[in] nBufferBufferSize - Number of elements in buffer
+* @param[in] pBufferBuffer - uint8 buffer of Input coil array. One byte per Input. MUST NOT be empty
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_forcemultiplecoils(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint8 * pBufferBuffer);
+
+/**
+* Forces multiple registers on Server.
+*
+* @param[in] pModbusTCPConnection - ModbusTCPConnection instance.
+* @param[in] nStartAddress - Start Address.
+* @param[in] nBufferBufferSize - Number of elements in buffer
+* @param[in] pBufferBuffer - uint16 buffer of Input register array. One word per Input. MUST NOT be empty
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_presetmultipleregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer);
+
+/*************************************************************************************************************************
+ Class definition for DriverStatusUpdateSession
+**************************************************************************************************************************/
+
+/**
+* sets a string parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setstringparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue);
+
+/**
+* sets a uuid parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setuuidparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue);
+
+/**
+* sets a double parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setdoubleparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_double dValue);
+
+/**
+* sets an int parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setintegerparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_int64 nValue);
+
+/**
+* sets a bool parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setboolparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool bValue);
+
+/**
+* logs a string as message
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_logmessage(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString);
+
+/**
+* logs a string as warning
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_logwarning(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString);
+
+/**
+* logs a string as info
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_loginfo(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString);
+
+/**
+* Sleeps for a definite amount of time.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] nDelay - Milliseconds to sleep.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_sleep(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay);
+
+/*************************************************************************************************************************
  Class definition for DriverEnvironment
 **************************************************************************************************************************/
+
+/**
+* creates a status update object which can be easily called from an independent thread.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pUpdateStatusInstance - creates a status update instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createstatusupdatesession(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DriverStatusUpdateSession * pUpdateStatusInstance);
 
 /**
 * creates a temporary working directory.
@@ -1074,6 +1527,30 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_workingdirectory_retrieveallfiles(LibM
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_WorkingDirectory * pWorkingDirectory);
+
+/**
+* creates a TCP/IP Connection for a specific IP address and port.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIPAddress - IP Address.
+* @param[in] nPort - Port.
+* @param[in] nTimeOutInMS - timeout in Milliseconds.
+* @param[out] pConnectionInstance - connects to the given IP Address
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createtcpipconnection(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIPAddress, LibMCEnv_uint32 nPort, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_TCPIPConnection * pConnectionInstance);
+
+/**
+* creates a Modbus TCP Connection for a specific IP address and port.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pIPAddress - IP Address.
+* @param[in] nPort - Port.
+* @param[in] nTimeOutInMS - timeout in Milliseconds.
+* @param[out] pConnectionInstance - connects to the given IP Address
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createmodbustcpconnection(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pIPAddress, LibMCEnv_uint32 nPort, LibMCEnv_uint32 nTimeOutInMS, LibMCEnv_ModbusTCPConnection * pConnectionInstance);
 
 /**
 * retrieves if attached driver has data with the given identifier.
@@ -1140,6 +1617,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievemachineresou
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
+* checks if a name is a valid alphanumerical string for parameters.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pNameIsValid - returns true if the parameter name is a valid name.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_parameternameisvalid(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool * pNameIsValid);
 
 /**
 * registers a string parameter. Must only be called during driver creation.
