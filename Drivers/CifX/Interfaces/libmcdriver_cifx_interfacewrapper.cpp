@@ -260,7 +260,31 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_getversion(LibMCDriver_CifX_Drive
 	}
 }
 
-LibMCDriver_CifXResult libmcdriver_cifx_driver_queryparameters(LibMCDriver_CifX_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
+LibMCDriver_CifXResult libmcdriver_cifx_driver_queryparameters(LibMCDriver_CifX_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_CIFX_SUCCESS;
+	}
+	catch (ELibMCDriver_CifXInterfaceException & Exception) {
+		return handleLibMCDriver_CifXException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_CifXResult libmcdriver_cifx_driver_queryparametersex(LibMCDriver_CifX_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
@@ -274,7 +298,7 @@ LibMCDriver_CifXResult libmcdriver_cifx_driver_queryparameters(LibMCDriver_CifX_
 		if (!pIDriver)
 			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCAST);
 		
-		pIDriver->QueryParameters(pIDriverUpdateInstance);
+		pIDriver->QueryParametersEx(pIDriverUpdateInstance);
 
 		return LIBMCDRIVER_CIFX_SUCCESS;
 	}
@@ -1215,6 +1239,8 @@ LibMCDriver_CifXResult LibMCDriver_CifX::Impl::LibMCDriver_CifX_GetProcAddress (
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_getversion;
 	if (sProcName == "libmcdriver_cifx_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_driver_queryparameters;
+	if (sProcName == "libmcdriver_cifx_driver_queryparametersex") 
+		*ppProcAddress = (void*) &libmcdriver_cifx_driver_queryparametersex;
 	if (sProcName == "libmcdriver_cifx_channelinformation_getboardname") 
 		*ppProcAddress = (void*) &libmcdriver_cifx_channelinformation_getboardname;
 	if (sProcName == "libmcdriver_cifx_channelinformation_getchannelindex") 

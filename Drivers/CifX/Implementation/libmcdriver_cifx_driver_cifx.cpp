@@ -162,7 +162,13 @@ void CDriver_CifX::GetVersion(LibMCDriver_CifX_uint32& nMajor, LibMCDriver_CifX_
 }
 
 
-void CDriver_CifX::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) 
+void CDriver_CifX::QueryParameters()
+{
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+
+void CDriver_CifX::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) 
 {
 	if (pDriverUpdateInstance.get() == nullptr)
 		return;

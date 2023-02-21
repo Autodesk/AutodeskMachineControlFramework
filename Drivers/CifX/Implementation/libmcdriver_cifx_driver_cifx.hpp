@@ -100,7 +100,9 @@ public:
 
 	void GetVersion(LibMCDriver_CifX_uint32& nMajor, LibMCDriver_CifX_uint32& nMinor, LibMCDriver_CifX_uint32& nMicro, std::string& sBuild) override;
 
-	void QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	void SetToSimulationMode() override;
 
