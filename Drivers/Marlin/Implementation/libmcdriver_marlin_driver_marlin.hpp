@@ -114,7 +114,7 @@ public:
 
 	void PowerOff() override;
 
-	void QueryParameters() override;
+	void QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 };
 

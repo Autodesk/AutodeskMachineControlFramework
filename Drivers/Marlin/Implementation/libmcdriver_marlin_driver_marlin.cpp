@@ -68,16 +68,17 @@ void CDriver_Marlin::Configure(const std::string& sConfigurationString)
 
 }
 
-void CDriver_Marlin::QueryParameters()
+void CDriver_Marlin::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
-
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
 	
 	if (m_pSerialController.get() != nullptr) {
 		double dX, dY, dZ;
 		m_pSerialController->getCurrentPosition(dX, dY, dZ);
-		m_pDriverEnvironment->SetDoubleParameter("targetx", dX);
-		m_pDriverEnvironment->SetDoubleParameter("targety", dY);
-		m_pDriverEnvironment->SetDoubleParameter("targetz", dZ);
+		pDriverUpdateInstance->SetDoubleParameter("targetx", dX);
+		pDriverUpdateInstance->SetDoubleParameter("targety", dY);
+		pDriverUpdateInstance->SetDoubleParameter("targetz", dZ);
 	}
 }
 
