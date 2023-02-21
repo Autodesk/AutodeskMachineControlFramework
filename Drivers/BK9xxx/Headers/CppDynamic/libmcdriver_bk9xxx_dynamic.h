@@ -98,13 +98,21 @@ typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_GetTypePtr) (LibMCD
 typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_GetVersionPtr) (LibMCDriver_BK9xxx_Driver pDriver, LibMCDriver_BK9xxx_uint32 * pMajor, LibMCDriver_BK9xxx_uint32 * pMinor, LibMCDriver_BK9xxx_uint32 * pMicro, const LibMCDriver_BK9xxx_uint32 nBuildBufferSize, LibMCDriver_BK9xxx_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_QueryParametersPtr) (LibMCDriver_BK9xxx_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_QueryParametersPtr) (LibMCDriver_BK9xxx_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+typedef LibMCDriver_BK9xxxResult (*PLibMCDriver_BK9xxxDriver_QueryParametersExPtr) (LibMCDriver_BK9xxx_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_BK9xxx
@@ -463,6 +471,7 @@ typedef struct {
 	PLibMCDriver_BK9xxxDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_BK9xxxDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_BK9xxxDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_BK9xxxDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_SetToSimulationModePtr m_Driver_BK9xxx_SetToSimulationMode;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_IsSimulationModePtr m_Driver_BK9xxx_IsSimulationMode;
 	PLibMCDriver_BK9xxxDriver_BK9xxx_ConnectPtr m_Driver_BK9xxx_Connect;

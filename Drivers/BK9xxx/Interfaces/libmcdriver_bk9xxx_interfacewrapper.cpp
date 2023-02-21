@@ -260,7 +260,31 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_getversion(LibMCDriver_BK9xxx
 	}
 }
 
-LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_queryparameters(LibMCDriver_BK9xxx_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
+LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_queryparameters(LibMCDriver_BK9xxx_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_BK9XXX_SUCCESS;
+	}
+	catch (ELibMCDriver_BK9xxxInterfaceException & Exception) {
+		return handleLibMCDriver_BK9xxxException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_queryparametersex(LibMCDriver_BK9xxx_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
@@ -274,7 +298,7 @@ LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_queryparameters(LibMCDriver_B
 		if (!pIDriver)
 			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_INVALIDCAST);
 		
-		pIDriver->QueryParameters(pIDriverUpdateInstance);
+		pIDriver->QueryParametersEx(pIDriverUpdateInstance);
 
 		return LIBMCDRIVER_BK9XXX_SUCCESS;
 	}
@@ -1098,6 +1122,8 @@ LibMCDriver_BK9xxxResult LibMCDriver_BK9xxx::Impl::LibMCDriver_BK9xxx_GetProcAdd
 		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_getversion;
 	if (sProcName == "libmcdriver_bk9xxx_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_queryparameters;
+	if (sProcName == "libmcdriver_bk9xxx_driver_queryparametersex") 
+		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_queryparametersex;
 	if (sProcName == "libmcdriver_bk9xxx_driver_bk9xxx_settosimulationmode") 
 		*ppProcAddress = (void*) &libmcdriver_bk9xxx_driver_bk9xxx_settosimulationmode;
 	if (sProcName == "libmcdriver_bk9xxx_driver_bk9xxx_issimulationmode") 

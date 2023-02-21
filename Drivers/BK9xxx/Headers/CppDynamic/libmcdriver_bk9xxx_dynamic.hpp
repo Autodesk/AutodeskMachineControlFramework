@@ -500,7 +500,8 @@ public:
 	inline std::string GetName();
 	inline std::string GetType();
 	inline void GetVersion(LibMCDriver_BK9xxx_uint32 & nMajor, LibMCDriver_BK9xxx_uint32 & nMinor, LibMCDriver_BK9xxx_uint32 & nMicro, std::string & sBuild);
-	inline void QueryParameters(classParam<LibMCEnv::CDriverStatusUpdateSession> pDriverUpdateInstance);
+	inline void QueryParameters();
+	inline void QueryParametersEx(classParam<LibMCEnv::CDriverStatusUpdateSession> pDriverUpdateInstance);
 };
 	
 /*************************************************************************************************************************
@@ -674,6 +675,7 @@ public:
 		pWrapperTable->m_Driver_GetType = nullptr;
 		pWrapperTable->m_Driver_GetVersion = nullptr;
 		pWrapperTable->m_Driver_QueryParameters = nullptr;
+		pWrapperTable->m_Driver_QueryParametersEx = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_SetToSimulationMode = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_IsSimulationMode = nullptr;
 		pWrapperTable->m_Driver_BK9xxx_Connect = nullptr;
@@ -802,6 +804,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_Driver_QueryParameters == nullptr)
+			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_Driver_QueryParametersEx = (PLibMCDriver_BK9xxxDriver_QueryParametersExPtr) GetProcAddress(hLibrary, "libmcdriver_bk9xxx_driver_queryparametersex");
+		#else // _WIN32
+		pWrapperTable->m_Driver_QueryParametersEx = (PLibMCDriver_BK9xxxDriver_QueryParametersExPtr) dlsym(hLibrary, "libmcdriver_bk9xxx_driver_queryparametersex");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_Driver_QueryParametersEx == nullptr)
 			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -1155,6 +1166,10 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParameters == nullptr) )
 			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcdriver_bk9xxx_driver_queryparametersex", (void**)&(pWrapperTable->m_Driver_QueryParametersEx));
+		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_QueryParametersEx == nullptr) )
+			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcdriver_bk9xxx_driver_bk9xxx_settosimulationmode", (void**)&(pWrapperTable->m_Driver_BK9xxx_SetToSimulationMode));
 		if ( (eLookupError != 0) || (pWrapperTable->m_Driver_BK9xxx_SetToSimulationMode == nullptr) )
 			return LIBMCDRIVER_BK9XXX_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -1365,13 +1380,21 @@ public:
 	}
 	
 	/**
-	* CDriver::QueryParameters - Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
+	* CDriver::QueryParameters - Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+	*/
+	void CDriver::QueryParameters()
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParameters(m_pHandle));
+	}
+	
+	/**
+	* CDriver::QueryParametersEx - Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 	* @param[in] pDriverUpdateInstance - Status update instance.
 	*/
-	void CDriver::QueryParameters(classParam<LibMCEnv::CDriverStatusUpdateSession> pDriverUpdateInstance)
+	void CDriver::QueryParametersEx(classParam<LibMCEnv::CDriverStatusUpdateSession> pDriverUpdateInstance)
 	{
 		LibMCEnvHandle hDriverUpdateInstance = pDriverUpdateInstance.GetHandle();
-		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParameters(m_pHandle, hDriverUpdateInstance));
+		CheckError(m_pWrapper->m_WrapperTable.m_Driver_QueryParametersEx(m_pHandle, hDriverUpdateInstance));
 	}
 	
 	/**

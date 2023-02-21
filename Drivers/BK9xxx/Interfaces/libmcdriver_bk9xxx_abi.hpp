@@ -111,13 +111,21 @@ LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_g
 LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_getversion(LibMCDriver_BK9xxx_Driver pDriver, LibMCDriver_BK9xxx_uint32 * pMajor, LibMCDriver_BK9xxx_uint32 * pMinor, LibMCDriver_BK9xxx_uint32 * pMicro, const LibMCDriver_BK9xxx_uint32 nBuildBufferSize, LibMCDriver_BK9xxx_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_queryparameters(LibMCDriver_BK9xxx_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_queryparameters(LibMCDriver_BK9xxx_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+LIBMCDRIVER_BK9XXX_DECLSPEC LibMCDriver_BK9xxxResult libmcdriver_bk9xxx_driver_queryparametersex(LibMCDriver_BK9xxx_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_BK9xxx

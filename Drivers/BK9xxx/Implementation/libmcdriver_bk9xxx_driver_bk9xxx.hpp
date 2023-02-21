@@ -143,7 +143,9 @@ namespace LibMCDriver_BK9xxx {
 
 			void GetVersion(LibMCDriver_BK9xxx_uint32& nMajor, LibMCDriver_BK9xxx_uint32& nMinor, LibMCDriver_BK9xxx_uint32& nMicro, std::string& sBuild) override;
 
-			void QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+			void QueryParameters() override;
+
+			void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 			void SetToSimulationMode() override;
 

@@ -375,15 +375,22 @@ void CDriver_BK9xxx::GetVersion(LibMCDriver_BK9xxx_uint32& nMajor, LibMCDriver_B
 }
 
 
-void CDriver_BK9xxx::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+void CDriver_BK9xxx::QueryParameters()
 {
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+void CDriver_BK9xxx::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
 	
 	if (IsConnected()) {
 		for (auto pDigitalInputBlock : m_pDigitalInputBlocks) {
 			uint32_t nCount = pDigitalInputBlock->getCount();
 			for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 				auto pIODefinition = pDigitalInputBlock->getIODefinition(nIndex);
-				m_pDriverEnvironment->SetBoolParameter(pIODefinition->getName(), pIODefinition->getActualValue());
+				pDriverUpdateInstance->SetBoolParameter(pIODefinition->getName(), pIODefinition->getActualValue());
 			}
 
 		}
@@ -392,7 +399,7 @@ void CDriver_BK9xxx::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDrive
 			uint32_t nCount = pDigitalOutputBlock->getCount();
 			for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 				auto pIODefinition = pDigitalOutputBlock->getIODefinition(nIndex);
-				m_pDriverEnvironment->SetBoolParameter(pIODefinition->getName(), pIODefinition->getActualValue());
+				pDriverUpdateInstance->SetBoolParameter(pIODefinition->getName(), pIODefinition->getActualValue());
 			}
 
 		}
@@ -401,7 +408,7 @@ void CDriver_BK9xxx::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDrive
 			uint32_t nCount = pAnalogInputBlock->getCount();
 			for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 				auto pIODefinition = pAnalogInputBlock->getIODefinition(nIndex);
-				m_pDriverEnvironment->SetDoubleParameter(pIODefinition->getName(), pIODefinition->rawValueToScaledValue (pIODefinition->getActualRawValue()));
+				pDriverUpdateInstance->SetDoubleParameter(pIODefinition->getName(), pIODefinition->rawValueToScaledValue (pIODefinition->getActualRawValue()));
 			}
 
 		}
@@ -410,7 +417,7 @@ void CDriver_BK9xxx::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDrive
 			uint32_t nCount = pAnalogOutputBlock->getCount();
 			for (uint32_t nIndex = 0; nIndex < nCount; nIndex++) {
 				auto pIODefinition = pAnalogOutputBlock->getIODefinition(nIndex);
-				m_pDriverEnvironment->SetDoubleParameter(pIODefinition->getName(), pIODefinition->rawValueToScaledValue(pIODefinition->getActualRawValue()));
+				pDriverUpdateInstance->SetDoubleParameter(pIODefinition->getName(), pIODefinition->rawValueToScaledValue(pIODefinition->getActualRawValue()));
 			}
 
 		}
