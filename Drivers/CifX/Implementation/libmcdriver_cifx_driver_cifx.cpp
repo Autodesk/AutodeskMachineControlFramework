@@ -164,21 +164,23 @@ void CDriver_CifX::GetVersion(LibMCDriver_CifX_uint32& nMajor, LibMCDriver_CifX_
 
 void CDriver_CifX::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) 
 {
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
 
 	if (IsConnected()) {
 		for (auto pOutputValueIter : m_GlobalOutputMap) {
 			auto pOutputValue = pOutputValueIter.second;
 			switch (pOutputValue->getAbstractType()) {
 			case eDriver_AbstractParameterType::CifXAbstractParameter_BOOL:
-				m_pDriverEnvironment->SetBoolParameter(pOutputValue->getName(), pOutputValue->GetActualBoolValue());
+				pDriverUpdateInstance->SetBoolParameter(pOutputValue->getName(), pOutputValue->GetActualBoolValue());
 				break;
 
 			case eDriver_AbstractParameterType::CifXAbstractParameter_INT:
-				m_pDriverEnvironment->SetIntegerParameter(pOutputValue->getName(), pOutputValue->GetActualIntegerValue());
+				pDriverUpdateInstance->SetIntegerParameter(pOutputValue->getName(), pOutputValue->GetActualIntegerValue());
 				break;
 
 			case eDriver_AbstractParameterType::CifXAbstractParameter_DOUBLE:
-				m_pDriverEnvironment->SetDoubleParameter(pOutputValue->getName(), pOutputValue->GetActualDoubleValue());
+				pDriverUpdateInstance->SetDoubleParameter(pOutputValue->getName(), pOutputValue->GetActualDoubleValue());
 				break;
 
 			}
@@ -189,15 +191,15 @@ void CDriver_CifX::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverU
 			auto pInputValue = pInputValueIter.second;
 			switch (pInputValue->getAbstractType()) {
 				case eDriver_AbstractParameterType::CifXAbstractParameter_BOOL:
-					m_pDriverEnvironment->SetBoolParameter(pInputValue->getName(), pInputValue->GetActualBoolValue());
+					pDriverUpdateInstance->SetBoolParameter(pInputValue->getName(), pInputValue->GetActualBoolValue());
 					break;
 
 				case eDriver_AbstractParameterType::CifXAbstractParameter_INT:
-					m_pDriverEnvironment->SetIntegerParameter(pInputValue->getName(), pInputValue->GetActualIntegerValue());
+					pDriverUpdateInstance->SetIntegerParameter(pInputValue->getName(), pInputValue->GetActualIntegerValue());
 					break;
 
 				case eDriver_AbstractParameterType::CifXAbstractParameter_DOUBLE:
-					m_pDriverEnvironment->SetDoubleParameter(pInputValue->getName(), pInputValue->GetActualDoubleValue());
+					pDriverUpdateInstance->SetDoubleParameter(pInputValue->getName(), pInputValue->GetActualDoubleValue());
 					break;
 
 			}
