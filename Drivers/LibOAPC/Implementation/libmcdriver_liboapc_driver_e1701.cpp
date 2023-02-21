@@ -91,6 +91,9 @@ void CDriver_E1701::GetVersion(LibMCDriver_LibOAPC_uint32& nMajor, LibMCDriver_L
 
 void CDriver_E1701::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {    
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
+
 }
 
 
