@@ -190,7 +190,7 @@ void CDriver_OPCUA::GetVersion(LibMCDriver_OPCUA_uint32& nMajor, LibMCDriver_OPC
 	nMajor = LIBMCDRIVER_OPCUA_VERSION_MAJOR;
 	nMinor = LIBMCDRIVER_OPCUA_VERSION_MINOR;
 	nMicro = LIBMCDRIVER_OPCUA_VERSION_MICRO;
-	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);;
+	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_OPCUA::QueryParameters()
