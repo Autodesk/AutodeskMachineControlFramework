@@ -544,6 +544,7 @@ public:
 			case LIBMC_ERROR_INVALIDBUTTONNAME: return "INVALIDBUTTONNAME";
 			case LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING: return "RESOURCEENTRYISNOUTF8STRING";
 			case LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION: return "AMBIGUOUSDRIVERCONFIGURATION";
+			case LIBMC_ERROR_COULDNOTCREATEDRIVER: return "COULDNOTCREATEDRIVER";
 		}
 		return "UNKNOWN";
 	}
@@ -930,6 +931,7 @@ public:
 			case LIBMC_ERROR_INVALIDBUTTONNAME: return "Invalid button name";
 			case LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING: return "Resource entry is no UTF8 string";
 			case LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION: return "Ambiguous driver configuration";
+			case LIBMC_ERROR_COULDNOTCREATEDRIVER: return "Could not create driver";
 		}
 		return "unknown error";
 	}

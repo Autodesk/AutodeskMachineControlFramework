@@ -63,6 +63,8 @@ CDriver::CDriver(const std::string& sName, const std::string& sType, LibMCDriver
 	auto pExternalEnvironment = mapInternalDriverEnvInstance<LibMCEnv::CDriverEnvironment>(pDriverEnvironment, m_pMCEnvWrapper);
 
 	m_pDriverInstance = m_pDriverWrapper->CreateDriver (sName, sType, pExternalEnvironment.get());
+	if (m_pDriverInstance.get() == nullptr)
+		throw ELibMCCustomException (LibMC_ERROR_COULDNOTCREATEDRIVER, sName);
 }
 
 CDriver::~CDriver()

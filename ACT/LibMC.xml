@@ -481,6 +481,9 @@
 		<error name="RESOURCEENTRYISNOUTF8STRING" code="448" description="Resource entry is no UTF8 string" />
 		<error name="AMBIGUOUSDRIVERCONFIGURATION" code="449" description="Ambiguous driver configuration" />		
 		
+		<error name="COULDNOTCREATEDRIVER" code="450" description="Could not create driver" />		
+		
+		
 		
 		
 		
