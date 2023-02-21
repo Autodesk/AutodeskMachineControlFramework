@@ -193,14 +193,15 @@ void CDriver_OPCUA::GetVersion(LibMCDriver_OPCUA_uint32& nMajor, LibMCDriver_OPC
 	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);;
 }
 
-void CDriver_OPCUA::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_OPCUA";
-	sBaseName = "libmcdriver_opcua";
-}
-
 void CDriver_OPCUA::QueryParameters()
 {
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+void CDriver_OPCUA::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) 
+{
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
 }
 
 
