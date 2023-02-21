@@ -315,13 +315,7 @@ void CDriver_ADS::GetVersion(LibMCDriver_ADS_uint32& nMajor, LibMCDriver_ADS_uin
     sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
-void CDriver_ADS::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-    sNameSpace = "LibMCDriver_ADS";
-    sBaseName = "libmcdriver_ads";
-}
-
-void CDriver_ADS::QueryParameters()
+void CDriver_ADS::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
     if (m_bSimulationMode)
         return;
