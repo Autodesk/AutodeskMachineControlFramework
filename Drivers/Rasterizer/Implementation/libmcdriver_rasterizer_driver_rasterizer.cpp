@@ -75,19 +75,20 @@ void CDriver_Rasterizer::GetVersion(LibMCDriver_Rasterizer_uint32& nMajor, LibMC
 	nMajor = LIBMCDRIVER_RASTERIZER_VERSION_MAJOR;
 	nMinor = LIBMCDRIVER_RASTERIZER_VERSION_MINOR;
 	nMicro = LIBMCDRIVER_RASTERIZER_VERSION_MICRO;
-	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);;
-}
-
-void CDriver_Rasterizer::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_Rasterizer";
-	sBaseName = "libmcdriver_rasterizer";
+	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_Rasterizer::QueryParameters()
 {
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
 }
 
+void CDriver_Rasterizer::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
+
+}
 
 
 ISliceStack * CDriver_Rasterizer::CreateSliceStack(const LibMCDriver_Rasterizer_uint32 nLayerCount, const LibMCDriver_Rasterizer_double dLayerThickness, const LibMCDriver_Rasterizer_double dBottomZ)
