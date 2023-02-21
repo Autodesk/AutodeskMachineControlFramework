@@ -104,7 +104,6 @@ typedef void * LibMCDriver_pvoid;
 #define LIBMCDRIVER_ERROR_COULDNOTLOADLIBRARY 6 /** the library could not be loaded */
 #define LIBMCDRIVER_ERROR_COULDNOTFINDLIBRARYEXPORT 7 /** a required exported symbol could not be found in the library */
 #define LIBMCDRIVER_ERROR_INCOMPATIBLEBINARYVERSION 8 /** the version of the binary interface does not match the bindings interface */
-#define LIBMCDRIVER_ERROR_INVALIDSTATENAME 9 /** invalid state name */
 #define LIBMCDRIVER_ERROR_DRIVERERROR 1000 /** a driver error occured */
 
 /*************************************************************************************************************************
@@ -122,7 +121,6 @@ inline const char * LIBMCDRIVER_GETERRORSTRING (LibMCDriverResult nErrorCode) {
     case LIBMCDRIVER_ERROR_COULDNOTLOADLIBRARY: return "the library could not be loaded";
     case LIBMCDRIVER_ERROR_COULDNOTFINDLIBRARYEXPORT: return "a required exported symbol could not be found in the library";
     case LIBMCDRIVER_ERROR_INCOMPATIBLEBINARYVERSION: return "the version of the binary interface does not match the bindings interface";
-    case LIBMCDRIVER_ERROR_INVALIDSTATENAME: return "invalid state name";
     case LIBMCDRIVER_ERROR_DRIVERERROR: return "a driver error occured";
     default: return "unknown error";
   }

@@ -71,6 +71,7 @@ class ITCPIPConnection;
 class IModbusTCPDigitalIOStatus;
 class IModbusTCPRegisterStatus;
 class IModbusTCPConnection;
+class IDriverStatusUpdateSession;
 class IDriverEnvironment;
 class ISignalTrigger;
 class ISignalHandler;
@@ -1299,11 +1300,87 @@ typedef IBaseSharedPtr<IModbusTCPConnection> PIModbusTCPConnection;
 
 
 /*************************************************************************************************************************
+ Class interface for DriverStatusUpdateSession 
+**************************************************************************************************************************/
+
+class IDriverStatusUpdateSession : public virtual IBase {
+public:
+	/**
+	* IDriverStatusUpdateSession::SetStringParameter - sets a string parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetStringParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	virtual void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetDoubleParameter - sets a double parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	virtual void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetIntegerParameter - sets an int parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	virtual void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::SetBoolParameter - sets a bool parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	virtual void SetBoolParameter(const std::string & sParameterName, const bool bValue) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogMessage(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogWarning(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	virtual void LogInfo(const std::string & sLogString) = 0;
+
+	/**
+	* IDriverStatusUpdateSession::Sleep - Sleeps for a definite amount of time.
+	* @param[in] nDelay - Milliseconds to sleep.
+	*/
+	virtual void Sleep(const LibMCEnv_uint32 nDelay) = 0;
+
+};
+
+typedef IBaseSharedPtr<IDriverStatusUpdateSession> PIDriverStatusUpdateSession;
+
+
+/*************************************************************************************************************************
  Class interface for DriverEnvironment 
 **************************************************************************************************************************/
 
 class IDriverEnvironment : public virtual IBase {
 public:
+	/**
+	* IDriverEnvironment::CreateStatusUpdateSession - creates a status update object which can be easily called from an independent thread.
+	* @return creates a status update instance
+	*/
+	virtual IDriverStatusUpdateSession * CreateStatusUpdateSession() = 0;
+
 	/**
 	* IDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
 	* @return creates a working directory
@@ -1375,6 +1452,13 @@ public:
 	* @return Toolpath instance.
 	*/
 	virtual IToolpathAccessor * CreateToolpathAccessor(const std::string & sStreamUUID) = 0;
+
+	/**
+	* IDriverEnvironment::ParameterNameIsValid - checks if a name is a valid alphanumerical string for parameters.
+	* @param[in] sParameterName - Parameter Name
+	* @return returns true if the parameter name is a valid name.
+	*/
+	virtual bool ParameterNameIsValid(const std::string & sParameterName) = 0;
 
 	/**
 	* IDriverEnvironment::RegisterStringParameter - registers a string parameter. Must only be called during driver creation.

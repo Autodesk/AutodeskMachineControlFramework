@@ -111,26 +111,13 @@ LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_gettype(LibMCDriver_Dr
 LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getversion(LibMCDriver_Driver pDriver, LibMCDriver_uint32 * pMajor, LibMCDriver_uint32 * pMinor, LibMCDriver_uint32 * pMicro, const LibMCDriver_uint32 nBuildBufferSize, LibMCDriver_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
-* returns the header information
+* Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
-* @param[in] nNameSpaceBufferSize - size of the buffer (including trailing 0)
-* @param[out] pNameSpaceNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pNameSpaceBuffer -  buffer of NameSpace of the driver., may be NULL
-* @param[in] nBaseNameBufferSize - size of the buffer (including trailing 0)
-* @param[out] pBaseNameNeededChars - will be filled with the count of the written bytes, or needed buffer size.
-* @param[out] pBaseNameBuffer -  buffer of BaseName of the driver., may be NULL
+* @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_getheaderinformation(LibMCDriver_Driver pDriver, const LibMCDriver_uint32 nNameSpaceBufferSize, LibMCDriver_uint32* pNameSpaceNeededChars, char * pNameSpaceBuffer, const LibMCDriver_uint32 nBaseNameBufferSize, LibMCDriver_uint32* pBaseNameNeededChars, char * pBaseNameBuffer);
-
-/**
-* Stores the driver parameters in the driver environment.
-*
-* @param[in] pDriver - Driver instance.
-* @return error code or 0 (success)
-*/
-LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparameters(LibMCDriver_Driver pDriver);
+LIBMCDRIVER_DECLSPEC LibMCDriverResult libmcdriver_driver_queryparametersex(LibMCDriver_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Global functions

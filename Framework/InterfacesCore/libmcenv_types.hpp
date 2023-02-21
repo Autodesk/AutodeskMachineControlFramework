@@ -299,6 +299,7 @@ typedef LibMCEnvHandle LibMCEnv_TCPIPConnection;
 typedef LibMCEnvHandle LibMCEnv_ModbusTCPDigitalIOStatus;
 typedef LibMCEnvHandle LibMCEnv_ModbusTCPRegisterStatus;
 typedef LibMCEnvHandle LibMCEnv_ModbusTCPConnection;
+typedef LibMCEnvHandle LibMCEnv_DriverStatusUpdateSession;
 typedef LibMCEnvHandle LibMCEnv_DriverEnvironment;
 typedef LibMCEnvHandle LibMCEnv_SignalTrigger;
 typedef LibMCEnvHandle LibMCEnv_SignalHandler;

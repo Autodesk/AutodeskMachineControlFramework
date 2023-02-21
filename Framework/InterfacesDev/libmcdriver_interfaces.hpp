@@ -292,16 +292,10 @@ public:
 	virtual void GetVersion(LibMCDriver_uint32 & nMajor, LibMCDriver_uint32 & nMinor, LibMCDriver_uint32 & nMicro, std::string & sBuild) = 0;
 
 	/**
-	* IDriver::GetHeaderInformation - returns the header information
-	* @param[out] sNameSpace - NameSpace of the driver.
-	* @param[out] sBaseName - BaseName of the driver.
+	* IDriver::QueryParametersEx - Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
+	* @param[in] pDriverUpdateInstance - Status update instance.
 	*/
-	virtual void GetHeaderInformation(std::string & sNameSpace, std::string & sBaseName) = 0;
-
-	/**
-	* IDriver::QueryParameters - Stores the driver parameters in the driver environment.
-	*/
-	virtual void QueryParameters() = 0;
+	virtual void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) = 0;
 
 };
 

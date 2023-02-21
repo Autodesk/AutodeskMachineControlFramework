@@ -76,6 +76,7 @@ class CTCPIPConnection;
 class CModbusTCPDigitalIOStatus;
 class CModbusTCPRegisterStatus;
 class CModbusTCPConnection;
+class CDriverStatusUpdateSession;
 class CDriverEnvironment;
 class CSignalTrigger;
 class CSignalHandler;
@@ -103,6 +104,7 @@ typedef CTCPIPConnection CLibMCEnvTCPIPConnection;
 typedef CModbusTCPDigitalIOStatus CLibMCEnvModbusTCPDigitalIOStatus;
 typedef CModbusTCPRegisterStatus CLibMCEnvModbusTCPRegisterStatus;
 typedef CModbusTCPConnection CLibMCEnvModbusTCPConnection;
+typedef CDriverStatusUpdateSession CLibMCEnvDriverStatusUpdateSession;
 typedef CDriverEnvironment CLibMCEnvDriverEnvironment;
 typedef CSignalTrigger CLibMCEnvSignalTrigger;
 typedef CSignalHandler CLibMCEnvSignalHandler;
@@ -130,6 +132,7 @@ typedef std::shared_ptr<CTCPIPConnection> PTCPIPConnection;
 typedef std::shared_ptr<CModbusTCPDigitalIOStatus> PModbusTCPDigitalIOStatus;
 typedef std::shared_ptr<CModbusTCPRegisterStatus> PModbusTCPRegisterStatus;
 typedef std::shared_ptr<CModbusTCPConnection> PModbusTCPConnection;
+typedef std::shared_ptr<CDriverStatusUpdateSession> PDriverStatusUpdateSession;
 typedef std::shared_ptr<CDriverEnvironment> PDriverEnvironment;
 typedef std::shared_ptr<CSignalTrigger> PSignalTrigger;
 typedef std::shared_ptr<CSignalHandler> PSignalHandler;
@@ -157,6 +160,7 @@ typedef PTCPIPConnection PLibMCEnvTCPIPConnection;
 typedef PModbusTCPDigitalIOStatus PLibMCEnvModbusTCPDigitalIOStatus;
 typedef PModbusTCPRegisterStatus PLibMCEnvModbusTCPRegisterStatus;
 typedef PModbusTCPConnection PLibMCEnvModbusTCPConnection;
+typedef PDriverStatusUpdateSession PLibMCEnvDriverStatusUpdateSession;
 typedef PDriverEnvironment PLibMCEnvDriverEnvironment;
 typedef PSignalTrigger PLibMCEnvSignalTrigger;
 typedef PSignalHandler PLibMCEnvSignalHandler;
@@ -552,6 +556,7 @@ private:
 	friend class CModbusTCPDigitalIOStatus;
 	friend class CModbusTCPRegisterStatus;
 	friend class CModbusTCPConnection;
+	friend class CDriverStatusUpdateSession;
 	friend class CDriverEnvironment;
 	friend class CSignalTrigger;
 	friend class CSignalHandler;
@@ -1002,6 +1007,31 @@ public:
 };
 	
 /*************************************************************************************************************************
+ Class CDriverStatusUpdateSession 
+**************************************************************************************************************************/
+class CDriverStatusUpdateSession : public CBase {
+public:
+	
+	/**
+	* CDriverStatusUpdateSession::CDriverStatusUpdateSession - Constructor for DriverStatusUpdateSession class.
+	*/
+	CDriverStatusUpdateSession(CWrapper* pWrapper, LibMCEnvHandle pHandle)
+		: CBase(pWrapper, pHandle)
+	{
+	}
+	
+	inline void SetStringParameter(const std::string & sParameterName, const std::string & sValue);
+	inline void SetUUIDParameter(const std::string & sParameterName, const std::string & sValue);
+	inline void SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue);
+	inline void SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue);
+	inline void SetBoolParameter(const std::string & sParameterName, const bool bValue);
+	inline void LogMessage(const std::string & sLogString);
+	inline void LogWarning(const std::string & sLogString);
+	inline void LogInfo(const std::string & sLogString);
+	inline void Sleep(const LibMCEnv_uint32 nDelay);
+};
+	
+/*************************************************************************************************************************
  Class CDriverEnvironment 
 **************************************************************************************************************************/
 class CDriverEnvironment : public CBase {
@@ -1015,6 +1045,7 @@ public:
 	{
 	}
 	
+	inline PDriverStatusUpdateSession CreateStatusUpdateSession();
 	inline PWorkingDirectory CreateWorkingDirectory();
 	inline PTCPIPConnection CreateTCPIPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS);
 	inline PModbusTCPConnection CreateModbusTCPConnection(const std::string & sIPAddress, const LibMCEnv_uint32 nPort, const LibMCEnv_uint32 nTimeOutInMS);
@@ -1024,6 +1055,7 @@ public:
 	inline void RetrieveDriverResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
 	inline void RetrieveMachineResourceData(const std::string & sIdentifier, std::vector<LibMCEnv_uint8> & DataBufferBuffer);
 	inline PToolpathAccessor CreateToolpathAccessor(const std::string & sStreamUUID);
+	inline bool ParameterNameIsValid(const std::string & sParameterName);
 	inline void RegisterStringParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterUUIDParameter(const std::string & sParameterName, const std::string & sDescription, const std::string & sDefaultValue);
 	inline void RegisterDoubleParameter(const std::string & sParameterName, const std::string & sDescription, const LibMCEnv_double dDefaultValue);
@@ -1411,6 +1443,16 @@ public:
 		pWrapperTable->m_ModbusTCPConnection_ReadInputRegisters = nullptr;
 		pWrapperTable->m_ModbusTCPConnection_ForceMultipleCoils = nullptr;
 		pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_SetStringParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_SetUUIDParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_SetDoubleParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_SetIntegerParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_SetBoolParameter = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_LogMessage = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_LogWarning = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_LogInfo = nullptr;
+		pWrapperTable->m_DriverStatusUpdateSession_Sleep = nullptr;
+		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateTCPIPConnection = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateModbusTCPConnection = nullptr;
@@ -1420,6 +1462,7 @@ public:
 		pWrapperTable->m_DriverEnvironment_RetrieveDriverResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_RetrieveMachineResourceData = nullptr;
 		pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor = nullptr;
+		pWrapperTable->m_DriverEnvironment_ParameterNameIsValid = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterStringParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterUUIDParameter = nullptr;
 		pWrapperTable->m_DriverEnvironment_RegisterDoubleParameter = nullptr;
@@ -2740,6 +2783,96 @@ public:
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetStringParameter = (PLibMCEnvDriverStatusUpdateSession_SetStringParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_setstringparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetStringParameter = (PLibMCEnvDriverStatusUpdateSession_SetStringParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_setstringparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_SetStringParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetUUIDParameter = (PLibMCEnvDriverStatusUpdateSession_SetUUIDParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_setuuidparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetUUIDParameter = (PLibMCEnvDriverStatusUpdateSession_SetUUIDParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_setuuidparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_SetUUIDParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetDoubleParameter = (PLibMCEnvDriverStatusUpdateSession_SetDoubleParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_setdoubleparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetDoubleParameter = (PLibMCEnvDriverStatusUpdateSession_SetDoubleParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_setdoubleparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_SetDoubleParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetIntegerParameter = (PLibMCEnvDriverStatusUpdateSession_SetIntegerParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_setintegerparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetIntegerParameter = (PLibMCEnvDriverStatusUpdateSession_SetIntegerParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_setintegerparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_SetIntegerParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetBoolParameter = (PLibMCEnvDriverStatusUpdateSession_SetBoolParameterPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_setboolparameter");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_SetBoolParameter = (PLibMCEnvDriverStatusUpdateSession_SetBoolParameterPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_setboolparameter");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_SetBoolParameter == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_LogMessage = (PLibMCEnvDriverStatusUpdateSession_LogMessagePtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_logmessage");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_LogMessage = (PLibMCEnvDriverStatusUpdateSession_LogMessagePtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_logmessage");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_LogMessage == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_LogWarning = (PLibMCEnvDriverStatusUpdateSession_LogWarningPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_logwarning");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_LogWarning = (PLibMCEnvDriverStatusUpdateSession_LogWarningPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_logwarning");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_LogWarning == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_LogInfo = (PLibMCEnvDriverStatusUpdateSession_LogInfoPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_loginfo");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_LogInfo = (PLibMCEnvDriverStatusUpdateSession_LogInfoPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_loginfo");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_LogInfo == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_Sleep = (PLibMCEnvDriverStatusUpdateSession_SleepPtr) GetProcAddress(hLibrary, "libmcenv_driverstatusupdatesession_sleep");
+		#else // _WIN32
+		pWrapperTable->m_DriverStatusUpdateSession_Sleep = (PLibMCEnvDriverStatusUpdateSession_SleepPtr) dlsym(hLibrary, "libmcenv_driverstatusupdatesession_sleep");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverStatusUpdateSession_Sleep == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = (PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createstatusupdatesession");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession = (PLibMCEnvDriverEnvironment_CreateStatusUpdateSessionPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createstatusupdatesession");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_createworkingdirectory");
 		#else // _WIN32
 		pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory = (PLibMCEnvDriverEnvironment_CreateWorkingDirectoryPtr) dlsym(hLibrary, "libmcenv_driverenvironment_createworkingdirectory");
@@ -2818,6 +2951,15 @@ public:
 		dlerror();
 		#endif // _WIN32
 		if (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr)
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		#ifdef _WIN32
+		pWrapperTable->m_DriverEnvironment_ParameterNameIsValid = (PLibMCEnvDriverEnvironment_ParameterNameIsValidPtr) GetProcAddress(hLibrary, "libmcenv_driverenvironment_parameternameisvalid");
+		#else // _WIN32
+		pWrapperTable->m_DriverEnvironment_ParameterNameIsValid = (PLibMCEnvDriverEnvironment_ParameterNameIsValidPtr) dlsym(hLibrary, "libmcenv_driverenvironment_parameternameisvalid");
+		dlerror();
+		#endif // _WIN32
+		if (pWrapperTable->m_DriverEnvironment_ParameterNameIsValid == nullptr)
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		#ifdef _WIN32
@@ -4401,6 +4543,46 @@ public:
 		if ( (eLookupError != 0) || (pWrapperTable->m_ModbusTCPConnection_PresetMultipleRegisters == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_setstringparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_SetStringParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_SetStringParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_setuuidparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_SetUUIDParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_SetUUIDParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_setdoubleparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_SetDoubleParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_SetDoubleParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_setintegerparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_SetIntegerParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_SetIntegerParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_setboolparameter", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_SetBoolParameter));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_SetBoolParameter == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_logmessage", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_LogMessage));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_LogMessage == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_logwarning", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_LogWarning));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_LogWarning == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_loginfo", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_LogInfo));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_LogInfo == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverstatusupdatesession_sleep", (void**)&(pWrapperTable->m_DriverStatusUpdateSession_Sleep));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverStatusUpdateSession_Sleep == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_createstatusupdatesession", (void**)&(pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateStatusUpdateSession == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createworkingdirectory", (void**)&(pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateWorkingDirectory == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
@@ -4435,6 +4617,10 @@ public:
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_createtoolpathaccessor", (void**)&(pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor));
 		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_CreateToolpathAccessor == nullptr) )
+			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
+		
+		eLookupError = (*pLookup)("libmcenv_driverenvironment_parameternameisvalid", (void**)&(pWrapperTable->m_DriverEnvironment_ParameterNameIsValid));
+		if ( (eLookupError != 0) || (pWrapperTable->m_DriverEnvironment_ParameterNameIsValid == nullptr) )
 			return LIBMCENV_ERROR_COULDNOTFINDLIBRARYEXPORT;
 		
 		eLookupError = (*pLookup)("libmcenv_driverenvironment_registerstringparameter", (void**)&(pWrapperTable->m_DriverEnvironment_RegisterStringParameter));
@@ -6659,8 +6845,113 @@ public:
 	}
 	
 	/**
+	 * Method definitions for class CDriverStatusUpdateSession
+	 */
+	
+	/**
+	* CDriverStatusUpdateSession::SetStringParameter - sets a string parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CDriverStatusUpdateSession::SetStringParameter(const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_SetStringParameter(m_pHandle, sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::SetUUIDParameter - sets a uuid parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] sValue - Value to set
+	*/
+	void CDriverStatusUpdateSession::SetUUIDParameter(const std::string & sParameterName, const std::string & sValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_SetUUIDParameter(m_pHandle, sParameterName.c_str(), sValue.c_str()));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::SetDoubleParameter - sets a double parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] dValue - Value to set
+	*/
+	void CDriverStatusUpdateSession::SetDoubleParameter(const std::string & sParameterName, const LibMCEnv_double dValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_SetDoubleParameter(m_pHandle, sParameterName.c_str(), dValue));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::SetIntegerParameter - sets an int parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] nValue - Value to set
+	*/
+	void CDriverStatusUpdateSession::SetIntegerParameter(const std::string & sParameterName, const LibMCEnv_int64 nValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_SetIntegerParameter(m_pHandle, sParameterName.c_str(), nValue));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::SetBoolParameter - sets a bool parameter
+	* @param[in] sParameterName - Parameter Name
+	* @param[in] bValue - Value to set
+	*/
+	void CDriverStatusUpdateSession::SetBoolParameter(const std::string & sParameterName, const bool bValue)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_SetBoolParameter(m_pHandle, sParameterName.c_str(), bValue));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::LogMessage - logs a string as message
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverStatusUpdateSession::LogMessage(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_LogMessage(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::LogWarning - logs a string as warning
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverStatusUpdateSession::LogWarning(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_LogWarning(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::LogInfo - logs a string as info
+	* @param[in] sLogString - String to Log
+	*/
+	void CDriverStatusUpdateSession::LogInfo(const std::string & sLogString)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_LogInfo(m_pHandle, sLogString.c_str()));
+	}
+	
+	/**
+	* CDriverStatusUpdateSession::Sleep - Sleeps for a definite amount of time.
+	* @param[in] nDelay - Milliseconds to sleep.
+	*/
+	void CDriverStatusUpdateSession::Sleep(const LibMCEnv_uint32 nDelay)
+	{
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverStatusUpdateSession_Sleep(m_pHandle, nDelay));
+	}
+	
+	/**
 	 * Method definitions for class CDriverEnvironment
 	 */
+	
+	/**
+	* CDriverEnvironment::CreateStatusUpdateSession - creates a status update object which can be easily called from an independent thread.
+	* @return creates a status update instance
+	*/
+	PDriverStatusUpdateSession CDriverEnvironment::CreateStatusUpdateSession()
+	{
+		LibMCEnvHandle hUpdateStatusInstance = nullptr;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_CreateStatusUpdateSession(m_pHandle, &hUpdateStatusInstance));
+		
+		if (!hUpdateStatusInstance) {
+			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
+		}
+		return std::make_shared<CDriverStatusUpdateSession>(m_pWrapper, hUpdateStatusInstance);
+	}
 	
 	/**
 	* CDriverEnvironment::CreateWorkingDirectory - creates a temporary working directory.
@@ -6795,6 +7086,19 @@ public:
 			CheckError(LIBMCENV_ERROR_INVALIDPARAM);
 		}
 		return std::make_shared<CToolpathAccessor>(m_pWrapper, hToolpathInstance);
+	}
+	
+	/**
+	* CDriverEnvironment::ParameterNameIsValid - checks if a name is a valid alphanumerical string for parameters.
+	* @param[in] sParameterName - Parameter Name
+	* @return returns true if the parameter name is a valid name.
+	*/
+	bool CDriverEnvironment::ParameterNameIsValid(const std::string & sParameterName)
+	{
+		bool resultNameIsValid = 0;
+		CheckError(m_pWrapper->m_WrapperTable.m_DriverEnvironment_ParameterNameIsValid(m_pHandle, sParameterName.c_str(), &resultNameIsValid));
+		
+		return resultNameIsValid;
 	}
 	
 	/**

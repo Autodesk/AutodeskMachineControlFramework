@@ -48,7 +48,6 @@
 		<error name="COULDNOTLOADLIBRARY" code="6" description="the library could not be loaded" />
 		<error name="COULDNOTFINDLIBRARYEXPORT" code="7" description="a required exported symbol could not be found in the library" />
 		<error name="INCOMPATIBLEBINARYVERSION" code="8" description="the version of the binary interface does not match the bindings interface" />
-		<error name="INVALIDSTATENAME" code="9" description="invalid state name" />
 
 		<error name="DRIVERERROR" code="1000" description="a driver error occured" />
 			
@@ -79,13 +78,8 @@
 			<param name="Build" type="string" pass="out" description="Build identifier." />
 		</method>
 
-		<method name="GetHeaderInformation" description = "returns the header information">
-			<param name="NameSpace" type="string" pass="out" description="NameSpace of the driver." />
-			<param name="BaseName" type="string" pass="out" description="BaseName of the driver." />
-		</method>
-
-
-		<method name="QueryParameters" description = "Stores the driver parameters in the driver environment.">			
+		<method name="QueryParametersEx" description = "Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.">
+			<param name="DriverUpdateInstance" type="class" class="LibMCEnv:DriverStatusUpdateSession" pass="in" description="Status update instance." />
 		</method>
 	
 	</class>
@@ -120,7 +114,7 @@
 			<param name="Name" type="string" pass="in" description="Name of driver to be created." />
 			<param name="Type" type="string" pass="in" description="Type of driver to be created." />
 			<param name="DriverEnvironment" type="class" class="LibMCEnv:DriverEnvironment" pass="in" description="Environment of this driver." />
-			<param name="Instance" type="class" class="Driver" pass="return" description="New Driver instance" />
+			<param name="Instance" type="optionalclass" class="Driver" pass="return" description="New Driver instance" />
 		</method>
 		
 	</global>

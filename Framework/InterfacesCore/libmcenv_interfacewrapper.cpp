@@ -4037,8 +4037,286 @@ LibMCEnvResult libmcenv_modbustcpconnection_presetmultipleregisters(LibMCEnv_Mod
 
 
 /*************************************************************************************************************************
+ Class implementation for DriverStatusUpdateSession
+**************************************************************************************************************************/
+LibMCEnvResult libmcenv_driverstatusupdatesession_setstringparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sValue(pValue);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetStringParameter(sParameterName, sValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setuuidparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pValue == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		std::string sValue(pValue);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetUUIDParameter(sParameterName, sValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setdoubleparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_double dValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetDoubleParameter(sParameterName, dValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setintegerparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_int64 nValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetIntegerParameter(sParameterName, nValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_setboolparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool bValue)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->SetBoolParameter(sParameterName, bValue);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_logmessage(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pLogString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sLogString(pLogString);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->LogMessage(sLogString);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_logwarning(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pLogString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sLogString(pLogString);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->LogWarning(sLogString);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_loginfo(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		if (pLogString == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sLogString(pLogString);
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->LogInfo(sLogString);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverstatusupdatesession_sleep(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay)
+{
+	IBase* pIBaseClass = (IBase *)pDriverStatusUpdateSession;
+
+	try {
+		IDriverStatusUpdateSession* pIDriverStatusUpdateSession = dynamic_cast<IDriverStatusUpdateSession*>(pIBaseClass);
+		if (!pIDriverStatusUpdateSession)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pIDriverStatusUpdateSession->Sleep(nDelay);
+
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+
+/*************************************************************************************************************************
  Class implementation for DriverEnvironment
 **************************************************************************************************************************/
+LibMCEnvResult libmcenv_driverenvironment_createstatusupdatesession(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DriverStatusUpdateSession * pUpdateStatusInstance)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pUpdateStatusInstance == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		IBase* pBaseUpdateStatusInstance(nullptr);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		pBaseUpdateStatusInstance = pIDriverEnvironment->CreateStatusUpdateSession();
+
+		*pUpdateStatusInstance = (IBase*)(pBaseUpdateStatusInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
 LibMCEnvResult libmcenv_driverenvironment_createworkingdirectory(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_WorkingDirectory * pWorkingDirectory)
 {
 	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
@@ -4292,6 +4570,35 @@ LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_Driver
 		pBaseToolpathInstance = pIDriverEnvironment->CreateToolpathAccessor(sStreamUUID);
 
 		*pToolpathInstance = (IBase*)(pBaseToolpathInstance);
+		return LIBMCENV_SUCCESS;
+	}
+	catch (ELibMCEnvInterfaceException & Exception) {
+		return handleLibMCEnvException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCEnvResult libmcenv_driverenvironment_parameternameisvalid(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool * pNameIsValid)
+{
+	IBase* pIBaseClass = (IBase *)pDriverEnvironment;
+
+	try {
+		if (pParameterName == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		if (pNameIsValid == nullptr)
+			throw ELibMCEnvInterfaceException (LIBMCENV_ERROR_INVALIDPARAM);
+		std::string sParameterName(pParameterName);
+		IDriverEnvironment* pIDriverEnvironment = dynamic_cast<IDriverEnvironment*>(pIBaseClass);
+		if (!pIDriverEnvironment)
+			throw ELibMCEnvInterfaceException(LIBMCENV_ERROR_INVALIDCAST);
+		
+		*pNameIsValid = pIDriverEnvironment->ParameterNameIsValid(sParameterName);
+
 		return LIBMCENV_SUCCESS;
 	}
 	catch (ELibMCEnvInterfaceException & Exception) {
@@ -8329,6 +8636,26 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_forcemultiplecoils;
 	if (sProcName == "libmcenv_modbustcpconnection_presetmultipleregisters") 
 		*ppProcAddress = (void*) &libmcenv_modbustcpconnection_presetmultipleregisters;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setstringparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setstringparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setuuidparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setuuidparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setdoubleparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setdoubleparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setintegerparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setintegerparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_setboolparameter") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_setboolparameter;
+	if (sProcName == "libmcenv_driverstatusupdatesession_logmessage") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_logmessage;
+	if (sProcName == "libmcenv_driverstatusupdatesession_logwarning") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_logwarning;
+	if (sProcName == "libmcenv_driverstatusupdatesession_loginfo") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_loginfo;
+	if (sProcName == "libmcenv_driverstatusupdatesession_sleep") 
+		*ppProcAddress = (void*) &libmcenv_driverstatusupdatesession_sleep;
+	if (sProcName == "libmcenv_driverenvironment_createstatusupdatesession") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_createstatusupdatesession;
 	if (sProcName == "libmcenv_driverenvironment_createworkingdirectory") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createworkingdirectory;
 	if (sProcName == "libmcenv_driverenvironment_createtcpipconnection") 
@@ -8347,6 +8674,8 @@ LibMCEnvResult LibMCEnv::Impl::LibMCEnv_GetProcAddress (const char * pProcName, 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_retrievemachineresourcedata;
 	if (sProcName == "libmcenv_driverenvironment_createtoolpathaccessor") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_createtoolpathaccessor;
+	if (sProcName == "libmcenv_driverenvironment_parameternameisvalid") 
+		*ppProcAddress = (void*) &libmcenv_driverenvironment_parameternameisvalid;
 	if (sProcName == "libmcenv_driverenvironment_registerstringparameter") 
 		*ppProcAddress = (void*) &libmcenv_driverenvironment_registerstringparameter;
 	if (sProcName == "libmcenv_driverenvironment_registeruuidparameter") 

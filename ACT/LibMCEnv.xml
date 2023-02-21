@@ -861,8 +861,58 @@
 	</class>	
 
 
-	<class name="DriverEnvironment" parent="Base" description="Environment of the driver">
+	<class name="DriverStatusUpdateSession" parent="Base" description="Thread-safe class for updating the status variables of the driver">
+	
+		<method name="SetStringParameter" description="sets a string parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetUUIDParameter" description="sets a uuid parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="string" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetDoubleParameter" description="sets a double parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="double" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetIntegerParameter" description="sets an int parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="int64" pass="in" description="Value to set" />
+		</method>
+
+		<method name="SetBoolParameter" description="sets a bool parameter">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="Value" type="bool" pass="in" description="Value to set" />
+		</method>	
+		
+		<method name="LogMessage" description="logs a string as message">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogWarning" description="logs a string as warning">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="LogInfo" description="logs a string as info">
+			<param name="LogString" type="string" pass="in" description="String to Log" />
+		</method>
+
+		<method name="Sleep" description="Sleeps for a definite amount of time.">
+			<param name="Delay" type="uint32" pass="in" description="Milliseconds to sleep." />
+		</method>
+		
+	</class>
+
+
+	<class name="DriverEnvironment" parent="Base" description="Environment of the driver. Method calls should be mutexed by the multithreading of the driver implementation.">
 	  
+		<method name="CreateStatusUpdateSession" description = "creates a status update object which can be easily called from an independent thread.">
+			<param name="UpdateStatusInstance" type="class" class="DriverStatusUpdateSession" pass="return" description="creates a status update instance" />
+		</method>
+
 		<method name="CreateWorkingDirectory" description = "creates a temporary working directory.">
 			<param name="WorkingDirectory" type="class" class="WorkingDirectory" pass="return" description="creates a working directory" />
 		</method>
@@ -911,6 +961,10 @@
 			<param name="ToolpathInstance" type="class" class="ToolpathAccessor" pass="return" description="Toolpath instance." />
 		</method>
 		
+		<method name="ParameterNameIsValid" description="checks if a name is a valid alphanumerical string for parameters.">
+			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
+			<param name="NameIsValid" type="bool" pass="return" description="returns true if the parameter name is a valid name." />
+		</method>
 		
 		<method name="RegisterStringParameter" description="registers a string parameter. Must only be called during driver creation.">
 			<param name="ParameterName" type="string" pass="in" description="Parameter Name" />
