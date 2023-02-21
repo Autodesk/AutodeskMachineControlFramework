@@ -111,13 +111,21 @@ LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_gettype(Li
 LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_getversion(LibMCDriver_BuR_Driver pDriver, LibMCDriver_BuR_uint32 * pMajor, LibMCDriver_BuR_uint32 * pMinor, LibMCDriver_BuR_uint32 * pMicro, const LibMCDriver_BuR_uint32 nBuildBufferSize, LibMCDriver_BuR_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+LIBMCDRIVER_BUR_DECLSPEC LibMCDriver_BuRResult libmcdriver_bur_driver_queryparametersex(LibMCDriver_BuR_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for PLCCommand

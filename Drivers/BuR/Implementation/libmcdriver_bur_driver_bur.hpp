@@ -107,7 +107,9 @@ public:
 
     void GetVersion(LibMCDriver_BuR_uint32& nMajor, LibMCDriver_BuR_uint32& nMinor, LibMCDriver_BuR_uint32& nMicro, std::string& sBuild) override;
 
-    void QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
+    void QueryParameters() override;
+
+    void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
     void Connect(const std::string& sIPAddress, const LibMCDriver_BuR_uint32 nPort, const LibMCDriver_BuR_uint32 nTimeout) override;
 

@@ -260,7 +260,31 @@ LibMCDriver_BuRResult libmcdriver_bur_driver_getversion(LibMCDriver_BuR_Driver p
 	}
 }
 
-LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
+LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Driver pDriver)
+{
+	IBase* pIBaseClass = (IBase *)pDriver;
+
+	try {
+		IDriver* pIDriver = dynamic_cast<IDriver*>(pIBaseClass);
+		if (!pIDriver)
+			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
+		
+		pIDriver->QueryParameters();
+
+		return LIBMCDRIVER_BUR_SUCCESS;
+	}
+	catch (ELibMCDriver_BuRInterfaceException & Exception) {
+		return handleLibMCDriver_BuRException(pIBaseClass, Exception);
+	}
+	catch (std::exception & StdException) {
+		return handleStdException(pIBaseClass, StdException);
+	}
+	catch (...) {
+		return handleUnhandledException(pIBaseClass);
+	}
+}
+
+LibMCDriver_BuRResult libmcdriver_bur_driver_queryparametersex(LibMCDriver_BuR_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance)
 {
 	IBase* pIBaseClass = (IBase *)pDriver;
 
@@ -274,7 +298,7 @@ LibMCDriver_BuRResult libmcdriver_bur_driver_queryparameters(LibMCDriver_BuR_Dri
 		if (!pIDriver)
 			throw ELibMCDriver_BuRInterfaceException(LIBMCDRIVER_BUR_ERROR_INVALIDCAST);
 		
-		pIDriver->QueryParameters(pIDriverUpdateInstance);
+		pIDriver->QueryParametersEx(pIDriverUpdateInstance);
 
 		return LIBMCDRIVER_BUR_SUCCESS;
 	}
@@ -814,6 +838,8 @@ LibMCDriver_BuRResult LibMCDriver_BuR::Impl::LibMCDriver_BuR_GetProcAddress (con
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_getversion;
 	if (sProcName == "libmcdriver_bur_driver_queryparameters") 
 		*ppProcAddress = (void*) &libmcdriver_bur_driver_queryparameters;
+	if (sProcName == "libmcdriver_bur_driver_queryparametersex") 
+		*ppProcAddress = (void*) &libmcdriver_bur_driver_queryparametersex;
 	if (sProcName == "libmcdriver_bur_plccommand_setintegerparameter") 
 		*ppProcAddress = (void*) &libmcdriver_bur_plccommand_setintegerparameter;
 	if (sProcName == "libmcdriver_bur_plccommand_setboolparameter") 

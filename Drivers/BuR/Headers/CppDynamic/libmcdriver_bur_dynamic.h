@@ -98,13 +98,21 @@ typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_GetTypePtr) (LibMCDriver_
 typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_GetVersionPtr) (LibMCDriver_BuR_Driver pDriver, LibMCDriver_BuR_uint32 * pMajor, LibMCDriver_BuR_uint32 * pMinor, LibMCDriver_BuR_uint32 * pMicro, const LibMCDriver_BuR_uint32 nBuildBufferSize, LibMCDriver_BuR_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_QueryParametersPtr) (LibMCDriver_BuR_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_QueryParametersPtr) (LibMCDriver_BuR_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+typedef LibMCDriver_BuRResult (*PLibMCDriver_BuRDriver_QueryParametersExPtr) (LibMCDriver_BuR_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for PLCCommand
@@ -368,6 +376,7 @@ typedef struct {
 	PLibMCDriver_BuRDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_BuRDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_BuRDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_BuRDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_BuRPLCCommand_SetIntegerParameterPtr m_PLCCommand_SetIntegerParameter;
 	PLibMCDriver_BuRPLCCommand_SetBoolParameterPtr m_PLCCommand_SetBoolParameter;
 	PLibMCDriver_BuRPLCCommand_SetDoubleParameterPtr m_PLCCommand_SetDoubleParameter;
