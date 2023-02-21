@@ -68,7 +68,12 @@ void CDriver_Marlin::Configure(const std::string& sConfigurationString)
 
 }
 
-void CDriver_Marlin::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+void CDriver_Marlin::QueryParameters()
+{
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+void CDriver_Marlin::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
 {
 	if (pDriverUpdateInstance.get() == nullptr)
 		return;

@@ -98,13 +98,21 @@ typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetTypePtr) (LibMCD
 typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_GetVersionPtr) (LibMCDriver_Marlin_Driver pDriver, LibMCDriver_Marlin_uint32 * pMajor, LibMCDriver_Marlin_uint32 * pMinor, LibMCDriver_Marlin_uint32 * pMicro, const LibMCDriver_Marlin_uint32 nBuildBufferSize, LibMCDriver_Marlin_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_QueryParametersPtr) (LibMCDriver_Marlin_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_QueryParametersPtr) (LibMCDriver_Marlin_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+typedef LibMCDriver_MarlinResult (*PLibMCDriver_MarlinDriver_QueryParametersExPtr) (LibMCDriver_Marlin_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_Marlin
@@ -500,6 +508,7 @@ typedef struct {
 	PLibMCDriver_MarlinDriver_GetTypePtr m_Driver_GetType;
 	PLibMCDriver_MarlinDriver_GetVersionPtr m_Driver_GetVersion;
 	PLibMCDriver_MarlinDriver_QueryParametersPtr m_Driver_QueryParameters;
+	PLibMCDriver_MarlinDriver_QueryParametersExPtr m_Driver_QueryParametersEx;
 	PLibMCDriver_MarlinDriver_Marlin_ConnectPtr m_Driver_Marlin_Connect;
 	PLibMCDriver_MarlinDriver_Marlin_DisconnectPtr m_Driver_Marlin_Disconnect;
 	PLibMCDriver_MarlinDriver_Marlin_SetAbsolutePositioningPtr m_Driver_Marlin_SetAbsolutePositioning;

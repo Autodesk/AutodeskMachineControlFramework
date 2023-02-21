@@ -111,13 +111,21 @@ LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_g
 LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_getversion(LibMCDriver_Marlin_Driver pDriver, LibMCDriver_Marlin_uint32 * pMajor, LibMCDriver_Marlin_uint32 * pMinor, LibMCDriver_Marlin_uint32 * pMicro, const LibMCDriver_Marlin_uint32 nBuildBufferSize, LibMCDriver_Marlin_uint32* pBuildNeededChars, char * pBuildBuffer);
 
 /**
+* Updates the driver parameters in the driver environment. Should only be called in the driver thread.
+*
+* @param[in] pDriver - Driver instance.
+* @return error code or 0 (success)
+*/
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_Marlin_Driver pDriver);
+
+/**
 * Updates the driver parameters in the driver environment. Might be called out of thread. Implementation MUST be able to handle parallel calls.
 *
 * @param[in] pDriver - Driver instance.
 * @param[in] pDriverUpdateInstance - Status update instance.
 * @return error code or 0 (success)
 */
-LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparameters(LibMCDriver_Marlin_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
+LIBMCDRIVER_MARLIN_DECLSPEC LibMCDriver_MarlinResult libmcdriver_marlin_driver_queryparametersex(LibMCDriver_Marlin_Driver pDriver, LibMCEnv_DriverStatusUpdateSession pDriverUpdateInstance);
 
 /*************************************************************************************************************************
  Class definition for Driver_Marlin
