@@ -161,13 +161,8 @@ void CDriver_CifX::GetVersion(LibMCDriver_CifX_uint32& nMajor, LibMCDriver_CifX_
 
 }
 
-void CDriver_CifX::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_CifX";
-	sBaseName = "libmcdriver_cifx";
-}
 
-void CDriver_CifX::QueryParameters()
+void CDriver_CifX::QueryParameters(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) 
 {
 
 	if (IsConnected()) {

@@ -78,7 +78,7 @@ IDriver * CWrapper::CreateDriver(const std::string & sName, const std::string & 
 	if (sType == "cifx-1.0")
 		return new CDriver_CifX(sName, pDriverEnvironment);
 
-	throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_DRIVERTYPENOTFOUND);
+	return nullptr;
 }
 
 
