@@ -52,7 +52,7 @@ using namespace LibMCDriver_BK9xxx::Impl;
 
 
 CDriver_BK9xxx_AnalogIODefinition::CDriver_BK9xxx_AnalogIODefinition(pugi::xml_node& xmlNode)
-	: m_nOffset(0), m_nRawValue(0), m_nRawMin (0), m_nRawMax (65535), m_dScaledMin (0.0), m_dScaledMax (100.0)
+	: m_nOffset(0), m_nActualRawValue(0), m_nTargetRawValue (0), m_nRawMin (0), m_nRawMax (65535), m_dScaledMin (0.0), m_dScaledMax (100.0)
 {
 
 	auto offsetAttrib = xmlNode.attribute("offset");
@@ -93,7 +93,8 @@ CDriver_BK9xxx_AnalogIODefinition::CDriver_BK9xxx_AnalogIODefinition(pugi::xml_n
 
 	m_nRawMin = (uint32_t)nRawMin;
 	m_nRawMax = (uint32_t)nRawMax;
-	m_nRawValue = m_nRawMin;
+	m_nActualRawValue = m_nRawMin;
+	m_nTargetRawValue = m_nRawMin;
 
 	auto scaledMinAttrib = xmlNode.attribute("scaled_min");
 	if (scaledMinAttrib.empty())
@@ -122,46 +123,78 @@ CDriver_BK9xxx_AnalogIODefinition::~CDriver_BK9xxx_AnalogIODefinition()
 
 }
 
-uint32_t CDriver_BK9xxx_AnalogIODefinition::getOffset()
+uint32_t CDriver_BK9xxx_AnalogIODefinition::getOffset()  const
 {
 	return m_nOffset;
 }
 
-std::string CDriver_BK9xxx_AnalogIODefinition::getName()
+std::string CDriver_BK9xxx_AnalogIODefinition::getName() const
 {
 	return m_sName;
 }
 
-std::string CDriver_BK9xxx_AnalogIODefinition::getDescription()
+std::string CDriver_BK9xxx_AnalogIODefinition::getDescription() const
 {
 	return m_sDescription;
 }
 
-uint32_t CDriver_BK9xxx_AnalogIODefinition::getRawValue()
-{
-	return m_nRawValue;
+uint32_t CDriver_BK9xxx_AnalogIODefinition::getActualRawValue() const
+{ 
+	return m_nActualRawValue;
 }
 
-void CDriver_BK9xxx_AnalogIODefinition::setRawValue(int64_t nRawValue)
+uint32_t CDriver_BK9xxx_AnalogIODefinition::getTargetRawValue() const
+{
+	return m_nTargetRawValue;
+}
+
+uint32_t CDriver_BK9xxx_AnalogIODefinition::setActualRawValue(int64_t nRawValue)
 {
 	if (nRawValue < (int64_t)m_nRawMin) {
-		m_nRawValue = m_nRawMin;
+		m_nActualRawValue = m_nRawMin;
 	}
 	else if (nRawValue > (int64_t)m_nRawMax) {
-		m_nRawValue = m_nRawMax;
+		m_nActualRawValue = m_nRawMax;
 	}
 	else {
-		m_nRawValue = (uint32_t) nRawValue;
+		m_nActualRawValue = (uint32_t) nRawValue;
 	}
+
+	return m_nActualRawValue;
 }
 
-double CDriver_BK9xxx_AnalogIODefinition::getScaledValue()
+uint32_t CDriver_BK9xxx_AnalogIODefinition::setTargetRawValue(int64_t nRawValue)
 {
-	double dFactor = ((double)(m_nRawValue - m_nRawMin)) / ((double)(m_nRawMax - m_nRawMin));
-	return (1.0 - dFactor) * m_dScaledMin + dFactor * m_dScaledMax;
+	if (nRawValue < (int64_t)m_nRawMin) {
+		m_nTargetRawValue = m_nRawMin;
+	}
+	else if (nRawValue > (int64_t)m_nRawMax) {
+		m_nTargetRawValue = m_nRawMax;
+	}
+	else {
+		m_nTargetRawValue = (uint32_t)nRawValue;
+	}
+
+	return m_nTargetRawValue;
 }
 
-void CDriver_BK9xxx_AnalogIODefinition::setScaledValue(double dScaledValue)
+
+double CDriver_BK9xxx_AnalogIODefinition::rawValueToScaledValue(int64_t nRawValue) const
+{
+	if (nRawValue <= (int64_t)m_nRawMin) {
+		return m_dScaledMin;
+	}
+	else if (nRawValue >= (int64_t)m_nRawMax) {
+		return m_dScaledMax;
+	}
+	else {
+		double dFactor = ((double)(nRawValue - (int64_t) m_nRawMin)) / ((double)(m_nRawMax - m_nRawMin));
+		return (1.0 - dFactor) * m_dScaledMin + dFactor * m_dScaledMax;
+	}
+
+}
+
+uint32_t CDriver_BK9xxx_AnalogIODefinition::scaledValueToRawValue(double dScaledValue) const
 {
 	double dFactor = (dScaledValue - m_dScaledMin) / (m_dScaledMax - m_dScaledMin);
 	if (dFactor < 0.0)
@@ -170,8 +203,16 @@ void CDriver_BK9xxx_AnalogIODefinition::setScaledValue(double dScaledValue)
 		dFactor = 1.0;
 
 	double dRawValue = ((1.0 - dFactor) * (double)m_nRawMin) + (dFactor * (double)m_nRawMax);
-	setRawValue((int64_t) round(dRawValue));
-
+	int64_t nRawValue = (int64_t)dRawValue;
+	if (nRawValue < (int64_t)m_nRawMin) {
+		return m_nRawMin;
+	}
+	else if (nRawValue > (int64_t)m_nRawMax) {
+		return m_nRawMax;
+	}
+	else {
+		return (uint32_t)nRawValue;
+	}
 }
 
 CDriver_BK9xxx_AnalogIODefinitionBlock::CDriver_BK9xxx_AnalogIODefinitionBlock(pugi::xml_node& xmlNode, const std::string& sNodeName)
@@ -196,6 +237,9 @@ CDriver_BK9xxx_AnalogIODefinitionBlock::CDriver_BK9xxx_AnalogIODefinitionBlock(p
 	auto analogIONodes = xmlNode.children(sNodeName.c_str());
 	for (auto analogIONode : analogIONodes) {
 		auto pAnalogIO = std::make_shared<CDriver_BK9xxx_AnalogIODefinition>(analogIONode);
+		if (pAnalogIO->getOffset() >= m_nRegisterCount)
+			throw ELibMCDriver_BK9xxxInterfaceException(LIBMCDRIVER_BK9XXX_ERROR_ANALOGIOOFFSETOUTOFRANGE);
+
 		std::string sName = pAnalogIO->getName();
 		m_IODefinitions.push_back(pAnalogIO);
 		m_IODefinitionMap.insert(std::make_pair(sName, pAnalogIO));

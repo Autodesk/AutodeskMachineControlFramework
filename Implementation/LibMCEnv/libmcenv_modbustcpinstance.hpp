@@ -102,7 +102,7 @@ namespace Impl {
             void readHoldingRegisters(uint16_t nStartAddress, uint16_t nRegisterCount, std::vector<uint16_t>& holdingRegisters);
             void readInputRegisters(uint16_t nStartAddress, uint16_t nRegisterCount, std::vector<uint16_t>& inputRegisters);
 
-            void forceMultipleCoils(uint16_t nStartAddress, std::vector<bool> coilStatus);
+            void forceMultipleCoils(uint16_t nStartAddress, const std::vector<uint8_t> & coilStatus);
             void presetMultipleRegisters(uint16_t nStartAddress, std::vector<uint16_t> registerValues);
 
             void diagnosisCall(uint16_t nSubFunction, uint16_t nDatafield, uint16_t & nDataResponse);

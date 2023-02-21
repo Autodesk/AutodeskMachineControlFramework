@@ -51,8 +51,3 @@ void CDriver::GetVersion(LibMCDriver_ScanLab_uint32& nMajor, LibMCDriver_ScanLab
 	sBuild = __STRINGIZE_VALUE_OF (__GITHASH);
 }
 
-void CDriver::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_ScanLab";
-	sBaseName = "libmcdriver_scanlab";
-}

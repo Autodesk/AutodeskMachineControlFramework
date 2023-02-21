@@ -89,11 +89,11 @@ public:
 
 	std::string GetType() override;
 
-	void GetVersion(LibMCDriver_UART_uint32& nMajor, LibMCDriver_UART_uint32& nMinor, LibMCDriver_UART_uint32& nMicro, std::string& sBuild) override;
-
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
+	void GetVersion(LibMCDriver_UART_uint32& nMajor, LibMCDriver_UART_uint32& nMinor, LibMCDriver_UART_uint32& nMicro, std::string& sBuild) override;	
 
 	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	void SetToSimulationMode() override;
 

@@ -65,6 +65,7 @@ func createMCServerTemplate (outputDir string, packageName string, clientName st
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_raylase\" import=\"%s_driver_raylase.%s\" resources=\"%s_driver_raylase.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_ximc\" import=\"%s_driver_ximc.%s\" resources=\"%s_driver_ximc.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_bur\" import=\"%s_driver_bur.%s\" resources=\"%s_driver_bur.data\"  />\n", gitHash, dllExtension, gitHash);
+	fmt.Fprintf(pkgfile, "    <library name=\"driver_bk9xxx\" import=\"%s_driver_bk9xxx.%s\" resources=\"%s_driver_bk9xxx.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_ads\" import=\"%s_driver_ads.%s\" resources=\"%s_driver_ads.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_cifx\" import=\"%s_driver_cifx.%s\" resources=\"%s_driver_cifx.data\"  />\n", gitHash, dllExtension, gitHash);
 	fmt.Fprintf(pkgfile, "    <library name=\"driver_modbustcp\" import=\"%s_driver_modbustcp.%s\" resources=\"%s_driver_modbustcp.data\"  />\n", gitHash, dllExtension, gitHash);

@@ -193,7 +193,15 @@ void onLogMessage(const char* pLogMessage, const char* pSubSystem, LibMCData::eL
 		std::string sTimeStamp(pTimeStamp);
 		CServer* pServer = (CServer*)pUserData;
 
-		pServer->log(sTimeStamp + " | " + sLogMessage);
+		size_t nLength = sSubSystem.length();
+		if (nLength > 8) {
+			sSubSystem = sSubSystem.substr(0, 8);
+		} else {
+			for (size_t nIndex = nLength; nIndex < 8; nIndex++)
+				sSubSystem += " ";
+		}		
+
+		pServer->log(sTimeStamp + " | " + sSubSystem + " | " + sLogMessage);
 	}
 }
 

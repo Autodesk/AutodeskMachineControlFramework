@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mutex>
 
 #include "libmcenv_dynamic.hpp"
+#include "libmcdriver_dynamic.hpp"
 
 #define AMCPACKAGE_SCHEMANAMESPACE "http://schemas.autodesk.com/amc/resourcepackage/2020/07"
 
@@ -71,6 +72,9 @@ namespace AMC {
 		std::list<PDriver> m_DriverList;
 		std::map<std::string, PDriver> m_DriverMap;
 
+		// Loaded DLL Wrappers for the drivers
+		std::map<std::string, LibMCDriver::PWrapper> m_DriverWrapperMap;
+
 		// Mutex for safe Multi-Thread-Handling
 		std::mutex m_Mutex;
 
@@ -82,7 +86,7 @@ namespace AMC {
 
 		virtual ~CDriverHandler();
 
-		void registerDriver(const std::string& sName, const std::string& sType, const std::string& sLibraryPath, const std::string & sResourcePath, const std::string & sDriverConfigurationData, AMC::PResourcePackage pMachineResourcePackage);
+		void registerDriver(const std::string& sName, const std::string& sType, const std::string & sLibraryName, const std::string& sLibraryPath, const std::string & sResourcePath, const std::string & sDriverConfigurationData, AMC::PResourcePackage pMachineResourcePackage);
 
 		void GetDriverInformation (const std::string& sName, std::string& sType, HSymbolLookupHandle & pSymbolLookup);
 

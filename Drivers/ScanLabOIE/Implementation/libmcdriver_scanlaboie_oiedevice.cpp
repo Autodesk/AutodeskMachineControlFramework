@@ -32,6 +32,7 @@ Abstract: This is a stub class definition of COIEDevice
 */
 
 #include "libmcdriver_scanlaboie_oiedevice.hpp"
+#include "libmcdriver_scanlaboie_datarecording.hpp"
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
 
 #include <array>
@@ -343,8 +344,13 @@ bool checkIniKey(const std::string & sLine, const std::string & sKey)
 	return false;
 }
 
-void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig)
+void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMajorVersion, const int32_t nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount)
 {
+	if (nRTCSignalCount == 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCSIGNALCOUNT);
+	if (nSensorSignalCount == 0)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORSIGNALCOUNT);
+
 	ensureConnectivity();
 
 	if (sName.empty())
@@ -387,7 +393,9 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 	std::string sDeviceConfigFileName = pDeviceConfigFile->GetAbsoluteFileName();
 
 	try {
+		std::cout << "Starting app call..." << std::endl;
 		m_pOIESDK->checkError(m_pOIESDK->oie_device_start_app_ver(m_pDevice, sName.c_str(), nMajorVersion, nMinorVersion, sDeviceConfigFileName.c_str()));
+		std::cout << "Starting app call finished..." << std::endl;
 
 		pDeviceConfigFile->DeleteFromDisk();
 		pDeviceConfigFile = nullptr;
@@ -400,14 +408,20 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 		}
 		throw;
 	}
+
+	{
+		std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
+		m_pCurrentDataRecording = std::make_shared<CDataRecordingInstance>(nRTCSignalCount + nSensorSignalCount, nRTCSignalCount, 1024);
+	}
+
 }
 
-void COIEDeviceInstance::StartAppByName(const std::string& sName, const std::string& sDeviceConfig)
+void COIEDeviceInstance::StartAppByName(const std::string& sName, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount)
 {
-	startAppEx(sName, -1, -1, sDeviceConfig);
+	startAppEx(sName, -1, -1, sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
 
-void COIEDeviceInstance::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string& sDeviceConfig)
+void COIEDeviceInstance::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount)
 {
 	ensureConnectivity();
 
@@ -416,10 +430,10 @@ void COIEDeviceInstance::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIn
 
 	auto pApp = m_AppList.at(nIndex);
 
-	startAppEx(pApp->getName(), pApp->getMajorVersion(), pApp->getMinorVersion(), sDeviceConfig);
+	startAppEx(pApp->getName(), pApp->getMajorVersion(), pApp->getMinorVersion(), sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
 
-void COIEDeviceInstance::StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string& sDeviceConfig)
+void COIEDeviceInstance::StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount)
 {
 	ensureConnectivity();
 
@@ -429,10 +443,10 @@ void COIEDeviceInstance::StartAppByMajorVersion(const std::string& sName, const 
 	if (nMajorVersion >= OIE_MAXSUPPORTEDAPPVERSION)
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPVERSION);
 
-	startAppEx(sName, (int32_t) nMajorVersion, -1, sDeviceConfig);
+	startAppEx(sName, (int32_t) nMajorVersion, -1, sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
 
-void COIEDeviceInstance::StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string& sDeviceConfig)
+void COIEDeviceInstance::StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string& sDeviceConfig, uint32_t nRTCSignalCount, uint32_t nSensorSignalCount)
 {
 	ensureConnectivity();
 
@@ -442,7 +456,7 @@ void COIEDeviceInstance::StartAppByMinorVersion(const std::string& sName, const 
 	if ((nMajorVersion >= OIE_MAXSUPPORTEDAPPVERSION) || (nMinorVersion >= OIE_MAXSUPPORTEDAPPVERSION))
 		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDAPPVERSION);
 
-	startAppEx(sName, (int32_t)nMajorVersion, (int32_t)nMinorVersion, sDeviceConfig);
+	startAppEx(sName, (int32_t)nMajorVersion, (int32_t)nMinorVersion, sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
 
 void COIEDeviceInstance::StopApp()
@@ -565,34 +579,40 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 	try {
 		if ((device == m_pDevice) && (pkt != nullptr)) {
 
-			std::lock_guard<std::mutex> lockGuard(m_PacketMutex);
-			std::cout << "Packet event: " << pkt->pktNr << " id: " << pkt->id << std::endl;
+			std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
 
-			double dX = 0.0;
-			double dY = 0.0;
+			if (m_pCurrentDataRecording.get() != nullptr) {
 
-			if (m_bHasCorrectionData) {
-				m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY));
-				std::cout << "  - Absolute Position: " << dX << "/" << dY << std::endl;
+
+				double dX = 0.0;
+				double dY = 0.0;
+
+				if (m_bHasCorrectionData) {
+					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_xy(pkt, &dX, &dY));
+				}
+
+				m_pCurrentDataRecording->startRecord(pkt->pktNr, dX, dY);
+
+				uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
+				for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
+				{
+					int32_t nValue = 0;
+					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
+
+					m_pCurrentDataRecording->recordValue(nValue);
+				}
+
+				uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
+				for (uint32_t sensorSignalIndex = 0; sensorSignalIndex < sensorSignalCount; sensorSignalIndex++)
+				{
+					int32_t nValue = 0;
+					m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_sensor_signal(pkt, sensorSignalIndex, &nValue));
+					m_pCurrentDataRecording->recordValue(nValue);
+				}
+
+				m_pCurrentDataRecording->finishRecord();
+
 			}
-
-			uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
-			for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
-			{
-				int32_t nValue = 0;
-				m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_rtc_signal(pkt, rtcSignalIndex, &nValue));
-				std::cout << "  - RTC Signal #" << rtcSignalIndex << ": " << nValue << std::endl;
-			}
-
-			uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
-			for (uint32_t sensorSignalIndex = 0; sensorSignalIndex < sensorSignalCount; sensorSignalIndex++)
-			{
-				int32_t nValue = 0;
-				m_pOIESDK->checkError(m_pOIESDK->oie_pkt_get_sensor_signal(pkt, sensorSignalIndex, &nValue));
-				std::cout << "  - Sensor Signal #" << sensorSignalIndex << ": " << nValue << std::endl;
-			}
-
-
 		}
 		else {
 			std::cout << "Packet event: with null" << std::endl;
@@ -626,6 +646,44 @@ std::vector<uint8_t>& COIEDeviceInstance::getRTC6CorrectionData()
 {
 	return m_RTC6CorrectionData;
 }
+
+PDataRecordingInstance COIEDeviceInstance::RetrieveCurrentRecording()
+{
+	std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
+
+	if (m_pCurrentDataRecording.get() != nullptr) {
+
+		auto pOldRecording = m_pCurrentDataRecording;
+		m_pCurrentDataRecording = nullptr;
+		m_pCurrentDataRecording = pOldRecording->createEmptyDuplicate();
+
+		return pOldRecording;
+	}
+	else {
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NODATARECORDINGAVAILABLE);
+	}
+
+
+}
+
+
+
+void COIEDeviceInstance::ClearCurrentRecording()
+{
+	std::lock_guard<std::mutex> lockGuard(m_RecordingMutex);
+	if (m_pCurrentDataRecording.get() != nullptr) {
+		auto pOldRecording = m_pCurrentDataRecording;
+		m_pCurrentDataRecording = nullptr;
+		m_pCurrentDataRecording = pOldRecording->createEmptyDuplicate();
+
+	}
+}
+
+PDataRecordingInstance COIEDeviceInstance::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
+{
+	throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTIMPLEMENTED);
+}
+
 
 COIEDevice::COIEDevice(POIEDeviceInstance pDeviceInstance)
 {
@@ -734,25 +792,50 @@ void COIEDevice::GetAppInfo(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::str
 	return lockInstance()->GetAppInfo(nIndex, sName, nMajor, nMinor, nPatch);
 }
 
-void COIEDevice::StartAppByName(const std::string & sName, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByName(const std::string& sName, IDeviceConfiguration* pDeviceConfig)
 {
-	lockInstance()->StartAppByName(sName, sDeviceConfig);
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+	uint32_t nRTCSignalCount = pDeviceConfig->GetRTCSignalCount();
+	uint32_t nSensorSignalCount = pDeviceConfig->GetSensorSignalCount();
+
+	lockInstance()->StartAppByName(sName, sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
 
-void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByIndex(const LibMCDriver_ScanLabOIE_uint32 nIndex, IDeviceConfiguration* pDeviceConfig)
 {
-	lockInstance()->StartAppByIndex(nIndex, sDeviceConfig);
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+	uint32_t nRTCSignalCount = pDeviceConfig->GetRTCSignalCount();
+	uint32_t nSensorSignalCount = pDeviceConfig->GetSensorSignalCount();
+
+	lockInstance()->StartAppByIndex(nIndex, sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
 
-void COIEDevice::StartAppByMajorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByMajorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, IDeviceConfiguration* pDeviceConfig)
 {
-	lockInstance()->StartAppByMajorVersion(sName, nMajorVersion, sDeviceConfig);
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+	uint32_t nRTCSignalCount = pDeviceConfig->GetRTCSignalCount();
+	uint32_t nSensorSignalCount = pDeviceConfig->GetSensorSignalCount();
+
+	lockInstance()->StartAppByMajorVersion(sName, nMajorVersion, sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
 
-void COIEDevice::StartAppByMinorVersion(const std::string & sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, const std::string & sDeviceConfig)
+void COIEDevice::StartAppByMinorVersion(const std::string& sName, const LibMCDriver_ScanLabOIE_uint32 nMajorVersion, const LibMCDriver_ScanLabOIE_uint32 nMinorVersion, IDeviceConfiguration* pDeviceConfig)
 {
-	lockInstance()->StartAppByMinorVersion(sName, nMajorVersion, nMinorVersion, sDeviceConfig);
+	if (pDeviceConfig == nullptr)
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+	std::string sDeviceConfig = pDeviceConfig->GetDeviceConfigurationString();
+	uint32_t nRTCSignalCount = pDeviceConfig->GetRTCSignalCount ();
+	uint32_t nSensorSignalCount = pDeviceConfig->GetSensorSignalCount ();
+
+	lockInstance()->StartAppByMinorVersion(sName, nMajorVersion, nMinorVersion, sDeviceConfig, nRTCSignalCount, nSensorSignalCount);
 }
+
 
 void COIEDevice::StopApp()
 {
@@ -798,4 +881,21 @@ void COIEDevice::UninstallAppByMinorVersion(const std::string & sName, const Lib
 void COIEDevice::RefreshAppList()
 {
 	lockInstance()->RefreshAppList();
+}
+
+IDataRecording* COIEDevice::RetrieveCurrentRecording()
+{
+	auto pRecordingInstance = lockInstance()->RetrieveCurrentRecording();
+	return new CDataRecording (pRecordingInstance);
+}
+
+void COIEDevice::ClearCurrentRecording()
+{
+	lockInstance()->ClearCurrentRecording();
+}
+
+IDataRecording* COIEDevice::LoadRecordingFromBuild(LibMCEnv::PBuild pBuild, const std::string& sDataUUID)
+{
+	auto pRecordingInstance = lockInstance()->LoadRecordingFromBuild(pBuild, sDataUUID);
+	return new CDataRecording(pRecordingInstance);
 }

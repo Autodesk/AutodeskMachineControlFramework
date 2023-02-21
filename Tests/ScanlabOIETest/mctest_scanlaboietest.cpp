@@ -36,6 +36,9 @@ using namespace LibMCPlugin::Impl;
 
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <thread>
+#include <cmath>
 
 
 /*************************************************************************************************************************
@@ -97,7 +100,35 @@ public:
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 		
-		
+		pStateEnvironment->LogMessage("acquiring OIE Driver...");
+		auto pOIEDriver = m_pPluginData->acquireOIE(pStateEnvironment);
+
+		pStateEnvironment->LogMessage("Loading SDK...");
+		pOIEDriver->SetDependencyResourceNames("libssl-1_1-x64", "libcrypto-1_1-x64", "qt5core-x64", "qt5network-x64");
+		pOIEDriver->InitializeSDK("liboie-x64");
+
+		pStateEnvironment->LogMessage("Loading OIE Device Config...");
+		std::string sDeviceConfig = pStateEnvironment->LoadResourceString("oie_test1");
+
+		auto pDeviceConfigurationInstance = pOIEDriver->ParseDeviceConfiguration(sDeviceConfig);
+
+		switch (pDeviceConfigurationInstance->GetDeviceType()) {
+		case LibMCDriver_ScanLabOIE::eRTCDeviceType::RTC5:
+			pStateEnvironment->LogMessage("Configured for RTC5");
+			break;
+		case LibMCDriver_ScanLabOIE::eRTCDeviceType::RTC6:
+			pStateEnvironment->LogMessage("Configured for RTC6");
+			break;
+		default:
+			throw std::runtime_error("Unknown RTC Card");
+		}
+
+		std::vector<uint32_t> signals;
+		pDeviceConfigurationInstance->GetRTCSignalIDs(signals);
+
+		for (auto signal : signals)
+			pStateEnvironment->LogMessage("  --Found signal #" + std::to_string(signal));
+
 		pStateEnvironment->LogMessage("Initialising Scanlab Driver");
 		auto pRTC6Driver = m_pPluginData->acquireRTC6(pStateEnvironment);
 		pRTC6Driver->LoadSDK("rtc6dllx64");
@@ -118,7 +149,6 @@ public:
 		uint32_t nDimension = 3;
 		uint32_t nTableNumberHeadA = 1;
 		uint32_t nTableNumberHeadB = 0;
-
 
 		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
 		pRTC6Driver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
@@ -152,27 +182,8 @@ public:
 		pStateEnvironment->LogMessage("Initialising done..");
 
 		pStateEnvironment->LogMessage("Initializing for OIE..");
-		std::vector<uint32_t> signals;
-		signals.push_back(1);
-		signals.push_back(2);
-		signals.push_back(39);
-		pRTC6Driver->InitializeForOIE(signals);
-		pStateEnvironment->Sleep(1000);
-
-		pStateEnvironment->LogMessage("Loading OIE Device Config...");
-		std::vector<uint8_t> buffer;
-		pStateEnvironment->LoadResourceData("oie_test1", buffer);
-		buffer.push_back(0);
-		std::string sDeviceConfig((char*)buffer.data());
-
-		std::cout << "device config: " << sDeviceConfig << std::endl;
-
-		pStateEnvironment->LogMessage("acquiring Driver...");
-		auto pOIEDriver = m_pPluginData->acquireOIE(pStateEnvironment);
-
-		pStateEnvironment->LogMessage("Loading SDK...");
-		pOIEDriver->SetDependencyResourceNames("libssl-1_1-x64", "libcrypto-1_1-x64", "qt5core-x64", "qt5network-x64");
-		pOIEDriver->InitializeSDK("liboie-x64");
+		auto pRTCContext = pRTC6Driver->GetContext();
+		pRTCContext->InitializeForOIE(signals);
 
 
 		pStateEnvironment->LogMessage("Adding Device...");
@@ -200,10 +211,9 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByMinorVersion("AIB", 2, 0, sDeviceConfig);
+		pDevice->StartAppByName("AIB", pDeviceConfigurationInstance);
 
 		pStateEnvironment->LogMessage("Waiting..");
-		pStateEnvironment->Sleep(1000);
 
 		pStateEnvironment->LogMessage("App is running:  " + std::to_string ((uint32_t)pDevice->AppIsRunning()));
 		std::string sName;
@@ -216,10 +226,50 @@ public:
 
 
 		pStateEnvironment->LogMessage("Running OIE Test..");
-		pRTC6Driver->OIETest();
+
+
+		pRTCContext->SetStartList(1, 0);
+		pRTCContext->EnableOIE();
+		pRTCContext->StartOIEMeasurement();
+
+		std::vector<LibMCDriver_ScanLab::sPoint2D> ContourPoints;
+		//ContourPoints.resize(1000);
+		for (int32_t nIndex = 0; nIndex < 1000; nIndex++) {
+			float T = (float)(nIndex - 500) / 500.0f * 3.14159f;
+			float dX = nIndex * 0.05f;
+			float dY = sin(T) * 20.0f;
+			ContourPoints.push_back(LibMCDriver_ScanLab::sPoint2D{ dX, dY });
+
+			//std::cout << "Point X: " << dX << " " << dY << std::endl;
+		}
+
+		std::cout << "How many points? " << ContourPoints.size() << std::endl;
+
+
+		pRTCContext->DrawPolyline(ContourPoints, 10.0, 100.0, 1.0, 0.0);
+
+		pRTCContext->StopOIEMeasurement();
+		pRTCContext->DisableOIE();
+
+		pRTCContext->SetEndOfList();
+		pRTCContext->ExecuteList(1, 0);
+
+		//pRTC6Driver->OIETest();
+
+		bool bBusy = true;
+		while (bBusy) {
+			uint32_t nPosition = 0;
+			pRTCContext->GetStatus (bBusy, nPosition);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+			std::cout << "List Position: " << nPosition << std::endl;
+
+		}
+
+		pDevice->StopApp();
 
 		pStateEnvironment->LogMessage("Waiting..");
-		pStateEnvironment->Sleep(10000);
 
 		pStateEnvironment->LogMessage("Disconnecting Device");
 		pDevice->Disconnect();

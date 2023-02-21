@@ -34,6 +34,7 @@ Abstract: This is a stub class definition of CDriver_ScanLab_OIE
 #include "libmcdriver_scanlaboie_driver_scanlab_oie.hpp"
 #include "libmcdriver_scanlaboie_interfaceexception.hpp"
 #include "libmcdriver_scanlaboie_oiedevice.hpp"
+#include "libmcdriver_scanlaboie_deviceconfiguration.hpp"
 
 // Include custom headers here.
 #define __STRINGIZE(x) #x
@@ -99,19 +100,16 @@ void CDriver_ScanLab_OIE::GetVersion(LibMCDriver_ScanLabOIE_uint32& nMajor, LibM
 	sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
-void CDriver_ScanLab_OIE::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-	sNameSpace = "LibMCDriver_ScanLabOIE";
-	sBaseName = "libmcdriver_scanlaboie";
-}
-
-
 void CDriver_ScanLab_OIE::QueryParameters()
 {
-	
+	QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
 }
 
-
+void CDriver_ScanLab_OIE::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+	if (pDriverUpdateInstance.get() == nullptr)
+		return;
+}
 
 void CDriver_ScanLab_OIE::SetDependencyResourceNames(const std::string & sLibSSLResourceName, const std::string & sLibCryptoResourceName, const std::string & sQT5CoreResourceName, const std::string & sQT5NetworkResourceName)
 {
@@ -347,5 +345,15 @@ void CDriver_ScanLab_OIE::releaseInstance()
 	m_pLibCryptoResourceFile = nullptr;
 	m_pQT5CoreResourceFile = nullptr;
 	m_pQT5NetworkResourceFile = nullptr;
+}
+
+
+IDeviceConfiguration* CDriver_ScanLab_OIE::ParseDeviceConfiguration(const std::string& sDeviceConfigString)
+{
+	if ((m_pInstance == nullptr) || (m_pOIESDK.get() == nullptr))
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_SCANLABOIESDKNOTLOADED);
+
+	return new CDeviceConfiguration(m_pOIESDK, sDeviceConfigString, m_pDriverEnvironment);
+
 }
 

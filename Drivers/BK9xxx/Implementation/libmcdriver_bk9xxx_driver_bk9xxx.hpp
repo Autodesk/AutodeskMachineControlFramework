@@ -47,9 +47,11 @@ Abstract: This is the class declaration of CDriver_BK9xxx
 // Include custom headers here.
 #include <map>
 #include <set>
+#include <atomic>
+#include <thread>
 
 #include "pugixml.hpp"
-
+#include <mutex>
 #include "libmcdriver_bk9xxx_digitalio.hpp"
 #include "libmcdriver_bk9xxx_analogio.hpp"
 
@@ -62,6 +64,40 @@ namespace LibMCDriver_BK9xxx {
 		/*************************************************************************************************************************
 		 Class declaration of CDriver_BK9xxx
 		**************************************************************************************************************************/
+
+		class CDriver_BK9xxxThreadState {
+		private:
+			bool m_bDebugMode;
+
+			std::mutex m_ModBusConnectionMutex;
+			std::atomic<bool> m_ModBusConnectionThreadShallFinish;
+			std::atomic<bool> m_bIsConnectedCache;
+			std::vector<std::pair<uint32_t, std::string>> m_Exceptions;
+
+		public:
+			LibMCEnv::PModbusTCPConnection m_pModBusTCPConnection;
+
+			CDriver_BK9xxxThreadState (LibMCEnv::PModbusTCPConnection pModBusTCPConnection);
+			virtual ~CDriver_BK9xxxThreadState();
+
+			void disconnect();
+			bool isConnected();
+
+			void updateConnectionState();
+
+			void handleException(uint32_t nErrorCode, const std::string & sMessage);
+
+			LibMCEnv::PModbusTCPDigitalIOStatus ReadCoilStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount);
+			LibMCEnv::PModbusTCPDigitalIOStatus ReadInputStatus(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nBitCount);
+			LibMCEnv::PModbusTCPRegisterStatus ReadHoldingRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
+			LibMCEnv::PModbusTCPRegisterStatus ReadInputRegisters(const LibMCEnv_uint32 nStartAddress, const LibMCEnv_uint32 nRegisterCount);
+			void ForceMultipleCoils(const LibMCEnv_uint32 nStartAddress, std::vector<uint8_t> BufferBuffer);
+			void PresetMultipleRegisters(const LibMCEnv_uint32 nStartAddress, std::vector<uint16_t> BufferBuffer);
+			
+			bool shallFinish();
+
+
+		};
 
 		class CDriver_BK9xxx : public virtual IDriver_BK9xxx, public virtual CDriver {
 		protected:
@@ -78,7 +114,11 @@ namespace LibMCDriver_BK9xxx {
 			uint32_t m_nPatchVersion;
 
 			LibMCEnv::PDriverEnvironment m_pDriverEnvironment;
-			LibMCEnv::PModbusTCPConnection m_pModBusTCPConnection;
+
+			std::thread m_ModBusConnectionThread;
+			std::shared_ptr<CDriver_BK9xxxThreadState> m_ModBusConnectionThreadState;
+			
+			
 
 			std::set<std::string> m_ReservedNames;
 			std::vector<PDriver_BK9xxx_DigitalInputsDefinition> m_pDigitalInputBlocks;
@@ -103,9 +143,9 @@ namespace LibMCDriver_BK9xxx {
 
 			void GetVersion(LibMCDriver_BK9xxx_uint32& nMajor, LibMCDriver_BK9xxx_uint32& nMinor, LibMCDriver_BK9xxx_uint32& nMicro, std::string& sBuild) override;
 
-			void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
 			void QueryParameters() override;
+
+			void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 			void SetToSimulationMode() override;
 
@@ -157,11 +197,11 @@ namespace LibMCDriver_BK9xxx {
 
 			LibMCDriver_BK9xxx_double GetAnalogOutput(const std::string& sVariableName) override;
 
-			void SetDigitalOutput(const std::string& sVariableName, const bool bValue) override;
+			void SetDigitalOutput(const std::string& sVariableName, const bool bValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) override;
 
-			void SetAnalogOutputRaw(const std::string& sVariableName, const LibMCDriver_BK9xxx_uint32 nValue) override;
+			void SetAnalogOutputRaw(const std::string& sVariableName, const LibMCDriver_BK9xxx_uint32 nValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) override;
 
-			void SetAnalogOutput(const std::string& sVariableName, const LibMCDriver_BK9xxx_double dValue) override;
+			void SetAnalogOutput(const std::string& sVariableName, const LibMCDriver_BK9xxx_double dValue, const LibMCDriver_BK9xxx_uint32 nTimeOutInMs) override;
 
 		};
 

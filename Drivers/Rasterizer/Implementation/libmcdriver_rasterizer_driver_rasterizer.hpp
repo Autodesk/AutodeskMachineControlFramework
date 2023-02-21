@@ -82,9 +82,9 @@ public:
 
 	void GetVersion(LibMCDriver_Rasterizer_uint32& nMajor, LibMCDriver_Rasterizer_uint32& nMinor, LibMCDriver_Rasterizer_uint32& nMicro, std::string& sBuild) override;
 
-	void GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName) override;
-
 	void QueryParameters() override;
+
+	void QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance) override;
 
 	ISliceStack * CreateSliceStack(const LibMCDriver_Rasterizer_uint32 nLayerCount, const LibMCDriver_Rasterizer_double dLayerThickness, const LibMCDriver_Rasterizer_double dBottomZ) override;
 

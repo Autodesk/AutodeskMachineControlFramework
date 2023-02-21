@@ -1417,8 +1417,107 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_forcemultiplecoils
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_modbustcpconnection_presetmultipleregisters(LibMCEnv_ModbusTCPConnection pModbusTCPConnection, LibMCEnv_uint32 nStartAddress, LibMCEnv_uint64 nBufferBufferSize, const LibMCEnv_uint16 * pBufferBuffer);
 
 /*************************************************************************************************************************
+ Class definition for DriverStatusUpdateSession
+**************************************************************************************************************************/
+
+/**
+* sets a string parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setstringparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue);
+
+/**
+* sets a uuid parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] pValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setuuidparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, const char * pValue);
+
+/**
+* sets a double parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] dValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setdoubleparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_double dValue);
+
+/**
+* sets an int parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] nValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setintegerparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, LibMCEnv_int64 nValue);
+
+/**
+* sets a bool parameter
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pParameterName - Parameter Name
+* @param[in] bValue - Value to set
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_setboolparameter(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pParameterName, bool bValue);
+
+/**
+* logs a string as message
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_logmessage(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString);
+
+/**
+* logs a string as warning
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_logwarning(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString);
+
+/**
+* logs a string as info
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] pLogString - String to Log
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_loginfo(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, const char * pLogString);
+
+/**
+* Sleeps for a definite amount of time.
+*
+* @param[in] pDriverStatusUpdateSession - DriverStatusUpdateSession instance.
+* @param[in] nDelay - Milliseconds to sleep.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverstatusupdatesession_sleep(LibMCEnv_DriverStatusUpdateSession pDriverStatusUpdateSession, LibMCEnv_uint32 nDelay);
+
+/*************************************************************************************************************************
  Class definition for DriverEnvironment
 **************************************************************************************************************************/
+
+/**
+* creates a status update object which can be easily called from an independent thread.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[out] pUpdateStatusInstance - creates a status update instance
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createstatusupdatesession(LibMCEnv_DriverEnvironment pDriverEnvironment, LibMCEnv_DriverStatusUpdateSession * pUpdateStatusInstance);
 
 /**
 * creates a temporary working directory.
@@ -1518,6 +1617,16 @@ LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_retrievemachineresou
 * @return error code or 0 (success)
 */
 LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_createtoolpathaccessor(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pStreamUUID, LibMCEnv_ToolpathAccessor * pToolpathInstance);
+
+/**
+* checks if a name is a valid alphanumerical string for parameters.
+*
+* @param[in] pDriverEnvironment - DriverEnvironment instance.
+* @param[in] pParameterName - Parameter Name
+* @param[out] pNameIsValid - returns true if the parameter name is a valid name.
+* @return error code or 0 (success)
+*/
+LIBMCENV_DECLSPEC LibMCEnvResult libmcenv_driverenvironment_parameternameisvalid(LibMCEnv_DriverEnvironment pDriverEnvironment, const char * pParameterName, bool * pNameIsValid);
 
 /**
 * registers a string parameter. Must only be called during driver creation.
