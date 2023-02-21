@@ -33,7 +33,9 @@ Abstract: This is a stub class definition of CDriver_E1701
 
 #include "libmcdriver_liboapc_driver_e1701.hpp"
 #include "libmcdriver_liboapc_interfaceexception.hpp"
+
 // Include custom headers here.
+#include <cmath>
 
 #define __STRINGIZE(x) #x
 #define __STRINGIZE_VALUE_OF(x) __STRINGIZE(x)
