@@ -77,17 +77,18 @@ void CDriver_Raylase::GetVersion(LibMCDriver_Raylase_uint32& nMajor, LibMCDriver
     nMajor = LIBMCDRIVER_RAYLASE_VERSION_MAJOR;
     nMinor = LIBMCDRIVER_RAYLASE_VERSION_MINOR;
     nMicro = LIBMCDRIVER_RAYLASE_VERSION_MICRO;
-    sBuild = __STRINGIZE_VALUE_OF(__GITHASH);;
-}
-
-void CDriver_Raylase::GetHeaderInformation(std::string& sNameSpace, std::string& sBaseName)
-{
-    sNameSpace = "LibMCDriver_Raylase";
-    sBaseName = "libmcdriver_raylase";
+    sBuild = __STRINGIZE_VALUE_OF(__GITHASH);
 }
 
 void CDriver_Raylase::QueryParameters()
 {
+    QueryParametersEx(m_pDriverEnvironment->CreateStatusUpdateSession());
+}
+
+void CDriver_Raylase::QueryParametersEx(LibMCEnv::PDriverStatusUpdateSession pDriverUpdateInstance)
+{
+    if (pDriverUpdateInstance.get() == nullptr)
+        return;
 }
 
 void CDriver_Raylase::SetCustomSDKResource(const std::string& sResourceName)
