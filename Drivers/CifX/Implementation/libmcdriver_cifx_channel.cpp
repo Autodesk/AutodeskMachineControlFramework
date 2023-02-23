@@ -639,7 +639,7 @@ uint32_t CDriver_CifXChannel::getChannelIndex()
 
 void CDriver_CifXChannel::RegisterVariables(LibMCEnv::PDriverEnvironment pDriverEnvironment)
 {
-	if (pDriverEnvironment.get() == nullptr)
+	if (pDriverEnvironment.get() != nullptr)
 	{
 		for (auto pInputParameter : m_Inputs) {
 			switch (pInputParameter->getAbstractType()) {
