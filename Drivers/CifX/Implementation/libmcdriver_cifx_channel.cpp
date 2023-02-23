@@ -254,7 +254,13 @@ void CDriver_CifXChannelBuffer::writeBool(uint32_t nAddress, uint32_t nBit, bool
 	if (nBit >= 8)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDADDRESSWRITEBIT);
 
-	*((int16_t*)&m_Data.at(nAddress)) |= (1UL << nBit);
+	if (bValue) {
+		m_Data.at(nAddress) |= (1UL << nBit);
+	}
+	else {
+		m_Data.at(nAddress) &= (0xff ^ (1UL << nBit));
+	}
+	
 
 }
 
