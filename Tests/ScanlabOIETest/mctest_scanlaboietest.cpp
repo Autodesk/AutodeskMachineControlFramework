@@ -97,6 +97,50 @@ public:
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 
+#if 1
+
+		std::string sOIEIniName = "oie_test2";
+		std::string sIP = "169.254.1.4";
+		std::string sNetmask = "255.255.0.0";
+		std::string sOIEIPAddress = "169.254.1.6";
+		uint32_t nTimeout = 1000;
+		uint32_t nSerial = 360208;
+		double dMaxLaserPower = 400;
+		double dLaserOnDelay = 330;
+		double dLaserOffDelay = 660;
+		double dMarkDelay = 550;
+		double dJumpDelay = 10;
+		double dPolygonDelay = 10;
+
+		std::string  sCorrectionResourceName = "d3_2995";
+		uint32_t nTableIndex = 1;
+		uint32_t nDimension = 3;
+		uint32_t nTableNumberHeadA = 1;
+		uint32_t nTableNumberHeadB = 0;
+
+#else
+
+		std::string sOIEIniName = "oie_test1";
+		std::string sIP = "192.168.5.2";
+		std::string sNetmask = "255.255.255.0";
+		std::string sOIEIPAddress = "169.254.1.6";
+		uint32_t nTimeout = 1000;
+		uint32_t nSerial = 356266;
+		double dMaxLaserPower = 300;
+		double dLaserOnDelay = 100;
+		double dLaserOffDelay = 100;
+		double dMarkDelay = 10;
+		double dJumpDelay = 10;
+		double dPolygonDelay = 10;
+
+		std::string  sCorrectionResourceName = "d3_2995";
+		uint32_t nTableIndex = 1;
+		uint32_t nDimension = 3;
+		uint32_t nTableNumberHeadA = 1;
+		uint32_t nTableNumberHeadB = 0;
+
+#endif
+
 		if (pStateEnvironment.get() == nullptr)
 			throw ELibMCPluginInterfaceException(LIBMCPLUGIN_ERROR_INVALIDPARAM);
 		
@@ -108,7 +152,7 @@ public:
 		pOIEDriver->InitializeSDK("liboie-x64");
 
 		pStateEnvironment->LogMessage("Loading OIE Device Config...");
-		std::string sDeviceConfig = pStateEnvironment->LoadResourceString("oie_test1");
+		std::string sDeviceConfig = pStateEnvironment->LoadResourceString(sOIEIniName);
 
 		auto pDeviceConfigurationInstance = pOIEDriver->ParseDeviceConfiguration(sDeviceConfig);
 
@@ -132,23 +176,6 @@ public:
 		pStateEnvironment->LogMessage("Initialising Scanlab Driver");
 		auto pRTC6Driver = m_pPluginData->acquireRTC6(pStateEnvironment);
 		pRTC6Driver->LoadSDK("rtc6dllx64");
-
-		std::string sIP = "192.168.5.2";
-		std::string sNetmask = "255.255.255.0";
-		uint32_t nTimeout = 1000;
-		uint32_t nSerial = 356266;
-		double dMaxLaserPower = 300;
-		double dLaserOnDelay = 100;
-		double dLaserOffDelay = 100;
-		double dMarkDelay = 10;
-		double dJumpDelay = 10;
-		double dPolygonDelay = 10;
-
-		std::string  sCorrectionResourceName = "d3_2889";
-		uint32_t nTableIndex = 1;
-		uint32_t nDimension = 3;
-		uint32_t nTableNumberHeadA = 1;
-		uint32_t nTableNumberHeadB = 0;
 
 		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
 		pRTC6Driver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
@@ -187,7 +214,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Adding Device...");
-		auto pDevice = pOIEDriver->AddDevice("oie1", "192.168.5.8", 21072, 200000);
+		auto pDevice = pOIEDriver->AddDevice("oie1", sOIEIPAddress, 21072, 200000);
 		pDevice->SetRTCCorrectionData(CorrectionFileBuffer);
 
 		pStateEnvironment->LogMessage("  Device Name: " + pDevice->GetDeviceName ());
@@ -211,7 +238,7 @@ public:
 
 
 		pStateEnvironment->LogMessage("Starting App AIB...");
-		pDevice->StartAppByName("AIB", pDeviceConfigurationInstance);
+		pDevice->StartAppByMinorVersion("AIB", 2, 0, pDeviceConfigurationInstance);
 
 		pStateEnvironment->LogMessage("Waiting..");
 
