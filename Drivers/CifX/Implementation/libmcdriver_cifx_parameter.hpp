@@ -98,6 +98,7 @@ namespace Impl {
 
 		uint32_t getAddress();
 		bool isBigEndian();
+		void setIsBigEndian(bool bValue);
 
 		static void getValueRangeFromType(eDriver_CifXParameterType parameterType, int64_t& nMinValue, int64_t& nMaxValue);
 

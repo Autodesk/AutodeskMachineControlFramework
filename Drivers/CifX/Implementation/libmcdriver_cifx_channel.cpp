@@ -54,7 +54,7 @@ PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node)
 	auto bitAttrib = node.attribute("bit");
 	auto nameAttrib = node.attribute("name");
 	auto descriptionAttrib = node.attribute("description");
-	auto defaultAttrib = node.attribute("default");
+	auto endianessAttrib = node.attribute("endianess");
 
 	if (addressAttrib.empty())
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_MISSINGADDRESSATTRIBUTE);
@@ -70,22 +70,39 @@ PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node)
 	if (sName.empty())
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDNAMEATTRIBUTE);
 
-	if (sNodeName == "bool")
-		return std::make_shared<CDriver_CifXParameter_Bool>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_BOOL, nAddress, nBit);
-	if (sNodeName == "uint8")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT8, nAddress);
-	if (sNodeName == "uint16")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT16, nAddress);
-	if (sNodeName == "uint32")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT32, nAddress);
-	if (sNodeName == "int8")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT8, nAddress);
-	if (sNodeName == "int16")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT16, nAddress);
-	if (sNodeName == "int32")
-		return std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT32, nAddress);
+	PDriver_CifXParameter pParameter;
 
-	return nullptr;
+	if (sNodeName == "bool")
+		pParameter = std::make_shared<CDriver_CifXParameter_Bool>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_BOOL, nAddress, nBit);
+	if (sNodeName == "uint8")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT8, nAddress);
+	if (sNodeName == "uint16")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT16, nAddress);
+	if (sNodeName == "uint32")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_UINT32, nAddress);
+	if (sNodeName == "int8")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT8, nAddress);
+	if (sNodeName == "int16")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT16, nAddress);
+	if (sNodeName == "int32")
+		pParameter = std::make_shared<CDriver_CifXParameter_Integer>(sName, sDescription, eDriver_CifXParameterType::CifXParameter_INT32, nAddress);
+
+	if (pParameter.get () == nullptr)
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDPARAMETERTYPE, "invalid parameter type: " + sNodeName);
+
+	if (!endianessAttrib.empty()) {
+		std::string sEndianess = endianessAttrib.as_string();
+		if (sEndianess == "littleendian") {
+			pParameter->setIsBigEndian(false);
+		} 
+		else if (sEndianess == "bigendian") {
+			pParameter->setIsBigEndian(true);
+		}
+		else
+			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDENDIANESSATTRIBUTE, "invalid endianess attribute: " + sNodeName);
+	}
+
+	return pParameter;
 
 }
 
@@ -107,7 +124,7 @@ void CDriver_CifXChannelBuffer::clear()
 {
 	for (auto& iIter : m_Data)
 		iIter = 0;
-}
+} 
 
 void CDriver_CifXChannelBuffer::readEndianValue(uint32_t nAddress, uint32_t nSize, bool bIsBigEndian, CDriver_CifXChannelEndianValue& outputValue)
 {

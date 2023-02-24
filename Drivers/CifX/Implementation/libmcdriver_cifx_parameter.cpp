@@ -48,7 +48,7 @@ CDriver_CifXParameter::CDriver_CifXParameter(const std::string& sName, const std
 	m_sDescription(sDescription),
 	m_eType(Type),
 	m_nAddress(nAddress),
-	m_bIsBigEndian(true)
+	m_bIsBigEndian(false)
 {
 
 }
@@ -224,6 +224,11 @@ uint32_t CDriver_CifXParameter::getAddress()
 bool CDriver_CifXParameter::isBigEndian()
 {
 	return m_bIsBigEndian;
+}
+
+void CDriver_CifXParameter::setIsBigEndian(bool bValue)
+{
+	m_bIsBigEndian = bValue;
 }
 
 

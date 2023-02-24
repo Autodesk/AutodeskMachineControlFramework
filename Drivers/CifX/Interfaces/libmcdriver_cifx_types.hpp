@@ -146,6 +146,8 @@ typedef void * LibMCDriver_CifX_pvoid;
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTINDEX 1039 /** invalid output index */
 #define LIBMCDRIVER_CIFX_ERROR_NOCONFIGURATIONSCHEMA 1040 /** no configuration schema */
 #define LIBMCDRIVER_CIFX_ERROR_INVALIDCONFIGURATIONSCHEMA 1041 /** invalid configuration schema */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDPARAMETERTYPE 1042 /** invalid parameter type */
+#define LIBMCDRIVER_CIFX_ERROR_INVALIDENDIANESSATTRIBUTE 1043 /** invalid endianess attribute */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_CifX
@@ -204,6 +206,8 @@ inline const char * LIBMCDRIVER_CIFX_GETERRORSTRING (LibMCDriver_CifXResult nErr
     case LIBMCDRIVER_CIFX_ERROR_INVALIDOUTPUTINDEX: return "invalid output index";
     case LIBMCDRIVER_CIFX_ERROR_NOCONFIGURATIONSCHEMA: return "no configuration schema";
     case LIBMCDRIVER_CIFX_ERROR_INVALIDCONFIGURATIONSCHEMA: return "invalid configuration schema";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDPARAMETERTYPE: return "invalid parameter type";
+    case LIBMCDRIVER_CIFX_ERROR_INVALIDENDIANESSATTRIBUTE: return "invalid endianess attribute";
     default: return "unknown error";
   }
 }

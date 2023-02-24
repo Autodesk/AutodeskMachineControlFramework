@@ -93,10 +93,8 @@
 		<error name="INVALIDOUTPUTINDEX" code="1039" description="invalid output index" />		
 		<error name="NOCONFIGURATIONSCHEMA" code="1040" description="no configuration schema" />		
 		<error name="INVALIDCONFIGURATIONSCHEMA" code="1041" description="invalid configuration schema" />		
-		
-		
-		
-		
+		<error name="INVALIDPARAMETERTYPE" code="1042" description="invalid parameter type" />		
+		<error name="INVALIDENDIANESSATTRIBUTE" code="1043" description="invalid endianess attribute" />		
 						
 	</errors>
 
