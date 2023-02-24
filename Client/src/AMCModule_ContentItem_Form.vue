@@ -9,7 +9,7 @@
 			</v-row>
 
 			<v-row dense no-gutters :key="entity.name" v-if="(entity.type=='switch')">
-				<v-col cols="10"><v-subheader v-text="entity.caption"></v-subheader></v-col>
+				<v-col cols="10"><v-subheader>{{ entity.caption }}</v-subheader></v-col>
 				<v-col cols="2"><v-switch dense hide-details persistent-hint inset v-model="entity.dataObject.value" @change="uiToggleSwitch (entity)" /></v-col>
 			</v-row>
 

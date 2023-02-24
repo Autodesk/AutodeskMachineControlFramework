@@ -11,8 +11,8 @@
 							</v-list-item-avatar>
 				  
 							<v-list-item-content>
-							  <v-list-item-title v-html="item.caption"></v-list-item-title>
-							  <v-list-item-subtitle v-html="item.description"></v-list-item-subtitle>
+							  <v-list-item-title>{{ item.caption }}</v-list-item-title>
+							  <v-list-item-subtitle>{{ item.description }}</v-list-item-subtitle>
 							</v-list-item-content>
 						  </v-list-item>
 						  						  

@@ -16,7 +16,7 @@
 		
 		<v-tabs-items v-model="tab"  style="overflow:auto; width:100%; height:95%;">
 		
-			<template v-for="moduleTab in module.tabs" fill-height>
+			<template v-for="moduleTab in module.tabs">
 						
 				<v-tab-item :key="moduleTab.uuid" style="overflow:auto; width:100%; height:100%;">
 						<Module_Content :key="moduleTab.name" v-if="(moduleTab.type == 'content')" :module="moduleTab" :Application="Application" />					
