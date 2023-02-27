@@ -46,7 +46,7 @@ Abstract: This is a stub class definition of CChannelInformation
 using namespace LibMCDriver_CifX::Impl;
 
 
-PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node)
+PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node, bool defaultIsBigEndian)
 {
 	std::string sNodeName = node.name();
 
@@ -100,6 +100,9 @@ PDriver_CifXParameter readParameterFromXMLNode(pugi::xml_node& node)
 		}
 		else
 			throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDENDIANESSATTRIBUTE, "invalid endianess attribute: " + sNodeName);
+	}
+	else {
+		pParameter->setIsBigEndian(defaultIsBigEndian);
 	}
 
 	return pParameter;
@@ -578,6 +581,9 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 {
 	auto boardAttrib = channelNode.attribute("board");
 	auto channelIndexAttrib = channelNode.attribute("channelindex");
+	auto endianessAttrib = channelNode.attribute("defaultendianess");
+
+	bool defaultIsBigEndian = false;
 
 	m_sBoardName = boardAttrib.as_string();
 	if (m_sBoardName.empty())
@@ -588,6 +594,18 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 	int nChannelIndex = channelIndexAttrib.as_int(-1);
 	if (nChannelIndex < 0)
 		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELINDEXATTRIBUTE);
+
+	if (endianessAttrib.empty ())
+		throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_MISSINGCHANNELENDIANESSATTRIBUTE);
+	std::string sDefaultEndianess = endianessAttrib.as_string();
+	if (sDefaultEndianess == "littlendian") {
+		defaultIsBigEndian = false;
+	} else if (sDefaultEndianess == "bigendian") {
+		defaultIsBigEndian = true;
+	}
+		else throw ELibMCDriver_CifXInterfaceException(LIBMCDRIVER_CIFX_ERROR_INVALIDCHANNELENDIANESSATTRIBUTE, "invalid channel endianess attribute: " + sDefaultEndianess);
+
+
 
 	m_nChannelIndex = (uint32_t)nChannelIndex;
 
@@ -621,7 +639,7 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 
 		auto ioNodes = inputIONode.children();
 		for (auto ioNode : ioNodes) {
-			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode);
+			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode, defaultIsBigEndian);
 			if (pParameter.get() != nullptr) {
 				m_Inputs.push_back(pParameter);
 				m_InputMap.insert(std::make_pair(pParameter->getName(), pParameter));
@@ -642,7 +660,7 @@ CDriver_CifXChannel::CDriver_CifXChannel(pugi::xml_node& channelNode)
 
 		auto ioNodes = outputIONode.children();
 		for (auto ioNode : ioNodes) {
-			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode);
+			PDriver_CifXParameter pParameter = readParameterFromXMLNode(ioNode, defaultIsBigEndian);
 			if (pParameter.get() != nullptr) {
 				m_Outputs.push_back(pParameter);
 				m_OutputMap.insert(std::make_pair(pParameter->getName(), pParameter));
