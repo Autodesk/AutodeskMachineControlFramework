@@ -475,6 +475,7 @@ typedef void * LibMC_pvoid;
 #define LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING 448 /** Resource entry is no UTF8 string */
 #define LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION 449 /** Ambiguous driver configuration */
 #define LIBMC_ERROR_COULDNOTCREATEDRIVER 450 /** Could not create driver */
+#define LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN 451 /** Empty group name but parameter given */
 
 /*************************************************************************************************************************
  Error strings for LibMC
@@ -862,6 +863,7 @@ inline const char * LIBMC_GETERRORSTRING (LibMCResult nErrorCode) {
     case LIBMC_ERROR_RESOURCEENTRYISNOUTF8STRING: return "Resource entry is no UTF8 string";
     case LIBMC_ERROR_AMBIGUOUSDRIVERCONFIGURATION: return "Ambiguous driver configuration";
     case LIBMC_ERROR_COULDNOTCREATEDRIVER: return "Could not create driver";
+    case LIBMC_ERROR_EMPTYGROUPNAMEBUTPARAMETERGIVEN: return "Empty group name but parameter given";
     default: return "unknown error";
   }
 }

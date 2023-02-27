@@ -482,10 +482,7 @@
 		<error name="AMBIGUOUSDRIVERCONFIGURATION" code="449" description="Ambiguous driver configuration" />		
 		
 		<error name="COULDNOTCREATEDRIVER" code="450" description="Could not create driver" />		
-		
-		
-		
-		
+		<error name="EMPTYGROUPNAMEBUTPARAMETERGIVEN" code="451" description="Empty group name but parameter given" />
 		
 		  
 	</errors>

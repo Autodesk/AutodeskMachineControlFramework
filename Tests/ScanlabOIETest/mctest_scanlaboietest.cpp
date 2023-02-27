@@ -97,7 +97,7 @@ public:
 	void Execute(LibMCEnv::PStateEnvironment pStateEnvironment)
 	{
 
-#if 1
+#if 0
 
 		std::string sOIEIniName = "oie_test2";
 		std::string sIP = "169.254.1.4";
@@ -123,8 +123,8 @@ public:
 		std::string sOIEIniName = "oie_test1";
 		std::string sIP = "192.168.5.2";
 		std::string sNetmask = "255.255.255.0";
-		std::string sOIEIPAddress = "169.254.1.6";
-		uint32_t nTimeout = 1000;
+		std::string sOIEIPAddress = "192.168.5.8";
+		uint32_t nTimeout = 4000;
 		uint32_t nSerial = 356266;
 		double dMaxLaserPower = 300;
 		double dLaserOnDelay = 100;
@@ -133,7 +133,7 @@ public:
 		double dJumpDelay = 10;
 		double dPolygonDelay = 10;
 
-		std::string  sCorrectionResourceName = "d3_2995";
+		std::string  sCorrectionResourceName = "d3_2889";
 		uint32_t nTableIndex = 1;
 		uint32_t nDimension = 3;
 		uint32_t nTableNumberHeadA = 1;
@@ -180,7 +180,7 @@ public:
 		pStateEnvironment->LogMessage("Acquiring ScanLab card #" + std::to_string(nSerial));
 		pRTC6Driver->Initialise(sIP, sNetmask, (uint32_t)nTimeout, (uint32_t)nSerial);
 
-		pRTC6Driver->SetCommunicationTimeouts(100, 3000, 1.2);
+		pRTC6Driver->SetCommunicationTimeouts(500, 3000, 1.2);
 
 		std::string sFirmwareResource;
 		if (sIP.empty()) {
