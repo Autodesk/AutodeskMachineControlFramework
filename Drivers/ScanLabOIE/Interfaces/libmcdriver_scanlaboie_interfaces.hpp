@@ -384,7 +384,7 @@ public:
 	* IDataRecording::GetRecordCount - Returns the number of records in the recording.
 	* @return Number of records in the recording
 	*/
-	virtual LibMCDriver_ScanLabOIE_uint32 GetRecordCount() = 0;
+	virtual LibMCDriver_ScanLabOIE_uint64 GetRecordCount() = 0;
 
 	/**
 	* IDataRecording::GetRecordInformation - Returns the information about a specific record.

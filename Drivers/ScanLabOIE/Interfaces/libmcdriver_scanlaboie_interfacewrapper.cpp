@@ -551,7 +551,7 @@ LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getsensorsigna
 	}
 }
 
-LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getrecordcount(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint32 * pRecord)
+LibMCDriver_ScanLabOIEResult libmcdriver_scanlaboie_datarecording_getrecordcount(LibMCDriver_ScanLabOIE_DataRecording pDataRecording, LibMCDriver_ScanLabOIE_uint64 * pRecord)
 {
 	IBase* pIBaseClass = (IBase *)pDataRecording;
 

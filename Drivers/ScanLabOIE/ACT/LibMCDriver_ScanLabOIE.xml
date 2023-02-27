@@ -195,7 +195,7 @@ Custom implementation
 		</method>	
 		
 		<method name="GetRecordCount" description="Returns the number of records in the recording.">
-			<param name="Record" type="uint32" pass="return" description="Number of records in the recording" />
+			<param name="Record" type="uint64" pass="return" description="Number of records in the recording" />
 		</method>	
 
 		<method name="GetRecordInformation" description="Returns the information about a specific record.">
@@ -239,7 +239,7 @@ Custom implementation
 			<param name="Build" type="class" class="LibMCEnv:Build" pass="in" description="Build that should store the data." />
 			<param name="DataUUID" type="string" pass="return" description="Data UUID of the build data." />
 		</method>	
-		
+				
 
 	</class>
 

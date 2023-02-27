@@ -296,6 +296,34 @@ public:
 
 		pDevice->StopApp();
 
+		auto pRecording = pDevice->RetrieveCurrentRecording();
+		pStateEnvironment->LogMessage("Storing as debug CSV..");
+		std::vector<double> XArrayBuffer;
+		std::vector<double> YArrayBuffer;
+		std::vector<int32_t> SignalsBuffer;
+		pRecording->GetAllCoordinates(XArrayBuffer, YArrayBuffer);
+		pRecording->GetAllSensorSignals(0, SignalsBuffer);
+
+		size_t nRecordCount = pRecording->GetRecordCount();
+
+		if (XArrayBuffer.size () != nRecordCount)
+			throw std::runtime_error("retrieved invalid recording x coord data");
+		if (YArrayBuffer.size() != nRecordCount)
+			throw std::runtime_error("retrieved invalid recording y coord data");
+		if (SignalsBuffer.size() != nRecordCount)
+			throw std::runtime_error("retrieved invalid recording signal data");
+
+		std::ofstream fStream;
+		fStream.open("debug.csv");
+		if (!fStream.is_open())
+			throw std::runtime_error("could not write file");
+
+		fStream << "packet number, X, Y, Sensor Value" << std::endl;
+
+		for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+			fStream << XArrayBuffer[nRecordIndex] << ", " << YArrayBuffer[nRecordIndex] << ", " << SignalsBuffer[nRecordIndex] << std::endl;
+		}
+
 		pStateEnvironment->LogMessage("Waiting..");
 
 		pStateEnvironment->LogMessage("Disconnecting Device");

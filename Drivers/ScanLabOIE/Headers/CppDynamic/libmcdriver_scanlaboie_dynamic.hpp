@@ -529,7 +529,7 @@ public:
 	
 	inline LibMCDriver_ScanLabOIE_uint32 GetRTCSignalCount();
 	inline LibMCDriver_ScanLabOIE_uint32 GetSensorSignalCount();
-	inline LibMCDriver_ScanLabOIE_uint32 GetRecordCount();
+	inline LibMCDriver_ScanLabOIE_uint64 GetRecordCount();
 	inline void GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY);
 	inline void GetRTCSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & RTCSignalsBuffer);
 	inline void GetSensorSignalsOfRecord(const LibMCDriver_ScanLabOIE_uint32 nIndex, std::vector<LibMCDriver_ScanLabOIE_int32> & SensorSignalsBuffer);
@@ -1965,9 +1965,9 @@ public:
 	* CDataRecording::GetRecordCount - Returns the number of records in the recording.
 	* @return Number of records in the recording
 	*/
-	LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRecordCount()
+	LibMCDriver_ScanLabOIE_uint64 CDataRecording::GetRecordCount()
 	{
-		LibMCDriver_ScanLabOIE_uint32 resultRecord = 0;
+		LibMCDriver_ScanLabOIE_uint64 resultRecord = 0;
 		CheckError(m_pWrapper->m_WrapperTable.m_DataRecording_GetRecordCount(m_pHandle, &resultRecord));
 		
 		return resultRecord;
