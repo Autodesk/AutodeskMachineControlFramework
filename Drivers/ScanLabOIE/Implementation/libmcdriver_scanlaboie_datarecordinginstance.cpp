@@ -133,8 +133,8 @@ void CDataRecordingInstance::finishRecord()
 {
     //std::cout << "finishing record: " << m_nCurrentEntryDataIndex << " of " << m_nValuesPerPacket << std::endl;
 
-    if (m_nCurrentEntryDataIndex < m_nValuesPerRecord)
-        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTENOUGHVALUESINPACKET);
+    //if (m_nCurrentEntryDataIndex < m_nValuesPerRecord)
+        //throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_NOTENOUGHVALUESINPACKET);
     if (m_CurrentEntry.m_pData == nullptr)
         throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_PACKETISNOTRECORDING);
 

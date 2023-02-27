@@ -92,6 +92,8 @@
 		<error name="INVALIDRTCVALUESPERRECORD" code="1035" description="Invalid RTC values per record." />	
 		<error name="INVALIDRECORDINDEX" code="1036" description="Invalid record index." />			
 		<error name="INVALIDSIGNALINDEX" code="1037" description="Invalid signal index." />	
+		<error name="COULDNOTSTARTAPP" code="1038" description="Could not start app." />	
+		<error name="COULDNOTSTOPAPP" code="1039" description="Could not stop app." />	
 
 	</errors>
 	

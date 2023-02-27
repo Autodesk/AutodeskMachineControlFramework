@@ -393,12 +393,15 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 	std::string sDeviceConfigFileName = pDeviceConfigFile->GetAbsoluteFileName();
 
 	try {
-		std::cout << "Starting app call..." << std::endl;
+		//std::cout << "Starting app call..." << std::endl;
 		m_pOIESDK->checkError(m_pOIESDK->oie_device_start_app_ver(m_pDevice, sName.c_str(), nMajorVersion, nMinorVersion, sDeviceConfigFileName.c_str()));
-		std::cout << "Starting app call finished..." << std::endl;
+		//std::cout << "Starting app call finished..." << std::endl;
 
 		pDeviceConfigFile->DeleteFromDisk();
 		pDeviceConfigFile = nullptr;
+	}
+	catch (std::runtime_error & E) {
+		throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTARTAPP, "could not start app: " + std::string (E.what ()));
 	}
 	catch (...) {
 
@@ -406,7 +409,7 @@ void COIEDeviceInstance::startAppEx(const std::string& sName, const int32_t nMaj
 			pDeviceConfigFile->DeleteFromDisk();
 			pDeviceConfigFile = nullptr;
 		}
-		throw;
+		throw ELibMCDriver_ScanLabOIEInterfaceException (LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTARTAPP);
 	}
 
 	{
@@ -593,7 +596,9 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 
 				m_pCurrentDataRecording->startRecord(pkt->pktNr, dX, dY);
 
+				//std::cout << "Packet Np: " << pkt->pktNr << " X: " << dX << " Y: " << dY << std::endl;
 				uint32_t rtcSignalCount = m_pOIESDK->oie_pkt_get_rtc_signal_count(pkt);
+				//std::cout << "RTC signal count" << rtcSignalCount << std::endl;
 				for (uint32_t rtcSignalIndex = 0; rtcSignalIndex < rtcSignalCount; rtcSignalIndex++)
 				{
 					int32_t nValue = 0;
@@ -603,6 +608,8 @@ void COIEDeviceInstance::onPacketEvent(oie_device device, const oie_pkt* pkt)
 				}
 
 				uint32_t sensorSignalCount = m_pOIESDK->oie_pkt_get_sensor_signal_count(pkt);
+				//std::cout << "Sensor signal count" << sensorSignalCount << std::endl;
+
 				for (uint32_t sensorSignalIndex = 0; sensorSignalIndex < sensorSignalCount; sensorSignalIndex++)
 				{
 					int32_t nValue = 0;

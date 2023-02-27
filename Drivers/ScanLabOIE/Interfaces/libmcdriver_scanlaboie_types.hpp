@@ -142,6 +142,8 @@ typedef void * LibMCDriver_ScanLabOIE_pvoid;
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD 1035 /** Invalid RTC values per record. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX 1036 /** Invalid record index. */
 #define LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX 1037 /** Invalid signal index. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTARTAPP 1038 /** Could not start app. */
+#define LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP 1039 /** Could not stop app. */
 
 /*************************************************************************************************************************
  Error strings for LibMCDriver_ScanLabOIE
@@ -196,6 +198,8 @@ inline const char * LIBMCDRIVER_SCANLABOIE_GETERRORSTRING (LibMCDriver_ScanLabOI
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCVALUESPERRECORD: return "Invalid RTC values per record.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRECORDINDEX: return "Invalid record index.";
     case LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSIGNALINDEX: return "Invalid signal index.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTARTAPP: return "Could not start app.";
+    case LIBMCDRIVER_SCANLABOIE_ERROR_COULDNOTSTOPAPP: return "Could not stop app.";
     default: return "unknown error";
   }
 }

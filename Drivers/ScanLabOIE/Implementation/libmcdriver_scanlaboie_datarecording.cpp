@@ -67,7 +67,7 @@ LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetSensorSignalCount()
 
 LibMCDriver_ScanLabOIE_uint32 CDataRecording::GetRecordCount()
 {
-	return m_pDataRecordingInstance->getRecordCount();
+	return (uint32_t) m_pDataRecordingInstance->getRecordCount();
 }
 
 void CDataRecording::GetRecordInformation(const LibMCDriver_ScanLabOIE_uint32 nIndex, LibMCDriver_ScanLabOIE_uint32 & nPacketNumber, LibMCDriver_ScanLabOIE_double & dX, LibMCDriver_ScanLabOIE_double & dY)
