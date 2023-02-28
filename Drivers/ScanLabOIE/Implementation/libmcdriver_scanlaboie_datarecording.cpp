@@ -148,7 +148,7 @@ void CDataRecording::GetAllRTCSignals(const LibMCDriver_ScanLabOIE_uint32 nRTCIn
 		*pSignalsNeededCount = nRecordCount;
 
 	if (pSignalsBuffer != nullptr)
-		m_pDataRecordingInstance->copyRTCSignals(nRTCIndex, pSignalsBuffer, nSignalsBufferSize);
+		m_pDataRecordingInstance->copyAllRTCSignalsByIndex(nRTCIndex, pSignalsBuffer, nSignalsBufferSize);
 }
 
 void CDataRecording::GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSignalIndex, LibMCDriver_ScanLabOIE_uint64 nSignalsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalsNeededCount, LibMCDriver_ScanLabOIE_int32 * pSignalsBuffer)
@@ -158,7 +158,7 @@ void CDataRecording::GetAllSensorSignals(const LibMCDriver_ScanLabOIE_uint32 nSi
 		*pSignalsNeededCount = nRecordCount;
 
 	if (pSignalsBuffer != nullptr)
-		m_pDataRecordingInstance->copySensorSignals(nSignalIndex, pSignalsBuffer, nSignalsBufferSize);
+		m_pDataRecordingInstance->copyAllSensorSignalsByIndex(nSignalIndex, pSignalsBuffer, nSignalsBufferSize);
 }
 
 std::string CDataRecording::StoreAsBuildData(const std::string & sName, LibMCEnv::PBuild pBuild)

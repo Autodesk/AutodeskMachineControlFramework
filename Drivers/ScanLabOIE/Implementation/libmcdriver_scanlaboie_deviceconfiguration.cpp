@@ -99,12 +99,12 @@ LibMCDriver_ScanLabOIE::eRTCDeviceType CDeviceConfiguration::GetDeviceType()
 
 LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetRTCSignalCount()
 {
-    return (uint32_t)m_RTCSignalIDs.size();
+    return 2;// (uint32_t)m_RTCSignalIDs.size();
 }
 
 LibMCDriver_ScanLabOIE_uint32 CDeviceConfiguration::GetSensorSignalCount()
 {
-    return (uint32_t)m_SensorSignalIDs.size();
+    return 1;// (uint32_t)m_SensorSignalIDs.size();
 }
 
 void CDeviceConfiguration::GetRTCSignalIDs(LibMCDriver_ScanLabOIE_uint64 nSignalIDsBufferSize, LibMCDriver_ScanLabOIE_uint64* pSignalIDsNeededCount, LibMCDriver_ScanLabOIE_uint32 * pSignalIDsBuffer)

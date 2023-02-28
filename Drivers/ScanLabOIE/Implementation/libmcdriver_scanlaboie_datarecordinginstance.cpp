@@ -319,3 +319,51 @@ void CDataRecordingInstance::copyPacketNumbers(uint32_t * pPacketNumberBuffer, s
 
 }
 
+void CDataRecordingInstance::copyAllRTCSignalsByIndex(uint32_t nRTCIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (nRTCIndex >= getRTCValuesPerRecord())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDRTCINDEX);
+
+    if (pRTCSignalBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nRTCSignalBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    int32_t* pTarget = pRTCSignalBuffer;
+    for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+        int32_t* pRTCData = getRTCData(nRecordIndex);
+        *pTarget = pRTCData[nRTCIndex];
+        pTarget++;
+    }
+}
+
+
+void CDataRecordingInstance::copyAllSensorSignalsByIndex(uint32_t nSensorIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize)
+{
+    size_t nRecordCount = getRecordCount();
+    if (nRecordCount == 0)
+        return;
+
+    if (nSensorIndex >= getSensorValuesPerRecord ())
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDSENSORINDEX);
+
+    if (pSensorSignalBuffer == nullptr)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_INVALIDPARAM);
+
+    if (nSensorSignalBufferSize < nRecordCount)
+        throw ELibMCDriver_ScanLabOIEInterfaceException(LIBMCDRIVER_SCANLABOIE_ERROR_BUFFERTOOSMALL);
+
+    int32_t* pTarget = pSensorSignalBuffer;
+    for (size_t nRecordIndex = 0; nRecordIndex < nRecordCount; nRecordIndex++) {
+        int32_t* pSensorData = getSensorData(nRecordIndex);
+        *pTarget = pSensorData[nSensorIndex];
+        pTarget++;
+    }
+
+}
+

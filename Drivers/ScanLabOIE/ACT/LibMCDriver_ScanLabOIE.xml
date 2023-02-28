@@ -94,6 +94,9 @@
 		<error name="INVALIDSIGNALINDEX" code="1037" description="Invalid signal index." />	
 		<error name="COULDNOTSTARTAPP" code="1038" description="Could not start app." />	
 		<error name="COULDNOTSTOPAPP" code="1039" description="Could not stop app." />	
+		<error name="INVALIDSENSORINDEX" code="1040" description="Invalid sensor index." />	
+		<error name="INVALIDRTCINDEX" code="1041" description="Invalid RTC index." />	
+		
 
 	</errors>
 	

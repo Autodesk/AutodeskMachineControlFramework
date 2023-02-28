@@ -144,6 +144,10 @@ public:
 
     void copyPacketNumbers(uint32_t* pPacketNumberBuffer, size_t nPacketNumberBufferSize);
 
+    void copyAllRTCSignalsByIndex(uint32_t nRTCIndex, int32_t* pRTCSignalBuffer, size_t nRTCSignalBufferSize);
+
+    void copyAllSensorSignalsByIndex(uint32_t nSensorIndex, int32_t* pSensorSignalBuffer, size_t nSensorSignalBufferSize);
+
     void writeToFile(const std::string & sFileName);
 
     sDataRecordingEntry* getRecord (uint32_t nIndex);
